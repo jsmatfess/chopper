@@ -1,0 +1,159 @@
+--- a/crates/chopper/src/engine/streaming.rs
++++ b/crates/chopper/src/engine/streaming.rs
+@@ -469,5 +469,156 @@
+             }
+         }
+         assert!(observed_retry, "control must reach admission retry");
++        Ok(())
++    }
++
++    #[test]
++    fn parent_retry_post_preparation_shared_pressure() -> Result<()> {
++        struct CountingSink {
++            writer: DatasetWriter,
++            rows: u64,
++        }
++        impl RowSink for CountingSink {
++            fn begin(&self, lineage: Vec<serde_json::Value>, exact: bool) -> Group {
++                self.writer.begin(lineage, exact)
++            }
++            fn row(&mut self, group: &mut Group, row: &Row) -> Result<()> {
++                self.writer.row(group, row)?;
++                self.rows += 1;
++                Ok(())
++            }
++            fn packed_row_ref(&mut self, group: &mut Group, row: &PackedRow) -> Result<()> {
++                self.writer.packed_row_ref(group, row)?;
++                self.rows += 1;
++                Ok(())
++            }
++            fn end(&mut self, group: Group) -> Result<()> {
++                self.writer.end(group)
++            }
++        }
++        const LIMIT: u64 = 8 * 1024 * 1024;
++        let mut competitor_bytes = 0;
++        let mut reference = None;
++        for (label, resident, pressured) in [
++            ("candidate-control", true, false),
++            ("routing-pressured", false, true),
++            ("candidate-pressured", true, true),
++        ] {
++            let pool = Arc::new(crate::resources::MemoryPool::new(LIMIT));
++            let mut ctx = context()?;
++            ctx.memory = 16 * 1024 * 1024;
++            ctx.replace_workspace_for_test(Workspace::shared(16 * 1024 * 1024, pool.clone()))?;
++            let mut input = DatasetWriter::new(&ctx)?;
++            let mut group = input.begin(vec![], false);
++            for id in 0..2500 {
++                input.row(
++                    &mut group,
++                    &Row {
++                        id,
++                        ordinal: id,
++                        key: vec![],
++                        fields: vec![id.to_string(), "x".repeat(128), (id % 7).to_string()],
++                    },
++                )?;
++            }
++            input.end(group)?;
++            let data = input.finish()?;
++            let parent = data.groups()?.next().unwrap()?;
++            // Production dispatch already owns its output writer before preparation.
++            let mut sink = CountingSink {
++                writer: DatasetWriter::new(&ctx)?,
++                rows: 0,
++            };
++            let operation = probabilistic();
++            PARENT_SCANS.with(|n| n.set(0));
++            let ready =
++                prepare_parent(&data, &parent, &operation, None, 3, [7; 32], &ctx, resident)?;
++            assert!(!ready.retried, "pressure starts only after preparation");
++            let held = pool.usage().reserved_bytes;
++            if !pressured {
++                // Freeze one matched competitor grant, leaving 256 bytes after
++                // resident preparation. This is a scaled feasibility control,
++                // not a predicted workload pressure distribution.
++                competitor_bytes = LIMIT.checked_sub(held + 256).unwrap();
++            }
++            let mut competitor = Reservation::for_workspace(Arc::new(Workspace::shared(
++                LIMIT as usize,
++                pool.clone(),
++            )));
++            if pressured {
++                competitor.resize(competitor_bytes as usize)?;
++            }
++            let headroom = LIMIT - pool.usage().reserved_bytes;
++            let result = ready.emit(&parent, 0, &mut sink, &ctx);
++            let denied = result.as_ref().err().is_some_and(|e| {
++                matches!(
++                    e.downcast_ref::<crate::resources::MemoryAdmission>(),
++                    Some(crate::resources::MemoryAdmission::Shared { .. })
++                )
++            });
++            assert_eq!(PARENT_SCANS.with(|n| n.get()), 1, "no emission retry");
++            let sink_rows = sink.rows;
++            if resident && pressured {
++                assert!(
++                    denied,
++                    "expected genuine shared admission denial: {result:?}"
++                );
++                assert_eq!(sink_rows, 0, "metadata must deny before any row");
++                drop(sink);
++            } else {
++                result?;
++                assert_eq!(sink_rows, 2500);
++                // Release only after emission, before caller-owned verification.
++                drop(competitor);
++                competitor = Reservation::for_workspace(Arc::new(Workspace::shared(
++                    LIMIT as usize,
++                    pool.clone(),
++                )));
++                let output = sink.writer.finish()?;
++                let mut actual = Vec::new();
++                let mut ids = std::collections::BTreeSet::new();
++                for group in output.groups()? {
++                    let group = group?;
++                    actual.extend_from_slice(serde_json::to_string(&group)?.as_bytes());
++                    for row in output.rows(&group, ctx.max_record)? {
++                        let row = row?;
++                        assert!(ids.insert(row.id));
++                        assert_eq!(
++                            row.fields,
++                            vec![
++                                row.id.to_string(),
++                                "x".repeat(128),
++                                (row.id % 7).to_string()
++                            ]
++                        );
++                        write_row(&mut actual, &row)?;
++                    }
++                }
++                assert_eq!(ids, (0..2500).collect());
++                if let Some(reference) = &reference {
++                    assert_eq!(&actual, reference);
++                } else {
++                    reference = Some(actual);
++                }
++            }
++            drop(competitor);
++            drop(parent);
++            drop(data);
++            assert_eq!(ctx.used(), 0);
++            assert_eq!(pool.usage().reserved_bytes, ctx.directory_reserved_bytes());
++            let dir = ctx.dir.path().to_path_buf();
++            drop(ctx);
++            assert_eq!(pool.usage().reserved_bytes, 0);
++            assert!(!dir.exists());
++            eprintln!(
++                "POST_PREP {}",
++                serde_json::json!({
++                    "cell":label,"resident":resident,"pressured":pressured,
++                    "prepared_shared_bytes":held,"competitor_bytes":if pressured {competitor_bytes} else {0},
++                    "emission_headroom_bytes":headroom,"shared_denied":denied,
++                    "sink_rows":sink_rows,"scans":1,"cleanup":true
++                })
++            );
++        }
+         Ok(())
+     }

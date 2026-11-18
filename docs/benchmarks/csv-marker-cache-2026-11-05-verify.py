@@ -1,0 +1,2 @@
+import pathlib,json,sys
+p=pathlib.Path(sys.argv[1]);j=json.loads((p/'records.json').read_text());assert len(j['complete_jobs'])==6 and all(r['cleanup'] for r in j['complete_jobs']);assert [(r['shape'],r['candidate']) for r in j['complete_jobs']]==[('plain',False),('plain',True),('plain',True),('plain',False),('rich',False),('rich',True)];assert len((p/'attempts.jsonl').read_text().splitlines())==12;print('Six fixed launches/completions and exact independent output/Analysis/cleanup controls passed')

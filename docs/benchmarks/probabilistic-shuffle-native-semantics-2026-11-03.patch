@@ -1,0 +1,150 @@
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -1150 +1150,5 @@
+-                    row.key = PackedKey::Random(key[..16].try_into().unwrap());
++                    #[cfg(test)]
++                    let primary = prob_shuffle_controls::primary_key(&key);
++                    #[cfg(not(test))]
++                    let primary = key[..16].try_into().unwrap();
++                    row.key = PackedKey::Random(primary);
+@@ -1771 +1775,5 @@
+-                    row.key = PackedKey::Random(key[..16].try_into().unwrap());
++                    #[cfg(test)]
++                    let primary = prob_shuffle_controls::primary_key(&key);
++                    #[cfg(not(test))]
++                    let primary = key[..16].try_into().unwrap();
++                    row.key = PackedKey::Random(primary);
+--- a/crates/chopper/src/engine/keys.rs
++++ b/crates/chopper/src/engine/keys.rs
+@@ -86,2 +86,6 @@
+-        key.bytes
+-            .extend_from_slice(&random::block(domain, id, 0)[..16]);
++        let block = random::block(domain, id, 0);
++        #[cfg(test)]
++        let primary = super::prob_shuffle_controls::primary_key(&block);
++        #[cfg(not(test))]
++        let primary: [u8; 16] = block[..16].try_into().unwrap();
++        key.bytes.extend_from_slice(&primary);
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -404,0 +405,120 @@
++
++thread_local! { static FORCE_PRIMARY: Cell<bool> = const { Cell::new(false) }; }
++pub(super) fn primary_key(block: &[u8]) -> [u8; 16] {
++    if FORCE_PRIMARY.get() {
++        [0; 16]
++    } else {
++        block[..16].try_into().unwrap()
++    }
++}
++
++#[test]
++fn probabilistic_shuffle_semantic_controls() -> Result<()> {
++    for collision in [false, true] {
++        FORCE_PRIMARY.set(collision);
++        let mut reference = None;
++        for candidate in [false, true] {
++            ENABLED.set(candidate);
++            let (dir, mut job) = setup(2000)?;
++            if let Operation::AssignProbabilistic { strata, .. } = &mut job.operations[1] {
++                *strata = vec![Column::Index(0), Column::Index(2)];
++            }
++            job.operations.push(Operation::Shuffle {
++                strategy: Shuffle::Uniform,
++            });
++            let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++            let a = run_with_memory_pool(
++                job.clone(),
++                Arc::new(AtomicBool::new(false)),
++                Arc::new(|_| {}),
++                pool.clone(),
++            )?;
++            let checked = verify(dir.path(), &job, 2000, &a)?;
++            assert_eq!(a.stages.len(), 4);
++            if let Some(ref old) = reference {
++                assert_eq!(&checked, old);
++            } else {
++                reference = Some(checked);
++            }
++            drop(a);
++            assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++            assert_eq!(pool.usage().reserved_bytes, 0);
++            println!(
++                "PROB_SEMANTIC {}",
++                serde_json::json!({"collision":collision,"candidate":candidate,"rows":2000,"strata":[0,2],"logical_stages":4,"outcome":"success_exact","cleanup":true})
++            );
++        }
++    }
++    FORCE_PRIMARY.set(true);
++    probabilistic_shuffle_external_sort_witness()?;
++    FORCE_PRIMARY.set(false);
++    for cancelled in [false, true] {
++        for candidate in [false, true] {
++            ENABLED.set(candidate);
++            let (dir, job) = setup(2000)?;
++            let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++            let space = Arc::new(crate::storage::Workspace::shared(
++                32 * 1024 * 1024,
++                pool.clone(),
++            ));
++            let grant = Arc::new(std::sync::Mutex::new(Reservation::for_workspace(space)));
++            let held = grant.clone();
++            let shared = pool.clone();
++            let trigger = Arc::new(AtomicBool::new(false));
++            let reached = trigger.clone();
++            let cancel = Arc::new(AtomicBool::new(false));
++            let set = cancel.clone();
++            let visits = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++            let seen = visits.clone();
++            let e = run_with_memory_pool(
++                job.clone(),
++                cancel,
++                Arc::new(move |p| {
++                    if p.phase == "Reading and validating CSV" && p.rows == 0 {
++                        seen.fetch_add(1, Ordering::Relaxed);
++                    }
++                    if p.phase == "Preparing operation 2 of 3" {
++                        assert!(!reached.swap(true, Ordering::Relaxed));
++                        if cancelled {
++                            set.store(true, Ordering::Relaxed);
++                        } else {
++                            let u = shared.usage();
++                            held.lock()
++                                .unwrap()
++                                .resize((u.limit_bytes - u.reserved_bytes) as usize)
++                                .unwrap();
++                        }
++                    }
++                }),
++                pool.clone(),
++            )
++            .expect_err("pre-emission failure expected");
++            assert!(trigger.load(Ordering::Relaxed));
++            assert_eq!(visits.load(Ordering::Relaxed), 1);
++            if cancelled {
++                assert!(format!("{e:#}").contains("job cancelled"), "{e:#}");
++            } else {
++                assert!(
++                    matches!(
++                        e.downcast_ref::<crate::resources::MemoryAdmission>(),
++                        Some(crate::resources::MemoryAdmission::Shared { .. })
++                    ),
++                    "{e:#}"
++                );
++            }
++            assert!(!std::path::Path::new(&job.output).exists());
++            assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++            assert_eq!(fs::read_dir(dir.path())?.count(), 2);
++            let retained = grant.lock().unwrap().bytes();
++            assert_eq!(pool.usage().reserved_bytes, retained);
++            grant.lock().unwrap().resize(0)?;
++            assert_eq!(pool.usage().reserved_bytes, 0);
++            println!(
++                "PROB_FAILURE {}",
++                serde_json::json!({"candidate":candidate,"cancelled":cancelled,"phase":"Preparing operation 2 of 3","outcome":if cancelled{"cancelled"}else{"typed_shared_denial"},"retained_competitor_bytes":retained,"input_visits":1,"cleanup":true})
++            );
++        }
++    }
++    ENABLED.set(false);
++    Ok(())
++}

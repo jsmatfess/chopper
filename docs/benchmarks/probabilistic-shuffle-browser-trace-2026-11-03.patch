@@ -1,0 +1,34 @@
+--- a/baseline-src/crates/chopper/src/engine.rs
++++ b/baseline-src/crates/chopper/src/engine.rs
+@@ -2104,0 +2105 @@
++        study_traffic(&self.ctx);
+@@ -2106,0 +2108,6 @@
++}
++
++fn study_traffic(ctx: &Context) {
++    use std::io::Write;
++    let (read, written) = ctx.study_traffic();
++    let _ = writeln!(std::io::stderr(), "TERMINAL_TRAFFIC read={read} written={written}");
+--- a/baseline-src/crates/chopper/src/storage.rs
++++ b/baseline-src/crates/chopper/src/storage.rs
+@@ -430,0 +431,3 @@
++    }
++    pub(crate) fn study_traffic(&self) -> (u64,u64) {
++        (self.budget.read.load(AtomicOrdering::Relaxed),self.budget.written.load(AtomicOrdering::Relaxed))
+--- a/candidate-src/crates/chopper/src/engine.rs
++++ b/candidate-src/crates/chopper/src/engine.rs
+@@ -2122,0 +2123 @@
++        study_traffic(&self.ctx);
+@@ -2136,0 +2138,6 @@
++}
++
++fn study_traffic(ctx: &Context) {
++    use std::io::Write;
++    let (read, written) = ctx.study_traffic();
++    let _ = writeln!(std::io::stderr(), "TERMINAL_TRAFFIC read={read} written={written}");
+--- a/candidate-src/crates/chopper/src/storage.rs
++++ b/candidate-src/crates/chopper/src/storage.rs
+@@ -430,0 +431,3 @@
++    }
++    pub(crate) fn study_traffic(&self) -> (u64,u64) {
++        (self.budget.read.load(AtomicOrdering::Relaxed),self.budget.written.load(AtomicOrdering::Relaxed))

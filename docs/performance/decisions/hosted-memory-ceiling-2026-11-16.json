@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "hosted-memory-ceiling-2026-11-16",
+  "title": "Raise hosted manual working memory to 2 GiB",
+  "date": "2026-11-16",
+  "subsystem": "resources",
+  "question": "How far can hosted manual memory increase without changing the WASI bridge or addressing architecture?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Allow manual 2048 MiB with a 1 GiB tracked ledger and 2 GiB linear ceiling; preserve 256 MiB defaults. The primary larger-budget shuffle avoids external runs/merge and reduces median complete-job elapsed by 19.3%.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "1200003 rows, three columns, 192-byte payload uniform shuffle; old256MiB versus new2048MiB, three alternating measured pairs after excluded warmups.",
+      "120003-row/64-byte unchanged256MiB control; separate unreplicated budget screen and Fisher\u2013Yates capacity/cleanup control."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Independent fields, uniqueIDs/conservation, logical stages/lineage, exact metadata, strict4MiB CSV caps, marker and zero retiredworkspace; expected oldresident denial leaves nooutputs. NativeClippy/workspacetests, coreWASM, full hostedcontracts including2048accept/2049reject/retry, base+shufflepartition resourcecontracts and interruption cleanup pass."
+  },
+  "limitations": [
+    "Warm WSL2/ext4 and persistent disposable bundledChromium only; no installedWindows browser, browserRSS, physicalSSD throughput or25millionrow claim.",
+    "Control ranges overlap and candidate median is1.0% slower; no default-setting speed improvement claimed. Pilot is single-observation perbudget.",
+    "Manual requests do notpreallocate capacity or discover hostRAM; tracked/linear memory are notRSS caps.",
+    "Raw originals and sourceforests remain in local ignoredscratch; no remoteupload or main delivery."
+  ],
+  "exclusions": [
+    "Repeat-1 warmups, unreplicated pilot and resident capacity control excluded from primary timing comparison.",
+    "Restart-interrupted process-kill acceptance has noexitcode and is notcounted aspass; resumed logs retained separately."
+  ],
+  "reopen_when": "A requirement to address more than2GiB justifies unsigned WASI-import/pointer auditing, allocator/growth and contiguous-allocation review and supported-browser pressure qualification; beyond4GiB requires another addressing architecture.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#hosted-memory-ceiling-2026-11-16",
+      "sha256": "4889b778cf1d367d3a17998675c46604ad58055bb65efa219b5df1ca30280002"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/hosted-memory-ceiling-2026-11-16.json",
+      "sha256": "5668ebd49113d1b0fc41d89a527cf2339e3a62d7b434c6e16194b608b5c7dc72"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md#resources-publication-and-interfaces",
+    "docs/browser.md#processing-and-limits",
+    "docs/resource-policy-research.md#explicit-settings-and-shared-reservations",
+    "docs/execution-decisions.md"
+  ]
+}

@@ -1,0 +1,2580 @@
+{
+  "schema_version": 1,
+  "metrics": [
+    {
+      "pointer": "/seconds",
+      "name": "wall_time",
+      "unit": "seconds",
+      "scale": 1,
+      "scope": "unspecified",
+      "source_unit": "seconds"
+    },
+    {
+      "pointer": "/wall_seconds",
+      "name": "wall_time",
+      "unit": "seconds",
+      "scale": 1,
+      "scope": "unspecified",
+      "source_unit": "seconds"
+    },
+    {
+      "pointer": "/elapsed_seconds",
+      "name": "wall_time",
+      "unit": "seconds",
+      "scale": 1,
+      "scope": "unspecified",
+      "source_unit": "seconds"
+    },
+    {
+      "pointer": "/cpu_seconds",
+      "name": "process_cpu",
+      "unit": "seconds",
+      "scale": 1,
+      "scope": "unspecified",
+      "source_unit": "seconds"
+    },
+    {
+      "pointer": "/cpu/total_seconds",
+      "name": "process_cpu",
+      "unit": "seconds",
+      "scale": 1,
+      "scope": "unspecified",
+      "source_unit": "seconds"
+    },
+    {
+      "pointer": "/cpu/user_seconds",
+      "name": "user_cpu",
+      "unit": "seconds",
+      "scale": 1,
+      "scope": "unspecified",
+      "source_unit": "seconds"
+    },
+    {
+      "pointer": "/cpu/kernel_seconds",
+      "name": "kernel_cpu",
+      "unit": "seconds",
+      "scale": 1,
+      "scope": "unspecified",
+      "source_unit": "seconds"
+    },
+    {
+      "pointer": "/peak_rss_kib",
+      "name": "peak_rss",
+      "unit": "bytes",
+      "scale": 1024,
+      "scope": "sampled process peak; not working reservations",
+      "source_unit": "KiB"
+    },
+    {
+      "pointer": "/peak_rss_bytes",
+      "name": "peak_rss",
+      "unit": "bytes",
+      "scale": 1,
+      "scope": "sampled process peak; not working reservations",
+      "source_unit": "bytes"
+    },
+    {
+      "pointer": "/diagnostics/peak_workspace_reserved_bytes",
+      "name": "peak_working_reservations",
+      "unit": "bytes",
+      "scale": 1,
+      "scope": "returned Analysis snapshot; not a complete-Run RSS peak",
+      "source_unit": "bytes"
+    },
+    {
+      "pointer": "/reported_analysis_diagnostics/peak_workspace_reserved_bytes",
+      "name": "peak_working_reservations",
+      "unit": "bytes",
+      "scale": 1,
+      "scope": "returned Analysis snapshot; not a complete-Run RSS peak",
+      "source_unit": "bytes"
+    },
+    {
+      "pointer": "/diagnostics/temporary_bytes_read",
+      "name": "logical_temporary_read",
+      "unit": "bytes",
+      "scale": 1,
+      "scope": "returned Analysis snapshot; not physical I/O",
+      "source_unit": "bytes"
+    },
+    {
+      "pointer": "/reported_analysis_diagnostics/temporary_bytes_read",
+      "name": "logical_temporary_read",
+      "unit": "bytes",
+      "scale": 1,
+      "scope": "returned Analysis snapshot; not physical I/O",
+      "source_unit": "bytes"
+    },
+    {
+      "pointer": "/diagnostics/temporary_bytes_written",
+      "name": "logical_temporary_written",
+      "unit": "bytes",
+      "scale": 1,
+      "scope": "returned Analysis snapshot; not physical I/O",
+      "source_unit": "bytes"
+    },
+    {
+      "pointer": "/reported_analysis_diagnostics/temporary_bytes_written",
+      "name": "logical_temporary_written",
+      "unit": "bytes",
+      "scale": 1,
+      "scope": "returned Analysis snapshot; not physical I/O",
+      "source_unit": "bytes"
+    },
+    {
+      "pointer": "/peak_temp_bytes",
+      "name": "sampled_temporary_storage",
+      "unit": "bytes",
+      "scale": 1,
+      "scope": "harness-defined sampled storage; lower bound",
+      "source_unit": "bytes"
+    },
+    {
+      "pointer": "/filesystem_input_blocks",
+      "name": "process_filesystem_input_blocks",
+      "unit": "count",
+      "source_unit": "count",
+      "scale": 1,
+      "scope": "source harness process filesystem block counter; not device bytes or throughput"
+    },
+    {
+      "pointer": "/filesystem_output_blocks",
+      "name": "process_filesystem_output_blocks",
+      "unit": "count",
+      "source_unit": "count",
+      "scale": 1,
+      "scope": "source harness process filesystem block counter; not device bytes or throughput"
+    }
+  ],
+  "dimensions": {
+    "binary_sha256": "/binary_sha256",
+    "build_label": "/build",
+    "fixture_sha256": "/input_sha256",
+    "variant": "/variant",
+    "candidate": "/candidate",
+    "case": "/case",
+    "recipe": "/recipe",
+    "shape": "/shape",
+    "repetition": "/repeat",
+    "workers": "/workers",
+    "memory_mb": "/memory_mb",
+    "runtime": "/runtime",
+    "engine": "/engine",
+    "seed": "/seed",
+    "algorithm": "/algorithm",
+    "physical_plan": "/physical_plan",
+    "cache": "/cache",
+    "storage": "/storage",
+    "features": "/features",
+    "algorithm_version": "/algorithm_version",
+    "rng_version": "/rng_version",
+    "fixture_label": "/fixture",
+    "observation_mode": "/mode",
+    "workload": "/workload",
+    "matched_block": "/block",
+    "sample_label": "/sample"
+  },
+  "classes": {
+    "measurement": "measurement",
+    "complete_job": "measurement",
+    "allocation": "allocation-census",
+    "summary": "summary",
+    "derived_summary": "summary",
+    "failure": "failure",
+    "invalid_configuration": "failure",
+    "boundary": "diagnostic",
+    "sample": "diagnostic",
+    "contract": "contract-duration",
+    "validation": "contract-duration"
+  },
+  "runtime_aliases": {
+    "linux": "native-linux",
+    "native-windows": "native-windows",
+    "windows": "native-windows",
+    "wasi-chrome-persistent": "wasi-chrome-persistent"
+  },
+  "observation_layouts": [
+    {
+      "id": "document-root",
+      "selector": ""
+    },
+    {
+      "id": "array-root",
+      "selector": "/*"
+    },
+    {
+      "id": "native-complete-jobs",
+      "selector": "/native/complete_jobs/*"
+    },
+    {
+      "id": "records-complete-jobs",
+      "selector": "/records/complete_jobs/*"
+    },
+    {
+      "id": "complete-jobs",
+      "selector": "/complete_jobs/*"
+    },
+    {
+      "id": "paired-observations",
+      "selector": "/pairs/*/observations/*"
+    },
+    {
+      "id": "document-measurements",
+      "selector": "/measurements/*"
+    },
+    {
+      "id": "document-tests",
+      "selector": "/tests/*",
+      "classification": "contract-duration"
+    },
+    {
+      "id": "projected-sample-references",
+      "selector": "/samples/*",
+      "classification": "summary"
+    },
+    {
+      "id": "diagnostic-runs",
+      "selector": "/runs/*",
+      "classification": "diagnostic"
+    }
+  ],
+  "validation_layouts": [
+    {
+      "id": "checks",
+      "selector": "/checks/*"
+    },
+    {
+      "id": "tests",
+      "selector": "/tests/*"
+    },
+    {
+      "id": "validation-checks",
+      "selector": "/validation/checks/*"
+    },
+    {
+      "id": "retained-failure",
+      "selector": "/retained_failure"
+    },
+    {
+      "id": "compact-batch-commands",
+      "selector": "/batches/*/commands/*"
+    }
+  ],
+  "comparison_bindings": [
+    {
+      "id": "inline-spool-key-2026-11-05-primary",
+      "source": "docs/benchmarks/inline-spool-key-2026-11-05.json",
+      "sha256": "f079c32bf3ccec894dbd1658cddaaf25f0c3812f3ead6388c16531f716256bbf",
+      "timing_scope": "CLI startup through complete Run/publication, Analysis JSON and exit; hashing and independent verification excluded. See dated narrative for controls and limitations.",
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ],
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Explicit primary-cohort selection reviewed against the pinned dated narrative; controls remain separate."
+      },
+      "runtime": "native-windows",
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "spool-utf8-simd-2026-11-05-primary",
+      "source": "docs/benchmarks/spool-utf8-simd-2026-11-05.json",
+      "sha256": "91938e88778dc2ea8cee192606641117c7a5238569af220b54d933724521d41a",
+      "timing_scope": "CLI startup through complete Run/publication, Analysis JSON and exit; hashing and independent verification excluded. See dated narrative for controls and limitations.",
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ],
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Explicit primary-cohort selection reviewed against the pinned dated narrative; controls remain separate."
+      },
+      "runtime": "native-windows",
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "quoted-serialization-2026-11-05-primary",
+      "source": "docs/benchmarks/quoted-serialization-2026-11-05.json",
+      "sha256": "dc32b3a13179c799d2e4992d2eecf0aedd67ffb09c1664918ce3fcb4dc2e8e98",
+      "timing_scope": "CLI startup through complete Run/publication, Analysis JSON and exit; hashing and independent verification excluded. See dated narrative for controls and limitations.",
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ],
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Explicit primary-cohort selection reviewed against the pinned dated narrative; controls remain separate."
+      },
+      "runtime": "native-windows",
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "ascii-quote-detection-2026-11-05-primary",
+      "source": "docs/benchmarks/ascii-quote-detection-2026-11-05.json",
+      "sha256": "30cd20f30cdaefa49c84a33d932bc1fd91b20a33609d68effd2fe456b5cf99c4",
+      "timing_scope": "CLI startup through complete Run/publication, Analysis JSON and exit; hashing and independent verification excluded. See dated narrative for controls and limitations.",
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ],
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Explicit primary-cohort selection reviewed against the pinned dated narrative; controls remain separate."
+      },
+      "runtime": "native-windows",
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "validated-compact-fields-2026-11-05-primary",
+      "source": "docs/benchmarks/validated-compact-fields-2026-11-05.json",
+      "sha256": "4e3867b38e8f9ee4eeaf9bec46b3348c402a929c424ad3516f62fcbd3dec26ef",
+      "timing_scope": "CLI startup through complete Run/publication, Analysis JSON and exit; hashing and independent verification excluded. See dated narrative for controls and limitations.",
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ],
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Explicit primary-cohort selection reviewed against the pinned dated narrative; controls remain separate."
+      },
+      "runtime": "native-windows",
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "strict-csv-serial-spans-2026-11-05-primary",
+      "source": "docs/benchmarks/strict-csv-serial-spans-2026-11-05.json",
+      "sha256": "9f3785671bd655b62de2162b72c143ace069aa8322695fe1b32c1c85bae2690d",
+      "timing_scope": "CLI startup through complete Run/publication, Analysis JSON and exit; hashing and independent verification excluded. See dated narrative for controls and limitations.",
+      "baseline": [
+        {
+          "pointer": "/records/complete_jobs/0"
+        },
+        {
+          "pointer": "/records/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/records/complete_jobs/1"
+        },
+        {
+          "pointer": "/records/complete_jobs/2"
+        }
+      ],
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Explicit primary-cohort selection reviewed against the pinned dated narrative; controls remain separate."
+      },
+      "runtime": "native-windows",
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "shuffle-native",
+      "source": "docs/benchmarks/shuffle-partition-native-2026-10-16.jsonl",
+      "sha256": "fb81d3eb7bb524e0a67c14eb54197824a13ba1c24004f16e561593da818d1894",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/0"
+      },
+      "baseline": [
+        {
+          "line": 101,
+          "pointer": ""
+        },
+        {
+          "line": 104,
+          "pointer": ""
+        },
+        {
+          "line": 105,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 102,
+          "pointer": ""
+        },
+        {
+          "line": 103,
+          "pointer": ""
+        },
+        {
+          "line": 106,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "shuffle-browser",
+      "source": "docs/benchmarks/shuffle-partition-persistent-engines-2026-10-17.jsonl",
+      "sha256": "d6b62c119d22ca2ea992c01dd47e7265eb0443ef308e39fcb19f8f874286db94",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/1"
+      },
+      "baseline": [
+        {
+          "line": 43,
+          "pointer": ""
+        },
+        {
+          "line": 46,
+          "pointer": ""
+        },
+        {
+          "line": 51,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 44,
+          "pointer": ""
+        },
+        {
+          "line": 45,
+          "pointer": ""
+        },
+        {
+          "line": 52,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "nested-native",
+      "source": "docs/benchmarks/nested-balanced-native-2026-10-17.jsonl",
+      "sha256": "7174b9009ac577c3b2e0453200cdca8da211dac8bc46c3ecbbda00bc2e700fd0",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/2"
+      },
+      "baseline": [
+        {
+          "line": 101,
+          "pointer": ""
+        },
+        {
+          "line": 104,
+          "pointer": ""
+        },
+        {
+          "line": 105,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 102,
+          "pointer": ""
+        },
+        {
+          "line": 103,
+          "pointer": ""
+        },
+        {
+          "line": 106,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "nested-browser",
+      "source": "docs/benchmarks/nested-balanced-engines-2026-10-17.jsonl",
+      "sha256": "8db365682a515e14a643028282aa634a4a21b2fc56566a3de9ecbcb81cd6c564",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/3"
+      },
+      "baseline": [
+        {
+          "line": 69,
+          "pointer": ""
+        },
+        {
+          "line": 72,
+          "pointer": ""
+        },
+        {
+          "line": 77,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 70,
+          "pointer": ""
+        },
+        {
+          "line": 71,
+          "pointer": ""
+        },
+        {
+          "line": 78,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "constant-native",
+      "source": "docs/benchmarks/constant-partition-native-2026-10-17.jsonl",
+      "sha256": "c97a88d59e508508963dfa5bd8650b90fd591f10d2322b6df0d20a6c30468921",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/4"
+      },
+      "baseline": [
+        {
+          "line": 65,
+          "pointer": ""
+        },
+        {
+          "line": 68,
+          "pointer": ""
+        },
+        {
+          "line": 69,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 66,
+          "pointer": ""
+        },
+        {
+          "line": 67,
+          "pointer": ""
+        },
+        {
+          "line": 70,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "constant-browser",
+      "source": "docs/benchmarks/constant-partition-partial-engines-2026-10-17.jsonl",
+      "sha256": "6dd4bae3f57b1e6299b3ada653fb80bbb5caedf63faca67ce0a293e7606bba87",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/5"
+      },
+      "baseline": [
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        },
+        {
+          "line": 12,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "consecutive-native",
+      "source": "docs/benchmarks/consecutive-partitions-independent-2026-10-17.jsonl",
+      "sha256": "a902693ccb5a4216bb71dd58525e960138e24aa9a99ee72d3cd7af97185c6322",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/6"
+      },
+      "baseline": [
+        {
+          "line": 11,
+          "pointer": ""
+        },
+        {
+          "line": 14,
+          "pointer": ""
+        },
+        {
+          "line": 15,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 12,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        },
+        {
+          "line": 16,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "consecutive-browser-small",
+      "source": "docs/benchmarks/consecutive-partitions-independent-engines-2026-10-17.jsonl",
+      "sha256": "64067496756c3ea52161866bbc9483ab34dacc28670462916e7965203f752390",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/7"
+      },
+      "baseline": [
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        },
+        {
+          "line": 12,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "consecutive-browser-large",
+      "source": "docs/benchmarks/consecutive-partitions-multilevel-repeated-engines-2026-10-17.jsonl",
+      "sha256": "acb51149e296fe3099c174e3c91fed6ee6f0bad419dc2f55d5746a882c08cb84",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/8"
+      },
+      "baseline": [
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        },
+        {
+          "line": 12,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "partition-balanced-native",
+      "source": "docs/benchmarks/partition-balanced-multilevel-2026-10-18.jsonl",
+      "sha256": "355a8426ce77f2ce11f4d3f4be543943916d074f26a882bcd856aae2c3a62c19",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/9"
+      },
+      "baseline": [
+        {
+          "line": 2,
+          "pointer": ""
+        },
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 6,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 3,
+          "pointer": ""
+        },
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "partition-balanced-browser",
+      "source": "docs/benchmarks/partition-balanced-multilevel-engines-2026-10-18.jsonl",
+      "sha256": "d556494ae53d2fa23764d7d1149dc452b1da773a8b0a740aaddde6c4ca96a90d",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/10"
+      },
+      "baseline": [
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        },
+        {
+          "line": 12,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "chain_probability-native",
+      "source": "docs/benchmarks/streaming-chain-multilevel-2026-10-18.jsonl",
+      "sha256": "8c0724c60637316f0f62a0a74662b9176144cca1b7a3b6697c1159859587d25d",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/11"
+      },
+      "baseline": [
+        {
+          "line": 2,
+          "pointer": ""
+        },
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 6,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 3,
+          "pointer": ""
+        },
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "chain_probability-browser",
+      "source": "docs/benchmarks/streaming-chain-multilevel-engines-2026-10-18.jsonl",
+      "sha256": "431b40b68b50e75197b803afcbdda1b806c2e26650b2da9d548579d30cecbae1",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/12"
+      },
+      "baseline": [
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        },
+        {
+          "line": 12,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "chain_interleaved-native",
+      "source": "docs/benchmarks/streaming-chain-multilevel-2026-10-18.jsonl",
+      "sha256": "8c0724c60637316f0f62a0a74662b9176144cca1b7a3b6697c1159859587d25d",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/13"
+      },
+      "baseline": [
+        {
+          "line": 11,
+          "pointer": ""
+        },
+        {
+          "line": 14,
+          "pointer": ""
+        },
+        {
+          "line": 15,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 12,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        },
+        {
+          "line": 16,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "chain_interleaved-browser",
+      "source": "docs/benchmarks/streaming-chain-multilevel-engines-2026-10-18.jsonl",
+      "sha256": "431b40b68b50e75197b803afcbdda1b806c2e26650b2da9d548579d30cecbae1",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/14"
+      },
+      "baseline": [
+        {
+          "line": 17,
+          "pointer": ""
+        },
+        {
+          "line": 20,
+          "pointer": ""
+        },
+        {
+          "line": 25,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 18,
+          "pointer": ""
+        },
+        {
+          "line": 19,
+          "pointer": ""
+        },
+        {
+          "line": 26,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "profile-columns",
+      "source": "docs/benchmarks/parallel-profile-native-2026-10-16.jsonl",
+      "sha256": "0928680fb050f04f2dd429f86b05cb34be97236e74cb6fe81bffb7de466d64ee",
+      "timing_scope": "CLI startup plus fresh full-file profile",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/15"
+      },
+      "baseline": [
+        {
+          "line": 26,
+          "pointer": ""
+        },
+        {
+          "line": 29,
+          "pointer": ""
+        },
+        {
+          "line": 34,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 27,
+          "pointer": ""
+        },
+        {
+          "line": 28,
+          "pointer": ""
+        },
+        {
+          "line": 35,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/wall_seconds"
+    },
+    {
+      "id": "profile-rare-wide",
+      "source": "docs/benchmarks/parallel-profile-native-2026-10-16.jsonl",
+      "sha256": "0928680fb050f04f2dd429f86b05cb34be97236e74cb6fe81bffb7de466d64ee",
+      "timing_scope": "CLI startup plus fresh full-file profile",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/16"
+      },
+      "baseline": [
+        {
+          "line": 89,
+          "pointer": ""
+        },
+        {
+          "line": 92,
+          "pointer": ""
+        },
+        {
+          "line": 97,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 90,
+          "pointer": ""
+        },
+        {
+          "line": 91,
+          "pointer": ""
+        },
+        {
+          "line": 98,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/wall_seconds"
+    },
+    {
+      "id": "groups-columns",
+      "source": "docs/benchmarks/parallel-groups-native-2026-10-16.jsonl",
+      "sha256": "489442b1242872ad39c9011406f94fa3d1eade027eb5b16151580d536bf24317",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/17"
+      },
+      "baseline": [
+        {
+          "line": 65,
+          "pointer": ""
+        },
+        {
+          "line": 68,
+          "pointer": ""
+        },
+        {
+          "line": 69,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 66,
+          "pointer": ""
+        },
+        {
+          "line": 67,
+          "pointer": ""
+        },
+        {
+          "line": 70,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "groups-skew",
+      "source": "docs/benchmarks/parallel-groups-skew-2026-10-16.jsonl",
+      "sha256": "6e386dc369e8920f3f465fd21382dde5fe49942a69a7b85fce48e2eba39bdbdb",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/18"
+      },
+      "baseline": [
+        {
+          "line": 2,
+          "pointer": ""
+        },
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 6,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 3,
+          "pointer": ""
+        },
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "spill-native",
+      "source": "docs/benchmarks/spill-blocks-native-2026-10-16.jsonl",
+      "sha256": "6cbf477d844d8f504bd66f89b9964f4bec9978c7b5cb314df841d896a523a6e2",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/19"
+      },
+      "baseline": [
+        {
+          "line": 65,
+          "pointer": ""
+        },
+        {
+          "line": 68,
+          "pointer": ""
+        },
+        {
+          "line": 69,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 66,
+          "pointer": ""
+        },
+        {
+          "line": 67,
+          "pointer": ""
+        },
+        {
+          "line": 70,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "spill-browser",
+      "source": "docs/benchmarks/spill-blocks-engines-2026-10-16.jsonl",
+      "sha256": "6931e432d24dfb5b0a60ba843db79e9b793a6f51934909f34ca714b3f2906d10",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/20"
+      },
+      "baseline": [
+        {
+          "line": 43,
+          "pointer": ""
+        },
+        {
+          "line": 46,
+          "pointer": ""
+        },
+        {
+          "line": 51,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 44,
+          "pointer": ""
+        },
+        {
+          "line": 45,
+          "pointer": ""
+        },
+        {
+          "line": 52,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "flexible-policy",
+      "source": "docs/benchmarks/flexible-policy-native-2026-10-18.jsonl",
+      "sha256": "7a58eb44edb6389388efcf09fc342a9e30966e982d3f888b5e331a7c1f0c52c2",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/21"
+      },
+      "baseline": [
+        {
+          "line": 3,
+          "pointer": ""
+        },
+        {
+          "line": 8,
+          "pointer": ""
+        },
+        {
+          "line": 11,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "partition-first-sequential",
+      "source": "docs/benchmarks/partition-first-native-2026-10-18.jsonl",
+      "sha256": "dfa864dc6d20941342fc323e368ce39af6364a4f77f702036ad41768f2a838e4",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/22"
+      },
+      "baseline": [
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 8,
+          "pointer": ""
+        },
+        {
+          "line": 15,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        },
+        {
+          "line": 16,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "partition-first-exact",
+      "source": "docs/benchmarks/partition-first-native-2026-10-18.jsonl",
+      "sha256": "dfa864dc6d20941342fc323e368ce39af6364a4f77f702036ad41768f2a838e4",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/23"
+      },
+      "baseline": [
+        {
+          "line": 3,
+          "pointer": ""
+        },
+        {
+          "line": 10,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        },
+        {
+          "line": 16,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "xof-flexible",
+      "source": "docs/benchmarks/fast-rng-focused-native-2026-10-18.jsonl",
+      "sha256": "4c90ad0ac593ba445a4be0b03b19a1811719bb0a9a238e0a3f659ca5c65b3cb3",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/24"
+      },
+      "baseline": [
+        {
+          "line": 3,
+          "pointer": ""
+        },
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 9,
+          "pointer": ""
+        },
+        {
+          "line": 12,
+          "pointer": ""
+        },
+        {
+          "line": 15,
+          "pointer": ""
+        },
+        {
+          "line": 18,
+          "pointer": ""
+        },
+        {
+          "line": 21,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 10,
+          "pointer": ""
+        },
+        {
+          "line": 11,
+          "pointer": ""
+        },
+        {
+          "line": 16,
+          "pointer": ""
+        },
+        {
+          "line": 17,
+          "pointer": ""
+        },
+        {
+          "line": 22,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "xof-seeded",
+      "source": "docs/benchmarks/fast-rng-focused-native-2026-10-18.jsonl",
+      "sha256": "4c90ad0ac593ba445a4be0b03b19a1811719bb0a9a238e0a3f659ca5c65b3cb3",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/25"
+      },
+      "baseline": [
+        {
+          "line": 2,
+          "pointer": ""
+        },
+        {
+          "line": 7,
+          "pointer": ""
+        },
+        {
+          "line": 8,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        },
+        {
+          "line": 14,
+          "pointer": ""
+        },
+        {
+          "line": 19,
+          "pointer": ""
+        },
+        {
+          "line": 20,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 10,
+          "pointer": ""
+        },
+        {
+          "line": 11,
+          "pointer": ""
+        },
+        {
+          "line": 16,
+          "pointer": ""
+        },
+        {
+          "line": 17,
+          "pointer": ""
+        },
+        {
+          "line": 22,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "ranges-uniform",
+      "source": "docs/benchmarks/allocation-ranges-final-native-2026-10-19.jsonl",
+      "sha256": "fdbe248d77f07528b4fd038e7206c8f26440c26c8ce951f5a234410ee4b7a027",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/26"
+      },
+      "baseline": [
+        {
+          "line": 36,
+          "pointer": ""
+        },
+        {
+          "line": 43,
+          "pointer": ""
+        },
+        {
+          "line": 44,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 39,
+          "pointer": ""
+        },
+        {
+          "line": 40,
+          "pointer": ""
+        },
+        {
+          "line": 47,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "ranges-external",
+      "source": "docs/benchmarks/allocation-ranges-final-native-2026-10-19.jsonl",
+      "sha256": "fdbe248d77f07528b4fd038e7206c8f26440c26c8ce951f5a234410ee4b7a027",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/27"
+      },
+      "baseline": [
+        {
+          "line": 206,
+          "pointer": ""
+        },
+        {
+          "line": 213,
+          "pointer": ""
+        },
+        {
+          "line": 214,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 209,
+          "pointer": ""
+        },
+        {
+          "line": 210,
+          "pointer": ""
+        },
+        {
+          "line": 217,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "ranges-many",
+      "source": "docs/benchmarks/allocation-ranges-final-native-2026-10-19.jsonl",
+      "sha256": "fdbe248d77f07528b4fd038e7206c8f26440c26c8ce951f5a234410ee4b7a027",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/28"
+      },
+      "baseline": [
+        {
+          "line": 138,
+          "pointer": ""
+        },
+        {
+          "line": 145,
+          "pointer": ""
+        },
+        {
+          "line": 146,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 141,
+          "pointer": ""
+        },
+        {
+          "line": 142,
+          "pointer": ""
+        },
+        {
+          "line": 149,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "ranges-rare_wide",
+      "source": "docs/benchmarks/allocation-ranges-final-native-2026-10-19.jsonl",
+      "sha256": "fdbe248d77f07528b4fd038e7206c8f26440c26c8ce951f5a234410ee4b7a027",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/29"
+      },
+      "baseline": [
+        {
+          "line": 240,
+          "pointer": ""
+        },
+        {
+          "line": 247,
+          "pointer": ""
+        },
+        {
+          "line": 248,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 243,
+          "pointer": ""
+        },
+        {
+          "line": 244,
+          "pointer": ""
+        },
+        {
+          "line": 251,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "ranges-existing-fusion",
+      "source": "docs/benchmarks/allocation-ranges-final-native-2026-10-19.jsonl",
+      "sha256": "fdbe248d77f07528b4fd038e7206c8f26440c26c8ce951f5a234410ee4b7a027",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/30"
+      },
+      "baseline": [
+        {
+          "line": 241,
+          "pointer": ""
+        },
+        {
+          "line": 246,
+          "pointer": ""
+        },
+        {
+          "line": 249,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 243,
+          "pointer": ""
+        },
+        {
+          "line": 244,
+          "pointer": ""
+        },
+        {
+          "line": 251,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "ranges-browser",
+      "source": "docs/benchmarks/allocation-ranges-engines-2026-10-19.jsonl",
+      "sha256": "cbabb9cc772a9736b75a6c5cd69f534933994a3d6075b4d522f504f990054eff",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/31"
+      },
+      "baseline": [
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 55,
+          "pointer": ""
+        },
+        {
+          "line": 60,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 54,
+          "pointer": ""
+        },
+        {
+          "line": 61,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/elapsed_seconds"
+    },
+    {
+      "id": "buckets-native",
+      "source": "docs/benchmarks/random-buckets-multilevel-native-2026-10-19.jsonl",
+      "sha256": "979a15b78954bddbc600e86704affc534b81129a2eb00e52ad646ada7fa56b16",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/32"
+      },
+      "baseline": [
+        {
+          "line": 3,
+          "pointer": ""
+        },
+        {
+          "line": 12,
+          "pointer": ""
+        },
+        {
+          "line": 13,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 9,
+          "pointer": ""
+        },
+        {
+          "line": 16,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "buckets-flexible",
+      "source": "docs/benchmarks/random-buckets-multilevel-native-2026-10-19.jsonl",
+      "sha256": "979a15b78954bddbc600e86704affc534b81129a2eb00e52ad646ada7fa56b16",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/33"
+      },
+      "baseline": [
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 11,
+          "pointer": ""
+        },
+        {
+          "line": 14,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 6,
+          "pointer": ""
+        },
+        {
+          "line": 9,
+          "pointer": ""
+        },
+        {
+          "line": 16,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "shared-admission",
+      "source": "docs/benchmarks/shared-memory-native-2026-10-16.jsonl",
+      "sha256": "4dd78f5730256e1f36c3ea6e9d2dc0f8af811b0f5a5319824e48fe254e09d174",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/34"
+      },
+      "baseline": [
+        {
+          "line": 38,
+          "pointer": ""
+        },
+        {
+          "line": 41,
+          "pointer": ""
+        },
+        {
+          "line": 42,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 39,
+          "pointer": ""
+        },
+        {
+          "line": 40,
+          "pointer": ""
+        },
+        {
+          "line": 43,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "pressure-recheck",
+      "source": "docs/benchmarks/dynamic-pressure-native-2026-10-16.jsonl",
+      "sha256": "2e4bb15435b37b2ebaabe9b2203d757931a19e306fe1230651564cd75e6b8d19",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/35"
+      },
+      "baseline": [
+        {
+          "line": 38,
+          "pointer": ""
+        },
+        {
+          "line": 41,
+          "pointer": ""
+        },
+        {
+          "line": 42,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 39,
+          "pointer": ""
+        },
+        {
+          "line": 40,
+          "pointer": ""
+        },
+        {
+          "line": 43,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/seconds"
+    },
+    {
+      "id": "resident-native",
+      "source": "docs/benchmarks/resident-browser-2026-10-15.jsonl",
+      "sha256": "ebfd6ac1531948eb008580aab0801ca967da7b92efc47aa26a68692f413a9291",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/36"
+      },
+      "baseline": [
+        {
+          "line": 2,
+          "pointer": ""
+        },
+        {
+          "line": 17,
+          "pointer": ""
+        },
+        {
+          "line": 18,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 4,
+          "pointer": ""
+        },
+        {
+          "line": 15,
+          "pointer": ""
+        },
+        {
+          "line": 20,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/elapsed_seconds"
+    },
+    {
+      "id": "resident-browser",
+      "source": "docs/benchmarks/resident-browser-2026-10-15.jsonl",
+      "sha256": "ebfd6ac1531948eb008580aab0801ca967da7b92efc47aa26a68692f413a9291",
+      "timing_scope": "Complete job including publication/export; see source context and dated narrative for exclusions",
+      "runtime": null,
+      "review": {
+        "source": "docs/benchmarks/performance-decisions-2026-10-20.json",
+        "sha256": "ca0881aef1a3ed6793c7c2d9317f53b579af6b700a7efc2c71bc2510d14ce7c7",
+        "pointer": "/cells/37"
+      },
+      "baseline": [
+        {
+          "line": 3,
+          "pointer": ""
+        },
+        {
+          "line": 16,
+          "pointer": ""
+        },
+        {
+          "line": 19,
+          "pointer": ""
+        }
+      ],
+      "candidate": [
+        {
+          "line": 5,
+          "pointer": ""
+        },
+        {
+          "line": 14,
+          "pointer": ""
+        },
+        {
+          "line": 21,
+          "pointer": ""
+        }
+      ],
+      "clock_pointer": "/elapsed_seconds"
+    },
+    {
+      "id": "zero-reservation-2026-11-05-primary",
+      "source": "docs/benchmarks/zero-reservation-2026-11-05.json",
+      "sha256": "5a1bc54de633945753a067164d501dabd87b057eecba7940f03d9c9ac01cd518",
+      "timing_scope": "CLI startup through complete Run/publication, Analysis JSON and exit; hashes, independent verification and post-exit CPU queries excluded. Ordered control is separate.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Explicit primary pipeline cohort reviewed against the pinned empty-reservation investigation; frozen rule fails and ordered control stays separate."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ]
+    },
+    {
+      "id": "buffered-spool-field-copy-2026-11-05-primary",
+      "source": "docs/benchmarks/buffered-field-copy-2026-11-05.json",
+      "sha256": "82be73319e0ea955d51f0de6e9a9cd1b948b1b05ed00f1c16645dde76b127577",
+      "timing_scope": "Native CLI startup through complete Run/publication/Analysis JSON/process exit; hashing, independent verification and post-exit CPU query excluded. Ordered pair remains separate.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Explicit primary ABBA cohort reviewed against the pinned buffered-spool-field-copy investigation. Total CPU remains separate from elapsed and user/kernel components; no control pooling."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ]
+    },
+    {
+      "id": "aligned-digest-2026-11-05-primary",
+      "source": "docs/benchmarks/aligned-digest-2026-11-05.json",
+      "sha256": "ddb3ea01e3b04229ab8c2f60b493c55db668ec8ea3395452694bb4b5b318b94c",
+      "timing_scope": "Native CLI launch through complete Run/publication/AnalysisJSON/process exit; hashing, independent verification and post-exit CPU queries excluded. OrderedABBA primary only; pipeline transfer pair separate.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Explicit ordered primary4locations reviewed against the pinned aligned-digest rejection; process/user/kernelCPU stay separate. Frozen userCPU rule fails; secondary pipeline is not pooled."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ]
+    },
+    {
+      "id": "csv-marker-cache-2026-11-05-primary",
+      "source": "docs/benchmarks/csv-marker-cache-2026-11-05.json",
+      "sha256": "f86e608f20d68a15810c224bdc02f768ac8d6b0ca1badb2237af5ee7cfac0fdd",
+      "timing_scope": "Native CLI startup through complete Run/publication/AnalysisJSON/process exit; fixture/hash/independent verification and post-exit CPU queries excluded. Fixed primary shape only; primary and control separate.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Reviewed exact locations against frozen six-job panel and rejection. Original baseline build/source/compiler/environment/features rechecked; first-source regression and failed preflight retained. Process/user/kernelCPU distinct; no pooling or extra summary observations."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ]
+    },
+    {
+      "id": "csv-marker-cache-2026-11-05-quoted-control",
+      "source": "docs/benchmarks/csv-marker-cache-2026-11-05.json",
+      "sha256": "f86e608f20d68a15810c224bdc02f768ac8d6b0ca1badb2237af5ee7cfac0fdd",
+      "timing_scope": "Native CLI startup through complete Run/publication/AnalysisJSON/process exit; fixture/hash/independent verification and post-exit CPU queries excluded. Fixed quoted-control shape only; primary and control separate.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Reviewed exact locations against frozen six-job panel and rejection. Original baseline build/source/compiler/environment/features rechecked; first-source regression and failed preflight retained. Process/user/kernelCPU distinct; no pooling or extra summary observations."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/4"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/5"
+        }
+      ]
+    },
+    {
+      "id": "ascii-quoted-escapes-2026-11-05-quoted-primary",
+      "source": "docs/benchmarks/ascii-quoted-escapes-2026-11-05.json",
+      "sha256": "4923bae1f66493417ce3abbc88c3b54634e9873e918d25292d6ebb307e34c002",
+      "timing_scope": "Native CLI startup through complete Run/publication/AnalysisJSON/process exit; fixture/hash/independent verification and post-exit CPU queries excluded. Fixed quoted-primary shape only; cells separate.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Reviewed exact fixed4M locations against premeasurement six-job rule and decision. Source333/original full build/recorded compiler/environment/binary/features and helper control verified. Distinct primary/control; wall/process/user/kernelCPU separate; summaries/contracts not extra observations."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ]
+    },
+    {
+      "id": "ascii-quoted-escapes-2026-11-05-plain-control",
+      "source": "docs/benchmarks/ascii-quoted-escapes-2026-11-05.json",
+      "sha256": "4923bae1f66493417ce3abbc88c3b54634e9873e918d25292d6ebb307e34c002",
+      "timing_scope": "Native CLI startup through complete Run/publication/AnalysisJSON/process exit; fixture/hash/independent verification and post-exit CPU queries excluded. Fixed plain-control shape only; cells separate.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Reviewed exact fixed4M locations against premeasurement six-job rule and decision. Source333/original full build/recorded compiler/environment/binary/features and helper control verified. Distinct primary/control; wall/process/user/kernelCPU separate; summaries/contracts not extra observations."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/4"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/5"
+        }
+      ]
+    },
+    {
+      "id": "reservation-entry-2026-11-05-pipeline-primary",
+      "source": "docs/benchmarks/reservation-entry-2026-11-05.json",
+      "sha256": "1d560523bf3055be05821b0af73c73f47ddefe10e0abde1b57abb3b6e1ae68b7",
+      "timing_scope": "Native CLI startup through complete Run/publication/AnalysisJSON/process exit; fixture/hash/independent verification and post-exit CPU queries excluded. pipeline-primary cell only; separate recipes.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Exact frozen source/fixture/build/toolchain/runtime/rule and locations reviewed; primarywall/total/user andtransferwall/total have separate decisionroles, user/kernel retained. No pooling or extra summary/profile observations."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ]
+    },
+    {
+      "id": "reservation-entry-2026-11-05-ordered-transfer",
+      "source": "docs/benchmarks/reservation-entry-2026-11-05.json",
+      "sha256": "1d560523bf3055be05821b0af73c73f47ddefe10e0abde1b57abb3b6e1ae68b7",
+      "timing_scope": "Native CLI startup through complete Run/publication/AnalysisJSON/process exit; fixture/hash/independent verification and post-exit CPU queries excluded. ordered-transfer cell only; separate recipes.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Exact frozen source/fixture/build/toolchain/runtime/rule and locations reviewed; primarywall/total/user andtransferwall/total have separate decisionroles, user/kernel retained. No pooling or extra summary/profile observations."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/4"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/5"
+        }
+      ]
+    },
+    {
+      "id": "packed-row-buffered-copy-2026-11-05-pipeline-primary",
+      "source": "docs/benchmarks/packed-row-buffered-copy-2026-11-05.json",
+      "sha256": "e0e7dd22ae8bdd5ca532d6b6887e386648e408c7ed433c6af502fa250eb5b58a",
+      "timing_scope": "Native CLI startup through completeRun/publication/AnalysisJSON/process exit; fixture/hash/independent verification andpost-exitCPUqueries excluded. pipeline-primary cellonly.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Exactsource/build/tool/fixture/runtime and frozenrules reviewed; primary0/3vs1/2 and separatebypass4/5 only. No pooling or extrasummary/profileobservations."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/0"
+        },
+        {
+          "pointer": "/native/complete_jobs/3"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/1"
+        },
+        {
+          "pointer": "/native/complete_jobs/2"
+        }
+      ]
+    },
+    {
+      "id": "packed-row-buffered-copy-2026-11-05-ordered-bypass",
+      "source": "docs/benchmarks/packed-row-buffered-copy-2026-11-05.json",
+      "sha256": "e0e7dd22ae8bdd5ca532d6b6887e386648e408c7ed433c6af502fa250eb5b58a",
+      "timing_scope": "Native CLI startup through completeRun/publication/AnalysisJSON/process exit; fixture/hash/independent verification andpost-exitCPUqueries excluded. ordered-bypass cellonly.",
+      "clock_pointer": "/seconds",
+      "runtime": "native-windows",
+      "review": {
+        "source": "docs/performance/views.v1.json",
+        "basis": "Exactsource/build/tool/fixture/runtime and frozenrules reviewed; primary0/3vs1/2 and separatebypass4/5 only. No pooling or extrasummary/profileobservations."
+      },
+      "baseline": [
+        {
+          "pointer": "/native/complete_jobs/4"
+        }
+      ],
+      "candidate": [
+        {
+          "pointer": "/native/complete_jobs/5"
+        }
+      ]
+    }
+  ],
+  "validation_bindings": [
+    {
+      "source": "docs/benchmarks/plain-publication-feature-2026-11-05.json",
+      "sha256": "c59b918777c2930f230a0dcf2739571ab09c763b5dbc16ffa2ebedb2bec8510b",
+      "location": {
+        "pointer": "/checks/2"
+      },
+      "check_id": "focused-feature",
+      "contract": "native-plain-publication-parity-and-cleanup",
+      "contract_refs": [
+        "docs/direct-execution.md",
+        "docs/specification.md"
+      ],
+      "runtime": "native-linux",
+      "browser": null,
+      "features": [
+        "experimental-plain-publication"
+      ]
+    },
+    {
+      "source": "docs/benchmarks/plain-publication-feature-2026-11-05.json",
+      "sha256": "c59b918777c2930f230a0dcf2739571ab09c763b5dbc16ffa2ebedb2bec8510b",
+      "location": {
+        "pointer": "/checks/8"
+      },
+      "check_id": "focused-release",
+      "contract": "native-plain-publication-parity-and-cleanup",
+      "contract_refs": [
+        "docs/direct-execution.md",
+        "docs/specification.md"
+      ],
+      "runtime": "native-windows",
+      "browser": null,
+      "features": [
+        "experimental-plain-publication"
+      ]
+    },
+    {
+      "source": "docs/benchmarks/plain-publication-feature-2026-11-05.json",
+      "sha256": "c59b918777c2930f230a0dcf2739571ab09c763b5dbc16ffa2ebedb2bec8510b",
+      "location": {
+        "pointer": "/checks/10"
+      },
+      "check_id": "cli-smoke",
+      "contract": "native-plain-publication-parity-and-cleanup",
+      "contract_refs": [
+        "docs/direct-execution.md",
+        "docs/specification.md"
+      ],
+      "runtime": "native-windows",
+      "browser": null,
+      "features": [
+        "experimental-plain-publication"
+      ]
+    },
+    {
+      "source": "docs/benchmarks/probabilistic-shuffle-spill-browser-2026-11-05.json",
+      "sha256": "54334de75d25e17cc06f8b8c018fe99aeb476cd3c0de2d9c15eb356bcc9f8e0d",
+      "location": {
+        "pointer": "/checks/23"
+      },
+      "check_id": "contracts",
+      "contract": "browser-resource-contracts",
+      "contract_refs": [
+        "docs/browser.md",
+        "docs/specification.md"
+      ],
+      "runtime": "wasi-chrome-persistent",
+      "browser": "Chrome 156.0.8078.48",
+      "features": null
+    },
+    {
+      "source": "docs/benchmarks/probabilistic-shuffle-spill-browser-2026-11-05.json",
+      "sha256": "54334de75d25e17cc06f8b8c018fe99aeb476cd3c0de2d9c15eb356bcc9f8e0d",
+      "location": {
+        "pointer": "/checks/24"
+      },
+      "check_id": "bridge",
+      "contract": "browser-worker-bridge",
+      "contract_refs": [
+        "docs/browser.md",
+        "docs/specification.md"
+      ],
+      "runtime": "wasi-chrome-persistent",
+      "browser": "Chrome 156.0.8078.48",
+      "features": null
+    },
+    {
+      "source": "docs/benchmarks/probabilistic-shuffle-spill-browser-2026-11-05.json",
+      "sha256": "54334de75d25e17cc06f8b8c018fe99aeb476cd3c0de2d9c15eb356bcc9f8e0d",
+      "location": {
+        "pointer": "/checks/25"
+      },
+      "check_id": "peer-cleanup",
+      "contract": "browser-workspace-cleanup",
+      "contract_refs": [
+        "docs/browser.md",
+        "docs/specification.md"
+      ],
+      "runtime": "wasi-chrome-persistent",
+      "browser": "Chrome 156.0.8078.48",
+      "features": null
+    },
+    {
+      "source": "docs/benchmarks/probabilistic-shuffle-spill-browser-2026-11-05.json",
+      "sha256": "54334de75d25e17cc06f8b8c018fe99aeb476cd3c0de2d9c15eb356bcc9f8e0d",
+      "location": {
+        "pointer": "/checks/26"
+      },
+      "check_id": "fused-interruption",
+      "contract": "browser-prepared-spill-interruption",
+      "contract_refs": [
+        "docs/browser.md",
+        "docs/specification.md"
+      ],
+      "runtime": "wasi-chrome-persistent",
+      "browser": "Chrome 156.0.8078.48",
+      "features": null
+    },
+    {
+      "source": "docs/benchmarks/execution-graph-merge-validation-2026-11-05.json",
+      "sha256": "c1bd573196f9b3cc545246f760b9609606dc4485ec39b9f3984fec29bc19f055",
+      "location": {
+        "pointer": "/checks/11"
+      },
+      "check_id": "hosted/test-browser-graph-mjs-3",
+      "contract": "execution-graph-strategy-codec-membership-parity",
+      "contract_refs": [
+        "docs/execution-observation.md",
+        "docs/browser.md",
+        "docs/validation.md"
+      ],
+      "runtime": "wasi-chromium",
+      "browser": "bundled Chromium 156.0.8078.4",
+      "features": []
+    },
+    {
+      "source": "docs/benchmarks/execution-graph-merge-validation-2026-11-05.json",
+      "sha256": "c1bd573196f9b3cc545246f760b9609606dc4485ec39b9f3984fec29bc19f055",
+      "location": {
+        "pointer": "/checks/12"
+      },
+      "check_id": "hosted/test-browser-graph-lifecycle-mjs-4",
+      "contract": "execution-graph-failure-cancellation-cleanup",
+      "contract_refs": [
+        "docs/execution-observation.md",
+        "docs/browser.md",
+        "docs/validation.md"
+      ],
+      "runtime": "wasi-chromium",
+      "browser": "bundled Chromium 156.0.8078.4",
+      "features": []
+    },
+    {
+      "source": "docs/benchmarks/execution-graph-merge-validation-2026-11-05.json",
+      "sha256": "c1bd573196f9b3cc545246f760b9609606dc4485ec39b9f3984fec29bc19f055",
+      "location": {
+        "pointer": "/checks/13"
+      },
+      "check_id": "hosted/test-browser-graph-inspection-mjs-5",
+      "contract": "execution-graph-inspection",
+      "contract_refs": [
+        "docs/execution-observation.md",
+        "docs/browser.md",
+        "docs/validation.md"
+      ],
+      "runtime": "wasi-chromium",
+      "browser": "bundled Chromium 156.0.8078.4",
+      "features": []
+    },
+    {
+      "source": "docs/benchmarks/execution-graph-merge-validation-2026-11-05.json",
+      "sha256": "c1bd573196f9b3cc545246f760b9609606dc4485ec39b9f3984fec29bc19f055",
+      "location": {
+        "pointer": "/checks/14"
+      },
+      "check_id": "hosted/test-browser-graph-bounds-mjs-6",
+      "contract": "execution-graph-bounds",
+      "contract_refs": [
+        "docs/execution-observation.md",
+        "docs/browser.md",
+        "docs/validation.md"
+      ],
+      "runtime": "wasi-chromium",
+      "browser": "bundled Chromium 156.0.8078.4",
+      "features": []
+    },
+    {
+      "source": "docs/benchmarks/execution-graph-merge-validation-2026-11-05.json",
+      "sha256": "c1bd573196f9b3cc545246f760b9609606dc4485ec39b9f3984fec29bc19f055",
+      "location": {
+        "pointer": "/checks/15"
+      },
+      "check_id": "hosted/test-browser-graph-lifecycle-mjs-7",
+      "contract": "execution-graph-composed-interruption",
+      "contract_refs": [
+        "docs/execution-observation.md",
+        "docs/browser.md",
+        "docs/validation.md"
+      ],
+      "runtime": "wasi-chromium",
+      "browser": "bundled Chromium 156.0.8078.4",
+      "features": []
+    },
+    {
+      "source": "docs/benchmarks/execution-graph-merge-validation-2026-11-05.json",
+      "sha256": "c1bd573196f9b3cc545246f760b9609606dc4485ec39b9f3984fec29bc19f055",
+      "location": {
+        "pointer": "/checks/26"
+      },
+      "check_id": "resources/test-browser-mjs-2",
+      "contract": "browser-resource-contracts",
+      "contract_refs": [
+        "docs/execution-observation.md",
+        "docs/browser.md",
+        "docs/validation.md"
+      ],
+      "runtime": "wasi-chromium",
+      "browser": "bundled Chromium 156.0.8078.4",
+      "features": []
+    },
+    {
+      "source": "docs/benchmarks/execution-graph-merge-validation-2026-11-05.json",
+      "sha256": "c1bd573196f9b3cc545246f760b9609606dc4485ec39b9f3984fec29bc19f055",
+      "location": {
+        "pointer": "/checks/30"
+      },
+      "check_id": "feature-resources/test-browser-mjs-2",
+      "contract": "browser-shuffle-partition-resource-contracts",
+      "contract_refs": [
+        "docs/execution-observation.md",
+        "docs/browser.md",
+        "docs/validation.md"
+      ],
+      "runtime": "wasi-chromium",
+      "browser": "bundled Chromium 156.0.8078.4",
+      "features": [
+        "experimental-shuffle-partition"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -585,0 +586,53 @@
++
++#[test]
++fn probabilistic_shuffle_working_set_panel() -> Result<()> {
++    let label = "working-set-200k";
++    let n = 200000;
++    let schedule = vec![
++        (false, Grouping::Auto),
++        (true, Grouping::Auto),
++        (false, Grouping::Sort),
++        (true, Grouping::Sort),
++        (true, Grouping::Sort),
++        (false, Grouping::Sort),
++        (true, Grouping::Auto),
++        (false, Grouping::Auto),
++    ];
++
++    let mut reference = None;
++    for (rep, (candidate, grouping)) in schedule.into_iter().enumerate() {
++        ENABLED.set(candidate);
++        let (dir, mut job) = setup(n)?;
++        job.resources.grouping = grouping;
++        let input_hash = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let started = std::time::Instant::now();
++        let prepared = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let ctx = prepared.ctx.clone();
++        let a = prepared.execute()?;
++        let seconds = started.elapsed().as_secs_f64();
++        let diagnostics = ctx.diagnostics();
++        // Verification is outside the complete engine preparation/publication timer.
++        let checked = verify(dir.path(), &job, n, &a)?;
++        if let Some(ref old) = reference {
++            assert_eq!(&checked, old);
++        } else {
++            reference = Some(checked);
++        }
++        drop(a);
++        drop(ctx);
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "PROB_SHUFFLE {}",
++            serde_json::json!({"label":label,"grouping":match grouping { Grouping::Auto => "auto", Grouping::Sort => "sort" },"rows":n,"candidate":candidate,"rep":rep,"seconds":seconds,"input_blake3":input_hash,"diagnostics":diagnostics,"exact_output_verified":true,"cleanup":true})
++        );
++    }
++    ENABLED.set(false);
++    Ok(())
++}

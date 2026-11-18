@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "copied-parallel-csv-2026-11-05",
+  "title": "Reject the unchanged copied-batch parallel parser",
+  "date": "2026-11-05",
+  "subsystem": "input",
+  "question": "Does copied-batch parallel parsing beat the stronger strict serial parser?",
+  "disposition": "reject",
+  "outcome": "unfavorable",
+  "delivery": "unapplied",
+  "summary": "Retain the patch as rejected evidence; copied handoff and dispatch do not justify production integration.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "Native plain-input ordered and allocation/shuffle complete Runs with four workers and matching 32-MiB limits."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux"
+    ],
+    "summary": "Six measured jobs independently verify fields, unique IDs, groups, caps and cleanup; use the source narrative for the isolated prototype gates."
+  },
+  "limitations": [
+    "Small development cells and uncontrolled cache/background state do not establish general device, shape or tail performance.",
+    "Historical percentage gains are not additive; every comparison uses its own pinned baseline.",
+    "Suffix filtering is not a proven plain-input magic detector.",
+    "The result does not reject parallel parsing fused with useful initial computation."
+  ],
+  "exclusions": [
+    "Upstream parser throughput and policy/dispatch costs do not establish isolated Chopper component speed."
+  ],
+  "reopen_when": "Only a materially different integration with a named whole-job benefit question warrants reopening; preserve strict parser/admission contracts.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#bounded-parallel-csv-parsing-with-copied-handoff-2026-11-05",
+      "sha256": "d66f030635e94a25bd65b707e05dcfe35fb4922a25b7442780a058161aefdd5e"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/bounded-parallel-csv-2026-11-05.json",
+      "sha256": "d741d13d9b46b4db52c6a2c8e19c447c089c3157662a8d5ca0e1f8b63970ea53"
+    },
+    {
+      "path": "docs/benchmarks/bounded-parallel-csv-2026-11-05.patch",
+      "sha256": "f6f874b1b2a414155fb6eaf79d985891f7dd190cb430381a282d7b4f2008b7c1"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md",
+    "docs/csv-ingestion-techniques.md"
+  ]
+}

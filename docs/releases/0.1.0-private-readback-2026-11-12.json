@@ -1,0 +1,39 @@
+{
+  "schema": "chopper-predecessor-fresh-readback-assets-v1",
+  "passed": true,
+  "release_version": "0.1.0",
+  "archive_members_restored_and_verified": 98,
+  "release_assets_verified_against_retained_github_identity": [
+    {
+      "name": "chopper-0.1.0-artifact-receipt.json",
+      "bytes": 3563,
+      "sha256": "9aa4032a3fc102b82ee164faba696eb48348ff912fc25da7bcdbfaa2a646868b"
+    },
+    {
+      "name": "chopper-0.1.0-hosted.zip",
+      "bytes": 821738,
+      "sha256": "bdd914517252d7cb1849ccae11955dad919ed052f912e891c3535417885e4606",
+      "verified_members": 7
+    },
+    {
+      "name": "chopper-0.1.0-windows-x86_64.zip",
+      "bytes": 1713965,
+      "sha256": "9c3be7b2ca3a7be587bfb83befd7de2c3526e03ff63c114ec1d7facd5c975e46",
+      "verified_members": 6
+    },
+    {
+      "name": "SHA256SUMS",
+      "bytes": 295,
+      "sha256": "f79648ca6ecfd794300385c1a813e69397e9e6c3f99fed72e9fd2eb5170174eb"
+    }
+  ],
+  "zip_crc_and_exact_member_sets": true,
+  "receipt_and_sha256sums_consistent": true,
+  "credentials_recorded": false,
+  "remote_changes": false,
+  "scope": "Fresh scoped-reader archive GET and safe restore; exact4predecessorassets and13ZIPmembers. Existing same-byte native/hosted runtime rehearsals remain within recorded scope; no production restoration or publication.",
+  "date_utc": "2026-11-12",
+  "private_scoped_reader_get": true,
+  "outer_archive_identity_verified": true,
+  "native_receipt_executable_verified": true
+}

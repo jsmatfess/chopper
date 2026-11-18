@@ -1,0 +1,42 @@
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+index 1de4cdb..7dac0a3 100644
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -1357,7 +1357,5 @@ impl Dataset {
+-                let mut row = PackedRow::read_fields_reserved(
+-                    &mut rows.reader,
+-                    maximum,
+-                    header,
+-                    None,
+-                    Some(rows._reservation.sibling()),
+-                )?;
++                // The header already owns the decode grant, including inline
++                // keys. A second empty sibling would only be absorbed/dropped.
++                debug_assert!(header.key_reservation.is_some());
++                let mut row =
++                    PackedRow::read_fields_reserved(&mut rows.reader, maximum, header, None, None)?;
+@@ -1417,8 +1415,5 @@ impl GroupRows {
+-        PackedRow::read_fields_reserved(
+-            &mut self.reader,
+-            self.maximum,
+-            header,
+-            previous,
+-            Some(self._reservation.sibling()),
+-        )
+-        .map(Some)
++        // A reused row retains its grant; otherwise the header supplies it.
++        // Keep the independent reader grant separate from returned row storage.
++        debug_assert!(header.key_reservation.is_some());
++        PackedRow::read_fields_reserved(&mut self.reader, self.maximum, header, previous, None)
++            .map(Some)
+diff --git a/crates/chopper/src/storage/adaptive.rs b/crates/chopper/src/storage/adaptive.rs
+index b8a8a4b..29223ae 100644
+--- a/crates/chopper/src/storage/adaptive.rs
++++ b/crates/chopper/src/storage/adaptive.rs
+@@ -204 +204,5 @@ impl Drop for Reservation {
+-        self.workspace.release(self.bytes);
++        // Empty and transferred grants own no bytes. Both ledger releases are
++        // relaxed arithmetic only, so a zero release has no observable effect.
++        if self.bytes != 0 {
++            self.workspace.release(self.bytes);
++        }

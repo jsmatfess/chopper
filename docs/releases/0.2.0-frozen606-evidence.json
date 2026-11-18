@@ -1,0 +1,601 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-11-06",
+  "scope": "Frozen606 custody/identity reconciliation plus separately scoped later acceptance records; original build and native tiny evidence unchanged",
+  "custody_base": "candidate-6069cef",
+  "custody_base_role": "Relative to retained release-next-20261106 custody; these locators are not repository files or public downloads",
+  "release_source_commit": "6069cef178f0b49cf45c2d5db94665c62d43ccc8",
+  "release_source_tree": "6cce1a9f85e5c3ae89323864adb7ca9723a3419e",
+  "source_files_verified": 1061,
+  "source_inventory": {
+    "path": "provenance/linux/records/source-inventory.json",
+    "bytes": 184821,
+    "sha256": "53276df0fdd52a874bd324b14d8dbfefa248585aa1134afb7fa97f599cbc1600"
+  },
+  "source_verification": "Complete 1061-file inventory matches retained source and Git blobs of frozen commit; Linux after and both Windows inventories match by path/size/SHA-256",
+  "indexes": {
+    "linux": {
+      "records_verified": 50,
+      "index": {
+        "path": "provenance/linux/hash-index.json",
+        "bytes": 6739,
+        "sha256": "a70ec33406d3010d576594ea005d74a6093c69185b84a746763aba0d03787864"
+      }
+    },
+    "windows": {
+      "records_verified": 1182,
+      "index": {
+        "path": "provenance/windows/final-hash-index.json",
+        "bytes": 220658,
+        "sha256": "54d4883db395a4cacc52d44b719eaa86030711fddad4667ef3c95a04af86d485"
+      }
+    }
+  },
+  "original_build_bindings": {
+    "linux": {
+      "status": {
+        "path": "provenance/linux/batch/status.json",
+        "bytes": 4573506,
+        "sha256": "b29195619a6589d805417ebdae8baeb1674559250c5d8e8709ecfcc4637ecbd5"
+      },
+      "producing_step": "native-release",
+      "attempt": 2,
+      "source_files_matched": 1061,
+      "artifact": {
+        "bytes": 5333352,
+        "sha256": "a3232531cbace5cbbc3ba29ad53e5412843efe7d0bae9b278907cb3d0577a8a3"
+      },
+      "steps": [
+        {
+          "id": "dependencies",
+          "attempt": 1,
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "id": "native-release",
+          "attempt": 2,
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "id": "first-default-wasi",
+          "attempt": 3,
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "id": "contract-default",
+          "attempt": 4,
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "id": "contract-shuffle",
+          "attempt": 5,
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "id": "restore-default",
+          "attempt": 6,
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "id": "hosted-production",
+          "attempt": 7,
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "id": "artifact-inspection",
+          "attempt": 8,
+          "status": "passed",
+          "exit_code": 0
+        }
+      ]
+    },
+    "windows": {
+      "status": {
+        "path": "provenance/windows/batch/status.json",
+        "bytes": 557113,
+        "sha256": "0fc491459e18528252068e0e0fe50b3078e6c8d0b780c68193ef9a0300cc7907"
+      },
+      "producing_step": "native-release-build",
+      "attempt": 1,
+      "source_files_matched": 1061,
+      "artifact": {
+        "bytes": 4315648,
+        "sha256": "68e0b64b81e917702ae7f48cc9570cfee6ef898ba862f987cc1b4a92e141d4d9"
+      },
+      "steps": [
+        {
+          "id": "native-release-build",
+          "attempt": 1,
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "id": "native-version",
+          "attempt": 2,
+          "status": "passed",
+          "exit_code": 0
+        },
+        {
+          "id": "native-help",
+          "attempt": 3,
+          "status": "passed",
+          "exit_code": 0
+        }
+      ]
+    }
+  },
+  "prior_reconciliation": {
+    "locator": "scratch/native131-review-logs/actual606-receipt-reconciliation.json",
+    "bytes": 609,
+    "sha256": "2ff7f82903e73238a5c22aa69ab8f3c525690bd8c111d76739e88a048721137f",
+    "verification": "Independently agrees with original status/source/producing-artifact checks above; locator relative to reviewer custody, separate from candidate custody"
+  },
+  "retained_attempt_records": {
+    "package-assembly.json": {
+      "path": "package-assembly.json",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "packaging-preflight-correction.json": {
+      "path": "packaging-preflight-correction.json",
+      "bytes": 289,
+      "sha256": "924665c4beac6cc51696008cbd5eb6afacc687501a6ffe6f54367dec94830ba8"
+    },
+    "package-assembly-corrected.json": {
+      "path": "package-assembly-corrected.json",
+      "bytes": 345,
+      "sha256": "670c1cd2e359fafbf5fd55a270d759d3fc183983c6398722f3c38978ee8f2192"
+    },
+    "integration-records/windows-small/handoff-copy-correction.json": {
+      "path": "integration-records/windows-small/handoff-copy-correction.json",
+      "bytes": 340,
+      "sha256": "b392c0548b7ae52d5dbd9f03792afb25da5a72a48554a981057f6c90e4618515"
+    }
+  },
+  "original_source_and_creation_records": {
+    "provenance/linux/records/before.json": {
+      "path": "provenance/linux/records/before.json",
+      "bytes": 193454,
+      "sha256": "ec3d36ca90bdd459afa89c90a91fdddb0a47742f4bef95f2a0146c6c073b6973"
+    },
+    "provenance/linux/records/after.json": {
+      "path": "provenance/linux/records/after.json",
+      "bytes": 400,
+      "sha256": "3e2b688cba33fea1a9e7a46143d9abcf5bc26db3b4102a3eebe9ef7e0488d603"
+    },
+    "provenance/windows/source-before.json": {
+      "path": "provenance/windows/source-before.json",
+      "bytes": 196,
+      "sha256": "78cdcd5702059cef07c5d058d478881bebd7b69b0ebeebfddd3925646934bf00"
+    },
+    "provenance/windows/source-after.json": {
+      "path": "provenance/windows/source-after.json",
+      "bytes": 196,
+      "sha256": "78cdcd5702059cef07c5d058d478881bebd7b69b0ebeebfddd3925646934bf00"
+    },
+    "provenance/windows/artifact-before.json": {
+      "path": "provenance/windows/artifact-before.json",
+      "bytes": 123,
+      "sha256": "f1042d8f7331ea7110c42b0ffece152ca38cc401746f9eceef59e52d049d45bd"
+    },
+    "provenance/windows/handoff.json": {
+      "path": "provenance/windows/handoff.json",
+      "bytes": 3262,
+      "sha256": "0e15c0f8fe653fd095ca7918670b27ff2855137f387f5b1e4db1f7e167e2c5cd"
+    }
+  },
+  "dependency_and_tool_audits": {
+    "provenance/linux/records/host-tools.json": {
+      "path": "provenance/linux/records/host-tools.json",
+      "bytes": 3123873,
+      "sha256": "418d8cde3cba134a2c98f6fb04efd9f79754ed6de7a3ee643196b1eefcc7e4e7"
+    },
+    "provenance/linux/records/sdk-inventory.json": {
+      "path": "provenance/linux/records/sdk-inventory.json",
+      "bytes": 3570867,
+      "sha256": "cbaddbc10040033372ea1b62f77eb459e8a411fcdd523e98cab84442520c67f9"
+    },
+    "provenance/linux/records/sdk-after.json": {
+      "path": "provenance/linux/records/sdk-after.json",
+      "bytes": 3570867,
+      "sha256": "cbaddbc10040033372ea1b62f77eb459e8a411fcdd523e98cab84442520c67f9"
+    },
+    "provenance/linux/records/cargo-dependencies.json": {
+      "path": "provenance/linux/records/cargo-dependencies.json",
+      "bytes": 1226213,
+      "sha256": "6051b1a61f2b56957d0df5fb7424aff83ea2a19b9c6fe198df3a68db93cafdba"
+    },
+    "provenance/linux/records/cargo-dependencies-after.json": {
+      "path": "provenance/linux/records/cargo-dependencies-after.json",
+      "bytes": 1226213,
+      "sha256": "6051b1a61f2b56957d0df5fb7424aff83ea2a19b9c6fe198df3a68db93cafdba"
+    },
+    "provenance/linux/records/npm-dependencies.json": {
+      "path": "provenance/linux/records/npm-dependencies.json",
+      "bytes": 53212,
+      "sha256": "bf91bdbd8c2411901f4bf1a41927c73a14ffee2654514d448cf6cd505a6f5715"
+    },
+    "provenance/linux/records/npm-dependencies-after.json": {
+      "path": "provenance/linux/records/npm-dependencies-after.json",
+      "bytes": 53212,
+      "sha256": "bf91bdbd8c2411901f4bf1a41927c73a14ffee2654514d448cf6cd505a6f5715"
+    },
+    "provenance/linux/records/after.json": {
+      "path": "provenance/linux/records/after.json",
+      "bytes": 400,
+      "sha256": "3e2b688cba33fea1a9e7a46143d9abcf5bc26db3b4102a3eebe9ef7e0488d603"
+    },
+    "provenance/windows/external-inputs-before.json": {
+      "path": "provenance/windows/external-inputs-before.json",
+      "bytes": 6041009,
+      "sha256": "6726e55a111f077aa51ae1750aa3f9c9665c8f8bffd0741fdb527e0c3af35a21"
+    },
+    "provenance/windows/external-inputs-after.json": {
+      "path": "provenance/windows/external-inputs-after.json",
+      "bytes": 6041009,
+      "sha256": "6726e55a111f077aa51ae1750aa3f9c9665c8f8bffd0741fdb527e0c3af35a21"
+    },
+    "provenance/windows/actual-build-features.json": {
+      "path": "provenance/windows/actual-build-features.json",
+      "bytes": 3720,
+      "sha256": "ad332568b35ab5c4ed61ae1a7ccb6eb742e366b6794971e8aad267355290ff2d"
+    }
+  },
+  "hosted_build_audit": {
+    "path": "provenance/linux/records/artifacts.json",
+    "bytes": 1894,
+    "sha256": "99da041e216a51816896d0765c229108c64d1c1665b61ad596e307bb08c1a2d8"
+  },
+  "production_restoration": {
+    "default_features": true,
+    "seven_assets": 7,
+    "test_export_absent": true,
+    "restored_default_identical": true,
+    "browser_runtime_acceptance": false
+  },
+  "package_members": {
+    "chopper-0.2.0-hosted.zip": {
+      "_headers": {
+        "bytes": 385,
+        "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1"
+      },
+      "app.js": {
+        "bytes": 62515,
+        "sha256": "33a70d0aa416a19d552620f9102ffcf416f517fa448e676bd4cf798aae484331"
+      },
+      "engine-worker.js": {
+        "bytes": 42781,
+        "sha256": "41e26203c5fba5d4751bf45aac940a2a17b27043d15902b29d2a90c4677d9e80"
+      },
+      "engine.wasm": {
+        "bytes": 2470286,
+        "sha256": "f96cedfd1e5f464dea3f70c6eb28c0fd4fa34680d70517ea8c5094ab91234451"
+      },
+      "index.html": {
+        "bytes": 8836,
+        "sha256": "7c5a0dea3884a3faaf03f3f37956f0bed3f7133a8ecfb253d5414160517a0c2a"
+      },
+      "storage-worker.js": {
+        "bytes": 3034,
+        "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6"
+      },
+      "style.css": {
+        "bytes": 14911,
+        "sha256": "da123fd1cc919783fb90e94f0c3c076fc57ff357879e53ba08a252f37fc8eef6"
+      }
+    },
+    "chopper-0.2.0-windows-x86_64.zip": {
+      "LICENSE": {
+        "bytes": 1071,
+        "sha256": "0e2f209b726650ef0b6569ed2d31d23ccd062b48650e16abf5d49b830d9df073"
+      },
+      "README.txt": {
+        "bytes": 1031,
+        "sha256": "b7b858eeaadd4cc6d00b55f80e6a1709be56408378db453f974ee0d57dee0c4e"
+      },
+      "chopper.exe": {
+        "bytes": 4315648,
+        "sha256": "68e0b64b81e917702ae7f48cc9570cfee6ef898ba862f987cc1b4a92e141d4d9"
+      },
+      "licenses/zip-2.4.2/LICENSE": {
+        "bytes": 1217,
+        "sha256": "04dc52136d82400b11df5f474949863a70a5d05d2278dec45b99c479494450a6"
+      },
+      "licenses/zstd-sys-2.1.1/LICENSE": {
+        "bytes": 1501,
+        "sha256": "ce4868c8e4ebe47a7d4b3c93dbf6b802033e5ae2fa7638098173f80836daac60"
+      },
+      "licenses/zstd-sys-2.1.1/LICENSE.BSD-3-Clause": {
+        "bytes": 1614,
+        "sha256": "bf7017a73a95ea63bf3716b13ec2bcd79c92942356e3408c6fb66332bad6d977"
+      }
+    },
+    "chopper-0.2.0-linux-x86_64.zip": {
+      "LICENSE": {
+        "bytes": 1071,
+        "sha256": "0e2f209b726650ef0b6569ed2d31d23ccd062b48650e16abf5d49b830d9df073"
+      },
+      "README.txt": {
+        "bytes": 1031,
+        "sha256": "b7b858eeaadd4cc6d00b55f80e6a1709be56408378db453f974ee0d57dee0c4e"
+      },
+      "chopper": {
+        "bytes": 5333352,
+        "sha256": "a3232531cbace5cbbc3ba29ad53e5412843efe7d0bae9b278907cb3d0577a8a3"
+      },
+      "licenses/zip-2.4.2/LICENSE": {
+        "bytes": 1217,
+        "sha256": "04dc52136d82400b11df5f474949863a70a5d05d2278dec45b99c479494450a6"
+      },
+      "licenses/zstd-sys-2.1.1/LICENSE": {
+        "bytes": 1501,
+        "sha256": "ce4868c8e4ebe47a7d4b3c93dbf6b802033e5ae2fa7638098173f80836daac60"
+      },
+      "licenses/zstd-sys-2.1.1/LICENSE.BSD-3-Clause": {
+        "bytes": 1614,
+        "sha256": "bf7017a73a95ea63bf3716b13ec2bcd79c92942356e3408c6fb66332bad6d977"
+      }
+    }
+  },
+  "packaging_tools": {
+    "package-release.py": {
+      "bytes": 13354,
+      "sha256": "deeab7b5e1a2ef523489c3a9fa73b0d65fdb3f68f4bc448e8a04a66055ec5cdc"
+    },
+    "browser-artifacts.mjs": {
+      "bytes": 655,
+      "sha256": "6f4c84abda6f57d7ae6eb3f92c4797e1d8858e7a3a61f44b67b52f2c5d13854e"
+    }
+  },
+  "packaging_input_manifest": {
+    "bytes": 5258,
+    "sha256": "da2de2cc877a741e1a116b4d6a4974b16c76dbdf3ea153911ed8741b00434d82"
+  },
+  "package_integrity": {
+    "archives": 3,
+    "members": 19,
+    "crc_safe_unique_names_sizes_sha256_modes": true,
+    "retained_extracted_members_match": true,
+    "checksum_entries": 4,
+    "outer_mutation_control": {
+      "path": "independent-package-check.json",
+      "bytes": 4687,
+      "sha256": "7867aada7c5d4704992b0911eee69b7e7f55d7787e6a2e717b99419732a16984"
+    },
+    "outer_mutation_negative_rejected": true
+  },
+  "acceptance_records": {
+    "source/scratch/native-tiny-linux/batch/status.json": {
+      "path": "source/scratch/native-tiny-linux/batch/status.json",
+      "bytes": 1176175,
+      "sha256": "445c832a2c62b335db29586747220045428b555fa4260d8989d7c832ea1f16a6"
+    },
+    "source/scratch/adversarial-smoke-v2/cases/receipt.json": {
+      "path": "source/scratch/adversarial-smoke-v2/cases/receipt.json",
+      "bytes": 13378,
+      "sha256": "0428fc56a3d6af6239397e923d144386f7e1c0f9ff6fb75fb2b239175bffd645"
+    },
+    "integration-records/windows-small/RESULT.json": {
+      "path": "integration-records/windows-small/RESULT.json",
+      "bytes": 231276,
+      "sha256": "032bb6402e837eb22a68dd4cbf0b58c4ef700a2ac8500d4cb2ee99724ab55e16"
+    },
+    "integration-records/windows-small/parent-independent-verification.json": {
+      "path": "integration-records/windows-small/parent-independent-verification.json",
+      "bytes": 422,
+      "sha256": "669d0f6ae3a9236934631c4bc86b3078a5b03c724be3dda656f5108fdb1ab91d"
+    }
+  },
+  "acceptance_scope": {
+    "linux": "Linux/WSL only; 6/6 tiny D/G steps, 6 adversarial cases",
+    "windows": "Windows 11 build 26200; 6/6 tiny D/G steps, 5 adversarial cases",
+    "rows_per_D_G": 127,
+    "seeded_peer_parity": "D/G chunks and group order/membership hashes; successful adversarial CSV hashes",
+    "adversarial_input_bytes": 703,
+    "adversarial_deadline_seconds": 600,
+    "adversarial_owned_bytes": 67108864,
+    "browser_launches": 0,
+    "scale_dialog_external_filesystem_recovery_publication_acceptance": false,
+    "browser_launches_scope": "Original native small receipts above only; later protected tooling attempt recorded separately"
+  },
+  "limitations": [
+    "No newmain/guided CLI/redesign bytes included in frozen606 packages",
+    "Linux requires GLIBC symbols through 2.39; no broader compatibility certification",
+    "Original assembly receipt leaves build provenance fields null; this reconciliation supplies separate original-build evidence without modifying that receipt",
+    "Tiny/adversarial receipts alone do not establish10GB Run/1GB scale, remaining installed-channel variants, real dialogs/external filesystem or fresh scoped R2 readback; first Chrome standard SMALL pass and Linux generation-only failure are scoped separately below."
+  ],
+  "later_protected_browser_attempts": [
+    {
+      "attempt": "20261106T153939Z",
+      "record_lookup": "Separate retained Windows SMALL prep/runtime attempt, not package custody",
+      "tooling_commit": "41dc4ae787577a01aa0778da05d7847751310fc4",
+      "harness_commit": "4f4d8771f65e0cdb8d3285ad69d33f784cd66d38",
+      "product_commit": "6069cef178f0b49cf45c2d5db94665c62d43ccc8",
+      "plan_sha256": "297dbe414ca12f09886ef5ba161e88916591d5d98adc92f879cfe77c04a248a7",
+      "browser_version": "156.0.8078.80",
+      "browser_sha256": "46461accbdc87dc88a5bdd6d611be095dd6147db009863d794f742ca90662efa",
+      "status": "Failed command-line identity initialization before product page or CSV execution",
+      "primary_error": "Observer failure: {'type': 'initialization-error', 'sampled_ms': 1793979915550, 'errors': ['Error: cdpSession.send: Protocol error (Browser.getBrowserCommandLine): Command line not returned because --enable-automation not set.']}",
+      "secondary": "Heartbeat watchdog failures during cleanup; no acceptance pass",
+      "runtime_records": {
+        "result.json": {
+          "bytes": 598,
+          "sha256": "38f0b3d01942b3a44551551bbc5a1fc9d97772c83f8783bd7472f95dcf90460b"
+        },
+        "control-failure.json": {
+          "bytes": 1633,
+          "sha256": "80b5cc6a69d83ba381117ceae39b7e10585d02f82b3f5a9ff8579e4ce82b6324"
+        },
+        "cleanup.json": {
+          "bytes": 325,
+          "sha256": "fc43c36851ba4c58da6fa90fdf4a28500ee0184e78bb64832dffad7eb197923c"
+        },
+        "storage-ledger.json": {
+          "bytes": 233,
+          "sha256": "6d598e90d7ba00a2057a5725ff78faf2c3df2087d46e4586196cca8395403c68"
+        }
+      },
+      "post_exit_inspection": {
+        "bytes": 2098,
+        "sha256": "2aa299c47cf7b4b9ee5218acae93cfc37848f5e4826e2a07382f2707d4595157"
+      },
+      "owned_original_identities_remaining": 0,
+      "owned_identity_observations": 15,
+      "pid_reuse_detected": true,
+      "shared_lock_reacquired_and_released": true,
+      "issue": 136
+    },
+    {
+      "attempt": "20261106T180530Z",
+      "tooling_commit": "597266c466f369a365182e63f2e80ff558dd7f66",
+      "harness_commit": "56dbde55a7ca281fc0a35d757adcd0d4ac48d92a",
+      "product_commit": "6069cef178f0b49cf45c2d5db94665c62d43ccc8",
+      "status": "Observer initialization failed after browser identity; no quota sample or contract pass",
+      "primary_error": "Please use browser.newContext()",
+      "post_exit": "14 recorded births absent; same host lock free; all 9,120 inputs and 12 prior roots unchanged",
+      "report": {
+        "bytes": 3327,
+        "sha256": "6ef7c55b7b32e05c339a99aa62e4ef30e171cb89c864102c00d1a66d08a7b262"
+      }
+    },
+    {
+      "attempt": "20261106T183759Z",
+      "tooling_commit": "e9e8304d203d59f0e6982cb04555c27bd44286f1",
+      "harness_commit": "1a6c4d673892eaffec122c0c2acfc657c953042e",
+      "product_commit": "6069cef178f0b49cf45c2d5db94665c62d43ccc8",
+      "plan_sha256": "dbec4e2cb3a3323793484fc48c7164730af9eea4428d1a0decab33e85b27366a",
+      "config_sha256": "e9f3af2f652d43933dd1ef31de1846f0e8e57b8b7550925e2c344cc9551cd0e1",
+      "browser_version": "156.0.8078.80",
+      "browser_sha256": "46461accbdc87dc88a5bdd6d611be095dd6147db009863d794f742ca90662efa",
+      "status": "Passed standard installed Chrome SMALL contract only",
+      "command": {
+        "script": "test-browser.mjs",
+        "flags": [],
+        "origin": "http://127.0.0.1:8422",
+        "timeout_seconds": 600
+      },
+      "tests_passed": 35,
+      "attempts": 1,
+      "exit_code": 0,
+      "runner_seconds": 33.88527980000072,
+      "observation": {
+        "quota_samples": 20,
+        "observer_events": 23,
+        "guard_samples": 82,
+        "maximum_guard_timestamp_gap_ms": 801,
+        "maximum_quota_gap_ms": 1018,
+        "minimum_available_quota_bytes": 10737418240,
+        "minimum_usable_after_20_percent_reserve_bytes": 8589934592,
+        "minimum_free_bytes": 576191774720,
+        "maximum_recorded_input_subphase_seconds": 0.7317871,
+        "whole_guard_sample_bound_ms": 800,
+        "whole_guard_sample_evidence": "Successful producer watchdog enforcement; no separate measured whole-sample maximum is claimed."
+      },
+      "post_exit": {
+        "audit": {
+          "bytes": 10889,
+          "sha256": "fb8fa9b63379eaef179ff53e2a8b8dad9b61d4d01a6a2fb66e29c6631aead26f"
+        },
+        "audit_seconds": 20.760661000000255,
+        "frozen_inputs_unchanged": 14728,
+        "prior_roots_unchanged": 14,
+        "known_births_absent": 19,
+        "same_lock_reacquired_and_released": true,
+        "source_custody_dependencies_product7_test2_gates_unchanged": true
+      },
+      "storage": {
+        "prior_ledger_charge_bytes": 810721280,
+        "actual_cumulative_ledger_bytes": 987324416,
+        "semantics": "Actual ledger already includes prior charges; no refund/retirement. Summing all six ledgers conservatively charges1798045696bytes."
+      },
+      "runtime_records": {
+        "result.json": {
+          "bytes": 67,
+          "sha256": "314573fa8a4d142d20ac7759744a489b8982f2a608b703c08a09a45f66998d4a"
+        },
+        "cleanup.json": {
+          "bytes": 82,
+          "sha256": "aa78f7efa0430fbe00e620e36e20fa2210bf9cc6e342bcc0dbb5a7b50c9b336f"
+        },
+        "batch/status.json": {
+          "bytes": 9189527,
+          "sha256": "9a167643f07616dbed249160d81b774b31a56bd39ada8c5f2f95232b2344ed27"
+        },
+        "batch/1-stdout.log": {
+          "bytes": 4434,
+          "sha256": "0c54ce7e4e899f51f38be7a9646f5a66e89248f54d6b892a0e0ed1a617f35a3c"
+        },
+        "command-1.jsonl": {
+          "bytes": 3431589,
+          "sha256": "c99ede46266b88d90cf419a93fe75c4cdc898b5d8ced041bee640e7e813f72fb"
+        },
+        "guard-history.jsonl": {
+          "bytes": 199275,
+          "sha256": "6bce5994c1eaed9bf0adc65294e4b0d33391af9c8394095ef8cf62558a57e5ef"
+        },
+        "storage-ledger.json": {
+          "bytes": 233,
+          "sha256": "555282e46707a72125db046a8ac33ad56cbc7b695bcb7e4ea7ce45fd57d33aa3"
+        }
+      },
+      "audit_failures_retained": "V1 native comparator stopped on Windows Path/string ordering; WSL reconciliation of 126.637s exceeded 120s end-to-end interpretation. V2 stopped at the other ordered snapshot. V3 corrects order-only comparison and omitted-file controls reject; original records remain incomplete, not relabeled passing.",
+      "remaining": "Other installed Chrome/Edge variants, persistent/process-kill/resource coverage, 1 GB scale, real dialogs/external filesystem and publication are unaccepted. Original batch expires20:39:36.963UTC; no supported cross-plan clock/progress continuation."
+    }
+  ],
+  "later_native_scale_attempts": [
+    {
+      "attempt": "native103-frozen606-linux-first",
+      "os": "Linux/WSL",
+      "product_commit": "6069cef178f0b49cf45c2d5db94665c62d43ccc8",
+      "harness_commit": "597266c466f369a365182e63f2e80ff558dd7f66",
+      "plan_sha256": "2f160031005195f9eac551b8590ff0570cce00045f3c88c7f24cdd764ca70e6f",
+      "generation": {
+        "shape": "D",
+        "attempts": 1,
+        "passed": true,
+        "seconds": 324.064,
+        "bytes": 10000000000,
+        "rows": 99999999,
+        "input_sha256": "a0f29f0b4f3b6a1b1ef2d2417704c857e09c1dd8e3d60c7a91997f532824dc4f",
+        "checkpoint": {
+          "bytes": 202,
+          "sha256": "afad5d98700613d1e3f0c3ae7300412f31d62c3e04532a71c5ce2f18fe3e103d"
+        },
+        "status": {
+          "bytes": 4279,
+          "sha256": "3dece101674457d9d2126ea9bb9f0d3e70d6fd265bd443a1ff201879d5b0edf9"
+        },
+        "cleanup": {
+          "bytes": 62,
+          "sha256": "89136d9036dcfd4103c0dc6ad04bbb214f48670270dcc0bdc22493fa7dcf2007"
+        }
+      },
+      "session": {
+        "passed": false,
+        "error": "source freeze drift",
+        "record": {
+          "bytes": 172,
+          "sha256": "f66c44a2e2c9edaf03e68f330ba0251f55b41ed5113acb0492d96e90c996868d"
+        },
+        "cause": "Parent Run-review import wrote an ignored recipe bytecode cache into the frozen harness; guard correctly stopped before Chopper Run. Tracked product 1,061/harness 1,096/runtime 1,331 files unchanged.",
+        "cache": {
+          "bytes": 3873,
+          "sha256": "5b43cf9ec7bee8106961dd2dad7ccbe3bdbed1920d9e08a36c6557e6d8c3b0e0"
+        }
+      },
+      "Run_slots_consumed": 0,
+      "Run_or_verification_executed": false,
+      "G_unrun": true,
+      "cleanup": "Known process identities absent; retained cgroup empty; original host lock free. Terminal records, cache and 10 GB input preserved.",
+      "retry_or_resume_approved": false,
+      "remaining": "Explicit owner authorization to amend the no-retry pre-consumption boundary is requested; disabled proposal keeps original 8h deadline/cumulative generation/storage/four Run slots. No restart authorized."
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "validated-compact-fields-2026-11-05",
+  "title": "Traverse already-validated immutable packed fields",
+  "date": "2026-11-05",
+  "subsystem": "storage",
+  "question": "Can traversal reuse packed-field UTF-8 invariants without weakening input validation?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Remove repeated traversal validation while preserving strict CSV/spool construction checks and immutable views.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "One million probe-v1 pipeline rows, four workers, 32-MiB job/shared limits and larger fixed output caps."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux"
+    ],
+    "summary": "Recorded exact output/Analysis comparisons and construction, corruption and ownership controls cover the pinned builds; external input remains validated."
+  },
+  "limitations": [
+    "Small development cells and uncontrolled cache/background state do not establish general device, shape or tail performance.",
+    "Historical percentage gains are not additive; every comparison uses its own pinned baseline.",
+    "Unchecked traversal depends on validated construction, cleared recycled storage, bounds checks and immutable views."
+  ],
+  "exclusions": [
+    "Earlier 200k-row/small-cap panels and rejected parser samples are different comparisons."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#validated-compact-field-traversal-2026-11-05",
+      "sha256": "d0d5a2d3fb211370784e8efcfe90c63886caf823c1109cfc6839f02c97d41ff0"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/validated-compact-fields-2026-11-05.json",
+      "sha256": "4e3867b38e8f9ee4eeaf9bec46b3348c402a929c424ad3516f62fcbd3dec26ef"
+    },
+    {
+      "path": "docs/benchmarks/validated-compact-fields-2026-11-05.patch",
+      "sha256": "4c4a9ee8ec2a9af7dd7c86547cd5a8d20466a43064fb26edf13e8b7496704b42"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md",
+    "docs/resource-policy-research.md#validated-packed-field-traversal-2026-11-05"
+  ]
+}

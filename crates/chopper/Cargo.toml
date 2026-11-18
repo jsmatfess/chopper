@@ -1,0 +1,73 @@
+[package]
+name = "chopper"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+default-run = "chopper"
+
+[features]
+# Test-only deterministic resource contracts; never enabled by production builds.
+resource-contract-tests = []
+# Opt-in external spill block/framing experiment; v1 rows remain the default.
+experimental-spill-blocks = []
+# Opt-in native profiling hash batches; serial profiling remains the default.
+experimental-parallel-profile = []
+# Opt-in native overlap of plain prepared-output files using requested workers.
+experimental-plain-publication = []
+# Opt-in exact-v1 uniform shuffle followed by value partition fusion.
+experimental-shuffle-partition = []
+# Opt-in single traversal of nested balanced ranges.
+experimental-nested-balanced = []
+# Opt-in elimination of partition keys proven constant by previous partitions.
+experimental-constant-partition = []
+# Opt-in single grouping traversal for adjacent value partitions.
+experimental-consecutive-partitions = []
+
+# Opt-in exact partition/uniform/balanced traversal with bounded tuple counts.
+experimental-partition-balanced = []
+
+# Opt-in exact count-independent membership/partition/membership routing.
+experimental-streaming-chain = []
+
+
+
+
+
+
+
+[dependencies]
+chopper-core = { path = "../chopper-core" }
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+blake3 = "1"
+tempfile = "3"
+# Codec admission is audited against these implementations; re-audit on update.
+flate2 = "=1.1.10"
+miniz_oxide = "=0.9.1"
+zstd = "=0.13.4"
+# Expose pinned stream-size estimation APIs; codec settings remain unchanged.
+zstd-safe = { version = "=7.4.0", default-features = false, features = ["experimental"] }
+zstd-sys = { version = "=2.1.1", default-features = false, features = ["vendored"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+crc32fast = "1"
+getrandom = "0.2"
+
+[target.'cfg(not(target_os = "wasi"))'.dependencies]
+clap = { version = "4", features = ["derive"] }
+ctrlc = "3"
+fs2 = "0.4"
+rayon = "1"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(any(unix, target_os = "wasi"))'.dependencies]
+rustix = { version = "1", features = ["fs"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_Threading"] }
+
+[dev-dependencies]
+
+

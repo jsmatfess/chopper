@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "ascii-quoted-escapes-2026-11-05",
+  "title": "Keep ASCII quoted-escape byte searches unapplied",
+  "date": "2026-11-05",
+  "subsystem": "input",
+  "question": "Can ASCII quote/escape boundary byte searches improve complete quoted Run without a material plain-control regression?",
+  "disposition": "reject",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Restore production exactly: quoted primary passes wall/total/user conditions, but plain-control user CPU exceeds the frozen ceiling while total CPU is flat. Preserve exact candidate and all raw data without retuning.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "Quoted ordered4M3field ABBA primary, n2 per variant.",
+      "Separate plain ordered4M3field negative pair, n1 per variant."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Exact-head/base Linux/native Windows workflows pass scalar reference UTF8/UTF16/dialect/span/reuse/admission-retry controls plus actual coreWASM/browser/resources/all-feature checks on Linux. Six complete native jobs preserve exact every-field/ID/order/byte/cap/17Analysis/cleanup. Final evidence-only head requires its applicable gate."
+  },
+  "limitations": [
+    "Quoted wall17.61%,totalCPU19.41%,userCPU24.89% median reductions with both opposite-order pairs favorable; n2 does not establish general shape/device/tail benefit.",
+    "Separate plain wall improves2.81%,totalCPU is flat,userCPU rises10.91% and kernelCPU falls27.27%. Frozen2% user ceiling fails. This unreplicated redistribution is not function attribution or a general regression claim.",
+    "One fixed4Mpanel replaced unexecuted1Mintent before any experimental build or Run to reduce relative15.625ms granularity. No size sweep, tuning, kernel scan or matrix.",
+    "Warm uncontrolled cache/background; no native full physical-plan trace, new RSS/physicalIO/wholeRun capacity peak or current-source browser throughput/macOS claim. Analysis diagnostics precede final publication.",
+    "Original source333-equivalent baseline reused after full recorded build/input/artifact/compiler/environment and actual original/current features verified. Historical independent MSVC C-compiler/linker hashes remain unknown."
+  ],
+  "exclusions": [
+    "Plain control stays separate; no pooling/subtraction or extra summary/contract-duration observations.",
+    "Initial planning/verifier-hardening versions, native binaries/raws and marker-cache/digest rejections remain preserved; those studies stay closed.",
+    "Source1/2,candidatebuild1/1,nativeRuns6/6 spent; no component scans, timing repeats, retuning or reopening."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#ascii-quoted-field-escape-searches-2026-11-05",
+      "sha256": "917a7bb6f9b2029702809c5ec28fe93ae52e1ed35b2d5309a1321b0426243568"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/ascii-quoted-escapes-2026-11-05.json",
+      "sha256": "4923bae1f66493417ce3abbc88c3b54634e9873e918d25292d6ebb307e34c002"
+    },
+    {
+      "path": "docs/benchmarks/ascii-quoted-escapes-2026-11-05.patch",
+      "sha256": "c74a97ed37cb486a76ac180ea67b82aebbe05db17673b89329a84b16df4ae0b4"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

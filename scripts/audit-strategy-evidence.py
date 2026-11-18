@@ -1,0 +1,330 @@
+#!/usr/bin/env python3
+"""Reproduce the phase-one corpus coverage audit. Never execute benchmark jobs.
+
+Family assignments are explicit review decisions, not inferred timing eligibility.
+Use the existing catalog parser and lossless record reader; do not normalize units.
+"""
+import argparse
+import hashlib
+import importlib.util
+import json
+import collections
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / 'docs/benchmarks/strategy-corpus-review-2026-10-23.json'
+SPEC = importlib.util.spec_from_file_location('benchmark_catalog', ROOT / 'scripts/benchmark-catalog.py')
+CAT = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(CAT)
+
+
+def generate():
+    catalog = CAT.build_catalog(ROOT)
+    experiments = catalog['experiments']
+    # This report's dated performance entry is navigation, not another experiment.
+    experiments = [e for e in experiments if e['title'] != 'Full strategy and maintainability review (2026-10-23)']
+    if {e['title'] for e in experiments} != set(SECTIONS):
+        raise ValueError('Evidence sections changed: review SECTIONS before regenerating')
+    by_evidence = {e['evidence']: SECTIONS[e['title']] for e in experiments}
+    sources = []
+    for artifact in catalog['artifacts']:
+        if artifact['path'] == OUT.relative_to(ROOT).as_posix():
+            continue
+        families = sorted({by_evidence[e] for e in artifact['evidence'] if e in by_evidence})
+        if not families:
+            families = [ORPHANS[Path(artifact['path']).name]]
+        counts = collections.Counter()
+        locations = {}
+        for location, value in CAT.records(ROOT / artifact['path']):
+            kind = CAT.kind(value)
+            counts[kind] += 1
+            locations.setdefault(kind, {'first': location, 'last': location})['last'] = location
+        assert dict(counts) == artifact['record_counts']
+        sources.append({**artifact, 'families': families, 'record_bounds_by_kind': locations,
+                        'use': 'Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations.'})
+    return json.dumps({
+        'schema_version': 1,
+        'type': 'derived_strategy_corpus_audit',
+        'analysis_script': 'scripts/audit-strategy-evidence.py',
+        'analysis_script_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        'scope': 'Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.',
+        'evidence_document': catalog['evidence_document'],
+        'families': sorted(set(SECTIONS.values())),
+        'sections': [{**e, 'family': SECTIONS[e['title']]} for e in experiments],
+        'sources': sources,
+        'identical_content': catalog['identical_content'],
+        'selected_numerical_audit': 'docs/benchmarks/performance-decisions-2026-10-20.json',
+    }, indent=2, ensure_ascii=False) + '\n'
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--check', action='store_true')
+    args = parser.parse_args()
+    output = generate()
+    if args.check:
+        if OUT.read_text(encoding='utf-8') != output:
+            raise SystemExit('Strategy audit is stale; review then regenerate')
+    else:
+        OUT.write_text(output, encoding='utf-8', newline='\n')
+    result = json.loads(output)
+    print(f"{len(result['sections'])} sections, {len(result['sources'])} artifacts, {len(result['families'])} families {'checked' if args.check else 'written'}")
+
+
+# Exact section titles: additions require an explicit family/eligibility review.
+SECTIONS = {
+    'Hosted memory ceiling (2026-11-16)': 'ownership-and-lifecycle',
+    'Buffered random final transfer (2026-11-16)': 'random-quality',
+    'Buffered random draws and seed removal (2026-11-16)': 'random-quality',
+    'Shuffle swarm decisions (2026-11-15)': 'allocation-ranges',
+    'Policy removal evidence delivery (2026-11-15)': 'shuffle-partition',
+    'Seeded policy removal and shuffle partition fusion (2026-11-15)': 'shuffle-partition',
+    'Complete buffered packed-row copy (2026-11-05)': 'ownership-and-lifecycle',
+    'Unchanged-size reservation entry (2026-11-05)': 'ownership-and-lifecycle',
+    'Current complete-Run CPU after buffered spool copying (2026-11-05)': 'profiling',
+    'ASCII quoted-field escape searches (2026-11-05)': 'compact-parser-and-consumers',
+    'CSV marker-cache candidate not promoted (2026-11-05)': 'compact-parser-and-consumers','Aligned digest batch candidate not promoted (2026-11-05)': 'compact-parser-and-consumers',
+ 'Execution graph landing candidate reconciliation (2026-11-05)': 'execution-observation',
+'Execution graph merged-source correctness (2026-11-05)': 'execution-observation',
+'Execution graph evidence conformance and merge scope (2026-11-05)': 'execution-observation',
+'Hosted execution graph: 126 retained jobs accepted (2026-11-05)': 'execution-observation',
+ 'Hosted execution graph: 108-job precision result remains unmet (2026-11-05)': 'execution-observation',
+ 'Hosted execution graph: first complete overhead gate unmet (2026-11-05)': 'execution-observation',
+ 'Buffered spool field copy (2026-11-05)': 'ownership-and-lifecycle',
+ 'Empty reservation accounting candidate not promoted (2026-11-05)': 'ownership-and-lifecycle',
+ 'Strict spool UTF-8 SIMD wrapper rejected (2026-11-05)': 'compact-parser-and-consumers',
+ 'Inline fixed-size spool header keys (2026-11-05)': 'ownership-and-lifecycle',
+ 'Current complete-Run user CPU attribution (2026-11-05)': 'profiling',
+ 'ASCII quote detection for CSV output (2026-11-05)': 'compact-parser-and-consumers',
+ 'Quoted CSV serialization spans (2026-11-05)': 'compact-parser-and-consumers',
+ 'Validated compact-field traversal (2026-11-05)': 'compact-parser-and-consumers',
+ 'Bounded parallel CSV parsing with copied handoff (2026-11-05)': 'compact-parser-and-consumers',
+ 'Strict CSV serial admitted-span control (2026-11-05)': 'compact-parser-and-consumers',
+ 'Probabilistic shuffle production eligibility (2026-11-05)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: prepared spill temporary failure control (2026-11-05)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: prepared spill browser acceptance (2026-11-05)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: external-wide owner acceptance (2026-11-05)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: prepared spill working-set cost (2026-11-05)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: prepared spill owner control (2026-11-05)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: peer after buffer observation (2026-11-05)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: wide-record acceptance control (2026-11-05)': 'adaptive-routing',
+ 'Native experimental plain publication delivery (2026-11-05)': 'ownership-and-lifecycle',
+ 'Plain publication overlap: 10 MB output cap (2026-11-05)': 'ownership-and-lifecycle',
+ 'Plain publication overlap: unchanged production Run transfer (2026-11-05)': 'ownership-and-lifecycle',
+ 'Bounded plain prepared-publication overlap control (2026-11-04)': 'ownership-and-lifecycle',
+ 'Complete-job kernel and publication attribution control (2026-11-04)': 'profiling',
+ 'Probabilistic shuffle fusion: native external working-set comparison (2026-11-03)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: available-buffer storage control (2026-11-03)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: live-owner completion counterexample (2026-11-03)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: browser transfer and interruption (2026-11-03)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: native semantic and failure controls (2026-11-03)': 'adaptive-routing',
+ 'Probabilistic shuffle fusion: fixed capacity and external-sort controls (2026-11-03)': 'adaptive-routing',
+ 'Probabilistic allocation and uniform shuffle fusion control (2026-11-03)': 'adaptive-routing',
+ 'Terminal direct output: dynamic owner and cancellation control (2026-11-03)': 'adaptive-routing',
+ 'Terminal direct output: fixed shared-capacity control (2026-11-03)': 'adaptive-routing',
+ 'Terminal direct output: storage lifetimes and temp-budget control (2026-11-03)': 'adaptive-routing',
+ 'Terminal direct output: Chrome and working-set transfer (2026-11-03)': 'adaptive-routing',
+ 'Isolated terminal direct Run: native comparison (2026-11-03)': 'adaptive-routing',
+ 'Direct final-output cost audit (2026-11-03)': 'design-and-derived',
+ 'Resident child metadata preparation control (2026-11-03)': 'adaptive-routing',
+ 'Independent events allocation transfer (2026-11-03)': 'adaptive-routing',
+ 'Allocation post-preparation pressure boundary (2026-11-03)': 'adaptive-routing',
+ 'Allocation retry safety and runtime evaluation (2026-11-03)': 'adaptive-routing',
+ 'Materialized-parent allocation retry (2026-11-03)': 'adaptive-routing',
+ 'Browser measurement readiness restored (2026-11-02)': 'design-and-derived',
+ 'Resident allocation prepared-router control (2026-11-02)': 'adaptive-routing',
+ 'Browser measurement prerequisite audit (2026-11-02)': 'design-and-derived',
+ 'Resident allocation admission control (2026-11-02)': 'adaptive-routing',
+ 'Resident allocation challenger (2026-11-02)': 'adaptive-routing',
+ 'Allocation routing storage audit (2026-11-02)': 'adaptive-routing',
+ 'Native unattended controller acceptance (2026-11-01)': 'design-and-derived',
+ 'Small complete-job grouping control (2026-10-31)': 'explicit-options',
+ 'Direct input snapshot rejection and removal (2026-10-26)': 'snapshot-adapters',
+ 'E4 explicit probabilistic-allocation advice (2026-10-28)': 'explicit-options',
+ 'E5 bounded native automatic-memory panel (2026-10-28)': 'explicit-options',
+ 'Abrupt browser process termination and recovery (2026-10-22)': 'ownership-and-lifecycle',
+ 'Persistent hosted spill-block E1 comparison (2026-10-24)': 'spill-blocks',
+ 'Adaptive strategy exploration (2026-10-11)': 'adaptive-routing',
+ 'Additional follow-up: inline sort keys': 'compact-parser-and-consumers',
+ 'Analysis header sharing and final-owner admission (2026-10-23)': 'ownership-and-lifecycle',
+ 'Analysis preview capacity and shared lifetime (2026-10-23)': 'ownership-and-lifecycle',
+ 'Analysis stage-statistics admission and sharing (2026-10-23)': 'ownership-and-lifecycle',
+ 'Analysis text admission and sharing (2026-10-23)': 'ownership-and-lifecycle',
+ 'Analysis warning and timing admission (2026-10-23)': 'ownership-and-lifecycle',
+ 'Approved options implementation, 2026-10-13': 'explicit-options',
+ 'Balanced-split boundary scanning, 2026-10-13': 'balanced-boundaries',
+ 'Billion-row native full-shuffle acceptance point (2026-10-16)': 'original-pipeline-and-scale',
+ 'Borrowed UTF-8 spill validation and copying, 2026-10-15': 'compact-parser-and-consumers',
+ 'Bounded CSV sniff sample and parser ownership (2026-10-21)': 'ownership-and-lifecycle',
+ 'Bounded independent group-processing evaluation (2026-10-16)': 'parallel-groups',
+ 'Retained-profile Shared-pressure E2 comparison (2026-10-25)': 'parallel-groups',
+ 'Independent parent batching removal (2026-10-25)': 'parallel-groups',
+ 'Bounded parallel profiling evaluation (2026-10-16)': 'parallel-profile',
+ 'Bounded retained-parent decision audit (2026-10-21)': 'ownership-and-lifecycle',
+ 'Browser completion marker termination and committed export preservation (2026-10-21)': 'ownership-and-lifecycle',
+ 'Browser export after retained-parent retry (2026-10-21)': 'ownership-and-lifecycle',
+ 'Browser export finalization failure ownership (2026-10-21)': 'ownership-and-lifecycle',
+ 'Catalog input buffers and streamed lineage JSON (2026-10-16)': 'ownership-and-lifecycle',
+ 'Column scalar deserialization without successful trial errors (2026-10-23)': 'ownership-and-lifecycle',
+ 'Compact CSV ingestion and frame metadata, 2026-10-15': 'ownership-and-lifecycle',
+ 'Compact buffer shuffle, 2026-10-14': 'buffer-shuffle',
+ 'Compact dataset decode accounting (2026-10-16)': 'ownership-and-lifecycle',
+ 'Compact dataset key accounting (2026-10-16)': 'ownership-and-lifecycle',
+ 'Compact external consumers, 2026-10-14': 'compact-parser-and-consumers',
+ 'Compact external-spill block evaluation (2026-10-16)': 'spill-blocks',
+ 'Compact group consumers, 2026-10-14': 'compact-parser-and-consumers',
+ 'Compact parser buffer accounting (2026-10-15)': 'ownership-and-lifecycle',
+ 'Compact resident consumers, 2026-10-13': 'compact-parser-and-consumers',
+ 'Compact shuffle ingestion, 2026-10-14': 'compact-parser-and-consumers',
+ 'Compact stage ingestion, 2026-10-14': 'compact-parser-and-consumers',
+ 'Consecutive value-partition fusion (2026-10-17)': 'consecutive-partitions',
+ 'Controlled temporary construction and identity-preserving reopen (2026-10-22)': 'ownership-and-lifecycle',
+ 'Current implementation': 'original-pipeline-and-scale',
+ 'Current retained-parent SSD calibration and publication failures (2026-10-21)': 'windows-retained-parent',
+ 'Current retained-parent Windows calibration attempt (2026-10-21)': 'windows-retained-parent',
+ 'Decode storage reuse, 2026-10-14': 'compact-parser-and-consumers',
+ 'Decoded group owners and WASI resource contracts (2026-10-21)': 'ownership-and-lifecycle',
+ 'Default child-lineage construction and borrowed domains (2026-10-22)': 'ownership-and-lifecycle',
+ 'Deterministic full-shuffle correctness, 2026-10-15': 'random-quality',
+ 'Diagnostic snapshot preflight and shared ownership (2026-10-23)': 'ownership-and-lifecycle',
+ 'Dynamic pressure rechecks at execution boundaries (2026-10-16)': 'ownership-and-lifecycle',
+ 'Encoded CSV caps and publication after retained-parent retry (2026-10-21)': 'ownership-and-lifecycle',
+ 'Exact shuffle/partition prototype evaluation (2026-10-16)': 'shuffle-partition',
+ 'Exact-assignment scratch accounting (2026-10-16)': 'ownership-and-lifecycle',
+ 'Execution changes': 'original-pipeline-and-scale',
+ 'Existing Cloudflare deployment acceptance (2026-10-22)': 'ownership-and-lifecycle',
+ 'Expanded memory accounting batch (2026-10-16)': 'ownership-and-lifecycle',
+ 'Experimental child lineage and mutable partition traversal (2026-10-22)': 'ownership-and-lifecycle',
+ 'Explicit flexible full-shuffle policy (2026-10-18)': 'flexible-policy',
+ 'External prefix-distribution experiment, 2026-10-15': 'prefix-distribution',
+ 'External shuffle native/browser follow-up, 2026-10-15': 'external-and-resident-shuffle',
+ 'First adaptive execution implementation (2026-10-11)': 'adaptive-routing',
+ 'Fixed-seed shuffle diagnostics, 2026-10-15': 'random-quality',
+ 'Flexible partition-first shuffle experiment (2026-10-18)': 'partition-first',
+ 'Flexible shuffle and exact allocation ranges (2026-10-19)': 'allocation-ranges',
+ 'Follow-up optimization pass (2026-10-11)': 'original-pipeline-and-scale',
+ 'Full-file input profiling (2026-10-12)': 'profiling',
+ 'Full-shuffle native and WASI worker matrix, 2026-10-15': 'external-and-resident-shuffle',
+ 'Grouped decode storage reuse, 2026-10-14': 'compact-parser-and-consumers',
+ 'Gzip input codec admission (2026-10-22)': 'ownership-and-lifecycle',
+ 'Independent random-bucket full-shuffle experiment (2026-10-19)': 'random-buckets',
+ 'Input-adapter capacity and Windows profile invalidation (2026-10-20)': 'ownership-and-lifecycle',
+ 'Intermediate dataset buffer accounting, 2026-10-15': 'ownership-and-lifecycle',
+ 'Job manifest tree construction admission (2026-10-21)': 'ownership-and-lifecycle',
+ 'Linux revalidation of the published lineage build (2026-10-22)': 'ownership-and-lifecycle',
+ 'Measured results (2026-10-10)': 'original-pipeline-and-scale',
+ 'Merge and routed header key accounting (2026-10-16)': 'ownership-and-lifecycle',
+ 'Native HTTP JSON response admission (2026-10-23)': 'ownership-and-lifecycle',
+ 'Native HTTP decoded request ownership (2026-10-23)': 'ownership-and-lifecycle',
+ 'Native HTTP request byte admission (2026-10-23)': 'ownership-and-lifecycle',
+ 'Native Windows SSD shuffle/partition calibration (2026-10-20)': 'windows-ingestion-fusion',
+ 'Native Windows bounded parallel profile calibration (2026-10-21)': 'windows-profile',
+ 'Native inspection HTTP payload admission (2026-10-21)': 'ownership-and-lifecycle',
+ 'Native picker parent pipe admission and shutdown (2026-10-23)': 'ownership-and-lifecycle',
+ 'Native typed Job construction admission (2026-10-23)': 'ownership-and-lifecycle',
+ 'Nested balanced lineage growth and leaf ownership (2026-10-22)': 'ownership-and-lifecycle',
+ 'Nested balanced range fusion (2026-10-17)': 'nested-balanced',
+ 'Operation-key capacity and inline group indices (2026-10-16)': 'ownership-and-lifecycle',
+ 'Output planning lineage clone ownership (2026-10-21)': 'ownership-and-lifecycle',
+ 'Output snapshot writer buffer accounting (2026-10-16)': 'ownership-and-lifecycle',
+ 'Owned CSV parser and header accounting (2026-10-15)': 'ownership-and-lifecycle',
+ 'Owned intermediate dataset decode accounting (2026-10-16)': 'ownership-and-lifecycle',
+ 'Parser storage and compact streaming ingestion, 2026-10-15': 'compact-parser-and-consumers',
+ 'Parser, serialization, digest and merge improvements (2026-10-12)': 'compact-parser-and-consumers',
+ 'Partition domain-cache accounting (2026-10-16)': 'ownership-and-lifecycle',
+ 'Partition shuffle balanced fusion (2026-10-18)': 'partition-balanced',
+ 'Peer tab and worker abandoned-workspace cleanup (2026-10-21)': 'ownership-and-lifecycle',
+ 'Per-group reservation accounting, 2026-10-15': 'ownership-and-lifecycle',
+ 'Persistent browser interruption and restart recovery (2026-10-21)': 'ownership-and-lifecycle',
+ 'Prepared configuration capacity ownership (2026-10-23)': 'ownership-and-lifecycle',
+ 'Production browser engine termination and partial export (2026-10-21)': 'ownership-and-lifecycle',
+ 'Profiling parser buffer accounting (2026-10-15)': 'ownership-and-lifecycle',
+ 'Proven-constant partition keys (2026-10-17)': 'constant-partition',
+ 'Public preparation retained-parent retry acceptance (2026-10-21)': 'ownership-and-lifecycle',
+ 'Publication I/O capacity and cleanup-failure admission (2026-10-20)': 'ownership-and-lifecycle',
+ 'Publication batch descriptors and output name ownership (2026-10-21)': 'ownership-and-lifecycle',
+ 'Radix-sort experiment, 2026-10-13': 'radix',
+ 'Reproduction and correctness': 'original-pipeline-and-scale',
+ 'Resident full-shuffle comparison, 2026-10-15': 'external-and-resident-shuffle',
+ 'Resident full-shuffle native and WASI comparison, 2026-10-15': 'external-and-resident-shuffle',
+ 'Resource tradeoffs': 'original-pipeline-and-scale',
+ 'Restored Windows checks and column-inspection ownership (2026-10-21)': 'ownership-and-lifecycle',
+ 'Retained job and staging directory path ownership (2026-10-21)': 'ownership-and-lifecycle',
+ 'Retained partition boundary key admission (2026-10-22)': 'ownership-and-lifecycle',
+ 'Retained profile header and preview accounting (2026-10-16)': 'ownership-and-lifecycle',
+ 'Retained publication path capacity ownership (2026-10-21)': 'ownership-and-lifecycle',
+ 'Retained temporary-path accounting, 2026-10-15': 'ownership-and-lifecycle',
+ 'Retained-parent retry and decoded output-catalog ownership (2026-10-20)': 'ownership-and-lifecycle',
+ 'Retained-parent shape calibration outside the checkout (2026-10-21)': 'windows-retained-parent',
+ 'Returned inspection JSON admission and serialization lifetime (2026-10-21)': 'ownership-and-lifecycle',
+ 'Scale and cross-engine benchmarks (2026-10-11)': 'original-pipeline-and-scale',
+ 'Selected-column summary admission and sharing (2026-10-23)': 'ownership-and-lifecycle',
+ 'Serializer, prefix and logical-digest accounting (2026-10-16)': 'ownership-and-lifecycle',
+ 'Shared process admission and Linux startup discovery (2026-10-16)': 'ownership-and-lifecycle',
+ 'Shuffle output lineage admission and cancellation (2026-10-22)': 'ownership-and-lifecycle',
+ 'Sort-run catalog accounting, 2026-10-15': 'ownership-and-lifecycle',
+ 'Stage and parent resource-policy design (2026-10-20)': 'design-and-derived',
+ 'Streaming and fallback follow-up (2026-10-12)': 'adaptive-routing',
+ 'Streaming decode-storage reuse, 2026-10-15': 'compact-parser-and-consumers',
+ 'Streaming group state accounting (2026-10-16)': 'ownership-and-lifecycle',
+ 'Streaming membership partition chains (2026-10-18)': 'streaming-chain',
+ 'Text snapshot and compact block prototype evaluation (2026-10-16)': 'snapshot-adapters',
+ 'Validated current build published to Pages (2026-10-22)': 'ownership-and-lifecycle',
+ 'Versioned buffered BLAKE3 shuffle source (2026-10-18)': 'xof-source',
+ 'WASI group denial and cleanup publication contracts (2026-10-21)': 'ownership-and-lifecycle',
+ 'WASI retained-parent retry acceptance (2026-10-21)': 'ownership-and-lifecycle',
+ 'Whole-job profiling, 2026-10-13': 'profiling',
+ 'Windows Chrome and Edge release acceptance (2026-10-22)': 'ownership-and-lifecycle',
+ 'Windows retained-parent replay after Smart App Control was disabled (2026-10-21)': 'windows-retained-parent',
+ 'Windows shuffle/partition spill-transition calibration (2026-10-20)': 'windows-ingestion-fusion',
+ 'Windows whole-device I/O diagnostic follow-up (2026-10-20)': 'device-diagnostic',
+ 'Workload and runtime decision synthesis (2026-10-20)': 'design-and-derived',
+ 'ZIP member and output deflate codec admission (2026-10-22)': 'ownership-and-lifecycle',
+ 'ZIP metadata parser admission and owner lifetimes (2026-10-21)': 'ownership-and-lifecycle',
+ 'ZIP metadata selection and allocation probes (2026-10-21)': 'ownership-and-lifecycle',
+ 'Zstandard modern and legacy input allocation ownership (2026-10-23)': 'ownership-and-lifecycle',
+ 'Zstandard output context admission (2026-10-23)': 'ownership-and-lifecycle'}
+
+# Explicit orphan associations are navigation only, never recovered metadata.
+ORPHANS = {'allocation-ranges-controls-2026-10-18.jsonl': 'allocation-ranges',
+ 'resident-allocation-admission-control-2026-11-02-private-narrative.md': 'adaptive-routing',
+ 'resident-allocation-challenger-2026-11-02-private-narrative.md': 'adaptive-routing',
+ 'small-complete-job-grouping-control-2026-10-31-private-narrative.md': 'adaptive-routing',
+ 'compact-parser-engines-2026-10-15.jsonl': 'compact-parser-and-consumers',
+ 'compact-parser-multilevel-browser-2026-10-15.jsonl': 'compact-parser-and-consumers',
+ 'fast-rng-browser-2026-10-18.json': 'xof-source',
+ 'native-request-wire-linux-validation-2026-10-23.json': 'ownership-and-lifecycle',
+ 'native-request-wire-validation-2026-10-23.json': 'ownership-and-lifecycle',
+ 'parallel-profile-initial-sources-2026-10-16.json': 'parallel-profile',
+ 'parallel-profile-revised-sources-2026-10-16.json': 'parallel-profile',
+ 'partition-balanced-initial-controls-2026-10-18.jsonl': 'partition-balanced',
+ 'partition-balanced-initial-native-2026-10-18.jsonl': 'partition-balanced',
+ 'performance-followup-2026-10-15.json': 'compact-parser-and-consumers',
+ 'picker-shutdown-incomplete-request-final-validation-2026-10-23.json': 'ownership-and-lifecycle',
+ 'random-buckets-diagnostics-native-2026-10-19.jsonl': 'random-buckets',
+ 'random-buckets-skew-invalid-config-2026-10-19.jsonl': 'random-buckets',
+ 'random-buckets-skew-invalid-config-2026-10-19.log': 'random-buckets',
+ 'random-buckets-skew-smoke-2026-10-19.jsonl': 'random-buckets',
+ 'random-buckets-window-followup-2026-10-19.jsonl': 'random-buckets',
+ 'random-buckets-window-reproduction-2026-10-19.jsonl': 'random-buckets',
+ 'shuffle-diagnostic-null-v1-2026-10-18.json': 'random-quality',
+ 'shuffle-partition-global-persistent-2026-10-17.jsonl': 'shuffle-partition',
+ 'shuffle-partition-smoke-2026-10-16.jsonl': 'shuffle-partition',
+ 'shuffle-partition-trap-bridge-count-2026-10-17.jsonl': 'shuffle-partition',
+ 'shuffle-partition-trap-global-control-2026-10-16.jsonl': 'shuffle-partition',
+ 'shuffle-partition-trap-previous-global-2026-10-16.jsonl': 'shuffle-partition',
+ 'shuffle-partition-trap-repro-32m-2026-10-16.jsonl': 'shuffle-partition',
+ 'shuffle-partition-trap-repro-8m-2026-10-16.jsonl': 'shuffle-partition',
+ 'shuffle-partition-trap-write-errors-2026-10-17.jsonl': 'shuffle-partition',
+ 'shuffle-partition-trap-write-probe-2026-10-17.jsonl': 'shuffle-partition',
+ 'streaming-chain-initial-boundaries-2026-10-18.jsonl': 'streaming-chain',
+ 'streaming-chain-initial-controls-2026-10-18.jsonl': 'streaming-chain',
+ 'streaming-chain-initial-default-controls-2026-10-18.jsonl': 'streaming-chain',
+ 'streaming-chain-initial-multilevel-2026-10-18.jsonl': 'streaming-chain',
+ 'streaming-chain-initial-native-2026-10-18.jsonl': 'streaming-chain',
+ 'streaming-chain-initial-skew-2026-10-18.jsonl': 'streaming-chain',
+ 'streaming-chain-initial-tiny-2026-10-18.jsonl': 'streaming-chain'}
+
+
+if __name__ == '__main__':
+    main()

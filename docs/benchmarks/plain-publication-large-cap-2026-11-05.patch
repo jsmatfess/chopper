@@ -1,0 +1,71 @@
+--- a/crates/chopper/src/output.rs
++++ b/crates/chopper/src/output.rs
+@@ -1782 +1782,3 @@
+-                assert!(bytes.len() <= 65536);
++                if let Some(limit) = job.limits.bytes {
++                    assert!((bytes.len() as u64) <= limit);
++                }
+@@ -1796 +1798,3 @@
+-                assert!(count <= 1024);
++                if let Some(limit) = job.limits.rows {
++                    assert!((count as u64) <= limit);
++                }
+@@ -2020 +2024,57 @@
+-}
++    #[test]
++    fn plain_publication_large_cap_panel() -> Result<()> {
++        let mut reference = None;
++        for (rep, (workers, parallel)) in [(4, false), (4, true), (4, true), (4, false)]
++            .into_iter()
++            .enumerate()
++        {
++            research_publication::set(parallel);
++            let (dir, mut job) = setup(200000)?;
++            job.resources.memory_mb = 128.into();
++            job.resources.workers = workers;
++            job.limits.rows = None;
++            job.limits.bytes = Some(10_000_000);
++            let input_hash = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++            let pool = Arc::new(crate::resources::MemoryPool::new(128 * 1024 * 1024));
++            let started = std::time::Instant::now();
++            let a = run_with_memory_pool(
++                job.clone(),
++                Arc::new(AtomicBool::new(false)),
++                Arc::new(|_| {}),
++                pool.clone(),
++            )?;
++            let seconds = started.elapsed().as_secs_f64();
++            assert_eq!(a.workers, workers);
++            let output_files = a.output_files;
++            let output_csv_bytes = a.output_csv_bytes;
++            assert!((1..=16).contains(&output_files));
++            let usage = pool.usage();
++            let prepublication_diagnostics = serde_json::to_value(&a.diagnostics)?;
++            let mut checked = verify(dir.path(), &job, 200000, &a)?;
++            assert_eq!(checked.logical["analysis"]["workers"], workers);
++            checked.logical["analysis"]
++                .as_object_mut()
++                .unwrap()
++                .remove("workers");
++            if let Some(ref old) = reference {
++                assert_eq!(&checked, old);
++            } else {
++                reference = Some(checked);
++            }
++            let peak = research_publication::peak();
++            assert!((1..=workers).contains(&peak));
++            if !parallel || workers == 1 {
++                assert_eq!(peak, 1);
++            }
++            drop(a);
++            assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++            assert_eq!(pool.usage().reserved_bytes, 0);
++            println!(
++                "PLAIN_LARGE_CAP {}",
++                serde_json::json!({"output_files":output_files,"output_csv_bytes":output_csv_bytes,"byte_cap":10000000,"row_cap":job.limits.rows,"rep":rep,"parallel":parallel,"workers":workers,"memory_mb":128,"rows":200000,"input_blake3":input_hash,"seconds":seconds,"peak_active_chunks":peak,"whole_run_peak_reserved_bytes":usage.peak_reserved_bytes,"retained_analysis_reserved_bytes":usage.reserved_bytes,"prepublication_diagnostics":prepublication_diagnostics,"exact_output_verified":true,"resource_invariant_analysis_fields":16,"workers_verified_separately":true,"cleanup":true})
++            );
++        }
++        research_publication::set(false);
++        Ok(())
++    }
++}

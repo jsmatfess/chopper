@@ -1,0 +1,151 @@
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -404,0 +405,148 @@
++
++fn verify_live_owner(
++    dir: &std::path::Path,
++    job: &Job,
++    n: usize,
++    a: &Analysis,
++) -> Result<serde_json::Value> {
++    let mut files = BTreeMap::new();
++    let mut records = Vec::new();
++    let mut ids = BTreeSet::new();
++    for entry in fs::read_dir(&job.output)? {
++        let e = entry?;
++        let name = e.file_name().to_string_lossy().into_owned();
++        let bytes = fs::read(e.path())?;
++        if name.ends_with(".csv") {
++            assert!(bytes.len() <= 65536);
++            let text = std::str::from_utf8(&bytes)?;
++            let mut lines = text.lines();
++            assert_eq!(lines.next(), Some("id,region,payload"));
++            let mut count = 0;
++            for line in lines {
++                let fields: Vec<_> = line.split(',').collect();
++                assert_eq!(fields.len(), 3);
++                let id = fields[0].parse::<usize>()?;
++                assert!(id < n && ids.insert(id));
++                assert_eq!(fields[1], "R0");
++                assert_eq!(fields[2], payload(id));
++                count += 1;
++            }
++            assert!(count <= 1024);
++            files.insert(name, bytes);
++        } else {
++            assert_eq!(name, "manifest.jsonl");
++            for line in bytes.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
++                let v: serde_json::Value = serde_json::from_slice(line)?;
++                if v["type"] == "output" {
++                    records.push(v);
++                }
++            }
++        }
++    }
++    assert_eq!(ids, (0..n).collect());
++    assert_eq!(a.rows, n as u64);
++    assert_eq!(a.groups, 3);
++    assert_eq!(files.len() as u64, a.output_files);
++    assert!(!fs::read_dir(dir)?.any(|e| e
++        .unwrap()
++        .file_name()
++        .to_string_lossy()
++        .starts_with(".chopper-staging-")));
++    let analysis = serde_json::to_value(a)?;
++    let logical: serde_json::Map<String, serde_json::Value> = [
++        "algorithm_version",
++        "column_values",
++        "seed",
++        "rows",
++        "columns",
++        "header",
++        "preview",
++        "logical_digest",
++        "groups",
++        "output_files",
++        "output_csv_bytes",
++        "largest_record_bytes",
++        "memory_budget_bytes",
++        "workers",
++        "stages",
++        "warnings",
++        "accuracy",
++    ]
++    .into_iter()
++    .map(|k| (k.into(), analysis[k].clone()))
++    .collect();
++    Ok(serde_json::json!({"files":files,"outputs":records,"analysis":logical}))
++}
++
++#[test]
++fn probabilistic_shuffle_live_owner_control() -> Result<()> {
++    let mut reference = None;
++    for candidate in [false, true] {
++        ENABLED.set(candidate);
++        let (dir, mut job) = setup(20000)?;
++        let mut text = String::from("id,region,payload\n");
++        for id in 0..20000 {
++            text.push_str(&format!("{id},R0,{}\n", payload(id)));
++        }
++        fs::write(&job.input, text)?;
++        if let Operation::AssignProbabilistic { groups, .. } = &mut job.operations[1] {
++            groups[0].percent = "50".into();
++            groups[1].percent = "50".into();
++        }
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let space = Arc::new(crate::storage::Workspace::shared(
++            32 * 1024 * 1024,
++            pool.clone(),
++        ));
++        let grant = Arc::new(std::sync::Mutex::new(Reservation::for_workspace(space)));
++        let g = grant.clone();
++        let shared = pool.clone();
++        let injection = Arc::new(std::sync::Mutex::new(None));
++        let event = injection.clone();
++        let visits = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++        let seen = visits.clone();
++        let result=prepare_with_memory_pool(job.clone(),Arc::new(AtomicBool::new(false)),Arc::new(move|p|{
++            if p.phase=="Reading and validating CSV"&&p.rows==0{seen.fetch_add(1,Ordering::Relaxed);}
++            if p.phase=="Preparing operation 2 of 3"{assert!(event.lock().unwrap().is_none());g.lock().unwrap().resize(28*1024*1024).unwrap();*event.lock().unwrap()=Some(serde_json::json!({"phase":p.phase.as_str(),"rows":p.rows,"pool_reserved":shared.usage().reserved_bytes,"grant_bytes":28*1024*1024}));}
++        }),pool.clone()).and_then(|p|{
++            let ctx=p.ctx.clone();let a=p.execute()?;let diagnostics=ctx.diagnostics();let checked=verify_live_owner(dir.path(),&job,20000,&a)?;
++            if let Some(ref old)=reference{assert_eq!(&checked,old);}else{reference=Some(checked);}
++            drop(a);drop(ctx);Ok(diagnostics)
++        });
++        let (outcome, diagnostics) = match result {
++            Ok(d) => ("success_exact", d),
++            Err(e) => {
++                assert!(
++                    matches!(
++                        e.downcast_ref::<crate::resources::MemoryAdmission>(),
++                        Some(crate::resources::MemoryAdmission::Shared { .. })
++                            | Some(crate::resources::MemoryAdmission::Local)
++                    ),
++                    "{e:#}"
++                );
++                assert!(!std::path::Path::new(&job.output).exists());
++                (
++                    "typed_memory_denial",
++                    serde_json::json!({"error":format!("{e:#}")}),
++                )
++            }
++        };
++        assert!(injection.lock().unwrap().is_some());
++        assert_eq!(visits.load(Ordering::Relaxed), 1);
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert!(!fs::read_dir(dir.path())?.any(|e| e
++            .unwrap()
++            .file_name()
++            .to_string_lossy()
++            .starts_with(".chopper-staging-")));
++        assert_eq!(pool.usage().reserved_bytes, 28 * 1024 * 1024);
++        grant.lock().unwrap().resize(0)?;
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "PROB_LIVE_OWNER {}",
++            serde_json::json!({"candidate":candidate,"outcome":outcome,"diagnostics":diagnostics,"injection":*injection.lock().unwrap(),"input_visits":1,"cleanup":true,"final_pool_reserved":0})
++        );
++    }
++    ENABLED.set(false);
++    Ok(())
++}

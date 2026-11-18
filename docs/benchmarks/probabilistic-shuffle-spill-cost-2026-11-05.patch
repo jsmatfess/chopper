@@ -1,0 +1,13 @@
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -822,0 +823,10 @@
++
++#[test]
++fn probabilistic_shuffle_prepared_spill_working_set() -> Result<()> {
++    panel(
++        "prepared-spill-working-set",
++        200000,
++        vec![false, true, true, false],
++        Grouping::Auto,
++    )
++}

@@ -1,0 +1,52 @@
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -3358,0 +3359,48 @@
++    fn resident_first_wide_control() -> Result<()> {
++        for payload in [128_000, 200_000] {
++            for compact in [false, true] {
++                for immediate in [true, false] {
++                    let mut ctx = context()?;
++                    ctx.memory = 4 * 1024 * 1024;
++                    ctx.replace_workspace_for_test(Workspace::new(2 * 1024 * 1024))?;
++                    let mut other = Reservation::new(&ctx);
++                    other.resize(2 * 1024 * 1024 - 300_000)?;
++                    let held = ctx.workspace.used();
++                    let mut sorter = if immediate {
++                        Sorter::streaming(&ctx)
++                    } else {
++                        Sorter::resident_allocation(&ctx, 2)?
++                    };
++                    let result = (move || -> Result<Vec<u64>> {
++                        let row = Row {
++                            id: 0,
++                            ordinal: 0,
++                            key: 0u64.to_be_bytes().to_vec(),
++                            fields: vec!["x".repeat(payload)],
++                        };
++                        if compact {
++                            sorter.push_compact(PackedRow::new(row)?, 8)?;
++                        } else {
++                            sorter.push(row)?;
++                        }
++                        sorter.finish()?.map(|row| row.map(|row| row.id)).collect()
++                    })();
++                    eprintln!("FIRST_WIDE payload={payload} compact={compact} immediate={immediate} success={} error={:?} held={held} remaining={} peak={}",result.is_ok(),result.as_ref().err(),ctx.workspace.used(),ctx.workspace.peak());
++                    assert_eq!(
++                        result.is_ok(),
++                        immediate,
++                        "diagnostic expected success-domain difference"
++                    );
++                    if let Ok(ids) = result {
++                        assert_eq!(ids, vec![0]);
++                    }
++                    assert_eq!(ctx.workspace.used(), held);
++                    assert_eq!(ctx.used(), 0);
++                    assert_eq!(ctx.budget.live_files.load(AtomicOrdering::Relaxed), 0);
++                }
++            }
++        }
++        Ok(())
++    }
++
++    #[test]

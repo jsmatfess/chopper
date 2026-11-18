@@ -1,0 +1,45 @@
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -3318,0 +3319,41 @@
++    fn allocation_admission_overlap_probe() -> Result<()> {
++        for immediate in [true, false] {
++            let mut ctx = context()?;
++            ctx.memory = 4 * 1024 * 1024;
++            ctx.replace_workspace_for_test(Workspace::new(2 * 1024 * 1024))?;
++            let directory = ctx.directory_reserved_bytes();
++            let mut other = Reservation::new(&ctx);
++            other.resize(2 * 1024 * 1024 - 300_000)?;
++            let held = ctx.workspace.used();
++            let mut sorter = if immediate {
++                Sorter::streaming(&ctx)
++            } else {
++                Sorter::new(&ctx, SortOrder::Key)
++            };
++            let result = (move || -> Result<Vec<u64>> {
++                for id in 0..2500u64 {
++                    sorter.push(Row {
++                        id, ordinal: id,
++                        key: (id % 2).to_be_bytes().to_vec(),
++                        fields: vec![id.to_string(), "x".repeat(128)],
++                    })?;
++                }
++                sorter.finish()?.map(|row| row.map(|row| row.id)).collect()
++            })();
++            eprintln!("PROBE immediate={immediate} success={} rows={} error={:?} held={held} remaining={} peak={}",
++                result.is_ok(), result.as_ref().map_or(0, Vec::len), result.as_ref().err(),
++                ctx.workspace.used(), ctx.workspace.peak());
++            if let Ok(ids) = &result {
++                let mut expected = (0..2500u64).collect::<Vec<_>>();
++                expected.sort_unstable_by_key(|id| (id % 2, *id));
++                assert_eq!(ids, &expected);
++            }
++            assert_eq!(ctx.workspace.used(), held);
++            assert_eq!(ctx.used(), 0);
++            drop(other);
++            assert_eq!(ctx.workspace.used(), directory);
++        }
++        Ok(())
++    }
++
++    #[test]

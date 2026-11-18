@@ -1,0 +1,1818 @@
+{
+  "type": "derived_allocation_retry_safety_and_runtime_evaluation",
+  "source_base": "41333789ca73f14f946438c5de0587146f896c2b",
+  "scope": "Original unapplied materialized-parent pre-emission retry algorithm; new synthetic safety controls and matched native CLI, pressured public-API and persistent-Chrome complete jobs. No algorithm revision, selector/default promotion, deployment, hold-out tuning or delegation.",
+  "host": {
+    "captured_utc": "2026-11-03T01:55:14.421748+00:00",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "architecture": "AMD64",
+    "logical_processors": 16,
+    "cpu": "AMD Ryzen 7 5800X 8-Core Processor",
+    "total_physical_memory_bytes": 137360130048,
+    "workload_volume_filesystem": "NTFS",
+    "scope": "Same available native Windows host for CLI/API/Chrome comparisons. Hardware captured after measurements; no physical device model, cache state or physical I/O inference."
+  },
+  "toolchains": {
+    "native": "Windows x86_64 MSVC Rust/Cargo1.99.1",
+    "browser_build": "wasm32-wasip1, WASI SDK33.0, Node22.23.4; actual asset/build hashes retained",
+    "browser_runtime": "Chrome156.0.8078.48"
+  },
+  "candidate": {
+    "original_patch": "docs/benchmarks/resident-parent-retry-prototype-2026-11-03.patch",
+    "original_patch_sha256": "89865f4b586256503a4797d202e551b59df62b3c81c181087671b70ed65e0af8",
+    "instrumentation": "Native-only stderr marker records each admission retry; its overhead is in native timing. Pressure driver is identical isolated library module/bin in both cells, invoking unchanged engine Run and normal admitted Reservation. Browser omits native marker. New test functions compile only in native test builds.",
+    "algorithm_revisions": 0
+  },
+  "workload": {
+    "generator": "entity-list-v1",
+    "parameters": {
+      "rows": 20000,
+      "seed": "entity-baseline-v1",
+      "regions": 8,
+      "hot_percent": 30,
+      "notes_min": 24,
+      "notes_max": 128
+    },
+    "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+    "input_bytes": 3002728,
+    "pipeline": "region partition -> independent probabilistic80/20 allocation -> child uniform shuffle",
+    "job_memory_mib": 64,
+    "workers": 1,
+    "policy": "seeded_v1",
+    "seed": "workload-baseline-v1"
+  },
+  "baseline_reuse": {
+    "native_relevant_files": 325,
+    "browser_relevant_source_driver_files": 359,
+    "differences": [],
+    "records": [
+      {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/baseline-source-match.json",
+        "sha256": "3fad9edea1a37f371066faf496967a36b2cb899c4912d379f486a246941a2964"
+      },
+      {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-baseline-source-match.json",
+        "sha256": "63e5c372ee783c378f26f62e6ef1bdc146a6ee2623455dedf539e29cc2ad3c83"
+      }
+    ],
+    "rule": "Retained original build/asset provenance and exact artifact hashes reused; no relabeling or overwritten earlier binaries."
+  },
+  "cases": [
+    {
+      "id": "native-cli-roomy",
+      "runtime": "native-cli",
+      "description": "Job64MiB/oneworker/shared32MiB; whole CLI launch-through-Run/publication. No observed retries.",
+      "pairs": [
+        {
+          "pair": 1,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "observations": [
+            {
+              "cell": "baseline",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-baseline/run.json",
+                "sha256": "857971dcab94e6ceacb59c3c21bb46f3358425a3484cbc493dd666d76658d42e"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-baseline/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "Windows-11-10.0.26200-SP0",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.23449509998317808,
+              "timing_scope": "CLI process launch through successful Run/publication; verification separate",
+              "engine_sha256": "8ac210295891a08dc732564576b847140bed1f41fe7b4d3d0208c929f4a03092",
+              "diagnostics": {
+                "temporary_bytes_written": 16798172,
+                "temporary_bytes_read": 14490224,
+                "temporary_files_created": 22,
+                "routed_groupings": 8,
+                "resident_sorts": 17,
+                "sort_rows": 40000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 8057130,
+                "workspace_reserved_bytes": 79719
+              },
+              "retry_markers": [],
+              "temporary_files_after_exit": [],
+              "shared_ceiling_mib": 32
+            },
+            {
+              "cell": "candidate",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-candidate/run.json",
+                "sha256": "6afb528399ad415d430d185071607f2c5fcff56972a1b2a6b0c802508413550a"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-candidate/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "Windows-11-10.0.26200-SP0",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.15196250000735745,
+              "timing_scope": "CLI process launch through successful Run/publication; verification separate",
+              "engine_sha256": "ac0a87a04e91a4cb7562216355931c8b842bcad65c825c49d7ba197e6d30dc66",
+              "diagnostics": {
+                "temporary_bytes_written": 12095993,
+                "temporary_bytes_read": 9788045,
+                "temporary_files_created": 6,
+                "routed_groupings": 0,
+                "resident_sorts": 25,
+                "sort_rows": 60000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 8057135,
+                "workspace_reserved_bytes": 79724
+              },
+              "retry_markers": [],
+              "temporary_files_after_exit": [],
+              "shared_ceiling_mib": 32
+            }
+          ],
+          "candidate_minus_baseline_seconds": -0.08253259997582063,
+          "candidate_minus_baseline_logical_counters": {
+            "temporary_bytes_written": -4702179,
+            "temporary_bytes_read": -4702179,
+            "temporary_files_created": -16
+          },
+          "parity": {
+            "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-parity.json",
+            "sha256": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef"
+          }
+        },
+        {
+          "pair": 2,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "observations": [
+            {
+              "cell": "baseline",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-baseline/run.json",
+                "sha256": "d7d79b99ba8d0ca9bff7cde3d6edb70df34e71e549f4aae6da0f2c727cee92f4"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-baseline/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "Windows-11-10.0.26200-SP0",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.2306951999780722,
+              "timing_scope": "CLI process launch through successful Run/publication; verification separate",
+              "engine_sha256": "8ac210295891a08dc732564576b847140bed1f41fe7b4d3d0208c929f4a03092",
+              "diagnostics": {
+                "temporary_bytes_written": 16798172,
+                "temporary_bytes_read": 14490224,
+                "temporary_files_created": 22,
+                "routed_groupings": 8,
+                "resident_sorts": 17,
+                "sort_rows": 40000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 8057130,
+                "workspace_reserved_bytes": 79719
+              },
+              "retry_markers": [],
+              "temporary_files_after_exit": [],
+              "shared_ceiling_mib": 32
+            },
+            {
+              "cell": "candidate",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-candidate/run.json",
+                "sha256": "44eb368d2972ca9b004b8b57e851c8be58524964a2d2856f8c6aa526d09e9be7"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-candidate/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "Windows-11-10.0.26200-SP0",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.1542654000222683,
+              "timing_scope": "CLI process launch through successful Run/publication; verification separate",
+              "engine_sha256": "ac0a87a04e91a4cb7562216355931c8b842bcad65c825c49d7ba197e6d30dc66",
+              "diagnostics": {
+                "temporary_bytes_written": 12095993,
+                "temporary_bytes_read": 9788045,
+                "temporary_files_created": 6,
+                "routed_groupings": 0,
+                "resident_sorts": 25,
+                "sort_rows": 60000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 8057135,
+                "workspace_reserved_bytes": 79724
+              },
+              "retry_markers": [],
+              "temporary_files_after_exit": [],
+              "shared_ceiling_mib": 32
+            }
+          ],
+          "candidate_minus_baseline_seconds": -0.0764297999558039,
+          "candidate_minus_baseline_logical_counters": {
+            "temporary_bytes_written": -4702179,
+            "temporary_bytes_read": -4702179,
+            "temporary_files_created": -16
+          },
+          "parity": {
+            "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-parity.json",
+            "sha256": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef"
+          }
+        }
+      ],
+      "summary": {
+        "baseline": {
+          "n": 2,
+          "median_seconds": 0.23259514998062514,
+          "minimum_seconds": 0.2306951999780722,
+          "maximum_seconds": 0.23449509998317808
+        },
+        "candidate": {
+          "n": 2,
+          "median_seconds": 0.15311395001481287,
+          "minimum_seconds": 0.15196250000735745,
+          "maximum_seconds": 0.1542654000222683
+        }
+      }
+    },
+    {
+      "id": "native-cli-constrained-no-retry",
+      "runtime": "native-cli",
+      "description": "Job64MiB/oneworker/shared2MiB; one verified pair only. No observed typed admission retries; partial resident work/routing is not the forced-retry case.",
+      "pairs": [
+        {
+          "pair": 1,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "observations": [
+            {
+              "cell": "baseline",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-baseline/run.json",
+                "sha256": "e523cb04eadb1303aacbfa01a7a058ba73193fc41dddb279ad77b85cc998c247"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-baseline/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "Windows-11-10.0.26200-SP0",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.3099760999903083,
+              "timing_scope": "CLI process launch through successful Run/publication; verification separate",
+              "engine_sha256": "8ac210295891a08dc732564576b847140bed1f41fe7b4d3d0208c929f4a03092",
+              "diagnostics": {
+                "temporary_bytes_written": 22732102,
+                "temporary_bytes_read": 20424154,
+                "temporary_files_created": 32,
+                "routed_groupings": 9,
+                "resident_sorts": 15,
+                "sort_rows": 20000,
+                "sort_runs": 2
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 1790864,
+                "workspace_reserved_bytes": 79761
+              },
+              "retry_markers": [],
+              "temporary_files_after_exit": [],
+              "shared_ceiling_mib": 2
+            },
+            {
+              "cell": "candidate",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-candidate/run.json",
+                "sha256": "2f90a978386daba3d38bc6bb4d7832477c4b8dc4873861454262b22b2ebdb129"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-candidate/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "Windows-11-10.0.26200-SP0",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.3360615000128746,
+              "timing_scope": "CLI process launch through successful Run/publication; verification separate",
+              "engine_sha256": "ac0a87a04e91a4cb7562216355931c8b842bcad65c825c49d7ba197e6d30dc66",
+              "diagnostics": {
+                "temporary_bytes_written": 19436314,
+                "temporary_bytes_read": 17128366,
+                "temporary_files_created": 18,
+                "routed_groupings": 2,
+                "resident_sorts": 22,
+                "sort_rows": 34015,
+                "sort_runs": 2
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 1790877,
+                "workspace_reserved_bytes": 79766
+              },
+              "retry_markers": [],
+              "temporary_files_after_exit": [],
+              "shared_ceiling_mib": 2
+            }
+          ],
+          "candidate_minus_baseline_seconds": 0.02608540002256632,
+          "candidate_minus_baseline_logical_counters": {
+            "temporary_bytes_written": -3295788,
+            "temporary_bytes_read": -3295788,
+            "temporary_files_created": -14
+          },
+          "parity": {
+            "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-parity.json",
+            "sha256": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef"
+          }
+        }
+      ],
+      "summary": {
+        "baseline": {
+          "n": 1,
+          "median_seconds": 0.3099760999903083,
+          "minimum_seconds": 0.3099760999903083,
+          "maximum_seconds": 0.3099760999903083
+        },
+        "candidate": {
+          "n": 1,
+          "median_seconds": 0.3360615000128746,
+          "minimum_seconds": 0.3360615000128746,
+          "maximum_seconds": 0.3360615000128746
+        }
+      }
+    },
+    {
+      "id": "native-api-forced-retry",
+      "runtime": "native-public-api",
+      "description": "Job64MiB/oneworker/pool8MiB; admitted competing Reservation leaves600000bytes at operation2 and releases at operation3. Same auxiliary harness in both isolated libraries. API clock is separate from CLI/browser clocks.",
+      "pairs": [
+        {
+          "pair": 1,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "observations": [
+            {
+              "cell": "baseline",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-baseline/run.json",
+                "sha256": "420fb1d37f2b5699935a6677aa9ee52ca72762161ebea1600a5c8d0ca345b0d7"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-baseline/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "Windows-11-10.0.26200-SP0",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.2684088,
+              "timing_scope": "Public engine Run through native publication; includes competing admission/release and retry, excludes process startup/job decoding/caller JSON serialization/verification",
+              "engine_sha256": "9407c6609ddbd237e9179c6fa53fc914749d63058d3ba474c6c8d03a19dd4f9f",
+              "diagnostics": {
+                "temporary_bytes_written": 21580351,
+                "temporary_bytes_read": 19272403,
+                "temporary_files_created": 30,
+                "routed_groupings": 9,
+                "resident_sorts": 16,
+                "sort_rows": 20000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 4936097,
+                "workspace_reserved_bytes": 73353
+              },
+              "retry_markers": [],
+              "temporary_files_after_exit": [],
+              "pressure_events": [
+                {
+                  "competitor_bytes": 7779085,
+                  "phase": "Preparing operation 2 of 3",
+                  "shared_headroom_bytes": 600000
+                },
+                {
+                  "competitor_bytes": 0,
+                  "phase": "Preparing operation 3 of 3"
+                }
+              ],
+              "shared_pool": {
+                "admission_limit_bytes": 8388608,
+                "limit_bytes": 8388608,
+                "peak_reserved_bytes": 8130140,
+                "pressure_baseline_reserved_bytes": null,
+                "pressure_observation": null,
+                "pressure_rechecks": 0,
+                "reserved_bytes": 0,
+                "startup_observation": null
+              },
+              "engine_result": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-baseline/engine.json",
+                "sha256": "c8469e6f6b4675ecba0928f61cc9c40ca705fd2e8a3581c4e7fd83f5de4051ca"
+              }
+            },
+            {
+              "cell": "candidate",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-candidate/run.json",
+                "sha256": "04c333a4a26c1f845f070e52de07b5816f1be015eee940823e4e1568a904d19f"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-candidate/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "Windows-11-10.0.26200-SP0",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.2603512,
+              "timing_scope": "Public engine Run through native publication; includes competing admission/release and retry, excludes process startup/job decoding/caller JSON serialization/verification",
+              "engine_sha256": "15e5af49af1d464dfb3a164ff985dcdb85f15303a526380205196ba0543dd189",
+              "diagnostics": {
+                "temporary_bytes_written": 21589219,
+                "temporary_bytes_read": 21369555,
+                "temporary_files_created": 38,
+                "routed_groupings": 9,
+                "resident_sorts": 16,
+                "sort_rows": 20000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 4936110,
+                "workspace_reserved_bytes": 73358
+              },
+              "retry_markers": [
+                {
+                  "offset": 0,
+                  "rows": 5985
+                },
+                {
+                  "offset": 1358511,
+                  "rows": 2058
+                },
+                {
+                  "offset": 1827715,
+                  "rows": 1980
+                },
+                {
+                  "offset": 2277325,
+                  "rows": 2005
+                },
+                {
+                  "offset": 2732741,
+                  "rows": 1940
+                },
+                {
+                  "offset": 3171990,
+                  "rows": 2026
+                },
+                {
+                  "offset": 3632201,
+                  "rows": 1996
+                },
+                {
+                  "offset": 4086359,
+                  "rows": 2010
+                }
+              ],
+              "temporary_files_after_exit": [],
+              "pressure_events": [
+                {
+                  "competitor_bytes": 7779079,
+                  "phase": "Preparing operation 2 of 3",
+                  "shared_headroom_bytes": 600000
+                },
+                {
+                  "competitor_bytes": 0,
+                  "phase": "Preparing operation 3 of 3"
+                }
+              ],
+              "shared_pool": {
+                "admission_limit_bytes": 8388608,
+                "limit_bytes": 8388608,
+                "peak_reserved_bytes": 8362407,
+                "pressure_baseline_reserved_bytes": null,
+                "pressure_observation": null,
+                "pressure_rechecks": 0,
+                "reserved_bytes": 0,
+                "startup_observation": null
+              },
+              "engine_result": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-candidate/engine.json",
+                "sha256": "59d4a815c85f962e457daa5c58d36e98882ac5d6b45fee4d44018c5c552efaad"
+              }
+            }
+          ],
+          "candidate_minus_baseline_seconds": -0.008057599999999998,
+          "candidate_minus_baseline_logical_counters": {
+            "temporary_bytes_written": 8868,
+            "temporary_bytes_read": 2097152,
+            "temporary_files_created": 8
+          },
+          "parity": {
+            "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-parity.json",
+            "sha256": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef"
+          }
+        },
+        {
+          "pair": 2,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "observations": [
+            {
+              "cell": "baseline",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-baseline/run.json",
+                "sha256": "79e6d73c8db4f23e96ffddff707a0f3e425fb12eeb5c4250ddd70ba3985f323d"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-baseline/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "Windows-11-10.0.26200-SP0",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.2546661,
+              "timing_scope": "Public engine Run through native publication; includes competing admission/release and retry, excludes process startup/job decoding/caller JSON serialization/verification",
+              "engine_sha256": "9407c6609ddbd237e9179c6fa53fc914749d63058d3ba474c6c8d03a19dd4f9f",
+              "diagnostics": {
+                "temporary_bytes_written": 21580351,
+                "temporary_bytes_read": 19272403,
+                "temporary_files_created": 30,
+                "routed_groupings": 9,
+                "resident_sorts": 16,
+                "sort_rows": 20000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 4936097,
+                "workspace_reserved_bytes": 73353
+              },
+              "retry_markers": [],
+              "temporary_files_after_exit": [],
+              "pressure_events": [
+                {
+                  "competitor_bytes": 7779085,
+                  "phase": "Preparing operation 2 of 3",
+                  "shared_headroom_bytes": 600000
+                },
+                {
+                  "competitor_bytes": 0,
+                  "phase": "Preparing operation 3 of 3"
+                }
+              ],
+              "shared_pool": {
+                "admission_limit_bytes": 8388608,
+                "limit_bytes": 8388608,
+                "peak_reserved_bytes": 8130140,
+                "pressure_baseline_reserved_bytes": null,
+                "pressure_observation": null,
+                "pressure_rechecks": 0,
+                "reserved_bytes": 0,
+                "startup_observation": null
+              },
+              "engine_result": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-baseline/engine.json",
+                "sha256": "54e5915d45285aee6ac8f861afcda60853371e0d96d92d81340d0c592144ffd9"
+              }
+            },
+            {
+              "cell": "candidate",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-candidate/run.json",
+                "sha256": "7c172215676ab3d97aa2430d21ed742ab3e210b229cf674b8cf8a106750619c5"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-candidate/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "Windows-11-10.0.26200-SP0",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.2633742,
+              "timing_scope": "Public engine Run through native publication; includes competing admission/release and retry, excludes process startup/job decoding/caller JSON serialization/verification",
+              "engine_sha256": "15e5af49af1d464dfb3a164ff985dcdb85f15303a526380205196ba0543dd189",
+              "diagnostics": {
+                "temporary_bytes_written": 21589219,
+                "temporary_bytes_read": 21369555,
+                "temporary_files_created": 38,
+                "routed_groupings": 9,
+                "resident_sorts": 16,
+                "sort_rows": 20000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 4936110,
+                "workspace_reserved_bytes": 73358
+              },
+              "retry_markers": [
+                {
+                  "offset": 0,
+                  "rows": 5985
+                },
+                {
+                  "offset": 1358511,
+                  "rows": 2058
+                },
+                {
+                  "offset": 1827715,
+                  "rows": 1980
+                },
+                {
+                  "offset": 2277325,
+                  "rows": 2005
+                },
+                {
+                  "offset": 2732741,
+                  "rows": 1940
+                },
+                {
+                  "offset": 3171990,
+                  "rows": 2026
+                },
+                {
+                  "offset": 3632201,
+                  "rows": 1996
+                },
+                {
+                  "offset": 4086359,
+                  "rows": 2010
+                }
+              ],
+              "temporary_files_after_exit": [],
+              "pressure_events": [
+                {
+                  "competitor_bytes": 7779079,
+                  "phase": "Preparing operation 2 of 3",
+                  "shared_headroom_bytes": 600000
+                },
+                {
+                  "competitor_bytes": 0,
+                  "phase": "Preparing operation 3 of 3"
+                }
+              ],
+              "shared_pool": {
+                "admission_limit_bytes": 8388608,
+                "limit_bytes": 8388608,
+                "peak_reserved_bytes": 8362407,
+                "pressure_baseline_reserved_bytes": null,
+                "pressure_observation": null,
+                "pressure_rechecks": 0,
+                "reserved_bytes": 0,
+                "startup_observation": null
+              },
+              "engine_result": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-candidate/engine.json",
+                "sha256": "d20ccd50b13943fa92f4e930e6f791bcd430b87cfee9ef7fdc37beffee135ee3"
+              }
+            }
+          ],
+          "candidate_minus_baseline_seconds": 0.008708099999999996,
+          "candidate_minus_baseline_logical_counters": {
+            "temporary_bytes_written": 8868,
+            "temporary_bytes_read": 2097152,
+            "temporary_files_created": 8
+          },
+          "parity": {
+            "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-parity.json",
+            "sha256": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef"
+          }
+        }
+      ],
+      "summary": {
+        "baseline": {
+          "n": 2,
+          "median_seconds": 0.26153745,
+          "minimum_seconds": 0.2546661,
+          "maximum_seconds": 0.2684088
+        },
+        "candidate": {
+          "n": 2,
+          "median_seconds": 0.2618627,
+          "minimum_seconds": 0.2603512,
+          "maximum_seconds": 0.2633742
+        }
+      }
+    },
+    {
+      "id": "persistent-chrome-fitting",
+      "runtime": "browser",
+      "description": "Job64MiB/oneworker, fresh persistent installed Chrome, OPFS-backed picker export. Run-direct clock excludes setup/extraction/independent verification. No browser-pressure generalization.",
+      "pairs": [
+        {
+          "pair": 1,
+          "order": [
+            "baseline",
+            "candidate"
+          ],
+          "observations": [
+            {
+              "cell": "baseline",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-baseline/run.json",
+                "sha256": "52b9dfdcc05b022e71df9fe7a518c94a174c6776b02ba0966bcd79487cc9ddcd"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-baseline/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "win32",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.47883499997854234,
+              "timing_scope": "Run-direct through completed OPFS export; setup/extraction/verification excluded",
+              "engine_sha256": "f10291a32a0ca7f8b15797ca451ce1d673959c48df487671cb32d696d5a4d09a",
+              "diagnostics": {
+                "temporary_bytes_written": 16798172,
+                "temporary_bytes_read": 14490224,
+                "temporary_files_created": 22,
+                "routed_groupings": 8,
+                "resident_sorts": 17,
+                "sort_rows": 40000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 7266439,
+                "workspace_reserved_bytes": 49772
+              },
+              "browser_version": "156.0.8078.48",
+              "channel": "chrome",
+              "context": "fresh persistent disk-backed profile",
+              "destination": "OPFS-backed picker; not native File System Access output performance",
+              "native_parity": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-baseline/native-parity.json",
+                "sha256": "6136a63948bb3a007d6c68f520cc8289ee4ef67489f18eed9f205ee3a380f50a"
+              },
+              "assets_sha256": {
+                "/engine.wasm": "f10291a32a0ca7f8b15797ca451ce1d673959c48df487671cb32d696d5a4d09a",
+                "/engine-worker.js": "cf407b6ce2b7d47f0909a352193c8260231a8f6c740f779f487806af8c8425f8",
+                "/storage-worker.js": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6",
+                "/baseline.js": "69a757aa7af22d7735b9fddd3399616074bd26968e49a285c118296d2dc548d1",
+                "/": "c722212d14df2458667b8139d944b7f40a226df713669e8b81ec7403f5cd7126"
+              }
+            },
+            {
+              "cell": "candidate",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-candidate/run.json",
+                "sha256": "38404d45b43272affd7d372a2d369a0952d888b7c45faf5d4dd4c5fb903eba3c"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-candidate/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "win32",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.39981999999284745,
+              "timing_scope": "Run-direct through completed OPFS export; setup/extraction/verification excluded",
+              "engine_sha256": "51bc392673ed60661b495ca3d493f2dcbe36c14a161902ea2a76421c3c79d128",
+              "diagnostics": {
+                "temporary_bytes_written": 12095993,
+                "temporary_bytes_read": 9788045,
+                "temporary_files_created": 6,
+                "routed_groupings": 0,
+                "resident_sorts": 25,
+                "sort_rows": 60000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 7266439,
+                "workspace_reserved_bytes": 49772
+              },
+              "browser_version": "156.0.8078.48",
+              "channel": "chrome",
+              "context": "fresh persistent disk-backed profile",
+              "destination": "OPFS-backed picker; not native File System Access output performance",
+              "native_parity": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-candidate/native-parity.json",
+                "sha256": "6136a63948bb3a007d6c68f520cc8289ee4ef67489f18eed9f205ee3a380f50a"
+              },
+              "assets_sha256": {
+                "/engine.wasm": "51bc392673ed60661b495ca3d493f2dcbe36c14a161902ea2a76421c3c79d128",
+                "/engine-worker.js": "cf407b6ce2b7d47f0909a352193c8260231a8f6c740f779f487806af8c8425f8",
+                "/storage-worker.js": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6",
+                "/baseline.js": "69a757aa7af22d7735b9fddd3399616074bd26968e49a285c118296d2dc548d1",
+                "/": "c722212d14df2458667b8139d944b7f40a226df713669e8b81ec7403f5cd7126"
+              }
+            }
+          ],
+          "candidate_minus_baseline_seconds": -0.07901499998569489,
+          "candidate_minus_baseline_logical_counters": {
+            "temporary_bytes_written": -4702179,
+            "temporary_bytes_read": -4702179,
+            "temporary_files_created": -16
+          }
+        },
+        {
+          "pair": 2,
+          "order": [
+            "candidate",
+            "baseline"
+          ],
+          "observations": [
+            {
+              "cell": "baseline",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-baseline/run.json",
+                "sha256": "e426564467acfa924fe97833970e4e45ac150218f36838fbe85a450e9d50306b"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-baseline/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "win32",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.47115499997138977,
+              "timing_scope": "Run-direct through completed OPFS export; setup/extraction/verification excluded",
+              "engine_sha256": "f10291a32a0ca7f8b15797ca451ce1d673959c48df487671cb32d696d5a4d09a",
+              "diagnostics": {
+                "temporary_bytes_written": 16798172,
+                "temporary_bytes_read": 14490224,
+                "temporary_files_created": 22,
+                "routed_groupings": 8,
+                "resident_sorts": 17,
+                "sort_rows": 40000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 7266439,
+                "workspace_reserved_bytes": 49772
+              },
+              "browser_version": "156.0.8078.48",
+              "channel": "chrome",
+              "context": "fresh persistent disk-backed profile",
+              "destination": "OPFS-backed picker; not native File System Access output performance",
+              "native_parity": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-baseline/native-parity.json",
+                "sha256": "6136a63948bb3a007d6c68f520cc8289ee4ef67489f18eed9f205ee3a380f50a"
+              },
+              "assets_sha256": {
+                "/engine.wasm": "f10291a32a0ca7f8b15797ca451ce1d673959c48df487671cb32d696d5a4d09a",
+                "/engine-worker.js": "cf407b6ce2b7d47f0909a352193c8260231a8f6c740f779f487806af8c8425f8",
+                "/storage-worker.js": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6",
+                "/baseline.js": "69a757aa7af22d7735b9fddd3399616074bd26968e49a285c118296d2dc548d1",
+                "/": "c722212d14df2458667b8139d944b7f40a226df713669e8b81ec7403f5cd7126"
+              }
+            },
+            {
+              "cell": "candidate",
+              "record": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-candidate/run.json",
+                "sha256": "ce1bcb389a8503356afd97df7b125796a28aaf6eb93bcce82401e8404fb2b546"
+              },
+              "verification": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-candidate/verified.json",
+                "sha256": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5"
+              },
+              "platform": "win32",
+              "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+              "elapsed_seconds": 0.38431999999284744,
+              "timing_scope": "Run-direct through completed OPFS export; setup/extraction/verification excluded",
+              "engine_sha256": "51bc392673ed60661b495ca3d493f2dcbe36c14a161902ea2a76421c3c79d128",
+              "diagnostics": {
+                "temporary_bytes_written": 12095993,
+                "temporary_bytes_read": 9788045,
+                "temporary_files_created": 6,
+                "routed_groupings": 0,
+                "resident_sorts": 25,
+                "sort_rows": 60000,
+                "sort_runs": 0
+              },
+              "workspace_diagnostics": {
+                "peak_workspace_reserved_bytes": 7266439,
+                "workspace_reserved_bytes": 49772
+              },
+              "browser_version": "156.0.8078.48",
+              "channel": "chrome",
+              "context": "fresh persistent disk-backed profile",
+              "destination": "OPFS-backed picker; not native File System Access output performance",
+              "native_parity": {
+                "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-candidate/native-parity.json",
+                "sha256": "6136a63948bb3a007d6c68f520cc8289ee4ef67489f18eed9f205ee3a380f50a"
+              },
+              "assets_sha256": {
+                "/engine.wasm": "51bc392673ed60661b495ca3d493f2dcbe36c14a161902ea2a76421c3c79d128",
+                "/engine-worker.js": "cf407b6ce2b7d47f0909a352193c8260231a8f6c740f779f487806af8c8425f8",
+                "/storage-worker.js": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6",
+                "/baseline.js": "69a757aa7af22d7735b9fddd3399616074bd26968e49a285c118296d2dc548d1",
+                "/": "c722212d14df2458667b8139d944b7f40a226df713669e8b81ec7403f5cd7126"
+              }
+            }
+          ],
+          "candidate_minus_baseline_seconds": -0.08683499997854233,
+          "candidate_minus_baseline_logical_counters": {
+            "temporary_bytes_written": -4702179,
+            "temporary_bytes_read": -4702179,
+            "temporary_files_created": -16
+          }
+        }
+      ],
+      "summary": {
+        "baseline": {
+          "n": 2,
+          "median_seconds": 0.4749949999749661,
+          "minimum_seconds": 0.47115499997138977,
+          "maximum_seconds": 0.47883499997854234
+        },
+        "candidate": {
+          "n": 2,
+          "median_seconds": 0.3920699999928474,
+          "minimum_seconds": 0.38431999999284744,
+          "maximum_seconds": 0.39981999999284745
+        }
+      }
+    }
+  ],
+  "safety_controls": {
+    "diagnostic_sink_lifetime": "With writer allocated after preparation, one768row/300000byte-headroom/8192byte-allocation-name candidate denies during emission where immediate routing succeeds. This is not the production writer lifetime. With writer already alive before preparation, all six matched headroom cases complete; two candidate cases observe pre-emission retry. Initial result retained as a consumer-lifetime limitation, not a current-dispatch failure.",
+    "shared_admission": "Three matched local and three matched genuinely shared-pool parent controls retain exact metadata/row-frame parity and release grants/files;2500x128 case observes retry. Scaled local workspace settings are synthetic, not supported CLI memory settings or retry occurrence estimates.",
+    "terminal_boundaries": "Pre-cancel, malformed record limit, first sink row, eighth sink row, sink I/O and sink end denial each perform one scan with cleanup; partial output is never replayed. These are bounded injection controls, not every cancellation/device-fault timing.",
+    "native_acceptance": "Fresh format, workspace/all-target Clippy and full locked default workspace suite pass for safety and native-instrumented snapshots. Auxiliary pressure source format/build/bin Clippy passes separately.",
+    "browser_acceptance": "35 default contracts plus bridge/peer cleanup, temporary/persistent interruption, persistent process-kill and direct-process-kill recovery, base and shuffle-partition resource reactors pass installed Chrome156.0.8078.48. Tested asset copies retained before rebuilding. Final isolated candidate package restored to seven default-feature test-free files."
+  },
+  "validation": {
+    "safety3-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/status.json",
+        "sha256": "0f529a3c3ba792f7f17e7dcc35cb0cb8636b245f0419894f986b6d625015d338"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/manifest.json",
+        "sha256": "49a4b5a0b904abbed80242e2cabcd52074b5023b42b489edc15d20255ad3b47f"
+      },
+      "passed_steps": [
+        "extract",
+        "safety-controls",
+        "format",
+        "clippy",
+        "workspace"
+      ],
+      "failed_steps": []
+    },
+    "study-gates-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/status.json",
+        "sha256": "8e538827f956c3b3a70809140d563688b661b7a13b867ea878eebfb8bd62281c"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/manifest.json",
+        "sha256": "5cdfa0b9fcf05f705b71f139895b108b66e674bdd832ec29286680d9b7d58da5"
+      },
+      "passed_steps": [
+        "format",
+        "clippy",
+        "workspace"
+      ],
+      "failed_steps": [
+        "prepare-native-cases"
+      ]
+    },
+    "native-build-v2-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-build-v2-batch/status.json",
+        "sha256": "b2b9b545f319c16fa6c6d69bae6041b9cd453db34ce99cd1d0b4388e9acdde73"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-build-v2-batch/manifest.json",
+        "sha256": "b889ce8863d8449f9197bf1a45c2def862c1f76e40001c1f29262a397749dc17"
+      },
+      "passed_steps": [
+        "candidate-build"
+      ],
+      "failed_steps": []
+    },
+    "pressure-build-v3-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/status.json",
+        "sha256": "a7589254d8d67cffd8c055c1a733c2a6f77f174005245d5a1d9833245d57f395"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/manifest.json",
+        "sha256": "db447dfb13ba62145e8a917808005dbf5ee4d778bc94772cf23722ae67a9be42"
+      },
+      "passed_steps": [
+        "extract",
+        "baseline-format",
+        "baseline-build",
+        "candidate-format",
+        "candidate-build"
+      ],
+      "failed_steps": []
+    },
+    "pressure-gates-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-batch/status.json",
+        "sha256": "b10232e4f3da8f893a24afa6bf253fe34cd4e04311e4c7f1295d5a5afd4ccdca"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-batch/manifest.json",
+        "sha256": "9eea43bbd4f4a2d294b8ec3b86d0816165cab1ea459657da53743e1a8dc20c2b"
+      },
+      "passed_steps": [
+        "baseline-clippy",
+        "candidate-clippy",
+        "prepare-pressure"
+      ],
+      "failed_steps": []
+    },
+    "browser-acceptance-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/status.json",
+        "sha256": "2e34144c886280d9787b6e8c8bc40ca6a72341479d3ff9637e42ca8d2150df35"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/manifest.json",
+        "sha256": "ebf758be311ca3cef4a654badac344ad6a6e864c4d9f6c0e693100d7d1bb537f"
+      },
+      "passed_steps": [
+        "packages",
+        "engine",
+        "hosted",
+        "test-bundle",
+        "contracts"
+      ],
+      "failed_steps": [
+        "bridge"
+      ]
+    },
+    "browser-acceptance-v2-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/status.json",
+        "sha256": "d8581e8bddea089730f5b7db85cd89d2e6021d247f8bda86f970567009d4804f"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/manifest.json",
+        "sha256": "184ec8df9eecf72dca16748095d55e7ded61273fee2908f2eb2e0a4b49627449"
+      },
+      "passed_steps": [
+        "bridge",
+        "cleanup",
+        "termination",
+        "persistent",
+        "process-kill",
+        "process-kill-direct",
+        "retain-tested-assets"
+      ],
+      "failed_steps": []
+    },
+    "browser-resource-base-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/status.json",
+        "sha256": "d92b70a20a0e3d3783ef38814de21353b565ad37aa9e5d2014a4b1dcb10e7786"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/manifest.json",
+        "sha256": "3881a11cad87ac70bd6467de53c3bca011e87043615ad9c70d0cda0b44438156"
+      },
+      "passed_steps": [
+        "resource-engine",
+        "resource-bundle",
+        "resource-contracts",
+        "retain-tested-assets"
+      ],
+      "failed_steps": []
+    },
+    "browser-resource-shuffle-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/status.json",
+        "sha256": "d9722e9a670e0e8acdeeec00040b820ea2a2144bfda9d57afe684e3380421fc3"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/manifest.json",
+        "sha256": "66ae624fd4155d48e79e7196b05e49f52903702500ae23c60c7758231f37fbbd"
+      },
+      "passed_steps": [
+        "resource-engine",
+        "resource-bundle",
+        "resource-contracts",
+        "retain-tested-assets"
+      ],
+      "failed_steps": []
+    },
+    "browser-final-package-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-final-package-batch/status.json",
+        "sha256": "c3fec0032af8ef97706ac5b053919d3bf9b02b7b8d11298d1ea3a7029cf25170"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/browser-final-package-batch/manifest.json",
+        "sha256": "c40f93d345b2fcc717644fea5cb28e463feb6fb29e9cfdd28c72f0cc3382498b"
+      },
+      "passed_steps": [
+        "engine",
+        "hosted"
+      ],
+      "failed_steps": []
+    },
+    "postflight-batch": {
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/postflight-batch/status.json",
+        "sha256": "27ac92ac095fcf2ee210fe7479e261060689d4dda552aa4a78ec83ec3e20dc03"
+      },
+      "manifest": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/postflight-batch/manifest.json",
+        "sha256": "3aac69251a7b6b00d5f4c116a2643c664c998c3983aad5395bd521751c2e2337"
+      },
+      "passed_steps": [
+        "identity-postflight"
+      ],
+      "failed_steps": []
+    }
+  },
+  "logical_metadata_audit": {
+    "verified": true,
+    "pairs": [
+      {
+        "pair": "native-v2/roomy-pair1",
+        "logical_fields_equal": [
+          "algorithm_version",
+          "column_values",
+          "seed",
+          "rows",
+          "columns",
+          "header",
+          "preview",
+          "logical_digest",
+          "groups",
+          "output_files",
+          "output_csv_bytes",
+          "largest_record_bytes",
+          "stages",
+          "warnings",
+          "accuracy"
+        ]
+      },
+      {
+        "pair": "native-v2/roomy-pair2",
+        "logical_fields_equal": [
+          "algorithm_version",
+          "column_values",
+          "seed",
+          "rows",
+          "columns",
+          "header",
+          "preview",
+          "logical_digest",
+          "groups",
+          "output_files",
+          "output_csv_bytes",
+          "largest_record_bytes",
+          "stages",
+          "warnings",
+          "accuracy"
+        ]
+      },
+      {
+        "pair": "native-v3/constrained2-pair1",
+        "logical_fields_equal": [
+          "algorithm_version",
+          "column_values",
+          "seed",
+          "rows",
+          "columns",
+          "header",
+          "preview",
+          "logical_digest",
+          "groups",
+          "output_files",
+          "output_csv_bytes",
+          "largest_record_bytes",
+          "stages",
+          "warnings",
+          "accuracy"
+        ]
+      },
+      {
+        "pair": "pressure-runs/pair1",
+        "logical_fields_equal": [
+          "algorithm_version",
+          "column_values",
+          "seed",
+          "rows",
+          "columns",
+          "header",
+          "preview",
+          "logical_digest",
+          "groups",
+          "output_files",
+          "output_csv_bytes",
+          "largest_record_bytes",
+          "stages",
+          "warnings",
+          "accuracy"
+        ]
+      },
+      {
+        "pair": "pressure-runs/pair2",
+        "logical_fields_equal": [
+          "algorithm_version",
+          "column_values",
+          "seed",
+          "rows",
+          "columns",
+          "header",
+          "preview",
+          "logical_digest",
+          "groups",
+          "output_files",
+          "output_csv_bytes",
+          "largest_record_bytes",
+          "stages",
+          "warnings",
+          "accuracy"
+        ]
+      },
+      {
+        "pair": "browser-runs/pair1",
+        "logical_fields_equal": [
+          "algorithm_version",
+          "column_values",
+          "seed",
+          "rows",
+          "columns",
+          "header",
+          "preview",
+          "logical_digest",
+          "groups",
+          "output_files",
+          "output_csv_bytes",
+          "largest_record_bytes",
+          "stages",
+          "warnings",
+          "accuracy"
+        ]
+      },
+      {
+        "pair": "browser-runs/pair2",
+        "logical_fields_equal": [
+          "algorithm_version",
+          "column_values",
+          "seed",
+          "rows",
+          "columns",
+          "header",
+          "preview",
+          "logical_digest",
+          "groups",
+          "output_files",
+          "output_csv_bytes",
+          "largest_record_bytes",
+          "stages",
+          "warnings",
+          "accuracy"
+        ]
+      }
+    ],
+    "scope": "Logical Analysis fields including exact stage counters/digest, seed/version, header/preview/column summaries, groups/files/bytes, warnings/accuracy match within each recorded pair. Physical temp/peak/reservation/timing/diagnostics are excluded. Browser/native ordered CSV and lineage parity is separately independently verified."
+  },
+  "postflight": {
+    "record": {
+      "path": "WIN:scratch/allocation-retry-evaluation-20261103/postflight.json",
+      "sha256": "592aee580499e46a26a381e1720a167237018e578fea048fbbf1c1d0a147e0dd"
+    },
+    "unique_file_identities": 22138,
+    "tested_asset_remap": "Exact archived tested copies verify older mutable ui/dist references; final package and measurement identities remain at original paths."
+  },
+  "failed_attempts_and_exclusions": [
+    {
+      "stage": "initial patch preparation",
+      "outcome": "zero-context patch application needed --unidiff-zero; initial failed command preserved; no engine job"
+    },
+    {
+      "stage": "guard import",
+      "outcome": "guard referred to not-yet-extracted source; failed before child launch; frozen task-owned runner used in revised guard"
+    },
+    {
+      "stage": "safety command",
+      "outcome": "missing test-argument separator; failed before compilation; separate corrected manifest"
+    },
+    {
+      "stage": "safety compilation",
+      "outcome": "duplicated test helpers; no engine tests launched; corrected isolated test source"
+    },
+    {
+      "stage": "native release guard",
+      "outcome": "live storage scan saw vanished rustc transient file; runner stopped/reaped build; revised census tolerates vanished entries; fresh target/attempt"
+    },
+    {
+      "stage": "native case preparation",
+      "outcome": "Path+str expression failed before engine launch; preserved partial fixture and revised fresh run root"
+    },
+    {
+      "stage": "pressure harness compilation",
+      "outcome": "crate-private Reservation unavailable to auxiliary binary; move identical harness into isolated library module; no production change"
+    },
+    {
+      "stage": "pressure harness module compilation",
+      "outcome": "callback retained external crate path after move; corrected crate path in fresh source/target"
+    },
+    {
+      "stage": "Chrome bridge preparation",
+      "outcome": "child cwd was parent checkout, so stdin bundle could not resolve isolated dependency; script-owning cwd fixes remaining acceptance; no browser launch in failed step"
+    },
+    {
+      "stage": "native CLI shared1MiB baseline",
+      "outcome": "typed shared admission denial during ingestion; measured attempt charged; candidate not launched; cleanup passed; excluded from paired timing populations",
+      "record": {
+        "path": "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-baseline/run.json",
+        "sha256": "9a140e898e57655ddfef0a26682608b3561ef3b133a1cc8964abda1b8953569a"
+      }
+    }
+  ],
+  "limits": {
+    "elapsed_seconds_max": 7200,
+    "launch_cutoff_seconds_from_start": 5400,
+    "simultaneous_task_owned_bytes_limit": 21474836480,
+    "measured_attempts_limit": 16,
+    "measured_attempts_used": 15,
+    "successful_complete_measured_jobs": 14,
+    "failed_complete_measured_attempts": 1,
+    "candidate_algorithm_revisions_used": 0,
+    "windows_owned_root_sampled_peak_bytes": 8044595182,
+    "storage_scope": "Sampled19GiB Windows-root guard plus separate1GiB WSL reserve. Native correctness-test default OS temp roots were not fully censused; no filesystem quota or complete transient/RSS-peak claim."
+  },
+  "decision": "Retain unapplied candidate for targeted broader evaluation: fitting native/Chrome pass reduction and bounded recovery supported. Do not promote to production or calibrate a selector from these small cells. Forced retry adds logical I/O/files, and elapsed differences are mixed/inconclusive.",
+  "limitations": [
+    "n2 per cell in fitting CLI/API-pressure/browser panels; n1 at shared2MiB; no significance/tails, cross-corpus or scale claim.",
+    "Cache/startup/host load uncontrolled; API, CLI and browser clocks are separate populations.",
+    "Engine diagnostics report logical temporary traffic snapshots, not physical I/O; reservations and shared-pool peaks are not RSS and competitor-inclusive peaks are not job-only usage.",
+    "No arbitrary shared-pressure success-domain inclusion, post-preparation pressure/emission admission guarantee or every cancellation/device/quota fault.",
+    "Browser fitting case uses OPFS picker handles; no browser forced-retry-cost or native File System Access throughput claim.",
+    "Raw attempts, logs, sources, binaries, tested/final packages and manifests remain in retained private local task roots; no new R2 upload, cleanup or public raw publication is claimed."
+  ],
+  "references_sha256": {
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-baseline/run.json": "857971dcab94e6ceacb59c3c21bb46f3358425a3484cbc493dd666d76658d42e",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-baseline/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-baseline/run.stderr.log": "79f76db72afd85c25966f9034ef54a35f26857858afeb70d2d46a81ac2898602",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-baseline/run.stdout.log": "f6850562500ba06fcf89773a19a9636cfab88ce25c77778d9541321d9c388aac",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-candidate/run.json": "6afb528399ad415d430d185071607f2c5fcff56972a1b2a6b0c802508413550a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-candidate/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-candidate/run.stderr.log": "79f76db72afd85c25966f9034ef54a35f26857858afeb70d2d46a81ac2898602",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-candidate/run.stdout.log": "328347abc7e208dd00c4257c18ce7d6010b7243760d5796929cb6b49f311b5a0",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-parity.json": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-baseline/run.json": "d7d79b99ba8d0ca9bff7cde3d6edb70df34e71e549f4aae6da0f2c727cee92f4",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-baseline/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-baseline/run.stderr.log": "79f76db72afd85c25966f9034ef54a35f26857858afeb70d2d46a81ac2898602",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-baseline/run.stdout.log": "30d33ab4d5b83ade2174b6892417b061fcb2a7e8d2f9e70534dd20548f014e99",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-candidate/run.json": "44eb368d2972ca9b004b8b57e851c8be58524964a2d2856f8c6aa526d09e9be7",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-candidate/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-candidate/run.stderr.log": "79f76db72afd85c25966f9034ef54a35f26857858afeb70d2d46a81ac2898602",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-candidate/run.stdout.log": "b1d912d5c8b7ad043e0de45cc478d836cbb8c4729511c13b7f614f6592dee91a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-parity.json": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-baseline/run.json": "e523cb04eadb1303aacbfa01a7a058ba73193fc41dddb279ad77b85cc998c247",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-baseline/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-baseline/run.stderr.log": "79f76db72afd85c25966f9034ef54a35f26857858afeb70d2d46a81ac2898602",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-baseline/run.stdout.log": "76f6cd554a2f200a267b39b625210e097615c9752fa9e11b1f97cade2ed44d7f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-candidate/run.json": "2f90a978386daba3d38bc6bb4d7832477c4b8dc4873861454262b22b2ebdb129",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-candidate/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-candidate/run.stderr.log": "79f76db72afd85c25966f9034ef54a35f26857858afeb70d2d46a81ac2898602",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-candidate/run.stdout.log": "c079d06c14d257e495321c972a6d01355f5772fc6a47983e7590ab1aa1e8c020",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-parity.json": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-baseline/run.json": "420fb1d37f2b5699935a6677aa9ee52ca72762161ebea1600a5c8d0ca345b0d7",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-baseline/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-baseline/run.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-baseline/engine.json": "c8469e6f6b4675ecba0928f61cc9c40ca705fd2e8a3581c4e7fd83f5de4051ca",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-candidate/run.json": "04c333a4a26c1f845f070e52de07b5816f1be015eee940823e4e1568a904d19f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-candidate/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-candidate/run.stderr.log": "02e7e95f5dd149d5f5e4d1d8be47f13a04bf31d8bef21dd2b39090ab24ee6d82",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-candidate/engine.json": "59d4a815c85f962e457daa5c58d36e98882ac5d6b45fee4d44018c5c552efaad",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-parity.json": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-baseline/run.json": "79e6d73c8db4f23e96ffddff707a0f3e425fb12eeb5c4250ddd70ba3985f323d",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-baseline/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-baseline/run.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-baseline/engine.json": "54e5915d45285aee6ac8f861afcda60853371e0d96d92d81340d0c592144ffd9",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-candidate/run.json": "7c172215676ab3d97aa2430d21ed742ab3e210b229cf674b8cf8a106750619c5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-candidate/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-candidate/run.stderr.log": "02e7e95f5dd149d5f5e4d1d8be47f13a04bf31d8bef21dd2b39090ab24ee6d82",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-candidate/engine.json": "d20ccd50b13943fa92f4e930e6f791bcd430b87cfee9ef7fdc37beffee135ee3",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-parity.json": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-baseline/run.json": "52b9dfdcc05b022e71df9fe7a518c94a174c6776b02ba0966bcd79487cc9ddcd",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-baseline/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-baseline/native-parity.json": "6136a63948bb3a007d6c68f520cc8289ee4ef67489f18eed9f205ee3a380f50a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-candidate/run.json": "38404d45b43272affd7d372a2d369a0952d888b7c45faf5d4dd4c5fb903eba3c",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-candidate/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-candidate/native-parity.json": "6136a63948bb3a007d6c68f520cc8289ee4ef67489f18eed9f205ee3a380f50a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-baseline/run.json": "e426564467acfa924fe97833970e4e45ac150218f36838fbe85a450e9d50306b",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-baseline/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-baseline/native-parity.json": "6136a63948bb3a007d6c68f520cc8289ee4ef67489f18eed9f205ee3a380f50a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-candidate/run.json": "ce1bcb389a8503356afd97df7b125796a28aaf6eb93bcce82401e8404fb2b546",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-candidate/verified.json": "aaf2d6aa56aedd64b54a8db684b06018b0d465cb8c6ca64fac8595ff28095fe5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-candidate/native-parity.json": "6136a63948bb3a007d6c68f520cc8289ee4ef67489f18eed9f205ee3a380f50a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/status.json": "0f529a3c3ba792f7f17e7dcc35cb0cb8636b245f0419894f986b6d625015d338",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/manifest.json": "49a4b5a0b904abbed80242e2cabcd52074b5023b42b489edc15d20255ad3b47f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/status.json": "8e538827f956c3b3a70809140d563688b661b7a13b867ea878eebfb8bd62281c",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/manifest.json": "5cdfa0b9fcf05f705b71f139895b108b66e674bdd832ec29286680d9b7d58da5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-v2-batch/status.json": "b2b9b545f319c16fa6c6d69bae6041b9cd453db34ce99cd1d0b4388e9acdde73",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-v2-batch/manifest.json": "b889ce8863d8449f9197bf1a45c2def862c1f76e40001c1f29262a397749dc17",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/status.json": "a7589254d8d67cffd8c055c1a733c2a6f77f174005245d5a1d9833245d57f395",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/manifest.json": "db447dfb13ba62145e8a917808005dbf5ee4d778bc94772cf23722ae67a9be42",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-batch/status.json": "b10232e4f3da8f893a24afa6bf253fe34cd4e04311e4c7f1295d5a5afd4ccdca",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-batch/manifest.json": "9eea43bbd4f4a2d294b8ec3b86d0816165cab1ea459657da53743e1a8dc20c2b",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/status.json": "2e34144c886280d9787b6e8c8bc40ca6a72341479d3ff9637e42ca8d2150df35",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/manifest.json": "ebf758be311ca3cef4a654badac344ad6a6e864c4d9f6c0e693100d7d1bb537f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/status.json": "d8581e8bddea089730f5b7db85cd89d2e6021d247f8bda86f970567009d4804f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/manifest.json": "184ec8df9eecf72dca16748095d55e7ded61273fee2908f2eb2e0a4b49627449",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/status.json": "d92b70a20a0e3d3783ef38814de21353b565ad37aa9e5d2014a4b1dcb10e7786",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/manifest.json": "3881a11cad87ac70bd6467de53c3bca011e87043615ad9c70d0cda0b44438156",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/status.json": "d9722e9a670e0e8acdeeec00040b820ea2a2144bfda9d57afe684e3380421fc3",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/manifest.json": "66ae624fd4155d48e79e7196b05e49f52903702500ae23c60c7758231f37fbbd",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-final-package-batch/status.json": "c3fec0032af8ef97706ac5b053919d3bf9b02b7b8d11298d1ea3a7029cf25170",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-final-package-batch/manifest.json": "c40f93d345b2fcc717644fea5cb28e463feb6fb29e9cfdd28c72f0cc3382498b",
+    "WIN:scratch/allocation-retry-evaluation-20261103/postflight-batch/status.json": "27ac92ac095fcf2ee210fe7479e261060689d4dda552aa4a78ec83ec3e20dc03",
+    "WIN:scratch/allocation-retry-evaluation-20261103/postflight-batch/manifest.json": "3aac69251a7b6b00d5f4c116a2643c664c998c3983aad5395bd521751c2e2337",
+    "WIN:scratch/allocation-retry-evaluation-20261103/baseline-source-match.json": "3fad9edea1a37f371066faf496967a36b2cb899c4912d379f486a246941a2964",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-plan.json": "ce30af4b324623ab5d9c48268ddc4b5935b10f2600eb821a526d28ea30387002",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-plan.json": "1e5fb9253d7b0937c9ff1a3133dc8019aa9483ed8c00ce7a18f36666c5ba525c",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-baseline-source-match.json": "63e5c372ee783c378f26f62e6ef1bdc146a6ee2623455dedf539e29cc2ad3c83",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-final-package-plan.json": "f0ce880f0867c2106d083bef258523ac2e2512885c535d0547961dda549e796d",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-prepare-plan.json": "0e2f9b36c4768652c5189cc3ee0b5ad7b4873fc44b05267860692ad7e8e314e5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-plan.json": "1a4399a35f44e2db2b3375682993c871d8699537a0086afa64e6af32fa61fc39",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-plan.json": "c79fea2900fd64473c7bf9cd99010d5bdc59e0bd834fe5b5e700dc91e2480b9d",
+    "WIN:scratch/allocation-retry-evaluation-20261103/capture-host.py": "86c7e9465b405ff4c75816d78f61cb6b420349470f667fe37bbdf65be52041f4",
+    "WIN:scratch/allocation-retry-evaluation-20261103/guarded-run-v2.py": "eb0e2078d4912ca0d8433acdaebca40d199582d180be68f75ee34ac879fa3b1e",
+    "WIN:scratch/allocation-retry-evaluation-20261103/guarded-run-v3.py": "5b0f9e9975e0cbc9f737a23a628afe19e0f7a2aafa359afabd3dc437b8e87ded",
+    "WIN:scratch/allocation-retry-evaluation-20261103/guarded-run.py": "0d4dc4a147fe74c9bbaff755721e3a0b595bb0651893ed3bdaa7ac8c4d1d0bde",
+    "WIN:scratch/allocation-retry-evaluation-20261103/host.json": "97a38a9c7428e2b220580b7ccd2a70e499a1a75e34af1337f8758e34531363fe",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-plan.json": "bfa22dc8d01f18abf1adf032ecdd090c08375fd6dab491898232dc70809c3e08",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-v2-plan.json": "41266c0ae5a384ac6f7a2bdb9d41646ca7c73c96716515de14698ceb7553fc38",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-prepare-constrained2-plan.json": "34900af98ba43d3d3965a9353a63afb02b1704af9000658f1b0a5fe43747e213",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-prepare-v2-plan.json": "c2b91dc1168bbeb8235b1e17279a2869f4d4ad28e07080adad31d920fa4a0c93",
+    "WIN:scratch/allocation-retry-evaluation-20261103/postflight-identities.py": "7c0e23016dc1019cf9adcdb246d4fa830002d6bb53c818f12257a395b6bdcfc0",
+    "WIN:scratch/allocation-retry-evaluation-20261103/postflight-plan.json": "441677f4993308841fc953205fc0aaa3eb91114d3cb0339197a10de06f0a63b4",
+    "WIN:scratch/allocation-retry-evaluation-20261103/postflight.json": "592aee580499e46a26a381e1720a167237018e578fea048fbbf1c1d0a147e0dd",
+    "WIN:scratch/allocation-retry-evaluation-20261103/prepare-browser-study.py": "d091a1cdf67e77c0b18ed5b09a74840bedcb4391d368360a5acffa1fa419bcda",
+    "WIN:scratch/allocation-retry-evaluation-20261103/prepare-native-constrained2.py": "215f130a23b2153ac008aef73f32343e3a2c3a1d0979f4cc3990d80a15375d4e",
+    "WIN:scratch/allocation-retry-evaluation-20261103/prepare-native-study-v2.py": "cf6903b1c2c10dce9dbcfff9bea1f1e3bf8123e11a5bff5427541da31c1fe37e",
+    "WIN:scratch/allocation-retry-evaluation-20261103/prepare-native-study.py": "e8d7e7d46688daebd9da9f76ea3b33f69be8337f6fbd35100854291b6698770c",
+    "WIN:scratch/allocation-retry-evaluation-20261103/prepare-pressure-study.py": "222ab8b30d0eacb41be7ef8734bac2af40b3674b4badcff774494b002ed47ec3",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-plan.json": "103deff6cfb48c972a058fa315ed210624ee912aa4de0a5a40ac5d594c7d03fb",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v2-plan.json": "8f7174b0edf1a73ed8566f24da12c1d926d45f74c44515a5794247819eb76d01",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-plan.json": "390f78412e8e7419d9a4db1381fbbbb79e456e09417d9ef0b8e5d637fd4418ec",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-plan.json": "db4e9a2b387b5cacd6bc971f6e099ae6ad4c6cb0cafba5c0ab877f5a327621ae",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe-plan.json": "2a824c0e504a9d1f2227a5294e48f2137207416b9daf4334a9d76c17bf10ce07",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe2-plan.json": "9dd689f0e4ef62c21cae5f47e2db99127a767132dddc8c5c54c877f8214dd1df",
+    "WIN:scratch/allocation-retry-evaluation-20261103/run-native-study.py": "143c2f8bc0fef73d46cfeb29fdac0e25be6a782e50a3b1182e8da39ffea4a47d",
+    "WIN:scratch/allocation-retry-evaluation-20261103/run-pressure-study.py": "1bb04e512e5e534189c0cb69ba620f9707f2cac30d6f40351f277e377b5ee5d1",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-plan.json": "5c0ce0cb557d0ef7e590eac67dc9200fa81037cff05a32465255ae90b03ba030",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-v2-plan.json": "7f77c3c18d28cbe40733f6f81ba99e6c728c23fafbc3ab638dd48abd196825d2",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-plan.json": "9649ffcf65bab5081f31817e227acd38833ab6bafe45577b1f5dff94bb9b8fb2",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-plan.json": "d7240e937b81aaf781996ae28e5018981c39997dd3c788d536717ee2f7598a81",
+    "WIN:scratch/allocation-retry-evaluation-20261103/validation-runner.py": "92ca1b7269245e378995b6afafd61003a8e54946e47ff4bcce1404248e9e09de",
+    "WIN:scratch/allocation-retry-evaluation-20261103/with-browser-env-v2.py": "046292b7c8ba8e642bd4f3f63f239e7dde31fd09d78e2c5e5eebd7425acf9d14",
+    "WIN:scratch/allocation-retry-evaluation-20261103/with-browser-env.py": "1d8bb309e59fdb7c93c73f092913a9e869f6f76f902875395ae2cb9a9cedb392",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/1-stdout.log": "78e68490e3269426110238b440eba8e3c61a127e0057418f2c26c2e38783cbb5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/2-stderr.log": "611b7f6cc4fdda209a3c9fdf3c13982ccb206363a906e24da28876c083311853",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/3-stdout.log": "0b604fa483ab56b20652014905d9ea6f0484bff384c1615f0bbf383fa1c8f9cd",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/4-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/5-stdout.log": "de979adf6632dd0562d9584208493e4babe9594bf30c6788bc6997759dd2a43a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/6-stderr.log": "b7abcc9308d68e2962aed138660b98e60cd79dbc21b7cce07c1f3e3739e0e4e5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-batch/6-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/1-stdout.log": "1b982a926b660430add0edbf90e844eea7aa1fc23e49b393b4c5b65920513b8e",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/2-stdout.log": "7cdb425751ca0bb25ea9dd88ec97ee97a12bce8948334bbf17c606e48ab6c765",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/3-stdout.log": "1f9a87f04d8ef5e70a6ea22700c7f0c22580c7475b1c7f221ccf2dcf84fbb18c",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/4-stdout.log": "4bb1e68771b9c0346387dbdd79b6f9f68675ff9e39e1f1a08f752f7a1c702407",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/5-stdout.log": "58bf88eefb704982713344b5cce2d64d0c5e3bb183de26ee838a67055b8aa7e5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/6-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/6-stdout.log": "0f7135c36b69a40d3a155dabc0b719c5b763a9811da23ca8c1da835269f7a4d6",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/7-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-batch/7-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-final-package-batch/1-stderr.log": "78e60c93cea594f939f1d023df571f121a61f7f91a3a4c9cf611473811e931bd",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-final-package-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-final-package-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-final-package-batch/2-stdout.log": "0b604fa483ab56b20652014905d9ea6f0484bff384c1615f0bbf383fa1c8f9cd",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-prepare-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-prepare-batch/1-stdout.log": "c79d11245ae4cd14b15e2e4dd158247992cab38f4635b922d3815fd7d0aec9cb",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-prepare-batch/manifest.json": "dcb64503d78cbcf727287056422fe233bbb5e79135bc02bd8d488ffc28fad2e0",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-prepare-batch/status.json": "d48bc212eeeca8b42be818f7e2fae95d91eec169526c02ce39879754ca99ddca",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/1-stderr.log": "fbe865c7e07840060d818a84184fd30aa170b5eba9fda36d27400ca6cd6e73e2",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/3-stdout.log": "27d239ce3bcd663310ee4c23cf98c137a988f86f4ce21fd56e88233045cef264",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-base-batch/4-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/1-stderr.log": "39530d0230895784d7b28bcf61b2181e36a64a99e1bfc6703ad534b2c3d75e4f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/3-stdout.log": "d60fb6bf1b301089254673f3e99a976908af72dab325b7171f9fac506b897bca",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-batch/4-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-plan.json": "e3e42395e30bc216bc1a274743740f0ff9694c4173a7640fe06132461d8fabc5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-plan.json": "0096a721e8aa1d4170d4fe97519f06fafebf8ff40999d6e46e3375fd240e614a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-baseline/job.json": "ba96e488ca24de74cc86151fc5833fefd935e18a915ed66821e87ad664734951",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-baseline/output/CHOPPER-COMPLETE.json": "a9768a3128264bb6277e3a5434cfd654f839a7003f7bbe9e82a27b4b16178502",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/1-stdout.log": "4b3dff653c3883ccdc8ff77942fa9d6cc63bf6f54ca31b8218435415bd36dae3",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/2-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/3-stdout.log": "2a77b6c916ea7fcc0a8f6df80a297330e696e6c84e6ac7ced35cfdd496b53e3b",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/4-stdout.log": "32b65665d993c64955234c7da0a592aa665337d0763cac9e9059469ce1318bbc",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/5-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/6-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/6-stdout.log": "2a77b6c916ea7fcc0a8f6df80a297330e696e6c84e6ac7ced35cfdd496b53e3b",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/manifest.json": "766963046984f244349ad72415da2af4a6e16ee658e72b08edd7ecff87b8d411",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-batch/status.json": "601ad80bba6874c509f2064ef04d189ec0710df5db2c75e37d6683816b165414",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-candidate/job.json": "e585d82838222c010470c5ff850580f2071e6e3f4a55f15c1294e218462348b5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair1-candidate/output/CHOPPER-COMPLETE.json": "a9768a3128264bb6277e3a5434cfd654f839a7003f7bbe9e82a27b4b16178502",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-baseline/job.json": "823702bb7c5312454b769c6cf7ebf63981dc8486940845a35307424f8f287d1c",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-baseline/output/CHOPPER-COMPLETE.json": "a9768a3128264bb6277e3a5434cfd654f839a7003f7bbe9e82a27b4b16178502",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/1-stdout.log": "94f1003ee44503a9e0a906c1520ec18fc9cb0e48b75c3e45dbe3d8521fd7826f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/2-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/3-stdout.log": "2a77b6c916ea7fcc0a8f6df80a297330e696e6c84e6ac7ced35cfdd496b53e3b",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/4-stdout.log": "0aeac7f4d694a838206f00f582a04443746405a18941bcf7270f5ffee7ebb025",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/5-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/6-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/6-stdout.log": "2a77b6c916ea7fcc0a8f6df80a297330e696e6c84e6ac7ced35cfdd496b53e3b",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/manifest.json": "c124b9a2b594d0f214d7ba7b3010751929eb9cd8c1b54c7754843bd6a57f8355",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-batch/status.json": "97fecae6163fc4a0795133aef17c319be0b341cd37321ea62b1ed5e7d28ffc3f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-candidate/job.json": "c946b90735b11b30a496c185f0224998865085e7aed1b966f7c0500923f5a511",
+    "WIN:scratch/allocation-retry-evaluation-20261103/browser-runs/pair2-candidate/output/CHOPPER-COMPLETE.json": "a9768a3128264bb6277e3a5434cfd654f839a7003f7bbe9e82a27b4b16178502",
+    "WIN:scratch/allocation-retry-evaluation-20261103/fixture-roomy/campaign.json": "2310b645d1defd5f358f68db58f13eac94975ac5d3303ece06eb4f99986d399b",
+    "WIN:scratch/allocation-retry-evaluation-20261103/fixture-roomy/dataset.json": "f0f61c281b14727b5de3295b8e871d6bb796591182ab115b9e6fcf72e9a61d16",
+    "WIN:scratch/allocation-retry-evaluation-20261103/fixture-roomy/ordered.json": "80afbcc3fd0b19d7d99517d53cda9512b9b53f0e8431a1ff67946a9d2a8bd46e",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-batch/2-stderr.log": "59d4116b2dc1a7d90c51b529f364da145e48dd27caf5190e0c786e6b7279f889",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-batch/manifest.json": "ce3b4bdd9ec05d4e25cd828b4a92a35e5908896d661cb7c0e20401cc45dae303",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-batch/status.json": "a497d76f9cf40ab9fc584613b88625748cf49e32b495a0d09292addeb9516c89",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-v2-batch/1-stderr.log": "9c05ba4aa8cf15de22f79009ff6cba64f4fd1cc9d28a8906ba2d5d8a0f07d296",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-build-v2-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-prepare-constrained2-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-prepare-constrained2-batch/1-stdout.log": "6a6132c61cf87d04616ff49b544ea2984fcd58ffccc01fd708b069997ab996ef",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-prepare-constrained2-batch/manifest.json": "a0b745fab7188e3f25e235d7273dbbd200f63b096cdb85f0f8703dc648c3e961",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-prepare-constrained2-batch/status.json": "3fa25580d5adc11ae000dfb3126ea34d5ea4958e11084e343ffccc9618f58eff",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-prepare-v2-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-prepare-v2-batch/1-stdout.log": "6a6132c61cf87d04616ff49b544ea2984fcd58ffccc01fd708b069997ab996ef",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-prepare-v2-batch/manifest.json": "571b8ce9f89481f82f535e0272545ffba61d924cd8fc9d68ef80f26704995932",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-prepare-v2-batch/status.json": "4db243a53cf863bf1291227b2b1f2e5e7a00867ba8f89bddcd21c63f1cbd4604",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-plan.json": "4ceaf537f723568a0228080bad3698103e131283050996bfc82b2d7d75ec06d0",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair2-plan.json": "72468741226a61abd3a26bc7abceb2031c3d0958e0c93d236311e46fe624e5ba",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-plan.json": "8b9d20832ea6b47fafb1651416277dc17cc057c1bd0611cb82a622297743b965",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-plan.json": "710d9aaa4a30ef4276bc3f52fc0da15db2533dbb987efe5308107cfeb92fe18c",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-baseline/job.json": "330970d92dab92506320dd3ee41afa75c6ec7b2d9b60ea8c5afa5c929f476548",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-baseline/run.json": "9a140e898e57655ddfef0a26682608b3561ef3b133a1cc8964abda1b8953569a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-baseline/run.stderr.log": "c6380204947f1f6b3a4b82e4706bec86bde8dd9d723dbfe1611d20bcc1a1410c",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-baseline/run.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-batch/1-stderr.log": "ec344a905740eee7f139a8b3c1a3a6db7ddfb0dee1e1a8f0e384dcfd1a1fda13",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-batch/manifest.json": "38130b0548fc5b6885c83f4f91f3008b25786dee2b92fd0150365d87df84bcce",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-batch/status.json": "2db6ed30bbaca1bffa707380235de60c149f8202a466065cc1161d4071611a4e",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair1-candidate/job.json": "98b0569c64727d80f28e05c80942bbe4c0bab02a609ff1dd364bc37923a2a3a6",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair2-baseline/job.json": "a0958c40d922412dc676e00764e2b3ccbc667137bc0e4722702cdb77b265fad1",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/constrained-pair2-candidate/job.json": "7cc082aab7890f6db36144c547f0950dceba53cd36b59e043d74ad924040d703",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/fixture-constrained/campaign.json": "6c484ee732c3230cdde506c98563ed157cf93838553ea8a8abc05a6b5b71a364",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/fixture-constrained/dataset.json": "f0f61c281b14727b5de3295b8e871d6bb796591182ab115b9e6fcf72e9a61d16",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/fixture-constrained/ordered.json": "196d7840c19d2dc777e70270ada7035c51653c2a84d71421fd76b4f1068ac377",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/fixture-roomy/campaign.json": "08730da9bd1319c9ecfb68072b6e0678e5364d2a41937542ad67652ecb9582df",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/fixture-roomy/dataset.json": "f0f61c281b14727b5de3295b8e871d6bb796591182ab115b9e6fcf72e9a61d16",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/fixture-roomy/ordered.json": "6093963d02f709b6fc0d96f062a23c5f33dce39715ff95bd388c4cba5fcc9d8e",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-baseline/job.json": "f7b06c9dcf3a2c4e05045f20fd702ee66b1ce0c2af4d759d730a9e69f4020949",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/2-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/4-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/5-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/manifest.json": "d4240a2c1aa50ce96d95c3ad07b2ff31ec5ba4638cf2f83e42613d61d734ccf5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-batch/status.json": "d4fabfdaaa4360eb27e3b441313acda0d2a10f3774c2275a864cd923351cdae9",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair1-candidate/job.json": "dd73691583bcd53239661fc9496f8c4f3fdaf3e01def5273b4536765f45fded0",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-baseline/job.json": "229ec8570f6173b90eb00523ab5333316e4356eeaa6917373ea419d0b3d6592f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/2-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/4-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/5-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/manifest.json": "55996d513cb085e0e18fee548b5d3d37a25ef40dc3d990aa364e2ed50e3e1b40",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-batch/status.json": "4ad98628d919076cdc9d63768e894b588205b6aa468f954c830f49a9bd7dd932",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v2/roomy-pair2-candidate/job.json": "b2f128458f325a63367a7c4256a7fde2cd647ed4c4c9af2af0fed04ef494332c",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-plan.json": "5165a5cce0aa8c30954c2f084ebc338f6f390b675e3badbe45e3e539689393a9",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair2-plan.json": "c2f378da5f6580adddf775546fff8dc296dc9955ad3d4283fbb66c8177da65f4",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-baseline/job.json": "639d92f56217ae6472106d75d0b896b92b7164017598cbd38a6d394a72b00b25",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/2-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/4-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/5-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/manifest.json": "7a4c1007417a67b98d0a44c6d04b3c24c7542120a23d9e2510cd5e589de3fe87",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-batch/status.json": "54ec0f966a875f09f0b6adfb6afac76a94ea4a5e5ab585da4f5c43e0d2e11fc3",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair1-candidate/job.json": "f0405b5bd246054fae78f7af1c3d8b2d302ed91ab38d64cb885614c2277a2c59",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair2-baseline/job.json": "dfec4726b26b6fc8469d28af32b989175124f44133bae92c38d302a6c43c2074",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/constrained2-pair2-candidate/job.json": "4a3f42ce8016d69b3f8bfe38abd6b69e4d18aa310d8f6a63cc3b0962b71644c8",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/fixture-constrained2/campaign.json": "2608d76137fc8ac53e27f157222d0d1c9a1c4ce79fb66be8948ebf76a9d3e396",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/fixture-constrained2/dataset.json": "f0f61c281b14727b5de3295b8e871d6bb796591182ab115b9e6fcf72e9a61d16",
+    "WIN:scratch/allocation-retry-evaluation-20261103/native-v3/fixture-constrained2/ordered.json": "b029e92bd8d7f85b1ea4941b21060f7f13077619e6298e2601d077cb02741a70",
+    "WIN:scratch/allocation-retry-evaluation-20261103/postflight-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/postflight-batch/1-stdout.log": "3f58a884ad861b53ac28f131390f42595cc6005540c834ffa597818c5b8a47d4",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-batch/3-stderr.log": "e5f9e9ff665978a724c5e96925748dcee7bf5098cc9a1cd2021acbdbb8ac3f1a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-batch/manifest.json": "46da8c65bd376e3814eb99704fa4520b0991b696a96438674011d446c6364dc6",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-batch/status.json": "934d11fabea126ef5fee0683fadda23f749b631ffd03c78042bc2dfee1f14be8",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v2-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v2-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v2-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v2-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v2-batch/3-stderr.log": "eb874cb4306e348e525a50fa667a373280f43c72fc11b79bd3a7b3a0f66519f0",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v2-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v2-batch/manifest.json": "0e89a16f2721390ef7e04146d355bfed2851cb0caf77de4851cf4061498f35d8",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v2-batch/status.json": "1e72d9b1c11fd6a6659fe9aef8f325a2d88d849714a5b8ebd7cdea2113fe5bba",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/3-stderr.log": "efc93e9d872a78f547cd9bdb124ac1d96dd2d86bf138cd5a18fe69513d96d274",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/4-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/5-stderr.log": "4cf8ebede561c9eefeeeba6edafcd0b043ef6e2b01134df8ab6a53bc89a6d1f5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-batch/5-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-batch/1-stderr.log": "0c2aba95dfe6fe032852cab9de4ab2b5717b28bd399b604b99b5056fd4870053",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-batch/2-stderr.log": "fee241498e351c121bb70057f414aa2ee33a4c761a8f158e13a4c239c0c5c6dc",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-gates-batch/3-stdout.log": "c79d11245ae4cd14b15e2e4dd158247992cab38f4635b922d3815fd7d0aec9cb",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-plan.json": "1300299ef6f3f2071b0143452b6b65976f059f7e8444b27ce9ad74ca8f312a81",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-plan.json": "3f63924af8a7d6b629190c6380985c1683aea5ea042013dfc33b0eb4bea743a5",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-baseline/job.json": "2341a0486476b491c78540a04f702cb69fc2caaae83f9f86833d56a6e2b4caac",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-baseline/run.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/2-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/4-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/5-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/manifest.json": "c7917c22bdf9e97f1c6c3fd225bdacd712fb5e1d39eb12e90589644e22e66b93",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-batch/status.json": "e4c46d1f611d0cd0f9b6d2c7b8fe5868c059192544c06aa6e060868bb6d11b5a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-candidate/job.json": "c9d97b27c86ae37754361e4b8b5bbc5e0efe0d11261f2cc1887516098b39b116",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair1-candidate/run.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-baseline/job.json": "2e494d33f179ef73d4c9628fa3a320c266b9b0f7770a9381a285df1133a4d5d8",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-baseline/run.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/2-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/4-stdout.log": "7ccaff14c60f035d00226040aa1d3e42eaee6d17b6e8e269e232ca6d2ff0618f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/5-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/manifest.json": "98a0759de15f0ba56652ed2fa0795d10545fa585cdd1adba28186ba2864ad950",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-batch/status.json": "c90280707494d95cffbbff322f64a71a573e60dca66e937f6f03169dbf4577e6",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-candidate/job.json": "e4a256cc0f8785cb926da4b843fa67964b8fbb85e3b2c605cb00d36d8cdf97bc",
+    "WIN:scratch/allocation-retry-evaluation-20261103/pressure-runs/pair2-candidate/run.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe-batch/2-stderr.log": "2c25fbd97073835ba6ba177aed19eec94ea2645ea38c461a0f9830c1ec95e6ab",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe-batch/2-stdout.log": "96f73239bc20a3a949de9c3ef8c5eab75dc0c4dc4dd310392303f48ced78d206",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe-batch/manifest.json": "19f9be8bea317bae019edf6f54fa4984505d5e24f63ce15437db8a391bdd3a17",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe-batch/status.json": "48c51bb35757cc23385b8274cc07a164c7b1cc635358309920433a4e494b927f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe2-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe2-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe2-batch/2-stderr.log": "e4b4fb1aa62982682380e16cd6d8652efff3b92331c1eb8dfc1a0e698d3ead5e",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe2-batch/2-stdout.log": "aaabfa17123018e1c4ff30e370712a86eca6ea1c9d66c6313d08ee522eff1f0a",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe2-batch/manifest.json": "cc62caf6a218a2544908a2e8bd78ac7a1e1a1965fa7cfdd8fb59c1cb16bf7dbc",
+    "WIN:scratch/allocation-retry-evaluation-20261103/probe2-batch/status.json": "fa88cd610424ce234d08e19794d036ce0f0b991390f9c9995e45c9ff09776dad",
+    "WIN:scratch/allocation-retry-evaluation-20261103/roomy-pair1-baseline/job.json": "246df99f50fb8828fa78e074bb7ec4ae6dddb21f811141ddeccad29ddb5c8520",
+    "WIN:scratch/allocation-retry-evaluation-20261103/roomy-pair1-candidate/job.json": "49c55f16502bc73ae8e1c3651df8efbfb55009139152faa41b5f65887ea31c66",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-batch/2-stderr.log": "db273b3c44b3e219781f93f8aa1580bbaaf0095e32be08893152887b1979eb0f",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-batch/manifest.json": "92d9f80906eb4b523403cbc4fbe6881dd92d3d81e90ea6a5f8eb3b1926834b4e",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-batch/status.json": "14c40034d5369e49cfa9e128194e29f2f628d47f99c93768419e138c58664c6d",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-v2-batch/1-stderr.log": "dc98f2cc2afde424035cfa968414acac751d839cb0f9f0658cc90edd2c5fba91",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-v2-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-v2-batch/manifest.json": "352bfa8a69107df3a9ad894ff1f14ef986bf69b229c08b60249db90690ec8821",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety-v2-batch/status.json": "f45207cda6c01013179639972bd538460f741a2b631b0ba4348771d5768a2399",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/2-stderr.log": "9ceddb78f592737d6473c789e152040a57cc76eca5445b24a98d4662a975241b",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/2-stdout.log": "54f005d3b2f925e3ed355bf8daebb8afcb9ca3536c63df6eba32cea0928c18cc",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/4-stderr.log": "bb9ae0091a05163064877f8c2bc0489277a80055ab0e977c00fe1eabea0b1622",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/4-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/5-stderr.log": "e138902b4ebea925d3c263e134918667ea4dc2286bef43f02149093145507681",
+    "WIN:scratch/allocation-retry-evaluation-20261103/safety3-batch/5-stdout.log": "f65af31417e8a28ffd950b7cd6161b30e79e903402dc9b668be1ed02c905f5b3",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/2-stderr.log": "6eedd6862d26130911710ab38c6b2f96ec28d70a093f060cf219b3d9094c2504",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/3-stderr.log": "20b58838151908f900524b289f6ff91b6dfa58b1cfcb5101d6da81457488183d",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/3-stdout.log": "f5b84506da307da474cac1dda5f7987b3cb7a3436b6d127c411ed41745d193e0",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/4-stderr.log": "04d0c5e50ec300ebfcfe9bd0b52d311b4071490e4159d3e36bde20dbda813a5d",
+    "WIN:scratch/allocation-retry-evaluation-20261103/study-gates-batch/4-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WSL:scratch/allocation-retry-evaluation-20261103/audit-logical-metadata.py": "d5ebf2c736d5b022c06f7e138cb5f4274ea789c65a9d9ae3f130160a9329b636",
+    "WSL:scratch/allocation-retry-evaluation-20261103/baseline-source-match.json": "3fad9edea1a37f371066faf496967a36b2cb899c4912d379f486a246941a2964",
+    "WSL:scratch/allocation-retry-evaluation-20261103/browser-acceptance-plan.json": "ce30af4b324623ab5d9c48268ddc4b5935b10f2600eb821a526d28ea30387002",
+    "WSL:scratch/allocation-retry-evaluation-20261103/browser-acceptance-review.md": "2a39cb91521251d85291033ce91dc328123da373c7b4d29a08d8c709a25df1f1",
+    "WSL:scratch/allocation-retry-evaluation-20261103/browser-acceptance-v2-plan.json": "1e5fb9253d7b0937c9ff1a3133dc8019aa9483ed8c00ce7a18f36666c5ba525c",
+    "WSL:scratch/allocation-retry-evaluation-20261103/browser-baseline-source-match.json": "63e5c372ee783c378f26f62e6ef1bdc146a6ee2623455dedf539e29cc2ad3c83",
+    "WSL:scratch/allocation-retry-evaluation-20261103/browser-bridge-cwd-failure.md": "a34f1874e907db8b366d3ae7e9b43b6b44135d083601e99032e71cd5e238ba44",
+    "WSL:scratch/allocation-retry-evaluation-20261103/browser-comparison-review.md": "df99da705e5c1d4f4e7ceaa46cf1c9186285ccaa6972c88c8abd648f2c1fd420",
+    "WSL:scratch/allocation-retry-evaluation-20261103/browser-final-package-plan.json": "f0ce880f0867c2106d083bef258523ac2e2512885c535d0547961dda549e796d",
+    "WSL:scratch/allocation-retry-evaluation-20261103/browser-prepare-plan.json": "0e2f9b36c4768652c5189cc3ee0b5ad7b4873fc44b05267860692ad7e8e314e5",
+    "WSL:scratch/allocation-retry-evaluation-20261103/browser-resource-base-plan.json": "1a4399a35f44e2db2b3375682993c871d8699537a0086afa64e6af32fa61fc39",
+    "WSL:scratch/allocation-retry-evaluation-20261103/browser-resource-shuffle-plan.json": "c79fea2900fd64473c7bf9cd99010d5bdc59e0bd834fe5b5e700dc91e2480b9d",
+    "WSL:scratch/allocation-retry-evaluation-20261103/capture-host.py": "86c7e9465b405ff4c75816d78f61cb6b420349470f667fe37bbdf65be52041f4",
+    "WSL:scratch/allocation-retry-evaluation-20261103/constrained1-decision.md": "a67bc16d611189a30cd83a2f841fc9249dcc02d3146303822fde2daeb33de239",
+    "WSL:scratch/allocation-retry-evaluation-20261103/derivative-generation-interruption.md": "d3978db92ea4cc3b52e9cc0fc110fce4de3b3c113cf880ad728d792c57894d15",
+    "WSL:scratch/allocation-retry-evaluation-20261103/evidence-checks-plan.json": "3f1ca5b3498fc0c1941c13e133d12d4f387c9a345d3eaa60813695272a850174",
+    "WSL:scratch/allocation-retry-evaluation-20261103/guard-failure.md": "e3e4ef474020314fa8ebacbd01efe6a5332708e76fb656cc4537a5ede1897d80",
+    "WSL:scratch/allocation-retry-evaluation-20261103/guarded-run-v2.py": "eb0e2078d4912ca0d8433acdaebca40d199582d180be68f75ee34ac879fa3b1e",
+    "WSL:scratch/allocation-retry-evaluation-20261103/guarded-run-v3.py": "5b0f9e9975e0cbc9f737a23a628afe19e0f7a2aafa359afabd3dc437b8e87ded",
+    "WSL:scratch/allocation-retry-evaluation-20261103/guarded-run.py": "0d4dc4a147fe74c9bbaff755721e3a0b595bb0651893ed3bdaa7ac8c4d1d0bde",
+    "WSL:scratch/allocation-retry-evaluation-20261103/logical-metadata-audit.json": "39b7f8b105e2ea9b26440c1df342a42e088ca0b8e98f71ffd6b2d8c39b1a998d",
+    "WSL:scratch/allocation-retry-evaluation-20261103/native-build-guard-failure.md": "febb7aef555430f5e4acdedad5d8284696b9f8bda2faeac50bfe93733d38809d",
+    "WSL:scratch/allocation-retry-evaluation-20261103/native-build-plan.json": "bfa22dc8d01f18abf1adf032ecdd090c08375fd6dab491898232dc70809c3e08",
+    "WSL:scratch/allocation-retry-evaluation-20261103/native-build-review.md": "4eeded0f413ece7ed78c6a9e53746c777fe237bda7b0c03e2e02e887acc40277",
+    "WSL:scratch/allocation-retry-evaluation-20261103/native-build-v2-plan.json": "41266c0ae5a384ac6f7a2bdb9d41646ca7c73c96716515de14698ceb7553fc38",
+    "WSL:scratch/allocation-retry-evaluation-20261103/native-comparison-review.md": "55814804ea0850ab1c37b584797e3be6673f9f3e632259be0fb938c443593e00",
+    "WSL:scratch/allocation-retry-evaluation-20261103/native-prepare-constrained2-plan.json": "34900af98ba43d3d3965a9353a63afb02b1704af9000658f1b0a5fe43747e213",
+    "WSL:scratch/allocation-retry-evaluation-20261103/native-prepare-failure.md": "f75b737b8dd5b1f7a5d7e8063fccc2977a1f44a5b2587025d3be9b076b11e8dd",
+    "WSL:scratch/allocation-retry-evaluation-20261103/native-prepare-v2-plan.json": "c2b91dc1168bbeb8235b1e17279a2869f4d4ad28e07080adad31d920fa4a0c93",
+    "WSL:scratch/allocation-retry-evaluation-20261103/performance-section.md": "356faf9958d0801ec06dbafcac72a4522699c9f540d2391aa1090c9965fe89b9",
+    "WSL:scratch/allocation-retry-evaluation-20261103/postflight-identities.py": "7c0e23016dc1019cf9adcdb246d4fa830002d6bb53c818f12257a395b6bdcfc0",
+    "WSL:scratch/allocation-retry-evaluation-20261103/postflight-plan.json": "441677f4993308841fc953205fc0aaa3eb91114d3cb0339197a10de06f0a63b4",
+    "WSL:scratch/allocation-retry-evaluation-20261103/prepare-browser-study.py": "d091a1cdf67e77c0b18ed5b09a74840bedcb4391d368360a5acffa1fa419bcda",
+    "WSL:scratch/allocation-retry-evaluation-20261103/prepare-native-constrained2.py": "215f130a23b2153ac008aef73f32343e3a2c3a1d0979f4cc3990d80a15375d4e",
+    "WSL:scratch/allocation-retry-evaluation-20261103/prepare-native-study-v2.py": "cf6903b1c2c10dce9dbcfff9bea1f1e3bf8123e11a5bff5427541da31c1fe37e",
+    "WSL:scratch/allocation-retry-evaluation-20261103/prepare-native-study.py": "e8d7e7d46688daebd9da9f76ea3b33f69be8337f6fbd35100854291b6698770c",
+    "WSL:scratch/allocation-retry-evaluation-20261103/prepare-pressure-study.py": "222ab8b30d0eacb41be7ef8734bac2af40b3674b4badcff774494b002ed47ec3",
+    "WSL:scratch/allocation-retry-evaluation-20261103/pressure-build-plan.json": "103deff6cfb48c972a058fa315ed210624ee912aa4de0a5a40ac5d594c7d03fb",
+    "WSL:scratch/allocation-retry-evaluation-20261103/pressure-build-v2-plan.json": "8f7174b0edf1a73ed8566f24da12c1d926d45f74c44515a5794247819eb76d01",
+    "WSL:scratch/allocation-retry-evaluation-20261103/pressure-build-v3-plan.json": "390f78412e8e7419d9a4db1381fbbbb79e456e09417d9ef0b8e5d637fd4418ec",
+    "WSL:scratch/allocation-retry-evaluation-20261103/pressure-driver-failure.md": "3234ca8224ee43cabc0c056ea912f134d600386f64ce675afdbe7766d9dec199",
+    "WSL:scratch/allocation-retry-evaluation-20261103/pressure-driver-v2-failure.md": "181730172a49da7106374b0237e200640294d662316802a8263a83a2ac532d3f",
+    "WSL:scratch/allocation-retry-evaluation-20261103/pressure-gates-plan.json": "db4e9a2b387b5cacd6bc971f6e099ae6ad4c6cb0cafba5c0ab877f5a327621ae",
+    "WSL:scratch/allocation-retry-evaluation-20261103/pressure-review.md": "5722157d859ef83189de16d69c6bd0305ed592e43736d493541833f1295d4c62",
+    "WSL:scratch/allocation-retry-evaluation-20261103/probe-plan.json": "2a824c0e504a9d1f2227a5294e48f2137207416b9daf4334a9d76c17bf10ce07",
+    "WSL:scratch/allocation-retry-evaluation-20261103/probe-review.md": "eaf7f70861b6cac6b679ef8e72171bea46adf940b5caab671904f3f8b808c773",
+    "WSL:scratch/allocation-retry-evaluation-20261103/probe2-plan.json": "9dd689f0e4ef62c21cae5f47e2db99127a767132dddc8c5c54c877f8214dd1df",
+    "WSL:scratch/allocation-retry-evaluation-20261103/probe2-review.md": "70cac844f2bf25c679ff214de8b1cf6caec19624082cd4b9960a56d61d7ef472",
+    "WSL:scratch/allocation-retry-evaluation-20261103/run-native-study.py": "143c2f8bc0fef73d46cfeb29fdac0e25be6a782e50a3b1182e8da39ffea4a47d",
+    "WSL:scratch/allocation-retry-evaluation-20261103/run-pressure-study.py": "1bb04e512e5e534189c0cb69ba620f9707f2cac30d6f40351f277e377b5ee5d1",
+    "WSL:scratch/allocation-retry-evaluation-20261103/safety-command-failure.md": "ac07af22e7c788082369325e08efa5d39dfb83b08512fd0af71e67b81d5f25b5",
+    "WSL:scratch/allocation-retry-evaluation-20261103/safety-compile-failure.md": "2554405e4f8eac4fab01c8ed151a927669344ae0f759538d232c262c78929713",
+    "WSL:scratch/allocation-retry-evaluation-20261103/safety-plan.json": "5c0ce0cb557d0ef7e590eac67dc9200fa81037cff05a32465255ae90b03ba030",
+    "WSL:scratch/allocation-retry-evaluation-20261103/safety-review.md": "667a426b66d7d2d389baebb584adeec0220481d5d8271114131645bfae95cac6",
+    "WSL:scratch/allocation-retry-evaluation-20261103/safety-v2-plan.json": "7f77c3c18d28cbe40733f6f81ba99e6c728c23fafbc3ab638dd48abd196825d2",
+    "WSL:scratch/allocation-retry-evaluation-20261103/safety3-plan.json": "9649ffcf65bab5081f31817e227acd38833ab6bafe45577b1f5dff94bb9b8fb2",
+    "WSL:scratch/allocation-retry-evaluation-20261103/session.json": "d53d88b3904f89771c29803499b4d402be9060027cfb53c70f1f4e8e8dd9d6b5",
+    "WSL:scratch/allocation-retry-evaluation-20261103/study-gates-plan.json": "d7240e937b81aaf781996ae28e5018981c39997dd3c788d536717ee2f7598a81",
+    "WSL:scratch/allocation-retry-evaluation-20261103/task-notes.md": "20744f98d385cc98a93551a1c2286852289bd0fccd4b00c9e962f233f3ff0ef6",
+    "WSL:scratch/allocation-retry-evaluation-20261103/validation-runner.py": "92ca1b7269245e378995b6afafd61003a8e54946e47ff4bcce1404248e9e09de",
+    "WSL:scratch/allocation-retry-evaluation-20261103/with-browser-env-v2.py": "046292b7c8ba8e642bd4f3f63f239e7dde31fd09d78e2c5e5eebd7425acf9d14",
+    "WSL:scratch/allocation-retry-evaluation-20261103/with-browser-env.py": "1d8bb309e59fdb7c93c73f092913a9e869f6f76f902875395ae2cb9a9cedb392",
+    "WSL:scratch/allocation-retry-evaluation-20261103/write-evidence-v2.py": "c3fef2d4698e6366bef7d5f7351f7a00164a097d0595c72fc3f2c08746f3b90e",
+    "WSL:scratch/allocation-retry-evaluation-20261103/write-evidence-v3.py": "043040b78724ebc57741baac1a9be00052e7622dce879f989aa0087a9e30a274"
+  }
+}

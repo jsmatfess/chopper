@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "quoted-serialization-2026-11-05",
+  "title": "Copy ordinary quoted-field text in spans",
+  "date": "2026-11-05",
+  "subsystem": "output",
+  "question": "Can quoted serialization avoid per-scalar appends while preserving exact escaping?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Span copying preserves encoded CSV bytes and retains a scoped native improvement with its negative control.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "One million rich ordered-export records with Unicode, doubled quotes and embedded CRLF; separate ordinary pipeline controls."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux"
+    ],
+    "summary": "Recorded eight-job comparison and semantic controls preserve escaping, encodings, strict caps and output parity on the tested settings."
+  },
+  "limitations": [
+    "Small development cells and uncontrolled cache/background state do not establish general device, shape or tail performance.",
+    "Historical percentage gains are not additive; every comparison uses its own pinned baseline.",
+    "Unreserved String growth is not claimed identical; no new buffer, worker or publication policy is introduced."
+  ],
+  "exclusions": [
+    "Previous compact-field gains and the negative control are not pooled into the rich-field effect."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#quoted-csv-serialization-spans-2026-11-05",
+      "sha256": "8de098b3ac899a797adb3961995a499a7d561e98998cc305a02e05c9ea2fb496"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/quoted-serialization-2026-11-05.json",
+      "sha256": "dc32b3a13179c799d2e4992d2eecf0aedd67ffb09c1664918ce3fcb4dc2e8e98"
+    },
+    {
+      "path": "docs/benchmarks/quoted-serialization-2026-11-05.patch",
+      "sha256": "c3bbb5253be6f8a5c139cf7c6f5d7b54923af41d335005cd9e91fead898df63f"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "root": "C:/path/to/chopper",
+  "batch_timeout_seconds": 30,
+  "estimated_seconds": 5,
+  "estimated_disk_bytes": 1048576,
+  "toolchains": {"python": "Replace with the actual executable/version used"},
+  "features": [],
+  "fixtures": ["tiny orchestration controls only; no engine benchmark"],
+  "experiment": {
+    "question": "Does the coded experiment cycle preserve failure and resume behavior?",
+    "hypothesis": "The tiny control and focused workflow tests pass.",
+    "decision_rule": "Inspect test results; these command durations are not benchmark evidence.",
+    "stop_rule": "Stop on the first failed, invalidated or timed-out step.",
+    "cohort": "development"
+  },
+  "steps": [
+    {
+      "id": "control",
+      "phase": "measure",
+      "argv": ["C:/path/to/python.exe", "-c", "print('orchestration control only')"],
+      "timeout_seconds": 5,
+      "inputs": ["scripts/experiment-cycle.py", "scripts/validation-runner.py"],
+      "artifacts": [],
+      "depends": []
+    },
+    {
+      "id": "verify",
+      "phase": "verify",
+      "argv": ["C:/path/to/python.exe", "scripts/test-experiment-cycle.py"],
+      "timeout_seconds": 20,
+      "inputs": ["scripts/experiment-cycle.py", "scripts/validation-runner.py", "scripts/test-experiment-cycle.py"],
+      "artifacts": [],
+      "depends": ["control"]
+    }
+  ]
+}

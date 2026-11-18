@@ -1,0 +1,891 @@
+{
+  "seed": "buffer-fusion-fixture",
+  "input": "id,key,stratum,note\n0,0,0,\"界,\"\"\n\"\n1,1,1,\n2,2,0,\n3,0,1,\n4,1,0,\"界,\"\"\n\"\n5,2,1,\n6,0,0,\n7,1,1,\n8,2,0,\"界,\"\"\n\"\n9,0,1,\n10,1,0,\n11,2,1,\n12,0,0,\"界,\"\"\n\"\n13,1,1,\n14,2,0,\n15,0,1,\n16,1,0,\"界,\"\"\n\"\n17,2,1,\n18,0,0,\n19,1,1,\n20,2,0,\"界,\"\"\n\"\n21,0,1,\n22,1,0,\n23,2,1,\n24,0,0,\"界,\"\"\n\"\n25,1,1,\n26,2,0,\n27,0,1,\n28,1,0,\"界,\"\"\n\"\n29,2,1,\n30,0,0,\n31,1,1,\n32,2,0,\"界,\"\"\n\"\n33,0,1,\n34,1,0,\n35,2,1,\n36,0,0,\"界,\"\"\n\"\n",
+  "cases": [
+    {
+      "config": {
+        "name": "window-1",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 1
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 450,
+          "lineage": [],
+          "path": "part-00000001.csv",
+          "rows": 37,
+          "stored_bytes": 450,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a302c302c302c22e7958c2c22220a220a312c312c312c22220a322c322c302c22220a332c302c312c22220a342c312c302c22e7958c2c22220a220a352c322c312c22220a362c302c302c22220a372c312c312c22220a382c322c302c22e7958c2c22220a220a392c302c312c22220a31302c312c302c22220a31312c322c312c22220a31322c302c302c22e7958c2c22220a220a31332c312c312c22220a31342c322c302c22220a31352c302c312c22220a31362c312c302c22e7958c2c22220a220a31372c322c312c22220a31382c302c302c22220a31392c312c312c22220a32302c322c302c22e7958c2c22220a220a32312c302c312c22220a32322c312c302c22220a32332c322c312c22220a32342c302c302c22e7958c2c22220a220a32352c312c312c22220a32362c322c302c22220a32372c302c312c22220a32382c312c302c22e7958c2c22220a220a32392c322c312c22220a33302c302c302c22220a33312c312c312c22220a33322c322c302c22e7958c2c22220a220a33332c302c312c22220a33342c312c302c22220a33352c322c312c22220a33362c302c302c22e7958c2c22220a220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "window-3",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 3
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 450,
+          "lineage": [],
+          "path": "part-00000001.csv",
+          "rows": 37,
+          "stored_bytes": 450,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a322c322c302c22220a312c312c312c22220a342c312c302c22e7958c2c22220a220a332c302c312c22220a362c302c302c22220a372c312c312c22220a382c322c302c22e7958c2c22220a220a302c302c302c22e7958c2c22220a220a352c322c312c22220a392c302c312c22220a31322c302c302c22e7958c2c22220a220a31332c312c312c22220a31302c312c302c22220a31312c322c312c22220a31342c322c302c22220a31362c312c302c22e7958c2c22220a220a31372c322c312c22220a31382c302c302c22220a32302c322c302c22e7958c2c22220a220a31392c312c312c22220a32322c312c302c22220a32332c322c312c22220a32312c302c312c22220a32342c302c302c22e7958c2c22220a220a32362c322c302c22220a32372c302c312c22220a32352c312c312c22220a31352c302c312c22220a32382c312c302c22e7958c2c22220a220a32392c322c312c22220a33302c302c302c22220a33322c322c302c22e7958c2c22220a220a33342c312c302c22220a33332c302c312c22220a33312c312c312c22220a33362c302c302c22e7958c2c22220a220a33352c322c312c22220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "window-37",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 37
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 450,
+          "lineage": [],
+          "path": "part-00000001.csv",
+          "rows": 37,
+          "stored_bytes": 450,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a33322c322c302c22e7958c2c22220a220a31392c312c312c22220a352c322c312c22220a31382c302c302c22220a31312c322c312c22220a362c302c302c22220a33312c312c312c22220a31322c302c302c22e7958c2c22220a220a31362c312c302c22e7958c2c22220a220a32332c322c312c22220a31342c322c302c22220a33352c322c312c22220a31372c322c312c22220a32352c312c312c22220a33332c302c312c22220a342c312c302c22e7958c2c22220a220a382c322c302c22e7958c2c22220a220a31302c312c302c22220a32342c302c302c22e7958c2c22220a220a32322c312c302c22220a31352c302c312c22220a392c302c312c22220a372c312c312c22220a302c302c302c22e7958c2c22220a220a33302c302c302c22220a32302c322c302c22e7958c2c22220a220a32362c322c302c22220a32372c302c312c22220a33342c312c302c22220a33362c302c302c22e7958c2c22220a220a322c322c302c22220a312c312c312c22220a32382c312c302c22e7958c2c22220a220a32312c302c312c22220a32392c322c312c22220a31332c312c312c22220a332c302c312c22220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "window-38",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 38
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 450,
+          "lineage": [],
+          "path": "part-00000001.csv",
+          "rows": 37,
+          "stored_bytes": 450,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a33322c322c302c22e7958c2c22220a220a31392c312c312c22220a352c322c312c22220a31382c302c302c22220a31312c322c312c22220a362c302c302c22220a33312c312c312c22220a31322c302c302c22e7958c2c22220a220a31362c312c302c22e7958c2c22220a220a32332c322c312c22220a31342c322c302c22220a33352c322c312c22220a31372c322c312c22220a32352c312c312c22220a33332c302c312c22220a342c312c302c22e7958c2c22220a220a382c322c302c22e7958c2c22220a220a31302c312c302c22220a32342c302c302c22e7958c2c22220a220a32322c312c302c22220a31352c302c312c22220a392c302c312c22220a372c312c312c22220a302c302c302c22e7958c2c22220a220a33302c302c302c22220a32302c322c302c22e7958c2c22220a220a32362c322c302c22220a32372c302c312c22220a33342c312c302c22220a33362c302c302c22e7958c2c22220a220a322c322c302c22220a312c312c312c22220a32382c312c302c22e7958c2c22220a220a32312c302c312c22220a32392c322c312c22220a31332c312c312c22220a332c302c312c22220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "window-100",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 100
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 450,
+          "lineage": [],
+          "path": "part-00000001.csv",
+          "rows": 37,
+          "stored_bytes": 450,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a33322c322c302c22e7958c2c22220a220a31392c312c312c22220a352c322c312c22220a31382c302c302c22220a31312c322c312c22220a362c302c302c22220a33312c312c312c22220a31322c302c302c22e7958c2c22220a220a31362c312c302c22e7958c2c22220a220a32332c322c312c22220a31342c322c302c22220a33352c322c312c22220a31372c322c312c22220a32352c312c312c22220a33332c302c312c22220a342c312c302c22e7958c2c22220a220a382c322c302c22e7958c2c22220a220a31302c312c302c22220a32342c302c302c22e7958c2c22220a220a32322c312c302c22220a31352c302c312c22220a392c302c312c22220a372c312c312c22220a302c302c302c22e7958c2c22220a220a33302c302c302c22220a32302c322c302c22e7958c2c22220a220a32362c322c302c22220a32372c302c312c22220a33342c312c302c22220a33362c302c302c22e7958c2c22220a220a322c322c302c22220a312c312c312c22220a32382c312c302c22e7958c2c22220a220a32312c302c312c22220a32392c322c312c22220a31332c312c312c22220a332c302c312c22220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "balanced",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 3
+          },
+          {
+            "type": "balanced",
+            "files": 4
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 1,
+          "output_groups": 4,
+          "smallest_group": 9,
+          "largest_group": 10,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 131,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            }
+          ],
+          "path": "split-1-part-00000001.csv",
+          "rows": 10,
+          "stored_bytes": 131,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a322c322c302c22220a312c312c312c22220a342c312c302c22e7958c2c22220a220a332c302c312c22220a362c302c302c22220a372c312c312c22220a382c322c302c22e7958c2c22220a220a302c302c302c22e7958c2c22220a220a352c322c312c22220a392c302c312c22220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 131,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            }
+          ],
+          "path": "split-2-part-00000002.csv",
+          "rows": 9,
+          "stored_bytes": 131,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a31322c302c302c22e7958c2c22220a220a31332c312c312c22220a31302c312c302c22220a31312c322c312c22220a31342c322c302c22220a31362c312c302c22e7958c2c22220a220a31372c322c312c22220a31382c302c302c22220a32302c322c302c22e7958c2c22220a220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 117,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 3
+            }
+          ],
+          "path": "split-3-part-00000003.csv",
+          "rows": 9,
+          "stored_bytes": 117,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a31392c312c312c22220a32322c312c302c22220a32332c322c312c22220a32312c302c312c22220a32342c302c302c22e7958c2c22220a220a32362c322c302c22220a32372c302c312c22220a32352c312c312c22220a31352c302c312c22220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 131,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 4
+            }
+          ],
+          "path": "split-4-part-00000004.csv",
+          "rows": 9,
+          "stored_bytes": 131,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a32382c312c302c22e7958c2c22220a220a32392c322c312c22220a33302c302c302c22220a33322c322c302c22e7958c2c22220a220a33342c312c302c22220a33332c302c312c22220a33312c312c312c22220a33362c302c302c22e7958c2c22220a220a33352c322c312c22220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "assignment",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 3
+          },
+          {
+            "type": "assign",
+            "groups": [
+              {
+                "name": "treatment",
+                "percent": "80"
+              },
+              {
+                "name": "control",
+                "percent": "20"
+              }
+            ],
+            "strata": [
+              "stratum"
+            ]
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 1,
+          "output_groups": 2,
+          "smallest_group": 8,
+          "largest_group": 29,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 352,
+          "lineage": [
+            {
+              "allocation": "treatment",
+              "operation": 1
+            }
+          ],
+          "path": "allocation-treatment-part-00000001.csv",
+          "rows": 29,
+          "stored_bytes": 352,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a322c322c302c22220a312c312c312c22220a342c312c302c22e7958c2c22220a220a332c302c312c22220a362c302c302c22220a382c322c302c22e7958c2c22220a220a352c322c312c22220a31322c302c302c22e7958c2c22220a220a31332c312c312c22220a31302c312c302c22220a31312c322c312c22220a31342c322c302c22220a31372c322c312c22220a31382c302c302c22220a31392c312c312c22220a32322c312c302c22220a32332c322c312c22220a32312c302c312c22220a32342c302c302c22e7958c2c22220a220a32372c302c312c22220a32352c312c312c22220a31352c302c312c22220a32382c312c302c22e7958c2c22220a220a33302c302c302c22220a33322c322c302c22e7958c2c22220a220a33342c312c302c22220a33332c302c312c22220a33312c312c312c22220a33362c302c302c22e7958c2c22220a220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 118,
+          "lineage": [
+            {
+              "allocation": "control",
+              "operation": 1
+            }
+          ],
+          "path": "allocation-control-part-00000002.csv",
+          "rows": 8,
+          "stored_bytes": 118,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a372c312c312c22220a302c302c302c22e7958c2c22220a220a392c302c312c22220a31362c312c302c22e7958c2c22220a220a32302c322c302c22e7958c2c22220a220a32362c322c302c22220a32392c322c312c22220a33352c322c312c22220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "partition-assignment",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 3
+          },
+          {
+            "type": "partition",
+            "columns": [
+              "key"
+            ]
+          },
+          {
+            "type": "assign",
+            "groups": [
+              {
+                "name": "treatment",
+                "percent": "80"
+              },
+              {
+                "name": "control",
+                "percent": "20"
+              }
+            ],
+            "strata": [
+              "stratum"
+            ]
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 1,
+          "output_groups": 3,
+          "smallest_group": 12,
+          "largest_group": 13,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 3,
+          "output_groups": 6,
+          "smallest_group": 2,
+          "largest_group": 11,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 155,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "0"
+              ]
+            },
+            {
+              "allocation": "treatment",
+              "operation": 2
+            }
+          ],
+          "path": "key-0-allocation-treatment-part-00000001.csv",
+          "rows": 11,
+          "stored_bytes": 155,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a332c302c312c22220a302c302c302c22e7958c2c22220a220a392c302c312c22220a31322c302c302c22e7958c2c22220a220a31382c302c302c22220a32312c302c312c22220a32342c302c302c22e7958c2c22220a220a31352c302c312c22220a33302c302c302c22220a33332c302c312c22220a33362c302c302c22e7958c2c22220a220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 39,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "0"
+              ]
+            },
+            {
+              "allocation": "control",
+              "operation": 2
+            }
+          ],
+          "path": "key-0-allocation-control-part-00000002.csv",
+          "rows": 2,
+          "stored_bytes": 39,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a362c302c302c22220a32372c302c312c22220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 139,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "1"
+              ]
+            },
+            {
+              "allocation": "treatment",
+              "operation": 2
+            }
+          ],
+          "path": "key-1-allocation-treatment-part-00000003.csv",
+          "rows": 10,
+          "stored_bytes": 139,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a312c312c312c22220a342c312c302c22e7958c2c22220a220a31332c312c312c22220a31362c312c302c22e7958c2c22220a220a31392c312c312c22220a32322c312c302c22220a32352c312c312c22220a32382c312c302c22e7958c2c22220a220a33342c312c302c22220a33312c312c312c22220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 39,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "1"
+              ]
+            },
+            {
+              "allocation": "control",
+              "operation": 2
+            }
+          ],
+          "path": "key-1-allocation-control-part-00000004.csv",
+          "rows": 2,
+          "stored_bytes": 39,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a372c312c312c22220a31302c312c302c22220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 131,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "2"
+              ]
+            },
+            {
+              "allocation": "treatment",
+              "operation": 2
+            }
+          ],
+          "path": "key-2-allocation-treatment-part-00000005.csv",
+          "rows": 10,
+          "stored_bytes": 131,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a322c322c302c22220a382c322c302c22e7958c2c22220a220a352c322c312c22220a31342c322c302c22220a31372c322c312c22220a32302c322c302c22e7958c2c22220a220a32332c322c312c22220a32362c322c302c22220a32392c322c312c22220a33352c322c312c22220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 47,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "2"
+              ]
+            },
+            {
+              "allocation": "control",
+              "operation": 2
+            }
+          ],
+          "path": "key-2-allocation-control-part-00000006.csv",
+          "rows": 2,
+          "stored_bytes": 47,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a31312c322c312c22220a33322c322c302c22e7958c2c22220a220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "second-buffer",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 3
+          },
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 7
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 450,
+          "lineage": [],
+          "path": "part-00000001.csv",
+          "rows": 37,
+          "stored_bytes": 450,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a362c302c302c22220a312c312c312c22220a352c322c312c22220a392c302c312c22220a332c302c312c22220a302c302c302c22e7958c2c22220a220a342c312c302c22e7958c2c22220a220a31302c312c302c22220a382c322c302c22e7958c2c22220a220a372c312c312c22220a31332c312c312c22220a31312c322c312c22220a31372c322c312c22220a31342c322c302c22220a32302c322c302c22e7958c2c22220a220a32322c312c302c22220a31382c302c302c22220a31362c312c302c22e7958c2c22220a220a322c322c302c22220a32312c302c312c22220a32332c322c312c22220a31352c302c312c22220a32352c312c312c22220a32392c322c312c22220a32382c312c302c22e7958c2c22220a220a32342c302c302c22e7958c2c22220a220a33342c312c302c22220a32372c302c312c22220a33312c312c312c22220a31322c302c302c22e7958c2c22220a220a33352c322c312c22220a33322c322c302c22e7958c2c22220a220a33332c302c312c22220a32362c322c302c22220a33362c302c302c22e7958c2c22220a220a31392c312c312c22220a33302c302c302c22220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "uniform-after",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 3
+          },
+          {
+            "type": "shuffle",
+            "strategy": "uniform"
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 450,
+          "lineage": [],
+          "path": "part-00000001.csv",
+          "rows": 37,
+          "stored_bytes": 450,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a31332c312c312c22220a31382c302c302c22220a382c322c302c22e7958c2c22220a220a32312c302c312c22220a31302c312c302c22220a31342c322c302c22220a32342c302c302c22e7958c2c22220a220a33352c322c312c22220a33362c302c302c22e7958c2c22220a220a342c312c302c22e7958c2c22220a220a31362c312c302c22e7958c2c22220a220a32322c312c302c22220a32352c312c312c22220a392c302c312c22220a31392c312c312c22220a32382c312c302c22e7958c2c22220a220a31372c322c312c22220a31352c302c312c22220a362c302c302c22220a31312c322c312c22220a32332c322c312c22220a322c322c302c22220a32302c322c302c22e7958c2c22220a220a302c302c302c22e7958c2c22220a220a33332c302c312c22220a32392c322c312c22220a32372c302c312c22220a372c312c312c22220a31322c302c302c22e7958c2c22220a220a33312c312c312c22220a33342c312c302c22220a352c322c312c22220a33322c322c302c22e7958c2c22220a220a312c312c312c22220a33302c302c302c22220a32362c322c302c22220a332c302c312c22220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "uniform-before",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "uniform"
+          },
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 3
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 450,
+          "lineage": [],
+          "path": "part-00000001.csv",
+          "rows": 37,
+          "stored_bytes": 450,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a312c312c312c22220a31302c312c302c22220a362c302c302c22220a32362c322c302c22220a31362c312c302c22e7958c2c22220a220a382c322c302c22e7958c2c22220a220a32332c322c312c22220a33322c322c302c22e7958c2c22220a220a352c322c312c22220a332c302c312c22220a33342c312c302c22220a32392c322c312c22220a342c312c302c22e7958c2c22220a220a31372c322c312c22220a31312c322c312c22220a33332c302c312c22220a31332c312c312c22220a31352c302c312c22220a32342c302c302c22e7958c2c22220a220a31322c302c302c22e7958c2c22220a220a372c312c312c22220a32322c312c302c22220a322c322c302c22220a32372c302c312c22220a302c302c302c22e7958c2c22220a220a33302c302c302c22220a32302c322c302c22e7958c2c22220a220a31342c322c302c22220a31392c312c312c22220a33362c302c302c22e7958c2c22220a220a33352c322c312c22220a32352c312c312c22220a31382c302c302c22220a33312c312c312c22220a32382c312c302c22e7958c2c22220a220a32312c302c312c22220a392c302c312c22220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "partition-before",
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              "key"
+            ]
+          },
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 3
+          }
+        ]
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 3,
+          "smallest_group": 12,
+          "largest_group": 13,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 3,
+          "output_groups": 3,
+          "smallest_group": 12,
+          "largest_group": 13,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 174,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "0"
+              ]
+            }
+          ],
+          "path": "key-0-part-00000001.csv",
+          "rows": 13,
+          "stored_bytes": 174,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a302c302c302c22e7958c2c22220a220a392c302c312c22220a332c302c312c22220a31352c302c312c22220a31382c302c302c22220a31322c302c302c22e7958c2c22220a220a362c302c302c22220a32312c302c312c22220a32342c302c302c22e7958c2c22220a220a33302c302c302c22220a33362c302c302c22e7958c2c22220a220a32372c302c312c22220a33332c302c312c22220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 158,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "1"
+              ]
+            }
+          ],
+          "path": "key-1-part-00000002.csv",
+          "rows": 12,
+          "stored_bytes": 158,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a342c312c302c22e7958c2c22220a220a372c312c312c22220a31332c312c312c22220a31362c312c302c22e7958c2c22220a220a312c312c312c22220a31302c312c302c22220a32322c312c302c22220a32382c312c302c22e7958c2c22220a220a32352c312c312c22220a33342c312c302c22220a31392c312c312c22220a33312c312c312c22220a"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 158,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "2"
+              ]
+            }
+          ],
+          "path": "key-2-part-00000003.csv",
+          "rows": 12,
+          "stored_bytes": 158,
+          "type": "output",
+          "contents_hex": "69642c6b65792c7374726174756d2c6e6f74650a322c322c302c22220a382c322c302c22e7958c2c22220a220a352c322c312c22220a31342c322c302c22220a31312c322c312c22220a32332c322c312c22220a32362c322c302c22220a31372c322c312c22220a33322c322c302c22e7958c2c22220a220a33352c322c312c22220a32302c322c302c22e7958c2c22220a220a32392c322c312c22220a"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "encoded-caps",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 3
+          }
+        ],
+        "output_csv": {
+          "encoding": "utf-16le",
+          "bom": true
+        },
+        "limits": {
+          "bytes": 180
+        }
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 37,
+          "largest_group": 37,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 160,
+          "lineage": [],
+          "path": "part-00000001.csv",
+          "rows": 6,
+          "stored_bytes": 160,
+          "type": "output",
+          "contents_hex": "fffe690064002c006b00650079002c007300740072006100740075006d002c006e006f00740065000a0032002c0032002c0030002c00220022000a0031002c0031002c0031002c00220022000a0034002c0031002c0030002c0022004c752c00220022000a0022000a0033002c0030002c0031002c00220022000a0036002c0030002c0030002c00220022000a0037002c0031002c0031002c00220022000a00"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 164,
+          "lineage": [],
+          "path": "part-00000002.csv",
+          "rows": 5,
+          "stored_bytes": 164,
+          "type": "output",
+          "contents_hex": "fffe690064002c006b00650079002c007300740072006100740075006d002c006e006f00740065000a0038002c0032002c0030002c0022004c752c00220022000a0022000a0030002c0030002c0030002c0022004c752c00220022000a0022000a0035002c0032002c0031002c00220022000a0039002c0030002c0031002c00220022000a00310032002c0030002c0030002c0022004c752c00220022000a0022000a00"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 172,
+          "lineage": [],
+          "path": "part-00000003.csv",
+          "rows": 6,
+          "stored_bytes": 172,
+          "type": "output",
+          "contents_hex": "fffe690064002c006b00650079002c007300740072006100740075006d002c006e006f00740065000a00310033002c0031002c0031002c00220022000a00310030002c0031002c0030002c00220022000a00310031002c0032002c0031002c00220022000a00310034002c0032002c0030002c00220022000a00310036002c0031002c0030002c0022004c752c00220022000a0022000a00310037002c0032002c0031002c00220022000a00"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 172,
+          "lineage": [],
+          "path": "part-00000004.csv",
+          "rows": 6,
+          "stored_bytes": 172,
+          "type": "output",
+          "contents_hex": "fffe690064002c006b00650079002c007300740072006100740075006d002c006e006f00740065000a00310038002c0030002c0030002c00220022000a00320030002c0032002c0030002c0022004c752c00220022000a0022000a00310039002c0031002c0031002c00220022000a00320032002c0031002c0030002c00220022000a00320033002c0032002c0031002c00220022000a00320031002c0030002c0031002c00220022000a00"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 152,
+          "lineage": [],
+          "path": "part-00000005.csv",
+          "rows": 5,
+          "stored_bytes": 152,
+          "type": "output",
+          "contents_hex": "fffe690064002c006b00650079002c007300740072006100740075006d002c006e006f00740065000a00320034002c0030002c0030002c0022004c752c00220022000a0022000a00320036002c0032002c0030002c00220022000a00320037002c0030002c0031002c00220022000a00320035002c0031002c0031002c00220022000a00310035002c0030002c0031002c00220022000a00"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 162,
+          "lineage": [],
+          "path": "part-00000006.csv",
+          "rows": 5,
+          "stored_bytes": 162,
+          "type": "output",
+          "contents_hex": "fffe690064002c006b00650079002c007300740072006100740075006d002c006e006f00740065000a00320038002c0031002c0030002c0022004c752c00220022000a0022000a00320039002c0032002c0031002c00220022000a00330030002c0030002c0030002c00220022000a00330032002c0032002c0030002c0022004c752c00220022000a0022000a00330034002c0031002c0030002c00220022000a00"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 132,
+          "lineage": [],
+          "path": "part-00000007.csv",
+          "rows": 4,
+          "stored_bytes": 132,
+          "type": "output",
+          "contents_hex": "fffe690064002c006b00650079002c007300740072006100740075006d002c006e006f00740065000a00330033002c0030002c0031002c00220022000a00330031002c0031002c0031002c00220022000a00330036002c0030002c0030002c0022004c752c00220022000a0022000a00330035002c0032002c0031002c00220022000a00"
+        }
+      ]
+    },
+    {
+      "config": {
+        "name": "empty",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "buffer",
+            "buffer_rows": 3
+          }
+        ],
+        "input_text": "id,key,stratum,note\n"
+      },
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 0,
+          "largest_group": 0,
+          "empty_groups": 1
+        }
+      ],
+      "outputs": []
+    }
+  ]
+}

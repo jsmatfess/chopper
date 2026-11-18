@@ -1,0 +1,8 @@
+--- a/scripts/test-browser-termination.mjs
++++ b/scripts/test-browser-termination.mjs
+@@ -96 +96 @@
+-  if(mode==='prepare'&&p?.phase==='Serializing output'&&p?.rows>=65536)pause({phase:'prepare',engine_phase:p.phase,rows:p.rows,temp_bytes:p.temp_bytes});
++  if(mode==='prepare'&&p?.phase==='Prepared spill writer'&&p?.rows===0)pause({phase:'prepare',engine_phase:p.phase,rows:p.rows,temp_bytes:p.temp_bytes});
+@@ -286 +286 @@
+-    if(phase==='prepare'){if(!direct)assert(paused.pause.temp_bytes>0);assert(paused.pause.rows>=65536);}
++    if(phase==='prepare'){if(!direct)assert(paused.pause.temp_bytes>0);assert.equal(paused.pause.rows,0);assert.equal(paused.pause.engine_phase,'Prepared spill writer');}

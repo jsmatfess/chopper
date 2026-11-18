@@ -1,0 +1,24 @@
+{
+  "origin": "reviewed private R31 actual-picker controller; source migrated and parameterized, evidence preserved",
+  "receipt": {
+    "path": "C:\\hosted105-tiny-export-r31\\attempt1\\receipt.json",
+    "sha256": "6d1e80caeac181d9670fd7f72ea44f1bb5fbd6a085b542621537fabf86e68e0a"
+  },
+  "original_source_sha256": {
+    "control.py": "50941a23e8445b26a9b626ea2967d4ca5a0f0609649a0d39f1673ba6733a4b48",
+    "suite.py": "b2dfceed62e927184b473fbf343508f493c82829a7b8a2563d6e5b8e11ffa4cf",
+    "diagnostics.py": "baee34c7ab1d4595a9bae8bc04cc16e9b1bb505ec3a6125f07ca6db060204489",
+    "selection.py": "af81a8fb279f79aab643fe75a2bc19bb46dc5a76a04a004fd723f227e7350f5e",
+    "postclick.py": "7f6b126c05f2d9be569c2a3a28d02cbfe8a1c1ebae400174c517e07e29a235b2",
+    "uia.py": "5339346bae99e2b9016b63c412e50c7fd9f6a4048b6f27acae9a92f0e47339be",
+    "uia.ps1": "9100574c53b8b1c8a0444296051cfce4b0fd36a2fd0dd42dabfff9b413a72257",
+    "assets.py": "71ea6b3bc214f64c777cd49e278b18db7dbaed27aa947c21c2d7f1744acbb3bc",
+    "model.py": "abdacf6ae9a7e03f80b31a69a063fc543ae20f90cf552a02c8b0284363b54606",
+    "reservation.py": "568d00c7b640bebf3dabf43c4a8750eb6baa3219adbc91fbcab62b428c06d9ad",
+    "integration.py": "d4f8e87f90d0a8f8621ddeb7041ad7a515c42b2bc484b1224a9b9cb678d96380",
+    "hosted.cjs": "577163b25748bd8c8c93c179976b998690c485635bc06beba924c8e8965aad54",
+    "driver.cjs": "5296e9f32ebf6f7719c72be327e606ca2b754349180a3c984ba8fc7ba0c11751",
+    "browser-small-windows.py": "e5818f9253f61f501beafa4c53a530c6b7252b251719121c345562d0fa4d6c77"
+  },
+  "current_source_identity": "bind the reviewed repository commit and complete actual source inventory; this origin record grants no qualification"
+}

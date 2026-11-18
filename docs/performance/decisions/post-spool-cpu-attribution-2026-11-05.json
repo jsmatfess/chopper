@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "post-spool-cpu-attribution-2026-11-05",
+  "title": "Select unchanged-size reservation codegen from current CPU evidence",
+  "date": "2026-11-05",
+  "subsystem": "execution",
+  "question": "Which current production user-CPU cost should drive the next distinct bounded source experiment after spool changes?",
+  "disposition": "informational",
+  "outcome": "diagnostic",
+  "delivery": "unchanged",
+  "summary": "Investigate a tiny inline unchanged-size reservation guard while retaining every existing grant/call/drop and changed-size admission body. Current self samples and static Linux code shape select a hypothesis, not a predicted gain.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "Current production ordered4M plain export and separate1M regionpartition/probabilisticallocation/uniformshuffle."
+    ],
+    "measurement": "diagnostic"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "One fresh debugmetadata release build and two complete profiles pass independent fields/IDs/groups/caps/bytes/17Analysis/nativeoracle/cleanup checks and separate quality verifiers;440/783selfsamples,0lost. Initial coordinator setup failure and old sampler header-parser failure/repair retained."
+  },
+  "limitations": [
+    "Different recipe sizes and separate selfperiod denominators; no old/new A/B speedup or crossrecipe percentage effect. Finitecounts/unresolvedframes/16KiBDWARF limit caller attribution.",
+    "Current Linux ELF out-of-line resize has6pushes+40bytestack before equality; static code shape does not establish equal-call sample share or nativeWindows gain.",
+    "UserCPUonly; no kernel/physicalIO/RSS/wholeRun capacity-peak/nativeWindows or browser performance claim. Analysis diagnostics precede finalpublication.",
+    "Fresh source333/tool/compiler/C/linker/kernel/paranoid/fixtures/resources pinned; old access-control wrapper failure and same206sample read-only repair explicit. No fresh sampler capture or oldstatus rewrite."
+  ],
+  "exclusions": [
+    "No share converted to wholeRun gain; inclusivepercentages notsummed, summaries/contractdurations notspeed samples.",
+    "This recommendation supersedes only the earlier next-hypothesis selection after its storage work landed; original capture and scope remain intact.",
+    "All prior rejectedstudies remainclosed; keep all grant objects/calls/drop semantics, unlike rejected emptygrant removal. Newsource/A-B still unimplemented/unmeasured in this decision."
+  ],
+  "reopen_when": null,
+  "supersedes": [
+    "cpu-attribution-2026-11-05"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#current-complete-run-cpu-after-buffered-spool-copying-2026-11-05",
+      "sha256": "47aacf7882ad5b6cebd41a8d28ceb08594e28815b739bfa06fdd7df10cd145de"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/post-spool-cpu-attribution-2026-11-05.json",
+      "sha256": "e8599d0d75b55a302154f048bd8e62d4f463484becb9c870721f8a4dd861878d"
+    },
+    {
+      "path": "docs/benchmarks/post-spool-cpu-attribution-2026-11-05-codegen.txt",
+      "sha256": "1e97ce095bcec0cc034232089d8b620c0ca7a8de86667b7b449c5e20d5436c98"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

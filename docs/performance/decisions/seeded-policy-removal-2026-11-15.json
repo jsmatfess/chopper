@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "seeded-policy-removal-2026-11-15",
+  "title": "Remove seeded-output policy and enable shuffle/partition fusion",
+  "date": "2026-11-15",
+  "subsystem": "execution",
+  "question": "Which shuffle/partition optimization should accompany removal of seeded-output policy?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Use one execution path without a seeded replay policy; promote tuple/random-key shuffle/partition fusion and withhold regressing partition-first/resident selectors.",
+  "scope": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "250000-row 192-byte payload, balanced/skewed/single-group native fixtures with 32 MiB and one worker.",
+      "100000-row 31-extra-column matched native/WASI fixture, three alternating repetitions."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Independent conservation, exact fields, group membership, caps and pinned cross-runtime CSV/metadata parity; UI/CLI policy rejection and full native/browser correctness checks."
+  },
+  "limitations": [
+    "Small warm Linux/WSL and bundled-Chromium cells do not establish Windows/macOS, other browsers, large-scale or tail performance.",
+    "A seed remains an RNG input, not a cross-plan replay promise.",
+    "Private archive upload and full readback used the existing OAuth principal; no new separate scoped-reader or public evidence publication is claimed."
+  ],
+  "exclusions": [
+    "Rejected blanket partition-first and resident selectors are separate diagnostic populations.",
+    "The stale-owner-assertion browser attempt failed before eligible measurements and is excluded."
+  ],
+  "reopen_when": "Reconsider child shuffling only with bounded selection and matched total-job evidence separating fitting and skewed/external parents.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#seeded-policy-removal-and-shuffle-partition-fusion-2026-11-15",
+      "sha256": "5fe44eef651a9a51c126f3bb6755919745b2fff9da4b879700f4df23f227ed1f"
+    },
+    {
+      "section": "docs/performance.md#policy-removal-evidence-delivery-2026-11-15",
+      "sha256": "ebeed12192d623f63211944e8aa24141cd911d3c88cd654d5a205c0e3c25a545"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/shuffle-policy-removal-summary-2026-11-15.json",
+      "sha256": "9ad9e2aac5d38667b0f5fc9d7bf94ce9eb1d360d37041dcaf596760629c0eb4e"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-archive-receipt-2026-11-15.json",
+      "sha256": "3b19be8a51bb3de17dc2e3b3f5d505e6029513bd470f9b6ad372862a6ca8622f"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md#seeded-policy-removal-and-shufflepartition-default-2026-11-15"
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "id": "terminal-direct-2026-11-03",
+  "title": "Retain terminal direct output with the cancellation-entry remedy",
+  "date": "2026-11-03",
+  "subsystem": "execution",
+  "question": "Can terminal Run avoid the encoded snapshot while preserving publication and resource lifetimes?",
+  "disposition": "retain-experimental",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Retain scoped traffic/completion evidence and the isolated cancellation-entry remedy; withhold general activation.",
+  "scope": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chrome-persistent"
+    ],
+    "workloads": [
+      "Seeded plain partition -> probabilistic allocation, explicit one worker; fixed 20k/200k events and native resource controls."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chrome-persistent"
+    ],
+    "summary": "Native and persistent-Chrome original-variant parity and storage controls remain scoped to those builds. The later cancellation remedy passes eight focused Linux scenarios; Windows/WASI acceptance of that revision is not inferred."
+  },
+  "limitations": [
+    "Small development cells and uncontrolled cache/background state do not establish general device, shape or tail performance.",
+    "Historical percentage gains are not additive; every comparison uses its own pinned baseline.",
+    "Snapshot and staging overlap shifts; lower temporary counters do not imply lower combined filesystem use.",
+    "The later revision has Linux validation only; general activation and broader workloads remain unproved."
+  ],
+  "exclusions": [
+    "Storage/pressure diagnostics are not speed observations.",
+    "Original cancellation precedence is rejected; prior runtime acceptance does not validate the revised prototype."
+  ],
+  "reopen_when": "Require a named completion or whole-job benefit question and validation of the actual revised variant before a promotion proposal.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#terminal-direct-output-dynamic-owner-and-cancellation-control-2026-11-03",
+      "sha256": "febd9bd1a5aed360226e684c54213c94e914427b7044a3f2542302901dcab682"
+    },
+    {
+      "section": "docs/performance.md#terminal-direct-output-storage-lifetimes-and-temp-budget-control-2026-11-03",
+      "sha256": "608d178106a477e596a2e7064b92f60e5b969e382a4a98671f34b40c2a94a553"
+    },
+    {
+      "section": "docs/performance.md#terminal-direct-output-chrome-and-working-set-transfer-2026-11-03",
+      "sha256": "530d8b8a2b7cf774c3e7203af73fb542eb35c6bae3c2692f7a35277e9665805d"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/terminal-direct-dynamic-owner-2026-11-03.json",
+      "sha256": "966f92d97b1427903c12cc8838c4be65579a0ce871861fa2928a149867502080"
+    },
+    {
+      "path": "docs/benchmarks/terminal-direct-storage-2026-11-03.json",
+      "sha256": "21309dccb9fcd2cba79bcb37ba2a9c871f945f96ddbb2f4b63dad1507e8f2a6d"
+    },
+    {
+      "path": "docs/benchmarks/terminal-direct-browser-scale-2026-11-03.json",
+      "sha256": "5c353ffd5b943bf86aa53a990f4033a1789bec23b8f754f2ba80a97e4d76103c"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md",
+    "docs/direct-execution.md"
+  ]
+}

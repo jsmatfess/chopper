@@ -1,0 +1,66 @@
+diff --git a/crates/chopper/src/engine/streaming.rs b/crates/chopper/src/engine/streaming.rs
+index af3c231..5364287 100644
+--- a/crates/chopper/src/engine/streaming.rs
++++ b/crates/chopper/src/engine/streaming.rs
+@@ -143 +143,5 @@ impl<'a> StreamingGroups<'a> {
+-            sorter: Sorter::streaming(ctx),
++            sorter: if matches!(operation, Operation::AssignProbabilistic { .. }) {
++                Sorter::new(ctx, SortOrder::Key)
++            } else {
++                Sorter::streaming(ctx)
++            },
+@@ -434,0 +439,54 @@ mod tests {
++    #[test]
++    fn experimental_allocation_retains_fitting_rows_and_routes_overflow() -> Result<()> {
++        for count in [64u64, 40_000] {
++            let ctx = Context::new(
++                &Resources {
++                    memory_mb: 32.into(),
++                    max_record_bytes: 1024 * 1024,
++                    workers: 1,
++                    ..Default::default()
++                },
++                Arc::new(AtomicBool::new(false)),
++                Arc::new(|_| {}),
++            )?;
++            let operation = probabilistic();
++            let mut groups = StreamingGroups::new(&operation, None, 3, [7; 32], &ctx)?;
++            for id in 0..count {
++                groups.push_compact(PackedRow::new(Row {
++                    id,
++                    ordinal: id,
++                    key: vec![],
++                    fields: vec![id.to_string(), "x".repeat(256), (id % 7).to_string()],
++                })?)?;
++            }
++            let mut writer = DatasetWriter::new(&ctx)?;
++            groups.emit(
++                &Group {
++                    offset: 0,
++                    rows: count,
++                    lineage: vec![],
++                    exact: false,
++                },
++                2,
++                &mut writer,
++                &ctx,
++            )?;
++            let data = writer.finish()?;
++            let mut ids = Vec::new();
++            for group in data.groups()? {
++                let group = group?;
++                for row in data.rows(&group, ctx.max_record)? {
++                    ids.push(row?.id);
++                }
++            }
++            ids.sort_unstable();
++            assert_eq!(ids, (0..count).collect::<Vec<_>>());
++            let diagnostics = ctx.diagnostics();
++            assert_eq!(diagnostics["routed_groupings"], u64::from(count > 64));
++            assert_eq!(diagnostics["routing_fallbacks"], 0);
++            drop(data);
++            assert_eq!(ctx.used(), 0);
++        }
++        Ok(())
++    }
++

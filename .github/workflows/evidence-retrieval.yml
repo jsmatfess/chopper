@@ -1,0 +1,24 @@
+name: Private evidence retrieval
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  retrieve:
+    # Explicit dispatch of trusted code only. Never expose private-reader keys to PR jobs.
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -r scripts/requirements-evidence.txt
+      - name: Independently retrieve exact private originals
+        env:
+          R2_ENDPOINT: ${{ secrets.CHOPPER_R2_ENDPOINT }}
+          R2_READ_ACCESS_KEY_ID: ${{ secrets.CHOPPER_R2_READ_ACCESS_KEY_ID }}
+          R2_READ_SECRET_ACCESS_KEY: ${{ secrets.CHOPPER_R2_READ_SECRET_ACCESS_KEY }}
+        run: python scripts/evidence-resolver.py hydrate --s3
+      - run: python scripts/evidence-resolver.py check
+      # Confidential downloads stay inside the disposable runner; do not upload them as CI artifacts.

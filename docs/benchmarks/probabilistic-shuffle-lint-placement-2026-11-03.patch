@@ -1,0 +1,192 @@
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -2126,0 +2127,12 @@
++// Isolated experiment selector; production sources are untouched.
++fn prob_shuffle_enabled() -> bool {
++    #[cfg(test)]
++    {
++        prob_shuffle_controls::enabled()
++    }
++    #[cfg(not(test))]
++    {
++        true
++    }
++}
++
+@@ -2471,12 +2482,0 @@
+-
+-// Isolated experiment selector; production sources are untouched.
+-fn prob_shuffle_enabled() -> bool {
+-    #[cfg(test)]
+-    {
+-        prob_shuffle_controls::enabled()
+-    }
+-    #[cfg(not(test))]
+-    {
+-        true
+-    }
+-}
+--- a/crates/chopper/src/engine/streaming.rs
++++ b/crates/chopper/src/engine/streaming.rs
+@@ -210,0 +211,80 @@
++}
++
++// Isolated whole-plan candidate. The membership generator and every logical domain
++// stay unchanged; one GroupRandom sort replaces routing+Dataset+child sorts.
++#[allow(clippy::too_many_arguments)]
++pub(super) fn fused_probabilistic_shuffle(
++    data: &Dataset,
++    parent: &Group,
++    operation: &Operation,
++    step: usize,
++    seed: &str,
++    shuffle_step: usize,
++    analysis: &Analysis,
++    output: &mut impl RowSink,
++    ctx: &Context,
++) -> Result<()> {
++    ensure!(
++        matches!(operation, Operation::AssignProbabilistic { .. }),
++        "probabilistic fusion only"
++    );
++    let domain = random::json_domain(seed, step as u64, &parent.lineage)?;
++    let mut membership = Membership::new(
++        operation,
++        analysis.header.as_deref(),
++        analysis.columns,
++        domain,
++        ctx,
++    )?;
++    let mut memory = Reservation::new(ctx);
++    let mut domains = Vec::new();
++    memory.reserve_vec(&mut domains, membership.counts().len())?;
++    for index in 0..membership.counts().len() {
++        domains.push(child_metadata::domain(
++            parent,
++            &membership.entry(step, index),
++            seed,
++            shuffle_step,
++            ctx,
++        )?);
++    }
++    let mut sorter = Sorter::new(ctx, SortOrder::GroupRandom);
++    for row in data.packed_rows(parent, ctx.max_record)? {
++        ctx.check()?;
++        let mut row = row?;
++        let index = membership.index(row.id, row.fields());
++        let key = OperationKey::allocation(
++            index as u64,
++            &domains[index],
++            row.id,
++            Reservation::new(ctx),
++            &mut sorter,
++        )?;
++        let capacity = key.install(&mut row, &mut sorter)?;
++        sorter.push_compact(row, capacity)?;
++    }
++    membership.validate_seen(membership.seen())?;
++    let mut rows = sorter.finish()?.reusing();
++    for (index, count) in membership.counts().iter().enumerate() {
++        ctx.check()?;
++        let mut owned = group_metadata::ClonedGroup::begin_child(
++            parent,
++            &membership.entry(step, index),
++            false,
++            output,
++            ctx,
++        )?;
++        let group = &mut owned.group;
++        for _ in 0..*count {
++            ctx.check()?;
++            let row = rows
++                .next()?
++                .context("truncated fused probabilistic allocation")?;
++            row.ordinal = group.rows;
++            row.key = PackedKey::Bytes(Box::default());
++            output.packed_row_ref(group, row)?;
++        }
++        ctx.check()?;
++        owned.finish(output)?;
++    }
++    Ok(())
+@@ -545,80 +624,0 @@
+-
+-// Isolated whole-plan candidate. The membership generator and every logical domain
+-// stay unchanged; one GroupRandom sort replaces routing+Dataset+child sorts.
+-#[allow(clippy::too_many_arguments)]
+-pub(super) fn fused_probabilistic_shuffle(
+-    data: &Dataset,
+-    parent: &Group,
+-    operation: &Operation,
+-    step: usize,
+-    seed: &str,
+-    shuffle_step: usize,
+-    analysis: &Analysis,
+-    output: &mut impl RowSink,
+-    ctx: &Context,
+-) -> Result<()> {
+-    ensure!(
+-        matches!(operation, Operation::AssignProbabilistic { .. }),
+-        "probabilistic fusion only"
+-    );
+-    let domain = random::json_domain(seed, step as u64, &parent.lineage)?;
+-    let mut membership = Membership::new(
+-        operation,
+-        analysis.header.as_deref(),
+-        analysis.columns,
+-        domain,
+-        ctx,
+-    )?;
+-    let mut memory = Reservation::new(ctx);
+-    let mut domains = Vec::new();
+-    memory.reserve_vec(&mut domains, membership.counts().len())?;
+-    for index in 0..membership.counts().len() {
+-        domains.push(child_metadata::domain(
+-            parent,
+-            &membership.entry(step, index),
+-            seed,
+-            shuffle_step,
+-            ctx,
+-        )?);
+-    }
+-    let mut sorter = Sorter::new(ctx, SortOrder::GroupRandom);
+-    for row in data.packed_rows(parent, ctx.max_record)? {
+-        ctx.check()?;
+-        let mut row = row?;
+-        let index = membership.index(row.id, row.fields());
+-        let key = OperationKey::allocation(
+-            index as u64,
+-            &domains[index],
+-            row.id,
+-            Reservation::new(ctx),
+-            &mut sorter,
+-        )?;
+-        let capacity = key.install(&mut row, &mut sorter)?;
+-        sorter.push_compact(row, capacity)?;
+-    }
+-    membership.validate_seen(membership.seen())?;
+-    let mut rows = sorter.finish()?.reusing();
+-    for (index, count) in membership.counts().iter().enumerate() {
+-        ctx.check()?;
+-        let mut owned = group_metadata::ClonedGroup::begin_child(
+-            parent,
+-            &membership.entry(step, index),
+-            false,
+-            output,
+-            ctx,
+-        )?;
+-        let group = &mut owned.group;
+-        for _ in 0..*count {
+-            ctx.check()?;
+-            let row = rows
+-                .next()?
+-                .context("truncated fused probabilistic allocation")?;
+-            row.ordinal = group.rows;
+-            row.key = PackedKey::Bytes(Box::default());
+-            output.packed_row_ref(group, row)?;
+-        }
+-        ctx.check()?;
+-        owned.finish(output)?;
+-    }
+-    Ok(())
+-}

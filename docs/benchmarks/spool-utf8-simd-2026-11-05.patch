@@ -1,0 +1,122 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 382ad1d..76a4746 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -165,0 +166 @@ dependencies = [
++ "simdutf8",
+diff --git a/crates/chopper/Cargo.toml b/crates/chopper/Cargo.toml
+index 3543f23..fbac179 100644
+--- a/crates/chopper/Cargo.toml
++++ b/crates/chopper/Cargo.toml
+@@ -57,0 +58,2 @@ crc32fast = "1"
++# Already locked through encoding_rs; safe borrowed spool UTF-8 validation.
++simdutf8 = "=0.1.5"
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+index 1de4cdb..143fed8 100644
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -17,0 +18 @@ mod frame_key;
++mod utf8;
+@@ -1096 +1097 @@ fn visit_utf8_field(
+-        std::str::from_utf8(field)?;
++        utf8::from_utf8(field)?;
+@@ -1131 +1132 @@ fn visit_split_utf8_field(
+-        match std::str::from_utf8(rest) {
++        match utf8::from_utf8(rest) {
+diff --git a/crates/chopper/src/storage/adaptive.rs b/crates/chopper/src/storage/adaptive.rs
+index b8a8a4b..b192f9b 100644
+--- a/crates/chopper/src/storage/adaptive.rs
++++ b/crates/chopper/src/storage/adaptive.rs
+@@ -412 +412 @@ impl PackedRow {
+-            std::str::from_utf8(&bytes[start..])?;
++            utf8::from_utf8(&bytes[start..])?;
+diff --git a/crates/chopper/src/storage/utf8.rs b/crates/chopper/src/storage/utf8.rs
+new file mode 100644
+index 0000000..7bef397
+--- /dev/null
++++ b/crates/chopper/src/storage/utf8.rs
+@@ -0,0 +1,84 @@
++//! Strict borrowed validation for spool fields. Preserve the standard error
++//! type and diagnostics on invalid input while using the pinned safe SIMD API
++//! for success. No mutable byte access or unchecked conversion escapes.
++#[inline]
++pub(super) fn from_utf8(bytes: &[u8]) -> Result<&str, std::str::Utf8Error> {
++    match simdutf8::compat::from_utf8(bytes) {
++        Ok(text) => Ok(text),
++        Err(_) => std::str::from_utf8(bytes),
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    fn compare(bytes: &[u8]) {
++        let expected = std::str::from_utf8(bytes);
++        let actual = from_utf8(bytes);
++        match (actual, expected) {
++            (Ok(actual), Ok(expected)) => {
++                assert_eq!(actual, expected);
++                assert_eq!(actual.as_ptr(), bytes.as_ptr());
++            }
++            (Err(actual), Err(expected)) => {
++                assert_eq!(actual.valid_up_to(), expected.valid_up_to());
++                assert_eq!(actual.error_len(), expected.error_len());
++                assert_eq!(actual.to_string(), expected.to_string());
++            }
++            _ => panic!("validator disagrees with normative UTF-8"),
++        }
++    }
++
++    #[test]
++    fn strict_validation_matches_scalar_and_error_contracts_at_block_edges() {
++        // Exhaust every adjacent byte pair at offsets surrounding SIMD blocks.
++        for prefix in [0, 1, 31, 63, 64, 65, 127, 128] {
++            let mut bytes = vec![b'x'; prefix + 2];
++            for first in 0..=255u8 {
++                for second in 0..=255u8 {
++                    bytes[prefix] = first;
++                    bytes[prefix + 1] = second;
++                    compare(&bytes);
++                }
++            }
++        }
++        // Valid scalars and malformed/truncated UTF-8 at refill/vector edges.
++        let sequences: &[&[u8]] = &[
++            b"",
++            b"ascii",
++            "界".as_bytes(),
++            "🙂".as_bytes(),
++            &[0xc2, 0x80],
++            &[0xdf, 0xbf],
++            &[0xe0, 0xa0, 0x80],
++            &[0xed, 0x9f, 0xbf],
++            &[0xee, 0x80, 0x80],
++            &[0xef, 0xbf, 0xbf],
++            &[0xf0, 0x90, 0x80, 0x80],
++            &[0xf4, 0x8f, 0xbf, 0xbf],
++            &[0xc0, 0x80],
++            &[0xc1, 0xbf],
++            &[0xed, 0xa0, 0x80],
++            &[0xe0, 0x9f, 0xbf],
++            &[0xf0, 0x8f, 0xbf, 0xbf],
++            &[0xf4, 0x90, 0x80, 0x80],
++            &[0xf5, 0x80, 0x80, 0x80],
++            &[0x80],
++            &[0xff],
++            &[0xc2],
++            &[0xe2, 0x82],
++            &[0xf0, 0x9f, 0x99],
++        ];
++        for prefix in [0, 1, 31, 63, 64, 65, 127, 128] {
++            for sequence in sequences {
++                for suffix in [0, 1, 64] {
++                    let mut bytes = vec![b'x'; prefix];
++                    bytes.extend_from_slice(sequence);
++                    bytes.resize(bytes.len() + suffix, b'y');
++                    compare(&bytes);
++                }
++            }
++        }
++    }
++}

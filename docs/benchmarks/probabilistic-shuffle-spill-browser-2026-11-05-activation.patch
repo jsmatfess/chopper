@@ -1,0 +1,5 @@
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -2136 +2136 @@
+-        false
++        cfg!(target_os = "wasi")

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chopper decision-provider input (maximum encoded size 32768 bytes)",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "batch", "experiment", "outcome", "metrics", "failures", "resources", "evidence", "allowed_targets", "decision_needed", "resume_command", "model_settings", "usage"],
+  "properties": {
+    "schema_version": {"const": 1}, "batch": {"$ref": "#/$defs/text"},
+    "experiment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["question", "hypothesis", "decision_rule", "stop_rule", "cohort"],
+      "properties": {
+        "question": {"$ref": "#/$defs/text"}, "hypothesis": {"$ref": "#/$defs/text"},
+        "decision_rule": {"$ref": "#/$defs/text"}, "stop_rule": {"$ref": "#/$defs/text"},
+        "cohort": {"const": "development"}
+      }
+    },
+    "outcome": {"const": "verified"},
+    "metrics": {
+      "type": "object", "additionalProperties": false, "required": ["samples", "summaries"],
+      "properties": {
+        "samples": {"type": "array", "minItems": 1, "maxItems": 6, "items": {"$ref": "#/$defs/sample"}},
+        "summaries": {"type": "array", "minItems": 1, "maxItems": 6, "items": {"$ref": "#/$defs/summary"}}
+      }
+    },
+    "failures": {"type": "array", "maxItems": 0},
+    "resources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["elapsed_session_seconds", "stored_bytes", "peak_observed_bytes", "rss_bytes", "storage_scope"],
+      "properties": {
+        "elapsed_session_seconds": {"type": "number", "minimum": 0},
+        "stored_bytes": {"type": "integer", "minimum": 0},
+        "peak_observed_bytes": {"type": "integer", "minimum": 0},
+        "rss_bytes": {"type": "null"}, "storage_scope": {"$ref": "#/$defs/text"}
+      }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["manifest", "manifest_sha256", "status", "status_sha256"],
+      "properties": {
+        "manifest": {"$ref": "#/$defs/text"}, "manifest_sha256": {"$ref": "#/$defs/hash"},
+        "status": {"$ref": "#/$defs/text"}, "status_sha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "allowed_targets": {"type": "array", "maxItems": 12, "uniqueItems": true, "items": {
+      "type": "object", "additionalProperties": false, "required": ["target", "action"],
+      "properties": {"target": {"$ref": "#/$defs/text"}, "action": {"enum": ["repeat", "refine", "challenger"]}}
+    }},
+    "decision_needed": {"$ref": "#/$defs/text"}, "resume_command": {"$ref": "#/$defs/text"},
+    "model_settings": {"type": "null"}, "usage": {"type": "null"}
+  },
+  "$defs": {
+    "text": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "sample": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "pointer", "unit", "scope", "cell", "sha256", "value"],
+      "properties": {
+        "path": {"$ref": "#/$defs/text"}, "pointer": {"$ref": "#/$defs/text"},
+        "unit": {"$ref": "#/$defs/text"}, "scope": {"$ref": "#/$defs/text"}, "cell": {"$ref": "#/$defs/text"},
+        "sha256": {"$ref": "#/$defs/hash"}, "value": {"type": "number", "minimum": 0}
+      }
+    },
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["cell", "unit", "scope", "n", "median", "min", "max"],
+      "properties": {
+        "cell": {"$ref": "#/$defs/text"}, "unit": {"$ref": "#/$defs/text"}, "scope": {"$ref": "#/$defs/text"},
+        "n": {"type": "integer", "minimum": 1, "maximum": 6},
+        "median": {"type": "number", "minimum": 0}, "min": {"type": "number", "minimum": 0}, "max": {"type": "number", "minimum": 0}
+      }
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "schema": "native-scale-v1",
+  "actions_enabled": false,
+  "parent_scheduled": false,
+  "features": [],
+  "os": "Linux",
+  "limits": {
+    "os_seconds": 28800,
+    "generation_seconds": 3600,
+    "run_seconds": 7200,
+    "verify_seconds": 3600,
+    "owned_bytes": 171798691840,
+    "start_free_bytes": 214748364800,
+    "stop_free_bytes": 21474836480,
+    "sample_seconds": 45,
+    "stale_seconds": 90,
+    "no_progress_seconds": 600,
+    "disk_observation_seconds": 30
+  },
+  "fixtures": {
+    "D": {
+      "generator": "release-acceptance-v1",
+      "shape": "D",
+      "runtime": "native",
+      "width": 100,
+      "rows": 99999999,
+      "bytes": 10000000000,
+      "tiny": false,
+      "job": {
+        "version": 1,
+        "input": "@input",
+        "output": "@output",
+        "zip_member": null,
+        "input_csv": {
+          "encoding": "utf-8",
+          "headers": true,
+          "delimiter": ",",
+          "quote": "\"",
+          "escape": null,
+          "line_ending": "lf",
+          "bom": false,
+          "skip_empty_lines": false
+        },
+        "output_csv": {
+          "encoding": "utf-8",
+          "headers": true,
+          "delimiter": ",",
+          "quote": "\"",
+          "escape": null,
+          "line_ending": "lf",
+          "bom": false,
+          "skip_empty_lines": false
+        },
+        "compression": "none",
+        "seed": "release-acceptance-v1",
+        "full_shuffle_policy": "seeded_v1",
+        "full_shuffle_rng": "blake3_counter_v1",
+        "full_shuffle_algorithm": "adaptive_v1",
+        "operations": [],
+        "limits": {
+          "bytes": 10000000,
+          "rows": 1000000,
+          "compressed_bytes": null
+        },
+        "resources": {
+          "memory_mb": 64,
+          "workers": 1,
+          "temp_dir": "@temp",
+          "temp_bytes": 107374182400,
+          "max_files": 4096,
+          "max_record_bytes": 4096,
+          "grouping": "auto"
+        }
+      }
+    },
+    "G": {
+      "generator": "release-acceptance-v1",
+      "shape": "G",
+      "runtime": "native",
+      "width": 1000,
+      "rows": 9999999,
+      "bytes": 10000000000,
+      "tiny": false,
+      "job": {
+        "version": 1,
+        "input": "@input",
+        "output": "@output",
+        "zip_member": null,
+        "input_csv": {
+          "encoding": "utf-8",
+          "headers": true,
+          "delimiter": ",",
+          "quote": "\"",
+          "escape": null,
+          "line_ending": "lf",
+          "bom": false,
+          "skip_empty_lines": false
+        },
+        "output_csv": {
+          "encoding": "utf-8",
+          "headers": true,
+          "delimiter": ",",
+          "quote": "\"",
+          "escape": null,
+          "line_ending": "lf",
+          "bom": false,
+          "skip_empty_lines": false
+        },
+        "compression": "none",
+        "seed": "release-acceptance-v1",
+        "full_shuffle_policy": "seeded_v1",
+        "full_shuffle_rng": "blake3_counter_v1",
+        "full_shuffle_algorithm": "adaptive_v1",
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              "region"
+            ]
+          },
+          {
+            "type": "assign",
+            "groups": [
+              {
+                "name": "treatment",
+                "percent": "80"
+              },
+              {
+                "name": "control",
+                "percent": "20"
+              }
+            ],
+            "strata": []
+          },
+          {
+            "type": "shuffle",
+            "strategy": "uniform"
+          }
+        ],
+        "limits": {
+          "bytes": 10000000,
+          "rows": 1000000,
+          "compressed_bytes": null
+        },
+        "resources": {
+          "memory_mb": 64,
+          "workers": 1,
+          "temp_dir": "@temp",
+          "temp_bytes": 107374182400,
+          "max_files": 4096,
+          "max_record_bytes": 4096,
+          "grouping": "auto"
+        }
+      }
+    }
+  },
+  "selected639_lineage": {
+    "path": "/opt/chopper/private-acceptance/focused639-linux-lineage-seal/lineage.json",
+    "sha256": "19289b1e120b26610e2df0f4f7a62ed336aeedb2ad132f4b8e3435c3f16996d2"
+  }
+}

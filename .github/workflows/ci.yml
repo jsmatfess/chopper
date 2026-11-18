@@ -1,0 +1,266 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      base_sha:
+        description: 'Optional base commit for path routing; empty runs all checks'
+        type: string
+        default: ''
+      local_platform:
+        description: 'Local act coverage profile; all preserves the hosted matrix'
+        type: choice
+        options: [all, linux, windows, macos]
+        default: all
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  changes:
+    runs-on: ${{ inputs.local_platform == 'windows' && 'windows-latest' || inputs.local_platform == 'macos' && 'macos-latest' || 'ubuntu-latest' }}
+    outputs:
+      native: ${{ steps.scope.outputs.native }}
+      features: ${{ steps.scope.outputs.features }}
+      core: ${{ steps.scope.outputs.core }}
+      browser: ${{ steps.scope.outputs.browser }}
+      evidence: ${{ steps.scope.outputs.evidence }}
+      tooling: ${{ steps.scope.outputs.tooling }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v7
+        # Native act uses provisioned tools; hosted/Linux jobs install theirs.
+        if: ${{ !env.ACT || runner.os == 'Linux' }}
+        with:
+          python-version: '3.13'
+      - run: python scripts/test-ci-scope.py
+      - run: python scripts/test-local-ci.py
+      - name: Select checks from the complete event diff
+        id: scope
+        env:
+          BASE_SHA: ${{ inputs.base_sha || github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+          LOCAL_PLATFORM: ${{ inputs.local_platform || 'all' }}
+        shell: bash
+        run: |
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = 0000000000000000000000000000000000000000 ]; then
+            python scripts/ci-scope.py --full --platform "$LOCAL_PLATFORM" --output "$GITHUB_OUTPUT"
+          else
+            git cat-file -e "$BASE_SHA^{commit}" || git fetch --no-tags --depth=1 origin "$BASE_SHA"
+            python scripts/ci-scope.py --base "$BASE_SHA" --head "$HEAD_SHA" --platform "$LOCAL_PLATFORM" --output "$GITHUB_OUTPUT"
+          fi
+  native:
+    needs: changes
+    if: needs.changes.outputs.native == 'true'
+    strategy:
+      matrix:
+        os: ${{ fromJSON(inputs.local_platform == 'windows' && '["windows-latest"]' || inputs.local_platform == 'macos' && '["macos-latest"]' || inputs.local_platform == 'linux' && '["ubuntu-latest"]' || '["ubuntu-latest","macos-latest","windows-latest"]') }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        if: ${{ !env.ACT || runner.os == 'Linux' }}
+        with:
+          components: rustfmt, clippy
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace --locked
+      - run: cargo build --release --locked
+      - uses: actions/upload-artifact@v7
+        # act does not implement the v7 hosted artifact service.
+        if: ${{ !env.ACT }}
+        with:
+          name: chopper-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            target/release/chopper
+            target/release/chopper.exe
+  surviving-features:
+    needs: changes
+    if: needs.changes.outputs.features == 'true'
+    # One combined native configuration; isolated/platform combinations remain targeted checks.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+      - run: cargo test --workspace --locked --all-features
+  evidence:
+    needs: changes
+    if: needs.changes.outputs.evidence == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      # Checks only: CI must reject drift rather than regenerate/accept it.
+      - run: python3 -m pip install -r scripts/requirements-evidence.txt
+      - name: Restore archived originals when absent
+        # Forks cannot access private originals/secrets. Their historical evidence
+        # check stays blocked, not silently passed; maintainer validation is required.
+        env:
+          R2_ENDPOINT: ${{ secrets.CHOPPER_R2_ENDPOINT }}
+          R2_READ_ACCESS_KEY_ID: ${{ secrets.CHOPPER_R2_READ_ACCESS_KEY_ID }}
+          R2_READ_SECRET_ACCESS_KEY: ${{ secrets.CHOPPER_R2_READ_SECRET_ACCESS_KEY }}
+        run: python3 scripts/evidence-resolver.py hydrate --s3 --if-missing --restore-aliases
+      - run: python3 scripts/test-performance-registry.py
+      - run: python3 scripts/performance-registry.py --check
+      - run: python3 scripts/test-performance-narratives.py
+      - run: python3 scripts/performance-narratives.py --check
+      - run: python3 scripts/test-evidence-views.py
+      - run: python3 scripts/test-benchmark-catalog.py
+      - run: python3 scripts/test-evidence-resolver.py
+      - run: python3 scripts/test-evidence-migration.py
+      - run: python3 scripts/evidence-resolver.py check
+      - run: python3 scripts/evidence-resolver.py index --check
+      - run: python3 scripts/benchmark-catalog.py --check
+      - run: python3 scripts/summarize-performance-decisions.py --check
+      - run: python3 scripts/audit-strategy-evidence.py --check
+      - run: python3 scripts/evidence-views.py --check
+  portable-core:
+    needs: changes
+    if: needs.changes.outputs.core == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - run: cargo check --locked -p chopper-core --target wasm32-unknown-unknown
+  browser:
+    needs: changes
+    if: needs.changes.outputs.browser == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-wasip1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - name: Install WASI SDK
+        run: |
+          curl -fL https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-33/wasi-sdk-33.0-x86_64-linux.tar.gz -o /tmp/wasi-sdk.tar.gz
+          tar -xzf /tmp/wasi-sdk.tar.gz -C /tmp
+          echo 'WASI_SDK_PATH=/tmp/wasi-sdk-33.0-x86_64-linux' >> "$GITHUB_ENV"
+      - run: node scripts/build-browser.mjs
+      - run: npm ci
+        working-directory: ui
+      - run: npm run build:hosted
+        working-directory: ui
+      - run: npm test
+        working-directory: ui
+      - run: node scripts/build-browser-tests.mjs
+      - run: npx playwright install --with-deps chromium
+        working-directory: ui
+      - run: node --test scripts/browser-acceptance.test.mjs
+      - run: node scripts/test-browser-launch.mjs
+      - run: npm --prefix ui run test:workspace
+      - run: node scripts/test-browser.mjs
+      - run: node scripts/test-browser-graph.mjs
+      - run: node scripts/test-browser-graph-lifecycle.mjs
+      - run: node scripts/test-browser-graph-inspection.mjs
+      - run: node scripts/test-browser-step-starts.mjs
+      - run: node scripts/test-browser-graph-bounds.mjs
+      - run: node scripts/test-browser-graph-lifecycle.mjs --composed
+      - run: python3 scripts/test-execution-graph-analysis.py
+      - run: python3 scripts/test-execution-graph-extension.py
+      - run: node scripts/test-browser-bridge.mjs
+      - run: node scripts/test-browser-cleanup.mjs
+      - run: node scripts/test-browser-termination.mjs
+      - run: node scripts/test-browser-termination.mjs --persistent
+      - run: node scripts/test-browser-termination.mjs --persistent --process-kill
+      - run: node scripts/test-browser-termination.mjs --persistent --process-kill --direct
+      - run: node scripts/test-browser-termination.mjs --persistent --process-kill --composed
+      - run: node scripts/build-browser.mjs --resource-contracts
+      - run: node scripts/build-browser-tests.mjs --resource-contracts
+      - run: node scripts/test-browser.mjs --resource-contracts
+      - run: node scripts/build-browser.mjs --resource-contracts --features experimental-shuffle-partition
+      - run: node scripts/test-browser.mjs --resource-contracts --shuffle-partition
+      # Restore a default production engine before test-free packaging/upload.
+      - run: node scripts/build-browser.mjs
+      - run: npm run build:hosted
+        working-directory: ui
+      - uses: actions/upload-artifact@v7
+        if: ${{ !env.ACT }}
+        with:
+          name: chopper-hosted
+          path: ui/dist/
+  tooling:
+    needs: changes
+    if: needs.changes.outputs.tooling == 'true'
+    strategy:
+      matrix:
+        os: ${{ fromJSON(inputs.local_platform == 'windows' && '["windows-latest"]' || inputs.local_platform == 'linux' && '["ubuntu-latest"]' || '["ubuntu-latest","windows-latest"]') }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        if: ${{ !env.ACT || runner.os == 'Linux' }}
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v7
+        if: ${{ !env.ACT || runner.os == 'Linux' }}
+        with:
+          node-version: 22
+      - run: python scripts/test-package-release.py
+      - run: python scripts/test-windows-native.py
+      - run: python scripts/test-validation-runner.py
+      - run: sudo apt-get update
+        if: runner.os == 'Linux'
+      - run: sudo apt-get install -y time
+        if: runner.os == 'Linux'
+      - run: python -B scripts/test-shuffle-swarm.py
+      - run: python -B scripts/verify-shuffle-swarm-browser.py --self-test
+      - run: python scripts/test-browser-small-runner.py
+      - run: python -B scripts/test-hosted-qualification.py
+      - run: python -B scripts/test-native-smoke.py
+      - run: node --test scripts/hosted_picker/hosted.test.cjs scripts/browser-hosted-qualification.test.mjs
+      - run: python -B scripts/test-acceptance-preflight.py
+      - run: python -B scripts/test-native-preflight.py
+      - run: python -B scripts/test-campaign-records.py
+      - run: python -B scripts/test-historical-harnesses.py
+      - run: npm --prefix ui ci
+      - run: node --test scripts/test-acceptance-syntax.mjs
+      - run: node --test scripts/browser-small-bootstrap.test.mjs scripts/browser-small-observer.test.mjs scripts/browser-launch-options.test.mjs
+      - run: node --test scripts/browser-build.test.mjs
+      - run: python scripts/test-scale-acceptance.py
+      - run: node scripts/test-scale-acceptance-browser.mjs
+      - run: python scripts/test-scale-acceptance-browser-scale.py
+      - run: |
+          node -e "require('node:fs').mkdirSync('scratch', {recursive:true})"
+          node scripts/test-scale-acceptance-browser-scale.mjs scratch/ci-browser-scale-controls
+      - run: python -B scripts/test-native-scale-runner.py scratch/ci-native-scale-controls
+      - run: python -B scripts/test-native-file-allocation.py
+      - if: runner.os == 'Linux'
+        run: sh -n scripts/graphify.sh
+  result:
+    name: CI result
+    if: always()
+    needs: [changes, native, surviving-features, evidence, portable-core, browser, tooling]
+    runs-on: ${{ inputs.local_platform == 'windows' && 'windows-latest' || inputs.local_platform == 'macos' && 'macos-latest' || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        if: ${{ !env.ACT || runner.os == 'Linux' }}
+        with:
+          python-version: '3.13'
+      - name: Require every selected check to pass
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: python scripts/ci-scope.py --check-results

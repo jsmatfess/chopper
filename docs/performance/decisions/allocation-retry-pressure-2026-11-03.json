@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "allocation-retry-pressure-2026-11-03",
+  "title": "Block unchanged materialized-parent retry promotion",
+  "date": "2026-11-03",
+  "subsystem": "execution",
+  "question": "Can a competitor arriving after preparation deny a candidate while immediate routing completes?",
+  "disposition": "block-promotion",
+  "outcome": "unfavorable",
+  "delivery": "unapplied",
+  "summary": "The production-lifetime emission-pressure counterexample blocks unchanged activation despite earlier fitting gains.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "Synthetic 2,500-row materialized parent, existing output writer, 16-MiB working budget and 8-MiB shared pool."
+    ],
+    "measurement": "diagnostic"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "The admitted competitor arrives after preparation; exact successful parity and typed-denial cleanup checks pass with the actual pre-existing writer lifetime."
+  },
+  "limitations": [
+    "This is a synthetic native admission boundary, not independent workload transfer or a complete-job performance comparison.",
+    "A later isolated child-metadata preparation control changes competitor admissibility and does not establish a universal remedy."
+  ],
+  "exclusions": [
+    "Fitting native/browser speed evidence cannot establish admission-domain inclusion."
+  ],
+  "reopen_when": "A separately reviewed feasibility remedy or explicitly authorized narrower success contract is required; benefit beyond existing explicit sort remains separate.",
+  "supersedes": [
+    "allocation-retry-evaluation-2026-11-03"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#allocation-post-preparation-pressure-boundary-2026-11-03",
+      "sha256": "48c4c0ddba4391dbe61e3f3076fcda7451e4a886fa63c80719faa2b0f00ef7d8"
+    },
+    {
+      "section": "docs/performance.md#resident-child-metadata-preparation-control-2026-11-03",
+      "sha256": "cc930ec023bf6323ea10be6ce03485ae5166991c492a7ab683ffbaf09fe9608a"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/allocation-post-prepare-pressure-2026-11-03.json",
+      "sha256": "7d84b17cfe896c05a6d7c880ccc296e7b69aaf637c41ec2cad9f40770af393c7"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "type": "historical_harness_source_inventory",
+  "source_commit": "de93a7a728fd8652f01627b1d1483409ed499455",
+  "status": "Historical only; not supported against current engine schemas. No replay/benchmark was run during archival.",
+  "harness_lines": 1038,
+  "files": [
+    {
+      "original_path": "scripts/benchmark-flexible.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/benchmark-flexible.py",
+      "role": "harness",
+      "bytes": 8257,
+      "sha256": "3e53032690c6d3e0a656c9e335909a569793f2ecd2a123d04efdd7365b0ee0d2",
+      "lines": 115
+    },
+    {
+      "original_path": "scripts/benchmark-allocation-ranges.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/benchmark-allocation-ranges.py",
+      "role": "harness",
+      "bytes": 12117,
+      "sha256": "647bafded5e7d097af5109e5a1fb6bff2a1ca535c25aa09de414c6f859044c02",
+      "lines": 151
+    },
+    {
+      "original_path": "scripts/validate-allocation-ranges.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/validate-allocation-ranges.py",
+      "role": "harness",
+      "bytes": 8425,
+      "sha256": "50adf118bc2ba2719f715b77adfe8595cccd15a7ea291c1fa0299b89b4f29af7",
+      "lines": 103
+    },
+    {
+      "original_path": "scripts/validate-partition-first.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/validate-partition-first.py",
+      "role": "harness",
+      "bytes": 6839,
+      "sha256": "19b6625184100ffce6290870294a660407f94159a422681cc1b638deb0e38305",
+      "lines": 95
+    },
+    {
+      "original_path": "scripts/benchmark-partition-first.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/benchmark-partition-first.py",
+      "role": "harness",
+      "bytes": 10057,
+      "sha256": "2338476f85b94a17cafb9d5981f7477a68375f875d2ec380b2c5c84d928205ba",
+      "lines": 131
+    },
+    {
+      "original_path": "scripts/benchmark-random-buckets.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/benchmark-random-buckets.py",
+      "role": "harness",
+      "bytes": 15072,
+      "sha256": "f46d5e5170f13c55e82f1de20e2d095a456179061827ec735ac5a8af8471f5d9",
+      "lines": 179
+    },
+    {
+      "original_path": "scripts/benchmark-fast-rng.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/benchmark-fast-rng.py",
+      "role": "harness",
+      "bytes": 9613,
+      "sha256": "467ff8ced747d7cfcf5f9574360058c21e2c2570fff455b9e08226fc0c0c6add",
+      "lines": 126
+    },
+    {
+      "original_path": "scripts/followup-bucket-window.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/followup-bucket-window.py",
+      "role": "harness",
+      "bytes": 4248,
+      "sha256": "389b9f44308507cce6d385bf662d592b966328cde5d6591eac0b928006294559",
+      "lines": 57
+    },
+    {
+      "original_path": "scripts/reproduce-bucket-window.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/reproduce-bucket-window.py",
+      "role": "harness",
+      "bytes": 4549,
+      "sha256": "0a26de5e6a6f9ecc1c9b68e61afedf64f9bacec87ecd9adc7948106eda1abd5e",
+      "lines": 81
+    },
+    {
+      "original_path": "scripts/benchmark_storage.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/benchmark_storage.py",
+      "role": "dependency",
+      "bytes": 1755,
+      "sha256": "79e9b75184f279afc4cc880efe336a696f75e9488a759008aaa3ae621543759f",
+      "lines": 38
+    },
+    {
+      "original_path": "scripts/diagnose-shuffle.py",
+      "archived_path": "docs/history/shuffle-harnesses-2026-11-16/diagnose-shuffle.py",
+      "role": "dependency",
+      "bytes": 14552,
+      "sha256": "f5c14418ee67b33f11ea9bd790fac7a28b091ef5aeaf8378f07d3f741cbb5e6a",
+      "lines": 264
+    }
+  ],
+  "relocated_narratives": [
+    {
+      "path": "docs/performance/investigations/versioned-buffered-blake3-shuffle-source-2026-10-18.md",
+      "original_section_sha256": "80c962fa2b54f8ac748a8a3197962b6083a6e3f23c4ea59a186b63865a972b51",
+      "previous_rendered_sha256": "3ecb7b4b05ceffae1daa4f608241bad9a60bcbe0c954066044b6089084bf526f",
+      "sources": [
+        "scripts/benchmark-fast-rng.py"
+      ]
+    },
+    {
+      "path": "docs/performance/investigations/flexible-shuffle-and-exact-allocation-ranges-2026-10-19.md",
+      "original_section_sha256": "bee948464721797a5c797168c18d5deb5708a26fbf534471868a07c79f134c25",
+      "previous_rendered_sha256": "287bd591a6d63ae9a944539d030bc528e27475540eae84d2848c0d0d5480ec85",
+      "sources": [
+        "scripts/benchmark-allocation-ranges.py",
+        "scripts/validate-allocation-ranges.py"
+      ]
+    },
+    {
+      "path": "docs/performance/investigations/independent-random-bucket-full-shuffle-experiment-2026-10-19.md",
+      "original_section_sha256": "4a9623ef590eacb34f4d5c26d6309cf89045057cfe28d03205d975dbda14d6c8",
+      "previous_rendered_sha256": "f999a40e423524810a5649c0f8cb539070847cd7a153e3d0fae962eaa14a4a54",
+      "sources": [
+        "scripts/benchmark-random-buckets.py",
+        "scripts/followup-bucket-window.py",
+        "scripts/reproduce-bucket-window.py"
+      ]
+    }
+  ],
+  "preservation": "All source bytes are unchanged. Narrative hyperlink relocation is reversible; original section identities, prose, fenced commands and raw evidence are unchanged. Dependencies are copied for sibling imports; archival is not a net line-count saving."
+}

@@ -1,0 +1,1035 @@
+--- a/crates/chopper-core/src/csv.rs
++++ b/crates/chopper-core/src/csv.rs
+@@ -333,0 +334,4 @@
++    }
++    /// Transfer the buffered reader after dropping parser-owned scratch.
++    pub fn into_reader(self) -> R {
++        self.reader
+@@ -1242,0 +1247,5 @@
++
++/// Private-study record-boundary search; parsing still validates every frame.
++pub fn study_framing_positions(bytes: &[u8]) -> impl Iterator<Item = usize> + '_ {
++    memchr::memchr2_iter(b'"', b'\n', bytes)
++}
+--- a/crates/chopper/Cargo.toml
++++ b/crates/chopper/Cargo.toml
+@@ -8,0 +9 @@
++study-parallel-csv = []
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -860,0 +861,2 @@
++    #[cfg(all(feature = "study-parallel-csv", not(target_family = "wasm")))]
++    let parser = input_parallel::ParallelRecords::new(parser, job, ctx, ctx.max_record);
+@@ -2108,0 +2111,3 @@
++#[cfg(all(feature = "study-parallel-csv", not(target_family = "wasm")))]
++mod input_parallel;
++
+--- a/crates/chopper/src/engine/direct.rs
++++ b/crates/chopper/src/engine/direct.rs
+@@ -59 +59 @@
+-    let mut parser = Parser::new(
++    let parser = Parser::new(
+@@ -63,0 +64,4 @@
++    #[cfg(all(feature = "study-parallel-csv", not(target_family = "wasm")))]
++    let mut parser = super::input_parallel::ParallelRecords::new(parser, job, ctx, ctx.max_record);
++    #[cfg(not(all(feature = "study-parallel-csv", not(target_family = "wasm"))))]
++    let mut parser = parser;
+--- /dev/null
++++ b/crates/chopper/src/engine/input_parallel.rs
+@@ -0,0 +1,996 @@
++//! Private bounded native ingestion study. No graph/operation changes.
++use super::*;
++use chopper_core::csv::CompactRecord;
++use std::io::{self, BufRead};
++
++const MAX_ROWS: usize = 1024;
++const TARGET_BYTES: usize = 128 * 1024;
++const MAX_WORKERS: usize = 4;
++
++enum Mode<R> {
++    Serial(Parser<R>),
++    Parallel { reader: R, batch: Batch },
++}
++pub(super) struct ParallelRecords<R> {
++    mode: Option<Mode<R>>,
++    ctx: Context,
++    maximum: usize,
++    record: u64,
++    header: bool,
++    eligible: bool,
++}
++impl<R: BufRead> ParallelRecords<R> {
++    pub(super) fn new(parser: Parser<R>, job: &Job, ctx: &Context, maximum: usize) -> Self {
++        let csv = &job.input_csv;
++        let eligible = ctx.workers() > 1
++            && csv.encoding == "utf-8"
++            && csv.delimiter == ','
++            && csv.quote == '"'
++            && csv.escape.is_none()
++            && !csv.skip_empty_lines
++            && csv.line_ending == "lf"
++            && job.zip_member.is_none()
++            && std::path::Path::new(&job.input)
++                .extension()
++                .is_some_and(|e| e == "csv");
++        #[cfg(test)]
++        let eligible = eligible && !tests::force_serial();
++        Self {
++            record: parser.record,
++            mode: Some(Mode::Serial(parser)),
++            ctx: ctx.clone(),
++            maximum,
++            header: csv.headers,
++            eligible,
++        }
++    }
++    fn prepare(&mut self) -> Result<()> {
++        if self.header {
++            self.header = false;
++            return Ok(());
++        }
++        if !self.eligible || !matches!(self.mode, Some(Mode::Serial(_))) {
++            return Ok(());
++        }
++        let Some(Mode::Serial(parser)) = self.mode.take() else {
++            unreachable!()
++        };
++        let batch = Batch::new(&self.ctx, self.maximum)?;
++        self.mode = Some(Mode::Parallel {
++            reader: parser.into_reader(),
++            batch,
++        });
++        Ok(())
++    }
++}
++impl<R: BufRead> super::records::Records for ParallelRecords<R> {
++    fn record_number(&self) -> u64 {
++        self.record
++    }
++    fn scratch_capacity(&self) -> usize {
++        match &self.mode {
++            Some(Mode::Serial(p)) => p.scratch_capacity(),
++            _ => 0,
++        }
++    }
++    fn next_record_into_reserved(
++        &mut self,
++        fields: &mut Vec<String>,
++        reserve: &mut impl FnMut(usize) -> Result<()>,
++    ) -> Result<bool> {
++        self.prepare()?;
++        match self.mode.as_mut().context("failed record source resumed")? {
++            Mode::Serial(parser) => {
++                let result = parser.next_record_into_reserved(fields, reserve);
++                self.record = parser.record;
++                result
++            }
++            Mode::Parallel { reader, batch } => {
++                let Some(row) = batch.next(reader, self.maximum, self.record)? else {
++                    fields.clear();
++                    reserve(fields.capacity() * std::mem::size_of::<String>())?;
++                    return Ok(false);
++                };
++                // Raw syntax/working limits were already enforced by the same
++                // strict Parser. Do not substitute the decoded-text limit.
++                chopper_core::csv::copy_text_fields_into_reserved(
++                    row.fields(),
++                    fields,
++                    usize::MAX,
++                    reserve,
++                )
++                .with_context(|| format!("CSV record {}", self.record + 1))?;
++                self.record += 1;
++                Ok(true)
++            }
++        }
++    }
++    fn next_compact_record_into_reserved(
++        &mut self,
++        fields: &mut CompactRecord,
++        reserve: &mut impl FnMut(usize) -> Result<()>,
++    ) -> Result<bool> {
++        let result = (|| -> Result<bool> {
++            self.prepare()?;
++            match self.mode.as_mut().context("failed record source resumed")? {
++                Mode::Serial(parser) => {
++                    let result = parser.next_compact_record_into_reserved(fields, reserve);
++                    self.record = parser.record;
++                    result
++                }
++                Mode::Parallel { reader, batch } => {
++                    let Some(row) = batch.next(reader, self.maximum, self.record)? else {
++                        fields.clear();
++                        reserve(fields.capacity())?;
++                        return Ok(false);
++                    };
++                    fields
++                        .set_text_fields_reserved(row.fields(), usize::MAX, reserve)
++                        .with_context(|| format!("CSV record {}", self.record + 1))?;
++                    self.record += 1;
++                    Ok(true)
++                }
++            }
++        })();
++        if result.is_err() {
++            fields.clear();
++        }
++        result
++    }
++}
++
++struct Worker {
++    // Drop every record and its descriptor allocation before either grant.
++    rows: Vec<CompactRecord>,
++    error: Option<anyhow::Error>,
++    terminal: Option<io::Error>,
++    start: usize,
++    end: usize,
++    base: u64,
++    assigned: usize,
++    complete: usize,
++    data: Reservation,
++    metadata: Reservation,
++}
++impl Worker {
++    fn new(ctx: &Context, count: usize) -> Result<Self> {
++        let mut metadata = Reservation::new(ctx);
++        let mut rows = Vec::new();
++        metadata.reserve_vec(&mut rows, count)?;
++        rows.resize_with(count, CompactRecord::default);
++        Ok(Self {
++            rows,
++            error: None,
++            terminal: None,
++            start: 0,
++            end: 0,
++            base: 0,
++            assigned: 0,
++            complete: 0,
++            data: Reservation::new(ctx),
++            metadata,
++        })
++    }
++    fn clear(&mut self) -> Result<()> {
++        for row in &mut self.rows {
++            *row = CompactRecord::default();
++        }
++        self.error = None;
++        self.terminal = None;
++        self.complete = 0;
++        self.assigned = 0;
++        self.data.resize(0)
++    }
++    fn parse(&mut self, raw: &[u8], maximum: usize) {
++        // Default UTF-8/LF settings have two known small String allocations;
++        // their bytes remain pre-admitted in the Source metadata grant.
++        let reader = Prefix {
++            bytes: &raw[self.start..self.end],
++            terminal: self.terminal.take(),
++        };
++        let mut parser = Parser::new(reader, chopper_core::CsvSettings::default(), maximum);
++        parser.record = self.base;
++        let mut retained = 0;
++        for index in 0..self.assigned {
++            match parser.next_compact_record_into_reserved(&mut self.rows[index], &mut |n| {
++                self.data.resize(retained + n)
++            }) {
++                Ok(true) => {
++                    self.complete += 1;
++                    retained += self.rows[index].capacity();
++                }
++                Ok(false) => {
++                    self.error = Some(anyhow::anyhow!("framed record disappeared"));
++                    break;
++                }
++                Err(error) => {
++                    self.error = Some(error);
++                    break;
++                }
++            }
++        }
++        if self.error.is_none() {
++            // Only the last worker can carry a deferred source error. Reading
++            // beyond its final complete record preserves the serial context.
++            let mut extra = CompactRecord::default();
++            match parser.next_compact_record_into_reserved(&mut extra, &mut |n| {
++                self.data.resize(retained + n)
++            }) {
++                Ok(false) => {}
++                Ok(true) => self.error = Some(anyhow::anyhow!("framing omitted a record")),
++                Err(error) => self.error = Some(error),
++            }
++            drop(extra);
++        }
++        // Parser scratch is covered along with all retained rows until drop.
++        drop(parser);
++        let held = self.rows.iter().map(CompactRecord::capacity).sum();
++        if let Err(error) = self.data.resize(held) {
++            self.error = Some(error);
++        }
++    }
++}
++
++struct Prefix<'a> {
++    bytes: &'a [u8],
++    terminal: Option<io::Error>,
++}
++impl io::Read for Prefix<'_> {
++    fn read(&mut self, out: &mut [u8]) -> io::Result<usize> {
++        let bytes = self.fill_buf()?;
++        let n = bytes.len().min(out.len());
++        out[..n].copy_from_slice(&bytes[..n]);
++        self.consume(n);
++        Ok(n)
++    }
++}
++impl BufRead for Prefix<'_> {
++    fn fill_buf(&mut self) -> io::Result<&[u8]> {
++        if self.bytes.is_empty() {
++            if let Some(error) = self.terminal.take() {
++                return Err(error);
++            }
++        }
++        Ok(self.bytes)
++    }
++    fn consume(&mut self, n: usize) {
++        self.bytes = &self.bytes[n..];
++    }
++}
++
++struct Batch {
++    workers: Vec<Worker>,
++    raw: Vec<u8>,
++    ends: Vec<usize>,
++    ctx: Context,
++    maximum: usize,
++    raw_limit: usize,
++    next_worker: usize,
++    next_row: usize,
++    active: usize,
++    finished: bool,
++    batches: usize,
++    delivered: usize,
++    peak_grants: u64,
++    raw_grant: Reservation,
++    metadata: Reservation,
++}
++impl Batch {
++    fn new(ctx: &Context, maximum: usize) -> Result<Self> {
++        let raw_limit = TARGET_BYTES
++            .checked_add(maximum)
++            .and_then(|n| n.checked_add(2))
++            .context("raw framing bound overflow")?;
++        let count = ctx.workers().min(MAX_WORKERS);
++        let mut metadata = Reservation::new(ctx);
++        // CsvSettings::default creates known 5+2 byte strings per worker.
++        metadata.resize(count * 16)?;
++        let mut workers = Vec::new();
++        metadata.reserve_vec(&mut workers, count)?;
++        let rows = MAX_ROWS.div_ceil(count);
++        for _ in 0..count {
++            workers.push(Worker::new(ctx, rows)?);
++        }
++        let mut ends = Vec::new();
++        metadata.reserve_vec(&mut ends, MAX_ROWS)?;
++        let mut raw_grant = Reservation::new(ctx);
++        let mut raw = Vec::new();
++        raw_grant.reserve_vec(&mut raw, raw_limit)?;
++        Ok(Self {
++            workers,
++            raw,
++            ends,
++            ctx: ctx.clone(),
++            maximum,
++            raw_limit,
++            next_worker: 0,
++            next_row: 0,
++            active: 0,
++            finished: false,
++            batches: 0,
++            delivered: 0,
++            peak_grants: 0,
++            raw_grant,
++            metadata,
++        })
++    }
++    fn fill(&mut self, reader: &mut dyn BufRead, base: u64) -> Result<()> {
++        for worker in &mut self.workers {
++            worker.clear()?;
++        }
++        self.raw.clear();
++        self.ends.clear();
++        self.next_worker = 0;
++        self.next_row = 0;
++        self.active = 0;
++        let mut quoted = false;
++        let mut terminal = None;
++        loop {
++            if let Err(error) = self.ctx.check() {
++                terminal = Some(io::Error::other(error));
++                self.finished = true;
++                break;
++            }
++            let data = match reader.fill_buf() {
++                Ok(data) => data,
++                Err(error) => {
++                    terminal = Some(error);
++                    self.finished = true;
++                    break;
++                }
++            };
++            if data.is_empty() {
++                self.finished = true;
++                break;
++            }
++            let available = data.len().min(self.raw_limit - self.raw.len());
++            let mut take = available;
++            let mut stop = false;
++            for offset in chopper_core::csv::study_framing_positions(&data[..available]) {
++                if data[offset] == b'"' {
++                    quoted = !quoted;
++                } else if !quoted {
++                    let end = self.raw.len() + offset + 1;
++                    self.ends.push(end);
++                    if self.ends.len() == MAX_ROWS || end >= TARGET_BYTES {
++                        take = offset + 1;
++                        stop = true;
++                        break;
++                    }
++                }
++            }
++            self.raw.extend_from_slice(&data[..take]);
++            reader.consume(take);
++            if stop {
++                break;
++            }
++            if self.raw.len() == self.raw_limit {
++                // A bounded prefix already exceeds the strict raw working
++                // limit. The strict parser chooses its earlier error, if any.
++                self.finished = true;
++                break;
++            }
++        }
++        if !self.raw.is_empty() && self.ends.last().copied() != Some(self.raw.len()) {
++            self.ends.push(self.raw.len());
++        }
++        if self.ends.is_empty() && terminal.is_none() {
++            return Ok(());
++        }
++        let count = self.workers.len();
++        let per = self.ends.len().div_ceil(count).max(1);
++        let mut first = 0;
++        let mut start = 0;
++        for worker in &mut self.workers {
++            if first >= self.ends.len() {
++                break;
++            }
++            let end_row = (first + per).min(self.ends.len());
++            worker.start = start;
++            worker.end = self.ends[end_row - 1];
++            worker.base = base + first as u64;
++            worker.assigned = end_row - first;
++            start = worker.end;
++            first = end_row;
++            self.active += 1;
++        }
++        if self.active == 0 {
++            self.active = 1;
++            let w = &mut self.workers[0];
++            w.start = 0;
++            w.end = 0;
++            w.base = base;
++        }
++        self.workers[self.active - 1].terminal = terminal;
++        let raw = &self.raw;
++        let maximum = self.maximum;
++        self.ctx
++            .for_each_batch(&mut self.workers[..self.active], |worker| {
++                worker.parse(raw, maximum)
++            });
++        self.batches += 1;
++        #[cfg(test)]
++        tests::after_batch();
++        let grant = self.raw_grant.bytes()
++            + self.metadata.bytes()
++            + self
++                .workers
++                .iter()
++                .map(|w| w.data.bytes() + w.metadata.bytes())
++                .sum::<u64>();
++        self.peak_grants = self.peak_grants.max(grant);
++        Ok(())
++    }
++}
++impl Batch {
++    fn next<'a>(
++        &'a mut self,
++        reader: &mut dyn BufRead,
++        maximum: usize,
++        record: u64,
++    ) -> Result<Option<&'a CompactRecord>> {
++        ensure!(maximum == self.maximum, "parser maximum changed");
++        loop {
++            if self.next_worker < self.active {
++                let index_worker = self.next_worker;
++                if self.next_row < self.workers[index_worker].complete {
++                    let index = self.next_row;
++                    self.next_row += 1;
++                    self.delivered += 1;
++                    return Ok(Some(&self.workers[self.next_worker].rows[index]));
++                }
++                if let Some(error) = self.workers[index_worker].error.take() {
++                    return Err(error);
++                }
++                self.next_worker += 1;
++                self.next_row = 0;
++                continue;
++            }
++            if self.finished {
++                return Ok(None);
++            }
++            self.fill(reader, record)?;
++        }
++    }
++}
++impl Drop for Batch {
++    fn drop(&mut self) {
++        eprintln!(
++            "PARALLEL_CSV batches={} rows={} workers={} peak_owned_grants={} raw_capacity={}",
++            self.batches,
++            self.delivered,
++            self.workers.len(),
++            self.peak_grants,
++            self.raw.capacity()
++        );
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::super::records::Records as _;
++    use super::*;
++    use std::io::{BufReader, Cursor};
++    fn context() -> Result<(
++        tempfile::TempDir,
++        Context,
++        Arc<crate::resources::MemoryPool>,
++    )> {
++        let dir = tempfile::tempdir()?;
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let ctx = Context::with_memory_pool(
++            &chopper_core::Resources {
++                memory_mb: 32.into(),
++                workers: 4,
++                max_record_bytes: 1048576,
++                temp_dir: Some(dir.path().to_string_lossy().into()),
++                ..Default::default()
++            },
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        Ok((dir, ctx, pool))
++    }
++    fn job() -> Job {
++        Job {
++            input: "fixture.csv".into(),
++            input_csv: chopper_core::CsvSettings {
++                headers: false,
++                ..Default::default()
++            },
++            ..Default::default()
++        }
++    }
++    fn collect(
++        parser: impl super::super::records::Records,
++        compact: bool,
++        ctx: &Context,
++    ) -> Result<(Vec<Vec<String>>, Option<String>, u64)> {
++        let mut memory = Reservation::new(ctx);
++        let mut parser = parser;
++        let mut fields = Vec::new();
++        let mut record = CompactRecord::default();
++        let mut rows = Vec::new();
++        let error = loop {
++            let result = if compact {
++                parser.next_compact_record_into_reserved(&mut record, &mut |n| memory.resize(n))
++            } else {
++                parser.next_record_into_reserved(&mut fields, &mut |n| memory.resize(n))
++            };
++            let held = if compact {
++                record.capacity()
++            } else {
++                fields.capacity() * std::mem::size_of::<String>()
++                    + fields.iter().map(String::capacity).sum::<usize>()
++            };
++            assert!(
++                memory.bytes() as usize >= held + parser.scratch_capacity(),
++                "target under-admitted"
++            );
++            if compact && result.is_err() {
++                assert!(record.is_empty());
++            }
++            match result {
++                Ok(true) => rows.push(if compact {
++                    record.fields().map(str::to_string).collect()
++                } else {
++                    fields.clone()
++                }),
++                Ok(false) => break None,
++                Err(error) => break Some(format!("{error:#}")),
++            }
++        };
++        let count = parser.record_number();
++        drop(record);
++        drop(fields);
++        drop(parser);
++        drop(memory);
++        Ok((rows, error, count))
++    }
++    fn parse(
++        data: &[u8],
++        capacity: usize,
++        maximum: usize,
++        batch: bool,
++        compact: bool,
++        ctx: &Context,
++    ) -> Result<(Vec<Vec<String>>, Option<String>, u64)> {
++        let parser = Parser::new(
++            BufReader::with_capacity(capacity, Cursor::new(data)),
++            chopper_core::CsvSettings::default(),
++            maximum,
++        );
++        if batch {
++            collect(
++                ParallelRecords::new(parser, &job(), ctx, maximum),
++                compact,
++                ctx,
++            )
++        } else {
++            collect(parser, compact, ctx)
++        }
++    }
++    #[test]
++    fn parallel_csv_strict_refill_working_and_order_controls() -> Result<()> {
++        let (_dir, ctx, pool) = context()?;
++        let held = pool.usage().reserved_bytes;
++        let cases: &[&[u8]] = &[
++            b"",
++            b"a,b\nnext,last\n",
++            b"a,b",
++            b"a,,\n",
++            b"\n",
++            b"\"\"\n",
++            b"a,b\rc,d\n",
++            b"\ra,b\n",
++            b"ab\"c,d\nnext,row\n",
++            b"\"a\"x,b\n",
++            b"\"a\nline\",b\r\n",
++            b"a,\"b\"\"c\"\n",
++            b"\"unterminated",
++            b"a,\xff\n",
++            b"ok,row\nbad,\"unterminated",
++            "α,界\nnext,é\n".as_bytes(),
++        ];
++        for data in cases {
++            for capacity in [1, 2, 7, 64, 65536] {
++                for maximum in [1, 5, 31, 32, 37, 38, 128, 4096] {
++                    for compact in [false, true] {
++                        assert_eq!(
++                            parse(data, capacity, maximum, true, compact, &ctx)?,
++                            parse(data, capacity, maximum, false, compact, &ctx)?,
++                            "input={data:?},cap={capacity},max={maximum},compact={compact}"
++                        );
++                        assert_eq!(pool.usage().reserved_bytes, held);
++                    }
++                }
++            }
++        }
++        let mut many = String::new();
++        for id in 0..5000 {
++            many.push_str(&format!("{id},\"row {id}\nline\"\n"));
++        }
++        let wide = format!("small,row\n{},tail\nlast,row\n", "x".repeat(200000));
++        for input in [many, wide] {
++            for compact in [false, true] {
++                assert_eq!(
++                    parse(input.as_bytes(), 65536, 1048576, true, compact, &ctx)?,
++                    parse(input.as_bytes(), 65536, 1048576, false, compact, &ctx)?
++                );
++            }
++        }
++        assert_eq!(pool.usage().reserved_bytes, held);
++        drop(ctx);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        Ok(())
++    }
++    struct Fault<'a> {
++        data: &'a [u8],
++    }
++    impl io::Read for Fault<'_> {
++        fn read(&mut self, out: &mut [u8]) -> io::Result<usize> {
++            let data = self.fill_buf()?;
++            let n = data.len().min(out.len());
++            out[..n].copy_from_slice(&data[..n]);
++            self.consume(n);
++            Ok(n)
++        }
++    }
++    impl BufRead for Fault<'_> {
++        fn fill_buf(&mut self) -> io::Result<&[u8]> {
++            if self.data.is_empty() {
++                Err(io::Error::other("injected trailing read error"))
++            } else {
++                Ok(self.data)
++            }
++        }
++        fn consume(&mut self, n: usize) {
++            self.data = &self.data[n..];
++        }
++    }
++    #[test]
++    fn parallel_csv_deferred_errors_admission_and_cancellation() -> Result<()> {
++        let (_dir, ctx, pool) = context()?;
++        let retained = pool.usage().reserved_bytes;
++        for data in [
++            b"first,row\nsecond,row\n".as_slice(),
++            b"first,row\npartial",
++            b"ab\"c,d\n",
++            b"first,row\n\"unterminated",
++        ] {
++            for compact in [false, true] {
++                let parser = Parser::new(
++                    Fault { data },
++                    chopper_core::CsvSettings::default(),
++                    1048576,
++                );
++                let expected = collect(parser, compact, &ctx)?;
++                let parser = Parser::new(
++                    Fault { data },
++                    chopper_core::CsvSettings::default(),
++                    1048576,
++                );
++                assert_eq!(
++                    collect(
++                        ParallelRecords::new(parser, &job(), &ctx, 1048576),
++                        compact,
++                        &ctx
++                    )?,
++                    expected
++                );
++            }
++        }
++        let mut peer =
++            Reservation::for_workspace(Arc::new(Workspace::shared(32 * 1024 * 1024, pool.clone())));
++        peer.resize(32 * 1024 * 1024 - retained as usize - 16384)?;
++        let held = pool.usage().reserved_bytes;
++        let mut memory = Reservation::new(&ctx);
++        let parser = Parser::new(
++            Cursor::new(b"a,b\n"),
++            chopper_core::CsvSettings::default(),
++            1048576,
++        );
++        let mut parser = ParallelRecords::new(parser, &job(), &ctx, 1048576);
++        let mut fields = Vec::new();
++        let error = parser
++            .next_record_into_reserved(&mut fields, &mut |n| memory.resize(n))
++            .unwrap_err();
++        assert!(error
++            .downcast_ref::<crate::resources::MemoryAdmission>()
++            .is_some());
++        drop(fields);
++        drop(parser);
++        drop(memory);
++        assert_eq!(pool.usage().reserved_bytes, held);
++        drop(peer);
++        drop(ctx);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        let dir = tempfile::tempdir()?;
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let signal = Arc::new(AtomicBool::new(false));
++        let ctx = Context::with_memory_pool(
++            &chopper_core::Resources {
++                memory_mb: 32.into(),
++                workers: 4,
++                max_record_bytes: 1048576,
++                temp_dir: Some(dir.path().to_string_lossy().into()),
++                ..Default::default()
++            },
++            signal.clone(),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let mut memory = Reservation::new(&ctx);
++        let parser = Parser::new(
++            Cursor::new(b"a,b\n"),
++            chopper_core::CsvSettings::default(),
++            1048576,
++        );
++        let mut parser = ParallelRecords::new(parser, &job(), &ctx, 1048576);
++        signal.store(true, std::sync::atomic::Ordering::Relaxed);
++        let mut fields = Vec::new();
++        assert!(format!(
++            "{:#}",
++            parser
++                .next_record_into_reserved(&mut fields, &mut |n| memory.resize(n))
++                .unwrap_err()
++        )
++        .contains("cancel"));
++        drop(fields);
++        drop(parser);
++        drop(memory);
++        drop(ctx);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        assert!(std::fs::read_dir(dir.path())?.next().is_none());
++        Ok(())
++    }
++    thread_local! {
++        static FORCE_SERIAL: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
++        static AFTER_BATCH: std::cell::RefCell<Option<Box<dyn FnMut()>>> = const { std::cell::RefCell::new(None) };
++    }
++    pub(super) fn force_serial() -> bool {
++        FORCE_SERIAL.get()
++    }
++    pub(super) fn after_batch() {
++        AFTER_BATCH.with(|slot| {
++            if let Some(hook) = slot.borrow_mut().as_mut() {
++                hook();
++            }
++        });
++    }
++    struct Reset;
++    impl Drop for Reset {
++        fn drop(&mut self) {
++            FORCE_SERIAL.set(false);
++            AFTER_BATCH.with(|slot| {
++                slot.borrow_mut().take();
++            });
++        }
++    }
++    fn input() -> Result<Vec<u8>> {
++        let mut input = b"id,region,payload\n".to_vec();
++        for id in 0..3000 {
++            input.extend(chopper_core::csv::serialize(
++                &[
++                    id.to_string(),
++                    format!("R{}", id % 4),
++                    format!("héllô,\nline \"{id}\""),
++                ],
++                &chopper_core::CsvSettings::default(),
++            )?);
++        }
++        Ok(input)
++    }
++    fn checked(job: &Job, analysis: &Analysis) -> Result<serde_json::Value> {
++        let mut files = std::collections::BTreeMap::new();
++        let mut outputs = Vec::new();
++        let mut seen = std::collections::BTreeSet::new();
++        for entry in std::fs::read_dir(&job.output)? {
++            let entry = entry?;
++            let name = entry.file_name().to_string_lossy().into_owned();
++            let data = std::fs::read(entry.path())?;
++            if name.ends_with(".csv") {
++                assert!(data.len() <= 65536);
++                let mut parser = Parser::new(
++                    std::io::Cursor::new(&data),
++                    chopper_core::CsvSettings::default(),
++                    1048576,
++                );
++                assert_eq!(parser.next_record()?.unwrap(), ["id", "region", "payload"]);
++                let mut count = 0;
++                while let Some(fields) = parser.next_record()? {
++                    let id = fields[0].parse::<usize>()?;
++                    assert!(id < 3000 && seen.insert(id));
++                    assert_eq!(
++                        fields,
++                        [
++                            id.to_string(),
++                            format!("R{}", id % 4),
++                            format!("héllô,\nline \"{id}\"")
++                        ]
++                    );
++                    count += 1;
++                }
++                assert!(count <= 512);
++                files.insert(name, data);
++            } else {
++                for line in data.split(|b| *b == b'\n').filter(|x| !x.is_empty()) {
++                    let r: serde_json::Value = serde_json::from_slice(line)?;
++                    if r["type"] == "output" {
++                        outputs.push(r);
++                    }
++                }
++            }
++        }
++        assert_eq!(seen, (0..3000).collect());
++        assert_eq!(analysis.rows, 3000);
++        assert_eq!(analysis.output_files, files.len() as u64);
++        let all = serde_json::to_value(analysis)?;
++        let logical: serde_json::Map<String, serde_json::Value> = [
++            "algorithm_version",
++            "column_values",
++            "seed",
++            "rows",
++            "columns",
++            "header",
++            "preview",
++            "logical_digest",
++            "groups",
++            "output_files",
++            "output_csv_bytes",
++            "largest_record_bytes",
++            "memory_budget_bytes",
++            "workers",
++            "stages",
++            "warnings",
++            "accuracy",
++        ]
++        .into_iter()
++        .map(|k| (k.into(), all[k].clone()))
++        .collect();
++        Ok(serde_json::json!({"files":files,"outputs":outputs,"analysis":logical}))
++    }
++    #[test]
++    fn parallel_csv_complete_run_controls() -> Result<()> {
++        let _reset = Reset;
++        for pipeline in [false, true] {
++            for case in ["valid", "width", "quote", "cancel"] {
++                let mut reference = None;
++                for parallel in if case == "cancel" {
++                    vec![true]
++                } else {
++                    vec![false, true]
++                } {
++                    FORCE_SERIAL.set(!parallel);
++                    let dir = tempfile::tempdir()?;
++                    let temp = dir.path().join("temp");
++                    std::fs::create_dir(&temp)?;
++                    let path = dir.path().join("input.csv");
++                    let mut bytes = input()?;
++                    if case == "width" {
++                        bytes.extend_from_slice(b"3000,R0,payload,extra\n");
++                    }
++                    if case == "quote" {
++                        bytes.extend_from_slice(b"3000,R0,ab\"c\n");
++                    }
++                    std::fs::write(&path, bytes)?;
++                    let mut job = Job {
++                        input: path.to_string_lossy().into(),
++                        output: dir.path().join("output").to_string_lossy().into(),
++                        seed: Some("parallel-csv-control-v1".into()),
++                        ..Default::default()
++                    };
++                    if pipeline {
++                        job.operations = vec![
++                            Operation::Partition {
++                                columns: vec![chopper_core::Column::Index(1)],
++                            },
++                            Operation::AssignProbabilistic {
++                                groups: vec![
++                                    chopper_core::Allocation {
++                                        name: "treatment".into(),
++                                        percent: "80".into(),
++                                    },
++                                    chopper_core::Allocation {
++                                        name: "control".into(),
++                                        percent: "20".into(),
++                                    },
++                                    chopper_core::Allocation {
++                                        name: "empty".into(),
++                                        percent: "0".into(),
++                                    },
++                                ],
++                                strata: vec![],
++                            },
++                            Operation::Shuffle {
++                                strategy: chopper_core::Shuffle::Uniform,
++                            },
++                        ];
++                    }
++                    job.resources.memory_mb = 32.into();
++                    job.resources.workers = 4;
++                    job.resources.max_record_bytes = 1048576;
++                    job.resources.temp_dir = Some(temp.to_string_lossy().into());
++                    job.limits.rows = Some(512);
++                    job.limits.bytes = Some(65536);
++                    let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++                    let signal = Arc::new(AtomicBool::new(false));
++                    let batches = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++                    if case == "cancel" {
++                        let signal = signal.clone();
++                        let count = batches.clone();
++                        AFTER_BATCH.with(|slot| {
++                            *slot.borrow_mut() = Some(Box::new(move || {
++                                if count.fetch_add(1, std::sync::atomic::Ordering::Relaxed) == 1 {
++                                    signal.store(true, std::sync::atomic::Ordering::Relaxed);
++                                }
++                            }))
++                        });
++                    }
++                    let visits = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++                    let count = visits.clone();
++                    let result = run_with_memory_pool(
++                        job.clone(),
++                        signal.clone(),
++                        Arc::new(move |p| {
++                            if matches!(
++                                p.phase.as_str(),
++                                "Reading and validating CSV" | "Reading and writing CSV"
++                            ) && p.rows == 0
++                            {
++                                count.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
++                            }
++                        }),
++                        pool.clone(),
++                    );
++                    let outcome = match result {
++                        Ok(analysis) => {
++                            assert_eq!(case, "valid");
++                            let value = checked(&job, &analysis)?;
++                            if let Some(ref prior) = reference {
++                                assert_eq!(&value, prior);
++                            } else {
++                                reference = Some(value);
++                            }
++                            drop(analysis);
++                            "success_exact"
++                        }
++                        Err(error) => {
++                            assert_ne!(case, "valid", "{error:#}");
++                            let text = format!("{error:#}");
++                            if case == "cancel" {
++                                assert!(text.contains("cancel"));
++                                assert!(batches.load(std::sync::atomic::Ordering::Relaxed) >= 2);
++                            } else {
++                                if let Some(ref prior) = reference {
++                                    assert_eq!(&serde_json::Value::String(text.clone()), prior);
++                                } else {
++                                    reference = Some(serde_json::Value::String(text));
++                                }
++                            }
++                            assert!(!std::path::Path::new(&job.output).exists());
++                            "terminal_error"
++                        }
++                    };
++                    AFTER_BATCH.with(|slot| {
++                        slot.borrow_mut().take();
++                    });
++                    assert_eq!(visits.load(std::sync::atomic::Ordering::Relaxed), 1);
++                    assert!(std::fs::read_dir(&temp)?.next().is_none());
++                    assert!(!std::fs::read_dir(dir.path())?.any(|e| e
++                        .unwrap()
++                        .file_name()
++                        .to_string_lossy()
++                        .starts_with(".chopper-staging-")));
++                    assert_eq!(pool.usage().reserved_bytes, 0);
++                    println!(
++                        "PARALLEL_CSV_RUN_CONTROL {}",
++                        serde_json::json!({"pipeline":pipeline,"case":case,"parallel":parallel,"outcome":outcome,"input_visits":1,"cancel_batches":batches.load(std::sync::atomic::Ordering::Relaxed),"cleanup":true,"final_pool_reserved":0})
++                    );
++                }
++            }
++        }
++        Ok(())
++    }
++}

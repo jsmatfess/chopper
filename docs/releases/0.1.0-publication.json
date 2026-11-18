@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "version": "0.1.0",
+  "published_utc": "2026-10-29T04:18:56.744233+00:00",
+  "release_url": "https://github.com/jsmatfess/chopper/releases/tag/v0.1.0",
+  "tag": "v0.1.0",
+  "release_source_commit": "7d78706c432f34742bbc29c17be9261002a6816a",
+  "repository_visibility": "private; unchanged",
+  "native": {
+    "platform": "Windows x86-64",
+    "executable": {
+      "bytes": 4139008,
+      "sha256": "771a33f8cc34e6bf871bdbe1349669251adc30d48c4fa51d4a585cf75a12409b"
+    },
+    "download_hashes_verified": true,
+    "downloaded_version_smoke": true
+  },
+  "release_assets": {
+    "chopper-0.1.0-artifact-receipt.json": "9aa4032a3fc102b82ee164faba696eb48348ff912fc25da7bcdbfaa2a646868b",
+    "chopper-0.1.0-hosted.zip": "bdd914517252d7cb1849ccae11955dad919ed052f912e891c3535417885e4606",
+    "chopper-0.1.0-windows-x86_64.zip": "9c3be7b2ca3a7be587bfb83befd7de2c3526e03ff63c114ec1d7facd5c975e46",
+    "SHA256SUMS": "f79648ca6ecfd794300385c1a813e69397e9e6c3f99fed72e9fd2eb5170174eb"
+  },
+  "hosted": {
+    "production_url": "https://chopper-1rx.pages.dev/",
+    "deployment_id": "8d497a07-be6e-43e2-abae-67f05f097ae2",
+    "deployment_url": "https://8d497a07.chopper-1rx.pages.dev",
+    "project": "chopper",
+    "production_branch": "master",
+    "previous_deployment_id": "31da2710-941c-4e0c-8e5d-a21ee3646315",
+    "assets": {
+      "_headers": {
+        "bytes": 385,
+        "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1"
+      },
+      "app.js": {
+        "bytes": 40493,
+        "sha256": "951232201b98ce2659608ade09ac76a8ef94bf9f3fb5cc8fb3ad4b9b275112ff"
+      },
+      "engine-worker.js": {
+        "bytes": 35153,
+        "sha256": "cf407b6ce2b7d47f0909a352193c8260231a8f6c740f779f487806af8c8425f8"
+      },
+      "engine.wasm": {
+        "bytes": 2358817,
+        "sha256": "afe7e8a61837e6317af70090a112158149725d9af909ea1eb2e60a66369787ce"
+      },
+      "index.html": {
+        "bytes": 8867,
+        "sha256": "ee73456f9b1afa8801244a3fbfbae2308d51f514c6a7b7f3cac6d8ee9d8e6898"
+      },
+      "storage-worker.js": {
+        "bytes": 3034,
+        "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6"
+      },
+      "style.css": {
+        "bytes": 12292,
+        "sha256": "edddae5c4a2aab3cfa8bcc3c2a79bd69a9bd9c7463ec3d9c2ec5a14d72ed2787"
+      }
+    },
+    "six_served_asset_bodies_verified": true,
+    "headers_configuration_uploaded_and_effective_isolation_verified": true,
+    "chrome": "156.0.8078.48",
+    "edge": "156.0.4314.50",
+    "live_checks": "exact CSV, completion marker, seed retention, preparation/import/export and stable served hashes; picker results injected into disposable OPFS contexts"
+  },
+  "ci": {
+    "url": "https://github.com/jsmatfess/chopper/actions/runs/40815793120",
+    "source_commit": "7d78706c432f34742bbc29c17be9261002a6816a",
+    "conclusion": "success",
+    "jobs": [
+      {
+        "name": "portable-core",
+        "conclusion": "success"
+      },
+      {
+        "name": "surviving-features",
+        "conclusion": "success"
+      },
+      {
+        "name": "browser",
+        "conclusion": "success"
+      },
+      {
+        "name": "native (macos-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "native (ubuntu-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "native (windows-latest)",
+        "conclusion": "success"
+      },
+      {
+        "name": "evidence",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "post_package_source_delta": {
+    "path": "crates/chopper/src/resources/e5_worker_controls.rs",
+    "scope": "native cfg(test) fixture only; portable CPU-count expectations; approved package bytes unchanged"
+  },
+  "storage": {
+    "private_original_aliases": 655,
+    "aliases_present_in_fresh_clone": 0,
+    "aliases_in_reachable_exported_history": 0,
+    "originals_verified_in_private_storage": true,
+    "selected_historical_raw_cache_paths_removed": 690,
+    "old_checkout_and_verified_backups_retained_privately": true,
+    "remote_erasure_or_immediate_size_reduction_claim": false
+  },
+  "human_acceptance": "owner reported original 676 MB job works at 512 MiB in both builds; real-picker export/cancellation/malformed-input smoke complete without issues; approved as is",
+  "rollback": "prior hosted package retained and privately restore-verified; first native release has no native predecessor"
+}

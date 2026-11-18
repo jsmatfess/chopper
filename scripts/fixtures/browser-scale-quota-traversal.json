@@ -1,0 +1,178 @@
+{
+  "status": "complete",
+  "error": null,
+  "graph": {
+    "unavailable": false,
+    "eventsOmitted": 0,
+    "steps": [
+      {
+        "id": 1072,
+        "title": "Sort and write spill runs",
+        "status": "completed",
+        "bytes": 0,
+        "active_bytes": 0,
+        "role": 0,
+        "groups": 0,
+        "empty_groups": 0,
+        "memberships": [],
+        "omitted_memberships": 0,
+        "kind": "spill",
+        "operations": [
+          2,
+          3
+        ],
+        "rows": 999999,
+        "seconds": 2.929265000000001,
+        "runs": 72,
+        "attempts": 72,
+        "completed_attempts": 72,
+        "interrupted_attempts": 0,
+        "partial_rows": 0,
+        "partial_seconds": 0,
+        "source_omitted": false,
+        "source": 1079,
+        "sources": [
+          1079
+        ],
+        "outcomes": {
+          "completed": {
+            "bytes": 0,
+            "rows": 999999,
+            "seconds": 2.929265000000001,
+            "runs": 72,
+            "attempts": 72,
+            "groups": 0,
+            "empty_groups": 0,
+            "memberships": [],
+            "omitted_memberships": 0
+          },
+          "interrupted": {
+            "bytes": 0,
+            "rows": 0,
+            "seconds": 0,
+            "runs": 0,
+            "attempts": 0,
+            "groups": 0,
+            "empty_groups": 0,
+            "memberships": [],
+            "omitted_memberships": 0
+          },
+          "failed": {
+            "bytes": 0,
+            "rows": 0,
+            "seconds": 0,
+            "runs": 0,
+            "attempts": 0,
+            "groups": 0,
+            "empty_groups": 0,
+            "memberships": [],
+            "omitted_memberships": 0
+          },
+          "handed_off": {
+            "bytes": 0,
+            "rows": 0,
+            "seconds": 0,
+            "runs": 0,
+            "attempts": 0,
+            "groups": 0,
+            "empty_groups": 0,
+            "memberships": [],
+            "omitted_memberships": 0
+          }
+        },
+        "active_rows": 0,
+        "active_seconds": 0,
+        "active_runs": 0,
+        "source_omissions": 0,
+        "last_attempt": 92,
+        "last_terminal": 92,
+        "min_level": null,
+        "max_level": null
+      },
+      {
+        "id": 1075,
+        "title": "Traverse final merge",
+        "status": "interrupted",
+        "bytes": 0,
+        "active_bytes": 0,
+        "role": 0,
+        "groups": 0,
+        "empty_groups": 0,
+        "memberships": [],
+        "omitted_memberships": 0,
+        "kind": "merge_traversal",
+        "operations": [
+          2,
+          3
+        ],
+        "rows": 0,
+        "seconds": 0,
+        "runs": 0,
+        "attempts": 8,
+        "completed_attempts": 0,
+        "interrupted_attempts": 8,
+        "partial_rows": 999999,
+        "partial_seconds": 3.44776,
+        "source_omitted": false,
+        "source": 1072,
+        "sources": [
+          1072
+        ],
+        "outcomes": {
+          "completed": {
+            "bytes": 0,
+            "rows": 0,
+            "seconds": 0,
+            "runs": 0,
+            "attempts": 0,
+            "groups": 0,
+            "empty_groups": 0,
+            "memberships": [],
+            "omitted_memberships": 0
+          },
+          "interrupted": {
+            "bytes": 0,
+            "rows": 999999,
+            "seconds": 3.44776,
+            "runs": 0,
+            "attempts": 8,
+            "groups": 0,
+            "empty_groups": 0,
+            "memberships": [],
+            "omitted_memberships": 0
+          },
+          "failed": {
+            "bytes": 0,
+            "rows": 0,
+            "seconds": 0,
+            "runs": 0,
+            "attempts": 0,
+            "groups": 0,
+            "empty_groups": 0,
+            "memberships": [],
+            "omitted_memberships": 0
+          },
+          "handed_off": {
+            "bytes": 0,
+            "rows": 0,
+            "seconds": 0,
+            "runs": 0,
+            "attempts": 0,
+            "groups": 0,
+            "empty_groups": 0,
+            "memberships": [],
+            "omitted_memberships": 0
+          }
+        },
+        "active_rows": 65536,
+        "active_seconds": 0.201085,
+        "active_runs": 0,
+        "source_omissions": 0,
+        "last_attempt": 93,
+        "last_terminal": 93,
+        "min_level": null,
+        "max_level": null
+      }
+    ]
+  }
+}

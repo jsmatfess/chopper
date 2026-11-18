@@ -1,0 +1,244 @@
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -99 +99 @@
+-    assert_eq!(a.groups, 12);
++    assert_eq!(a.groups, if job.operations.is_empty() { 1 } else { 12 });
+@@ -585,0 +586,189 @@
++
++#[test]
++fn plain_publication_parallel_panel() -> Result<()> {
++    let mut reference = None;
++    let mut last_recipe = None;
++    for (rep, (fusion_recipe, parallel)) in [
++        (false, false),
++        (false, true),
++        (false, true),
++        (false, false),
++        (true, false),
++        (true, true),
++        (true, true),
++        (true, false),
++    ]
++    .into_iter()
++    .enumerate()
++    {
++        ENABLED.set(true);
++        crate::output::research_publication::set(parallel);
++        if last_recipe != Some(fusion_recipe) {
++            reference = None;
++        }
++        last_recipe = Some(fusion_recipe);
++        let (dir, mut job) = setup(200000)?;
++        if !fusion_recipe {
++            job.operations.clear();
++        }
++        job.resources.memory_mb = 128.into();
++        job.resources.workers = 4;
++        let input_hash = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++        let pool = Arc::new(crate::resources::MemoryPool::new(128 * 1024 * 1024));
++        let started = std::time::Instant::now();
++        let prepared = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let preparation_seconds = started.elapsed().as_secs_f64();
++        let execution_started = std::time::Instant::now();
++        let ctx = prepared.ctx.clone();
++        let a = prepared.execute()?;
++        let execution_seconds = execution_started.elapsed().as_secs_f64();
++        let seconds = started.elapsed().as_secs_f64();
++        assert_eq!(a.workers, 4);
++        let diagnostics = ctx.diagnostics();
++        let checked = verify(dir.path(), &job, 200000, &a)?;
++        if let Some(ref old) = reference {
++            assert_eq!(&checked, old);
++        } else {
++            reference = Some(checked);
++        }
++        let peak = crate::output::research_publication::peak();
++        assert!((1..=4).contains(&peak));
++        if !parallel {
++            assert_eq!(peak, 1);
++        }
++        drop(a);
++        drop(ctx);
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "PLAIN_PARALLEL {}",
++            serde_json::json!({"rep":rep,"fusion_recipe":fusion_recipe,"parallel":parallel,"rows":200000,"workers":4,"memory_mb":128,"input_blake3":input_hash,"seconds":seconds,"preparation_seconds":preparation_seconds,"execution_seconds":execution_seconds,"peak_active_chunks":peak,"diagnostics":diagnostics,"exact_output_verified":true,"cleanup":true})
++        );
++    }
++    ENABLED.set(false);
++    crate::output::research_publication::set(false);
++    Ok(())
++}
++
++#[test]
++fn plain_publication_parallel_safety() -> Result<()> {
++    for parallel in [false, true] {
++        crate::output::research_publication::set(parallel);
++        let (dir, mut job) = setup(2000)?;
++        job.operations.clear();
++        job.resources.memory_mb = 128.into();
++        job.resources.workers = 4;
++        let cancel = Arc::new(AtomicBool::new(false));
++        let set = cancel.clone();
++        let fired = Arc::new(AtomicBool::new(false));
++        let event = fired.clone();
++        let pool = Arc::new(crate::resources::MemoryPool::new(128 * 1024 * 1024));
++        let p = prepare_with_memory_pool(
++            job.clone(),
++            cancel,
++            Arc::new(move |p| {
++                if p.phase == "Writing output" && p.rows > 0 {
++                    event.store(true, Ordering::Relaxed);
++                    set.store(true, Ordering::Relaxed);
++                }
++            }),
++            pool.clone(),
++        )?;
++        assert_eq!(p.analysis.workers, 4);
++        let e = p.execute().expect_err("cancel after a collected chunk");
++        assert!(format!("{e:#}").contains("job cancelled"));
++        assert!(fired.load(Ordering::Relaxed));
++        assert!(!std::path::Path::new(&job.output).exists());
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert_eq!(fs::read_dir(dir.path())?.count(), 2);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "PLAIN_PARALLEL_SAFETY {}",
++            serde_json::json!({"parallel":parallel,"case":"mid_publication_cancel","outcome":"cancelled","cleanup":true,"peak_active_chunks":crate::output::research_publication::peak()})
++        );
++    }
++    let mut reference = None;
++    for parallel in [false, true] {
++        crate::output::research_publication::set(parallel);
++        let (dir, mut job) = setup(2000)?;
++        job.operations.clear();
++        job.resources.memory_mb = 128.into();
++        job.resources.workers = 4;
++        let pool = Arc::new(crate::resources::MemoryPool::new(128 * 1024 * 1024));
++        let space = Arc::new(crate::storage::Workspace::shared(
++            128 * 1024 * 1024,
++            pool.clone(),
++        ));
++        let grant = Arc::new(std::sync::Mutex::new(Reservation::for_workspace(space)));
++        let g = grant.clone();
++        let shared = pool.clone();
++        let held = Arc::new(std::sync::atomic::AtomicU64::new(0));
++        let bytes = held.clone();
++        let result = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(move |p| {
++                if p.phase == "Ready for confirmation" {
++                    let amount = (128 * 1024 * 1024u64)
++                        .saturating_sub(shared.usage().reserved_bytes)
++                        .saturating_sub(200 * 1024);
++                    assert!(amount > 0);
++                    g.lock()
++                        .unwrap()
++                        .resize(usize::try_from(amount).unwrap())
++                        .unwrap();
++                    bytes.store(amount, Ordering::Relaxed);
++                }
++            }),
++            pool.clone(),
++        )
++        .and_then(|p| {
++            let ctx = p.ctx.clone();
++            let a = p.execute()?;
++            let checked = verify(dir.path(), &job, 2000, &a)?;
++            if let Some(ref old) = reference {
++                assert_eq!(&checked, old);
++            } else {
++                reference = Some(checked);
++            }
++            drop(a);
++            drop(ctx);
++            Ok(())
++        });
++        let outcome = match result {
++            Ok(()) => "success_exact",
++            Err(e) => {
++                assert!(
++                    matches!(
++                        e.downcast_ref::<crate::resources::MemoryAdmission>(),
++                        Some(crate::resources::MemoryAdmission::Shared { .. })
++                            | Some(crate::resources::MemoryAdmission::Local)
++                    ),
++                    "{e:#}"
++                );
++                assert!(!std::path::Path::new(&job.output).exists());
++                "typed_memory_denial"
++            }
++        };
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert!(!fs::read_dir(dir.path())?.any(|e| e
++            .unwrap()
++            .file_name()
++            .to_string_lossy()
++            .starts_with(".chopper-staging-")));
++        assert_eq!(pool.usage().reserved_bytes, held.load(Ordering::Relaxed));
++        drop(grant);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "PLAIN_PARALLEL_SAFETY {}",
++            serde_json::json!({"parallel":parallel,"case":"late_200KiB_free","outcome":outcome,"grant_bytes":held.load(Ordering::Relaxed),"cleanup":true,"peak_active_chunks":crate::output::research_publication::peak()})
++        );
++    }
++    crate::output::research_publication::set(false);
++    Ok(())
++}
+--- a/crates/chopper/src/output.rs
++++ b/crates/chopper/src/output.rs
+@@ -82,0 +83,40 @@
++#[cfg(test)]
++pub(crate) mod research_publication {
++    use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
++    static ENABLED: AtomicBool = AtomicBool::new(false);
++    static ACTIVE: AtomicUsize = AtomicUsize::new(0);
++    static PEAK: AtomicUsize = AtomicUsize::new(0);
++    pub fn set(enabled: bool) {
++        assert_eq!(ACTIVE.load(Ordering::Relaxed), 0);
++        PEAK.store(0, Ordering::Relaxed);
++        ENABLED.store(enabled, Ordering::Relaxed);
++    }
++    pub fn enabled() -> bool {
++        ENABLED.load(Ordering::Relaxed)
++    }
++    pub fn peak() -> usize {
++        PEAK.load(Ordering::Relaxed)
++    }
++    pub struct Active;
++    pub fn enter() -> Active {
++        let active = ACTIVE.fetch_add(1, Ordering::Relaxed) + 1;
++        PEAK.fetch_max(active, Ordering::Relaxed);
++        Active
++    }
++    impl Drop for Active {
++        fn drop(&mut self) {
++            ACTIVE.fetch_sub(1, Ordering::Relaxed);
++        }
++    }
++}
++fn research_parallel_publication() -> bool {
++    #[cfg(test)]
++    {
++        research_publication::enabled()
++    }
++    #[cfg(not(test))]
++    {
++        false
++    }
++}
++
+@@ -511,0 +552,2 @@
++    #[cfg(test)]
++    let _research_active = research_publication::enter();
+@@ -603 +645 @@
+-    let concurrency = if job.compression == Compression::None {
++    let concurrency = if job.compression == Compression::None && !research_parallel_publication() {

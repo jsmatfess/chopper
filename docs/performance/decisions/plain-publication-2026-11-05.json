@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "plain-publication-2026-11-05",
+  "title": "Offer native plain prepared-publication overlap as opt-in",
+  "date": "2026-11-05",
+  "subsystem": "output",
+  "question": "Can independent prepared files publish concurrently within existing resource contracts?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "opt-in",
+  "summary": "Ship experimental-plain-publication for native builds while keeping serial defaults and existing Run eligibility.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "Prepared plain files; fixed 200k-row allocation/shuffle probe with small caps and a separate 10-MB-cap comparison."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux"
+    ],
+    "summary": "Fresh Linux default/all-feature checks and native Windows release contracts/CLI smoke cover parity, caps, partial batch capacity, cancellation and typed-denial cleanup."
+  },
+  "limitations": [
+    "Small development cells and uncontrolled cache/background state do not establish general device, shape or tail performance.",
+    "Historical percentage gains are not additive; every comparison uses its own pinned baseline.",
+    "Concurrent owners may deny later work; no retry or admission-parity guarantee.",
+    "Direct limits-only Run and WASI keep their existing paths; no Auto threshold or browser speed claim."
+  ],
+  "exclusions": [
+    "Feature delivery tests add no timed jobs.",
+    "Initial Windows artifact-glob failure stays incomplete; the corrected fresh batch is separate."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#native-experimental-plain-publication-delivery-2026-11-05",
+      "sha256": "368eb6b4872d17af4f55afe3147a1e51aecb206cc53ae2e94bfa7a358476d21a"
+    },
+    {
+      "section": "docs/performance.md#plain-publication-overlap-10-mb-output-cap-2026-11-05",
+      "sha256": "cf6f85e010b9a404ed80d223f17b4fae5c82fd6b3420167c552977bf697935ed"
+    },
+    {
+      "section": "docs/performance.md#plain-publication-overlap-unchanged-production-run-transfer-2026-11-05",
+      "sha256": "b429657aa6aaedca0fea8d97df65a1ad450b61a4cbd9477544054b73a54290c8"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/plain-publication-feature-2026-11-05.json",
+      "sha256": "c59b918777c2930f230a0dcf2739571ab09c763b5dbc16ffa2ebedb2bec8510b"
+    },
+    {
+      "path": "docs/benchmarks/plain-publication-large-cap-2026-11-05.json",
+      "sha256": "61e2a66271fa5c1f7145ab09a84392a58adc6950417f05d31b6637cba66dd1ff"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md",
+    "docs/direct-execution.md"
+  ]
+}

@@ -1,0 +1,45 @@
+diff --git a/crates/chopper/src/digest.rs b/crates/chopper/src/digest.rs
+index b34c8be..9d93ec0 100644
+--- a/crates/chopper/src/digest.rs
++++ b/crates/chopper/src/digest.rs
+@@ -34,3 +34,10 @@ impl LogicalDigest {
+-    fn update(&mut self, bytes: &[u8]) {
+-        if bytes.len() > CAPACITY - self.buffer.len() {
+-            self.flush();
++    fn update(&mut self, mut bytes: &[u8]) {
++        // Keep non-final updates aligned to the existing 16 KiB buffer so
++        // small field boundaries do not split BLAKE3's full input chunks.
++        if !self.buffer.is_empty() {
++            let fill = bytes.len().min(CAPACITY - self.buffer.len());
++            self.buffer.extend_from_slice(&bytes[..fill]);
++            bytes = &bytes[fill..];
++            if self.buffer.len() == CAPACITY {
++                self.flush();
++            }
+@@ -39,3 +46,3 @@ impl LogicalDigest {
+-            self.hasher.update(bytes);
+-        } else {
+-            self.buffer.extend_from_slice(bytes);
++            let complete = bytes.len() / CAPACITY * CAPACITY;
++            self.hasher.update(&bytes[..complete]);
++            bytes = &bytes[complete..];
+@@ -42,0 +50 @@ impl LogicalDigest {
++        self.buffer.extend_from_slice(bytes);
+@@ -74 +82,16 @@ mod tests {
+-                    "x".repeat([1, CAPACITY - 1, CAPACITY, CAPACITY + 1][row % 4]),
++                    "x".repeat(
++                        [
++                            0,
++                            1,
++                            63,
++                            64,
++                            1023,
++                            1024,
++                            CAPACITY - 1,
++                            CAPACITY,
++                            CAPACITY + 1,
++                            2 * CAPACITY - 1,
++                            2 * CAPACITY,
++                            2 * CAPACITY + 1,
++                        ][row % 12],
++                    ),

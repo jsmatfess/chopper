@@ -1,0 +1,3648 @@
+{
+  "input": "id,k,s,text\n0,a,0,\"é,\"\"quoted\"\"\"\n1,a\u0000,1,\"line\nline\"\n2,a\u0000b,2,plain\n3,a,3,\"é,\"\"quoted\"\"\"\n4,a\u0000,4,\"line\nline\"\n5,a\u0000b,5,plain\n6,a,6,\"é,\"\"quoted\"\"\"\n7,a\u0000,0,\"line\nline\"\n8,a\u0000b,1,plain\n9,a,2,\"é,\"\"quoted\"\"\"\n10,a\u0000,3,\"line\nline\"\n11,a\u0000b,4,plain\n12,a,5,\"é,\"\"quoted\"\"\"\n13,a\u0000,6,\"line\nline\"\n14,a\u0000b,0,plain\n15,a,1,\"é,\"\"quoted\"\"\"\n16,a\u0000,2,\"line\nline\"\n17,a\u0000b,3,plain\n18,a,4,\"é,\"\"quoted\"\"\"\n19,a\u0000,5,\"line\nline\"\n20,a\u0000b,6,plain\n21,a,0,\"é,\"\"quoted\"\"\"\n22,a\u0000,1,\"line\nline\"\n23,a\u0000b,2,plain\n24,a,3,\"é,\"\"quoted\"\"\"\n25,a\u0000,4,\"line\nline\"\n26,a\u0000b,5,plain\n27,a,6,\"é,\"\"quoted\"\"\"\n28,a\u0000,0,\"line\nline\"\n29,a\u0000b,1,plain\n30,a,2,\"é,\"\"quoted\"\"\"\n31,a\u0000,3,\"line\nline\"\n32,a\u0000b,4,plain\n33,a,5,\"é,\"\"quoted\"\"\"\n34,a\u0000,6,\"line\nline\"\n35,a\u0000b,0,plain\n36,a,1,\"é,\"\"quoted\"\"\"\n37,a\u0000,2,\"line\nline\"\n38,a\u0000b,3,plain\n39,a,4,\"é,\"\"quoted\"\"\"\n40,a\u0000,5,\"line\nline\"\n41,a\u0000b,6,plain\n42,a,0,\"é,\"\"quoted\"\"\"\n43,a\u0000,1,\"line\nline\"\n44,a\u0000b,2,plain\n45,a,3,\"é,\"\"quoted\"\"\"\n46,a\u0000,4,\"line\nline\"\n47,a\u0000b,5,plain\n48,a,6,\"é,\"\"quoted\"\"\"\n49,a\u0000,0,\"line\nline\"\n50,a\u0000b,1,plain\n51,a,2,\"é,\"\"quoted\"\"\"\n52,a\u0000,3,\"line\nline\"\n53,a\u0000b,4,plain\n54,a,5,\"é,\"\"quoted\"\"\"\n55,a\u0000,6,\"line\nline\"\n56,a\u0000b,0,plain\n57,a,1,\"é,\"\"quoted\"\"\"\n58,a\u0000,2,\"line\nline\"\n59,a\u0000b,3,plain\n60,a,4,\"é,\"\"quoted\"\"\"\n61,a\u0000,5,\"line\nline\"\n62,a\u0000b,6,plain\n63,a,0,\"é,\"\"quoted\"\"\"\n64,a\u0000,1,\"line\nline\"\n65,a\u0000b,2,plain\n66,a,3,\"é,\"\"quoted\"\"\"\n67,a\u0000,4,\"line\nline\"\n68,a\u0000b,5,plain\n69,a,6,\"é,\"\"quoted\"\"\"\n70,a\u0000,0,\"line\nline\"\n71,a\u0000b,1,plain\n72,a,2,\"é,\"\"quoted\"\"\"\n73,a\u0000,3,\"line\nline\"\n74,a\u0000b,4,plain\n75,a,5,\"é,\"\"quoted\"\"\"\n76,a\u0000,6,\"line\nline\"\n77,a\u0000b,0,plain\n78,a,1,\"é,\"\"quoted\"\"\"\n79,a\u0000,2,\"line\nline\"\n80,a\u0000b,3,plain\n81,a,4,\"é,\"\"quoted\"\"\"\n82,a\u0000,5,\"line\nline\"\n83,a\u0000b,6,plain\n84,a,0,\"é,\"\"quoted\"\"\"\n85,a\u0000,1,\"line\nline\"\n86,a\u0000b,2,plain\n87,a,3,\"é,\"\"quoted\"\"\"\n88,a\u0000,4,\"line\nline\"\n89,a\u0000b,5,plain\n90,a,6,\"é,\"\"quoted\"\"\"\n91,a\u0000,0,\"line\nline\"\n92,a\u0000b,1,plain\n93,a,2,\"é,\"\"quoted\"\"\"\n94,a\u0000,3,\"line\nline\"\n95,a\u0000b,4,plain\n96,a,5,\"é,\"\"quoted\"\"\"\n",
+  "seed": "fusion-regression",
+  "cases": [
+    {
+      "operations": [],
+      "stages": [],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 1881,
+          "lineage": [],
+          "path": "part-00000001.csv",
+          "rows": 97,
+          "type": "output",
+          "contents": "id,k,s,text\n0,a,0,\"é,\"\"quoted\"\"\"\n1,a\u0000,1,\"line\nline\"\n2,a\u0000b,2,plain\n3,a,3,\"é,\"\"quoted\"\"\"\n4,a\u0000,4,\"line\nline\"\n5,a\u0000b,5,plain\n6,a,6,\"é,\"\"quoted\"\"\"\n7,a\u0000,0,\"line\nline\"\n8,a\u0000b,1,plain\n9,a,2,\"é,\"\"quoted\"\"\"\n10,a\u0000,3,\"line\nline\"\n11,a\u0000b,4,plain\n12,a,5,\"é,\"\"quoted\"\"\"\n13,a\u0000,6,\"line\nline\"\n14,a\u0000b,0,plain\n15,a,1,\"é,\"\"quoted\"\"\"\n16,a\u0000,2,\"line\nline\"\n17,a\u0000b,3,plain\n18,a,4,\"é,\"\"quoted\"\"\"\n19,a\u0000,5,\"line\nline\"\n20,a\u0000b,6,plain\n21,a,0,\"é,\"\"quoted\"\"\"\n22,a\u0000,1,\"line\nline\"\n23,a\u0000b,2,plain\n24,a,3,\"é,\"\"quoted\"\"\"\n25,a\u0000,4,\"line\nline\"\n26,a\u0000b,5,plain\n27,a,6,\"é,\"\"quoted\"\"\"\n28,a\u0000,0,\"line\nline\"\n29,a\u0000b,1,plain\n30,a,2,\"é,\"\"quoted\"\"\"\n31,a\u0000,3,\"line\nline\"\n32,a\u0000b,4,plain\n33,a,5,\"é,\"\"quoted\"\"\"\n34,a\u0000,6,\"line\nline\"\n35,a\u0000b,0,plain\n36,a,1,\"é,\"\"quoted\"\"\"\n37,a\u0000,2,\"line\nline\"\n38,a\u0000b,3,plain\n39,a,4,\"é,\"\"quoted\"\"\"\n40,a\u0000,5,\"line\nline\"\n41,a\u0000b,6,plain\n42,a,0,\"é,\"\"quoted\"\"\"\n43,a\u0000,1,\"line\nline\"\n44,a\u0000b,2,plain\n45,a,3,\"é,\"\"quoted\"\"\"\n46,a\u0000,4,\"line\nline\"\n47,a\u0000b,5,plain\n48,a,6,\"é,\"\"quoted\"\"\"\n49,a\u0000,0,\"line\nline\"\n50,a\u0000b,1,plain\n51,a,2,\"é,\"\"quoted\"\"\"\n52,a\u0000,3,\"line\nline\"\n53,a\u0000b,4,plain\n54,a,5,\"é,\"\"quoted\"\"\"\n55,a\u0000,6,\"line\nline\"\n56,a\u0000b,0,plain\n57,a,1,\"é,\"\"quoted\"\"\"\n58,a\u0000,2,\"line\nline\"\n59,a\u0000b,3,plain\n60,a,4,\"é,\"\"quoted\"\"\"\n61,a\u0000,5,\"line\nline\"\n62,a\u0000b,6,plain\n63,a,0,\"é,\"\"quoted\"\"\"\n64,a\u0000,1,\"line\nline\"\n65,a\u0000b,2,plain\n66,a,3,\"é,\"\"quoted\"\"\"\n67,a\u0000,4,\"line\nline\"\n68,a\u0000b,5,plain\n69,a,6,\"é,\"\"quoted\"\"\"\n70,a\u0000,0,\"line\nline\"\n71,a\u0000b,1,plain\n72,a,2,\"é,\"\"quoted\"\"\"\n73,a\u0000,3,\"line\nline\"\n74,a\u0000b,4,plain\n75,a,5,\"é,\"\"quoted\"\"\"\n76,a\u0000,6,\"line\nline\"\n77,a\u0000b,0,plain\n78,a,1,\"é,\"\"quoted\"\"\"\n79,a\u0000,2,\"line\nline\"\n80,a\u0000b,3,plain\n81,a,4,\"é,\"\"quoted\"\"\"\n82,a\u0000,5,\"line\nline\"\n83,a\u0000b,6,plain\n84,a,0,\"é,\"\"quoted\"\"\"\n85,a\u0000,1,\"line\nline\"\n86,a\u0000b,2,plain\n87,a,3,\"é,\"\"quoted\"\"\"\n88,a\u0000,4,\"line\nline\"\n89,a\u0000b,5,plain\n90,a,6,\"é,\"\"quoted\"\"\"\n91,a\u0000,0,\"line\nline\"\n92,a\u0000b,1,plain\n93,a,2,\"é,\"\"quoted\"\"\"\n94,a\u0000,3,\"line\nline\"\n95,a\u0000b,4,plain\n96,a,5,\"é,\"\"quoted\"\"\"\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "balanced",
+          "files": 2
+        },
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 2,
+          "smallest_group": 48,
+          "largest_group": 49,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 2,
+          "output_groups": 6,
+          "smallest_group": 16,
+          "largest_group": 17,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 6,
+          "output_groups": 6,
+          "smallest_group": 16,
+          "largest_group": 17,
+          "empty_groups": 0
+        },
+        {
+          "operation": 4,
+          "input_groups": 6,
+          "output_groups": 12,
+          "smallest_group": 8,
+          "largest_group": 9,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 218,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a-split-1-part-00000001.csv",
+          "rows": 9,
+          "type": "output",
+          "contents": "id,k,s,text\n18,a,4,\"é,\"\"quoted\"\"\"\n21,a,0,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n15,a,1,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n30,a,2,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 193,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a-split-2-part-00000002.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n0,a,0,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n9,a,2,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 171,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a_-split-1-part-00000003.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n1,a\u0000,1,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n25,a\u0000,4,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n31,a\u0000,3,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 170,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a_-split-2-part-00000004.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n37,a\u0000,2,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n4,a\u0000,4,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n10,a\u0000,3,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n7,a\u0000,0,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 132,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a_b-split-1-part-00000005.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n47,a\u0000b,5,plain\n41,a\u0000b,6,plain\n14,a\u0000b,0,plain\n17,a\u0000b,3,plain\n32,a\u0000b,4,plain\n44,a\u0000b,2,plain\n26,a\u0000b,5,plain\n11,a\u0000b,4,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 129,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a_b-split-2-part-00000006.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n8,a\u0000b,1,plain\n20,a\u0000b,6,plain\n29,a\u0000b,1,plain\n5,a\u0000b,5,plain\n2,a\u0000b,2,plain\n35,a\u0000b,0,plain\n23,a\u0000b,2,plain\n38,a\u0000b,3,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 196,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a-split-1-part-00000007.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n78,a,1,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n75,a,5,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n87,a,3,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 196,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a-split-2-part-00000008.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n96,a,5,\"é,\"\"quoted\"\"\"\n60,a,4,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n57,a,1,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 172,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a_-split-1-part-00000009.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n91,a\u0000,0,\"line\nline\"\n85,a\u0000,1,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 172,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a_-split-2-part-00000010.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n70,a\u0000,0,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n94,a\u0000,3,\"line\nline\"\n73,a\u0000,3,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 132,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a_b-split-1-part-00000011.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n68,a\u0000b,5,plain\n83,a\u0000b,6,plain\n50,a\u0000b,1,plain\n95,a\u0000b,4,plain\n86,a\u0000b,2,plain\n65,a\u0000b,2,plain\n89,a\u0000b,5,plain\n53,a\u0000b,4,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 132,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a_b-split-2-part-00000012.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n92,a\u0000b,1,plain\n59,a\u0000b,3,plain\n56,a\u0000b,0,plain\n62,a\u0000b,6,plain\n71,a\u0000b,1,plain\n74,a\u0000b,4,plain\n80,a\u0000b,3,plain\n77,a\u0000b,0,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        },
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        },
+        {
+          "type": "assign",
+          "groups": [
+            {
+              "name": "t",
+              "percent": "70"
+            },
+            {
+              "name": "c",
+              "percent": "30"
+            }
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 97,
+          "largest_group": 97,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 1,
+          "output_groups": 2,
+          "smallest_group": 48,
+          "largest_group": 49,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 2,
+          "output_groups": 6,
+          "smallest_group": 12,
+          "largest_group": 20,
+          "empty_groups": 0
+        },
+        {
+          "operation": 4,
+          "input_groups": 6,
+          "output_groups": 12,
+          "smallest_group": 4,
+          "largest_group": 14,
+          "empty_groups": 0
+        },
+        {
+          "operation": 5,
+          "input_groups": 12,
+          "output_groups": 12,
+          "smallest_group": 4,
+          "largest_group": 14,
+          "empty_groups": 0
+        },
+        {
+          "operation": 6,
+          "input_groups": 12,
+          "output_groups": 24,
+          "smallest_group": 2,
+          "largest_group": 7,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 150,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a-allocation-t-split-1-part-00000001.csv",
+          "rows": 6,
+          "type": "output",
+          "contents": "id,k,s,text\n48,a,6,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n75,a,5,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 127,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a-allocation-t-split-2-part-00000002.csv",
+          "rows": 5,
+          "type": "output",
+          "contents": "id,k,s,text\n21,a,0,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 58,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a-allocation-c-split-1-part-00000003.csv",
+          "rows": 2,
+          "type": "output",
+          "contents": "id,k,s,text\n63,a,0,\"é,\"\"quoted\"\"\"\n60,a,4,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 57,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a-allocation-c-split-2-part-00000004.csv",
+          "rows": 2,
+          "type": "output",
+          "contents": "id,k,s,text\n0,a,0,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 111,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a_-allocation-t-split-1-part-00000005.csv",
+          "rows": 5,
+          "type": "output",
+          "contents": "id,k,s,text\n76,a\u0000,6,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n10,a\u0000,3,\"line\nline\"\n1,a\u0000,1,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 111,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a_-allocation-t-split-2-part-00000006.csv",
+          "rows": 5,
+          "type": "output",
+          "contents": "id,k,s,text\n7,a\u0000,0,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n73,a\u0000,3,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 52,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a_-allocation-c-split-1-part-00000007.csv",
+          "rows": 2,
+          "type": "output",
+          "contents": "id,k,s,text\n49,a\u0000,0,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 52,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a_-allocation-c-split-2-part-00000008.csv",
+          "rows": 2,
+          "type": "output",
+          "contents": "id,k,s,text\n94,a\u0000,3,\"line\nline\"\n31,a\u0000,3,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 116,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a_b-allocation-t-split-1-part-00000009.csv",
+          "rows": 7,
+          "type": "output",
+          "contents": "id,k,s,text\n83,a\u0000b,6,plain\n23,a\u0000b,2,plain\n89,a\u0000b,5,plain\n2,a\u0000b,2,plain\n53,a\u0000b,4,plain\n86,a\u0000b,2,plain\n80,a\u0000b,3,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 116,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a_b-allocation-t-split-2-part-00000010.csv",
+          "rows": 7,
+          "type": "output",
+          "contents": "id,k,s,text\n20,a\u0000b,6,plain\n5,a\u0000b,5,plain\n65,a\u0000b,2,plain\n95,a\u0000b,4,plain\n56,a\u0000b,0,plain\n32,a\u0000b,4,plain\n11,a\u0000b,4,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 57,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a_b-allocation-c-split-1-part-00000011.csv",
+          "rows": 3,
+          "type": "output",
+          "contents": "id,k,s,text\n38,a\u0000b,3,plain\n14,a\u0000b,0,plain\n17,a\u0000b,3,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 57,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a_b-allocation-c-split-2-part-00000012.csv",
+          "rows": 3,
+          "type": "output",
+          "contents": "id,k,s,text\n47,a\u0000b,5,plain\n59,a\u0000b,3,plain\n62,a\u0000b,6,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 173,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a-allocation-t-split-1-part-00000013.csv",
+          "rows": 7,
+          "type": "output",
+          "contents": "id,k,s,text\n87,a,3,\"é,\"\"quoted\"\"\"\n78,a,1,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n15,a,1,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 148,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a-allocation-t-split-2-part-00000014.csv",
+          "rows": 6,
+          "type": "output",
+          "contents": "id,k,s,text\n96,a,5,\"é,\"\"quoted\"\"\"\n9,a,2,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n30,a,2,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 81,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a-allocation-c-split-1-part-00000015.csv",
+          "rows": 3,
+          "type": "output",
+          "contents": "id,k,s,text\n57,a,1,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 57,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a-allocation-c-split-2-part-00000016.csv",
+          "rows": 2,
+          "type": "output",
+          "contents": "id,k,s,text\n3,a,3,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 151,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a_-allocation-t-split-1-part-00000017.csv",
+          "rows": 7,
+          "type": "output",
+          "contents": "id,k,s,text\n4,a\u0000,4,\"line\nline\"\n85,a\u0000,1,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 132,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a_-allocation-t-split-2-part-00000018.csv",
+          "rows": 6,
+          "type": "output",
+          "contents": "id,k,s,text\n37,a\u0000,2,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n25,a\u0000,4,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 72,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a_-allocation-c-split-1-part-00000019.csv",
+          "rows": 3,
+          "type": "output",
+          "contents": "id,k,s,text\n70,a\u0000,0,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 52,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a_-allocation-c-split-2-part-00000020.csv",
+          "rows": 2,
+          "type": "output",
+          "contents": "id,k,s,text\n28,a\u0000,0,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 71,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a_b-allocation-t-split-1-part-00000021.csv",
+          "rows": 4,
+          "type": "output",
+          "contents": "id,k,s,text\n8,a\u0000b,1,plain\n26,a\u0000b,5,plain\n74,a\u0000b,4,plain\n77,a\u0000b,0,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 72,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a_b-allocation-t-split-2-part-00000022.csv",
+          "rows": 4,
+          "type": "output",
+          "contents": "id,k,s,text\n44,a\u0000b,2,plain\n71,a\u0000b,1,plain\n92,a\u0000b,1,plain\n68,a\u0000b,5,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 42,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a_b-allocation-c-split-1-part-00000023.csv",
+          "rows": 2,
+          "type": "output",
+          "contents": "id,k,s,text\n35,a\u0000b,0,plain\n41,a\u0000b,6,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 42,
+          "lineage": [
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 3
+            },
+            {
+              "operation": 5,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a_b-allocation-c-split-2-part-00000024.csv",
+          "rows": 2,
+          "type": "output",
+          "contents": "id,k,s,text\n29,a\u0000b,1,plain\n50,a\u0000b,1,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 3,
+          "smallest_group": 32,
+          "largest_group": 33,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 3,
+          "output_groups": 3,
+          "smallest_group": 32,
+          "largest_group": 33,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 3,
+          "output_groups": 6,
+          "smallest_group": 16,
+          "largest_group": 17,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 400,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "k-a-split-1-part-00000001.csv",
+          "rows": 17,
+          "type": "output",
+          "contents": "id,k,s,text\n60,a,4,\"é,\"\"quoted\"\"\"\n0,a,0,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n57,a,1,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n21,a,0,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n9,a,2,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n96,a,5,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n87,a,3,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 379,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "k-a-split-2-part-00000002.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n78,a,1,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n30,a,2,\"é,\"\"quoted\"\"\"\n15,a,1,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n75,a,5,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 330,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "k-a_-split-1-part-00000003.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n4,a\u0000,4,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n10,a\u0000,3,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n7,a\u0000,0,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n37,a\u0000,2,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 331,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "k-a_-split-2-part-00000004.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n1,a\u0000,1,\"line\nline\"\n70,a\u0000,0,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n25,a\u0000,4,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n73,a\u0000,3,\"line\nline\"\n31,a\u0000,3,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n94,a\u0000,3,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n85,a\u0000,1,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 251,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "k-a_b-split-1-part-00000005.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n23,a\u0000b,2,plain\n68,a\u0000b,5,plain\n95,a\u0000b,4,plain\n35,a\u0000b,0,plain\n77,a\u0000b,0,plain\n32,a\u0000b,4,plain\n56,a\u0000b,0,plain\n80,a\u0000b,3,plain\n29,a\u0000b,1,plain\n8,a\u0000b,1,plain\n65,a\u0000b,2,plain\n14,a\u0000b,0,plain\n44,a\u0000b,2,plain\n53,a\u0000b,4,plain\n20,a\u0000b,6,plain\n86,a\u0000b,2,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 250,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "k-a_b-split-2-part-00000006.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n11,a\u0000b,4,plain\n71,a\u0000b,1,plain\n89,a\u0000b,5,plain\n47,a\u0000b,5,plain\n59,a\u0000b,3,plain\n41,a\u0000b,6,plain\n74,a\u0000b,4,plain\n50,a\u0000b,1,plain\n2,a\u0000b,2,plain\n5,a\u0000b,5,plain\n26,a\u0000b,5,plain\n92,a\u0000b,1,plain\n83,a\u0000b,6,plain\n17,a\u0000b,3,plain\n38,a\u0000b,3,plain\n62,a\u0000b,6,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "assign",
+          "groups": [
+            {
+              "name": "t",
+              "percent": "70"
+            },
+            {
+              "name": "c",
+              "percent": "30"
+            }
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 2,
+          "smallest_group": 29,
+          "largest_group": 68,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 2,
+          "output_groups": 2,
+          "smallest_group": 29,
+          "largest_group": 68,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 2,
+          "output_groups": 4,
+          "smallest_group": 14,
+          "largest_group": 34,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 682,
+          "lineage": [
+            {
+              "allocation": "t",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "allocation-t-split-1-part-00000001.csv",
+          "rows": 34,
+          "type": "output",
+          "contents": "id,k,s,text\n33,a,5,\"é,\"\"quoted\"\"\"\n86,a\u0000b,2,plain\n90,a,6,\"é,\"\"quoted\"\"\"\n76,a\u0000,6,\"line\nline\"\n4,a\u0000,4,\"line\nline\"\n42,a,0,\"é,\"\"quoted\"\"\"\n53,a\u0000b,4,plain\n93,a,2,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n13,a\u0000,6,\"line\nline\"\n59,a\u0000b,3,plain\n34,a\u0000,6,\"line\nline\"\n2,a\u0000b,2,plain\n92,a\u0000b,1,plain\n3,a,3,\"é,\"\"quoted\"\"\"\n31,a\u0000,3,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n39,a,4,\"é,\"\"quoted\"\"\"\n80,a\u0000b,3,plain\n71,a\u0000b,1,plain\n79,a\u0000,2,\"line\nline\"\n57,a,1,\"é,\"\"quoted\"\"\"\n64,a\u0000,1,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n65,a\u0000b,2,plain\n54,a,5,\"é,\"\"quoted\"\"\"\n0,a,0,\"é,\"\"quoted\"\"\"\n49,a\u0000,0,\"line\nline\"\n87,a,3,\"é,\"\"quoted\"\"\"\n82,a\u0000,5,\"line\nline\"\n75,a,5,\"é,\"\"quoted\"\"\"\n78,a,1,\"é,\"\"quoted\"\"\"\n41,a\u0000b,6,plain\n70,a\u0000,0,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 639,
+          "lineage": [
+            {
+              "allocation": "t",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "allocation-t-split-2-part-00000002.csv",
+          "rows": 34,
+          "type": "output",
+          "contents": "id,k,s,text\n51,a,2,\"é,\"\"quoted\"\"\"\n1,a\u0000,1,\"line\nline\"\n9,a,2,\"é,\"\"quoted\"\"\"\n16,a\u0000,2,\"line\nline\"\n5,a\u0000b,5,plain\n89,a\u0000b,5,plain\n32,a\u0000b,4,plain\n83,a\u0000b,6,plain\n11,a\u0000b,4,plain\n91,a\u0000,0,\"line\nline\"\n62,a\u0000b,6,plain\n74,a\u0000b,4,plain\n23,a\u0000b,2,plain\n40,a\u0000,5,\"line\nline\"\n37,a\u0000,2,\"line\nline\"\n21,a,0,\"é,\"\"quoted\"\"\"\n73,a\u0000,3,\"line\nline\"\n56,a\u0000b,0,plain\n12,a,5,\"é,\"\"quoted\"\"\"\n61,a\u0000,5,\"line\nline\"\n81,a,4,\"é,\"\"quoted\"\"\"\n95,a\u0000b,4,plain\n6,a,6,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n47,a\u0000b,5,plain\n50,a\u0000b,1,plain\n77,a\u0000b,0,plain\n46,a\u0000,4,\"line\nline\"\n29,a\u0000b,1,plain\n63,a,0,\"é,\"\"quoted\"\"\"\n38,a\u0000b,3,plain\n7,a\u0000,0,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n69,a,6,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 313,
+          "lineage": [
+            {
+              "allocation": "c",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "allocation-c-split-1-part-00000003.csv",
+          "rows": 15,
+          "type": "output",
+          "contents": "id,k,s,text\n48,a,6,\"é,\"\"quoted\"\"\"\n60,a,4,\"é,\"\"quoted\"\"\"\n20,a\u0000b,6,plain\n36,a,1,\"é,\"\"quoted\"\"\"\n44,a\u0000b,2,plain\n85,a\u0000,1,\"line\nline\"\n94,a\u0000,3,\"line\nline\"\n24,a,3,\"é,\"\"quoted\"\"\"\n52,a\u0000,3,\"line\nline\"\n68,a\u0000b,5,plain\n17,a\u0000b,3,plain\n72,a,2,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n67,a\u0000,4,\"line\nline\"\n30,a,2,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 283,
+          "lineage": [
+            {
+              "allocation": "c",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "allocation-c-split-2-part-00000004.csv",
+          "rows": 14,
+          "type": "output",
+          "contents": "id,k,s,text\n96,a,5,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n55,a\u0000,6,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n26,a\u0000b,5,plain\n19,a\u0000,5,\"line\nline\"\n8,a\u0000b,1,plain\n15,a,1,\"é,\"\"quoted\"\"\"\n43,a\u0000,1,\"line\nline\"\n14,a\u0000b,0,plain\n10,a\u0000,3,\"line\nline\"\n27,a,6,\"é,\"\"quoted\"\"\"\n25,a\u0000,4,\"line\nline\"\n35,a\u0000b,0,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "assign",
+          "groups": [
+            {
+              "name": "t",
+              "percent": "70"
+            },
+            {
+              "name": "c",
+              "percent": "30"
+            }
+          ],
+          "strata": [
+            "s"
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 2,
+          "smallest_group": 28,
+          "largest_group": 69,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 2,
+          "output_groups": 2,
+          "smallest_group": 28,
+          "largest_group": 69,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 2,
+          "output_groups": 4,
+          "smallest_group": 14,
+          "largest_group": 35,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 687,
+          "lineage": [
+            {
+              "allocation": "t",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "allocation-t-split-1-part-00000001.csv",
+          "rows": 35,
+          "type": "output",
+          "contents": "id,k,s,text\n26,a\u0000b,5,plain\n33,a,5,\"é,\"\"quoted\"\"\"\n86,a\u0000b,2,plain\n90,a,6,\"é,\"\"quoted\"\"\"\n76,a\u0000,6,\"line\nline\"\n68,a\u0000b,5,plain\n18,a,4,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n53,a\u0000b,4,plain\n93,a,2,\"é,\"\"quoted\"\"\"\n94,a\u0000,3,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n59,a\u0000b,3,plain\n34,a\u0000,6,\"line\nline\"\n2,a\u0000b,2,plain\n92,a\u0000b,1,plain\n3,a,3,\"é,\"\"quoted\"\"\"\n31,a\u0000,3,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n71,a\u0000b,1,plain\n79,a\u0000,2,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n57,a,1,\"é,\"\"quoted\"\"\"\n64,a\u0000,1,\"line\nline\"\n17,a\u0000b,3,plain\n58,a\u0000,2,\"line\nline\"\n20,a\u0000b,6,plain\n65,a\u0000b,2,plain\n54,a,5,\"é,\"\"quoted\"\"\"\n0,a,0,\"é,\"\"quoted\"\"\"\n49,a\u0000,0,\"line\nline\"\n87,a,3,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n10,a\u0000,3,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 648,
+          "lineage": [
+            {
+              "allocation": "t",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "allocation-t-split-2-part-00000002.csv",
+          "rows": 34,
+          "type": "output",
+          "contents": "id,k,s,text\n14,a\u0000b,0,plain\n78,a,1,\"é,\"\"quoted\"\"\"\n41,a\u0000b,6,plain\n70,a\u0000,0,\"line\nline\"\n51,a,2,\"é,\"\"quoted\"\"\"\n1,a\u0000,1,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n5,a\u0000b,5,plain\n25,a\u0000,4,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n89,a\u0000b,5,plain\n32,a\u0000b,4,plain\n83,a\u0000b,6,plain\n11,a\u0000b,4,plain\n35,a\u0000b,0,plain\n62,a\u0000b,6,plain\n74,a\u0000b,4,plain\n23,a\u0000b,2,plain\n37,a\u0000,2,\"line\nline\"\n15,a,1,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n61,a\u0000,5,\"line\nline\"\n81,a,4,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n46,a\u0000,4,\"line\nline\"\n29,a\u0000b,1,plain\n63,a,0,\"é,\"\"quoted\"\"\"\n38,a\u0000b,3,plain\n28,a\u0000,0,\"line\nline\"\n7,a\u0000,0,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n85,a\u0000,1,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 299,
+          "lineage": [
+            {
+              "allocation": "c",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "allocation-c-split-1-part-00000003.csv",
+          "rows": 14,
+          "type": "output",
+          "contents": "id,k,s,text\n60,a,4,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n44,a\u0000b,2,plain\n9,a,2,\"é,\"\"quoted\"\"\"\n4,a\u0000,4,\"line\nline\"\n72,a,2,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n91,a\u0000,0,\"line\nline\"\n95,a\u0000b,4,plain\n30,a,2,\"é,\"\"quoted\"\"\"\n96,a,5,\"é,\"\"quoted\"\"\"\n55,a\u0000,6,\"line\nline\"\n47,a\u0000b,5,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 283,
+          "lineage": [
+            {
+              "allocation": "c",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "allocation-c-split-2-part-00000004.csv",
+          "rows": 14,
+          "type": "output",
+          "contents": "id,k,s,text\n77,a\u0000b,0,plain\n21,a,0,\"é,\"\"quoted\"\"\"\n50,a\u0000b,1,plain\n56,a\u0000b,0,plain\n66,a,3,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n8,a\u0000b,1,plain\n73,a\u0000,3,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n27,a,6,\"é,\"\"quoted\"\"\"\n40,a\u0000,5,\"line\nline\"\n75,a,5,\"é,\"\"quoted\"\"\"\n80,a\u0000b,3,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 97,
+          "largest_group": 97,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 97,
+          "largest_group": 97,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 1,
+          "output_groups": 2,
+          "smallest_group": 48,
+          "largest_group": 49,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 947,
+          "lineage": [
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "split-1-part-00000001.csv",
+          "rows": 49,
+          "type": "output",
+          "contents": "id,k,s,text\n65,a\u0000b,2,plain\n72,a,2,\"é,\"\"quoted\"\"\"\n59,a\u0000b,3,plain\n32,a\u0000b,4,plain\n15,a,1,\"é,\"\"quoted\"\"\"\n92,a\u0000b,1,plain\n57,a,1,\"é,\"\"quoted\"\"\"\n96,a,5,\"é,\"\"quoted\"\"\"\n2,a\u0000b,2,plain\n13,a\u0000,6,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n31,a\u0000,3,\"line\nline\"\n18,a,4,\"é,\"\"quoted\"\"\"\n61,a\u0000,5,\"line\nline\"\n87,a,3,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n47,a\u0000b,5,plain\n82,a\u0000,5,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n24,a,3,\"é,\"\"quoted\"\"\"\n86,a\u0000b,2,plain\n44,a\u0000b,2,plain\n94,a\u0000,3,\"line\nline\"\n29,a\u0000b,1,plain\n8,a\u0000b,1,plain\n71,a\u0000b,1,plain\n7,a\u0000,0,\"line\nline\"\n0,a,0,\"é,\"\"quoted\"\"\"\n41,a\u0000b,6,plain\n9,a,2,\"é,\"\"quoted\"\"\"\n64,a\u0000,1,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n26,a\u0000b,5,plain\n3,a,3,\"é,\"\"quoted\"\"\"\n85,a\u0000,1,\"line\nline\"\n20,a\u0000b,6,plain\n1,a\u0000,1,\"line\nline\"\n93,a,2,\"é,\"\"quoted\"\"\"\n10,a\u0000,3,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n14,a\u0000b,0,plain\n83,a\u0000b,6,plain\n36,a,1,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 946,
+          "lineage": [
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "split-2-part-00000002.csv",
+          "rows": 48,
+          "type": "output",
+          "contents": "id,k,s,text\n45,a,3,\"é,\"\"quoted\"\"\"\n16,a\u0000,2,\"line\nline\"\n69,a,6,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n68,a\u0000b,5,plain\n91,a\u0000,0,\"line\nline\"\n77,a\u0000b,0,plain\n48,a,6,\"é,\"\"quoted\"\"\"\n58,a\u0000,2,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n37,a\u0000,2,\"line\nline\"\n66,a,3,\"é,\"\"quoted\"\"\"\n25,a\u0000,4,\"line\nline\"\n60,a,4,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n21,a,0,\"é,\"\"quoted\"\"\"\n11,a\u0000b,4,plain\n56,a\u0000b,0,plain\n78,a,1,\"é,\"\"quoted\"\"\"\n73,a\u0000,3,\"line\nline\"\n4,a\u0000,4,\"line\nline\"\n81,a,4,\"é,\"\"quoted\"\"\"\n70,a\u0000,0,\"line\nline\"\n62,a\u0000b,6,plain\n30,a,2,\"é,\"\"quoted\"\"\"\n17,a\u0000b,3,plain\n75,a,5,\"é,\"\"quoted\"\"\"\n80,a\u0000b,3,plain\n54,a,5,\"é,\"\"quoted\"\"\"\n38,a\u0000b,3,plain\n39,a,4,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n53,a\u0000b,4,plain\n23,a\u0000b,2,plain\n74,a\u0000b,4,plain\n12,a,5,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n88,a\u0000,4,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n95,a\u0000b,4,plain\n50,a\u0000b,1,plain\n89,a\u0000b,5,plain\n35,a\u0000b,0,plain\n79,a\u0000,2,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n5,a\u0000b,5,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 3,
+          "smallest_group": 32,
+          "largest_group": 33,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 3,
+          "output_groups": 3,
+          "smallest_group": 32,
+          "largest_group": 33,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 3,
+          "output_groups": 3,
+          "smallest_group": 32,
+          "largest_group": 33,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 767,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            }
+          ],
+          "path": "k-a-part-00000001.csv",
+          "rows": 33,
+          "type": "output",
+          "contents": "id,k,s,text\n96,a,5,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n0,a,0,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n87,a,3,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n30,a,2,\"é,\"\"quoted\"\"\"\n21,a,0,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n60,a,4,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n15,a,1,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n75,a,5,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n78,a,1,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n9,a,2,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n57,a,1,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 649,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            }
+          ],
+          "path": "k-a_-part-00000002.csv",
+          "rows": 32,
+          "type": "output",
+          "contents": "id,k,s,text\n76,a\u0000,6,\"line\nline\"\n85,a\u0000,1,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n37,a\u0000,2,\"line\nline\"\n10,a\u0000,3,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n73,a\u0000,3,\"line\nline\"\n7,a\u0000,0,\"line\nline\"\n70,a\u0000,0,\"line\nline\"\n4,a\u0000,4,\"line\nline\"\n25,a\u0000,4,\"line\nline\"\n1,a\u0000,1,\"line\nline\"\n31,a\u0000,3,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n94,a\u0000,3,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 489,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            }
+          ],
+          "path": "k-a_b-part-00000003.csv",
+          "rows": 32,
+          "type": "output",
+          "contents": "id,k,s,text\n77,a\u0000b,0,plain\n35,a\u0000b,0,plain\n50,a\u0000b,1,plain\n83,a\u0000b,6,plain\n80,a\u0000b,3,plain\n56,a\u0000b,0,plain\n20,a\u0000b,6,plain\n26,a\u0000b,5,plain\n86,a\u0000b,2,plain\n47,a\u0000b,5,plain\n23,a\u0000b,2,plain\n68,a\u0000b,5,plain\n95,a\u0000b,4,plain\n11,a\u0000b,4,plain\n59,a\u0000b,3,plain\n53,a\u0000b,4,plain\n38,a\u0000b,3,plain\n32,a\u0000b,4,plain\n44,a\u0000b,2,plain\n8,a\u0000b,1,plain\n62,a\u0000b,6,plain\n29,a\u0000b,1,plain\n17,a\u0000b,3,plain\n71,a\u0000b,1,plain\n41,a\u0000b,6,plain\n5,a\u0000b,5,plain\n14,a\u0000b,0,plain\n65,a\u0000b,2,plain\n92,a\u0000b,1,plain\n2,a\u0000b,2,plain\n89,a\u0000b,5,plain\n74,a\u0000b,4,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        },
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 3,
+          "smallest_group": 32,
+          "largest_group": 33,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 3,
+          "output_groups": 6,
+          "smallest_group": 16,
+          "largest_group": 17,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 6,
+          "output_groups": 6,
+          "smallest_group": 16,
+          "largest_group": 17,
+          "empty_groups": 0
+        },
+        {
+          "operation": 4,
+          "input_groups": 6,
+          "output_groups": 6,
+          "smallest_group": 16,
+          "largest_group": 17,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 399,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            }
+          ],
+          "path": "k-a-split-1-k-a-part-00000001.csv",
+          "rows": 17,
+          "type": "output",
+          "contents": "id,k,s,text\n9,a,2,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n30,a,2,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n0,a,0,\"é,\"\"quoted\"\"\"\n21,a,0,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n15,a,1,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 380,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            }
+          ],
+          "path": "k-a-split-2-k-a-part-00000002.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n69,a,6,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n60,a,4,\"é,\"\"quoted\"\"\"\n96,a,5,\"é,\"\"quoted\"\"\"\n78,a,1,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n75,a,5,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n87,a,3,\"é,\"\"quoted\"\"\"\n57,a,1,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 329,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            }
+          ],
+          "path": "k-a_-split-1-k-a_-part-00000003.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n31,a\u0000,3,\"line\nline\"\n1,a\u0000,1,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n4,a\u0000,4,\"line\nline\"\n25,a\u0000,4,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n7,a\u0000,0,\"line\nline\"\n10,a\u0000,3,\"line\nline\"\n37,a\u0000,2,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 332,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            }
+          ],
+          "path": "k-a_-split-2-k-a_-part-00000004.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n82,a\u0000,5,\"line\nline\"\n70,a\u0000,0,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n85,a\u0000,1,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n94,a\u0000,3,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n73,a\u0000,3,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 249,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            }
+          ],
+          "path": "k-a_b-split-1-k-a_b-part-00000005.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n14,a\u0000b,0,plain\n17,a\u0000b,3,plain\n32,a\u0000b,4,plain\n23,a\u0000b,2,plain\n41,a\u0000b,6,plain\n2,a\u0000b,2,plain\n26,a\u0000b,5,plain\n5,a\u0000b,5,plain\n38,a\u0000b,3,plain\n11,a\u0000b,4,plain\n44,a\u0000b,2,plain\n20,a\u0000b,6,plain\n29,a\u0000b,1,plain\n8,a\u0000b,1,plain\n47,a\u0000b,5,plain\n35,a\u0000b,0,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 252,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            }
+          ],
+          "path": "k-a_b-split-2-k-a_b-part-00000006.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n50,a\u0000b,1,plain\n89,a\u0000b,5,plain\n92,a\u0000b,1,plain\n59,a\u0000b,3,plain\n77,a\u0000b,0,plain\n80,a\u0000b,3,plain\n62,a\u0000b,6,plain\n86,a\u0000b,2,plain\n71,a\u0000b,1,plain\n68,a\u0000b,5,plain\n83,a\u0000b,6,plain\n95,a\u0000b,4,plain\n74,a\u0000b,4,plain\n56,a\u0000b,0,plain\n53,a\u0000b,4,plain\n65,a\u0000b,2,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "shuffle",
+          "strategy": "buffer",
+          "buffer_rows": 3
+        },
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        },
+        {
+          "type": "assign",
+          "groups": [
+            {
+              "name": "t",
+              "percent": "70"
+            },
+            {
+              "name": "c",
+              "percent": "30"
+            }
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 1,
+          "smallest_group": 97,
+          "largest_group": 97,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 1,
+          "output_groups": 3,
+          "smallest_group": 32,
+          "largest_group": 33,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 3,
+          "output_groups": 6,
+          "smallest_group": 10,
+          "largest_group": 23,
+          "empty_groups": 0
+        },
+        {
+          "operation": 4,
+          "input_groups": 6,
+          "output_groups": 6,
+          "smallest_group": 10,
+          "largest_group": 23,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 538,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 2
+            }
+          ],
+          "path": "k-a-allocation-t-part-00000001.csv",
+          "rows": 23,
+          "type": "output",
+          "contents": "id,k,s,text\n0,a,0,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n78,a,1,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n30,a,2,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n57,a,1,\"é,\"\"quoted\"\"\"\n9,a,2,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n15,a,1,\"é,\"\"quoted\"\"\"\n60,a,4,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n75,a,5,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 241,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 2
+            }
+          ],
+          "path": "k-a-allocation-c-part-00000002.csv",
+          "rows": 10,
+          "type": "output",
+          "contents": "id,k,s,text\n21,a,0,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n87,a,3,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n96,a,5,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 450,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 2
+            }
+          ],
+          "path": "k-a_-allocation-t-part-00000003.csv",
+          "rows": 22,
+          "type": "output",
+          "contents": "id,k,s,text\n37,a\u0000,2,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n31,a\u0000,3,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n73,a\u0000,3,\"line\nline\"\n7,a\u0000,0,\"line\nline\"\n85,a\u0000,1,\"line\nline\"\n1,a\u0000,1,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n94,a\u0000,3,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n10,a\u0000,3,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 211,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 2
+            }
+          ],
+          "path": "k-a_-allocation-c-part-00000004.csv",
+          "rows": 10,
+          "type": "output",
+          "contents": "id,k,s,text\n88,a\u0000,4,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n4,a\u0000,4,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n25,a\u0000,4,\"line\nline\"\n70,a\u0000,0,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 341,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 2
+            }
+          ],
+          "path": "k-a_b-allocation-t-part-00000005.csv",
+          "rows": 22,
+          "type": "output",
+          "contents": "id,k,s,text\n68,a\u0000b,5,plain\n26,a\u0000b,5,plain\n44,a\u0000b,2,plain\n86,a\u0000b,2,plain\n47,a\u0000b,5,plain\n50,a\u0000b,1,plain\n95,a\u0000b,4,plain\n92,a\u0000b,1,plain\n71,a\u0000b,1,plain\n2,a\u0000b,2,plain\n83,a\u0000b,6,plain\n23,a\u0000b,2,plain\n35,a\u0000b,0,plain\n41,a\u0000b,6,plain\n56,a\u0000b,0,plain\n89,a\u0000b,5,plain\n20,a\u0000b,6,plain\n53,a\u0000b,4,plain\n14,a\u0000b,0,plain\n17,a\u0000b,3,plain\n77,a\u0000b,0,plain\n32,a\u0000b,4,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 160,
+          "lineage": [
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 2
+            }
+          ],
+          "path": "k-a_b-allocation-c-part-00000006.csv",
+          "rows": 10,
+          "type": "output",
+          "contents": "id,k,s,text\n29,a\u0000b,1,plain\n5,a\u0000b,5,plain\n11,a\u0000b,4,plain\n74,a\u0000b,4,plain\n80,a\u0000b,3,plain\n38,a\u0000b,3,plain\n65,a\u0000b,2,plain\n62,a\u0000b,6,plain\n59,a\u0000b,3,plain\n8,a\u0000b,1,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "balanced",
+          "files": 2
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        },
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 2,
+          "smallest_group": 48,
+          "largest_group": 49,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 2,
+          "output_groups": 4,
+          "smallest_group": 24,
+          "largest_group": 25,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 4,
+          "output_groups": 12,
+          "smallest_group": 8,
+          "largest_group": 9,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 215,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            }
+          ],
+          "path": "split-1-split-1-k-a-part-00000001.csv",
+          "rows": 9,
+          "type": "output",
+          "contents": "id,k,s,text\n0,a,0,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n9,a,2,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n15,a,1,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n21,a,0,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 169,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            }
+          ],
+          "path": "split-1-split-1-k-a_-part-00000002.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n1,a\u0000,1,\"line\nline\"\n4,a\u0000,4,\"line\nline\"\n7,a\u0000,0,\"line\nline\"\n10,a\u0000,3,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 129,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            }
+          ],
+          "path": "split-1-split-1-k-a_b-part-00000003.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n2,a\u0000b,2,plain\n5,a\u0000b,5,plain\n8,a\u0000b,1,plain\n11,a\u0000b,4,plain\n14,a\u0000b,0,plain\n17,a\u0000b,3,plain\n20,a\u0000b,6,plain\n23,a\u0000b,2,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 196,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            }
+          ],
+          "path": "split-1-split-2-k-a-part-00000004.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n27,a,6,\"é,\"\"quoted\"\"\"\n30,a,2,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 172,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            }
+          ],
+          "path": "split-1-split-2-k-a_-part-00000005.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n25,a\u0000,4,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n31,a\u0000,3,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n37,a\u0000,2,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 132,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            }
+          ],
+          "path": "split-1-split-2-k-a_b-part-00000006.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n26,a\u0000b,5,plain\n29,a\u0000b,1,plain\n32,a\u0000b,4,plain\n35,a\u0000b,0,plain\n38,a\u0000b,3,plain\n41,a\u0000b,6,plain\n44,a\u0000b,2,plain\n47,a\u0000b,5,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 196,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            }
+          ],
+          "path": "split-2-split-1-k-a-part-00000007.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n51,a,2,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n57,a,1,\"é,\"\"quoted\"\"\"\n60,a,4,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 172,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            }
+          ],
+          "path": "split-2-split-1-k-a_-part-00000008.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n49,a\u0000,0,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n70,a\u0000,0,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 132,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "part": 1
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            }
+          ],
+          "path": "split-2-split-1-k-a_b-part-00000009.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n50,a\u0000b,1,plain\n53,a\u0000b,4,plain\n56,a\u0000b,0,plain\n59,a\u0000b,3,plain\n62,a\u0000b,6,plain\n65,a\u0000b,2,plain\n68,a\u0000b,5,plain\n71,a\u0000b,1,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 196,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            }
+          ],
+          "path": "split-2-split-2-k-a-part-00000010.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n75,a,5,\"é,\"\"quoted\"\"\"\n78,a,1,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n87,a,3,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n96,a,5,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 172,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            }
+          ],
+          "path": "split-2-split-2-k-a_-part-00000011.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n73,a\u0000,3,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n85,a\u0000,1,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n94,a\u0000,3,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 132,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "part": 2
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            }
+          ],
+          "path": "split-2-split-2-k-a_b-part-00000012.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n74,a\u0000b,4,plain\n77,a\u0000b,0,plain\n80,a\u0000b,3,plain\n83,a\u0000b,6,plain\n86,a\u0000b,2,plain\n89,a\u0000b,5,plain\n92,a\u0000b,1,plain\n95,a\u0000b,4,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "assign",
+          "groups": [
+            {
+              "name": "t",
+              "percent": "70"
+            },
+            {
+              "name": "c",
+              "percent": "30"
+            }
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "buffer",
+          "buffer_rows": 3
+        },
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 2,
+          "smallest_group": 29,
+          "largest_group": 68,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 2,
+          "output_groups": 2,
+          "smallest_group": 29,
+          "largest_group": 68,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 2,
+          "output_groups": 6,
+          "smallest_group": 8,
+          "largest_group": 24,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 514,
+          "lineage": [
+            {
+              "allocation": "t",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            }
+          ],
+          "path": "allocation-t-k-a-part-00000001.csv",
+          "rows": 22,
+          "type": "output",
+          "contents": "id,k,s,text\n0,a,0,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n9,a,2,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n21,a,0,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n57,a,1,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n75,a,5,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n78,a,1,\"é,\"\"quoted\"\"\"\n87,a,3,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 449,
+          "lineage": [
+            {
+              "allocation": "t",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            }
+          ],
+          "path": "allocation-t-k-a_-part-00000002.csv",
+          "rows": 22,
+          "type": "output",
+          "contents": "id,k,s,text\n1,a\u0000,1,\"line\nline\"\n4,a\u0000,4,\"line\nline\"\n7,a\u0000,0,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n37,a\u0000,2,\"line\nline\"\n31,a\u0000,3,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n70,a\u0000,0,\"line\nline\"\n73,a\u0000,3,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 370,
+          "lineage": [
+            {
+              "allocation": "t",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            }
+          ],
+          "path": "allocation-t-k-a_b-part-00000003.csv",
+          "rows": 24,
+          "type": "output",
+          "contents": "id,k,s,text\n2,a\u0000b,2,plain\n5,a\u0000b,5,plain\n11,a\u0000b,4,plain\n29,a\u0000b,1,plain\n23,a\u0000b,2,plain\n32,a\u0000b,4,plain\n38,a\u0000b,3,plain\n41,a\u0000b,6,plain\n47,a\u0000b,5,plain\n53,a\u0000b,4,plain\n50,a\u0000b,1,plain\n59,a\u0000b,3,plain\n56,a\u0000b,0,plain\n62,a\u0000b,6,plain\n65,a\u0000b,2,plain\n71,a\u0000b,1,plain\n74,a\u0000b,4,plain\n77,a\u0000b,0,plain\n80,a\u0000b,3,plain\n83,a\u0000b,6,plain\n89,a\u0000b,5,plain\n92,a\u0000b,1,plain\n95,a\u0000b,4,plain\n86,a\u0000b,2,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 265,
+          "lineage": [
+            {
+              "allocation": "c",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a"
+              ]
+            }
+          ],
+          "path": "allocation-c-k-a-part-00000004.csv",
+          "rows": 11,
+          "type": "output",
+          "contents": "id,k,s,text\n15,a,1,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n30,a,2,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n60,a,4,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n96,a,5,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 212,
+          "lineage": [
+            {
+              "allocation": "c",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000"
+              ]
+            }
+          ],
+          "path": "allocation-c-k-a_-part-00000005.csv",
+          "rows": 10,
+          "type": "output",
+          "contents": "id,k,s,text\n10,a\u0000,3,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n25,a\u0000,4,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n85,a\u0000,1,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n94,a\u0000,3,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 131,
+          "lineage": [
+            {
+              "allocation": "c",
+              "operation": 0
+            },
+            {
+              "operation": 2,
+              "values": [
+                "a\u0000b"
+              ]
+            }
+          ],
+          "path": "allocation-c-k-a_b-part-00000006.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n14,a\u0000b,0,plain\n17,a\u0000b,3,plain\n20,a\u0000b,6,plain\n8,a\u0000b,1,plain\n26,a\u0000b,5,plain\n44,a\u0000b,2,plain\n35,a\u0000b,0,plain\n68,a\u0000b,5,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        },
+        {
+          "type": "assign",
+          "groups": [
+            {
+              "name": "t",
+              "percent": "70"
+            },
+            {
+              "name": "c",
+              "percent": "30"
+            }
+          ],
+          "strata": [
+            "s"
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 3,
+          "smallest_group": 32,
+          "largest_group": 33,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 3,
+          "output_groups": 6,
+          "smallest_group": 7,
+          "largest_group": 26,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 6,
+          "output_groups": 6,
+          "smallest_group": 7,
+          "largest_group": 26,
+          "empty_groups": 0
+        },
+        {
+          "operation": 4,
+          "input_groups": 6,
+          "output_groups": 12,
+          "smallest_group": 3,
+          "largest_group": 13,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 310,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "k-a-allocation-t-split-1-part-00000001.csv",
+          "rows": 13,
+          "type": "output",
+          "contents": "id,k,s,text\n48,a,6,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n75,a,5,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n87,a,3,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n78,a,1,\"é,\"\"quoted\"\"\"\n57,a,1,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n9,a,2,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 310,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "k-a-allocation-t-split-2-part-00000002.csv",
+          "rows": 13,
+          "type": "output",
+          "contents": "id,k,s,text\n30,a,2,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n21,a,0,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n60,a,4,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 102,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "k-a-allocation-c-split-1-part-00000003.csv",
+          "rows": 4,
+          "type": "output",
+          "contents": "id,k,s,text\n96,a,5,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n0,a,0,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 81,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "k-a-allocation-c-split-2-part-00000004.csv",
+          "rows": 3,
+          "type": "output",
+          "contents": "id,k,s,text\n93,a,2,\"é,\"\"quoted\"\"\"\n15,a,1,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 271,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "k-a_-allocation-t-split-1-part-00000005.csv",
+          "rows": 13,
+          "type": "output",
+          "contents": "id,k,s,text\n7,a\u0000,0,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n94,a\u0000,3,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n73,a\u0000,3,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 250,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "k-a_-allocation-t-split-2-part-00000006.csv",
+          "rows": 12,
+          "type": "output",
+          "contents": "id,k,s,text\n10,a\u0000,3,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n4,a\u0000,4,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n25,a\u0000,4,\"line\nline\"\n1,a\u0000,1,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n37,a\u0000,2,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 92,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "k-a_-allocation-c-split-1-part-00000007.csv",
+          "rows": 4,
+          "type": "output",
+          "contents": "id,k,s,text\n31,a\u0000,3,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n70,a\u0000,0,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 72,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "k-a_-allocation-c-split-2-part-00000008.csv",
+          "rows": 3,
+          "type": "output",
+          "contents": "id,k,s,text\n85,a\u0000,1,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 207,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "k-a_b-allocation-t-split-1-part-00000009.csv",
+          "rows": 13,
+          "type": "output",
+          "contents": "id,k,s,text\n92,a\u0000b,1,plain\n26,a\u0000b,5,plain\n89,a\u0000b,5,plain\n29,a\u0000b,1,plain\n71,a\u0000b,1,plain\n83,a\u0000b,6,plain\n32,a\u0000b,4,plain\n41,a\u0000b,6,plain\n17,a\u0000b,3,plain\n23,a\u0000b,2,plain\n80,a\u0000b,3,plain\n20,a\u0000b,6,plain\n14,a\u0000b,0,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 190,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "t",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "k-a_b-allocation-t-split-2-part-00000010.csv",
+          "rows": 12,
+          "type": "output",
+          "contents": "id,k,s,text\n56,a\u0000b,0,plain\n77,a\u0000b,0,plain\n74,a\u0000b,4,plain\n5,a\u0000b,5,plain\n47,a\u0000b,5,plain\n86,a\u0000b,2,plain\n50,a\u0000b,1,plain\n38,a\u0000b,3,plain\n53,a\u0000b,4,plain\n2,a\u0000b,2,plain\n95,a\u0000b,4,plain\n44,a\u0000b,2,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 71,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 1
+            }
+          ],
+          "path": "k-a_b-allocation-c-split-1-part-00000011.csv",
+          "rows": 4,
+          "type": "output",
+          "contents": "id,k,s,text\n8,a\u0000b,1,plain\n35,a\u0000b,0,plain\n62,a\u0000b,6,plain\n68,a\u0000b,5,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 57,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "allocation": "c",
+              "operation": 1
+            },
+            {
+              "operation": 3,
+              "part": 2
+            }
+          ],
+          "path": "k-a_b-allocation-c-split-2-part-00000012.csv",
+          "rows": 3,
+          "type": "output",
+          "contents": "id,k,s,text\n59,a\u0000b,3,plain\n11,a\u0000b,4,plain\n65,a\u0000b,2,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "balanced",
+          "files": 2
+        },
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 2,
+          "smallest_group": 48,
+          "largest_group": 49,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 2,
+          "output_groups": 6,
+          "smallest_group": 16,
+          "largest_group": 17,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 6,
+          "output_groups": 6,
+          "smallest_group": 16,
+          "largest_group": 17,
+          "empty_groups": 0
+        },
+        {
+          "operation": 4,
+          "input_groups": 6,
+          "output_groups": 6,
+          "smallest_group": 16,
+          "largest_group": 17,
+          "empty_groups": 0
+        },
+        {
+          "operation": 5,
+          "input_groups": 6,
+          "output_groups": 12,
+          "smallest_group": 8,
+          "largest_group": 9,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 218,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a-split-1-part-00000001.csv",
+          "rows": 9,
+          "type": "output",
+          "contents": "id,k,s,text\n6,a,6,\"é,\"\"quoted\"\"\"\n30,a,2,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n21,a,0,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 193,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a-split-2-part-00000002.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n9,a,2,\"é,\"\"quoted\"\"\"\n15,a,1,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n0,a,0,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 170,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a_-split-1-part-00000003.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n4,a\u0000,4,\"line\nline\"\n37,a\u0000,2,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n7,a\u0000,0,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 171,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a_-split-2-part-00000004.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n43,a\u0000,1,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n10,a\u0000,3,\"line\nline\"\n31,a\u0000,3,\"line\nline\"\n25,a\u0000,4,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n1,a\u0000,1,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 130,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 1
+            }
+          ],
+          "path": "split-1-k-a_b-split-1-part-00000005.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n38,a\u0000b,3,plain\n23,a\u0000b,2,plain\n2,a\u0000b,2,plain\n44,a\u0000b,2,plain\n32,a\u0000b,4,plain\n14,a\u0000b,0,plain\n47,a\u0000b,5,plain\n8,a\u0000b,1,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 131,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 2
+            }
+          ],
+          "path": "split-1-k-a_b-split-2-part-00000006.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n17,a\u0000b,3,plain\n20,a\u0000b,6,plain\n29,a\u0000b,1,plain\n5,a\u0000b,5,plain\n35,a\u0000b,0,plain\n11,a\u0000b,4,plain\n41,a\u0000b,6,plain\n26,a\u0000b,5,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 196,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a-split-1-part-00000007.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n87,a,3,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n78,a,1,\"é,\"\"quoted\"\"\"\n60,a,4,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n57,a,1,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 196,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a-split-2-part-00000008.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n66,a,3,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n96,a,5,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n75,a,5,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 172,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a_-split-1-part-00000009.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n94,a\u0000,3,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n73,a\u0000,3,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 172,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a_-split-2-part-00000010.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n85,a\u0000,1,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n70,a\u0000,0,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 132,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 1
+            }
+          ],
+          "path": "split-2-k-a_b-split-1-part-00000011.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n86,a\u0000b,2,plain\n95,a\u0000b,4,plain\n83,a\u0000b,6,plain\n62,a\u0000b,6,plain\n56,a\u0000b,0,plain\n50,a\u0000b,1,plain\n68,a\u0000b,5,plain\n80,a\u0000b,3,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 132,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "operation": 1,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 4,
+              "part": 2
+            }
+          ],
+          "path": "split-2-k-a_b-split-2-part-00000012.csv",
+          "rows": 8,
+          "type": "output",
+          "contents": "id,k,s,text\n77,a\u0000b,0,plain\n74,a\u0000b,4,plain\n89,a\u0000b,5,plain\n59,a\u0000b,3,plain\n92,a\u0000b,1,plain\n71,a\u0000b,1,plain\n65,a\u0000b,2,plain\n53,a\u0000b,4,plain\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "balanced",
+          "files": 2
+        },
+        {
+          "type": "assign",
+          "groups": [
+            {
+              "name": "t",
+              "percent": "70"
+            },
+            {
+              "name": "c",
+              "percent": "30"
+            }
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        },
+        {
+          "type": "shuffle",
+          "strategy": "uniform"
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 2,
+          "smallest_group": 48,
+          "largest_group": 49,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 2,
+          "output_groups": 4,
+          "smallest_group": 14,
+          "largest_group": 34,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 4,
+          "output_groups": 4,
+          "smallest_group": 14,
+          "largest_group": 34,
+          "empty_groups": 0
+        },
+        {
+          "operation": 4,
+          "input_groups": 4,
+          "output_groups": 4,
+          "smallest_group": 14,
+          "largest_group": 34,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 677,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "allocation": "t",
+              "operation": 1
+            }
+          ],
+          "path": "split-1-allocation-t-part-00000001.csv",
+          "rows": 34,
+          "type": "output",
+          "contents": "id,k,s,text\n42,a,0,\"é,\"\"quoted\"\"\"\n29,a\u0000b,1,plain\n15,a,1,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n31,a\u0000,3,\"line\nline\"\n30,a,2,\"é,\"\"quoted\"\"\"\n11,a\u0000b,4,plain\n20,a\u0000b,6,plain\n2,a\u0000b,2,plain\n36,a,1,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n44,a\u0000b,2,plain\n7,a\u0000,0,\"line\nline\"\n33,a,5,\"é,\"\"quoted\"\"\"\n8,a\u0000b,1,plain\n16,a\u0000,2,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n6,a,6,\"é,\"\"quoted\"\"\"\n19,a\u0000,5,\"line\nline\"\n38,a\u0000b,3,plain\n40,a\u0000,5,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n0,a,0,\"é,\"\"quoted\"\"\"\n47,a\u0000b,5,plain\n28,a\u0000,0,\"line\nline\"\n39,a,4,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n32,a\u0000b,4,plain\n21,a,0,\"é,\"\"quoted\"\"\"\n43,a\u0000,1,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n23,a\u0000b,2,plain\n9,a,2,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 288,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 1
+            },
+            {
+              "allocation": "c",
+              "operation": 1
+            }
+          ],
+          "path": "split-1-allocation-c-part-00000002.csv",
+          "rows": 15,
+          "type": "output",
+          "contents": "id,k,s,text\n14,a\u0000b,0,plain\n24,a,3,\"é,\"\"quoted\"\"\"\n37,a\u0000,2,\"line\nline\"\n4,a\u0000,4,\"line\nline\"\n35,a\u0000b,0,plain\n46,a\u0000,4,\"line\nline\"\n18,a,4,\"é,\"\"quoted\"\"\"\n25,a\u0000,4,\"line\nline\"\n26,a\u0000b,5,plain\n27,a,6,\"é,\"\"quoted\"\"\"\n1,a\u0000,1,\"line\nline\"\n5,a\u0000b,5,plain\n10,a\u0000,3,\"line\nline\"\n41,a\u0000b,6,plain\n17,a\u0000b,3,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 661,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "allocation": "t",
+              "operation": 1
+            }
+          ],
+          "path": "split-2-allocation-t-part-00000003.csv",
+          "rows": 34,
+          "type": "output",
+          "contents": "id,k,s,text\n90,a,6,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n85,a\u0000,1,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n75,a,5,\"é,\"\"quoted\"\"\"\n78,a,1,\"é,\"\"quoted\"\"\"\n58,a\u0000,2,\"line\nline\"\n68,a\u0000b,5,plain\n94,a\u0000,3,\"line\nline\"\n80,a\u0000b,3,plain\n57,a,1,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n52,a\u0000,3,\"line\nline\"\n74,a\u0000b,4,plain\n82,a\u0000,5,\"line\nline\"\n95,a\u0000b,4,plain\n73,a\u0000,3,\"line\nline\"\n59,a\u0000b,3,plain\n88,a\u0000,4,\"line\nline\"\n77,a\u0000b,0,plain\n79,a\u0000,2,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n89,a\u0000b,5,plain\n84,a,0,\"é,\"\"quoted\"\"\"\n83,a\u0000b,6,plain\n96,a,5,\"é,\"\"quoted\"\"\"\n70,a\u0000,0,\"line\nline\"\n86,a\u0000b,2,plain\n67,a\u0000,4,\"line\nline\"\n65,a\u0000b,2,plain\n92,a\u0000b,1,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 291,
+          "lineage": [
+            {
+              "operation": 0,
+              "part": 2
+            },
+            {
+              "allocation": "c",
+              "operation": 1
+            }
+          ],
+          "path": "split-2-allocation-c-part-00000004.csv",
+          "rows": 14,
+          "type": "output",
+          "contents": "id,k,s,text\n66,a,3,\"é,\"\"quoted\"\"\"\n71,a\u0000b,1,plain\n72,a,2,\"é,\"\"quoted\"\"\"\n64,a\u0000,1,\"line\nline\"\n53,a\u0000b,4,plain\n60,a,4,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n56,a\u0000b,0,plain\n50,a\u0000b,1,plain\n62,a\u0000b,6,plain\n87,a,3,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n"
+        }
+      ]
+    },
+    {
+      "operations": [
+        {
+          "type": "partition",
+          "columns": [
+            "k"
+          ]
+        },
+        {
+          "type": "shuffle",
+          "strategy": "auto"
+        },
+        {
+          "type": "balanced",
+          "files": 2
+        }
+      ],
+      "stages": [
+        {
+          "operation": 1,
+          "input_groups": 1,
+          "output_groups": 3,
+          "smallest_group": 32,
+          "largest_group": 33,
+          "empty_groups": 0
+        },
+        {
+          "operation": 2,
+          "input_groups": 3,
+          "output_groups": 3,
+          "smallest_group": 32,
+          "largest_group": 33,
+          "empty_groups": 0
+        },
+        {
+          "operation": 3,
+          "input_groups": 3,
+          "output_groups": 6,
+          "smallest_group": 16,
+          "largest_group": 17,
+          "empty_groups": 0
+        }
+      ],
+      "outputs": [
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 400,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "k-a-split-1-part-00000001.csv",
+          "rows": 17,
+          "type": "output",
+          "contents": "id,k,s,text\n60,a,4,\"é,\"\"quoted\"\"\"\n0,a,0,\"é,\"\"quoted\"\"\"\n51,a,2,\"é,\"\"quoted\"\"\"\n57,a,1,\"é,\"\"quoted\"\"\"\n54,a,5,\"é,\"\"quoted\"\"\"\n39,a,4,\"é,\"\"quoted\"\"\"\n3,a,3,\"é,\"\"quoted\"\"\"\n21,a,0,\"é,\"\"quoted\"\"\"\n69,a,6,\"é,\"\"quoted\"\"\"\n36,a,1,\"é,\"\"quoted\"\"\"\n12,a,5,\"é,\"\"quoted\"\"\"\n9,a,2,\"é,\"\"quoted\"\"\"\n24,a,3,\"é,\"\"quoted\"\"\"\n96,a,5,\"é,\"\"quoted\"\"\"\n72,a,2,\"é,\"\"quoted\"\"\"\n87,a,3,\"é,\"\"quoted\"\"\"\n42,a,0,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 379,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "k-a-split-2-part-00000002.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n78,a,1,\"é,\"\"quoted\"\"\"\n90,a,6,\"é,\"\"quoted\"\"\"\n48,a,6,\"é,\"\"quoted\"\"\"\n33,a,5,\"é,\"\"quoted\"\"\"\n63,a,0,\"é,\"\"quoted\"\"\"\n93,a,2,\"é,\"\"quoted\"\"\"\n30,a,2,\"é,\"\"quoted\"\"\"\n15,a,1,\"é,\"\"quoted\"\"\"\n18,a,4,\"é,\"\"quoted\"\"\"\n81,a,4,\"é,\"\"quoted\"\"\"\n6,a,6,\"é,\"\"quoted\"\"\"\n75,a,5,\"é,\"\"quoted\"\"\"\n66,a,3,\"é,\"\"quoted\"\"\"\n84,a,0,\"é,\"\"quoted\"\"\"\n27,a,6,\"é,\"\"quoted\"\"\"\n45,a,3,\"é,\"\"quoted\"\"\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 330,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "k-a_-split-1-part-00000003.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n4,a\u0000,4,\"line\nline\"\n46,a\u0000,4,\"line\nline\"\n55,a\u0000,6,\"line\nline\"\n13,a\u0000,6,\"line\nline\"\n52,a\u0000,3,\"line\nline\"\n64,a\u0000,1,\"line\nline\"\n61,a\u0000,5,\"line\nline\"\n28,a\u0000,0,\"line\nline\"\n16,a\u0000,2,\"line\nline\"\n22,a\u0000,1,\"line\nline\"\n10,a\u0000,3,\"line\nline\"\n49,a\u0000,0,\"line\nline\"\n79,a\u0000,2,\"line\nline\"\n7,a\u0000,0,\"line\nline\"\n43,a\u0000,1,\"line\nline\"\n37,a\u0000,2,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 331,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "k-a_-split-2-part-00000004.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n1,a\u0000,1,\"line\nline\"\n70,a\u0000,0,\"line\nline\"\n58,a\u0000,2,\"line\nline\"\n91,a\u0000,0,\"line\nline\"\n25,a\u0000,4,\"line\nline\"\n40,a\u0000,5,\"line\nline\"\n73,a\u0000,3,\"line\nline\"\n31,a\u0000,3,\"line\nline\"\n82,a\u0000,5,\"line\nline\"\n34,a\u0000,6,\"line\nline\"\n76,a\u0000,6,\"line\nline\"\n19,a\u0000,5,\"line\nline\"\n94,a\u0000,3,\"line\nline\"\n88,a\u0000,4,\"line\nline\"\n67,a\u0000,4,\"line\nline\"\n85,a\u0000,1,\"line\nline\"\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 251,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 1
+            }
+          ],
+          "path": "k-a_b-split-1-part-00000005.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n23,a\u0000b,2,plain\n68,a\u0000b,5,plain\n95,a\u0000b,4,plain\n35,a\u0000b,0,plain\n77,a\u0000b,0,plain\n32,a\u0000b,4,plain\n56,a\u0000b,0,plain\n80,a\u0000b,3,plain\n29,a\u0000b,1,plain\n8,a\u0000b,1,plain\n65,a\u0000b,2,plain\n14,a\u0000b,0,plain\n44,a\u0000b,2,plain\n53,a\u0000b,4,plain\n20,a\u0000b,6,plain\n86,a\u0000b,2,plain\n"
+        },
+        {
+          "compressed_target_exceeded": false,
+          "csv_bytes": 250,
+          "lineage": [
+            {
+              "operation": 0,
+              "values": [
+                "a\u0000b"
+              ]
+            },
+            {
+              "operation": 2,
+              "part": 2
+            }
+          ],
+          "path": "k-a_b-split-2-part-00000006.csv",
+          "rows": 16,
+          "type": "output",
+          "contents": "id,k,s,text\n11,a\u0000b,4,plain\n71,a\u0000b,1,plain\n89,a\u0000b,5,plain\n47,a\u0000b,5,plain\n59,a\u0000b,3,plain\n41,a\u0000b,6,plain\n74,a\u0000b,4,plain\n50,a\u0000b,1,plain\n2,a\u0000b,2,plain\n5,a\u0000b,5,plain\n26,a\u0000b,5,plain\n92,a\u0000b,1,plain\n83,a\u0000b,6,plain\n17,a\u0000b,3,plain\n38,a\u0000b,3,plain\n62,a\u0000b,6,plain\n"
+        }
+      ]
+    }
+  ]
+}

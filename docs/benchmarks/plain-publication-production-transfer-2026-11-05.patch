@@ -1,0 +1,367 @@
+--- a/crates/chopper/src/output.rs
++++ b/crates/chopper/src/output.rs
+@@ -82,0 +83,40 @@
++#[cfg(test)]
++pub(crate) mod research_publication {
++    use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
++    static ENABLED: AtomicBool = AtomicBool::new(false);
++    static ACTIVE: AtomicUsize = AtomicUsize::new(0);
++    static PEAK: AtomicUsize = AtomicUsize::new(0);
++    pub fn set(enabled: bool) {
++        assert_eq!(ACTIVE.load(Ordering::Relaxed), 0);
++        PEAK.store(0, Ordering::Relaxed);
++        ENABLED.store(enabled, Ordering::Relaxed);
++    }
++    pub fn enabled() -> bool {
++        ENABLED.load(Ordering::Relaxed)
++    }
++    pub fn peak() -> usize {
++        PEAK.load(Ordering::Relaxed)
++    }
++    pub struct Active;
++    pub fn enter() -> Active {
++        let active = ACTIVE.fetch_add(1, Ordering::Relaxed) + 1;
++        PEAK.fetch_max(active, Ordering::Relaxed);
++        Active
++    }
++    impl Drop for Active {
++        fn drop(&mut self) {
++            ACTIVE.fetch_sub(1, Ordering::Relaxed);
++        }
++    }
++}
++fn research_parallel_publication() -> bool {
++    #[cfg(test)]
++    {
++        research_publication::enabled()
++    }
++    #[cfg(not(test))]
++    {
++        false
++    }
++}
++
+@@ -511,0 +552,2 @@
++    #[cfg(test)]
++    let _research_active = research_publication::enter();
+@@ -603 +645 @@
+-    let concurrency = if job.compression == Compression::None {
++    let concurrency = if job.compression == Compression::None && !research_parallel_publication() {
+@@ -1661,0 +1704,317 @@
++
++#[cfg(test)]
++mod research_transfer {
++    use super::*;
++    use crate::engine::{prepare_with_memory_pool, run_with_memory_pool, Analysis};
++    use chopper_core::{Allocation, Shuffle};
++    use std::{
++        collections::{BTreeMap, BTreeSet},
++        fs,
++        sync::{
++            atomic::{AtomicBool, Ordering},
++            Arc,
++        },
++    };
++    #[derive(Debug, PartialEq)]
++    struct Checked {
++        files: BTreeMap<String, Vec<u8>>,
++        logical: serde_json::Value,
++    }
++    fn payload(id: usize) -> String {
++        format!("note-{id}-{}", "x".repeat(24 + id % 97))
++    }
++    fn setup(n: usize) -> Result<(tempfile::TempDir, Job)> {
++        let dir = tempfile::tempdir()?;
++        let mut text = String::from("id,region,payload\n");
++        for id in 0..n {
++            text.push_str(&format!("{id},R{},{}\n", id % 4, payload(id)));
++        }
++        fs::write(dir.path().join("input.csv"), text)?;
++        fs::create_dir(dir.path().join("temp"))?;
++        let mut job = Job {
++            input: dir.path().join("input.csv").to_string_lossy().into(),
++            output: dir.path().join("output").to_string_lossy().into(),
++            seed: Some("prob-shuffle-fusion-v1".into()),
++            operations: vec![
++                Operation::Partition {
++                    columns: vec![Column::Index(1)],
++                },
++                Operation::AssignProbabilistic {
++                    groups: vec![
++                        Allocation {
++                            name: "treatment".into(),
++                            percent: "80".into(),
++                        },
++                        Allocation {
++                            name: "control".into(),
++                            percent: "20".into(),
++                        },
++                        Allocation {
++                            name: "empty".into(),
++                            percent: "0".into(),
++                        },
++                    ],
++                    strata: vec![],
++                },
++                Operation::Shuffle {
++                    strategy: Shuffle::Uniform,
++                },
++            ],
++            ..Default::default()
++        };
++        job.resources.memory_mb = 32.into();
++        job.resources.workers = 1;
++        job.resources.max_record_bytes = 1048576;
++        job.resources.temp_dir = Some(dir.path().join("temp").to_string_lossy().into());
++        job.limits.rows = Some(1024);
++        job.limits.bytes = Some(65536);
++        Ok((dir, job))
++    }
++    fn verify(dir: &std::path::Path, job: &Job, n: usize, a: &Analysis) -> Result<Checked> {
++        let mut files = BTreeMap::new();
++        let mut records = Vec::new();
++        let mut ids = BTreeSet::new();
++        for entry in fs::read_dir(&job.output)? {
++            let e = entry?;
++            let name = e.file_name().to_string_lossy().into_owned();
++            let bytes = fs::read(e.path())?;
++            if name.ends_with(".csv") {
++                assert!(bytes.len() <= 65536);
++                let text = std::str::from_utf8(&bytes)?;
++                let mut lines = text.lines();
++                assert_eq!(lines.next(), Some("id,region,payload"));
++                let mut count = 0;
++                for line in lines {
++                    let fields: Vec<_> = line.split(',').collect();
++                    assert_eq!(fields.len(), 3);
++                    let id = fields[0].parse::<usize>()?;
++                    assert!(id < n && ids.insert(id));
++                    assert_eq!(fields[1], format!("R{}", id % 4));
++                    assert_eq!(fields[2], payload(id));
++                    count += 1;
++                }
++                assert!(count <= 1024);
++                files.insert(name, bytes);
++            } else {
++                assert_eq!(name, "manifest.jsonl");
++                for line in bytes.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
++                    let v: serde_json::Value = serde_json::from_slice(line)?;
++                    if v["type"] == "output" {
++                        records.push(v);
++                    }
++                }
++            }
++        }
++        assert_eq!(ids, (0..n).collect());
++        assert_eq!(a.rows, n as u64);
++        assert_eq!(a.groups, if job.operations.is_empty() { 1 } else { 12 });
++        assert_eq!(files.len() as u64, a.output_files);
++        assert!(!fs::read_dir(dir)?.any(|e| e
++            .unwrap()
++            .file_name()
++            .to_string_lossy()
++            .starts_with(".chopper-staging-")));
++        let analysis = serde_json::to_value(a)?;
++        let logical: serde_json::Map<String, serde_json::Value> = [
++            "algorithm_version",
++            "column_values",
++            "seed",
++            "rows",
++            "columns",
++            "header",
++            "preview",
++            "logical_digest",
++            "groups",
++            "output_files",
++            "output_csv_bytes",
++            "largest_record_bytes",
++            "memory_budget_bytes",
++            "workers",
++            "stages",
++            "warnings",
++            "accuracy",
++        ]
++        .into_iter()
++        .map(|k| (k.into(), analysis[k].clone()))
++        .collect();
++        Ok(Checked {
++            files,
++            logical: serde_json::json!({"outputs":records,"analysis":logical}),
++        })
++    }
++    #[test]
++    fn plain_publication_production_transfer_safety() -> Result<()> {
++        for parallel in [false, true] {
++            crate::output::research_publication::set(parallel);
++            let (dir, mut job) = setup(2000)?;
++            job.operations.clear();
++            job.resources.memory_mb = 128.into();
++            job.resources.workers = 4;
++            let cancel = Arc::new(AtomicBool::new(false));
++            let set = cancel.clone();
++            let fired = Arc::new(AtomicBool::new(false));
++            let event = fired.clone();
++            let pool = Arc::new(crate::resources::MemoryPool::new(128 * 1024 * 1024));
++            let p = prepare_with_memory_pool(
++                job.clone(),
++                cancel,
++                Arc::new(move |p| {
++                    if p.phase == "Writing output" && p.rows > 0 {
++                        event.store(true, Ordering::Relaxed);
++                        set.store(true, Ordering::Relaxed);
++                    }
++                }),
++                pool.clone(),
++            )?;
++            assert_eq!(p.analysis.workers, 4);
++            let e = p.execute().expect_err("cancel after a collected chunk");
++            assert!(format!("{e:#}").contains("job cancelled"));
++            assert!(fired.load(Ordering::Relaxed));
++            assert!(!std::path::Path::new(&job.output).exists());
++            assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++            assert_eq!(fs::read_dir(dir.path())?.count(), 2);
++            assert_eq!(pool.usage().reserved_bytes, 0);
++            println!(
++                "PLAIN_PARALLEL_SAFETY {}",
++                serde_json::json!({"parallel":parallel,"case":"mid_publication_cancel","outcome":"cancelled","cleanup":true,"peak_active_chunks":crate::output::research_publication::peak()})
++            );
++        }
++        let mut reference = None;
++        for parallel in [false, true] {
++            crate::output::research_publication::set(parallel);
++            let (dir, mut job) = setup(2000)?;
++            job.operations.clear();
++            job.resources.memory_mb = 128.into();
++            job.resources.workers = 4;
++            let pool = Arc::new(crate::resources::MemoryPool::new(128 * 1024 * 1024));
++            let space = Arc::new(crate::storage::Workspace::shared(
++                128 * 1024 * 1024,
++                pool.clone(),
++            ));
++            let grant = Arc::new(std::sync::Mutex::new(Reservation::for_workspace(space)));
++            let g = grant.clone();
++            let shared = pool.clone();
++            let held = Arc::new(std::sync::atomic::AtomicU64::new(0));
++            let bytes = held.clone();
++            let result = prepare_with_memory_pool(
++                job.clone(),
++                Arc::new(AtomicBool::new(false)),
++                Arc::new(move |p| {
++                    if p.phase == "Ready for confirmation" {
++                        let amount = (128 * 1024 * 1024u64)
++                            .saturating_sub(shared.usage().reserved_bytes)
++                            .saturating_sub(200 * 1024);
++                        assert!(amount > 0);
++                        g.lock()
++                            .unwrap()
++                            .resize(usize::try_from(amount).unwrap())
++                            .unwrap();
++                        bytes.store(amount, Ordering::Relaxed);
++                    }
++                }),
++                pool.clone(),
++            )
++            .and_then(|p| {
++                let ctx = p.ctx.clone();
++                let a = p.execute()?;
++                let checked = verify(dir.path(), &job, 2000, &a)?;
++                if let Some(ref old) = reference {
++                    assert_eq!(&checked, old);
++                } else {
++                    reference = Some(checked);
++                }
++                drop(a);
++                drop(ctx);
++                Ok(())
++            });
++            let outcome = match result {
++                Ok(()) => "success_exact",
++                Err(e) => {
++                    assert!(
++                        matches!(
++                            e.downcast_ref::<crate::resources::MemoryAdmission>(),
++                            Some(crate::resources::MemoryAdmission::Shared { .. })
++                                | Some(crate::resources::MemoryAdmission::Local)
++                        ),
++                        "{e:#}"
++                    );
++                    assert!(!std::path::Path::new(&job.output).exists());
++                    "typed_memory_denial"
++                }
++            };
++            assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++            assert!(!fs::read_dir(dir.path())?.any(|e| e
++                .unwrap()
++                .file_name()
++                .to_string_lossy()
++                .starts_with(".chopper-staging-")));
++            assert_eq!(pool.usage().reserved_bytes, held.load(Ordering::Relaxed));
++            drop(grant);
++            assert_eq!(pool.usage().reserved_bytes, 0);
++            println!(
++                "PLAIN_PARALLEL_SAFETY {}",
++                serde_json::json!({"parallel":parallel,"case":"late_200KiB_free","outcome":outcome,"grant_bytes":held.load(Ordering::Relaxed),"cleanup":true,"peak_active_chunks":crate::output::research_publication::peak()})
++            );
++        }
++        crate::output::research_publication::set(false);
++        Ok(())
++    }
++    #[test]
++    fn plain_publication_production_transfer_panel() -> Result<()> {
++        let mut reference = None;
++        for (rep, (workers, parallel)) in [
++            (4, false),
++            (4, true),
++            (4, true),
++            (4, false),
++            (1, false),
++            (1, true),
++        ]
++        .into_iter()
++        .enumerate()
++        {
++            research_publication::set(parallel);
++            let (dir, mut job) = setup(200000)?;
++            job.resources.memory_mb = 128.into();
++            job.resources.workers = workers;
++            let input_hash = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++            let pool = Arc::new(crate::resources::MemoryPool::new(128 * 1024 * 1024));
++            let started = std::time::Instant::now();
++            let a = run_with_memory_pool(
++                job.clone(),
++                Arc::new(AtomicBool::new(false)),
++                Arc::new(|_| {}),
++                pool.clone(),
++            )?;
++            let seconds = started.elapsed().as_secs_f64();
++            assert_eq!(a.workers, workers);
++            let usage = pool.usage();
++            let prepublication_diagnostics = serde_json::to_value(&a.diagnostics)?;
++            let mut checked = verify(dir.path(), &job, 200000, &a)?;
++            assert_eq!(checked.logical["analysis"]["workers"], workers);
++            checked.logical["analysis"]
++                .as_object_mut()
++                .unwrap()
++                .remove("workers");
++            if let Some(ref old) = reference {
++                assert_eq!(&checked, old);
++            } else {
++                reference = Some(checked);
++            }
++            let peak = research_publication::peak();
++            assert!((1..=workers).contains(&peak));
++            if !parallel || workers == 1 {
++                assert_eq!(peak, 1);
++            }
++            drop(a);
++            assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++            assert_eq!(pool.usage().reserved_bytes, 0);
++            println!(
++                "PLAIN_PRODUCTION_TRANSFER {}",
++                serde_json::json!({"rep":rep,"parallel":parallel,"workers":workers,"memory_mb":128,"rows":200000,"input_blake3":input_hash,"seconds":seconds,"peak_active_chunks":peak,"whole_run_peak_reserved_bytes":usage.peak_reserved_bytes,"retained_analysis_reserved_bytes":usage.reserved_bytes,"prepublication_diagnostics":prepublication_diagnostics,"exact_output_verified":true,"resource_invariant_analysis_fields":16,"workers_verified_separately":true,"cleanup":true})
++            );
++        }
++        research_publication::set(false);
++        Ok(())
++    }
++}

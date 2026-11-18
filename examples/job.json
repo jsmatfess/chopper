@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "input": "examples/customers.csv",
+  "output": "chopped-customers",
+  "compression": "zip",
+  "operations": [
+    { "type": "partition", "columns": ["country"] },
+    { "type": "assign", "groups": [
+      { "name": "treatment", "percent": "80" },
+      { "name": "control", "percent": "20" }
+    ] }
+  ],
+  "limits": { "rows": 100000 }
+}

@@ -1,0 +1,372 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-15",
+  "decision": "Remove seeded-output policy and alternate runner; enable existing exact shuffle/partition fusion by default. Withhold blanket partition-first and resident Auto candidates.",
+  "runtimes": [
+    "native-linux (WSL)",
+    "wasi-bundled-chromium"
+  ],
+  "raw_storage": "Privately archived in the content-addressed bundle pinned by docs/benchmarks/shuffle-policy-archive-receipt-2026-11-15.json; remote readback and every member identity verified. Originals remain in local caches. No public raw publication occurred.",
+  "toolchains": {
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+    "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+    "node": "v22.23.4"
+  },
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/shuffle-policy-auto-fit-native-2026-11-15.jsonl",
+      "sha256": "89f9381a68361c894bbaf4bb636d03fc35c7e92d8268283fc0c1818dc38432b3",
+      "bytes": 68900,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-auto-spill-native-2026-11-15.jsonl",
+      "sha256": "c9101f76a175d705d2f1a4e1f18edd413dd3ead716e540ce5f463b9191c4d91c",
+      "bytes": 68973,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-browser-harness-stale-2026-11-15.jsonl",
+      "sha256": "a74465d78914b12b2b8f7d9490ca5fc555d94380d18a3b28abdd387145e2d7f9",
+      "bytes": 1556,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-forward-native-2026-11-15.jsonl",
+      "sha256": "1e8f571f86af1b72595d0d72ba43a4df6dcb6019493c19628fdcde8bfb1799a3",
+      "bytes": 112096,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-fusion-native-2026-11-15.jsonl",
+      "sha256": "df52794cdaa8d74d868081e58611cca37a2509a6530cb6d2fa8ee75242520e8d",
+      "bytes": 112111,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-production-browser-2026-11-15.jsonl",
+      "sha256": "b12041efac96ced22df6f5977f27b38bd0703bb3f257c413f989ce7845541c9f",
+      "bytes": 54443,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-production-native-2026-11-15.jsonl",
+      "sha256": "f732913761afdbec1e7b117e997e6faa826156da7cf239b6e22bc872f04594f2",
+      "bytes": 111862,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-removal-native-2026-11-15.jsonl",
+      "sha256": "a425ee02735b7967c922bbad2954246067ee14acf614a2947114ed6e5736f0c6",
+      "bytes": 112107,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-partition-first-engine-2026-11-15.rs",
+      "sha256": "1a7dcb36dabf4d371802f18f7380918d7da607da97c3060014da201b6a3b4e1b",
+      "bytes": 111009,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-partition-first-source-2026-11-15.patch",
+      "sha256": "f69f47dafb7928a196ff82ebb9a4974c2fa1ab091741ddc7717622aa948b57d7",
+      "bytes": 434567,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-baseline-source-2026-11-15.patch",
+      "sha256": "af5f0c7e0e226bea0aeb8f7d141f8579f68806d701472833e33095c0913359b8",
+      "bytes": 368611,
+      "status": "private archive; verified remote readback"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-policy-resident-candidate-2026-11-15.rs",
+      "sha256": "9ab81fe66ce2db11a91368794cb7caa233e8bda238cbd47fd68eb063178920b6",
+      "bytes": 819,
+      "status": "private archive; verified remote readback"
+    }
+  ],
+  "cells": [
+    {
+      "artifact": "shuffle-policy-auto-fit-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "single",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.016124283953104168,
+          "median": 0.014310247963294387,
+          "min": 0.014280544011853635
+        },
+        "candidate": {
+          "max": 0.01736554701346904,
+          "median": 0.01685574697330594,
+          "min": 0.016690086980815977
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-auto-spill-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "single",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.07112817099550739,
+          "median": 0.06545320397708565,
+          "min": 0.06411425600526854
+        },
+        "candidate": {
+          "max": 0.09940791002009064,
+          "median": 0.08758600597502664,
+          "min": 0.08547288301633671
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-forward-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "balanced",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.0862956449855119,
+          "median": 0.08319919602945447,
+          "min": 0.07984995702281594
+        },
+        "candidate": {
+          "max": 0.08886131102917716,
+          "median": 0.08548584399977699,
+          "min": 0.08542238600784913
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-forward-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "skewed",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.08091054100077599,
+          "median": 0.08047180302673951,
+          "min": 0.0786106510204263
+        },
+        "candidate": {
+          "max": 0.11216129397507757,
+          "median": 0.11055842402856797,
+          "min": 0.10988601000281051
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-forward-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "single",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.07549756503431126,
+          "median": 0.07462568499613553,
+          "min": 0.07434567401651293
+        },
+        "candidate": {
+          "max": 0.11698831099784002,
+          "median": 0.11011933302506804,
+          "min": 0.10678462398936972
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-fusion-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "balanced",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.1084285379620269,
+          "median": 0.10810729896184057,
+          "min": 0.1080096069490537
+        },
+        "candidate": {
+          "max": 0.08593862794805318,
+          "median": 0.08235644403612241,
+          "min": 0.0800932029960677
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-fusion-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "skewed",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.10540507698897272,
+          "median": 0.10481744102435187,
+          "min": 0.10154393204720691
+        },
+        "candidate": {
+          "max": 0.080059030035045,
+          "median": 0.0784713770262897,
+          "min": 0.07757051498629153
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-fusion-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "single",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.09995301504386589,
+          "median": 0.09912873699795455,
+          "min": 0.09746989101404324
+        },
+        "candidate": {
+          "max": 0.0758781970362179,
+          "median": 0.07545398495858535,
+          "min": 0.07485280401306227
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-production-browser-2026-11-15.jsonl",
+      "type": "summary",
+      "shape": "columns",
+      "case": "shuffle_partition",
+      "median_seconds": {
+        "native-baseline": 0.37643879700000016,
+        "native-candidate": 0.23437541299999998,
+        "browser-baseline": 1.49125,
+        "browser-candidate": 0.8897850000262261
+      },
+      "candidate_over_baseline": {
+        "native": 0.6226122675660338,
+        "browser": 0.5966705783914341
+      },
+      "range_seconds": {
+        "native-baseline": [
+          0.36631428200000027,
+          0.37657398199999986
+        ],
+        "native-candidate": [
+          0.23326528899999993,
+          0.2351239459999997
+        ],
+        "browser-baseline": [
+          1.4574350000023841,
+          1.4942749999761582
+        ],
+        "browser-candidate": [
+          0.8594049999713897,
+          0.9017450000047684
+        ]
+      },
+      "verified": true
+    },
+    {
+      "artifact": "shuffle-policy-production-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "balanced",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.47958932002075016,
+          "median": 0.4754508179612458,
+          "min": 0.47328484803438187
+        },
+        "candidate": {
+          "max": 0.35791094199521467,
+          "median": 0.35470131400506943,
+          "min": 0.3471357899834402
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-production-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "skewed",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.46165652404306456,
+          "median": 0.4563061439548619,
+          "min": 0.45145504403626546
+        },
+        "candidate": {
+          "max": 0.34181392402388155,
+          "median": 0.33917913801269606,
+          "min": 0.3387835099711083
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-production-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "single",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.45513466896954924,
+          "median": 0.4513875659904443,
+          "min": 0.4482265589758754
+        },
+        "candidate": {
+          "max": 0.3473275830037892,
+          "median": 0.34719332202803344,
+          "min": 0.3420140469679609
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-removal-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "balanced",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.11339819000568241,
+          "median": 0.10888508905190974,
+          "min": 0.10725012002512813
+        },
+        "candidate": {
+          "max": 0.10650862602051347,
+          "median": 0.10631800099508837,
+          "min": 0.10630631900858134
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-removal-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "skewed",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.1079961100476794,
+          "median": 0.10277417895849794,
+          "min": 0.10189787397393957
+        },
+        "candidate": {
+          "max": 0.13255190500058234,
+          "median": 0.13166719500441104,
+          "min": 0.12891084200236946
+        }
+      }
+    },
+    {
+      "artifact": "shuffle-policy-removal-native-2026-11-15.jsonl",
+      "kind": "summary",
+      "shape": "single",
+      "wall_seconds": {
+        "baseline": {
+          "max": 0.09985022194450721,
+          "median": 0.09917243797099218,
+          "min": 0.09754740801872686
+        },
+        "candidate": {
+          "max": 0.1327796099940315,
+          "median": 0.13112808903679252,
+          "min": 0.13057332305470482
+        }
+      }
+    }
+  ],
+  "limits": [
+    "Three warm repetitions per cell; uncontrolled cache/background state. No pooling or tail claims.",
+    "Native 250000-row fixtures exceed the 32-MiB job working budget; working allocation is not RSS.",
+    "Browser fixture: 100000 rows, 31 extra columns, prepare/confirm/export in persistent disposable Chromium context.",
+    "Initial browser harness attempt failed a stale allocation-ownership assertion and is excluded. Corrected harness sums all retained owners.",
+    "No native Windows/macOS, large scale or alternate browser qualification."
+  ],
+  "archive_receipt": "docs/benchmarks/shuffle-policy-archive-receipt-2026-11-15.json"
+}

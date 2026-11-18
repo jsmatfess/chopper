@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "aligned-digest-2026-11-05",
+  "title": "Keep aligned digest batches unpromoted",
+  "date": "2026-11-05",
+  "subsystem": "storage",
+  "question": "Does batching the identical logical digest stream into full16KiB updates meet the frozen whole-Run userCPU benefit rule?",
+  "disposition": "reject",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Restore production exactly: primary userCPU is worse in one pair and flat in the other, so the frozen conjunctive rule fails despite favorable elapsed/totalCPU medians.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "One million plain probe-v1 ordered rows, primaryABBA, fixed seed, four workers,32MiB job/shared limits.",
+      "Separate unreplicated partition/probabilistic allocation/shuffle transfer control."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Fresh exact measured-head Linux/native Windows workflows pass after current-main integration. Two fresh matched builds and all seven experiment steps/six complete jobs pass fields,IDs,groups,CSV/output/logicalAnalysis/caps/cleanup. Final delivery restores all engine/vendor/UI inputs to current main."
+  },
+  "limitations": [
+    "Primary n2/variant, widely overlapping elapsed ranges and one elapsed pair below1ms; uncontrolled cache/background and coarse CPU accounting preclude general or tail claims.",
+    "Lower totalCPU is kernel time; userCPU is worse/flat and the older WSL BLAKE3 profile does not attribute logical-digest cost.",
+    "No complete native physical-plan observation, new RSS, allocation or physicalIO measurement; configured recipe and pre-final diagnostics remain separately scoped."
+  ],
+  "exclusions": [
+    "Pipeline n1/variant transfer control and copied summaries are not primary observations and cannot rescue the failed rule.",
+    "Initial773/2cc Linux pass is historical after main integration. Failed native expected-head guards are retained, not passing validation.",
+    "No tuning/repeats/alternate buffer sizes/shape expansion; unused source-attempt capacity does not reopen this rejection."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#aligned-digest-batch-candidate-not-promoted-2026-11-05",
+      "sha256": "d3308d6e54d226eeb2afd2897fbc178a8749299f40b42c8ee152c1b06c17c578"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/aligned-digest-2026-11-05.json",
+      "sha256": "ddb3ea01e3b04229ab8c2f60b493c55db668ec8ea3395452694bb4b5b318b94c"
+    },
+    {
+      "path": "docs/benchmarks/aligned-digest-2026-11-05.patch",
+      "sha256": "9755a4992b5a1170196836c27b25492758c7ab5953d3d77420284dd64f3d4158"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

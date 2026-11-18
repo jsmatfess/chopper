@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "ascii-quote-detection-2026-11-05",
+  "title": "Use byte searches for ASCII CSV quote detection",
+  "date": "2026-11-05",
+  "subsystem": "output",
+  "question": "Can ASCII structural-byte searches reduce quote detection cost without changing Unicode behavior?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Use existing byte searches for ASCII delimiters/quotes and retain character matching for Unicode settings.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "Native ordered exports and allocation/shuffle pipelines with rich quoted fields and ordinary probe-v1 controls."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux"
+    ],
+    "summary": "Recorded eight-job comparison retains exact CSV output, independent field/group/cap verification, owner controls and fresh local workflow results."
+  },
+  "limitations": [
+    "Small development cells and uncontrolled cache/background state do not establish general device, shape or tail performance.",
+    "Historical percentage gains are not additive; every comparison uses its own pinned baseline.",
+    "Standalone predicate assembly justifies a hypothesis; it does not identify production inlined code or function-level CPU cost."
+  ],
+  "exclusions": [
+    "Compiler probes and prior quoted-span gains are not additional complete-Run observations."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#ascii-quote-detection-for-csv-output-2026-11-05",
+      "sha256": "fd05ad3f46c9827208fe660a09d81189d52c030d0fbcac0355c726e2e93010e4"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/ascii-quote-detection-2026-11-05.json",
+      "sha256": "30cd20f30cdaefa49c84a33d932bc1fd91b20a33609d68effd2fe456b5cf99c4"
+    },
+    {
+      "path": "docs/benchmarks/ascii-quote-detection-2026-11-05.patch",
+      "sha256": "8b4b5fc099ea73ad2f3754f2d69a99a90ac096bf4af314f14971e9e9f567c390"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

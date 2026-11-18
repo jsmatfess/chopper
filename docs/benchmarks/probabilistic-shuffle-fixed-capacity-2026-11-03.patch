@@ -1,0 +1,183 @@
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -224,0 +225,180 @@
++
++#[test]
++fn probabilistic_shuffle_fixed_shared_control() -> Result<()> {
++    let mut reference = None;
++    for candidate in [false, true] {
++        ENABLED.set(candidate);
++        let (dir, job) = setup(20000)?;
++        let input_hash = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++        let pool = Arc::new(crate::resources::MemoryPool::new(4 * 1024 * 1024));
++        let visits = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++        let seen = visits.clone();
++        let result = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(move |p| {
++                if p.phase == "Reading and validating CSV" && p.rows == 0 {
++                    seen.fetch_add(1, Ordering::Relaxed);
++                }
++            }),
++            pool.clone(),
++        )
++        .and_then(|p| {
++            let ctx = p.ctx.clone();
++            let a = p.execute()?;
++            let d = ctx.diagnostics();
++            let checked = verify(dir.path(), &job, 20000, &a)?;
++            if let Some(ref old) = reference {
++                assert_eq!(&checked, old);
++            } else {
++                reference = Some(checked);
++            }
++            drop(a);
++            drop(ctx);
++            Ok(d)
++        });
++        let (outcome, diagnostics) = match result {
++            Ok(d) => ("success_exact", d),
++            Err(e) => {
++                assert!(
++                    matches!(
++                        e.downcast_ref::<crate::resources::MemoryAdmission>(),
++                        Some(crate::resources::MemoryAdmission::Shared { .. })
++                            | Some(crate::resources::MemoryAdmission::Local)
++                    ),
++                    "{e:#}"
++                );
++                assert!(!std::path::Path::new(&job.output).exists());
++                (
++                    "typed_memory_denial",
++                    serde_json::json!({"error":format!("{e:#}")}),
++                )
++            }
++        };
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert!(!fs::read_dir(dir.path())?.any(|e| e
++            .unwrap()
++            .file_name()
++            .to_string_lossy()
++            .starts_with(".chopper-staging-")));
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        assert_eq!(visits.load(Ordering::Relaxed), 1);
++        println!(
++            "PROB_SHUFFLE_FIXED {}",
++            serde_json::json!({"candidate":candidate,"outcome":outcome,"diagnostics":diagnostics,"shared_pool_bytes":4*1024*1024,"input_blake3":input_hash,"input_visits":1,"cleanup":true})
++        );
++    }
++    ENABLED.set(false);
++    Ok(())
++}
++
++#[test]
++fn probabilistic_shuffle_external_sort_witness() -> Result<()> {
++    let mut reference = None;
++    for candidate in [false, true] {
++        ENABLED.set(candidate);
++        let (dir, job) = setup(20000)?;
++        let mut input = String::from("id,region,payload\n");
++        for id in 0..20000 {
++            input.push_str(&format!("{id},R0,{}\n", payload(id)));
++        }
++        fs::write(&job.input, input)?;
++        let input_hash = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++        let pool = Arc::new(crate::resources::MemoryPool::new(4 * 1024 * 1024));
++        let prepared = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let ctx = prepared.ctx.clone();
++        let a = prepared.execute()?;
++        let diagnostics = ctx.diagnostics();
++        assert_eq!(a.rows, 20000);
++        assert_eq!(a.groups, 3);
++        assert!(
++            diagnostics["sort_runs"].as_u64().unwrap() > 0,
++            "external sort must be observed"
++        );
++        let mut files = BTreeMap::new();
++        let mut records = Vec::new();
++        let mut ids = BTreeSet::new();
++        for entry in fs::read_dir(&job.output)? {
++            let entry = entry?;
++            let name = entry.file_name().to_string_lossy().into_owned();
++            let bytes = fs::read(entry.path())?;
++            if name.ends_with(".csv") {
++                assert!(bytes.len() <= 65536);
++                let text = std::str::from_utf8(&bytes)?;
++                let mut lines = text.lines();
++                assert_eq!(lines.next(), Some("id,region,payload"));
++                let mut rows = 0;
++                for line in lines {
++                    let fields: Vec<_> = line.split(',').collect();
++                    assert_eq!(fields.len(), 3);
++                    let id = fields[0].parse::<usize>()?;
++                    assert!(id < 20000 && ids.insert(id));
++                    assert_eq!(fields[1], "R0");
++                    assert_eq!(fields[2], payload(id));
++                    rows += 1;
++                }
++                assert!(rows <= 1024);
++                files.insert(name, bytes);
++            } else {
++                assert_eq!(name, "manifest.jsonl");
++                for line in bytes.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
++                    let v: serde_json::Value = serde_json::from_slice(line)?;
++                    if v["type"] == "output" {
++                        records.push(v);
++                    }
++                }
++            }
++        }
++        assert_eq!(ids, (0..20000).collect());
++        assert_eq!(files.len() as u64, a.output_files);
++        let logical = serde_json::to_value(&a)?;
++        let summary: serde_json::Map<String, serde_json::Value> = [
++            "algorithm_version",
++            "column_values",
++            "seed",
++            "rows",
++            "columns",
++            "header",
++            "preview",
++            "logical_digest",
++            "groups",
++            "output_files",
++            "output_csv_bytes",
++            "largest_record_bytes",
++            "memory_budget_bytes",
++            "workers",
++            "stages",
++            "warnings",
++            "accuracy",
++        ]
++        .into_iter()
++        .map(|k| (k.into(), logical[k].clone()))
++        .collect();
++        let comparison = serde_json::json!({"files":files,"outputs":records,"analysis":summary});
++        if let Some(ref old) = reference {
++            assert_eq!(&comparison, old);
++        } else {
++            reference = Some(comparison);
++        }
++        drop(a);
++        drop(ctx);
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert!(!fs::read_dir(dir.path())?.any(|e| e
++            .unwrap()
++            .file_name()
++            .to_string_lossy()
++            .starts_with(".chopper-staging-")));
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "PROB_SHUFFLE_SPILL {}",
++            serde_json::json!({"candidate":candidate,"outcome":"success_exact","diagnostics":diagnostics,"shared_pool_bytes":4*1024*1024,"input_blake3":input_hash,"cleanup":true})
++        );
++    }
++    ENABLED.set(false);
++    Ok(())
++}

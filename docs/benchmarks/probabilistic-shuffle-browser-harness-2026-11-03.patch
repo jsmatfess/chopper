@@ -1,0 +1,315 @@
+--- /dev/null
++++ b/browser-probe/scripts/run-terminal-workload.mjs
+@@ -0,0 +1,88 @@
++// Small persistent-browser baseline. Never mutates ui/dist or uses Prepare.
++import assert from 'node:assert/strict';
++import {createHash} from 'node:crypto';
++import {readFile,writeFile,mkdir,stat} from 'node:fs/promises';
++import http from 'node:http';
++import {resolve,join,basename} from 'node:path';
++import {fileURLToPath} from 'node:url';
++import {browserChannel,browserLaunchOptions} from './browser-launch.mjs';
++
++assert(process.argv.length===7,'Usage: node scripts/run-workload-browser.mjs JOB OUTPUT RECORD PROFILE BUILD_STATUS');
++const [jobPath,output,record,profile,buildStatus]=process.argv.slice(2).map(value=>resolve(value));
++const root=fileURLToPath(new URL('../',import.meta.url));
++const job=JSON.parse(await readFile(jobPath,'utf8'));
++assert((await stat(job.input)).size<=16*1024*1024,'Small baseline fixture exceeds 16 MiB');
++const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
++// Dependency/build errors remain explicit prerequisites, not silent substitutions.
++const {build}=await import('../ui/node_modules/esbuild/lib/main.js');
++const {chromium}=await import('../ui/node_modules/playwright/index.mjs');
++const assets=new Map();
++for(const name of ['engine.wasm','engine-worker.js','storage-worker.js'])
++  assets.set('/'+name,await readFile(join(root,'ui/dist',name)));
++const statusBytes=await readFile(buildStatus),status=JSON.parse(statusBytes);
++const manifestPath=resolve(buildStatus,'../manifest.json');
++const buildManifest=await readFile(manifestPath),buildPlan=JSON.parse(buildManifest);
++assert(status.summary.incomplete===0,'Build record is incomplete');
++const latest=new Map(status.attempts.map(attempt=>[attempt.id,attempt]));
++for(const name of ['engine.wasm','engine-worker.js','storage-worker.js']){
++  const matching=[...latest.values()].filter(attempt=>attempt.status==='passed')
++    .flatMap(attempt=>Object.entries(attempt.artifacts))
++    .filter(([path,identity])=>resolve(buildPlan.root,path)===join(root,'ui/dist',name)&&identity.sha256);
++  assert(matching.length&&matching.every(([,identity])=>identity.sha256===sha(assets.get('/'+name))),
++    'Hosted asset does not match completed build provenance: '+name);
++}
++const bundle=await build({entryPoints:[join(root,'ui/tests/terminal-workload.ts')],
++  bundle:true,format:'esm',write:false,platform:'browser'});
++assets.set('/baseline.js',bundle.outputFiles[0].contents);
++assets.set('/',Buffer.from('<!doctype html><input id="fixture" type="file"><script type="module" src="/baseline.js"></script>'));
++await mkdir(output); // Require a fresh host output directory; preserve attempts.
++await mkdir(profile); // Require a fresh, task-owned persistent profile.
++const result={runtime:'browser',status:'running',job_sha256:sha(await readFile(jobPath)),
++  input_sha256:sha(await readFile(job.input)),wasm_sha256:sha(assets.get('/engine.wasm')),
++  assets_sha256:Object.fromEntries([...assets].map(([name,bytes])=>[name,sha(bytes)])),
++  script_sha256:sha(await readFile(fileURLToPath(import.meta.url))),
++  driver_sha256:sha(await readFile(join(root,'ui/tests/terminal-workload.ts'))),
++  channel:browserChannel,context:'fresh persistent disk-backed profile',cache:'uncontrolled',
++  platform:process.platform,node:process.version,profile,job_source:jobPath};
++result.build_provenance={status:buildStatus,status_sha256:sha(statusBytes),manifest_sha256:sha(buildManifest)};
++await writeFile(record,JSON.stringify(result,null,2)+'\n',{flag:'wx'});
++const server=http.createServer((request,response)=>{
++  response.setHeader('Cross-Origin-Opener-Policy','same-origin');
++  response.setHeader('Cross-Origin-Embedder-Policy','require-corp');
++  response.setHeader('Cache-Control','no-store');
++  const name=new URL(request.url,'http://localhost').pathname;
++  const bytes=assets.get(name);
++  if(request.method!=='GET'||!bytes){response.writeHead(404);response.end();return;}
++  response.setHeader('Content-Type',name.endsWith('.wasm')?'application/wasm':
++    name.endsWith('.js')?'application/javascript':'text/html; charset=utf-8');
++  response.end(bytes);
++});
++let browser;
++try{
++  await new Promise((ok,fail)=>{server.once('error',fail);server.listen(0,'127.0.0.1',ok);});
++  browser=await chromium.launchPersistentContext(profile,browserLaunchOptions);
++  result.browser_version=browser.browser()?.version();
++  const page=await browser.newPage();
++  const traffic=[];
++  page.on('console',message=>{const match=/TERMINAL_TRAFFIC read=(\d+) written=(\d+)/.exec(message.text());if(match&&traffic.length<2)traffic.push({read:Number(match[1]),written:Number(match[2])});});
++  page.setDefaultTimeout(130000);
++  await page.goto(`http://127.0.0.1:${server.address().port}/`);
++  await page.waitForFunction(()=>typeof window.workloadBaseline==='function');
++  await page.locator('#fixture').setInputFiles(job.input);
++  const {files,...measurement}=await page.evaluate(job=>window.workloadBaseline(job),job);
++  for(const file of files){
++    assert(file.name===basename(file.name)&&!file.name.includes('\\'),'Unsafe result path');
++    await writeFile(join(output,file.name),Buffer.from(file.base64,'base64'),{flag:'wx'});
++  }
++  assert(traffic.length===1,'One post-publication engine traffic marker required');
++  Object.assign(result,measurement,{status:'complete',engine_temporary_traffic:traffic[0]});
++}catch(error){
++  result.status='failed';result.error=String(error);process.exitCode=1;
++}finally{
++  if(browser)try{await browser.close();}catch(error){
++    result.status='failed';result.cleanup_error=String(error);process.exitCode=1;
++  }
++  await new Promise(ok=>server.close(ok));
++  await writeFile(record,JSON.stringify(result,null,2)+'\n');
++}
++console.log(JSON.stringify(result));
+--- /dev/null
++++ b/browser-probe/ui/tests/terminal-workload.ts
+@@ -0,0 +1,64 @@
++import {browserApi as api} from '../src/browser/client';
++import type {Job,State} from '../src/app';
++
++declare global {
++  interface Window {
++    workloadBaseline:(job:Job)=>Promise<unknown>;
++  }
++}
++
++window.workloadBaseline=async(job:Job)=>{
++  const input=(document.querySelector('#fixture') as HTMLInputElement).files?.[0];
++  if(!input)throw new Error('Select the declared local fixture first');
++  const root=await navigator.storage.getDirectory();
++  const parent=await root.getDirectoryHandle('workload-baseline-'+crypto.randomUUID(),{create:true});
++  Object.assign(window,{
++    showOpenFilePicker:async()=>[{getFile:async()=>input}],
++    showDirectoryPicker:async()=>parent
++  });
++  const setup=performance.now();
++  const defaults=await api<Job>('defaults');
++  await api('pick-path',{mode:'input'});
++  await api('pick-path',{mode:'output'});
++  const configuration={...defaults,...job,input:input.name,output:'results',
++    resources:{...defaults.resources,...job.resources,temp_dir:null}};
++  const setupSeconds=(performance.now()-setup)/1000;
++  const start=performance.now();
++  // Run directly: explicit analyze/Prepare would measure a different workflow.
++  await api('run-direct',configuration);
++  let done:State;
++  while(true){
++    done=await api<State>('state');
++    if(done.status==='complete'){
++      if(done.error)throw new Error(done.error);
++      break;
++    }
++    if(done.status==='failed')throw new Error(done.error||'Browser Run failed');
++    if(performance.now()-start>120000)throw new Error('Browser baseline timed out');
++    await new Promise(resolve=>setTimeout(resolve,10));
++  }
++  const elapsed=(performance.now()-start)/1000;
++  const folder=await parent.getDirectoryHandle(done.output!.split('/').at(-1)!);
++  // Host extraction/independent verification occurs after the measured completion.
++  const files:{name:string;base64:string}[]=[];
++  for await(const [name,handle] of (folder as any).entries()){
++    const file=await handle.getFile();
++    const base64=await new Promise<string>((resolve,reject)=>{
++      const reader=new FileReader();reader.onerror=()=>reject(reader.error);
++      reader.onload=()=>resolve(String(reader.result).split(',')[1]);
++      reader.readAsDataURL(file);
++    });
++    files.push({name,base64});
++  }
++  const marker=files.find(file=>file.name==='CHOPPER-COMPLETE.json');
++  if(!marker)throw new Error('Browser output missing completion marker');
++  await api('cancel',{});
++  const workspaces=await root.getDirectoryHandle('chopper-workspaces');
++  let remaining=0;for await(const _ of (workspaces as any).entries())remaining++;
++  if(remaining!==0)throw new Error('Completed job leaked OPFS workspace');
++  return {workspace_cleanup_verified:true,elapsed_seconds:elapsed,setup_seconds:setupSeconds,files,
++    analysis:done.analysis,output:done.output,
++    timing_scope:'Run-direct through completed OPFS export; setup/extraction/verification excluded',
++    destination:'OPFS-backed picker; not native File System Access output performance',
++    input_mode:'Playwright-selected local File'};
++};
+--- /dev/null
++++ b/browser-probe/verify-events.py
+@@ -0,0 +1,143 @@
++"""Bounded events transfer study; not a production strategy or generic verifier."""
++import csv
++import hashlib
++import importlib.util
++import json
++import os
++from pathlib import Path
++import sys
++
++HEADER = ['record_id', 'entity_id', 'timestamp', 'event_type', 'category', 'value']
++VERSION = 'events-transfer-v1'
++SEED = 'allocation-transfer-events-v1'
++
++def digest(path):
++    with Path(path).open('rb') as f:
++        return hashlib.file_digest(f, 'sha256').hexdigest()
++
++def read(path):
++    return json.loads(Path(path).read_text(encoding='utf-8'))
++
++def write(path, data):
++    with Path(path).open('x', encoding='utf-8', newline='\n') as f:
++        json.dump(data, f, indent=2); f.write('\n')
++
++def row(i):
++    # Addressed independent draws; all fields and ordering frozen before launch.
++    def draw(label):
++        return int.from_bytes(hashlib.sha256(f'{VERSION}:{SEED}:{i}:{label}'.encode()).digest()[:8], 'big')
++    return [str(i), str(draw('entity') % 5000), f'2026-01-{1 + draw("day") % 28:02}T{draw("hour") % 24:02}:00:00Z',
++            ['view', 'click', 'purchase', 'return'][draw('type') % 4],
++            ['news', 'food,drink', 'text\n"quoted"', 'café'][draw('category') % 4],
++            f'{draw("value") % 100000}.{draw("decimal") % 100:02}']
++
++def verify(job_path, browser=False):
++    job = read(job_path); source = Path(job['input']); out = Path(job['output'])
++    meta = read(source.with_suffix('.json'))
++    assert digest(source) == meta['sha256']
++    with source.open(encoding='utf-8', newline='') as f:
++        records = list(csv.reader(f, strict=True))
++    assert records[0] == HEADER and records[1:] == [row(i) for i in range(meta['rows'])]
++    manifest = [json.loads(l) for l in (out/'manifest.jsonl').read_text(encoding='utf-8').splitlines()]
++    assert manifest[0]['type'] == 'job'
++    for key in ['operations','input_csv','output_csv','compression','seed','full_shuffle_policy']:
++        assert manifest[0]['config'].get(key, 'seeded_v1' if key == 'full_shuffle_policy' else None) == job[key], key
++    assert all(manifest[0]['config']['limits'].get(k) == job['limits'].get(k) for k in ['rows','bytes','compressed_bytes'])
++    entries = manifest[1:]; names = [e['path'] for e in entries]
++    assert len(names) == len(set(names))
++    assert {p.name for p in out.iterdir()} == set(names) | {'manifest.jsonl'} | ({'CHOPPER-COMPLETE.json'} if browser else set())
++    if browser:
++        marker=read(out/'CHOPPER-COMPLETE.json')
++        assert marker.get('complete') is True and marker.get('engine')=='chopper-browser' and marker.get('version')==1 and marker.get('files')==len(names)+1
++    seen = set(); groups = set(); signatures = []
++    for e in entries:
++        assert Path(e['path']).name == e['path'] and e['type'] == 'output'
++        p = out/e['path']; assert not p.is_symlink()
++        assert p.stat().st_size == e['csv_bytes'] == e['stored_bytes']
++        assert e['csv_bytes'] <= job['limits']['bytes'] and e['rows'] <= job['limits']['rows']
++        with p.open(encoding='utf-8', newline='') as f:
++            actual = list(csv.reader(f, strict=True))
++        assert actual[0] == HEADER and len(actual)-1 == e['rows']
++        lineage = e['lineage']
++        assert len(lineage) == 2
++        assert lineage[0]['operation'] == 0 and len(lineage[0]['values']) == 1
++        assert lineage[1]['operation'] == 1 and lineage[1]['allocation'] in ['treatment','control']
++        group = (lineage[0]['values'][0], lineage[1]['allocation'])
++        groups.add(group)
++        previous = -1
++        for r in actual[1:]:
++            i = int(r[0]); assert 0 <= i < meta['rows'] and i not in seen
++            assert r == records[i+1] and r[3] == group[0]
++            seen.add(i); previous = i
++        signatures.append([e['path'],e['rows'],e['csv_bytes'],e['lineage'],digest(p)])
++    assert len(seen) == meta['rows']
++    if not browser:
++        assert not list(Path(job['resources']['temp_dir']).iterdir())
++        assert not list(out.parent.glob('.chopper-*'))
++    return {'verified':True,'rows':len(seen),'groups':len(groups),'source_sha256':digest(source),
++            'algorithm_version':manifest[0]['algorithm_version'],'signature':signatures,
++            'checks':'exact field/ID conservation, partition and allocation lineage, shuffled child order compared by exact baseline parity, strict caps, sizes, file inventory, temporary cleanup; seeded membership checked by exact baseline parity; no independent RNG oracle'}
++
++def native_reference(job_path, exe, status_path, record_path):
++    import subprocess, time
++    job=read(job_path);status=read(status_path)
++    matches=[identity for a in status['attempts'] if a['status']=='passed' for name,identity in a.get('artifacts',{}).items() if Path(name).name.lower()=='chopper.exe']
++    assert any(x.get('sha256')==digest(exe) for x in matches), 'Native executable lacks original completed build identity'
++    root=Path(read(Path(status_path).parent/'manifest.json')['root'])
++    # Rehash original build inputs before reuse; ignore recorded directory entries.
++    for a in status['attempts']:
++        if a['status']!='passed':continue
++        for name,identity in a.get('inputs',{}).items():
++            if 'sha256' in identity:assert digest(root/name)==identity['sha256'],name
++    completed=subprocess.run([exe,'run','--config',str(job_path),'--yes'],capture_output=True)
++    target=Path(record_path)
++    target.with_suffix('.stdout.log').write_bytes(completed.stdout);target.with_suffix('.stderr.log').write_bytes(completed.stderr)
++    assert completed.returncode==0,completed.stderr
++    analysis=json.loads(completed.stdout)
++    write(target,analysis)
++    write(target.with_name('verified.json'),verify(job_path,False))
++
++def main():
++    action = sys.argv[1]
++    if action == 'native-reference':
++        native_reference(*sys.argv[2:6])
++    elif action == 'verify-browser':
++        write(sys.argv[3],verify(sys.argv[2],True))
++    elif action == 'native-parity':
++        a,b=read(sys.argv[2]),read(sys.argv[3])
++        for key in ['verified','rows','groups','source_sha256','algorithm_version','signature']:assert a[key]==b[key],key
++        write(sys.argv[4],{'exact_native_csv_lineage_parity':True,'rows':a['rows'],'groups':a['groups']})
++    elif action == 'metadata':
++        a,b=read(sys.argv[2]),read(sys.argv[3])['analysis']
++        keys=['algorithm_version','column_values','seed','rows','columns','header','preview','logical_digest','groups','output_files','output_csv_bytes','largest_record_bytes','stages','accuracy']
++        expected='Browser export is not atomic. A valid CHOPPER-COMPLETE.json record marks successful completion.'
++        assert b['warnings']==a['warnings']+[expected], 'unexpected browser warning difference'
++        assert not [k for k in keys if a[k]!=b[k]], [k for k in keys if a[k]!=b[k]]
++        write(sys.argv[4],{'logical_analysis_equal':keys,'expected_browser_export_warning_verified':True})
++    elif action == 'verify':
++        write(sys.argv[3], verify(sys.argv[2]))
++    elif action == 'parity':
++        a,b = read(sys.argv[2]),read(sys.argv[3]); assert a == b
++        write(sys.argv[4], {'exact_seeded_parity':True,'rows':a['rows'],'groups':a['groups']})
++    elif action == 'run':
++        # Existing harness checks retained executable against original complete build record.
++        owned = Path(__file__).resolve().parent.parent/'allocation-retry-evaluation-20261103'
++        sys.path.insert(0,str(owned/'study-src/scripts'))
++        spec=importlib.util.spec_from_file_location('baseline',owned/'study-src/scripts/workload-baselines.py')
++        b=importlib.util.module_from_spec(spec); spec.loader.exec_module(b)
++        os.environ['CHOPPER_MEMORY_LIMIT_MB']='32'
++        b.run_native(*map(Path,sys.argv[2:6]))
++        record=Path(sys.argv[4]); data=read(record)
++        import re
++        markers=re.findall(r'TERMINAL_TRAFFIC read=(\d+) written=(\d+)',record.with_suffix('.stderr.log').read_text(encoding='utf-8'))
++        assert len(markers)==1, 'one complete post-publication traffic snapshot required'
++        data['full_temporary_traffic']={'read':int(markers[0][0]),'written':int(markers[0][1]),'scope':'Context DiskFile/DiskReader counters after native publication, includes metadata and buffered read-ahead; excludes source reads, final File output writes and physical IO'}
++        temporary=record.with_suffix('.updated.json'); temporary.write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8');os.replace(temporary,record)
++
++        assert not list(Path(read(sys.argv[3])['resources']['temp_dir']).iterdir())
++        assert 'ALLOCATION_PARENT_RETRY' not in record.with_suffix('.stderr.log').read_text(encoding='utf-8')
++        print(json.dumps({'completed':True,'record':str(record),'binary_sha256':data['binary_sha256']}))
++    else:
++        raise ValueError(action)
++if __name__=='__main__':
++    main()
+--- a/contracts-src/scripts/test-browser-termination.mjs
++++ b/contracts-src/scripts/test-browser-termination.mjs
+@@ -62 +62 @@
+-      operations:pauseMode==='prepare'&&!direct?[{type:'balanced',files:2},{type:'shuffle',strategy:'uniform'},{type:'partition',columns:[1]}]:[],
++      operations:pauseMode==='prepare'?[{type:'partition',columns:[1]},{type:'assign_probabilistic',groups:[{name:'treatment',percent:'80'},{name:'control',percent:'20'}],strata:[]},{type:'shuffle',strategy:'uniform'}]:[],
+@@ -65 +65 @@
+-    await browserApi(direct?'run-direct':'analyze',job);
++    await browserApi(pauseMode==='prepare'?'run-direct':(direct?'run-direct':'analyze'),job);
+@@ -96 +96 @@
+-  if(mode==='prepare'&&p?.rows>=65536)pause({phase:'prepare',engine_phase:p.phase,rows:p.rows,temp_bytes:p.temp_bytes});
++  if(mode==='prepare'&&p?.phase==='Serializing output'&&p?.rows>=65536)pause({phase:'prepare',engine_phase:p.phase,rows:p.rows,temp_bytes:p.temp_bytes});

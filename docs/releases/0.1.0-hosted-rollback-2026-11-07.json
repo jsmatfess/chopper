@@ -1,0 +1,146 @@
+{
+  "schema": "chopper-hosted-rollback-rehearsal-v1",
+  "date_utc": "2026-11-07",
+  "status": "passed-isolated",
+  "predecessor": {
+    "version": "0.1.0",
+    "source_commit": "7d78706c432f34742bbc29c17be9261002a6816a",
+    "package": "chopper-0.1.0-hosted.zip",
+    "package_bytes": 821738,
+    "package_sha256": "bdd914517252d7cb1849ccae11955dad919ed052f912e891c3535417885e4606",
+    "source": "Retained GitHub v0.1.0 asset, checked against its published receipt; not fresh private R2 readback"
+  },
+  "served_assets": [
+    {
+      "name": "_headers",
+      "bytes": 385,
+      "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1"
+    },
+    {
+      "name": "app.js",
+      "bytes": 40493,
+      "sha256": "951232201b98ce2659608ade09ac76a8ef94bf9f3fb5cc8fb3ad4b9b275112ff"
+    },
+    {
+      "name": "engine-worker.js",
+      "bytes": 35153,
+      "sha256": "cf407b6ce2b7d47f0909a352193c8260231a8f6c740f779f487806af8c8425f8"
+    },
+    {
+      "name": "engine.wasm",
+      "bytes": 2358817,
+      "sha256": "afe7e8a61837e6317af70090a112158149725d9af909ea1eb2e60a66369787ce"
+    },
+    {
+      "name": "index.html",
+      "bytes": 8867,
+      "sha256": "ee73456f9b1afa8801244a3fbfbae2308d51f514c6a7b7f3cac6d8ee9d8e6898"
+    },
+    {
+      "name": "storage-worker.js",
+      "bytes": 3034,
+      "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6"
+    },
+    {
+      "name": "style.css",
+      "bytes": 12292,
+      "sha256": "edddae5c4a2aab3cfa8bcc3c2a79bd69a9bd9c7463ec3d9c2ec5a14d72ed2787"
+    }
+  ],
+  "environment": {
+    "os": {
+      "platform": "linux",
+      "release": "6.18.33.1-microsoft-standard-WSL2"
+    },
+    "node": "v22.23.4",
+    "browser": "bundled Chromium",
+    "browser_version": "156.0.8078.4",
+    "browser_sha256": "377a9fc07b495c3b8d0ab8ec1fdfd153641759f9756fea34d8dfce4de82f5025",
+    "disposable_persistent_profile": true,
+    "secure_context": true,
+    "cross_origin_isolated": true,
+    "response_headers": {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "require-corp"
+    }
+  },
+  "fixture": {
+    "bytes": 53,
+    "sha256": "ecbed63ad30d497bcbaf3ad45ec86b0ab6651215e6d086bf87afe157fb3e610b",
+    "rows": 2,
+    "columns": 3,
+    "details": "UTF-8/CRLF header, escaped quote, non-ASCII and quoted embedded newline"
+  },
+  "execution": {
+    "public_direct_runs": 1,
+    "input": "injected real File object",
+    "output": "injected real OPFS directory handle",
+    "terminal": "COMPLETE",
+    "csv_bytes_cap": 40,
+    "memory_mib": 64,
+    "workers": 1,
+    "operations": []
+  },
+  "verification": {
+    "rows": 2,
+    "csv_files": 2,
+    "csv_bytes": 66,
+    "bytes_cap": 40,
+    "exact_fields_and_order": true,
+    "marker": {
+      "complete": true,
+      "files": 3,
+      "engine": "chopper-browser",
+      "version": 1
+    },
+    "hashes": {
+      "part-00000002.csv": "1591ab1577f13e9e25bc846f91a4db8e195674786805b5694294977b734b0abf",
+      "part-00000001.csv": "78acbf6fc1c0336746c724d038474a9c83690c02a8ea6302dc393c5d3555914a",
+      "manifest.jsonl": "e12780ddc47e107960343158e4e67e45c5d0fbef2d0a18c147d7d6cbb515c01f",
+      "CHOPPER-COMPLETE.json": "3925dc6257e3530f4e9df91c38c86490409fabfdb07af13068c51a85f514c2e3"
+    }
+  },
+  "cleanup": {
+    "real_browser_closed": true,
+    "known_browser_node_and_supervisor_births_absent": true,
+    "server_closed_and_reaped": true,
+    "server_signal": "SIGTERM",
+    "capture_eof": {
+      "stderr": true,
+      "stdout": true
+    },
+    "readers_joined": true,
+    "original_linux_reservation_explicitly_closed_after_quiescence": true,
+    "independent_same_file_lock_available": true
+  },
+  "limits": {
+    "attempt_seconds": 90,
+    "cumulative_owned_artifact_bytes": 67108864,
+    "input_bytes": 53,
+    "export_transfer_bytes": 1048576,
+    "successful_run_ms": 2353,
+    "parent_lifetime_ms": 2699.979,
+    "observed_cumulative_owned_highwater_bytes": 10480436,
+    "timing_scope": "Administrative record only; not a performance comparison"
+  },
+  "retained_failure": {
+    "attempt": "r1",
+    "status": "failed-controller-cleanup-assertion",
+    "functional_export_verified": true,
+    "cause": "Numeric-only exit-code check rejected a server closed by SIGTERM",
+    "recovery": "Exact retained owner administratively stopped only after workload group absence, private EOF and closed readers; original failed receipt unchanged, no explicit original-owner release credit",
+    "result_sha256": "cd138f36675f0a28047fd707ec0fa850a21bed44c6f2e1a88f8eda335a6e3449"
+  },
+  "evidence_sha256": {
+    "result.json": "e6b14958cc06d7c6826a0f7e4149893809f676451c85488b3bf9fa5ce09fd716",
+    "parent-result.json": "33e3b12426253b67bd71433d14b93d7275024b417f54bf486acecd30e0c1f43b",
+    "independent-review.json": "88c36020483ac3ae2146ef9c622b8361d41f64369275d2cb412ff551b218035b",
+    "parent-reviewed-inputs.json": "4e97279cafc514fafb46e8851bbda53c2e7f73c0f73880064d3bf3ba1bbf69ca"
+  },
+  "limits_of_claim": [
+    "Isolated Linux/WSL bundled Chromium only; no installed Windows channel or actual system-picker claim",
+    "Completed exports and profile retained; no device/power-loss durability claim",
+    "No fresh private R2 readback, production restore, deployment, selected639 acceptance or publication approval"
+  ],
+  "raw_evidence_root": "Task-owned rollback010-hosted-linux-r2 under the private release-blockers-20261107 acceptance directory; raw receipt hashes below"
+}

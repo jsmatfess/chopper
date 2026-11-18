@@ -1,0 +1,533 @@
+{
+  "kind": "summary",
+  "scope": "Integrated hosted graph correctness/lifecycle/bounds and source-matched native/portable/resource validation; local originals retained",
+  "production_assets": {
+    "engine.wasm": "88ab215a5bf75f45afb9e6b0bcc027f43e3a6c071d3c3c949695aceff963dc0c",
+    "engine-worker.js": "41e26203c5fba5d4751bf45aac940a2a17b27043d15902b29d2a90c4677d9e80",
+    "storage-worker.js": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6",
+    "app.js": "fc57683e5602cb5721a2ef6ee7369de6bdee9cf6236fd9fa01cd51558038c235",
+    "style.css": "da123fd1cc919783fb90e94f0c3c076fc57ff357879e53ba08a252f37fc8eef6",
+    "index.html": "7c5a0dea3884a3faaf03f3f37956f0bed3f7133a8ecfb253d5414160517a0c2a"
+  },
+  "batches": [
+    {
+      "mode": "native",
+      "status": ".tools/execution-graph/58/native/attempt-1793868657869903277/batch/status.json",
+      "status_sha256": "8d698101a05c06d21a9c5801cfe7d44a7f6f1fc75144f46b940bd5918c5eb770",
+      "summary": {
+        "passed": 5,
+        "incomplete": 0
+      },
+      "commands": [
+        {
+          "id": "ui-tests",
+          "exit_code": 0,
+          "command_template": [
+            "npm",
+            "--prefix",
+            "ui",
+            "test"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "ui-build",
+          "exit_code": 0,
+          "command_template": [
+            "npm",
+            "--prefix",
+            "ui",
+            "run",
+            "build"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "rust-format",
+          "exit_code": 0,
+          "command_template": [
+            "cargo",
+            "fmt",
+            "--all",
+            "--",
+            "--check"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "rust-clippy",
+          "exit_code": 0,
+          "command_template": [
+            "cargo",
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "rust-tests",
+          "exit_code": 0,
+          "command_template": [
+            "cargo",
+            "test",
+            "--workspace",
+            "--locked"
+          ],
+          "original_argv_in_retained_status": true
+        }
+      ]
+    },
+    {
+      "mode": "features",
+      "status": ".tools/execution-graph/58/features/attempt-1793865747428856416/batch/status.json",
+      "status_sha256": "64c0780f0d01437314a9f8eb15e5266875c27501143a6e6e6359f5595ab5a310",
+      "summary": {
+        "passed": 2,
+        "incomplete": 0
+      },
+      "commands": [
+        {
+          "id": "all-feature-clippy",
+          "exit_code": 0,
+          "command_template": [
+            "cargo",
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--all-features",
+            "--",
+            "-D",
+            "warnings"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "all-feature-tests",
+          "exit_code": 0,
+          "command_template": [
+            "cargo",
+            "test",
+            "--workspace",
+            "--locked",
+            "--all-features"
+          ],
+          "original_argv_in_retained_status": true
+        }
+      ]
+    },
+    {
+      "mode": "core-check",
+      "status": ".tools/execution-graph/58/core-check/attempt-1793865710782868296/batch/status.json",
+      "status_sha256": "4063b3b538100b5beec7effd02833592615630564132ca5df3b9d2850cec6b19",
+      "summary": {
+        "passed": 1,
+        "incomplete": 0
+      },
+      "commands": [
+        {
+          "id": "portable-core-wasm",
+          "exit_code": 0,
+          "command_template": [
+            "cargo",
+            "check",
+            "--locked",
+            "-p",
+            "chopper-core",
+            "--target",
+            "wasm32-unknown-unknown"
+          ],
+          "original_argv_in_retained_status": true
+        }
+      ]
+    },
+    {
+      "mode": "hosted",
+      "status": ".tools/execution-graph/58/hosted/attempt-1793869349734483278/batch/status.json",
+      "status_sha256": "dc1ce65aa9b98b55a6fd0ea414591fbeac9b50258908c9ab8cfa8447442e5d9e",
+      "summary": {
+        "passed": 16,
+        "incomplete": 0
+      },
+      "commands": [
+        {
+          "id": "build-browser-mjs-0",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/build-browser.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "hosted-build",
+          "exit_code": 0,
+          "command_template": [
+            "npm",
+            "--prefix",
+            "ui",
+            "run",
+            "build:hosted"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "build-browser-tests-mjs-2",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/build-browser-tests.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-graph-mjs-3",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-graph.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-graph-lifecycle-mjs-4",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-graph-lifecycle.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-graph-inspection-mjs-5",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-graph-inspection.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-graph-bounds-mjs-6",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-graph-bounds.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-graph-lifecycle-mjs-7",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-graph-lifecycle.mjs",
+            "--composed"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-mjs-8",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-bridge-mjs-9",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-bridge.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-cleanup-mjs-10",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-cleanup.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-termination-mjs-11",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-termination.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-termination-mjs-12",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-termination.mjs",
+            "--persistent"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-termination-mjs-13",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-termination.mjs",
+            "--persistent",
+            "--process-kill"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-termination-mjs-14",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-termination.mjs",
+            "--persistent",
+            "--process-kill",
+            "--direct"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-termination-mjs-15",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser-termination.mjs",
+            "--persistent",
+            "--process-kill",
+            "--composed"
+          ],
+          "original_argv_in_retained_status": true
+        }
+      ]
+    },
+    {
+      "mode": "resources",
+      "status": ".tools/execution-graph/58/resources/attempt-1793869590683046078/batch/status.json",
+      "status_sha256": "d3765fb404c24883bbed0702e378b52143e513953155e9e7a7c87bd549889e48",
+      "summary": {
+        "passed": 4,
+        "incomplete": 0
+      },
+      "commands": [
+        {
+          "id": "build-browser-mjs-0",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/build-browser.mjs",
+            "--resource-contracts"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "build-browser-tests-mjs-1",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/build-browser-tests.mjs",
+            "--resource-contracts"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-mjs-2",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser.mjs",
+            "--resource-contracts"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "retain-reactor",
+          "exit_code": 0,
+          "command_template": [
+            "python3",
+            "-c",
+            "import shutil,sys;shutil.copy2(sys.argv[1],sys.argv[2])",
+            "ui/dist/engine-resource-tests.wasm",
+            ".tools/execution-graph/58/resources/attempt-1793869590683046078/reactor.wasm"
+          ],
+          "original_argv_in_retained_status": true
+        }
+      ]
+    },
+    {
+      "mode": "feature-resources",
+      "status": ".tools/execution-graph/58/feature-resources/attempt-1793869603909768112/batch/status.json",
+      "status_sha256": "78f67ed26074feb89a5bddf3014084b80025dcd6b3ea93b97b29eb2fffb0d686",
+      "summary": {
+        "passed": 4,
+        "incomplete": 0
+      },
+      "commands": [
+        {
+          "id": "build-browser-mjs-0",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/build-browser.mjs",
+            "--resource-contracts",
+            "--features",
+            "experimental-shuffle-partition"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "build-browser-tests-mjs-1",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/build-browser-tests.mjs",
+            "--resource-contracts"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "test-browser-mjs-2",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/test-browser.mjs",
+            "--resource-contracts",
+            "--shuffle-partition"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "retain-reactor",
+          "exit_code": 0,
+          "command_template": [
+            "python3",
+            "-c",
+            "import shutil,sys;shutil.copy2(sys.argv[1],sys.argv[2])",
+            "ui/dist/engine-resource-tests.wasm",
+            ".tools/execution-graph/58/feature-resources/attempt-1793869603909768112/reactor.wasm"
+          ],
+          "original_argv_in_retained_status": true
+        }
+      ]
+    },
+    {
+      "mode": "restore",
+      "status": ".tools/execution-graph/58/restore/attempt-1793869622356721396/batch/status.json",
+      "status_sha256": "088b9175114e611c07d610438ad9add250cba439042da42aae3ac025cd948a37",
+      "summary": {
+        "passed": 3,
+        "incomplete": 0
+      },
+      "commands": [
+        {
+          "id": "build-browser-mjs-0",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "scripts/build-browser.mjs"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "production-hosted",
+          "exit_code": 0,
+          "command_template": [
+            "npm",
+            "--prefix",
+            "ui",
+            "run",
+            "build:hosted"
+          ],
+          "original_argv_in_retained_status": true
+        },
+        {
+          "id": "production-guard",
+          "exit_code": 0,
+          "command_template": [
+            "node",
+            "--input-type=module",
+            "-e",
+            "import {readFileSync,readdirSync} from \"node:fs\";import {assertProductionWasm,testAssets} from \"./scripts/browser-artifacts.mjs\";assertProductionWasm(readFileSync(\"ui/dist/engine.wasm\"));for(const name of testAssets)if(readdirSync(\"ui/dist\").includes(name))throw Error(name);"
+          ],
+          "original_argv_in_retained_status": true
+        }
+      ]
+    },
+    {
+      "mode": "native-build",
+      "status": ".tools/execution-graph/58/native-build/attempt-1793869626995071070/batch/status.json",
+      "status_sha256": "64e6ebacb9c0488550dada197ca6527b8378a041987e8df52e86ccf9eef2c8b9",
+      "summary": {
+        "passed": 1,
+        "incomplete": 0
+      },
+      "commands": [
+        {
+          "id": "native-build",
+          "exit_code": 0,
+          "command_template": [
+            "cargo",
+            "build",
+            "--locked",
+            "-p",
+            "chopper"
+          ],
+          "original_argv_in_retained_status": true
+        }
+      ]
+    }
+  ],
+  "reuse_scope": "Native, hosted, resource and restoration batch production inputs match current source. Earlier all-feature and portable-core checks retain identical relevant Rust/core/vendor/embedded-asset identities; their broad UI snapshot predates only the separately validated hosted counter-label correction. No Rust or dependency change followed.",
+  "bounds": {
+    "browserVersion": "156.0.8078.4",
+    "browserChannel": "bundled-chromium",
+    "hashes": {
+      "engine.wasm": "88ab215a5bf75f45afb9e6b0bcc027f43e3a6c071d3c3c949695aceff963dc0c",
+      "engine-worker.js": "41e26203c5fba5d4751bf45aac940a2a17b27043d15902b29d2a90c4677d9e80",
+      "storage-worker.js": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6",
+      "app.js": "fc57683e5602cb5721a2ef6ee7369de6bdee9cf6236fd9fa01cd51558038c235"
+    },
+    "adapter_sha256": "9d51cd84f17136e50a43828cebee7ff1356bbaf7332e7b2df627add93e4851a5",
+    "harness_sha256": "85b3c125dd0bbb0a37c245d1b11141b677942cd8d991ddaa3f83682acce7263b",
+    "scope": "real Run/output and cancellation; synthetic focused state/render saturation supplements production strategy fixtures; no heap/RSS cap",
+    "saturation": {
+      "serialized_bytes": 3108261,
+      "event_serialized_bytes": 9723,
+      "logical_payload_bytes": 14651007,
+      "dom_text_bytes": 5369938,
+      "cards": 1156,
+      "events": 128,
+      "omitted": 4485,
+      "queued_messages": 1,
+      "credit": 1,
+      "physical": 1156,
+      "after_overflow": 1156,
+      "unavailable": true
+    },
+    "cancellationMs": 462.652102,
+    "held_observation_acknowledgement": true
+  },
+  "analysis_checks": {
+    "status": ".tools/execution-graph/58-final-precision-validation/batch/status.json",
+    "summary": {
+      "passed": 12,
+      "incomplete": 0
+    },
+    "extension_regressions": 17,
+    "existing_analysis_regressions": 4,
+    "ci_scope_regressions": 11
+  },
+  "historical_attempts": "Interrupted cohort001, original72-job unmet gate,108-job unmet precision result, harness failures and obsolete combined-resource/restoration attempts are retained as incomplete; no failed attempt overwritten.",
+  "public_evidence_classification": "Synthetic developer fixtures and reviewed toolchain/build identities. Compact command templates abbreviate executable paths; exact argv/runtime identities remain in retained local status files referenced by SHA256. No user data, credentials or environment values are published."
+}

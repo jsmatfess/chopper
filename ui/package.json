@@ -1,0 +1,23 @@
+{
+  "name": "chopper-ui",
+  "private": true,
+  "version": "0.2.0",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/plan.mjs tests/column-picker.mjs tests/browser-fs.mjs tests/storage-worker.mjs tests/browser-session.mjs tests/submission.mjs tests/memory.mjs tests/size-units.mjs tests/run-command.mjs tests/execution-history.mjs tests/execution-motion.mjs tests/physical-history.mjs tests/live-physical.mjs tests/contracts.mjs",
+    "test:workspace": "node --test tests/hosted-workspace.mjs",
+    "simulate:plan": "node tests/simulate-plan.mjs",
+    "build": "npm run build:hosted",
+    "check": "tsc --noEmit",
+    "build:hosted": "tsc --noEmit && node ../scripts/build-hosted.mjs",
+    "serve:hosted": "node ../scripts/serve-hosted.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "playwright": "^1.64.0",
+    "typescript": "^5.9.0"
+  },
+  "dependencies": {
+    "@bjorn3/browser_wasi_shim": "^0.4.2"
+  }
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "original_path": "crates/chopper/src/engine/snapshots.rs",
+    "archive_path": "docs/history/rejected-input-snapshots-2026-10-26/crates/chopper/src/engine/snapshots.rs",
+    "bytes": 32405,
+    "sha256": "20a4fe8e4d7ce6b2f2174baddb9269e11a851b4cc64b71281bb257dcbca46f81"
+  },
+  {
+    "original_path": "crates/chopper/src/engine/snapshots/ipc.rs",
+    "archive_path": "docs/history/rejected-input-snapshots-2026-10-26/crates/chopper/src/engine/snapshots/ipc.rs",
+    "bytes": 18631,
+    "sha256": "e5badf69448ee9da39d557242b545e561cc6cbaa887ff7fe9451ce444d3c21a1"
+  },
+  {
+    "original_path": "crates/chopper/src/engine/snapshots/rows.rs",
+    "archive_path": "docs/history/rejected-input-snapshots-2026-10-26/crates/chopper/src/engine/snapshots/rows.rs",
+    "bytes": 9115,
+    "sha256": "55b192aaa902da584fc4c4b0764bc128d29a48c974bdee350c2624e2640a9a89"
+  },
+  {
+    "original_path": "crates/chopper/src/engine/snapshots/tests/arrow_census.rs",
+    "archive_path": "docs/history/rejected-input-snapshots-2026-10-26/crates/chopper/src/engine/snapshots/tests/arrow_census.rs",
+    "bytes": 8129,
+    "sha256": "a334a84f9570e961a7feada3f5003dc646d3de1ce988903eeda4da8d1a955190"
+  },
+  {
+    "original_path": "crates/chopper/src/engine/snapshots/tests/decoder_gates.rs",
+    "archive_path": "docs/history/rejected-input-snapshots-2026-10-26/crates/chopper/src/engine/snapshots/tests/decoder_gates.rs",
+    "bytes": 29514,
+    "sha256": "c9873ce4afc3ee4277857d820d96ca15c904c9789be37ea2fe8ffdfbe0f38a95"
+  },
+  {
+    "original_path": "crates/chopper/src/engine/snapshots/tests/lifecycle.rs",
+    "archive_path": "docs/history/rejected-input-snapshots-2026-10-26/crates/chopper/src/engine/snapshots/tests/lifecycle.rs",
+    "bytes": 20331,
+    "sha256": "c448816556c72242f77d4bf009d63d5df1d13c639c7deeee5e803c6b8285903c"
+  },
+  {
+    "original_path": "crates/chopper/src/engine/snapshots/tests.rs",
+    "archive_path": "docs/history/rejected-input-snapshots-2026-10-26/crates/chopper/src/engine/snapshots/tests.rs",
+    "bytes": 69978,
+    "sha256": "b303e45bb6e0a021bf21d1a310b44752d5d28ac0f8aabbf3a903ba00944b3363"
+  }
+]

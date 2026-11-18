@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chopper observation v1",
+  "description": "Normalized source projection; not a new independent observation or reusable acceptance receipt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "source",
+    "source_sha256",
+    "aliases",
+    "location",
+    "record_kind",
+    "classification",
+    "dimensions",
+    "timing_scope",
+    "verification",
+    "metrics",
+    "comparisons",
+    "eligibility",
+    "diagnostic_refs"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source": {
+      "type": "string"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pointer": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer"
+        },
+        "manifest_pointer": {
+          "type": "string"
+        }
+      }
+    },
+    "record_kind": {
+      "type": "string"
+    },
+    "classification": {
+      "enum": [
+        "measurement",
+        "allocation-census",
+        "summary",
+        "failure",
+        "diagnostic",
+        "contract-duration",
+        "unclassified"
+      ]
+    },
+    "dimensions": {
+      "type": "object"
+    },
+    "timing_scope": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "verification": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "value",
+          "unit",
+          "source_pointer",
+          "source_value",
+          "source_unit",
+          "scale",
+          "scope"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "unit": {
+            "enum": [
+              "seconds",
+              "bytes",
+              "count"
+            ]
+          },
+          "source_pointer": {
+            "type": "string"
+          },
+          "source_value": {
+            "type": "number"
+          },
+          "source_unit": {
+            "enum": [
+              "seconds",
+              "bytes",
+              "KiB",
+              "count"
+            ]
+          },
+          "scale": {
+            "type": "number"
+          },
+          "scope": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "comparisons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "role",
+          "timing_scope",
+          "runtime",
+          "review",
+          "mapping_source",
+          "mapping_sha256",
+          "clock_pointer"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "baseline",
+              "candidate"
+            ]
+          },
+          "timing_scope": {
+            "type": "string"
+          },
+          "runtime": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "review": {
+            "type": "object"
+          },
+          "mapping_source": {
+            "type": "string"
+          },
+          "mapping_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "clock_pointer": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "eligibility": {
+      "enum": [
+        "unreviewed",
+        "reviewed-for-named-comparisons-only"
+      ]
+    },
+    "diagnostic_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pointer": {
+            "type": "string"
+          },
+          "line": {
+            "type": "integer"
+          },
+          "manifest_pointer": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "metadata_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "pointer",
+          "source",
+          "source_sha256"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "pointer": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {}
+}

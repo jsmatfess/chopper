@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-15",
+  "subsystem": "execution",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#shuffle-swarm-decisions-2026-11-15",
+      "sha256": "9d6630a478f692ff092bf8158c374588ef0c8b799bc7e186b73c67cc0af2e81a"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/shuffle-swarm-summary-2026-11-15.json",
+      "sha256": "30e3beb60e4b02e8f9c01393664c0ea5bbb236249aa5bc6f19b1aeeb4f9468ae"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-swarm-archive-receipt-2026-11-15.json",
+      "sha256": "af4e167cf48ffe2eabb3a0a9e8568daf80ec101b1707b119ea82d188863a9a6c"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/execution-decisions.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md"
+  ],
+  "id": "shuffle-balanced-parts-2026-11-15",
+  "title": "Defer direct shuffled balanced parts after bounded pilot",
+  "question": "Can random exact membership and independent child sorts beat sort-once balanced ranges?",
+  "disposition": "block-promotion",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Remove the fixed-membership routing prototype: the predefined all-three-paired external falsifier failed and the fitting control median regressed.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "Retained Balanced(1) -> Uniform -> Balanced(8), 4003 and 100003 rows, constant key and 192-byte ASCII payload; three alternating pairs."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Joint membership/order proof; revised fallback keeps sampled membership pointwise, actual errors terminal; quotas/nonempty/caps/lineage and owning transfer/cancellation controls passed before removal."
+  },
+  "limitations": [
+    "External median improvement is insufficient: one pair regresses and total CPU medians tie at coarse resolution.",
+    "No root counting-free implementation, no WASI/native Windows performance result and no shipped fanout/size selector.",
+    "Small warm WSL2/bundled-Chromium development samples do not establish native Windows/macOS, other browsers, scale or tails.",
+    "Working reservations are not RSS; Analysis temporary counters precede publication; final committed-head CI is separate.",
+    "An inherited parser-owned shrink replacement-overlap gap remains in unchanged baseline producers; new mixed-prefix intake retains actual capacity.",
+    "Private archive readback used the existing OAuth principal; no separate scoped-reader or public publication claim."
+  ],
+  "exclusions": [
+    "Warmups, failed attempts and source-mismatched/quarantined WASM output are excluded from measured comparisons.",
+    "Derived summaries and repeated verification records are not additional observations; cells/runtimes are not pooled."
+  ],
+  "reopen_when": "Reopen only with bounded counting/routing/materialization costs and a predefined matched complete-job rule that the candidate actually passes."
+}

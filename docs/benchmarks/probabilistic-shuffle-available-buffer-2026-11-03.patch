@@ -1,0 +1,66 @@
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -1508,0 +1509,7 @@
++    }
++    pub(crate) fn with_available_capacity(ctx: &Context, order: SortOrder) -> Self {
++        let mut sorter = Self::new(ctx, order);
++        sorter.buffer_limit = ctx
++            .workspace
++            .available_sort_buffer_limit(sorter.buffer_limit);
++        sorter
+--- a/crates/chopper/src/storage/adaptive.rs
++++ b/crates/chopper/src/storage/adaptive.rs
+@@ -77,0 +78,12 @@
++    }
++    // Isolated candidate target only. Observations grant no capacity; every
++    // actual allocation still goes through ordinary local/shared admission.
++    pub(crate) fn available_sort_buffer_limit(&self, nominal: usize) -> usize {
++        let local = self.limit.saturating_sub(self.used());
++        let available = self.pool.as_ref().map_or(local, |pool| {
++            local.min(
++                pool.admission_limit()
++                    .saturating_sub(pool.reservation_counts().0),
++            )
++        });
++        nominal.min((available / 2).min(usize::MAX as u64) as usize)
+--- a/crates/chopper/src/engine/streaming.rs
++++ b/crates/chopper/src/engine/streaming.rs
+@@ -251 +251 @@
+-    let mut sorter = Sorter::new(ctx, SortOrder::GroupRandom);
++    let mut sorter = Sorter::with_available_capacity(ctx, SortOrder::GroupRandom);
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -552,0 +553,33 @@
++
++#[test]
++fn probabilistic_shuffle_available_buffer_contract() -> Result<()> {
++    use crate::storage::Workspace;
++    let pool = Arc::new(crate::resources::MemoryPool::new(1024));
++    let own = Arc::new(Workspace::shared(768, pool.clone()));
++    let peer = Arc::new(Workspace::shared(1024, pool.clone()));
++    let mut a = Reservation::for_workspace(own.clone());
++    let mut b = Reservation::for_workspace(peer);
++    a.resize(64)?;
++    b.resize(400)?;
++    assert_eq!(own.available_sort_buffer_limit(999), 280);
++    assert_eq!(own.available_sort_buffer_limit(100), 100);
++    assert_eq!(pool.usage().reserved_bytes, 464, "target is not a grant");
++    b.resize(800)?;
++    assert_eq!(own.available_sort_buffer_limit(999), 80);
++    drop(a);
++    drop(b);
++    assert_eq!(pool.usage().reserved_bytes, 0);
++    println!("AVAILABLE_BUFFER_CONTRACT passed");
++    Ok(())
++}
++
++#[test]
++fn probabilistic_shuffle_available_buffer_fitting() -> Result<()> {
++    probabilistic_shuffle_available_buffer_contract()?;
++    panel(
++        "available-buffer-fitting",
++        20000,
++        vec![false, true],
++        Grouping::Auto,
++    )
++}

@@ -1,0 +1,195 @@
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -1485,0 +1486 @@
++    prepared_router: Option<Router>,
+@@ -1507,0 +1509 @@
++            prepared_router: None,
+@@ -1518,0 +1521,28 @@
++    }
++    /// Experiment only: construct all bounded index routes before retaining rows.
++    pub(crate) fn resident_allocation(ctx: &Context, groups: usize) -> Result<Self> {
++        if ctx.grouping != chopper_core::Grouping::Auto || !(1..=64).contains(&groups) {
++            return Ok(Self::streaming(ctx));
++        }
++        let prepared = Router::prepare_indices(ctx, groups);
++        let router = match prepared {
++            Ok(Some(router)) => router,
++            Ok(None) => return Ok(Self::streaming(ctx)),
++            Err(error)
++                if error
++                    .downcast_ref::<crate::resources::MemoryAdmission>()
++                    .is_some() =>
++            {
++                ctx.check()?;
++                return Ok(Self::streaming(ctx));
++            }
++            Err(error) => return Err(error),
++        };
++        let mut sorter = Self::new(ctx, SortOrder::Key);
++        // Keep local headroom for incoming decode/conversion and catalog owners.
++        // This observation is only a target; every allocation still admits.
++        let remaining = ctx.workspace.remaining();
++        sorter.buffer_limit = sorter.buffer_limit.min(remaining / 2);
++        sorter.routing_candidate = false;
++        sorter.prepared_router = Some(router);
++        Ok(sorter)
+@@ -1705,0 +1736,10 @@
++            return Ok(());
++        }
++        if let Some(mut router) = self.prepared_router.take() {
++            for row in &self.buffer {
++                ensure!(router.push(row)?, "prepared allocation route mismatch");
++            }
++            self.buffer = Vec::new();
++            self.bytes = 0;
++            self.reservation.resize(0)?;
++            self.router = Some(router);
+@@ -3318,0 +3359,118 @@
++    fn resident_transition_controls() -> Result<()> {
++        for (label, groups, count, available, cancel) in [
++            ("occupied-overflow", 2, 2500, 300_000, false),
++            ("fit", 2, 64, 300_000, false),
++            ("prepare-denial-fallback", 8, 2500, 300_000, false),
++            ("cancel-resident", 2, 64, 300_000, true),
++            ("cancel-routed", 2, 2500, 300_000, true),
++            ("denied-both", 2, 2500, 100, false),
++        ] {
++            let mut ctx = context()?;
++            ctx.memory = 4 * 1024 * 1024;
++            ctx.replace_workspace_for_test(Workspace::new(2 * 1024 * 1024))?;
++            let directory = ctx.directory_reserved_bytes();
++            let mut other = Reservation::new(&ctx);
++            other.resize(2 * 1024 * 1024 - available)?;
++            let held = ctx.workspace.used();
++            let mut sorter = Sorter::resident_allocation(&ctx, groups)?;
++            assert_eq!(
++                sorter.prepared_router.is_some(),
++                groups == 2 && available > 100
++            );
++            let result = (move || -> Result<Vec<u64>> {
++                for id in 0..count {
++                    sorter.push(Row {
++                        id,
++                        ordinal: id,
++                        key: (id % 2).to_be_bytes().to_vec(),
++                        fields: vec![id.to_string(), "x".repeat(128)],
++                    })?;
++                }
++                if cancel {
++                    sorter
++                        .ctx
++                        .budget
++                        .cancel
++                        .store(true, AtomicOrdering::Relaxed);
++                    sorter.push(Row {
++                        id: count,
++                        ordinal: count,
++                        key: 0u64.to_be_bytes().to_vec(),
++                        fields: vec!["cancel".into()],
++                    })?;
++                }
++                let rows = sorter.finish()?;
++                if !cancel {
++                    assert_eq!(matches!(rows, SortedRows::Memory(_)), count == 64);
++                }
++                rows.map(|row| row.map(|row| row.id)).collect()
++            })();
++            assert_eq!(
++                result.is_ok(),
++                !cancel && available > 100,
++                "{label}: {result:?}"
++            );
++            if let Ok(ids) = &result {
++                let mut expected = (0..count).collect::<Vec<_>>();
++                expected.sort_unstable_by_key(|id| (id % 2, *id));
++                assert_eq!(ids, &expected);
++            }
++            eprintln!(
++                "TRANSITION {label} success={} held={held} remaining={} peak={} live_files={}",
++                result.is_ok(),
++                ctx.workspace.used(),
++                ctx.workspace.peak(),
++                ctx.budget.live_files.load(AtomicOrdering::Relaxed)
++            );
++            assert_eq!(ctx.workspace.used(), held);
++            assert_eq!(ctx.used(), 0);
++            assert_eq!(ctx.budget.live_files.load(AtomicOrdering::Relaxed), 0);
++            drop(other);
++            assert_eq!(ctx.workspace.used(), directory);
++        }
++        Ok(())
++    }
++
++    #[test]
++    fn allocation_admission_overlap_probe() -> Result<()> {
++        for immediate in [true, false] {
++            let mut ctx = context()?;
++            ctx.memory = 4 * 1024 * 1024;
++            ctx.replace_workspace_for_test(Workspace::new(2 * 1024 * 1024))?;
++            let directory = ctx.directory_reserved_bytes();
++            let mut other = Reservation::new(&ctx);
++            other.resize(2 * 1024 * 1024 - 300_000)?;
++            let held = ctx.workspace.used();
++            let mut sorter = if immediate {
++                Sorter::streaming(&ctx)
++            } else {
++                Sorter::new(&ctx, SortOrder::Key)
++            };
++            let result = (move || -> Result<Vec<u64>> {
++                for id in 0..2500u64 {
++                    sorter.push(Row {
++                        id,
++                        ordinal: id,
++                        key: (id % 2).to_be_bytes().to_vec(),
++                        fields: vec![id.to_string(), "x".repeat(128)],
++                    })?;
++                }
++                sorter.finish()?.map(|row| row.map(|row| row.id)).collect()
++            })();
++            eprintln!("PROBE immediate={immediate} success={} rows={} error={:?} held={held} remaining={} peak={}",
++                result.is_ok(), result.as_ref().map_or(0, Vec::len), result.as_ref().err(),
++                ctx.workspace.used(), ctx.workspace.peak());
++            if let Ok(ids) = &result {
++                let mut expected = (0..2500u64).collect::<Vec<_>>();
++                expected.sort_unstable_by_key(|id| (id % 2, *id));
++                assert_eq!(ids, &expected);
++            }
++            assert_eq!(ctx.workspace.used(), held);
++            assert_eq!(ctx.used(), 0);
++            drop(other);
++            assert_eq!(ctx.workspace.used(), directory);
++        }
++        Ok(())
++    }
++
++    #[test]
+diff --git a/crates/chopper/src/storage/adaptive.rs b/crates/chopper/src/storage/adaptive.rs
+--- a/crates/chopper/src/storage/adaptive.rs
++++ b/crates/chopper/src/storage/adaptive.rs
+@@ -74,0 +75,3 @@
++    }
++    pub(super) fn remaining(&self) -> usize {
++        self.limit.saturating_sub(self.used()) as usize
+@@ -922,0 +926,11 @@
++    }
++    /// Prepare every known allocation key. Empty files and their owned grants
++    /// survive retention; overflow only writes to existing admitted writers.
++    pub(super) fn prepare_indices(ctx: &Context, groups: usize) -> Result<Option<Self>> {
++        let mut router = Self::new(ctx);
++        for index in 0..groups {
++            if !router.push_parts(&(index as u64).to_be_bytes(), 0, |_| Ok(()))? {
++                return Ok(None);
++            }
++        }
++        Ok(Some(router))
+diff --git a/crates/chopper/src/engine/streaming.rs b/crates/chopper/src/engine/streaming.rs
+--- a/crates/chopper/src/engine/streaming.rs
++++ b/crates/chopper/src/engine/streaming.rs
+@@ -143 +143,5 @@
+-            sorter: Sorter::streaming(ctx),
++            sorter: if let Operation::AssignProbabilistic { groups, .. } = operation {
++                Sorter::resident_allocation(ctx, groups.len())?
++            } else {
++                Sorter::streaming(ctx)
++            },

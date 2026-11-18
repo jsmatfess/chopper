@@ -1,0 +1,689 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-11-07",
+  "scope": "Focused639 selected packaging source with original feb9 runtime builds; static receipt/member and metadata reconciliation only",
+  "custody_roots": {
+    "candidate_source": "Retained focused candidate worktree t3-23851a57; paths relative to its root",
+    "parent_evidence": "Retained parent evidence worktree t3-ed9ab79d; paths relative to its root"
+  },
+  "custody_note": "Local evidence locators, not repository links or public downloads. Raw paths/environments remain in retained custody.",
+  "release_source_commit": "639d1fe97d985b1544df0932321c6a93cca2567b",
+  "release_source_tree": "b3bde79d552ee29760cb283d07938f9248cee0bb",
+  "release_source_branch": "release/0.2.0-focused-source-151-153-154",
+  "original_runtime_build": {
+    "commit": "feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d",
+    "tree": "57f6675f4e216d0b504c3063c17a2b37ab16ac20",
+    "source_files": 1119,
+    "runtime_input_files_unchanged": 1116,
+    "changed_paths": [
+      "docs/release-packaging.md",
+      "docs/releases/native-usage.txt",
+      "scripts/package-release.py"
+    ],
+    "reuse_basis": "Exact three packaging/docs paths only; no compiled Rust/TypeScript/Cargo/vendor/embedded/browser input changes. Original attempts retain feb9 identity, never relabeled as 639."
+  },
+  "records": {
+    "source_reconciliation": {
+      "custody": "candidate_source",
+      "path": "scratch/focused-package-notices/source-reconciliation.json",
+      "bytes": 68141,
+      "sha256": "a5034cab5d27c3244aec4d08637f62afa0382faeaa43afc63ca59ba317da90f8"
+    },
+    "linux_qualification": {
+      "custody": "candidate_source",
+      "path": "scratch/focused-linux-qualification-r4/summary.json",
+      "bytes": 1895,
+      "sha256": "72c45d1928649923b8a4a9978067fd0e49a8e936d775713843d5edb1f4bade70"
+    },
+    "linux_qualification_custody": {
+      "custody": "candidate_source",
+      "path": "scratch/focused-linux-qualification-r4/final-custody.json",
+      "bytes": 249,
+      "sha256": "257fc241399fbc7e94c69d0a541ec653f4fcc64b7107d0e54218a24c66a234c5"
+    },
+    "linux_hosted_build_binding": {
+      "custody": "candidate_source",
+      "path": "scratch/focused-production-artifacts-20261107T061837Z/records/build-bindings.json",
+      "bytes": 4628,
+      "sha256": "3bec10f544b0ffe67300159fb6d68e016c328d5b92d2d6f87988566414bf61f1"
+    },
+    "linux_hosted_toolchains": {
+      "custody": "candidate_source",
+      "path": "scratch/focused-production-artifacts-20261107T061837Z/records/toolchains.json",
+      "bytes": 2182,
+      "sha256": "a516d138b7c57c69e0a835824f83655c49ad356b60ef18decb051035eac58032"
+    },
+    "production_guard": {
+      "custody": "candidate_source",
+      "path": "scratch/focused-production-artifacts-20261107T061837Z/records/production-guard.json",
+      "bytes": 3936,
+      "sha256": "bfca56298ca2b0093474b020b18619bdace1ec114526768e7255c1166e259ad6"
+    },
+    "windows_qualification": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-qualification-r2/summary.json",
+      "bytes": 1282,
+      "sha256": "b2396b1035ff2084185960c96311fa28d44092e47e07c06b05d8996579394893"
+    },
+    "windows_qualification_handoff": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-qualification-r2/handoff.txt",
+      "bytes": 4869,
+      "sha256": "2a5a165daaf0adfc71dc9912632e18e85eda2d8783e263fc8fe8706cae3c1f1f"
+    },
+    "windows_qualification_index": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-qualification-r2/packet-index.json",
+      "bytes": 3091,
+      "sha256": "65b257979942ab22f4a61a6f4c8dbfb69ad6b6778c576e9e4800b8d162664d04"
+    },
+    "windows_build_binding": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-release-r1/native/build-binding.json",
+      "bytes": 191090,
+      "sha256": "666edb1ce9271888062e4d9056c75d1cadee4cc79c8f87e006868ff128dda3b4"
+    },
+    "windows_build_handoff": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-release-r1/handoff.txt",
+      "bytes": 6595,
+      "sha256": "ef08328c595008aa066ee3f950a1d1beece367f8175403100acb6cdbf5053582"
+    },
+    "windows_build_index": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-release-r1/file-hash-index.json",
+      "bytes": 427507,
+      "sha256": "9b7d4f08c8d7947292c9f862af8f4b7a5b3bed3caf8750bf974ab7c8d2288eaf"
+    },
+    "windows_build_audit": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-release-r1/native/independent-audit.json",
+      "bytes": 3148,
+      "sha256": "4f5799b0f7278e150768a79e193a808c2ad04936397954d34a1cd6921d0ec367"
+    },
+    "ui_handoff": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-ui-encoding-20261107-r3/records/HANDOFF.json",
+      "bytes": 14645,
+      "sha256": "e2b46d71fd6561fd780b45f7f1923f8923a79564e2b3caecc00daeec43561212"
+    },
+    "ui_results": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-ui-encoding-20261107-r3/records/results.json",
+      "bytes": 11440,
+      "sha256": "68a1a36a187c79e60767430fc06f7c78ce1ea383efb9db642cf3590d03ed0e92"
+    },
+    "ui_browser": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-ui-encoding-20261107-r3/records/browser.json",
+      "bytes": 280,
+      "sha256": "cd757807414533cde83b1d9a50b63a20d3e9b60d271c6e36dd961f5fb76e4198"
+    },
+    "ui_custody": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-ui-encoding-20261107-r3/records/custody.json",
+      "bytes": 384,
+      "sha256": "4990407cfbe4a6d2c87a86767c56c400250043671771c96fc0e83fab4303b4f9"
+    },
+    "ui_retained_r2_case": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-ui-encoding-20261107-r2/records/native-cp1252-direct.json",
+      "bytes": 7417,
+      "sha256": "5d24ac402eedc025b294d5917a25d374a2d0ae1e7eb1244fb75ff3e9279847ec"
+    },
+    "linux_package_smoke": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-linux-release-package-smoke-639-r2/packet-summary.json",
+      "bytes": 2056,
+      "sha256": "86a63b40d5ac56b01ba6d0c551d91ed77ef217ffd7cd228cc36227c0e69c3015"
+    },
+    "linux_package_smoke_index": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-linux-release-package-smoke-639-r2/packet-index.json",
+      "bytes": 14128,
+      "sha256": "e7ced364440135cf7ccab831ad867858447477e115a6a313489082f4b3483ddd"
+    },
+    "linux_package_smoke_audit": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-linux-release-package-smoke-639-r2/independent-audit.json",
+      "bytes": 449,
+      "sha256": "fe0e6fc15a7a45a630b847de8a44b2efc777a269d37b3ae6c8fb25a5f8688106"
+    },
+    "windows_package_smoke": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-package-639-r1/report.json",
+      "bytes": 8381,
+      "sha256": "59fc9fc39b03c8a092a079c353e8684dea094b3ca28736e3cfc1b092dcf33fa7"
+    },
+    "windows_package_smoke_index": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-package-639-r1/evidence-index.json",
+      "bytes": 3829,
+      "sha256": "8e0403bce9bae2826ffdde33c82af8ddf7ad1ee239c1e5e4b4ed8a1c65172ce4"
+    }
+  },
+  "original_build_status_records": {
+    "linux_hosted": {
+      "custody": "candidate_source",
+      "path": "scratch/focused-production-artifacts-20261107T061837Z/batch/status.json",
+      "bytes": 65348668,
+      "sha256": "4e77bd4dc88059ca8b51d1d6e8c7fefd772ee5b36ee3bb66d3402001d773cdb0"
+    },
+    "windows": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-release-r1/native/batch/status.json",
+      "bytes": 11504900,
+      "sha256": "5018bf502349a236af620327bdb812750b001d7c8efc08bf46163b1480721d0d"
+    }
+  },
+  "original_build_attempts": {
+    "linux_hosted": [
+      {
+        "id": "native",
+        "attempt": 1,
+        "status": "passed",
+        "exit_code": 0,
+        "source_input_metadata_matches": 1119,
+        "artifacts": {
+          "../target/x86_64-unknown-linux-gnu/release/chopper": {
+            "bytes": 5380336,
+            "sha256": "979ade07540ac251d60da377e4d536d8cdaf414fcdcaaeefb61978fdbc1ce169"
+          }
+        }
+      },
+      {
+        "id": "wasi",
+        "attempt": 2,
+        "status": "passed",
+        "exit_code": 0,
+        "source_input_metadata_matches": 1119,
+        "artifacts": {
+          "ui/dist/engine.wasm": {
+            "bytes": 2469712,
+            "sha256": "036abf2b61a9735b9bc9c0650d1fc0179793c37fb9ba383804681de3d725550c"
+          }
+        }
+      },
+      {
+        "id": "hosted",
+        "attempt": 3,
+        "status": "passed",
+        "exit_code": 0,
+        "source_input_metadata_matches": 1119,
+        "artifacts": {
+          "ui/dist/_headers": {
+            "bytes": 385,
+            "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1"
+          },
+          "ui/dist/app.js": {
+            "bytes": 62608,
+            "sha256": "89a6a6940765c6db1a0a8eb08f0d1ba1d7fefba09c2968b773fc059c77acde23"
+          },
+          "ui/dist/engine-worker.js": {
+            "bytes": 42781,
+            "sha256": "41e26203c5fba5d4751bf45aac940a2a17b27043d15902b29d2a90c4677d9e80"
+          },
+          "ui/dist/engine.wasm": {
+            "bytes": 2469712,
+            "sha256": "036abf2b61a9735b9bc9c0650d1fc0179793c37fb9ba383804681de3d725550c"
+          },
+          "ui/dist/index.html": {
+            "bytes": 8836,
+            "sha256": "7c5a0dea3884a3faaf03f3f37956f0bed3f7133a8ecfb253d5414160517a0c2a"
+          },
+          "ui/dist/storage-worker.js": {
+            "bytes": 3034,
+            "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6"
+          },
+          "ui/dist/style.css": {
+            "bytes": 14911,
+            "sha256": "da123fd1cc919783fb90e94f0c3c076fc57ff357879e53ba08a252f37fc8eef6"
+          }
+        }
+      }
+    ],
+    "windows": [
+      {
+        "id": "one-default-windows-release-build",
+        "attempt": 1,
+        "status": "passed",
+        "exit_code": 0,
+        "source_input_metadata_matches": 1119,
+        "artifacts": {
+          "../target/x86_64-pc-windows-msvc/release/chopper.exe": {
+            "bytes": 4368896,
+            "sha256": "42772aa8bb8a76e27fe9d7a0e479b445250e164bdcb4da25fdae88a83536c5d2"
+          }
+        }
+      },
+      {
+        "id": "actual-produced-version-once",
+        "attempt": 2,
+        "status": "passed",
+        "exit_code": 0,
+        "source_input_metadata_matches": 0,
+        "artifacts": {}
+      },
+      {
+        "id": "actual-produced-help-once",
+        "attempt": 3,
+        "status": "passed",
+        "exit_code": 0,
+        "source_input_metadata_matches": 0,
+        "artifacts": {}
+      }
+    ]
+  },
+  "artifact_receipt": {
+    "custody": "candidate_source",
+    "path": "scratch/focused-candidate-packages-639-r1/chopper-0.2.0-artifact-receipt.json",
+    "bytes": 6495,
+    "sha256": "1720f28a01cbbd7a30cbb8c8614b9efc2da01e57c765c625f51e8a5e3455c30d"
+  },
+  "checksums": {
+    "custody": "candidate_source",
+    "path": "scratch/focused-candidate-packages-639-r1/SHA256SUMS",
+    "bytes": 389,
+    "sha256": "0a1c8a5c3ce4f60b6f21e861c7764acb99f568014082c38bb4f9f54455cb8b6a"
+  },
+  "packaging_input_manifest": {
+    "bytes": 5427,
+    "sha256": "5eae794d495792b5e9abb78f9eed6aea2077c67b214034ac0250d72398b79170"
+  },
+  "packaging_tools": {
+    "package-release.py": {
+      "bytes": 13544,
+      "sha256": "5ccc0fc62f109490f7431d534a2e931d9f5e4acf759cfb8fcc141dfd2d16797c"
+    },
+    "browser-artifacts.mjs": {
+      "bytes": 655,
+      "sha256": "6f4c84abda6f57d7ae6eb3f92c4797e1d8858e7a3a61f44b67b52f2c5d13854e"
+    }
+  },
+  "packages": {
+    "chopper-0.2.0-hosted.zip": {
+      "bytes": 873522,
+      "sha256": "c321df0c684439da7c622578b7685705cbf667e65f0039d7318674c7fc1f8e9d"
+    },
+    "chopper-0.2.0-windows-x86_64.zip": {
+      "bytes": 1804401,
+      "sha256": "bba46786609777f2722c6fec0563f6ce5ae32fb2dd630032889f56f3ab27be01"
+    },
+    "chopper-0.2.0-linux-x86_64.zip": {
+      "bytes": 2190534,
+      "sha256": "6a09fea10f62cdd1d504e83de06f597dcb218f3077ca745ac049d1d7df33e076"
+    }
+  },
+  "native": {
+    "windows_x86_64": {
+      "target": "x86_64-pc-windows-msvc",
+      "bytes": 4368896,
+      "sha256": "42772aa8bb8a76e27fe9d7a0e479b445250e164bdcb4da25fdae88a83536c5d2"
+    },
+    "linux_x86_64": {
+      "target": "x86_64-unknown-linux-gnu",
+      "bytes": 5380336,
+      "sha256": "979ade07540ac251d60da377e4d536d8cdaf414fcdcaaeefb61978fdbc1ce169"
+    }
+  },
+  "hosted": {
+    "_headers": {
+      "bytes": 385,
+      "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1"
+    },
+    "app.js": {
+      "bytes": 62608,
+      "sha256": "89a6a6940765c6db1a0a8eb08f0d1ba1d7fefba09c2968b773fc059c77acde23"
+    },
+    "engine-worker.js": {
+      "bytes": 42781,
+      "sha256": "41e26203c5fba5d4751bf45aac940a2a17b27043d15902b29d2a90c4677d9e80"
+    },
+    "engine.wasm": {
+      "bytes": 2469712,
+      "sha256": "036abf2b61a9735b9bc9c0650d1fc0179793c37fb9ba383804681de3d725550c"
+    },
+    "index.html": {
+      "bytes": 8836,
+      "sha256": "7c5a0dea3884a3faaf03f3f37956f0bed3f7133a8ecfb253d5414160517a0c2a"
+    },
+    "storage-worker.js": {
+      "bytes": 3034,
+      "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6"
+    },
+    "style.css": {
+      "bytes": 14911,
+      "sha256": "da123fd1cc919783fb90e94f0c3c076fc57ff357879e53ba08a252f37fc8eef6"
+    }
+  },
+  "package_members": {
+    "chopper-0.2.0-hosted.zip": {
+      "_headers": {
+        "bytes": 385,
+        "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1",
+        "mode": "0644"
+      },
+      "app.js": {
+        "bytes": 62608,
+        "sha256": "89a6a6940765c6db1a0a8eb08f0d1ba1d7fefba09c2968b773fc059c77acde23",
+        "mode": "0644"
+      },
+      "engine-worker.js": {
+        "bytes": 42781,
+        "sha256": "41e26203c5fba5d4751bf45aac940a2a17b27043d15902b29d2a90c4677d9e80",
+        "mode": "0644"
+      },
+      "engine.wasm": {
+        "bytes": 2469712,
+        "sha256": "036abf2b61a9735b9bc9c0650d1fc0179793c37fb9ba383804681de3d725550c",
+        "mode": "0644"
+      },
+      "index.html": {
+        "bytes": 8836,
+        "sha256": "7c5a0dea3884a3faaf03f3f37956f0bed3f7133a8ecfb253d5414160517a0c2a",
+        "mode": "0644"
+      },
+      "storage-worker.js": {
+        "bytes": 3034,
+        "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6",
+        "mode": "0644"
+      },
+      "style.css": {
+        "bytes": 14911,
+        "sha256": "da123fd1cc919783fb90e94f0c3c076fc57ff357879e53ba08a252f37fc8eef6",
+        "mode": "0644"
+      }
+    },
+    "chopper-0.2.0-windows-x86_64.zip": {
+      "LICENSE": {
+        "bytes": 1071,
+        "sha256": "0e2f209b726650ef0b6569ed2d31d23ccd062b48650e16abf5d49b830d9df073",
+        "mode": "0644"
+      },
+      "README.txt": {
+        "bytes": 1103,
+        "sha256": "17352a38d958c3ab50092fc4c6f0db0861481b27dd25bbcf4fb10162be0adeeb",
+        "mode": "0644"
+      },
+      "chopper.exe": {
+        "bytes": 4368896,
+        "sha256": "42772aa8bb8a76e27fe9d7a0e479b445250e164bdcb4da25fdae88a83536c5d2",
+        "mode": "0644"
+      },
+      "licenses/tiny_http-0.12.0/LICENSE-APACHE": {
+        "bytes": 10847,
+        "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "mode": "0644"
+      },
+      "licenses/tiny_http-0.12.0/LICENSE-MIT": {
+        "bytes": 1075,
+        "sha256": "e69bb98ae371fc43e5ef9cb1fc648762faf92edd93a8afd71411fac419b1b550",
+        "mode": "0644"
+      },
+      "licenses/zip-2.4.2/LICENSE": {
+        "bytes": 1217,
+        "sha256": "04dc52136d82400b11df5f474949863a70a5d05d2278dec45b99c479494450a6",
+        "mode": "0644"
+      },
+      "licenses/zstd-sys-2.1.1/LICENSE": {
+        "bytes": 1501,
+        "sha256": "ce4868c8e4ebe47a7d4b3c93dbf6b802033e5ae2fa7638098173f80836daac60",
+        "mode": "0644"
+      },
+      "licenses/zstd-sys-2.1.1/LICENSE.BSD-3-Clause": {
+        "bytes": 1614,
+        "sha256": "bf7017a73a95ea63bf3716b13ec2bcd79c92942356e3408c6fb66332bad6d977",
+        "mode": "0644"
+      }
+    },
+    "chopper-0.2.0-linux-x86_64.zip": {
+      "LICENSE": {
+        "bytes": 1071,
+        "sha256": "0e2f209b726650ef0b6569ed2d31d23ccd062b48650e16abf5d49b830d9df073",
+        "mode": "0644"
+      },
+      "README.txt": {
+        "bytes": 1103,
+        "sha256": "17352a38d958c3ab50092fc4c6f0db0861481b27dd25bbcf4fb10162be0adeeb",
+        "mode": "0644"
+      },
+      "chopper": {
+        "bytes": 5380336,
+        "sha256": "979ade07540ac251d60da377e4d536d8cdaf414fcdcaaeefb61978fdbc1ce169",
+        "mode": "0755"
+      },
+      "licenses/tiny_http-0.12.0/LICENSE-APACHE": {
+        "bytes": 10847,
+        "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "mode": "0644"
+      },
+      "licenses/tiny_http-0.12.0/LICENSE-MIT": {
+        "bytes": 1075,
+        "sha256": "e69bb98ae371fc43e5ef9cb1fc648762faf92edd93a8afd71411fac419b1b550",
+        "mode": "0644"
+      },
+      "licenses/zip-2.4.2/LICENSE": {
+        "bytes": 1217,
+        "sha256": "04dc52136d82400b11df5f474949863a70a5d05d2278dec45b99c479494450a6",
+        "mode": "0644"
+      },
+      "licenses/zstd-sys-2.1.1/LICENSE": {
+        "bytes": 1501,
+        "sha256": "ce4868c8e4ebe47a7d4b3c93dbf6b802033e5ae2fa7638098173f80836daac60",
+        "mode": "0644"
+      },
+      "licenses/zstd-sys-2.1.1/LICENSE.BSD-3-Clause": {
+        "bytes": 1614,
+        "sha256": "bf7017a73a95ea63bf3716b13ec2bcd79c92942356e3408c6fb66332bad6d977",
+        "mode": "0644"
+      }
+    }
+  },
+  "package_integrity": {
+    "archives": 3,
+    "members": 23,
+    "windows_members": 8,
+    "linux_members": 8,
+    "hosted_members": 7,
+    "outer_sizes_sha256": true,
+    "crc_unique_safe_names_sizes_sha256_regular_file_modes": true,
+    "native_usage_matches_unchanged_repository_payload": true,
+    "tiny_http_both_license_members_each_native": true,
+    "checksum_entries": 4,
+    "receipt_immutable": true,
+    "receipt_build_provenance_fields_remain_null": true
+  },
+  "qualification": {
+    "linux": {
+      "checks": 9,
+      "workspace_tests": 426,
+      "source": "feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d",
+      "scope": "Default native Linux/WSL; fmt/clippy/tests/layout/features/build/full tiny HTTP/active signal/four encoding API cases"
+    },
+    "windows": {
+      "checks": 8,
+      "workspace_tests": 422,
+      "decoder_layout_controls": 11,
+      "encoding_api_cases": 4,
+      "source": "feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d",
+      "scope": "Native Windows 11 build 26200, default debug; no optional features"
+    },
+    "production": {
+      "linux_hosted_builds": 3,
+      "windows_release_builds": 1,
+      "windows_version_help": 2,
+      "hosted_assets": 7,
+      "test_support_builds": 0,
+      "optional_features": []
+    },
+    "ui": {
+      "flows": 8,
+      "fresh_r3": 7,
+      "hash_bound_r2": 1,
+      "retained_case": "native-cp1252-direct",
+      "browser": {
+        "version": "156.0.8078.4",
+        "channel": "bundled-chromium",
+        "executable": "bundled Chromium (private absolute executable path retained in custody)",
+        "sha256": "377a9fc07b495c3b8d0ab8ec1fdfd153641759f9756fea34d8dfce4de82f5025",
+        "playwright": "1.64.0",
+        "node": "v22.23.4"
+      },
+      "scope": "Real native Linux production binary and WASI worker, same packaged runtime bytes; DOM import/edit/export/submission/completion/config/manifest and independent literal cp1252/Shift-JIS byte checks. Two unsupported encodings export-only checks are additional, not engine executions. Hosted File System Access picker stubbed with real File/OPFS handles, no actual desktop dialog."
+    },
+    "package_smoke": {
+      "linux_steps": 7,
+      "linux": "Extracted current release ELF: version/help, full tiny HTTP, active SIGINT and four encoding HTTP cases; preceding verify/extract included",
+      "windows": "Extracted current release PE: version/help, full tiny HTTP, active CTRL_BREAK and four encoding HTTP cases; Windows11/NTFS fixture publication/cleanup only"
+    }
+  },
+  "toolchain_limits": "Current actual Rust/Cargo/Rustdoc 1.99.1 binaries pinned. Prior failed Windows r1 rust-src install/rollback effect unassessed; no full-sysroot unchanged, repair or hermetic-build claim.",
+  "acceptance_ledger": {
+    "103": {
+      "status": "closed",
+      "record": "0.2.0-native-scale-acceptance.json",
+      "scope": "Exact 10,000,000,000-byte D/G accepted on Linux/WSL and native Windows, independently verified with same-input seeded report parity. Windows G observed 712 sort runs and 16 merge operations; logical counters are not physical I/O or RSS. All four native slots consumed; failed sessions remain failed. Delivered through exact Linux/native Windows local gates at3f02e85.",
+      "delivery_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+      "delivery_pr": "https://github.com/jsmatfess/chopper/pull/193",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/103#issuecomment-6897408155",
+      "local_ci": {
+        "linux_sha256": "9d63a2de5fffdf34c7ad7b6b321562f6a5960b0f2a8b97f74a82c4cd2b7f280a",
+        "windows_sha256": "ab97d10a277c66bbef719ba03a38112263df5d01f97328b0299c91760243cb68"
+      },
+      "delivery_record_sha256": "50803e5fde07abd923a172baa52cabf49ef742986de6a37b6eda055b5cedf533"
+    },
+    "104": {
+      "status": "closed",
+      "scope": "All four selected1,000,000,000-byte Chrome/Edge D/G cells independently verified with exact same-input seeded cross-channel parity,64MiB/one worker and strict10MB CSV caps. G observed actual spill and truthful full-row interrupted merge traversal. Chrome G original harness failure remains failed; separate read-only completed-export recovery added no Run/claim. Current Edge SMALL15 at6afaffb and complete scale Tiny/D/G at94a4b76 passed normal and independent cleanup. Four canonical claims remain consumed. Delivered through exact Linux/native Windows local gates at3f02e85.",
+      "record": "0.2.0-browser-scale-acceptance.json",
+      "delivery_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+      "delivery_pr": "https://github.com/jsmatfess/chopper/pull/194",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/104#issuecomment-6897408897",
+      "local_ci": {
+        "linux_sha256": "9d63a2de5fffdf34c7ad7b6b321562f6a5960b0f2a8b97f74a82c4cd2b7f280a",
+        "windows_sha256": "ab97d10a277c66bbef719ba03a38112263df5d01f97328b0299c91760243cb68"
+      },
+      "delivery_record_sha256": "50803e5fde07abd923a172baa52cabf49ef742986de6a37b6eda055b5cedf533"
+    },
+    "105": {
+      "status": "closed",
+      "record": "0.2.0-final-package-smoke-acceptance.json",
+      "scope": "All8 selected final-package cancellation/recovery cases passed: Native processing/export cancellation; Chrome and Edge processing/export cancellation and malformed-after-valid-rows with preserved completed baseline and same-client retry. Actual system pickers/ordinary filesystems, no injected handle claim. Earlier native-dialog success and Windows CLI malformed/cleanup/overwrite proofs and Linux ordinary success plus Q8 malformed/preserved-export proof remain credited separately. Main/runtime/verifier identities and every failed attempt/charge retain their scopes. Delivered through exact Linux/native Windows local gates at3f02e85.",
+      "delivery_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+      "delivery_pr": "https://github.com/jsmatfess/chopper/pull/194",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/105#issuecomment-6897409755",
+      "local_ci": {
+        "linux_sha256": "9d63a2de5fffdf34c7ad7b6b321562f6a5960b0f2a8b97f74a82c4cd2b7f280a",
+        "windows_sha256": "ab97d10a277c66bbef719ba03a38112263df5d01f97328b0299c91760243cb68"
+      },
+      "delivery_record_sha256": "50803e5fde07abd923a172baa52cabf49ef742986de6a37b6eda055b5cedf533"
+    },
+    "91_recovery": {
+      "status": "scoped_checks_passed",
+      "scope": "Exact predecessor private readback delivered at 7b061: all 98 archive members, four released assets and 13 ZIP members verified. Existing isolated same-byte native/hosted runtime rehearsals retain their limits; no production restoration or deployment. Retain recovery archives through publication smoke and retention review.",
+      "record": "0.1.0-private-readback-2026-11-12.json",
+      "sha256": "b088ee092d5fee2ca916393734fd63a6c392779d5e75ba38e6880929518a2231",
+      "delivery_commit": "7b061b7467da93ddc1c727de0c9e97e4d8176cb4"
+    },
+    "version": {
+      "approved": false
+    },
+    "publication": {
+      "approved": false,
+      "tag_created": false,
+      "deployment_id": null
+    },
+    "178": {
+      "status": "closed",
+      "scope": "Complete native Tiny qualified at Linux harness 7aa7fe1 and Windows runtime 50c6465 with separately pinned verifier 919757f; both Windows 127-row D/G Runs, independent verification, malformed failure, all nine cleanup phases and independent Original/process proof passed. Harness delivered through exact Linux/native Windows local gates at 1f76; no scale or product-build relabelling.",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/178#issuecomment-6873691808",
+      "delivery_commit": "1f76a980f9eaccad65d253eb604d79e90e7e5480",
+      "delivery_record_sha256": "37290a4593faa2956dd728a90a3102d21d6b4d80d14e1c38c7a4c00158342516",
+      "linux_ci_sha256": "baf3c204f0673076c77cbd02babc00121f0bdedcbc51a3c7d1fbb84fee5f5ed0",
+      "windows_ci_sha256": "ec393cf62429c5607a8280d107e3fa28bf155de1f82c149f18e563dc2fe3d55b",
+      "windows_qualification_sha256": "7ac88169956cacf00c2568936e59497720540c9567a253cbec3742a1c1f90da8",
+      "windows_independent_sha256": "6779bd13c28d3b5bee593a63f9f59fe60ce519bfa45c617e29c7e226a93bdbe8"
+    },
+    "179": {
+      "status": "delivered",
+      "scope": "Actual-picker success/header-cap failure, all 15 SMALL contracts including deliberate-kill cases, and BrowserScale Tiny success/inline controlled failure have distinct Chrome/Edge runtime proofs. Delivered at 217dff6 through exact final Linux/Windows local gates; no 1 GB scale, complete #105 or publication credit. Failed attempts and charges remain retained.",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/179#issuecomment-6875376519",
+      "chrome_small": {
+        "harness": "63c01f2d34815bd60f672251e38aa592f48b4f77",
+        "runtime": "74cf796b4c86b898303644f074e94231f48d72dd",
+        "independent_sha256": "43e5ef0b82387395ccc4953fdd898bbd0bb3af63f0266b50e46a994b0f47fae9"
+      },
+      "edge_small": {
+        "harness": "4ef8aa6519ff38130ffa1b771ca71915bb6b6509",
+        "outcome_sha256": "85f6e564f8ff7f02a14aadd9e0c8cc4c4df559976cdbd7dbb70633caaaef455d",
+        "independent_supplement_sha256": "fa6158017401c2fdec614593891d405b77b98b39888d4ffaf494b1019a17ff99",
+        "audit_scope": "Raw independent audit remains failed for one access-denied PID; checked read-only supplement establishes that PID absent and combines all 349 process facts with the prior unchanged-Original proof. No administrative recovery or product retry."
+      },
+      "browser_scale": {
+        "harness": "ce245d243ad3828ed710ebd1534229719b95e2b6",
+        "chrome": {
+          "version": "157.0.8103.51",
+          "tiny_sha256": "2dc7e8b09a7a4dcb9f2a76bd190ed6b22fd16e987dd965bf2087eb04c99df523",
+          "independent_sha256": "fb4d8bfb2c409994bba815f900df2850a767afb7ce2584a004a68f4b4f8be1d4"
+        },
+        "edge": {
+          "version": "157.0.4341.46",
+          "tiny_sha256": "03b5345202202da83e16a2499575a1b63ecbe9c5b80962e043c879548def3b4f",
+          "independent_sha256": "3ac5d0f2c17ed25ecbfec69778dbbb6c733cffa9b0062eceb28c1bb3faad5c5a"
+        },
+        "scope": "Distinct installed-channel public Tiny success, independent CSV/manifest/marker verification, inline public one-byte engine failure, empty incomplete output/workspace/Web Lock cleanup, normal Original release and independent current-birth/byte0 proof. No scale or other-profile substitution."
+      },
+      "picker_browser_identity_comparison_sha256": "6511682fec660afe3afe6e0acb902330cf842c07f3960147127809a53bd62ad5",
+      "delivered_commit": "217dff6a52446417a79fa87581f3c03e5ada4aa6",
+      "delivery_pr": "https://github.com/jsmatfess/chopper/pull/187",
+      "delivery_comment": "https://github.com/jsmatfess/chopper/issues/179#issuecomment-6879821279",
+      "local_ci": {
+        "windows_sha256": "4702addace002051d43569ee68e8bfe2bf4dc70a2ed2df3efb44ee106361d230",
+        "linux_sha256": "34c56bdeadd7f5fd6560b2a224966dc6ffa713e06dfe363bf4717a884dce2ea4",
+        "windows_after_exit_sha256": "63fdec914d9114a9bc0dcf8777098a065986a0c20c7d2be6b9f6df3d79f6b553",
+        "delivery_outcome_sha256": "80b0eaaf7f8ddc07691875525fb1015360b70cea858392b11f9ca93608d45eb2"
+      }
+    },
+    "180": {
+      "status": "closed",
+      "scope": "Generated frozen-batch gate and actual bounded Windows generated batch passed at harness 6d4cda4; maintained Linux Tiny passed at 27a8466 with both D/G Runs, actual malformed-input failure, all nine cleanup roles and independent Original/process proof. Delivered at 2485fd4 through exact Linux/native Windows local gates. Tiny is not 10 GB/1 GB scale, complete #105 or publication acceptance; #176 stays open.",
+      "delivery_commit": "2485fd40167c5314d58f8398c63b179399801798",
+      "delivery_pr": "https://github.com/jsmatfess/chopper/pull/192",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/180#issuecomment-6883890593",
+      "delivery_record_sha256": "1196c22058faf6c39e95c53fd9e6b623ab0b15cf624887ec7226ced35cfd4f39",
+      "windows": {
+        "harness": "6d4cda449438b02926f789b36fb7e283e72fe0fa",
+        "batch_sha256": "b4ea4c82ecc0cdbaae48af0a4e479e4e81b301478df060f20bcafa6529103a34",
+        "independent_sha256": "169190a4b9543c460dc85ebcae2e1dd5ee818d77ab3aecd4bd46ad3bb66f608f",
+        "reused_input_bytes": 12800,
+        "generated_input_bytes": 0
+      },
+      "linux": {
+        "harness": "27a8466eedfca90043270fd8fb4f305797a6f5f3",
+        "qualification_sha256": "9654d7ee710f836be297164966541a04cb1de8be3e8007a7aecf74d27e200f29",
+        "independent_sha256": "2db95b583a7f4f2c31c4fdb3fe16c74cd35b8e9123f4f42969dc18d3255da878",
+        "administrative_recovery": false
+      },
+      "local_ci": {
+        "windows_sha256": "1191c215c9310c7fe8ff59a60cb0a8e38ec8d8cc507ca4a0f5f2fd0eace632f6",
+        "linux_sha256": "33f78ebf5684c17f51fb6bd12d6d48c5d139f81aecf17267457ba973b71dc02a",
+        "windows_after_exit_sha256": "c80b17822f09c58fce1c1f5ad966aa2c9d6cff6b9aa11a410c819993237e4dd9"
+      }
+    },
+    "87": {
+      "status": "closed",
+      "delivery_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/87#issuecomment-6897410430",
+      "scope": "Selected Windows/Linux native10GB D/G, Windows Chrome/Edge hosted1GB D/G and actual final-package smoke mapped to exact accepted identities; deferred platforms/device faults/RSS/general workload claims remain outside scope."
+    }
+  },
+  "historical_evidence": "0.2.0-frozen606-evidence.json",
+  "retained_failures": [
+    "All frozen606 attempts remain in the historical evidence JSON without new-source credit.",
+    "Focused Linux qualification r1-r3 and Windows qualification r1 retained; Windows r1 rustup/rust-src rollback effects unassessed.",
+    "Windows release controller fingerprint-path assertion failed after all three commands passed; first metadata completion used incorrect attempt IDs. Read-only v2 completion passed with no rebuild or extra binary invocation.",
+    "UI initial Chromium socket-path failure, prelaunch-path failure and r2 timeout retained. r2 native cp1252 direct result is hash-bound once; r3 adds seven flows, not eight retries.",
+    "Linux package smoke r1 parser failure before executable launch retained; r2 corrected NUL handling. Windows initial audit field error retained; read-only v2 passed without product rerun."
+  ],
+  "verification_scope": "This documentation task read original status/input/artifact metadata and small pinned records, checked selected Git tree/path delta, and directly verified receipt, three small ZIPs/all23 members and four checksum entries. It did not rehash full source/dependency/tool/sysroot sets or large raw statuses, rebuild, run binaries/browsers/CI/Windows/scale, assemble ZIPs or perform release operations."
+}

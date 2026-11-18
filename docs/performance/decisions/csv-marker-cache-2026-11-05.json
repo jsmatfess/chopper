@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "csv-marker-cache-2026-11-05",
+  "title": "Keep record-local CSV marker caching unapplied",
+  "date": "2026-11-05",
+  "subsystem": "input",
+  "question": "Can record-local structural-boundary caching improve strict complete CSV Run without a material quoted-path regression?",
+  "disposition": "reject",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Restore production exactly: favorable plain primary meets the practical rule, but the quote-rich control exceeds the frozen CPU regression ceiling. Preserve generic-window counterexample, corrected candidate and failed preflight without retuning.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "Ordered plain250k32field ABBA primary, n2 per variant.",
+      "Separate ordered quote-rich50k32field negative pair, n1 per variant."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Corrected generic changing-window controls pass exact-head Linux/native Windows workflows, including core WASM/browser/resource/all-feature checks on Linux. Preserved initial cached source independently fails the new control (exit101). Six complete native jobs pass exact every-field/ID/order/byte/cap/17Analysis/cleanup checks. Final evidence-only head uses its applicable local gate."
+  },
+  "limitations": [
+    "Plain wall median8.09%, totalCPU12.24%,userCPU11.11% lower with both opposite-order pairs favorable, but short n2 cells/ranges overlap. No general/tail performance claim.",
+    "Separate quote-rich total/userCPU rises7.14%/8.33%, each one15.625ms tick, failing the predeclared2% ceiling despite favorable wall. Unreplicated coarse result is not a general regression claim.",
+    "Warm uncontrolled cache/background, no native full physical-plan trace, no current-source browser throughput/macOS/RSS/physicalIO claim. Analysis diagnostic snapshots precede final publication.",
+    "Original source333-equivalent baseline binary reused only after original full build/input/artifact/recorded compiler/environment and features checks. Historical independent MSVC C-compiler/linker hashes remain unknown."
+  ],
+  "exclusions": [
+    "Quote-rich controls are separate from the primary; summaries/contracts/older passes are not extra speed samples.",
+    "First-source suite passes do not resolve the executed generic-window counterexample. Failed first preflight and original Cargo-wrapper exit-capture limitation remain explicit.",
+    "Source2/2, candidatebuild1/1 and nativeRuns6/6 spent; no component scans, tuning, measurement repeats or reopening."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#csv-marker-cache-candidate-not-promoted-2026-11-05",
+      "sha256": "3b81bff5cec294dd8a7313ceaa1ac068305ce04a7ebd3bf9ead8dfd24c155161"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/csv-marker-cache-2026-11-05.json",
+      "sha256": "f86e608f20d68a15810c224bdc02f768ac8d6b0ca1badb2237af5ee7cfac0fdd"
+    },
+    {
+      "path": "docs/benchmarks/csv-marker-cache-2026-11-05.patch",
+      "sha256": "3d98d0d334c7403a9add75718753e898724365e6a36c6f28639adc59a18d2575"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

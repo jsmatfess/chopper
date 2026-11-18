@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chopper offline experiment decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["action", "target", "assessment", "reason", "packet_sha256"],
+  "properties": {
+    "action": {"enum": ["stop", "repeat", "refine", "challenger"]},
+    "target": {"type": ["string", "null"], "minLength": 1, "maxLength": 80},
+    "assessment": {"enum": ["useful", "rejected", "inconclusive"]},
+    "reason": {"type": "string", "minLength": 1, "maxLength": 2000, "pattern": "\\S"},
+    "packet_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

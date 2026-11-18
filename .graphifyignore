@@ -1,0 +1,13 @@
+# Build products and local tooling (also excluded by .gitignore).
+.tools/
+target/
+scratch/
+ui/node_modules/
+ui/dist/
+# Generated native UI bundle; index the TypeScript source instead.
+ui/public/app.js
+# Third-party sources and preserved historical evidence are outside this map.
+vendor/
+docs/history/
+docs/benchmarks/
+graphify-out/

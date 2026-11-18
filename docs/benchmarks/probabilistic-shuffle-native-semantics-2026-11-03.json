@@ -1,0 +1,511 @@
+{
+  "type": "derived_probabilistic_shuffle_native_semantic_and_failure_controls",
+  "scope": "Ten untimedcompleteenginecontrols each onLinux/WSL and nativeWindows/MSVC; isolatedcandidate/diagnosticprimarykeyoverride. No generalperformance, browser or promotionclaim.",
+  "base_patches": [
+    "docs/benchmarks/probabilistic-shuffle-fusion-2026-11-03.patch",
+    "docs/benchmarks/probabilistic-shuffle-lint-placement-2026-11-03.patch",
+    "docs/benchmarks/probabilistic-shuffle-fixed-capacity-2026-11-03.patch"
+  ],
+  "diagnostic_patch": "docs/benchmarks/probabilistic-shuffle-native-semantics-2026-11-03.patch",
+  "records": {
+    "linux": {
+      "PROB_SEMANTIC": [
+        {
+          "candidate": false,
+          "cleanup": true,
+          "collision": false,
+          "logical_stages": 4,
+          "outcome": "success_exact",
+          "rows": 2000,
+          "strata": [
+            0,
+            2
+          ]
+        },
+        {
+          "candidate": true,
+          "cleanup": true,
+          "collision": false,
+          "logical_stages": 4,
+          "outcome": "success_exact",
+          "rows": 2000,
+          "strata": [
+            0,
+            2
+          ]
+        },
+        {
+          "candidate": false,
+          "cleanup": true,
+          "collision": true,
+          "logical_stages": 4,
+          "outcome": "success_exact",
+          "rows": 2000,
+          "strata": [
+            0,
+            2
+          ]
+        },
+        {
+          "candidate": true,
+          "cleanup": true,
+          "collision": true,
+          "logical_stages": 4,
+          "outcome": "success_exact",
+          "rows": 2000,
+          "strata": [
+            0,
+            2
+          ]
+        }
+      ],
+      "PROB_SHUFFLE_SPILL": [
+        {
+          "candidate": false,
+          "cleanup": true,
+          "diagnostics": {
+            "compact_spill_blocks": 0,
+            "compact_spill_fallbacks": 0,
+            "compact_spill_files": 0,
+            "compact_spill_rows": 0,
+            "compact_spill_source_bytes": 0,
+            "compact_spill_stored_bytes": 0,
+            "consecutive_partition_fusions": 0,
+            "consecutive_partition_retries": 0,
+            "consecutive_partition_rows": 0,
+            "directory_path_reserved_bytes": 35,
+            "fisher_yates_calls": 0,
+            "fisher_yates_rows": 0,
+            "fisher_yates_seconds": 0.0,
+            "grouping_policy": "auto",
+            "merge_inputs": 2,
+            "merge_operations": 1,
+            "partition_balanced_fusions": 0,
+            "partition_balanced_retries": 0,
+            "partition_balanced_rows": 0,
+            "peak_temporary_files": 6,
+            "peak_workspace_reserved_bytes": 2002418,
+            "process_memory": {
+              "admission_limit_bytes": 4194304,
+              "limit_bytes": 4194304,
+              "peak_reserved_bytes": 2002418,
+              "pressure_baseline_reserved_bytes": null,
+              "pressure_observation": null,
+              "pressure_rechecks": 0,
+              "reserved_bytes": 66948,
+              "startup_observation": null
+            },
+            "resident_sorts": 2,
+            "routed_groupings": 2,
+            "routing_fallbacks": 0,
+            "routing_reused_runs": 0,
+            "shuffle_partition_fusions": 0,
+            "shuffle_partition_retries": 0,
+            "shuffle_partition_rows": 0,
+            "sort_calls": 4,
+            "sort_rows": 20000,
+            "sort_runs": 2,
+            "sort_seconds": 2.444902888,
+            "spill_format_candidate": false,
+            "streaming_chain_fusions": 0,
+            "streaming_chain_retries": 0,
+            "streaming_chain_rows": 0,
+            "temporary_bytes_read": 16329511,
+            "temporary_bytes_written": 16237647,
+            "temporary_cleanup_failures": 0,
+            "temporary_files_created": 11,
+            "temporary_path_reserved_bytes": 0,
+            "workspace_reserved_bytes": 66948
+          },
+          "input_blake3": "03979f0c90a360ab45182a63ce69599138a6dedde267221decd9b944b3322e37",
+          "outcome": "success_exact",
+          "shared_pool_bytes": 4194304
+        },
+        {
+          "candidate": true,
+          "cleanup": true,
+          "diagnostics": {
+            "compact_spill_blocks": 0,
+            "compact_spill_fallbacks": 0,
+            "compact_spill_files": 0,
+            "compact_spill_rows": 0,
+            "compact_spill_source_bytes": 0,
+            "compact_spill_stored_bytes": 0,
+            "consecutive_partition_fusions": 0,
+            "consecutive_partition_retries": 0,
+            "consecutive_partition_rows": 0,
+            "directory_path_reserved_bytes": 35,
+            "fisher_yates_calls": 0,
+            "fisher_yates_rows": 0,
+            "fisher_yates_seconds": 0.0,
+            "grouping_policy": "auto",
+            "merge_inputs": 3,
+            "merge_operations": 1,
+            "partition_balanced_fusions": 0,
+            "partition_balanced_retries": 0,
+            "partition_balanced_rows": 0,
+            "peak_temporary_files": 7,
+            "peak_workspace_reserved_bytes": 2373788,
+            "process_memory": {
+              "admission_limit_bytes": 4194304,
+              "limit_bytes": 4194304,
+              "peak_reserved_bytes": 2373788,
+              "pressure_baseline_reserved_bytes": null,
+              "pressure_observation": null,
+              "pressure_rechecks": 0,
+              "reserved_bytes": 66948,
+              "startup_observation": null
+            },
+            "resident_sorts": 0,
+            "routed_groupings": 1,
+            "routing_fallbacks": 0,
+            "routing_reused_runs": 0,
+            "shuffle_partition_fusions": 0,
+            "shuffle_partition_retries": 0,
+            "shuffle_partition_rows": 0,
+            "sort_calls": 3,
+            "sort_rows": 20000,
+            "sort_runs": 3,
+            "sort_seconds": 2.362846872,
+            "spill_format_candidate": false,
+            "streaming_chain_fusions": 0,
+            "streaming_chain_retries": 0,
+            "streaming_chain_rows": 0,
+            "temporary_bytes_read": 11777066,
+            "temporary_bytes_written": 11734456,
+            "temporary_cleanup_failures": 0,
+            "temporary_files_created": 8,
+            "temporary_path_reserved_bytes": 0,
+            "workspace_reserved_bytes": 66948
+          },
+          "input_blake3": "03979f0c90a360ab45182a63ce69599138a6dedde267221decd9b944b3322e37",
+          "outcome": "success_exact",
+          "shared_pool_bytes": 4194304
+        }
+      ],
+      "PROB_FAILURE": [
+        {
+          "cancelled": false,
+          "candidate": false,
+          "cleanup": true,
+          "input_visits": 1,
+          "outcome": "typed_shared_denial",
+          "phase": "Preparing operation 2 of 3",
+          "retained_competitor_bytes": 33549371
+        },
+        {
+          "cancelled": false,
+          "candidate": true,
+          "cleanup": true,
+          "input_visits": 1,
+          "outcome": "typed_shared_denial",
+          "phase": "Preparing operation 2 of 3",
+          "retained_competitor_bytes": 33549371
+        },
+        {
+          "cancelled": true,
+          "candidate": false,
+          "cleanup": true,
+          "input_visits": 1,
+          "outcome": "cancelled",
+          "phase": "Preparing operation 2 of 3",
+          "retained_competitor_bytes": 0
+        },
+        {
+          "cancelled": true,
+          "candidate": true,
+          "cleanup": true,
+          "input_visits": 1,
+          "outcome": "cancelled",
+          "phase": "Preparing operation 2 of 3",
+          "retained_competitor_bytes": 0
+        }
+      ]
+    },
+    "windows": {
+      "PROB_SEMANTIC": [
+        {
+          "candidate": false,
+          "cleanup": true,
+          "collision": false,
+          "logical_stages": 4,
+          "outcome": "success_exact",
+          "rows": 2000,
+          "strata": [
+            0,
+            2
+          ]
+        },
+        {
+          "candidate": true,
+          "cleanup": true,
+          "collision": false,
+          "logical_stages": 4,
+          "outcome": "success_exact",
+          "rows": 2000,
+          "strata": [
+            0,
+            2
+          ]
+        },
+        {
+          "candidate": false,
+          "cleanup": true,
+          "collision": true,
+          "logical_stages": 4,
+          "outcome": "success_exact",
+          "rows": 2000,
+          "strata": [
+            0,
+            2
+          ]
+        },
+        {
+          "candidate": true,
+          "cleanup": true,
+          "collision": true,
+          "logical_stages": 4,
+          "outcome": "success_exact",
+          "rows": 2000,
+          "strata": [
+            0,
+            2
+          ]
+        }
+      ],
+      "PROB_SHUFFLE_SPILL": [
+        {
+          "candidate": false,
+          "cleanup": true,
+          "diagnostics": {
+            "compact_spill_blocks": 0,
+            "compact_spill_fallbacks": 0,
+            "compact_spill_files": 0,
+            "compact_spill_rows": 0,
+            "compact_spill_source_bytes": 0,
+            "compact_spill_stored_bytes": 0,
+            "consecutive_partition_fusions": 0,
+            "consecutive_partition_retries": 0,
+            "consecutive_partition_rows": 0,
+            "directory_path_reserved_bytes": 64,
+            "fisher_yates_calls": 0,
+            "fisher_yates_rows": 0,
+            "fisher_yates_seconds": 0.0,
+            "grouping_policy": "auto",
+            "merge_inputs": 2,
+            "merge_operations": 1,
+            "partition_balanced_fusions": 0,
+            "partition_balanced_retries": 0,
+            "partition_balanced_rows": 0,
+            "peak_temporary_files": 6,
+            "peak_workspace_reserved_bytes": 2002621,
+            "process_memory": {
+              "admission_limit_bytes": 4194304,
+              "limit_bytes": 4194304,
+              "peak_reserved_bytes": 2002621,
+              "pressure_baseline_reserved_bytes": null,
+              "pressure_observation": null,
+              "pressure_rechecks": 0,
+              "reserved_bytes": 66977,
+              "startup_observation": null
+            },
+            "resident_sorts": 2,
+            "routed_groupings": 2,
+            "routing_fallbacks": 0,
+            "routing_reused_runs": 0,
+            "shuffle_partition_fusions": 0,
+            "shuffle_partition_retries": 0,
+            "shuffle_partition_rows": 0,
+            "sort_calls": 4,
+            "sort_rows": 20000,
+            "sort_runs": 2,
+            "sort_seconds": 2.5031206,
+            "spill_format_candidate": false,
+            "streaming_chain_fusions": 0,
+            "streaming_chain_retries": 0,
+            "streaming_chain_rows": 0,
+            "temporary_bytes_read": 16329511,
+            "temporary_bytes_written": 16237647,
+            "temporary_cleanup_failures": 0,
+            "temporary_files_created": 11,
+            "temporary_path_reserved_bytes": 0,
+            "workspace_reserved_bytes": 66977
+          },
+          "input_blake3": "03979f0c90a360ab45182a63ce69599138a6dedde267221decd9b944b3322e37",
+          "outcome": "success_exact",
+          "shared_pool_bytes": 4194304
+        },
+        {
+          "candidate": true,
+          "cleanup": true,
+          "diagnostics": {
+            "compact_spill_blocks": 0,
+            "compact_spill_fallbacks": 0,
+            "compact_spill_files": 0,
+            "compact_spill_rows": 0,
+            "compact_spill_source_bytes": 0,
+            "compact_spill_stored_bytes": 0,
+            "consecutive_partition_fusions": 0,
+            "consecutive_partition_retries": 0,
+            "consecutive_partition_rows": 0,
+            "directory_path_reserved_bytes": 64,
+            "fisher_yates_calls": 0,
+            "fisher_yates_rows": 0,
+            "fisher_yates_seconds": 0.0,
+            "grouping_policy": "auto",
+            "merge_inputs": 3,
+            "merge_operations": 1,
+            "partition_balanced_fusions": 0,
+            "partition_balanced_retries": 0,
+            "partition_balanced_rows": 0,
+            "peak_temporary_files": 7,
+            "peak_workspace_reserved_bytes": 2374078,
+            "process_memory": {
+              "admission_limit_bytes": 4194304,
+              "limit_bytes": 4194304,
+              "peak_reserved_bytes": 2374078,
+              "pressure_baseline_reserved_bytes": null,
+              "pressure_observation": null,
+              "pressure_rechecks": 0,
+              "reserved_bytes": 66977,
+              "startup_observation": null
+            },
+            "resident_sorts": 0,
+            "routed_groupings": 1,
+            "routing_fallbacks": 0,
+            "routing_reused_runs": 0,
+            "shuffle_partition_fusions": 0,
+            "shuffle_partition_retries": 0,
+            "shuffle_partition_rows": 0,
+            "sort_calls": 3,
+            "sort_rows": 20000,
+            "sort_runs": 3,
+            "sort_seconds": 2.4216026,
+            "spill_format_candidate": false,
+            "streaming_chain_fusions": 0,
+            "streaming_chain_retries": 0,
+            "streaming_chain_rows": 0,
+            "temporary_bytes_read": 11777066,
+            "temporary_bytes_written": 11734456,
+            "temporary_cleanup_failures": 0,
+            "temporary_files_created": 8,
+            "temporary_path_reserved_bytes": 0,
+            "workspace_reserved_bytes": 66977
+          },
+          "input_blake3": "03979f0c90a360ab45182a63ce69599138a6dedde267221decd9b944b3322e37",
+          "outcome": "success_exact",
+          "shared_pool_bytes": 4194304
+        }
+      ],
+      "PROB_FAILURE": [
+        {
+          "cancelled": false,
+          "candidate": false,
+          "cleanup": true,
+          "input_visits": 1,
+          "outcome": "typed_shared_denial",
+          "phase": "Preparing operation 2 of 3",
+          "retained_competitor_bytes": 33549197
+        },
+        {
+          "cancelled": false,
+          "candidate": true,
+          "cleanup": true,
+          "input_visits": 1,
+          "outcome": "typed_shared_denial",
+          "phase": "Preparing operation 2 of 3",
+          "retained_competitor_bytes": 33549197
+        },
+        {
+          "cancelled": true,
+          "candidate": false,
+          "cleanup": true,
+          "input_visits": 1,
+          "outcome": "cancelled",
+          "phase": "Preparing operation 2 of 3",
+          "retained_competitor_bytes": 0
+        },
+        {
+          "cancelled": true,
+          "candidate": true,
+          "cleanup": true,
+          "input_visits": 1,
+          "outcome": "cancelled",
+          "phase": "Preparing operation 2 of 3",
+          "retained_competitor_bytes": 0
+        }
+      ]
+    }
+  },
+  "coverage": {
+    "strata_and_repeated_uniform": "Bothcells,2000rows,fourparents,80/20/0groups,strataIDsandpayload(columns0+2),twoadjacentUniforms. Exact17Analysisfields including4logicalstages,CSVnames/bytes/order/outputrecords, independentIDs/fields/caps/cleanup.",
+    "forced_primary_collisions": "Test-local zero16byteprimary overrides plainRandom ingestion/retained generators and allocationcompositekey; categoricalmembership and compare_ties unchanged. Bothcellsforced. Repeatedshuffle/strata2000pair and singleR0/20000row/4MiB externalpair preserve exactoutputs.",
+    "before_emission_failures": "At public Preparingoperation2of3 progress, either fillremaining32MiBpool via independentgrant or setcancel. Bothcells report typedShared or cancellation respectively, no output/private/temp residue, oneinputstart, onlycompetitorgrant remains untilreleased.",
+    "runtime": "Windowsdoctor prerequisites ready; source snapshot/vendor/UI hashes matchLinuxbyte-for-byte; nativeNTFSfixtures/builds and expectedexistingcheckoutcommit guard. Dirtyexistingcheckout preserved. Windowsfocusonly; Linuxfmt/alltargetClippy/lockedworkspacepass separately."
+  },
+  "limitations": "Within-runtime exactbaseline/challenger parity, not recorded cross-runtime CSVhashcomparison. Forcedcollisiondiagnosticbuild is not naturalcollisionfrequency/distributionproof or speed. Pre-emissionpublicprogressdenial is not internalnewdomain-construction boundary or latefusedemission/mergefailure. No browser or universaladmission-domainclaim.",
+  "setup_failure": "Sourceeditguard expectedone plainRandom producer butfoundtwo. It stopped before sourcewrite/build/engineattempt; freshguard instrumentsbothmatchingproducers. Preserved separately, no hiddenenginefailure.",
+  "usage": {
+    "prior_cli_attempts": 34,
+    "prior_dynamic_control_jobs": 16,
+    "prior_fusion_debug_jobs": 9,
+    "prior_fusion_optimized_jobs": 6,
+    "prior_fixed_capacity_jobs": 4,
+    "new_linux_control_jobs": 10,
+    "new_windows_control_jobs": 10,
+    "new_timed_or_cli_jobs": 0
+  },
+  "decision": "Close scoped strata/repeatedshuffle/forcedprimarycollision and beforeemissionfailure controls on two nativeplatforms. Continue browsertransfer and safe admission/retry design before promotion.",
+  "references_sha256": {
+    "scratch/prob-shuffle-semantics-20261103T1454/session.json": "b634938b2e35f52d01f9f753e409dbf69a579ee97e2e5bedd8cead36e231df6b",
+    "scratch/prob-shuffle-semantics-20261103T1454/setup-remedy.json": "422d989072030f672cb08b8ceb4f2ebad62a52e63e7b531bc2a2d25a3c6164da",
+    "scratch/prob-shuffle-semantics-20261103T1454/plan.json": "2717d2d11ad952c0b97cf9d1d8865bdaa112456254fa2cca0f9abe07920356a5",
+    "scratch/prob-shuffle-semantics-20261103T1454/review.md": "aa170a7052463ee50351249c5588571055f4dba160a0d80f1105ddf67814ed53",
+    "scratch/prob-shuffle-semantics-20261103T1454/batch/status.json": "f02a7e171fe083c90ee1da8e238a230740d5fd6b6df8c4d0a52b46cb1d2ed402",
+    "scratch/prob-shuffle-semantics-20261103T1454/batch/manifest.json": "21d30a531edbeeafdfca6024fdeddf6eaa72534bca00c9944727fc01cbd40e18",
+    "scratch/prob-shuffle-semantics-20261103T1454/batch/1-stdout.log": "bcfa6c78456b9f97d573772ae845c456995d908159ce18e6e616eea818ceb3bb",
+    "scratch/prob-shuffle-semantics-20261103T1454/batch/1-stderr.log": "5787542e0130a612e2c65e82a4385c346ab6bf0c2515a07bf8cf0add6f278391",
+    "scratch/prob-shuffle-semantics-20261103T1454/records.json": "1978c3c6f5780c7705b761c4768ce189a9e9c3dd25048cc6828ecc45739afb35",
+    "scratch/prob-shuffle-semantics-20261103T1454/validation-batch/status.json": "c6630e523989e84a3012670943689f951badeec59a91cc87ea7be57a22a75e66",
+    "scratch/prob-shuffle-semantics-20261103T1454/validation-batch/manifest.json": "31234622827e3e744d61f14b15b7404ab845872340d481fba53fe5c9309966ca",
+    "scratch/prob-shuffle-semantics-20261103T1454/validation-batch/2-stderr.log": "c0180042b18142e790839b8f59822a5897b593f21d87798abd9f77dc10eaa767",
+    "scratch/prob-shuffle-semantics-20261103T1454/validation-batch/3-stdout.log": "31a8426a8678a1d3dc14740116bfaca7761244cf1c4bc3425b036c25830ec813",
+    "scratch/prob-shuffle-semantics-20261103T1454/windows-plan.json": "59c0dba941fc76c979c95cd59d832540e84d2575362ffdb1a2af999c5b6f62b5",
+    "scratch/prob-shuffle-semantics-20261103T1454/windows-review.json": "25697e1f845b20380e75fcbc27e83c3d312950c1bb89e72f8d2529f804a7ccf7",
+    "scratch/prob-shuffle-semantics-20261103T1454/windows-copy-match.json": "cbfb5fcea52ba2d04532235467bb8e441078bf9f7f790bac5aea62a890e83e9d",
+    "scratch/prob-shuffle-semantics-20261103T1454/windows-status.json": "873d5ac75152c35025af823c5d7f304deda797a011bc8ca90b231a524148a6be",
+    "scratch/prob-shuffle-semantics-20261103T1454/windows-manifest.json": "18cc932aaf8f8382013e1d53c06efadf395e01310c59c9af1b01ba8408852ea9",
+    "scratch/prob-shuffle-semantics-20261103T1454/windows-records.json": "9f92ca191caa851525ff55776bc260aca2526077f5b87690dc98b04a865b41a9",
+    "scratch/prob-shuffle-semantics-20261103T1454/windows-launch.stdout": "d15d7b675e59534bc3535c86034e050c2d7ac0b71a9b1dfa190f0922be64d363",
+    "scratch/prob-shuffle-semantics-20261103T1454/windows-launch.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-semantics-20261103T1454/batch/1-stdout.log": "94351ca695d59cdbdebc040417960fb45e7b4a309b5400d7794e86de568120cc",
+    "WIN:scratch/prob-shuffle-semantics-20261103T1454/batch/1-stderr.log": "7d402dc8d1bccefa0c2bbbd69d025f38c25af3149da94c9f2f9ca9dd988dafed",
+    "WIN:scratch/prob-shuffle-semantics-20261103T1454/batch/status.json": "873d5ac75152c35025af823c5d7f304deda797a011bc8ca90b231a524148a6be",
+    "WIN:scratch/prob-shuffle-semantics-20261103T1454/batch/manifest.json": "18cc932aaf8f8382013e1d53c06efadf395e01310c59c9af1b01ba8408852ea9",
+    "WIN:scratch/prob-shuffle-semantics-20261103T1454/target/debug/deps/chopper-2dc93f80406de5f6.exe": "ee2565af214c28102d1d735b42c51c1670879900f7bb5e70438f23bfa630bfe1"
+  },
+  "session": {
+    "objective": "TODO.md exactprobabilistic/shuffle fusion semantic and beforeemissionfailure acceptance",
+    "prior_handoff": "scratch/prob-shuffle-pressure-20261103T1444/handoff.json",
+    "original_objective_start_utc": "2026-11-03T08:27:43Z",
+    "window_start_utc": "2026-11-03T14:54:00+00:00",
+    "window_duration_seconds": 7200,
+    "deadline_utc": "2026-11-03T16:54:00+00:00",
+    "launch_cutoff_utc": "2026-11-03T16:34:00+00:00",
+    "limits": {
+      "research_job_attempts": 10,
+      "test_build_attempts": 2,
+      "additional_storage_bytes": 2147483648
+    },
+    "estimate_seconds": 90,
+    "estimate_disk_bytes": 805306368,
+    "scope": "UntimedLinux diagnosticcopies. Three exactoutput pairs: stratifiedprob plus repeateduniform, samewithforcedprimarycollisions, singleparentexternal sortwithforcedcollisions. Two beforeemissionpairs: typedshareddenial, cancellation. Independentchecks and original17Analysis/output parity. Testonlyprimarykey override appliesmatchingbaseline/candidate; membership/tie generator unchanged. No promotion or speedclaim.",
+    "prior_usage": {
+      "cli_attempts": 34,
+      "dynamic_control_jobs": 16,
+      "fusion_debug_attempts": 9,
+      "fusion_optimized_jobs": 6,
+      "fixed_capacity_jobs": 4
+    }
+  }
+}

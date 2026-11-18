@@ -1,0 +1,59 @@
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -11,0 +12 @@
++thread_local! { static WIDE: Cell<bool> = const { Cell::new(false) }; }
+@@ -13 +14,2 @@
+-    format!("note-{id}-{}", "x".repeat(24 + id % 97))
++    let base = if WIDE.get() { 4096 } else { 24 };
++    format!("note-{id}-{}", "x".repeat(base + id % 97))
+@@ -585,0 +588,50 @@
++
++#[test]
++fn probabilistic_shuffle_wide_available_buffer_acceptance() -> Result<()> {
++    WIDE.set(true);
++    let mut reference = None;
++    for candidate in [false, true] {
++        ENABLED.set(candidate);
++        let (dir, job) = setup(4096)?;
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let visits = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++        let observed = visits.clone();
++        let prepared = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(move |p| {
++                if p.phase == "Reading and validating CSV" && p.rows == 0 {
++                    observed.fetch_add(1, Ordering::Relaxed);
++                }
++            }),
++            pool.clone(),
++        )?;
++        let ctx = prepared.ctx.clone();
++        let analysis = prepared.execute()?;
++        let checked = verify(dir.path(), &job, 4096, &analysis)?;
++        if let Some(ref expected) = reference {
++            assert_eq!(&checked, expected);
++        } else {
++            reference = Some(checked);
++        }
++        assert!(analysis.output_files > 4);
++        let diagnostics = ctx.diagnostics();
++        drop(analysis);
++        drop(ctx);
++        assert_eq!(visits.load(Ordering::Relaxed), 1);
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert!(!fs::read_dir(dir.path())?.any(|entry| entry
++            .unwrap()
++            .file_name()
++            .to_string_lossy()
++            .starts_with(".chopper-staging-")));
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "PROB_WIDE_ACCEPTANCE {}",
++            serde_json::json!({"candidate":candidate,"rows":4096,"payload_base_bytes":4096,"exact_output":true,"independent_fields_ids_groups_caps":true,"input_visits":1,"cleanup":true,"final_pool_reserved":0,"diagnostics":diagnostics,"performance_measurement":false})
++        );
++    }
++    ENABLED.set(false);
++    WIDE.set(false);
++    Ok(())
++}

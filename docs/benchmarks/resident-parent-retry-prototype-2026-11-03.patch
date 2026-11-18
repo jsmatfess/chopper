@@ -1,0 +1,292 @@
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -208 +208 @@
+-    fn replace_workspace_for_test(&mut self, mut workspace: Workspace) -> Result<()> {
++    pub(crate) fn replace_workspace_for_test(&mut self, mut workspace: Workspace) -> Result<()> {
+diff --git a/crates/chopper/src/engine.rs b/crates/chopper/src/engine.rs
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -1639 +1639,3 @@
+-            let mut routed = StreamingGroups::new(
++            let ready = streaming::prepare_parent(
++                data,
++                parent,
+@@ -1644,0 +1647,2 @@
++                matches!(operation, Operation::AssignProbabilistic { .. })
++                    && job.resources.grouping == Grouping::Auto,
+@@ -1646,6 +1650 @@
+-            let mut rows = data.rows(parent, ctx.max_record)?;
+-            let mut previous = None;
+-            while let Some(row) = rows.next_packed(previous.take())? {
+-                previous = routed.push_compact(row)?;
+-            }
+-            routed.emit(parent, step, output, ctx)?;
++            ready.emit(parent, step, output, ctx)?;
+diff --git a/crates/chopper/src/engine/streaming.rs b/crates/chopper/src/engine/streaming.rs
+--- a/crates/chopper/src/engine/streaming.rs
++++ b/crates/chopper/src/engine/streaming.rs
+@@ -187,0 +188,3 @@
++        self.finish()?.emit(parent, step, output, ctx)
++    }
++    fn finish(self) -> Result<ReadyGroups<'a>> {
+@@ -189 +192,24 @@
+-        let mut rows = self.sorter.finish()?.reusing();
++        Ok(ReadyGroups {
++            membership: self.membership,
++            rows: self.sorter.finish()?,
++            #[cfg(test)]
++            retried: false,
++        })
++    }
++}
++
++pub(super) struct ReadyGroups<'a> {
++    membership: Membership<'a>,
++    rows: SortedRows,
++    #[cfg(test)]
++    retried: bool,
++}
++impl ReadyGroups<'_> {
++    pub fn emit(
++        self,
++        parent: &Group,
++        step: usize,
++        output: &mut impl RowSink,
++        ctx: &Context,
++    ) -> Result<()> {
++        let mut rows = self.rows.reusing();
+@@ -213,0 +240,59 @@
++std::thread_local! {
++    static PARENT_SCANS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
++}
++
++/// Experiment only: retry admitted materialized input before any sink emission.
++#[allow(clippy::too_many_arguments)]
++pub(super) fn prepare_parent<'a>(
++    data: &Dataset,
++    parent: &Group,
++    operation: &'a Operation,
++    header: Option<&[String]>,
++    width: usize,
++    domain: [u8; 32],
++    ctx: &Context,
++    try_resident: bool,
++) -> Result<ReadyGroups<'a>> {
++    let scan = |resident| -> Result<ReadyGroups<'a>> {
++        #[cfg(test)]
++        PARENT_SCANS.with(|count| count.set(count.get() + 1));
++        let mut state = StreamingGroups {
++            sorter: if resident {
++                Sorter::new(ctx, SortOrder::Key)
++            } else {
++                Sorter::streaming(ctx)
++            },
++            membership: Membership::new(operation, header, width, domain, ctx)?,
++        };
++        let mut rows = data.rows(parent, ctx.max_record)?;
++        let mut previous = None;
++        while let Some(row) = rows.next_packed(previous.take())? {
++            previous = state.push_compact(row)?;
++        }
++        state.finish()
++    };
++    if try_resident {
++        match scan(true) {
++            Ok(ready) => return Ok(ready),
++            Err(error)
++                if error
++                    .downcast_ref::<crate::resources::MemoryAdmission>()
++                    .is_some() =>
++            {
++                // The failed scan and its readers/rows/files are destroyed here.
++                // Cancellation and cleanup failures prohibit retry.
++                ctx.check()?;
++            }
++            Err(error) => return Err(error),
++        }
++    }
++    let ready = scan(false)?;
++    #[cfg(test)]
++    let ready = ReadyGroups {
++        retried: try_resident,
++        ..ready
++    };
++    Ok(ready)
++}
++
++#[cfg(test)]
+@@ -215,0 +301,173 @@
++
++    #[test]
++    fn parent_retry_terminal_errors_and_emission_boundary() -> Result<()> {
++        struct DeniedSink {
++            rows: usize,
++        }
++        impl RowSink for DeniedSink {
++            fn begin(&self, lineage: Vec<serde_json::Value>, exact: bool) -> Group {
++                Group {
++                    offset: 0,
++                    rows: 0,
++                    lineage,
++                    exact,
++                }
++            }
++            fn row(&mut self, _group: &mut Group, _row: &Row) -> Result<()> {
++                self.rows += 1;
++                Err(crate::resources::MemoryAdmission::Local.into())
++            }
++            fn end(&mut self, _group: Group) -> Result<()> {
++                Ok(())
++            }
++        }
++        for failure in ["cancel", "malformed", "emission"] {
++            let flag = Arc::new(AtomicBool::new(false));
++            let mut ctx = Context::new(
++                &Resources {
++                    workers: 1,
++                    ..Default::default()
++                },
++                flag.clone(),
++                Arc::new(|_| {}),
++            )?;
++            let mut input = DatasetWriter::new(&ctx)?;
++            let mut group = input.begin(vec![], false);
++            for id in 0..64 {
++                input.row(
++                    &mut group,
++                    &Row {
++                        id,
++                        ordinal: id,
++                        key: vec![],
++                        fields: vec![id.to_string(), "x".repeat(128), (id % 7).to_string()],
++                    },
++                )?;
++            }
++            input.end(group)?;
++            let data = input.finish()?;
++            let parent = data.groups()?.next().unwrap()?;
++            let held = ctx.diagnostics()["workspace_reserved_bytes"]
++                .as_u64()
++                .unwrap();
++            if failure == "cancel" {
++                flag.store(true, std::sync::atomic::Ordering::Relaxed);
++            }
++            if failure == "malformed" {
++                ctx.max_record = 1;
++            }
++            let operation = probabilistic();
++            PARENT_SCANS.with(|count| count.set(0));
++            let ready = prepare_parent(&data, &parent, &operation, None, 3, [7; 32], &ctx, true);
++            if failure == "emission" {
++                let mut sink = DeniedSink { rows: 0 };
++                let error = ready?
++                    .emit(&parent, 0, &mut sink, &ctx)
++                    .expect_err("sink must deny");
++                assert!(error
++                    .downcast_ref::<crate::resources::MemoryAdmission>()
++                    .is_some());
++                assert_eq!(sink.rows, 1);
++            } else {
++                let error = ready.err().expect("input must fail");
++                assert!(error
++                    .downcast_ref::<crate::resources::MemoryAdmission>()
++                    .is_none());
++            }
++            assert_eq!(
++                PARENT_SCANS.with(|count| count.get()),
++                1,
++                "{failure} must not replay"
++            );
++            assert_eq!(ctx.diagnostics()["workspace_reserved_bytes"], held);
++            drop(parent);
++            drop(data);
++            assert_eq!(ctx.used(), 0);
++            assert_eq!(
++                ctx.diagnostics()["workspace_reserved_bytes"],
++                ctx.directory_reserved_bytes()
++            );
++            eprintln!("PARENT_TERMINAL {failure} scans=1 cleanup=true");
++        }
++        Ok(())
++    }
++
++    #[test]
++    fn parent_retry_admission_parity_and_cleanup() -> Result<()> {
++        let mut observed_retry = false;
++        for (count, payload, available) in [
++            (64, 128, 300_000),
++            (2500, 128, 300_000),
++            (1, 200_000, 500_000),
++        ] {
++            let mut reference = None;
++            for resident in [false, true] {
++                let mut ctx = context()?;
++                ctx.memory = 4 * 1024 * 1024;
++                ctx.replace_workspace_for_test(Workspace::new(2 * 1024 * 1024))?;
++                let mut input = DatasetWriter::new(&ctx)?;
++                let mut group = input.begin(vec![], false);
++                for id in 0..count {
++                    input.row(
++                        &mut group,
++                        &Row {
++                            id,
++                            ordinal: id,
++                            key: vec![],
++                            fields: vec![id.to_string(), "x".repeat(payload), (id % 7).to_string()],
++                        },
++                    )?;
++                }
++                input.end(group)?;
++                let data = input.finish()?;
++                let before = ctx.diagnostics()["workspace_reserved_bytes"]
++                    .as_u64()
++                    .unwrap();
++                let mut other = Reservation::new(&ctx);
++                other.resize(
++                    (2 * 1024 * 1024 - available - before + ctx.directory_reserved_bytes())
++                        as usize,
++                )?;
++                let held = ctx.diagnostics()["workspace_reserved_bytes"]
++                    .as_u64()
++                    .unwrap();
++                let parent = data.groups()?.next().unwrap()?;
++                let operation = probabilistic();
++                let ready =
++                    prepare_parent(&data, &parent, &operation, None, 3, [7; 32], &ctx, resident)?;
++                observed_retry |= ready.retried;
++                eprintln!(
++                    "PARENT_RETRY count={count} payload={payload} resident={resident} retried={}",
++                    ready.retried
++                );
++                let mut output = DatasetWriter::new(&ctx)?;
++                ready.emit(&parent, 0, &mut output, &ctx)?;
++                let output = output.finish()?;
++                let mut actual = Vec::new();
++                for group in output.groups()? {
++                    let group = group?;
++                    actual.extend_from_slice(serde_json::to_string(&group)?.as_bytes());
++                    for row in output.rows(&group, ctx.max_record)? {
++                        let row = row?;
++                        write_row(&mut actual, &row)?;
++                    }
++                }
++                if let Some(reference) = &reference {
++                    assert_eq!(&actual, reference);
++                } else {
++                    reference = Some(actual);
++                }
++                drop(output);
++                assert_eq!(ctx.diagnostics()["workspace_reserved_bytes"], held);
++                drop(other);
++                drop(data);
++                assert_eq!(ctx.used(), 0);
++                assert_eq!(
++                    ctx.diagnostics()["workspace_reserved_bytes"],
++                    ctx.directory_reserved_bytes()
++                );
++            }
++        }
++        assert!(observed_retry, "control must reach admission retry");
++        Ok(())
++    }

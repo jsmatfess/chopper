@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "id": "fusion-prepared-spill-2026-11-05",
+  "title": "Retain the real prepared-spill owner fusion variant",
+  "date": "2026-11-05",
+  "subsystem": "execution",
+  "question": "Can a real pre-admitted spill owner repair the observation-only race while retaining useful pass reduction?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "The revised private owner repairs the fixed counterexample and retains scoped benefit and acceptance; production integration remains separate.",
+  "scope": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chrome-persistent"
+    ],
+    "workloads": [
+      "Fixed 20k peer/cancellation controls and 200k no-peer native cost panel.",
+      "Resident and external wide-record controls; persistent Chrome events-transfer and spill failure cases."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chrome-persistent"
+    ],
+    "summary": "Scoped exact CSV/Analysis, field/group/cap, cancellation, partial owner, external-wide and spill-write failure controls pass on their recorded runtimes. Chrome checks apply to the changed real-owner variant."
+  },
+  "limitations": [
+    "Small development cells and uncontrolled cache/background state do not establish general device, shape or tail performance.",
+    "Historical percentage gains are not additive; every comparison uses its own pinned baseline.",
+    "An extra live path/file and 64-KiB buffer may reduce construction or competitor admissibility and create unused files.",
+    "No universal shared-pressure completion or production execution-graph integration is established."
+  ],
+  "exclusions": [
+    "Observation-only speed samples are not pooled with changed-owner measurements.",
+    "Diagnostic API/sort clocks and acceptance durations are excluded from speed inference."
+  ],
+  "reopen_when": "A promotion proposal needs separately reviewed execution integration and remaining resource/pressure feasibility, using the stronger current baseline.",
+  "supersedes": [
+    "fusion-observation-only-2026-11-05"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#probabilistic-shuffle-fusion-prepared-spill-temporary-failure-control-2026-11-05",
+      "sha256": "a8dc684ee0b80d59395ca5005306db0850316bc3c0a141e88da893ac81fbd0d4"
+    },
+    {
+      "section": "docs/performance.md#probabilistic-shuffle-fusion-prepared-spill-browser-acceptance-2026-11-05",
+      "sha256": "8649ce656b2b497e478e0911a6db9930a474b9e7815d46f6910db734bdda729c"
+    },
+    {
+      "section": "docs/performance.md#probabilistic-shuffle-fusion-external-wide-owner-acceptance-2026-11-05",
+      "sha256": "96afa80327dabd238ae94c4d80e00eb898ef36cc8a597362fe856f8ae9631b97"
+    },
+    {
+      "section": "docs/performance.md#probabilistic-shuffle-fusion-prepared-spill-working-set-cost-2026-11-05",
+      "sha256": "f75a68d0adba1cc78e3936f5eb10f772a567a962449f66de6c530adfd58633c1"
+    },
+    {
+      "section": "docs/performance.md#probabilistic-shuffle-fusion-prepared-spill-owner-control-2026-11-05",
+      "sha256": "0a05edd10cce1bdd4f6bbb55b40ad5d19cdd7587e27d6e2ffcc768e290826690"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/probabilistic-shuffle-spill-temp-failure-2026-11-05.json",
+      "sha256": "a8cc0819aea3ce7d2758fe52275d0f24bf5cf99d3e8017614399bac97e36a1ee"
+    },
+    {
+      "path": "docs/benchmarks/probabilistic-shuffle-spill-browser-2026-11-05.json",
+      "sha256": "54334de75d25e17cc06f8b8c018fe99aeb476cd3c0de2d9c15eb356bcc9f8e0d"
+    },
+    {
+      "path": "docs/benchmarks/probabilistic-shuffle-external-wide-2026-11-05.json",
+      "sha256": "323acadca34ea8076365a8098d2b541d5d4e4c7d2b0c5792fae290321189675d"
+    },
+    {
+      "path": "docs/benchmarks/probabilistic-shuffle-spill-cost-2026-11-05.json",
+      "sha256": "6dfef6e55af954491dbd57cb55cde67cf041b34ed2d060c6d8172eb001872c7e"
+    },
+    {
+      "path": "docs/benchmarks/probabilistic-shuffle-prepared-spill-2026-11-05.json",
+      "sha256": "04bf720fcc13a5ec164d7d74842eef42c2bab2baa08caa48ef666558681911e4"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

@@ -1,0 +1,224 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-11-15",
+  "scope": "Prepared operator inputs and locally validated postdeploy smoke for selected release; no publication authorization or live deployment proof.",
+  "selected_product": {
+    "source_commit": "639d1fe97d985b1544df0932321c6a93cca2567b",
+    "runtime_build_commit": "feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d",
+    "artifact_receipt_sha256": "1720f28a01cbbd7a30cbb8c8614b9efc2da01e57c765c625f51e8a5e3455c30d"
+  },
+  "operator_tools": {
+    "node": {
+      "version": "v22.23.4",
+      "bytes": 124902584,
+      "sha256": "94efd062ed066c1a0b332e18249859c905e920eeada5df55d24c99b919629a90"
+    },
+    "wrangler": {
+      "version": "4.162.0",
+      "registry_resolved": "https://registry.npmjs.org/wrangler/-/wrangler-4.162.0.tgz",
+      "npm_integrity": "sha512-jUnlzHKlWdW4MFXPgeYbe0+c4oTy/AAZfL/IUz921+dZBY5nJ48xjpvwff5djUR1MXoJRevzntAP/U97TUhPEw==",
+      "entry": {
+        "bytes": 3479,
+        "sha256": "d35986bcb0dc16bf6b9515fd2ba0d431b5705c80730702b764f0286a3b825414"
+      },
+      "implementation": {
+        "bytes": 15104145,
+        "sha256": "014ebf6d5194abb1287998f5e6f5bda31104c34062d89dcccd1b7c6ad4967a71"
+      },
+      "package_lock": {
+        "bytes": 47973,
+        "sha256": "ee7d0dfb05f39c9224351bf2ad54e4d1dc5a8200b5c3931c3f0cd215afcfbd52"
+      }
+    }
+  },
+  "authentication_and_app": {
+    "existing_oauth_authenticated": true,
+    "read_only_whoami_project_and_deployment_queries_passed": true,
+    "scope": "Read access only; deployment-write permission was not exercised or established. No login or credential disclosure.",
+    "project": "chopper",
+    "production_branch": "master",
+    "production_domain": "chopper-1rx.pages.dev",
+    "last_observed_production_deployment_id": "8d497a07-be6e-43e2-abae-67f05f097ae2",
+    "last_observed_production_deployment_url": "https://8d497a07.chopper-1rx.pages.dev",
+    "production_changed_by_this_work": false,
+    "evidence_project_untouched": true
+  },
+  "release_assets": [
+    {
+      "name": "chopper-0.2.0-windows-x86_64.zip",
+      "bytes": 1804401,
+      "sha256": "bba46786609777f2722c6fec0563f6ce5ae32fb2dd630032889f56f3ab27be01"
+    },
+    {
+      "name": "chopper-0.2.0-linux-x86_64.zip",
+      "bytes": 2190534,
+      "sha256": "6a09fea10f62cdd1d504e83de06f597dcb218f3077ca745ac049d1d7df33e076"
+    },
+    {
+      "name": "chopper-0.2.0-hosted.zip",
+      "bytes": 873522,
+      "sha256": "c321df0c684439da7c622578b7685705cbf667e65f0039d7318674c7fc1f8e9d"
+    },
+    {
+      "name": "chopper-0.2.0-artifact-receipt.json",
+      "bytes": 6495,
+      "sha256": "1720f28a01cbbd7a30cbb8c8614b9efc2da01e57c765c625f51e8a5e3455c30d"
+    },
+    {
+      "name": "SHA256SUMS",
+      "bytes": 389,
+      "sha256": "0a1c8a5c3ce4f60b6f21e861c7764acb99f568014082c38bb4f9f54455cb8b6a"
+    }
+  ],
+  "prepared_hosted_folders": [
+    {
+      "role": "selected639-hosted",
+      "members": {
+        "_headers": {
+          "bytes": 385,
+          "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1"
+        },
+        "app.js": {
+          "bytes": 62608,
+          "sha256": "89a6a6940765c6db1a0a8eb08f0d1ba1d7fefba09c2968b773fc059c77acde23"
+        },
+        "engine-worker.js": {
+          "bytes": 42781,
+          "sha256": "41e26203c5fba5d4751bf45aac940a2a17b27043d15902b29d2a90c4677d9e80"
+        },
+        "engine.wasm": {
+          "bytes": 2469712,
+          "sha256": "036abf2b61a9735b9bc9c0650d1fc0179793c37fb9ba383804681de3d725550c"
+        },
+        "index.html": {
+          "bytes": 8836,
+          "sha256": "7c5a0dea3884a3faaf03f3f37956f0bed3f7133a8ecfb253d5414160517a0c2a"
+        },
+        "storage-worker.js": {
+          "bytes": 3034,
+          "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6"
+        },
+        "style.css": {
+          "bytes": 14911,
+          "sha256": "da123fd1cc919783fb90e94f0c3c076fc57ff357879e53ba08a252f37fc8eef6"
+        }
+      },
+      "logical_bytes": 2602267,
+      "served_body_count": 6,
+      "headers_member": "_headers is deployment configuration, not a served seventh body"
+    },
+    {
+      "role": "restored-0.1.0-hosted",
+      "members": {
+        "_headers": {
+          "bytes": 385,
+          "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1"
+        },
+        "app.js": {
+          "bytes": 40493,
+          "sha256": "951232201b98ce2659608ade09ac76a8ef94bf9f3fb5cc8fb3ad4b9b275112ff"
+        },
+        "engine-worker.js": {
+          "bytes": 35153,
+          "sha256": "cf407b6ce2b7d47f0909a352193c8260231a8f6c740f779f487806af8c8425f8"
+        },
+        "engine.wasm": {
+          "bytes": 2358817,
+          "sha256": "afe7e8a61837e6317af70090a112158149725d9af909ea1eb2e60a66369787ce"
+        },
+        "index.html": {
+          "bytes": 8867,
+          "sha256": "ee73456f9b1afa8801244a3fbfbae2308d51f514c6a7b7f3cac6d8ee9d8e6898"
+        },
+        "storage-worker.js": {
+          "bytes": 3034,
+          "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6"
+        },
+        "style.css": {
+          "bytes": 12292,
+          "sha256": "edddae5c4a2aab3cfa8bcc3c2a79bd69a9bd9c7463ec3d9c2ec5a14d72ed2787"
+        }
+      },
+      "logical_bytes": 2459041,
+      "served_body_count": 6,
+      "headers_member": "_headers is deployment configuration, not a served seventh body"
+    }
+  ],
+  "prepared_folder_logical_bytes": 5061308,
+  "qualified_common_smoke": {
+    "script_sha256": "77000377bcabb5ed3e0bb2f9c00f2ad0e89ae24056dcdd52c940a146c6db0b6b",
+    "local_outcome_sha256": "f6d689cae613542a8c6a9cb23e65a3f06f77a3f8755288a48c1238e0abf49061",
+    "local_independent_sha256": "1f810124a6546f2e75c300a96aa28f93d4077c60709fe3f491fa9723d883fb97",
+    "public_command_supplement_sha256": "85235892905211d6be7fff6b1b6c9555011bf09c3b89ad66034c4ba27181600b",
+    "browser": "Linux bundled Chromium156.0.8078.4",
+    "source_scope": "One exact script uses the common BrowserServer launch, process birth/group, executable/profile identity and normal close/EOF implementation in both modes; only local server lifecycle is conditional.",
+    "cases": [
+      {
+        "role": "restored-0.1.0-hosted",
+        "result_sha256": "ba4e6ede8cc4b417c0a22538f6b3eec40cf38e004fff0b124145ce5fdd764a45",
+        "csv_files": 2,
+        "bytes_each_csv": 33,
+        "serialized_csv_cap_bytes": 40,
+        "manifest_records": 3,
+        "marker": {
+          "complete": true,
+          "files": 3,
+          "engine": "chopper-browser",
+          "version": 1
+        }
+      },
+      {
+        "role": "selected639-hosted",
+        "result_sha256": "3394ec64e87ce5a9c9c638bf8313369018f5795d70435844b8924f28dea0788e",
+        "csv_files": 2,
+        "bytes_each_csv": 33,
+        "serialized_csv_cap_bytes": 40,
+        "manifest_records": 3,
+        "marker": {
+          "complete": true,
+          "files": 3,
+          "engine": "chopper-browser",
+          "version": 1
+        }
+      }
+    ],
+    "checks": "Six served body identities before and after, effective COOP same-origin/COEP require-corp, crossOriginIsolated and production-only WASM; real public Run action and exact CSV/manifest/completion marker.",
+    "interaction_scope": "Injected borrowed File and disposable OPFS picker results; no actual system-dialog or device claim. Existing53-byte fixture and848-byte job reused, no CSV generation/copy.",
+    "cleanup": {
+      "all_recorded_births_absent": 6,
+      "owned_groups_proved_empty": 4,
+      "server_and_browser_close_eof": true,
+      "outer_exit_code": 0,
+      "outer_reaped": true,
+      "no_local_listener_after_exit": true
+    },
+    "public_argv_parser_passed_offline": true,
+    "public_network_or_deployment_executed": false,
+    "local_proof_is_not_production_smoke": true
+  },
+  "retained_scope": {
+    "predecessor_readback": "Existing delivered98-member archive/four assets/13ZIP-member verification and scoped runtime rehearsals remain authoritative; not repeated. No archive replacement, rebuild or download.",
+    "failed_preparations": "R1 runner-ID rejection and R2 failed profile assertion remain failed with their costs. R2 historical kernel argv was not captured; its reason remains UNKNOWN. Positive failed-state cleanup is separate from successfulR4 proof.",
+    "earlier_local_r3": "Preserved at its exact earlier script identity; final public commands bind successfulR4 common script instead.",
+    "raw_operations_paths_credentials_and_process_ids": "Retained privately, omitted from this record."
+  },
+  "private_proof_record_sha256": {
+    "operator_readiness": "c072dbe1b6d75b903779bd641e8abb44d2c2d679942f3342465a88eddc50d389",
+    "publication_packet": "f22e31d2e43279d4dfd80cc6f1ff6dfb2bc8f626088abb272bfd04245c72b420"
+  },
+  "publication_boundary": {
+    "authorized": false,
+    "required_scope": "Selected actual acceptance and exact Linux/native Windows local delivery passed. Owner review and separate approval of version0.2.0, the exact five assets, selected source and production cutover remain required. Requested private hosted preview is available; its endpoint and runtime receipt stay outside Git. No public tag/release/upload/visibility/deployment action is authorized by readiness.",
+    "after_approved_deploy": "Bind the actual new deployment ID; verify six served bodies and effective headers against the seven-member folder, production-only WASM and a capped export/manifest/marker. Use the qualified exact script under existing bounded ownership, then positive independent process release.",
+    "rollback": "Use the separately approved exact retained0.1.0 seven-file folder to create a new Pages deployment on app projectchopper/branchmaster; repeat served-header/export checks. Do not use Worker rollback or the evidence project."
+  },
+  "local_delivery": {
+    "code_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+    "local_ci": {
+      "linux_sha256": "9d63a2de5fffdf34c7ad7b6b321562f6a5960b0f2a8b97f74a82c4cd2b7f280a",
+      "windows_sha256": "ab97d10a277c66bbef719ba03a38112263df5d01f97328b0299c91760243cb68"
+    },
+    "record_sha256": "50803e5fde07abd923a172baa52cabf49ef742986de6a37b6eda055b5cedf533",
+    "scope": "Validation-tooling/documentation delivery; selected product and actual qualification harnesses retain their original identities. Publication requires separate owner approval."
+  }
+}

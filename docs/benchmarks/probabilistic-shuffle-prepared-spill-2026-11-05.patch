@@ -1,0 +1,172 @@
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -1473,0 +1474,15 @@
++// Isolated alternative-constructor owner. Keep buffered writer destruction
++// (including its admitted temporary path) before releasing its buffer grant.
++struct PreparedSpill {
++    writer: BufWriter<SpillFile>,
++    io: Reservation,
++}
++impl PreparedSpill {
++    fn new(ctx: &Context) -> Result<Self> {
++        let mut io = Reservation::new(ctx);
++        io.resize(65536)?;
++        let writer = ctx.spill_writer(65536)?;
++        Ok(Self { writer, io })
++    }
++}
++
+@@ -1483,0 +1499 @@
++    prepared_spill: Option<PreparedSpill>,
+@@ -1505,0 +1522 @@
++            prepared_spill: None,
+@@ -1510 +1527 @@
+-    pub(crate) fn with_available_capacity(ctx: &Context, order: SortOrder) -> Self {
++    pub(crate) fn with_available_capacity(ctx: &Context, order: SortOrder) -> Result<Self> {
+@@ -1511,0 +1529 @@
++        sorter.prepared_spill = Some(PreparedSpill::new(ctx)?);
+@@ -1515 +1533 @@
+-        sorter
++        Ok(sorter)
+@@ -1734,0 +1753 @@
++        let renew_prepared = self.prepared_spill.is_some();
+@@ -1736 +1755,8 @@
+-        io.resize(65536)?;
++        // Declare the writer after its grant so every failure drops it first.
++        let prepared_writer = if let Some(prepared) = self.prepared_spill.take() {
++            io = prepared.io;
++            Some(prepared.writer)
++        } else {
++            io.resize(65536)?;
++            None
++        };
+@@ -1742 +1768,4 @@
+-        let mut writer = self.ctx.spill_writer(64 * 1024)?;
++        let mut writer = match prepared_writer {
++            Some(writer) => writer,
++            None => self.ctx.spill_writer(64 * 1024)?,
++        };
+@@ -1752 +1781,5 @@
+-        self.add_run(SortRun::single(&self.ctx, run)?, 0)
++        self.add_run(SortRun::single(&self.ctx, run)?, 0)?;
++        if renew_prepared {
++            self.prepared_spill = Some(PreparedSpill::new(&self.ctx)?);
++        }
++        Ok(())
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -710,0 +711,4 @@
++        ensure!(
++            outcome == "success_exact",
++            "prepared spill did not restore completion"
++        );
+@@ -714,0 +719,104 @@
++
++fn prepared_spill_owner_edges() -> Result<()> {
++    for free in [65535u64, 65536] {
++        let (dir, job) = setup(0)?;
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let ctx = Context::with_memory_pool(
++            &job.resources,
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let retained = pool.usage().reserved_bytes;
++        let mut peer =
++            Reservation::for_workspace(Arc::new(Workspace::shared(32 * 1024 * 1024, pool.clone())));
++        peer.resize(usize::try_from(32 * 1024 * 1024 - retained - free)?)?;
++        let held = pool.usage().reserved_bytes;
++        let error = Sorter::with_available_capacity(&ctx, SortOrder::GroupRandom)
++            .err()
++            .context("constructor edge accepted")?;
++        ensure!(
++            matches!(
++                error.downcast_ref::<crate::resources::MemoryAdmission>(),
++                Some(crate::resources::MemoryAdmission::Shared { .. })
++            ),
++            "{error:#}"
++        );
++        ensure!(
++            pool.usage().reserved_bytes == held,
++            "partial prepared owner leaked"
++        );
++        ensure!(ctx.used() == 0, "empty owner edge wrote payload");
++        let jobdir = fs::read_dir(dir.path().join("temp"))?
++            .next()
++            .context("job directory absent")??
++            .path();
++        ensure!(
++            fs::read_dir(jobdir)?.next().is_none(),
++            "partial file left behind"
++        );
++        drop(peer);
++        drop(ctx);
++        ensure!(pool.usage().reserved_bytes == 0, "edge pool leaked");
++        ensure!(
++            fs::read_dir(dir.path().join("temp"))?.next().is_none(),
++            "edge job directory leaked"
++        );
++        println!(
++            "PROB_PREPARED_SPILL_EDGE {}",
++            serde_json::json!({"free_bytes":free,"typed_shared_denial":true,"cleanup":true,"final_pool_reserved":0})
++        );
++    }
++    Ok(())
++}
++fn prepared_spill_cancel() -> Result<()> {
++    ENABLED.set(true);
++    let (dir, job) = setup(20000)?;
++    let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++    let cancel = Arc::new(AtomicBool::new(false));
++    let signal = cancel.clone();
++    let hook = target_hook(move |point, _| {
++        if point == "after" {
++            assert!(!signal.swap(true, Ordering::Relaxed));
++        }
++    });
++    let error =
++        prepare_with_memory_pool(job.clone(), cancel.clone(), Arc::new(|_| {}), pool.clone())
++            .err()
++            .context("prepared-owner cancellation accepted")?;
++    ensure!(
++        cancel.load(Ordering::Relaxed) && format!("{error:#}").contains("cancel"),
++        "{error:#}"
++    );
++    drop(hook);
++    ensure!(
++        !std::path::Path::new(&job.output).exists(),
++        "cancel published output"
++    );
++    ensure!(
++        fs::read_dir(dir.path().join("temp"))?.next().is_none(),
++        "cancel temp leaked"
++    );
++    ensure!(
++        !fs::read_dir(dir.path())?.any(|entry| entry
++            .unwrap()
++            .file_name()
++            .to_string_lossy()
++            .starts_with(".chopper-staging-")),
++        "cancel stage leaked"
++    );
++    ensure!(pool.usage().reserved_bytes == 0, "cancel pool leaked");
++    ENABLED.set(false);
++    println!(
++        "PROB_PREPARED_SPILL_CANCEL {}",
++        serde_json::json!({"after_owner_construction":true,"cleanup":true,"final_pool_reserved":0})
++    );
++    Ok(())
++}
++#[test]
++fn probabilistic_shuffle_prepared_spill_acceptance() -> Result<()> {
++    prepared_spill_owner_edges()?;
++    probabilistic_shuffle_after_observation_owner_control()?;
++    probabilistic_shuffle_available_buffer_fitting()?;
++    prepared_spill_cancel()
++}
+--- a/crates/chopper/src/engine/streaming.rs
++++ b/crates/chopper/src/engine/streaming.rs
+@@ -253 +253 @@
+-    let mut sorter = Sorter::with_available_capacity(ctx, SortOrder::GroupRandom);
++    let mut sorter = Sorter::with_available_capacity(ctx, SortOrder::GroupRandom)?;

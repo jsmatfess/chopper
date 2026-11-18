@@ -1,0 +1,28 @@
+name: Feature request
+description: Suggest an improvement to Chopper.
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the workflow you want to improve. Synthetic examples are welcome;
+        please leave out confidential CSVs, credentials, private paths and unredacted logs.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Explain the task and where Chopper currently gets in the way.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Suggested improvement
+      description: Describe the behavior you would like, and any alternatives you have considered.
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Version and platform
+      description: CLI version and operating system, or hosted app URL and browser version, if relevant.

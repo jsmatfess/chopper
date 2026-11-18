@@ -1,0 +1,1553 @@
+{
+  "kind": "reference",
+  "scope": "Reviewed original JSONL locations for the unchanged pre-merge hosted acceptance; this document contains no new observations or new measurements.",
+  "review": {
+    "basis": "Literal row fields and elapsed_seconds verified against hash-pinned originals; match only within raw cohort and block. Existing 004 report retains analysis and simulation provenance.",
+    "source": "docs/benchmarks/execution-graph-overhead-004-summary-2026-11-05.json",
+    "sha256": "0accc096510b5e7767bffed9ec557fb6d4614b6ee0e4e171f1dab8ece0631830"
+  },
+  "eligibility": "Only these retained primary rows belong to this comparison. Context remains at its exact source; absent row metadata stays unknown. Summary projections and diagnostic/control rows are excluded.",
+  "normalization_limit": "Local .tools raw sources are outside the public benchmark catalog. These references do not constitute normalized comparison bindings; projected /samples rows remain summary and ineligible for speed.",
+  "raw_sources": [
+    {
+      "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+      "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+      "context_location": {
+        "line": 1,
+        "pointer": ""
+      },
+      "plan": ".tools/execution-graph/58-overhead-002/overhead-plan.json",
+      "plan_sha256": "cfa61952ae85004bd9e847a4182b06602977f1d18defbbb37d5347dfd7558f7f"
+    },
+    {
+      "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+      "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+      "context_location": {
+        "line": 1,
+        "pointer": ""
+      },
+      "plan": ".tools/execution-graph/58-overhead-003/overhead-plan.json",
+      "plan_sha256": "832b17bddc50afb08a4196d53913d35552478c82e4bd4ff7783301bbd6155497"
+    },
+    {
+      "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+      "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+      "context_location": {
+        "line": 1,
+        "pointer": ""
+      },
+      "plan": ".tools/execution-graph/58-overhead-004/overhead-plan.json",
+      "plan_sha256": "51591d2125a255856cb21021c29395edf3570c219b5f35ac0bbfd455179dbbc2"
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "execution-graph-direct-collapsed",
+      "workload": "direct",
+      "baseline_mode": "disabled",
+      "candidate_mode": "collapsed",
+      "clock_pointer": "/elapsed_seconds",
+      "measurement_boundary": "same-build matched complete hosted Runs through authoritative destination export/marker reply; public cleanup/UI completion checked separately; verification outside timer",
+      "pairs": [
+        {
+          "block": "direct-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 4,
+            "pointer": "",
+            "sample": "direct-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 7,
+            "pointer": "",
+            "sample": "direct-0-collapsed"
+          }
+        },
+        {
+          "block": "direct-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 44,
+            "pointer": "",
+            "sample": "direct-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 50,
+            "pointer": "",
+            "sample": "direct-1-collapsed"
+          }
+        },
+        {
+          "block": "direct-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 87,
+            "pointer": "",
+            "sample": "direct-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 84,
+            "pointer": "",
+            "sample": "direct-2-collapsed"
+          }
+        },
+        {
+          "block": "direct-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 130,
+            "pointer": "",
+            "sample": "direct-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 124,
+            "pointer": "",
+            "sample": "direct-3-collapsed"
+          }
+        },
+        {
+          "block": "direct-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 167,
+            "pointer": "",
+            "sample": "direct-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 170,
+            "pointer": "",
+            "sample": "direct-4-collapsed"
+          }
+        },
+        {
+          "block": "direct-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 210,
+            "pointer": "",
+            "sample": "direct-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 207,
+            "pointer": "",
+            "sample": "direct-5-collapsed"
+          }
+        }
+      ]
+    },
+    {
+      "id": "execution-graph-direct-expanded",
+      "workload": "direct",
+      "baseline_mode": "disabled",
+      "candidate_mode": "expanded",
+      "clock_pointer": "/elapsed_seconds",
+      "measurement_boundary": "same-build matched complete hosted Runs through authoritative destination export/marker reply; public cleanup/UI completion checked separately; verification outside timer",
+      "pairs": [
+        {
+          "block": "direct-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 4,
+            "pointer": "",
+            "sample": "direct-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 10,
+            "pointer": "",
+            "sample": "direct-0-expanded"
+          }
+        },
+        {
+          "block": "direct-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 44,
+            "pointer": "",
+            "sample": "direct-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 47,
+            "pointer": "",
+            "sample": "direct-1-expanded"
+          }
+        },
+        {
+          "block": "direct-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 87,
+            "pointer": "",
+            "sample": "direct-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 90,
+            "pointer": "",
+            "sample": "direct-2-expanded"
+          }
+        },
+        {
+          "block": "direct-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 130,
+            "pointer": "",
+            "sample": "direct-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 127,
+            "pointer": "",
+            "sample": "direct-3-expanded"
+          }
+        },
+        {
+          "block": "direct-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 167,
+            "pointer": "",
+            "sample": "direct-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 164,
+            "pointer": "",
+            "sample": "direct-4-expanded"
+          }
+        },
+        {
+          "block": "direct-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 210,
+            "pointer": "",
+            "sample": "direct-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 204,
+            "pointer": "",
+            "sample": "direct-5-expanded"
+          }
+        }
+      ]
+    },
+    {
+      "id": "execution-graph-resident_fused-collapsed",
+      "workload": "resident_fused",
+      "baseline_mode": "disabled",
+      "candidate_mode": "collapsed",
+      "clock_pointer": "/elapsed_seconds",
+      "measurement_boundary": "same-build matched complete hosted Runs through authoritative destination export/marker reply; public cleanup/UI completion checked separately; verification outside timer",
+      "pairs": [
+        {
+          "block": "resident_fused-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 14,
+            "pointer": "",
+            "sample": "resident_fused-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 17,
+            "pointer": "",
+            "sample": "resident_fused-0-collapsed"
+          }
+        },
+        {
+          "block": "resident_fused-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 54,
+            "pointer": "",
+            "sample": "resident_fused-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 60,
+            "pointer": "",
+            "sample": "resident_fused-1-collapsed"
+          }
+        },
+        {
+          "block": "resident_fused-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 97,
+            "pointer": "",
+            "sample": "resident_fused-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 94,
+            "pointer": "",
+            "sample": "resident_fused-2-collapsed"
+          }
+        },
+        {
+          "block": "resident_fused-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 140,
+            "pointer": "",
+            "sample": "resident_fused-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 134,
+            "pointer": "",
+            "sample": "resident_fused-3-collapsed"
+          }
+        },
+        {
+          "block": "resident_fused-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 177,
+            "pointer": "",
+            "sample": "resident_fused-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 180,
+            "pointer": "",
+            "sample": "resident_fused-4-collapsed"
+          }
+        },
+        {
+          "block": "resident_fused-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 220,
+            "pointer": "",
+            "sample": "resident_fused-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 217,
+            "pointer": "",
+            "sample": "resident_fused-5-collapsed"
+          }
+        }
+      ]
+    },
+    {
+      "id": "execution-graph-resident_fused-expanded",
+      "workload": "resident_fused",
+      "baseline_mode": "disabled",
+      "candidate_mode": "expanded",
+      "clock_pointer": "/elapsed_seconds",
+      "measurement_boundary": "same-build matched complete hosted Runs through authoritative destination export/marker reply; public cleanup/UI completion checked separately; verification outside timer",
+      "pairs": [
+        {
+          "block": "resident_fused-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 14,
+            "pointer": "",
+            "sample": "resident_fused-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 20,
+            "pointer": "",
+            "sample": "resident_fused-0-expanded"
+          }
+        },
+        {
+          "block": "resident_fused-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 54,
+            "pointer": "",
+            "sample": "resident_fused-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 57,
+            "pointer": "",
+            "sample": "resident_fused-1-expanded"
+          }
+        },
+        {
+          "block": "resident_fused-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 97,
+            "pointer": "",
+            "sample": "resident_fused-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 100,
+            "pointer": "",
+            "sample": "resident_fused-2-expanded"
+          }
+        },
+        {
+          "block": "resident_fused-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 140,
+            "pointer": "",
+            "sample": "resident_fused-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 137,
+            "pointer": "",
+            "sample": "resident_fused-3-expanded"
+          }
+        },
+        {
+          "block": "resident_fused-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 177,
+            "pointer": "",
+            "sample": "resident_fused-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 174,
+            "pointer": "",
+            "sample": "resident_fused-4-expanded"
+          }
+        },
+        {
+          "block": "resident_fused-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 220,
+            "pointer": "",
+            "sample": "resident_fused-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 214,
+            "pointer": "",
+            "sample": "resident_fused-5-expanded"
+          }
+        }
+      ]
+    },
+    {
+      "id": "execution-graph-external_merge-collapsed",
+      "workload": "external_merge",
+      "baseline_mode": "disabled",
+      "candidate_mode": "collapsed",
+      "clock_pointer": "/elapsed_seconds",
+      "measurement_boundary": "same-build matched complete hosted Runs through authoritative destination export/marker reply; public cleanup/UI completion checked separately; verification outside timer",
+      "pairs": [
+        {
+          "block": "external_merge-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 24,
+            "pointer": "",
+            "sample": "external_merge-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 27,
+            "pointer": "",
+            "sample": "external_merge-0-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 64,
+            "pointer": "",
+            "sample": "external_merge-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 70,
+            "pointer": "",
+            "sample": "external_merge-1-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 107,
+            "pointer": "",
+            "sample": "external_merge-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 104,
+            "pointer": "",
+            "sample": "external_merge-2-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 150,
+            "pointer": "",
+            "sample": "external_merge-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 144,
+            "pointer": "",
+            "sample": "external_merge-3-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 187,
+            "pointer": "",
+            "sample": "external_merge-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 190,
+            "pointer": "",
+            "sample": "external_merge-4-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 230,
+            "pointer": "",
+            "sample": "external_merge-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 227,
+            "pointer": "",
+            "sample": "external_merge-5-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 4,
+            "pointer": "",
+            "sample": "external_merge-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 7,
+            "pointer": "",
+            "sample": "external_merge-0-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 24,
+            "pointer": "",
+            "sample": "external_merge-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 30,
+            "pointer": "",
+            "sample": "external_merge-1-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 47,
+            "pointer": "",
+            "sample": "external_merge-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 44,
+            "pointer": "",
+            "sample": "external_merge-2-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 70,
+            "pointer": "",
+            "sample": "external_merge-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 64,
+            "pointer": "",
+            "sample": "external_merge-3-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 87,
+            "pointer": "",
+            "sample": "external_merge-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 90,
+            "pointer": "",
+            "sample": "external_merge-4-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 110,
+            "pointer": "",
+            "sample": "external_merge-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 107,
+            "pointer": "",
+            "sample": "external_merge-5-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 4,
+            "pointer": "",
+            "sample": "external_merge-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 7,
+            "pointer": "",
+            "sample": "external_merge-0-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 14,
+            "pointer": "",
+            "sample": "external_merge-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 20,
+            "pointer": "",
+            "sample": "external_merge-1-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 27,
+            "pointer": "",
+            "sample": "external_merge-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 24,
+            "pointer": "",
+            "sample": "external_merge-2-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 40,
+            "pointer": "",
+            "sample": "external_merge-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 34,
+            "pointer": "",
+            "sample": "external_merge-3-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 47,
+            "pointer": "",
+            "sample": "external_merge-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 50,
+            "pointer": "",
+            "sample": "external_merge-4-collapsed"
+          }
+        },
+        {
+          "block": "external_merge-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 60,
+            "pointer": "",
+            "sample": "external_merge-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 57,
+            "pointer": "",
+            "sample": "external_merge-5-collapsed"
+          }
+        }
+      ]
+    },
+    {
+      "id": "execution-graph-external_merge-expanded",
+      "workload": "external_merge",
+      "baseline_mode": "disabled",
+      "candidate_mode": "expanded",
+      "clock_pointer": "/elapsed_seconds",
+      "measurement_boundary": "same-build matched complete hosted Runs through authoritative destination export/marker reply; public cleanup/UI completion checked separately; verification outside timer",
+      "pairs": [
+        {
+          "block": "external_merge-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 24,
+            "pointer": "",
+            "sample": "external_merge-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 30,
+            "pointer": "",
+            "sample": "external_merge-0-expanded"
+          }
+        },
+        {
+          "block": "external_merge-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 64,
+            "pointer": "",
+            "sample": "external_merge-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 67,
+            "pointer": "",
+            "sample": "external_merge-1-expanded"
+          }
+        },
+        {
+          "block": "external_merge-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 107,
+            "pointer": "",
+            "sample": "external_merge-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 110,
+            "pointer": "",
+            "sample": "external_merge-2-expanded"
+          }
+        },
+        {
+          "block": "external_merge-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 150,
+            "pointer": "",
+            "sample": "external_merge-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 147,
+            "pointer": "",
+            "sample": "external_merge-3-expanded"
+          }
+        },
+        {
+          "block": "external_merge-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 187,
+            "pointer": "",
+            "sample": "external_merge-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 184,
+            "pointer": "",
+            "sample": "external_merge-4-expanded"
+          }
+        },
+        {
+          "block": "external_merge-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 230,
+            "pointer": "",
+            "sample": "external_merge-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 224,
+            "pointer": "",
+            "sample": "external_merge-5-expanded"
+          }
+        },
+        {
+          "block": "external_merge-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 4,
+            "pointer": "",
+            "sample": "external_merge-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 10,
+            "pointer": "",
+            "sample": "external_merge-0-expanded"
+          }
+        },
+        {
+          "block": "external_merge-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 24,
+            "pointer": "",
+            "sample": "external_merge-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 27,
+            "pointer": "",
+            "sample": "external_merge-1-expanded"
+          }
+        },
+        {
+          "block": "external_merge-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 47,
+            "pointer": "",
+            "sample": "external_merge-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 50,
+            "pointer": "",
+            "sample": "external_merge-2-expanded"
+          }
+        },
+        {
+          "block": "external_merge-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 70,
+            "pointer": "",
+            "sample": "external_merge-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 67,
+            "pointer": "",
+            "sample": "external_merge-3-expanded"
+          }
+        },
+        {
+          "block": "external_merge-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 87,
+            "pointer": "",
+            "sample": "external_merge-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 84,
+            "pointer": "",
+            "sample": "external_merge-4-expanded"
+          }
+        },
+        {
+          "block": "external_merge-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 110,
+            "pointer": "",
+            "sample": "external_merge-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 104,
+            "pointer": "",
+            "sample": "external_merge-5-expanded"
+          }
+        },
+        {
+          "block": "external_merge-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 4,
+            "pointer": "",
+            "sample": "external_merge-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 10,
+            "pointer": "",
+            "sample": "external_merge-0-expanded"
+          }
+        },
+        {
+          "block": "external_merge-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 14,
+            "pointer": "",
+            "sample": "external_merge-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 17,
+            "pointer": "",
+            "sample": "external_merge-1-expanded"
+          }
+        },
+        {
+          "block": "external_merge-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 27,
+            "pointer": "",
+            "sample": "external_merge-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 30,
+            "pointer": "",
+            "sample": "external_merge-2-expanded"
+          }
+        },
+        {
+          "block": "external_merge-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 40,
+            "pointer": "",
+            "sample": "external_merge-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 37,
+            "pointer": "",
+            "sample": "external_merge-3-expanded"
+          }
+        },
+        {
+          "block": "external_merge-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 47,
+            "pointer": "",
+            "sample": "external_merge-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 44,
+            "pointer": "",
+            "sample": "external_merge-4-expanded"
+          }
+        },
+        {
+          "block": "external_merge-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 60,
+            "pointer": "",
+            "sample": "external_merge-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-004/raw.jsonl",
+            "sha256": "cfb229975459682acbfed03937a1d7aa0dc78b274a66e2f47f1d4abade0267e8",
+            "line": 54,
+            "pointer": "",
+            "sample": "external_merge-5-expanded"
+          }
+        }
+      ]
+    },
+    {
+      "id": "execution-graph-high_cardinality-collapsed",
+      "workload": "high_cardinality",
+      "baseline_mode": "disabled",
+      "candidate_mode": "collapsed",
+      "clock_pointer": "/elapsed_seconds",
+      "measurement_boundary": "same-build matched complete hosted Runs through authoritative destination export/marker reply; public cleanup/UI completion checked separately; verification outside timer",
+      "pairs": [
+        {
+          "block": "high_cardinality-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 34,
+            "pointer": "",
+            "sample": "high_cardinality-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 37,
+            "pointer": "",
+            "sample": "high_cardinality-0-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 74,
+            "pointer": "",
+            "sample": "high_cardinality-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 80,
+            "pointer": "",
+            "sample": "high_cardinality-1-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 117,
+            "pointer": "",
+            "sample": "high_cardinality-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 114,
+            "pointer": "",
+            "sample": "high_cardinality-2-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 160,
+            "pointer": "",
+            "sample": "high_cardinality-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 154,
+            "pointer": "",
+            "sample": "high_cardinality-3-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 197,
+            "pointer": "",
+            "sample": "high_cardinality-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 200,
+            "pointer": "",
+            "sample": "high_cardinality-4-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 240,
+            "pointer": "",
+            "sample": "high_cardinality-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 237,
+            "pointer": "",
+            "sample": "high_cardinality-5-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 14,
+            "pointer": "",
+            "sample": "high_cardinality-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 17,
+            "pointer": "",
+            "sample": "high_cardinality-0-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 34,
+            "pointer": "",
+            "sample": "high_cardinality-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 40,
+            "pointer": "",
+            "sample": "high_cardinality-1-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 57,
+            "pointer": "",
+            "sample": "high_cardinality-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 54,
+            "pointer": "",
+            "sample": "high_cardinality-2-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 80,
+            "pointer": "",
+            "sample": "high_cardinality-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 74,
+            "pointer": "",
+            "sample": "high_cardinality-3-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 97,
+            "pointer": "",
+            "sample": "high_cardinality-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 100,
+            "pointer": "",
+            "sample": "high_cardinality-4-collapsed"
+          }
+        },
+        {
+          "block": "high_cardinality-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 120,
+            "pointer": "",
+            "sample": "high_cardinality-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 117,
+            "pointer": "",
+            "sample": "high_cardinality-5-collapsed"
+          }
+        }
+      ]
+    },
+    {
+      "id": "execution-graph-high_cardinality-expanded",
+      "workload": "high_cardinality",
+      "baseline_mode": "disabled",
+      "candidate_mode": "expanded",
+      "clock_pointer": "/elapsed_seconds",
+      "measurement_boundary": "same-build matched complete hosted Runs through authoritative destination export/marker reply; public cleanup/UI completion checked separately; verification outside timer",
+      "pairs": [
+        {
+          "block": "high_cardinality-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 34,
+            "pointer": "",
+            "sample": "high_cardinality-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 40,
+            "pointer": "",
+            "sample": "high_cardinality-0-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 74,
+            "pointer": "",
+            "sample": "high_cardinality-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 77,
+            "pointer": "",
+            "sample": "high_cardinality-1-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 117,
+            "pointer": "",
+            "sample": "high_cardinality-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 120,
+            "pointer": "",
+            "sample": "high_cardinality-2-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 160,
+            "pointer": "",
+            "sample": "high_cardinality-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 157,
+            "pointer": "",
+            "sample": "high_cardinality-3-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 197,
+            "pointer": "",
+            "sample": "high_cardinality-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 194,
+            "pointer": "",
+            "sample": "high_cardinality-4-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 240,
+            "pointer": "",
+            "sample": "high_cardinality-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-002/raw.jsonl",
+            "sha256": "4a900a6168914a2fc6fd5044bdae0c70ae13d261c702816c7772846c559a6ee9",
+            "line": 234,
+            "pointer": "",
+            "sample": "high_cardinality-5-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-0",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 14,
+            "pointer": "",
+            "sample": "high_cardinality-0-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 20,
+            "pointer": "",
+            "sample": "high_cardinality-0-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-1",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 34,
+            "pointer": "",
+            "sample": "high_cardinality-1-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 37,
+            "pointer": "",
+            "sample": "high_cardinality-1-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-2",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 57,
+            "pointer": "",
+            "sample": "high_cardinality-2-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 60,
+            "pointer": "",
+            "sample": "high_cardinality-2-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-3",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 80,
+            "pointer": "",
+            "sample": "high_cardinality-3-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 77,
+            "pointer": "",
+            "sample": "high_cardinality-3-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-4",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 97,
+            "pointer": "",
+            "sample": "high_cardinality-4-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 94,
+            "pointer": "",
+            "sample": "high_cardinality-4-expanded"
+          }
+        },
+        {
+          "block": "high_cardinality-5",
+          "baseline": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 120,
+            "pointer": "",
+            "sample": "high_cardinality-5-disabled"
+          },
+          "candidate": {
+            "source": ".tools/execution-graph/58-overhead-003/raw.jsonl",
+            "sha256": "d0392b16c3a32df2e34756c4537629c30e7b643284db73f7550fa6da44a542b6",
+            "line": 114,
+            "pointer": "",
+            "sample": "high_cardinality-5-expanded"
+          }
+        }
+      ]
+    }
+  ]
+}

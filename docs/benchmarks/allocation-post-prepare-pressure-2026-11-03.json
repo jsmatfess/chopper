@@ -1,0 +1,111 @@
+{
+  "type": "derived_allocation_post_preparation_pressure_control",
+  "source_base": "409a017625aa856ecfd73263bc11a0a3a61cb18e",
+  "decision": "Unchanged candidate cannot claim admission-domain inclusion; block production promotion pending a pre-emission feasibility remedy or explicit narrower success contract. This control does not reject fitting-case pass reductions.",
+  "scope": "Linux native synthetic materialized-parent control, not a complete Run benchmark, pressure-frequency estimate, Windows/WASI result or held-out evaluation. No production code/default/selector change.",
+  "candidate": {
+    "patch": "docs/benchmarks/resident-parent-retry-prototype-2026-11-03.patch",
+    "sha256": "89865f4b586256503a4797d202e551b59df62b3c81c181087671b70ed65e0af8",
+    "algorithm_revisions": 0
+  },
+  "control": {
+    "patch": "docs/benchmarks/allocation-post-prepare-pressure-control-2026-11-03.patch",
+    "sha256": "644a47ce637719e7c2f6a625735f1fdd4c1dfc6c0d7f16a49a4c354652d9f0fa",
+    "rows": 2500,
+    "payload_bytes": 128,
+    "fields": [
+      "decimal ID",
+      "128 x characters",
+      "ID modulo 7"
+    ],
+    "membership": "Existing probabilistic() helper: a=35%, b=65%, strata=[index2,index0], domain=[7;32]",
+    "job_context_memory_bytes": 16777216,
+    "shared_pool_bytes": 8388608,
+    "writer_lifetime": "DatasetWriter exists before prepare_parent in all cells",
+    "pressure": "Prepare without competitor; derive one competitor grant as pool limit minus unpressured candidate retained usage minus 256. Both pressured cells admit this identical absolute grant in an independent workspace, then retain it throughout emission.",
+    "verification": "Unpressured candidate and pressured router have exact serialized group metadata and row-frame parity, all IDs exactly once and exact fields. Candidate shared denial emits zero rows. Each cell scans once, ctx.used=0 and all grants/directory release after drop."
+  },
+  "observations": [
+    {
+      "cell": "candidate-control",
+      "cleanup": true,
+      "competitor_bytes": 0,
+      "emission_headroom_bytes": 7542479,
+      "prepared_shared_bytes": 846129,
+      "pressured": false,
+      "resident": true,
+      "scans": 1,
+      "shared_denied": false,
+      "sink_rows": 2500
+    },
+    {
+      "cell": "routing-pressured",
+      "cleanup": true,
+      "competitor_bytes": 7542223,
+      "emission_headroom_bytes": 706746,
+      "prepared_shared_bytes": 139639,
+      "pressured": true,
+      "resident": false,
+      "scans": 1,
+      "shared_denied": false,
+      "sink_rows": 2500
+    },
+    {
+      "cell": "candidate-pressured",
+      "cleanup": true,
+      "competitor_bytes": 7542223,
+      "emission_headroom_bytes": 256,
+      "prepared_shared_bytes": 846129,
+      "pressured": true,
+      "resident": true,
+      "scans": 1,
+      "shared_denied": true,
+      "sink_rows": 0
+    }
+  ],
+  "failures": [
+    {
+      "attempt": "batch",
+      "reason": "Cargo proxy resolves to rustup; format command rejected before build."
+    },
+    {
+      "attempt": "batch-v2",
+      "reason": "Compiler rustup proxy triggers conflicting dependency rust-src component installation; no control executes."
+    },
+    {
+      "attempt": "batch-v3",
+      "reason": "Absolute compiler input glob rejected at setup; no commands."
+    },
+    {
+      "attempt": "batch-v4",
+      "reason": "64-row candidate succeeds with 90,345 retained bytes; fixed competitor cannot fit the larger router footprint. Not a matching success/denial pair, excluded from target conclusion."
+    }
+  ],
+  "revision": "v5 changes only the synthetic row count to the previously studied 2500-row case. No sweep, candidate algorithm revision or elapsed samples.",
+  "host": {
+    "system": "Linux",
+    "machine": "x86_64",
+    "runtime": "Linux native under WSL; no native Windows performance claim",
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+  },
+  "provenance": {
+    "root": "scratch/allocation-emission-20261103",
+    "source_inventory_sha256": "3bdce10063b5c8701b4d25a47ea5b17a64f938a62d783023b427d8c043108446",
+    "source_files": 356,
+    "tested_control_binary_sha256": "aa836eb76f0332cbce476d5cc039cd6fadce34ee3bf794ea5587a7d337f68f93",
+    "runner_manifest_sha256": "e3479e6dd3c2cac77813521d06114c3c24a9bd81e63581da4cecae126d318da8",
+    "runner_status_sha256": "832fe428c87836d06b5b76a39a96172a73f1227e7373aea8a89f41924afa0f7c",
+    "observations_log_sha256": "8ad731682f1420f19252c3444f0154523daff7b7714f02b5eab643a13dca7170",
+    "workspace_manifest_sha256": "aedc1e89ea4347c2638776cf4c4fcadc8e9bd101db2d74fa21014871f555a9ef",
+    "workspace_status_sha256": "38253c457cf97c4835390adaf2eae2bfe5baa4eaafacdc73eacfcf8726c0d38f"
+  },
+  "validation": {
+    "format": "passed",
+    "focused_control": "passed",
+    "original_parent_retry_controls": "passed (3 including new control)",
+    "workspace_all_target_clippy": "passed",
+    "workspace_locked_tests": "passed",
+    "patch_replay": "Both committed patches reproduce all three changed source files byte for byte"
+  },
+  "archive": "Raw sources, binary, manifests, full logs and failed attempts retained in ignored private scratch. No new remote archive/upload or cleanup claimed."
+}

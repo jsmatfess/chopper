@@ -1,0 +1,44 @@
+{
+  "type": "derived_allocation_admission_control",
+  "scope": "One native Windows default-feature unit-test invocation, two isolated local-workspace contexts. No complete CLI jobs or performance samples.",
+  "source_revision": "1cf44a9961bd5ca67e03df79b3dcf9370648a13f",
+  "probe_patch_sha256": "0642ced80d8efa37a8ada901a46100b805564bbd5a3ec225aea1276be8edc027",
+  "parameters": {
+    "rows": 2500,
+    "payload_bytes": 128,
+    "keys": 2,
+    "key_membership": "preassigned id % 2; monotonic original ordinals, no RNG membership test",
+    "nominal_memory_override_bytes": 4194304,
+    "workspace_before_directory_allowance_bytes": 2097152,
+    "other_reservation_bytes": 1797152,
+    "available_after_other_before_directory_allowance_bytes": 300000
+  },
+  "observations": [
+    {
+      "path": "immediate-routing",
+      "success": true,
+      "verified_ids_and_key_ordinal_order": true,
+      "returned_rows": 2500,
+      "held_workspace_bytes": 1797200,
+      "remaining_workspace_bytes": 1797200,
+      "peak_workspace_bytes": 1930646
+    },
+    {
+      "path": "retained-key-sort",
+      "success": false,
+      "returned_rows": null,
+      "error": "concurrent algorithm workspaces exceed memory budget; increase memory_mb",
+      "held_workspace_bytes": 1797200,
+      "remaining_workspace_bytes": 1797200,
+      "peak_workspace_bytes": 2054678
+    }
+  ],
+  "cleanup": "Both contexts asserted temporary bytes zero and final workspace equal held other+directory grants; dropping other returns directory baseline. Failure raw rows=0 is a missing-result placeholder, not number of input rows visited.",
+  "limits": "Test-only context overrides are not supported CLI memory settings. This probes the sorter physical path, not full-job publication, probabilistic membership, RSS, physical I/O, real concurrent Jobs or browser behavior. It establishes a retained-versus-immediate admission difference in this controlled state, not prevalence in production. Exact denied allocation is not instrumented; the source overlap explanation is an inference, while the observed success-domain difference is direct.",
+  "references": {
+    "scratch/allocation-admission-20261102/batch/status.json": "6d4bbe4e449d1db9285723d4d53a685b252e510d46ca1e9c8fedd011942db525",
+    "scratch/allocation-admission-20261102/batch/manifest.json": "c7f7e451ca8ad714e8b68b26ce495d9b5eab74afb1ff926beec07e764a32a1ba",
+    "scratch/allocation-admission-20261102/batch/1-stdout.log": "d216cbfc957c39c4a08da5c8e1566a5dd141833c54748b309e9d8cbb1d7d02ed",
+    "scratch/allocation-admission-20261102/batch/1-stderr.log": "55748120fd0c5c421fdf891b8780e0ed52ee1d24511451a25be7ce53e8c95fed"
+  }
+}

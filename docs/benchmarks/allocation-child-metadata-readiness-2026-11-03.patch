@@ -1,0 +1,365 @@
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -1646,6 +1646,7 @@
+                 ctx,
+                 matches!(operation, Operation::AssignProbabilistic { .. })
+                     && job.resources.grouping == Grouping::Auto,
++                step,
+             )?;
+             ready.emit(parent, step, output, ctx)?;
+         }
+--- a/crates/chopper/src/engine/streaming.rs
++++ b/crates/chopper/src/engine/streaming.rs
+@@ -192,19 +192,59 @@
+         Ok(ReadyGroups {
+             membership: self.membership,
+             rows: self.sorter.finish()?,
++            children: None,
+             #[cfg(test)]
+             retried: false,
+         })
+     }
+ }
+ 
++struct ReadyChildren {
++    // The iterator drops every unused lineage owner before its descriptor grant.
++    children: std::vec::IntoIter<group_metadata::ClonedGroup>,
++    _memory: Reservation,
++}
++
+ pub(super) struct ReadyGroups<'a> {
+     membership: Membership<'a>,
+     rows: SortedRows,
++    children: Option<ReadyChildren>,
+     #[cfg(test)]
+     retried: bool,
+ }
+ impl ReadyGroups<'_> {
++    fn prepare_children(&mut self, parent: &Group, step: usize, ctx: &Context) -> Result<()> {
++        // Only resident iteration transfers already-admitted row capacity. Disk
++        // cursors can admit new reads later and need a separate feasibility design.
++        if !matches!(self.rows, SortedRows::Memory(_)) {
++            return Ok(());
++        }
++        let mut memory = Reservation::new(ctx);
++        let mut children = Vec::new();
++        memory.reserve_vec(&mut children, self.membership.counts().len())?;
++        for index in 0..self.membership.counts().len() {
++            ctx.check()?;
++            children.push(group_metadata::ClonedGroup::child(
++                parent,
++                &self.membership.entry(step, index),
++                ctx,
++                |lineage| Group {
++                    offset: 0,
++                    rows: 0,
++                    lineage,
++                    exact: self.membership.exact(),
++                },
++            )?);
++            #[cfg(test)]
++            CHILD_PREPARED.with(|n| n.set(n.get() + 1));
++        }
++        self.children = Some(ReadyChildren {
++            children: children.into_iter(),
++            _memory: memory,
++        });
++        Ok(())
++    }
++
+     pub fn emit(
+         self,
+         parent: &Group,
+@@ -213,15 +253,24 @@
+         ctx: &Context,
+     ) -> Result<()> {
+         let mut rows = self.rows.reusing();
++        let mut prepared = self.children;
+         for (index, count) in self.membership.counts().iter().enumerate() {
+             ctx.check()?;
+-            let mut owned = group_metadata::ClonedGroup::begin_child(
+-                parent,
+-                &self.membership.entry(step, index),
+-                self.membership.exact(),
+-                output,
+-                ctx,
+-            )?;
++            let mut owned = if let Some(children) = &mut prepared {
++                children
++                    .children
++                    .next()
++                    .context("missing prepared child")?
++                    .start(output)
++            } else {
++                group_metadata::ClonedGroup::begin_child(
++                    parent,
++                    &self.membership.entry(step, index),
++                    self.membership.exact(),
++                    output,
++                    ctx,
++                )?
++            };
+             let group = &mut owned.group;
+             for _ in 0..*count {
+                 ctx.check()?;
+@@ -238,6 +287,7 @@
+ 
+ #[cfg(test)]
+ std::thread_local! {
++    static CHILD_PREPARED: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+     static PARENT_SCANS: std::cell::Cell<usize> = const { std::cell::Cell::new(0) };
+ }
+ 
+@@ -252,6 +302,7 @@
+     domain: [u8; 32],
+     ctx: &Context,
+     try_resident: bool,
++    step: usize,
+ ) -> Result<ReadyGroups<'a>> {
+     let scan = |resident| -> Result<ReadyGroups<'a>> {
+         #[cfg(test)]
+@@ -269,7 +320,11 @@
+         while let Some(row) = rows.next_packed(previous.take())? {
+             previous = state.push_compact(row)?;
+         }
+-        state.finish()
++        let mut ready = state.finish()?;
++        if resident {
++            ready.prepare_children(parent, step, ctx)?;
++        }
++        Ok(ready)
+     };
+     if try_resident {
+         match scan(true) {
+@@ -358,7 +413,7 @@
+             }
+             let operation = probabilistic();
+             PARENT_SCANS.with(|count| count.set(0));
+-            let ready = prepare_parent(&data, &parent, &operation, None, 3, [7; 32], &ctx, true);
++            let ready = prepare_parent(&data, &parent, &operation, None, 3, [7; 32], &ctx, true, 0);
+             if failure == "emission" {
+                 let mut sink = DeniedSink { rows: 0 };
+                 let error = ready?
+@@ -433,8 +488,9 @@
+                     .unwrap();
+                 let parent = data.groups()?.next().unwrap()?;
+                 let operation = probabilistic();
+-                let ready =
+-                    prepare_parent(&data, &parent, &operation, None, 3, [7; 32], &ctx, resident)?;
++                let ready = prepare_parent(
++                    &data, &parent, &operation, None, 3, [7; 32], &ctx, resident, 0,
++                )?;
+                 observed_retry |= ready.retried;
+                 eprintln!(
+                     "PARENT_RETRY count={count} payload={payload} resident={resident} retried={}",
+@@ -531,8 +587,9 @@
+             };
+             let operation = probabilistic();
+             PARENT_SCANS.with(|n| n.set(0));
+-            let ready =
+-                prepare_parent(&data, &parent, &operation, None, 3, [7; 32], &ctx, resident)?;
++            let ready = prepare_parent(
++                &data, &parent, &operation, None, 3, [7; 32], &ctx, resident, 0,
++            )?;
+             assert!(!ready.retried, "pressure starts only after preparation");
+             let held = pool.usage().reserved_bytes;
+             if !pressured {
+@@ -558,14 +615,11 @@
+             });
+             assert_eq!(PARENT_SCANS.with(|n| n.get()), 1, "no emission retry");
+             let sink_rows = sink.rows;
+-            if resident && pressured {
++            {
+                 assert!(
+-                    denied,
+-                    "expected genuine shared admission denial: {result:?}"
++                    !denied,
++                    "pre-admitted resident metadata must survive matched pressure"
+                 );
+-                assert_eq!(sink_rows, 0, "metadata must deny before any row");
+-                drop(sink);
+-            } else {
+                 result?;
+                 assert_eq!(sink_rows, 2500);
+                 // Release only after emission, before caller-owned verification.
+@@ -622,6 +676,162 @@
+         }
+         Ok(())
+     }
++
++    #[test]
++    fn parent_retry_metadata_partial_denial_and_empty_children() -> Result<()> {
++        const LIMIT: u64 = 8 * 1024 * 1024;
++        for mode in ["partial", "success", "cancel"] {
++            let pressured = mode == "partial";
++            let pool = Arc::new(crate::resources::MemoryPool::new(LIMIT));
++            let cancel = Arc::new(AtomicBool::new(false));
++            let mut ctx = Context::new(
++                &Resources {
++                    workers: 1,
++                    ..Default::default()
++                },
++                cancel.clone(),
++                Arc::new(|_| {}),
++            )?;
++            ctx.memory = 16 * 1024 * 1024;
++            ctx.replace_workspace_for_test(Workspace::shared(ctx.memory, pool.clone()))?;
++            let operation = Operation::AssignProbabilistic {
++                groups: (0..16)
++                    .map(|i| Allocation {
++                        name: format!("group-{i:02}"),
++                        percent: if i == 0 { "100".into() } else { "0".into() },
++                    })
++                    .collect(),
++                strata: vec![],
++            };
++            let parent = Group {
++                offset: 0,
++                rows: 32,
++                lineage: vec![],
++                exact: false,
++            };
++            let mut state = StreamingGroups {
++                sorter: Sorter::new(&ctx, SortOrder::Key),
++                membership: Membership::new(&operation, None, 3, [7; 32], &ctx)?,
++            };
++            for id in 0..32 {
++                state.push(Row {
++                    id,
++                    ordinal: id,
++                    key: vec![],
++                    fields: vec![id.to_string(), "payload".into(), "x".into()],
++                })?;
++            }
++            let mut ready = state.finish()?;
++            assert!(matches!(ready.rows, SortedRows::Memory(_)));
++            let mut sink = DatasetWriter::new(&ctx)?;
++            let mut competitor = Reservation::for_workspace(Arc::new(Workspace::shared(
++                LIMIT as usize,
++                pool.clone(),
++            )));
++            let mut expected_partial = 0;
++            if pressured {
++                let before = pool.usage().reserved_bytes;
++                let first = group_metadata::ClonedGroup::child(
++                    &parent,
++                    &ready.membership.entry(0, 0),
++                    &ctx,
++                    |lineage| Group {
++                        offset: 0,
++                        rows: 0,
++                        lineage,
++                        exact: false,
++                    },
++                )?;
++                let first_bytes = pool.usage().reserved_bytes - before;
++                drop(first);
++                let descriptor_bytes = 16 * std::mem::size_of::<group_metadata::ClonedGroup>();
++                competitor.resize(
++                    (LIMIT - before - first_bytes - descriptor_bytes as u64 - 256) as usize,
++                )?;
++                expected_partial = pool.usage().reserved_bytes;
++            }
++            CHILD_PREPARED.with(|n| n.set(0));
++            let result = ready.prepare_children(&parent, 0, &ctx);
++            let built = CHILD_PREPARED.with(|n| n.get());
++            if pressured {
++                assert!(matches!(
++                    result
++                        .err()
++                        .and_then(|e| e.downcast::<crate::resources::MemoryAdmission>().ok()),
++                    Some(crate::resources::MemoryAdmission::Shared { .. })
++                ));
++                assert!(
++                    built > 0 && built < 16,
++                    "must deny after partial construction: {built}"
++                );
++                assert!(ready.children.is_none());
++                assert_eq!(
++                    pool.usage().reserved_bytes,
++                    expected_partial,
++                    "partial child owners and vector grant must release"
++                );
++            } else {
++                result?;
++                assert_eq!(built, 16);
++                if mode == "cancel" {
++                    cancel.store(true, std::sync::atomic::Ordering::Relaxed);
++                    let error = ready
++                        .emit(&parent, 0, &mut sink, &ctx)
++                        .expect_err("cancel after metadata preparation");
++                    assert!(error
++                        .downcast_ref::<crate::resources::MemoryAdmission>()
++                        .is_none());
++                    drop(sink);
++                    drop(competitor);
++                    drop(parent);
++                    assert_eq!(ctx.used(), 0);
++                    drop(ctx);
++                    assert_eq!(pool.usage().reserved_bytes, 0);
++                    eprintln!("METADATA_CONTROL prepared_cancellation=true grants_released=true");
++                    continue;
++                }
++                ready.emit(&parent, 0, &mut sink, &ctx)?;
++                let data = sink.finish()?;
++                let mut total = 0;
++                let mut offset = 0;
++                for (index, group) in data.groups()?.enumerate() {
++                    let group = group?;
++                    assert_eq!(
++                        group.offset, offset,
++                        "prepared children must use actual sink offset"
++                    );
++                    assert_eq!(group.rows, if index == 0 { 32 } else { 0 });
++                    assert_eq!(group.lineage[0]["allocation"], format!("group-{index:02}"));
++                    for row in data.rows(&group, ctx.max_record)? {
++                        let row = row?;
++                        assert_eq!(row.id, total);
++                        total += 1;
++                        offset += row.disk_len();
++                    }
++                }
++                assert_eq!(total, 32);
++                assert_eq!(data.groups()?.count(), 16);
++                eprintln!("METADATA_CONTROL empty_children=15 offsets=true");
++                drop(data);
++                // sink and ready have moved and their grants must already be gone.
++                drop(competitor);
++                drop(parent);
++                assert_eq!(ctx.used(), 0);
++                drop(ctx);
++                assert_eq!(pool.usage().reserved_bytes, 0);
++                continue;
++            }
++            eprintln!("METADATA_CONTROL partial_children={built} cleanup=true");
++            drop(ready);
++            drop(sink);
++            drop(competitor);
++            drop(parent);
++            assert_eq!(ctx.used(), 0);
++            drop(ctx);
++            assert_eq!(pool.usage().reserved_bytes, 0);
++        }
++        Ok(())
++    }
+ 
+     fn context() -> Result<Context> {
+         Context::new(
+--- a/crates/chopper/src/engine/group_metadata.rs
++++ b/crates/chopper/src/engine/group_metadata.rs
+@@ -7,6 +7,15 @@
+     memory: Reservation,
+ }
+ impl ClonedGroup {
++    /// Move pre-admitted lineage into a sink at its actual current offset.
++    pub(super) fn start(self, output: &impl RowSink) -> Self {
++        let Self { group, memory } = self;
++        Self {
++            group: output.begin(group.lineage, group.exact),
++            memory,
++        }
++    }
++
+     #[cfg(feature = "experimental-consecutive-partitions")]
+     pub(super) fn append(
+         &mut self,

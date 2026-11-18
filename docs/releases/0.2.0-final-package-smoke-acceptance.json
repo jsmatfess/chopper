@@ -1,0 +1,380 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-11-15",
+  "issue": "https://github.com/jsmatfess/chopper/issues/105",
+  "status": "eight-selected-actual-cases-qualified; validation tooling delivered at3f02e85; publication requires separate approval",
+  "selected_product": {
+    "source_commit": "639d1fe97d985b1544df0932321c6a93cca2567b",
+    "runtime_build_commit": "feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d",
+    "linux_elf_sha256": "979ade07540ac251d60da377e4d536d8cdaf414fcdcaaeefb61978fdbc1ce169",
+    "windows_pe_sha256": "42772aa8bb8a76e27fe9d7a0e479b445250e164bdcb4da25fdae88a83536c5d2",
+    "artifact_receipt_sha256": "1720f28a01cbbd7a30cbb8c8614b9efc2da01e57c765c625f51e8a5e3455c30d"
+  },
+  "case_count": 8,
+  "cases": [
+    {
+      "profile": "native",
+      "case": "processing-cancel",
+      "main_receipt_sha256": "fa76c8c078272de34f82e573937443407072874a75cf59e61cdc26182ef22340",
+      "independent_receipt_sha256": "c53c7a36c8cc2ddb1b18e36f1a953ef347c344078c081b4f9e903428106ea329",
+      "configuration_sha256": "6c3069b2d89c2c53c35ca03bb3bff6cd15091aa462ea6fc6f20f755eda91759a",
+      "main_execution_source_commit": "24b37fb305015d2ce3f28ed56635b60b208d25ff",
+      "independent_verifier_source_commit": "24b37fb305015d2ce3f28ed56635b60b208d25ff",
+      "normal_original_release_and_independent_probe": true,
+      "qualified_case": true,
+      "cancel_observation": {
+        "active_phase": "Reading and validating CSV",
+        "active_rows": 65536,
+        "trusted_public_cancel_click": true,
+        "terminal_status": "cancelled",
+        "cancel_http_status": 200
+      },
+      "output_after_cancel": {
+        "destinationExists": false,
+        "staging": [],
+        "tempEntries": []
+      },
+      "interaction_scope": "Packaged native PE/local server and public UI Cancel; no browser File System Access handle injection.",
+      "actual_os": {
+        "os": "Windows",
+        "release": "11",
+        "build": "10.0.26300",
+        "architecture": "AMD64"
+      },
+      "browser_executable_sha256": "5b835c10836045119334d9524e62437110e00e1bd20612c9072a0ae155f94a17",
+      "actual_browser_version": "157.0.8103.51",
+      "case_bound_host_observation_sha256": "16cf0f11ace909060cf652d417e80001c77f513a94f479fd50f0e8aa0ae309ea",
+      "browser_identity_scope": "Case configuration and its hash-pinned host observation; native cases use Chrome as the packaged local-server UI client."
+    },
+    {
+      "profile": "native",
+      "case": "export-cancel",
+      "main_receipt_sha256": "b1c7a27a2d761104e0f3c1c687aad6b798e3b08870f23721e6eddf9b697697ea",
+      "independent_receipt_sha256": "9d076d12e523163004e0b70ed4814ccf9c5a87f09d6a3a4c0a85c8e3d2f67fc8",
+      "configuration_sha256": "6f39d5601a19c62f657075b96367acb88af568752b54d4467a386edc0b96dfa6",
+      "main_execution_source_commit": "823450f6a642a173ac97421e53718d298cfcbfdd",
+      "independent_verifier_source_commit": "823450f6a642a173ac97421e53718d298cfcbfdd",
+      "normal_original_release_and_independent_probe": true,
+      "qualified_case": true,
+      "cancel_observation": {
+        "active_phase": "Writing output",
+        "active_rows": 400,
+        "trusted_public_cancel_click": true,
+        "terminal_status": "cancelled",
+        "cancel_http_status": 200
+      },
+      "output_after_cancel": {
+        "destinationExists": false,
+        "staging": [],
+        "tempEntries": []
+      },
+      "interaction_scope": "Packaged native PE/local server and public UI Cancel; no browser File System Access handle injection.",
+      "actual_os": {
+        "os": "Windows",
+        "release": "11",
+        "build": "10.0.26300",
+        "architecture": "AMD64"
+      },
+      "browser_executable_sha256": "5b835c10836045119334d9524e62437110e00e1bd20612c9072a0ae155f94a17",
+      "actual_browser_version": "157.0.8103.51",
+      "case_bound_host_observation_sha256": "16cf0f11ace909060cf652d417e80001c77f513a94f479fd50f0e8aa0ae309ea",
+      "browser_identity_scope": "Case configuration and its hash-pinned host observation; native cases use Chrome as the packaged local-server UI client."
+    },
+    {
+      "profile": "hosted-chrome",
+      "case": "processing-cancel",
+      "main_receipt_sha256": "7b4bb0046b02f15e614f4b2d34053abf3ab3114adfc07273af403f752b59075e",
+      "independent_receipt_sha256": "7a930f3dc7a1cd787f7978102083d1b4372689ab12d8b4489ffdd6037f3efb23",
+      "configuration_sha256": "0fcfdbc39da705b917cd8f7c2bf779b1da8fcc837be742cabcf7876577e5a55d",
+      "main_execution_source_commit": "796b539d61bae60faf7b424c12b0141cf5496e0c",
+      "independent_verifier_source_commit": "796b539d61bae60faf7b424c12b0141cf5496e0c",
+      "normal_original_release_and_independent_probe": true,
+      "qualified_case": true,
+      "qualification_origin_source_commit": "24b37fb305015d2ce3f28ed56635b60b208d25ff",
+      "interaction_scope": "Actual system input/output pickers and trusted UI events; no injected File or directory handles.",
+      "runs": 1,
+      "cancel_observation": {
+        "phase": "Reading and validating CSV",
+        "rows": 65536,
+        "status": "RUNNING",
+        "trusted": true,
+        "type": "click"
+      },
+      "output_after_cancel": {
+        "files": 0,
+        "bytes": 0,
+        "complete": false,
+        "completion_marker": "absent"
+      },
+      "actual_browser_version": "157.0.8103.51",
+      "actual_os": {
+        "os": "Windows",
+        "release": "11",
+        "build": "10.0.26300",
+        "architecture": "AMD64"
+      },
+      "browser_executable_sha256": "5b835c10836045119334d9524e62437110e00e1bd20612c9072a0ae155f94a17",
+      "case_bound_host_observation_sha256": "16cf0f11ace909060cf652d417e80001c77f513a94f479fd50f0e8aa0ae309ea",
+      "browser_identity_scope": "Case configuration and its hash-pinned host observation; no later browser identity substituted."
+    },
+    {
+      "profile": "hosted-chrome",
+      "case": "export-cancel",
+      "main_receipt_sha256": "481c2ec5014606b2078bb50cf1135be36d282651016fe92f3b5f055f3589ee1d",
+      "independent_receipt_sha256": "6904dcc7a67df13be90a58132f206c8e89cb212608dbb484713c24ef3d475a24",
+      "configuration_sha256": "12e2296aff7b4daeaa9f80a3c70853e4acee6df4f25886a5085ead70f1d91594",
+      "main_execution_source_commit": "796b539d61bae60faf7b424c12b0141cf5496e0c",
+      "independent_verifier_source_commit": "796b539d61bae60faf7b424c12b0141cf5496e0c",
+      "normal_original_release_and_independent_probe": true,
+      "qualified_case": true,
+      "qualification_origin_source_commit": "24b37fb305015d2ce3f28ed56635b60b208d25ff",
+      "interaction_scope": "Actual system input/output pickers and trusted UI events; no injected File or directory handles.",
+      "runs": 1,
+      "cancel_observation": {
+        "phase": "Saving results (11/1101)",
+        "rows": 0,
+        "status": "RUNNING",
+        "trusted": true,
+        "type": "click"
+      },
+      "output_after_cancel": {
+        "files": 12,
+        "bytes": 2424,
+        "complete": false,
+        "completion_marker": "absent"
+      },
+      "actual_browser_version": "157.0.8103.51",
+      "actual_os": {
+        "os": "Windows",
+        "release": "11",
+        "build": "10.0.26300",
+        "architecture": "AMD64"
+      },
+      "browser_executable_sha256": "5b835c10836045119334d9524e62437110e00e1bd20612c9072a0ae155f94a17",
+      "case_bound_host_observation_sha256": "16cf0f11ace909060cf652d417e80001c77f513a94f479fd50f0e8aa0ae309ea",
+      "browser_identity_scope": "Case configuration and its hash-pinned host observation; no later browser identity substituted."
+    },
+    {
+      "profile": "hosted-chrome",
+      "case": "malformed-retry",
+      "main_receipt_sha256": "874a1b3877415a94616aaf35e95375116823d5ce3b82d07fb9a88df8f3b36f2b",
+      "independent_receipt_sha256": "717851521adce3d57f801baef792b866301364d928fd0ef2c9635a0bf9f9f45b",
+      "configuration_sha256": "2d217b2672f80718783c0c309bc2bef90992c6ec9f77e72b0e0b88d7d9eadf65",
+      "main_execution_source_commit": "1a5854b33e3b0dac3bb1e1e3ac43c8e604775d89",
+      "independent_verifier_source_commit": "1a5854b33e3b0dac3bb1e1e3ac43c8e604775d89",
+      "normal_original_release_and_independent_probe": true,
+      "qualified_case": true,
+      "qualification_origin_source_commit": "1a5854b33e3b0dac3bb1e1e3ac43c8e604775d89",
+      "interaction_scope": "Actual system input/output pickers and trusted UI events; no injected File or directory handles.",
+      "runs": 3,
+      "recovery": {
+        "committed_baseline_before_malformed": true,
+        "malformed_failure": {
+          "status": "FAILED",
+          "error": "Error: CSV record 4 has 2 fields, expected 3",
+          "runs": 2
+        },
+        "baseline_preserved_by_owning_checks": true,
+        "same_client_retry_complete": true,
+        "runs": 3,
+        "baseline_files": {
+          "CHOPPER-COMPLETE.json": {
+            "bytes": 67,
+            "sha256": "3925dc6257e3530f4e9df91c38c86490409fabfdb07af13068c51a85f514c2e3"
+          },
+          "manifest.jsonl": {
+            "bytes": 3697,
+            "sha256": "7447af1e13c6cc2236fe8c5abf2051a928548db9d666146203d93731e1a10fe6"
+          },
+          "part-00000001.csv": {
+            "bytes": 33,
+            "sha256": "78acbf6fc1c0336746c724d038474a9c83690c02a8ea6302dc393c5d3555914a"
+          },
+          "part-00000002.csv": {
+            "bytes": 33,
+            "sha256": "1591ab1577f13e9e25bc846f91a4db8e195674786805b5694294977b734b0abf"
+          }
+        }
+      },
+      "actual_browser_version": "157.0.8103.51",
+      "actual_os": {
+        "os": "Windows",
+        "release": "11",
+        "build": "10.0.26300",
+        "architecture": "AMD64"
+      },
+      "browser_executable_sha256": "5b835c10836045119334d9524e62437110e00e1bd20612c9072a0ae155f94a17",
+      "case_bound_host_observation_sha256": "16cf0f11ace909060cf652d417e80001c77f513a94f479fd50f0e8aa0ae309ea",
+      "browser_identity_scope": "Case configuration and its hash-pinned host observation; no later browser identity substituted."
+    },
+    {
+      "profile": "hosted-msedge",
+      "case": "processing-cancel",
+      "main_receipt_sha256": "6835ed19c88ef6cdad21b5b7163420eab6996bcc5b99e6d56ff3c5487b6160fe",
+      "independent_receipt_sha256": "60fcb9c4acaebc7c26dfa881f30b4adceee764c2539c9c67ba8babf34d196992",
+      "configuration_sha256": "13927c82e49dbd7c3260543293e67695893b86734114e0fd228ccf190707e5d2",
+      "main_execution_source_commit": "1a5854b33e3b0dac3bb1e1e3ac43c8e604775d89",
+      "independent_verifier_source_commit": "aed1ab3f98416c7838af3a5642066d4d8fd71ad3",
+      "normal_original_release_and_independent_probe": true,
+      "qualified_case": true,
+      "actual_browser_version": "157.0.4341.60",
+      "qualification_origin_source_commit": "1a5854b33e3b0dac3bb1e1e3ac43c8e604775d89",
+      "interaction_scope": "Actual system input/output pickers and trusted UI events; no injected File or directory handles.",
+      "runs": 1,
+      "cancel_observation": {
+        "phase": "Preparing operation 16 of 17",
+        "rows": 0,
+        "status": "RUNNING",
+        "trusted": true,
+        "type": "click"
+      },
+      "output_after_cancel": {
+        "files": 0,
+        "bytes": 0,
+        "complete": false,
+        "completion_marker": "absent"
+      },
+      "actual_os": {
+        "os": "Windows",
+        "release": "11",
+        "build": "10.0.26300",
+        "architecture": "AMD64"
+      },
+      "browser_executable_sha256": "2497874639116d8edc3de34b3fd83f72fa099112a5d2a426e1f08fcf39a99612",
+      "case_bound_host_observation_sha256": "fb4eaf3b5a633cbbc11ff33673d7d484328cc8c9c0074c184d8e4eac2fbff013",
+      "browser_identity_scope": "Case configuration and its hash-pinned host observation; no later browser identity substituted."
+    },
+    {
+      "profile": "hosted-msedge",
+      "case": "export-cancel",
+      "main_receipt_sha256": "b39555b0844a570ca0f3ac1408f2404bb93694aa2e4477ad1843c5ca6305abd2",
+      "independent_receipt_sha256": "ae2e40814bd8aa8497fb815e8311a4986a29a15e1d790586cbe2eadbf1a15a0b",
+      "configuration_sha256": "6c6846a634e71a9006f0b7b85de7a6524507c09c4cba501f18e3b8d01991a72e",
+      "main_execution_source_commit": "1a5854b33e3b0dac3bb1e1e3ac43c8e604775d89",
+      "independent_verifier_source_commit": "aed1ab3f98416c7838af3a5642066d4d8fd71ad3",
+      "normal_original_release_and_independent_probe": true,
+      "qualified_case": true,
+      "actual_browser_version": "157.0.4341.60",
+      "qualification_origin_source_commit": "1a5854b33e3b0dac3bb1e1e3ac43c8e604775d89",
+      "interaction_scope": "Actual system input/output pickers and trusted UI events; no injected File or directory handles.",
+      "runs": 1,
+      "cancel_observation": {
+        "phase": "Saving results (8/1101)",
+        "rows": 0,
+        "status": "RUNNING",
+        "trusted": true,
+        "type": "click"
+      },
+      "output_after_cancel": {
+        "files": 10,
+        "bytes": 2020,
+        "complete": false,
+        "completion_marker": "absent"
+      },
+      "actual_os": {
+        "os": "Windows",
+        "release": "11",
+        "build": "10.0.26300",
+        "architecture": "AMD64"
+      },
+      "browser_executable_sha256": "2497874639116d8edc3de34b3fd83f72fa099112a5d2a426e1f08fcf39a99612",
+      "case_bound_host_observation_sha256": "fb4eaf3b5a633cbbc11ff33673d7d484328cc8c9c0074c184d8e4eac2fbff013",
+      "browser_identity_scope": "Case configuration and its hash-pinned host observation; no later browser identity substituted."
+    },
+    {
+      "profile": "hosted-msedge",
+      "case": "malformed-retry",
+      "main_receipt_sha256": "0c8c12bcf3cec4561d58fb94c595ab1ac423c7b443fcd0594aa955b00c782490",
+      "independent_receipt_sha256": "814ded3c3600796e60d8f0f01b0c8b7729bc7deeecd1d77b96a216512668a408",
+      "configuration_sha256": "b18d7463b1d5124bc461119afe010cb562a4bb5e5e6b0a36807814bc909feb64",
+      "main_execution_source_commit": "1a5854b33e3b0dac3bb1e1e3ac43c8e604775d89",
+      "independent_verifier_source_commit": "aed1ab3f98416c7838af3a5642066d4d8fd71ad3",
+      "normal_original_release_and_independent_probe": true,
+      "qualified_case": true,
+      "actual_browser_version": "157.0.4341.60",
+      "qualification_origin_source_commit": "1a5854b33e3b0dac3bb1e1e3ac43c8e604775d89",
+      "interaction_scope": "Actual system input/output pickers and trusted UI events; no injected File or directory handles.",
+      "runs": 3,
+      "recovery": {
+        "committed_baseline_before_malformed": true,
+        "malformed_failure": {
+          "status": "FAILED",
+          "error": "Error: CSV record 4 has 2 fields, expected 3",
+          "runs": 2
+        },
+        "baseline_preserved_by_owning_checks": true,
+        "same_client_retry_complete": true,
+        "runs": 3,
+        "baseline_files": {
+          "CHOPPER-COMPLETE.json": {
+            "bytes": 67,
+            "sha256": "3925dc6257e3530f4e9df91c38c86490409fabfdb07af13068c51a85f514c2e3"
+          },
+          "manifest.jsonl": {
+            "bytes": 3696,
+            "sha256": "afec5e71d197920ea9e620194aedf370e85abe78098c1198d4fac6c2bf56a005"
+          },
+          "part-00000001.csv": {
+            "bytes": 33,
+            "sha256": "78acbf6fc1c0336746c724d038474a9c83690c02a8ea6302dc393c5d3555914a"
+          },
+          "part-00000002.csv": {
+            "bytes": 33,
+            "sha256": "1591ab1577f13e9e25bc846f91a4db8e195674786805b5694294977b734b0abf"
+          }
+        }
+      },
+      "actual_os": {
+        "os": "Windows",
+        "release": "11",
+        "build": "10.0.26300",
+        "architecture": "AMD64"
+      },
+      "browser_executable_sha256": "2497874639116d8edc3de34b3fd83f72fa099112a5d2a426e1f08fcf39a99612",
+      "case_bound_host_observation_sha256": "fb4eaf3b5a633cbbc11ff33673d7d484328cc8c9c0074c184d8e4eac2fbff013",
+      "browser_identity_scope": "Case configuration and its hash-pinned host observation; no later browser identity substituted."
+    }
+  ],
+  "scope_notes": [
+    "Native public processing/export Cancel is separate from hosted actual-picker smoke. Native processing observed Reading and validating CSV at 65536 rows; export observed Writing output.",
+    "Chrome processing Cancel was observed during Reading and validating CSV at 65536 rows. Edge processing Cancel was observed during Preparing operation 16 of 17 at zero rows; this does not claim Edge row-processing cancellation.",
+    "Hosted saving cancellation leaves ordinary partial CSV files without CHOPPER-COMPLETE.json; absence of a marker prevents treating these files as committed results. Native atomic output/staging cleanup remains a distinct contract.",
+    "Hosted malformed-after-valid-row cases preserve a committed baseline, report CSV record 4 with two fields instead of three, then complete a successful retry in the same client: three Runs per case.",
+    "Exact earlier Native/Chrome cancellations are reused at their original source identities. Edge main source1a and independent verifieraed are separate; old adapter failure remains failed, with no product replay.",
+    "Chrome cases, including the earlier Native UI client, bind their own retained 16cf0f11 host observation. Edge cases bind fb4eaf3b. Later matching Chrome observations are not substituted for earlier case provenance."
+  ],
+  "accounting": {
+    "cumulative_actual_phase_dispatch_seconds": 1723.6293665716948,
+    "input_charged_total": 1048480,
+    "input_remaining": 96,
+    "input_generated": 0,
+    "input_copied": 0,
+    "physical_highwater": "UNKNOWN; final_owned samples are visible logical bytes before independent metadata additions"
+  },
+  "retained_custody": {
+    "reused_cancellation_record_sha256": "a60165de412b176ec26614a7ca0e20b24ac8c2f83202dc7ccae2bc316d48f9b6",
+    "actual_case_scopes_sha256": "3c99d03fbebfb89328db2ece25a7d9987a0a8c08aca38be18b748ce364719232",
+    "execution_packet_sha256": "6d974105cbe27baf14da31b63d4163025de4666ed82210e2f1ff43e04aae2d3c",
+    "execution_outcome_sha256": "8c85eb9573ddd9b5c01eb8cc28ea332a4e9c2b4cf52ec1c886fa99a100f3ddd8",
+    "failed_first_independent_sha256": "b5b84342b28d2ed55e858f40e9b8757f57a6b5756306bad85d1afef6f81ee40a",
+    "all_failures_and_charges_retained": true,
+    "private_raw_paths_omitted": true
+  },
+  "limits": {
+    "all_referenced_main_and_independent_receipts_hash_verified": true,
+    "missing_receipts": [],
+    "no_new_execution_for_this_record": true,
+    "local_delivery_claim": false,
+    "publication_authorized": false,
+    "scope": "Selected exact package/runtime/browser/source scopes only; no general cancellation latency, physical highwater or arbitrary-build claim."
+  },
+  "delivery": {
+    "code_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+    "local_ci": {
+      "linux_sha256": "9d63a2de5fffdf34c7ad7b6b321562f6a5960b0f2a8b97f74a82c4cd2b7f280a",
+      "windows_sha256": "ab97d10a277c66bbef719ba03a38112263df5d01f97328b0299c91760243cb68"
+    },
+    "record_sha256": "50803e5fde07abd923a172baa52cabf49ef742986de6a37b6eda055b5cedf533",
+    "scope": "Validation-tooling/documentation delivery; selected product and actual qualification harnesses retain their original identities. Publication requires separate owner approval."
+  }
+}

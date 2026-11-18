@@ -1,0 +1,813 @@
+{
+  "type": "derived_whole_job_partial_cost_attribution",
+  "decision": "The measured parser, digest, hash and CSV serializer scopes do not justify concurrency complexity for this fixed narrow probe. Explicit phase-boundary controls put substantial time in prepared publication; investigate that path next. This is partial wall attribution, not a CPU profile or a rejection for other shapes.",
+  "fixture": "200000 probe-v1 ASCII rows,four regions;ordered export with no operations and revised probabilistic/shuffle fusion;same32MiB job/shared,one worker,1024row/65536byte caps and seed. Explicit Prepare+Execute API, not direct Run or CLI startup.",
+  "original_controls": {
+    "observations": [
+      {
+        "candidate": true,
+        "cleanup": true,
+        "costs": [
+          [
+            "parse_inclusive",
+            0,
+            0
+          ],
+          [
+            "decode_nested_in_parse",
+            0,
+            0
+          ],
+          [
+            "logical_digest",
+            0,
+            0
+          ],
+          [
+            "random_block_nested_in_categorical_or_key",
+            0,
+            0
+          ],
+          [
+            "categorical_inclusive",
+            0,
+            0
+          ],
+          [
+            "serialize_reserved",
+            0,
+            0
+          ]
+        ],
+        "diagnostics": {
+          "compact_spill_blocks": 0,
+          "compact_spill_fallbacks": 0,
+          "compact_spill_files": 0,
+          "compact_spill_rows": 0,
+          "compact_spill_source_bytes": 0,
+          "compact_spill_stored_bytes": 0,
+          "consecutive_partition_fusions": 0,
+          "consecutive_partition_retries": 0,
+          "consecutive_partition_rows": 0,
+          "directory_path_reserved_bytes": 64,
+          "fisher_yates_calls": 0,
+          "fisher_yates_rows": 0,
+          "fisher_yates_seconds": 0.0,
+          "grouping_policy": "auto",
+          "merge_inputs": 0,
+          "merge_operations": 0,
+          "partition_balanced_fusions": 0,
+          "partition_balanced_retries": 0,
+          "partition_balanced_rows": 0,
+          "peak_temporary_files": 4,
+          "peak_workspace_reserved_bytes": 275410,
+          "process_memory": {
+            "admission_limit_bytes": 33554432,
+            "limit_bytes": 33554432,
+            "peak_reserved_bytes": 275410,
+            "pressure_baseline_reserved_bytes": null,
+            "pressure_observation": null,
+            "pressure_rechecks": 0,
+            "reserved_bytes": 65567,
+            "startup_observation": null
+          },
+          "resident_sorts": 0,
+          "routed_groupings": 0,
+          "routing_fallbacks": 0,
+          "routing_reused_runs": 0,
+          "shuffle_partition_fusions": 0,
+          "shuffle_partition_retries": 0,
+          "shuffle_partition_rows": 0,
+          "sort_calls": 0,
+          "sort_rows": 0,
+          "sort_runs": 0,
+          "sort_seconds": 0.0,
+          "spill_format_candidate": false,
+          "streaming_chain_fusions": 0,
+          "streaming_chain_retries": 0,
+          "streaming_chain_rows": 0,
+          "temporary_bytes_read": 18830688,
+          "temporary_bytes_written": 18816075,
+          "temporary_cleanup_failures": 0,
+          "temporary_files_created": 4,
+          "temporary_path_reserved_bytes": 0,
+          "workspace_reserved_bytes": 65567
+        },
+        "exact_output_verified": true,
+        "fusion_recipe": false,
+        "grouping": "auto",
+        "input_blake3": "838c6f75e07ad7616c005b12e7067527dc05c4fb7274bca306310a34d6954309",
+        "instrumented": false,
+        "label": "cost-attribution",
+        "phases": {
+          "final_serialization": 1e-07,
+          "ingest_and_fused_operations": 0.0652073,
+          "remaining_operations": 6.42e-05
+        },
+        "rep": 0,
+        "rows": 200000,
+        "seconds": 0.8158197
+      },
+      {
+        "candidate": true,
+        "cleanup": true,
+        "costs": [
+          [
+            "parse_inclusive",
+            200002,
+            38640900
+          ],
+          [
+            "decode_nested_in_parse",
+            2295,
+            10502100
+          ],
+          [
+            "logical_digest",
+            200001,
+            20174400
+          ],
+          [
+            "random_block_nested_in_categorical_or_key",
+            0,
+            0
+          ],
+          [
+            "categorical_inclusive",
+            0,
+            0
+          ],
+          [
+            "serialize_reserved",
+            200001,
+            20416400
+          ]
+        ],
+        "diagnostics": {
+          "compact_spill_blocks": 0,
+          "compact_spill_fallbacks": 0,
+          "compact_spill_files": 0,
+          "compact_spill_rows": 0,
+          "compact_spill_source_bytes": 0,
+          "compact_spill_stored_bytes": 0,
+          "consecutive_partition_fusions": 0,
+          "consecutive_partition_retries": 0,
+          "consecutive_partition_rows": 0,
+          "directory_path_reserved_bytes": 64,
+          "fisher_yates_calls": 0,
+          "fisher_yates_rows": 0,
+          "fisher_yates_seconds": 0.0,
+          "grouping_policy": "auto",
+          "merge_inputs": 0,
+          "merge_operations": 0,
+          "partition_balanced_fusions": 0,
+          "partition_balanced_retries": 0,
+          "partition_balanced_rows": 0,
+          "peak_temporary_files": 4,
+          "peak_workspace_reserved_bytes": 275410,
+          "process_memory": {
+            "admission_limit_bytes": 33554432,
+            "limit_bytes": 33554432,
+            "peak_reserved_bytes": 275410,
+            "pressure_baseline_reserved_bytes": null,
+            "pressure_observation": null,
+            "pressure_rechecks": 0,
+            "reserved_bytes": 65567,
+            "startup_observation": null
+          },
+          "resident_sorts": 0,
+          "routed_groupings": 0,
+          "routing_fallbacks": 0,
+          "routing_reused_runs": 0,
+          "shuffle_partition_fusions": 0,
+          "shuffle_partition_retries": 0,
+          "shuffle_partition_rows": 0,
+          "sort_calls": 0,
+          "sort_rows": 0,
+          "sort_runs": 0,
+          "sort_seconds": 0.0,
+          "spill_format_candidate": false,
+          "streaming_chain_fusions": 0,
+          "streaming_chain_retries": 0,
+          "streaming_chain_rows": 0,
+          "temporary_bytes_read": 18830688,
+          "temporary_bytes_written": 18816075,
+          "temporary_cleanup_failures": 0,
+          "temporary_files_created": 4,
+          "temporary_path_reserved_bytes": 0,
+          "workspace_reserved_bytes": 65567
+        },
+        "exact_output_verified": true,
+        "fusion_recipe": false,
+        "grouping": "auto",
+        "input_blake3": "838c6f75e07ad7616c005b12e7067527dc05c4fb7274bca306310a34d6954309",
+        "instrumented": true,
+        "label": "cost-attribution",
+        "phases": {
+          "final_serialization": 0.0,
+          "ingest_and_fused_operations": 0.119087,
+          "remaining_operations": 4.42e-05
+        },
+        "rep": 1,
+        "rows": 200000,
+        "seconds": 0.9045938
+      },
+      {
+        "candidate": true,
+        "cleanup": true,
+        "costs": [
+          [
+            "parse_inclusive",
+            0,
+            0
+          ],
+          [
+            "decode_nested_in_parse",
+            0,
+            0
+          ],
+          [
+            "logical_digest",
+            0,
+            0
+          ],
+          [
+            "random_block_nested_in_categorical_or_key",
+            0,
+            0
+          ],
+          [
+            "categorical_inclusive",
+            0,
+            0
+          ],
+          [
+            "serialize_reserved",
+            0,
+            0
+          ]
+        ],
+        "diagnostics": {
+          "compact_spill_blocks": 0,
+          "compact_spill_fallbacks": 0,
+          "compact_spill_files": 0,
+          "compact_spill_rows": 0,
+          "compact_spill_source_bytes": 0,
+          "compact_spill_stored_bytes": 0,
+          "consecutive_partition_fusions": 0,
+          "consecutive_partition_retries": 0,
+          "consecutive_partition_rows": 0,
+          "directory_path_reserved_bytes": 64,
+          "fisher_yates_calls": 0,
+          "fisher_yates_rows": 0,
+          "fisher_yates_seconds": 0.0,
+          "grouping_policy": "auto",
+          "merge_inputs": 8,
+          "merge_operations": 4,
+          "partition_balanced_fusions": 0,
+          "partition_balanced_retries": 0,
+          "partition_balanced_rows": 0,
+          "peak_temporary_files": 6,
+          "peak_workspace_reserved_bytes": 8593550,
+          "process_memory": {
+            "admission_limit_bytes": 33554432,
+            "limit_bytes": 33554432,
+            "peak_reserved_bytes": 8593550,
+            "pressure_baseline_reserved_bytes": null,
+            "pressure_observation": null,
+            "pressure_rechecks": 0,
+            "reserved_bytes": 68615,
+            "startup_observation": null
+          },
+          "resident_sorts": 0,
+          "routed_groupings": 1,
+          "routing_fallbacks": 0,
+          "routing_reused_runs": 0,
+          "shuffle_partition_fusions": 0,
+          "shuffle_partition_retries": 0,
+          "shuffle_partition_rows": 0,
+          "sort_calls": 8,
+          "sort_rows": 200000,
+          "sort_runs": 8,
+          "sort_seconds": 0.030443,
+          "spill_format_candidate": false,
+          "streaming_chain_fusions": 0,
+          "streaming_chain_retries": 0,
+          "streaming_chain_rows": 0,
+          "temporary_bytes_read": 119662607,
+          "temporary_bytes_written": 118970108,
+          "temporary_cleanup_failures": 0,
+          "temporary_files_created": 16,
+          "temporary_path_reserved_bytes": 0,
+          "workspace_reserved_bytes": 68615
+        },
+        "exact_output_verified": true,
+        "fusion_recipe": true,
+        "grouping": "auto",
+        "input_blake3": "838c6f75e07ad7616c005b12e7067527dc05c4fb7274bca306310a34d6954309",
+        "instrumented": false,
+        "label": "cost-attribution",
+        "phases": {
+          "final_serialization": 1e-07,
+          "ingest_and_fused_operations": 0.2045347,
+          "remaining_operations": 0.3341607
+        },
+        "rep": 2,
+        "rows": 200000,
+        "seconds": 1.2572179
+      },
+      {
+        "candidate": true,
+        "cleanup": true,
+        "costs": [
+          [
+            "parse_inclusive",
+            200002,
+            49748300
+          ],
+          [
+            "decode_nested_in_parse",
+            2295,
+            13159800
+          ],
+          [
+            "logical_digest",
+            200001,
+            19646100
+          ],
+          [
+            "random_block_nested_in_categorical_or_key",
+            400000,
+            41245000
+          ],
+          [
+            "categorical_inclusive",
+            200000,
+            47081100
+          ],
+          [
+            "serialize_reserved",
+            200001,
+            26127900
+          ]
+        ],
+        "diagnostics": {
+          "compact_spill_blocks": 0,
+          "compact_spill_fallbacks": 0,
+          "compact_spill_files": 0,
+          "compact_spill_rows": 0,
+          "compact_spill_source_bytes": 0,
+          "compact_spill_stored_bytes": 0,
+          "consecutive_partition_fusions": 0,
+          "consecutive_partition_retries": 0,
+          "consecutive_partition_rows": 0,
+          "directory_path_reserved_bytes": 64,
+          "fisher_yates_calls": 0,
+          "fisher_yates_rows": 0,
+          "fisher_yates_seconds": 0.0,
+          "grouping_policy": "auto",
+          "merge_inputs": 8,
+          "merge_operations": 4,
+          "partition_balanced_fusions": 0,
+          "partition_balanced_retries": 0,
+          "partition_balanced_rows": 0,
+          "peak_temporary_files": 6,
+          "peak_workspace_reserved_bytes": 8593550,
+          "process_memory": {
+            "admission_limit_bytes": 33554432,
+            "limit_bytes": 33554432,
+            "peak_reserved_bytes": 8593550,
+            "pressure_baseline_reserved_bytes": null,
+            "pressure_observation": null,
+            "pressure_rechecks": 0,
+            "reserved_bytes": 68615,
+            "startup_observation": null
+          },
+          "resident_sorts": 0,
+          "routed_groupings": 1,
+          "routing_fallbacks": 0,
+          "routing_reused_runs": 0,
+          "shuffle_partition_fusions": 0,
+          "shuffle_partition_retries": 0,
+          "shuffle_partition_rows": 0,
+          "sort_calls": 8,
+          "sort_rows": 200000,
+          "sort_runs": 8,
+          "sort_seconds": 0.0338315,
+          "spill_format_candidate": false,
+          "streaming_chain_fusions": 0,
+          "streaming_chain_retries": 0,
+          "streaming_chain_rows": 0,
+          "temporary_bytes_read": 119662607,
+          "temporary_bytes_written": 118970108,
+          "temporary_cleanup_failures": 0,
+          "temporary_files_created": 16,
+          "temporary_path_reserved_bytes": 0,
+          "workspace_reserved_bytes": 68615
+        },
+        "exact_output_verified": true,
+        "fusion_recipe": true,
+        "grouping": "auto",
+        "input_blake3": "838c6f75e07ad7616c005b12e7067527dc05c4fb7274bca306310a34d6954309",
+        "instrumented": true,
+        "label": "cost-attribution",
+        "phases": {
+          "final_serialization": 1e-07,
+          "ingest_and_fused_operations": 0.2672963,
+          "remaining_operations": 0.3906629
+        },
+        "rep": 3,
+        "rows": 200000,
+        "seconds": 1.3742398
+      }
+    ],
+    "empty_span_calibration": {
+      "counters": [
+        [
+          "parse_inclusive",
+          100000,
+          2627800
+        ],
+        [
+          "decode_nested_in_parse",
+          0,
+          0
+        ],
+        [
+          "logical_digest",
+          0,
+          0
+        ],
+        [
+          "random_block_nested_in_categorical_or_key",
+          0,
+          0
+        ],
+        [
+          "categorical_inclusive",
+          0,
+          0
+        ],
+        [
+          "serialize_reserved",
+          0,
+          0
+        ]
+      ],
+      "iterations": 100000,
+      "seconds": 0.0057884
+    },
+    "binary_sha256": "f76324a89e6c8c9151c54935acfc4d259820200b38d73c0c2eedc58f38b1bba0",
+    "limits": "Partial inclusive wall spans, overlapping/nested scopes; no CPU or speed comparison. Calibration not subtracted. One off/on job per recipe."
+  },
+  "phase_boundary_controls": {
+    "observations": [
+      {
+        "candidate": true,
+        "cleanup": true,
+        "costs": [
+          [
+            "parse_inclusive",
+            200002,
+            29999300
+          ],
+          [
+            "decode_nested_in_parse",
+            2295,
+            7609300
+          ],
+          [
+            "logical_digest",
+            200001,
+            17074400
+          ],
+          [
+            "random_block_nested_in_categorical_or_key",
+            0,
+            0
+          ],
+          [
+            "categorical_inclusive",
+            0,
+            0
+          ],
+          [
+            "serialize_reserved",
+            200001,
+            16890000
+          ]
+        ],
+        "diagnostics": {
+          "compact_spill_blocks": 0,
+          "compact_spill_fallbacks": 0,
+          "compact_spill_files": 0,
+          "compact_spill_rows": 0,
+          "compact_spill_source_bytes": 0,
+          "compact_spill_stored_bytes": 0,
+          "consecutive_partition_fusions": 0,
+          "consecutive_partition_retries": 0,
+          "consecutive_partition_rows": 0,
+          "directory_path_reserved_bytes": 64,
+          "fisher_yates_calls": 0,
+          "fisher_yates_rows": 0,
+          "fisher_yates_seconds": 0.0,
+          "grouping_policy": "auto",
+          "merge_inputs": 0,
+          "merge_operations": 0,
+          "partition_balanced_fusions": 0,
+          "partition_balanced_retries": 0,
+          "partition_balanced_rows": 0,
+          "peak_temporary_files": 4,
+          "peak_workspace_reserved_bytes": 275410,
+          "process_memory": {
+            "admission_limit_bytes": 33554432,
+            "limit_bytes": 33554432,
+            "peak_reserved_bytes": 275410,
+            "pressure_baseline_reserved_bytes": null,
+            "pressure_observation": null,
+            "pressure_rechecks": 0,
+            "reserved_bytes": 65567,
+            "startup_observation": null
+          },
+          "resident_sorts": 0,
+          "routed_groupings": 0,
+          "routing_fallbacks": 0,
+          "routing_reused_runs": 0,
+          "shuffle_partition_fusions": 0,
+          "shuffle_partition_retries": 0,
+          "shuffle_partition_rows": 0,
+          "sort_calls": 0,
+          "sort_rows": 0,
+          "sort_runs": 0,
+          "sort_seconds": 0.0,
+          "spill_format_candidate": false,
+          "streaming_chain_fusions": 0,
+          "streaming_chain_retries": 0,
+          "streaming_chain_rows": 0,
+          "temporary_bytes_read": 18830688,
+          "temporary_bytes_written": 18816075,
+          "temporary_cleanup_failures": 0,
+          "temporary_files_created": 4,
+          "temporary_path_reserved_bytes": 0,
+          "workspace_reserved_bytes": 65567
+        },
+        "exact_output_verified": true,
+        "execution_seconds": 0.7491182,
+        "fusion_recipe": false,
+        "grouping": "auto",
+        "input_blake3": "838c6f75e07ad7616c005b12e7067527dc05c4fb7274bca306310a34d6954309",
+        "instrumented": true,
+        "label": "cost-attribution",
+        "phases": {
+          "final_serialization": 1e-07,
+          "ingest_and_fused_operations": 0.0962253,
+          "remaining_operations": 6.3e-05
+        },
+        "preparation_seconds": 0.098245,
+        "rep": 0,
+        "rows": 200000,
+        "seconds": 0.8473634
+      },
+      {
+        "candidate": true,
+        "cleanup": true,
+        "costs": [
+          [
+            "parse_inclusive",
+            200002,
+            38020600
+          ],
+          [
+            "decode_nested_in_parse",
+            2295,
+            9624000
+          ],
+          [
+            "logical_digest",
+            200001,
+            17413100
+          ],
+          [
+            "random_block_nested_in_categorical_or_key",
+            400000,
+            40747400
+          ],
+          [
+            "categorical_inclusive",
+            200000,
+            46231400
+          ],
+          [
+            "serialize_reserved",
+            200001,
+            24589000
+          ]
+        ],
+        "diagnostics": {
+          "compact_spill_blocks": 0,
+          "compact_spill_fallbacks": 0,
+          "compact_spill_files": 0,
+          "compact_spill_rows": 0,
+          "compact_spill_source_bytes": 0,
+          "compact_spill_stored_bytes": 0,
+          "consecutive_partition_fusions": 0,
+          "consecutive_partition_retries": 0,
+          "consecutive_partition_rows": 0,
+          "directory_path_reserved_bytes": 64,
+          "fisher_yates_calls": 0,
+          "fisher_yates_rows": 0,
+          "fisher_yates_seconds": 0.0,
+          "grouping_policy": "auto",
+          "merge_inputs": 8,
+          "merge_operations": 4,
+          "partition_balanced_fusions": 0,
+          "partition_balanced_retries": 0,
+          "partition_balanced_rows": 0,
+          "peak_temporary_files": 6,
+          "peak_workspace_reserved_bytes": 8593550,
+          "process_memory": {
+            "admission_limit_bytes": 33554432,
+            "limit_bytes": 33554432,
+            "peak_reserved_bytes": 8593550,
+            "pressure_baseline_reserved_bytes": null,
+            "pressure_observation": null,
+            "pressure_rechecks": 0,
+            "reserved_bytes": 68615,
+            "startup_observation": null
+          },
+          "resident_sorts": 0,
+          "routed_groupings": 1,
+          "routing_fallbacks": 0,
+          "routing_reused_runs": 0,
+          "shuffle_partition_fusions": 0,
+          "shuffle_partition_retries": 0,
+          "shuffle_partition_rows": 0,
+          "sort_calls": 8,
+          "sort_rows": 200000,
+          "sort_runs": 8,
+          "sort_seconds": 0.0377125,
+          "spill_format_candidate": false,
+          "streaming_chain_fusions": 0,
+          "streaming_chain_retries": 0,
+          "streaming_chain_rows": 0,
+          "temporary_bytes_read": 119662607,
+          "temporary_bytes_written": 118970108,
+          "temporary_cleanup_failures": 0,
+          "temporary_files_created": 16,
+          "temporary_path_reserved_bytes": 0,
+          "workspace_reserved_bytes": 68615
+        },
+        "exact_output_verified": true,
+        "execution_seconds": 0.8209548,
+        "fusion_recipe": true,
+        "grouping": "auto",
+        "input_blake3": "838c6f75e07ad7616c005b12e7067527dc05c4fb7274bca306310a34d6954309",
+        "instrumented": true,
+        "label": "cost-attribution",
+        "phases": {
+          "final_serialization": 1e-07,
+          "ingest_and_fused_operations": 0.213842,
+          "remaining_operations": 0.3972941
+        },
+        "preparation_seconds": 0.6146283,
+        "rep": 1,
+        "rows": 200000,
+        "seconds": 1.4355832
+      }
+    ],
+    "binary_sha256": "8aa1610ced06d97c7c04fee6d2bb32f1df6c293a9d0bc643b5b8e83a454f0aa3",
+    "scope": "Explicit Prepare/Execute wall boundaries, one instrumented control per recipe. No timing comparison or pure CPU inference."
+  },
+  "coverage": "Four original off/on jobs preserve exact CSV/output-record/17-field Analysis parity within each recipe, with independent fields/IDs/groups/caps and cleanup. Two follow-up instrumented controls independently repeat correctness/cleanup and time preparation/execution explicitly. All final pool grants release. No speed comparison between instrumentation modes.",
+  "scope_limits": [
+    "Parser includes I/O, validation and reserve callbacks; decoder is nested in parser.",
+    "Categorical includes its random draws; random-block spans may be nested. Do not sum scopes.",
+    "Logical digest covers compact/owned record updates and finalization; operation-key encoding, other allocation/storage/OS work and publication syscalls are not individually attributed.",
+    "Per-call clocks and atomics perturb work; calibration contextualizes overhead and is not a rigorous bound or a subtracted correction.",
+    "One enabled observation per recipe in each diagnostic pass; no per-job CPU/RSS, physical I/O, tails or cross-runtime inference.",
+    "Prepared publication differs from direct Run and browser export; no transfer assumed."
+  ],
+  "context": {
+    "os": "Windows-11-10.0.26200-SP0",
+    "cpu": {
+      "Name": "AMD Ryzen 7 5800X 8-Core Processor             ",
+      "NumberOfCores": 8,
+      "NumberOfLogicalProcessors": 16
+    },
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+    "cache": "Warm/uncontrolled: each fresh input is written immediately before timed API preparation. No cache flush. Background programs retained; host not claimed idle.",
+    "background": "Host not claimed idle. No concurrent compiler in original pre-build snapshot; Linux checks finished before follow-up engine jobs."
+  },
+  "validation": {
+    "linux": "Fresh formatting, all-target Clippy and locked workspace tests --skip prob_shuffle_controls pass on source-v1.",
+    "portable": "Source-v2 format and chopper-core wasm32-unknown-unknown check pass.",
+    "source_v2": "Only appended phase-boundary helper differs from full-suite source; core/vendor/native embedded inputs remain identical. Both native sources have complete byte-matched Linux/Windows identities.",
+    "patch_replay": "Exact replay passes for all four changed files.",
+    "browser": "Not run; no browser instrumentation or performance claim."
+  },
+  "usage": {
+    "research_jobs": 6,
+    "native_release_builds": 2,
+    "linux_workspace_validation_builds": 1,
+    "engine_failures": 0,
+    "timed_cli_jobs": 0,
+    "additional_case_reason": "First four controls left prepare/execute boundary unmeasured. Separately reviewed two-job diagnostic closes that attribution gap without changing algorithms, fixture, size or budget."
+  },
+  "owner_boundary": "Private snapshot instrumentation and evidence only. No production source, execution graph code/docs/diagrams, glossary, ADRs, prototype or concurrent root edits.",
+  "session": {
+    "objective": "TODO.md evidence gate for ingestion, independent record computation and output overlap, after fixed fusion comparison.",
+    "prior_handoff": "scratch/prob-shuffle-working-set-20261103T1940/handoff.json",
+    "prior_merge": "cb644bcad954ce63428ee1f9f7df6e0b27aff7f7",
+    "original_start_utc": "2026-11-03T08:27:43Z",
+    "window_start_utc": "2026-11-04T00:02:39Z",
+    "window_duration_seconds": 7200,
+    "deadline_utc": "2026-11-04T02:02:39Z",
+    "launch_cutoff_utc": "2026-11-04T01:42:39Z",
+    "scope": "First inspect existing phase timing coverage and locally installed native profilers. No experiment jobs until a bounded manifest and trustworthy attribution method are reviewed. Preserve other-thread execution graph and root dirty research edits.",
+    "previous_turn": "Verified CI wait. This turn merged PR59 after exact-head CI and full review checks."
+  },
+  "phase_review": {
+    "question": "Does the large remainder outside coarse preparation phase counters actually lie in Prepared::execute publication?",
+    "reason": "Original four controls measured total API time and Analysis preparation phases, but did not place a timer at the prepare/execute boundary. Do not infer the missing attribution.",
+    "scope": "Same instrumentation/core and fixed200krecipes, one enabled job per recipe with explicit preparation/execution clocks; no algorithm, capacity or formula change. Original off/on exactness gates remain preserved. Independent fields/IDs/caps/cleanup rerun.",
+    "revised_limits": {
+      "research_jobs": 6,
+      "native_release_builds": 2,
+      "additional_storage_bytes": 3221225472
+    },
+    "estimate_seconds": 150,
+    "estimate_additional_bytes": 402653184,
+    "stop": "No extra case/repetition or speed inference. Preserve original source and binary; fresh source-v2 and phase-target. Linux full-suite results may transfer only for byte-identical core; only new helper differs."
+  },
+  "validation_review": {
+    "reason": "Portable parser and random/digest functions now contain private instrumentation. Run fresh full Linux checks as well as actual native controls, rather than reusing source-mismatched suite results.",
+    "storage_limit_revision": {
+      "previous_bytes": 2147483648,
+      "revised_bytes": 3221225472
+    },
+    "research_jobs": "Unchanged four native jobs; no timing repetitions.",
+    "builds": "One completed native release build, plus one fresh Linux format/Clippy/workspace validation build.",
+    "estimate_seconds": 120,
+    "estimate_additional_bytes": 2147483648,
+    "scope": "Private source only; no production/graph changes."
+  },
+  "references_sha256": {
+    "scratch/performance-attribution-20261104T0003/attest.py": "dc268384f33e246f39b00d879c2ce292b91bdf235d4bb53bc7540aaf2bfcc770",
+    "scratch/performance-attribution-20261104T0003/instrumentation.patch": "1b854586c8df63d29ef8904e223c463ff50fb614df55551d04beaa2b0e5ae8ae",
+    "scratch/performance-attribution-20261104T0003/launch-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/launch-stdout.log": "35cf8f397e8a5be2a92576b71af526a0c0a996e785076dd136ca8aa4a15a35e7",
+    "scratch/performance-attribution-20261104T0003/limits.json": "3f442a94e6faae37ace0079987c34ffe8c71f514932c9db2bde99c70f2e7e067",
+    "scratch/performance-attribution-20261104T0003/phase-launch-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/phase-launch-stdout.log": "a3cb23959178bc2dfc3ba80e1fdcac4a80afb32f863590aa50710a30c11216ac",
+    "scratch/performance-attribution-20261104T0003/phase-plan.json": "82a51519353ba24ea545e7115bcac0b84cfb330c924a05245bdd25ee87447e56",
+    "scratch/performance-attribution-20261104T0003/phase-review.json": "a7031447be67f1357d8e4facfb6d8d4a900e746696f2c1ac066fec94c72750da",
+    "scratch/performance-attribution-20261104T0003/phase-source-identities.json": "1f9b3a75a37d655c475e4a595054fff76027ad41879705a53d2831ed8d8e3e7e",
+    "scratch/performance-attribution-20261104T0003/plan.json": "e3609afc2bc45a686ea4dd04bfd082062c5890572bc1709e2e729ccd6e393f79",
+    "scratch/performance-attribution-20261104T0003/portable-plan.json": "884325a54e8b7306188d2887a01445e05449f0a395a605f5d9f1c12a90b375ea",
+    "scratch/performance-attribution-20261104T0003/review.md": "0f26ad3097fe75302e6aa5cb19510915a614b7d28684899f51ff59893295532b",
+    "scratch/performance-attribution-20261104T0003/session.json": "3f30acd4959d3fa99440e1ecf9f54a36abe4e8eec6aa3d2191b4d35437c4cdf2",
+    "scratch/performance-attribution-20261104T0003/source-change-review.json": "aa2b57c82518aaa182b3385f05757b629447fc7401c593cc963607af0af1445f",
+    "scratch/performance-attribution-20261104T0003/source-identities.json": "b8db19683a38f6ca2dfce0b7463118d22a742108adc58bb110c402109da94a0a",
+    "scratch/performance-attribution-20261104T0003/validation-plan.json": "78aed2645bc15d3f43f5ab4659bf650cd105507b9bd3a5821d93943f45aec899",
+    "scratch/performance-attribution-20261104T0003/validation-review.json": "aadf7dffa53a5601b5a07e826df1733b7f25390062e7dda52cf5a811d03001d6",
+    "scratch/performance-attribution-20261104T0003/verify-phase.py": "ee69d3a09b0e85372287d3bf02da8c35583d2eb375bc2649d2afc484085d0c4c",
+    "scratch/performance-attribution-20261104T0003/verify.py": "aa37385566a08189d71eaea257572ef632d999ed14558b4a3e5cc508c99d5524",
+    "scratch/performance-attribution-20261104T0003/windows-attestation.json": "2db0c29e73420c5e9b28aa0038126a71f4609dade8064c565a3ca303ab406144",
+    "scratch/performance-attribution-20261104T0003/windows-manifest.json": "62afa45ea130fb00206b3bf2de14ce546469fe0e35aba412e6f8821c5505a71e",
+    "scratch/performance-attribution-20261104T0003/windows-phase-manifest.json": "16a9b0fa18dc694b93f5e6e505eeaaf1dbaa891ab9d377906f8ed91922d768a0",
+    "scratch/performance-attribution-20261104T0003/windows-phase-records.json": "5c64fe6c3e1f46aa4c1efd31fab3d13d221e79d914b6ac6fe42696a602c46b8e",
+    "scratch/performance-attribution-20261104T0003/windows-phase-status.json": "ec465f756bb1d9527b8713161e818ae63969fb5c2c82547e79edd40aaeda5274",
+    "scratch/performance-attribution-20261104T0003/windows-records.json": "9eb88368207693d54fbfacdf729689660a481cd54d5e1f0266262d1578d005ca",
+    "scratch/performance-attribution-20261104T0003/windows-status.json": "0178ee133dff8d1d4676b056f778a736aaf3e46d562de373dce37ffd91aaacb8",
+    "scratch/performance-attribution-20261104T0003/validation-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/validation-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/validation-batch/2-stderr.log": "05bb0f717196b650d33436681448af6ab30784f9d0fa39417c6267e38cbcebbe",
+    "scratch/performance-attribution-20261104T0003/validation-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/validation-batch/3-stderr.log": "14fe076289ba4865000ce6d31051003f5de9621dab1f8481d687379d7b626c63",
+    "scratch/performance-attribution-20261104T0003/validation-batch/3-stdout.log": "5336ab81bfb6b67d906e8d0a68df42091872d16f2406d52e95062057270c8da3",
+    "scratch/performance-attribution-20261104T0003/validation-batch/manifest.json": "78aed2645bc15d3f43f5ab4659bf650cd105507b9bd3a5821d93943f45aec899",
+    "scratch/performance-attribution-20261104T0003/validation-batch/status.json": "1babe7c41126dbc4ab56eab56fb090a67aee4816ba27254222a1613d8e78a253",
+    "scratch/performance-attribution-20261104T0003/portable-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/portable-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/portable-batch/2-stderr.log": "497bc542186baa62fda234a1efa7e523460ce36eaa3264fcaf722a7a5279511c",
+    "scratch/performance-attribution-20261104T0003/portable-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/portable-batch/manifest.json": "884325a54e8b7306188d2887a01445e05449f0a395a605f5d9f1c12a90b375ea",
+    "scratch/performance-attribution-20261104T0003/portable-batch/status.json": "78b52f01cd606a06b15773b663db1f1775bfcf3e9240588077f9b548e0d586a5",
+    "scratch/performance-attribution-20261104T0003/WIN:batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/WIN:batch/1-stdout.log": "3e5a57649fc4bb02d08ec7ed465146b73aef5c568ab4cb1f5bdf32c825d03cdb",
+    "scratch/performance-attribution-20261104T0003/WIN:batch/2-stderr.log": "373294b7e75b654e5990e6b9fbeec232b8c567687d41f60dfc1b68a1f80129fd",
+    "scratch/performance-attribution-20261104T0003/WIN:batch/2-stdout.log": "8ae403a2697ce95f2b6fe16470fa380f23d54a3a93c877dca88d270c62affc41",
+    "scratch/performance-attribution-20261104T0003/WIN:batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/WIN:batch/3-stdout.log": "e187eb2c30c01a2eaaebfa1b775dafe84f049f56847919c8d90b24a260c16983",
+    "scratch/performance-attribution-20261104T0003/WIN:batch/decision-packet.json": "e3415f714f57df89f5dfd4fbab7ac1e9e5035ee9edac63d0b72837676feb49d9",
+    "scratch/performance-attribution-20261104T0003/WIN:batch/manifest.json": "62afa45ea130fb00206b3bf2de14ce546469fe0e35aba412e6f8821c5505a71e",
+    "scratch/performance-attribution-20261104T0003/WIN:batch/status.json": "0178ee133dff8d1d4676b056f778a736aaf3e46d562de373dce37ffd91aaacb8",
+    "scratch/performance-attribution-20261104T0003/WIN:phase-batch/1-stderr.log": "d60c6970042d0f53ecb1079f7e294f8160da7a093ce9ae71d60f125019b7328f",
+    "scratch/performance-attribution-20261104T0003/WIN:phase-batch/1-stdout.log": "4dcff9be6015a015429a9a1e7705f1f76c96e04f6c2eacad76a62e5161ad917f",
+    "scratch/performance-attribution-20261104T0003/WIN:phase-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/performance-attribution-20261104T0003/WIN:phase-batch/2-stdout.log": "0bdd4a3ca35348ddb37cdefbd0996fa2ac9eba5b46ea5a456328060b7e330a55",
+    "scratch/performance-attribution-20261104T0003/WIN:phase-batch/decision-packet.json": "f26fe8b212aad1522d4e946e37ed82b95bf1c873a35ff54122c48df2a5a14615",
+    "scratch/performance-attribution-20261104T0003/WIN:phase-batch/manifest.json": "16a9b0fa18dc694b93f5e6e505eeaaf1dbaa891ab9d377906f8ed91922d768a0",
+    "scratch/performance-attribution-20261104T0003/WIN:phase-batch/status.json": "ec465f756bb1d9527b8713161e818ae63969fb5c2c82547e79edd40aaeda5274"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "serial-csv-spans-2026-11-05",
+  "title": "Copy complete ordinary CSV fields directly into admitted destinations",
+  "date": "2026-11-05",
+  "subsystem": "input",
+  "question": "Can the strict serial parser remove an intermediate scratch copy?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Deliver the ordinary-field copy optimization as the stronger serial baseline, with modest scoped timing evidence.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "One million unquoted ASCII ordered-export rows, one worker and 32-MiB job memory."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux"
+    ],
+    "summary": "The recorded native comparison and parser semantic/ownership controls preserve strict validation, error placement and special-field handling."
+  },
+  "limitations": [
+    "Small development cells and uncontrolled cache/background state do not establish general device, shape or tail performance.",
+    "Historical percentage gains are not additive; every comparison uses its own pinned baseline.",
+    "Fast path requires a complete nonempty unquoted field ending at delimiter/LF in the current input buffer."
+  ],
+  "exclusions": [
+    "Component-probe throughput is not a whole-job gain; quoted, split, CRLF and final-field paths keep prior handling."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#strict-csv-serial-admitted-span-control-2026-11-05",
+      "sha256": "897c51231f270c2144f13fdb9441c190a22a4671977f2bec48e38317dd4be4f4"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/strict-csv-serial-spans-2026-11-05.json",
+      "sha256": "9f3785671bd655b62de2162b72c143ace069aa8322695fe1b32c1c85bae2690d"
+    },
+    {
+      "path": "docs/benchmarks/strict-csv-serial-spans-2026-11-05.patch",
+      "sha256": "d17954c23e19f5113bdc95bed98af3cc5789bd89a8e1a0f2faabf13dd65f52b8"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

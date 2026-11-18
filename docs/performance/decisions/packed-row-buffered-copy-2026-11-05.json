@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "packed-row-buffered-copy-2026-11-05",
+  "title": "Complete buffered packed-row copy decision",
+  "date": "2026-11-05",
+  "subsystem": "storage",
+  "question": "Does complete framed-row copying within existing admitted capacity improve matched complete native Runs without a bypass-control regression?",
+  "disposition": "reject",
+  "outcome": "unfavorable",
+  "delivery": "unapplied",
+  "summary": "The frozen primary or bypass condition fails; restore production exactly and retain the unchanged candidate without tuning.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "Plain1M partition/probabilistic allocation/uniform shuffle ABBA4 primary; separate plain4M ordered export pair2 bypass."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows",
+      "wasi-chromium"
+    ],
+    "summary": "Premeasurement exact committed candidate/current-main local workflow Linux/native Windows passes; independent field/ID/group/order/strict-cap/byte/17Analysis/cleanup checks pass all six native jobs and six runner steps. Final delivery requires fresh matching committed head/base receipts; no matching macOS claim."
+  },
+  "limitations": [
+    "Small development pipeline n2/variant and bypass n1/variant; uncontrolled warm cache/background and finite/coarse CPU counters. No general, tail, device-scale or browser throughput claim.",
+    "Original WSL decoder/read_exact self samples select a hypothesis; unresolved caller stacks do not establish fast-path hit rate or predict native gain. No new profiling or component scan.",
+    "Original baseline binary is reused only after complete compiled/vendor/embedded source maps, original build/runtime/compiler/environment/features/artifact identities are checked. Unknown independent backend details stay unknown.",
+    "All field lengths/UTF8 are validated in one borrowed window before any fast-path copy/consume. No new allocation, admission call, raw-pointer cache, unsafe code, ownership/lifetime, cancellation, algorithm, key, layout or graph change.",
+    "Analysis diagnostics precede final publication and do not establish whole-Run physical IO, RSS or capacity peaks. Reservations are not an RSS cap.",
+    "Old parser/digest/ASCII/empty-grant/SIMD rejections and prior source/binary/plans/raw failures remain closed and unchanged; this is a distinct complete-frame copy question."
+  ],
+  "exclusions": [
+    "No retuning, extra measured Runs or pooling. Separate primary/bypass reviewed locations with wall/total/user guard; kernel remains a diagnostic.",
+    "Retained production binary reuse requires exact source/compiler/environment/features/artifact checks. Historical source/validation contexts are not relabeled; older scientific rejections stay closed."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#complete-buffered-packed-row-copy-2026-11-05",
+      "sha256": "3de09ae2b32dec181a0ad2721fc6ac41c07245e46c4188b4ecf2bdd9d05bbafd"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/packed-row-buffered-copy-2026-11-05.json",
+      "sha256": "e0e7dd22ae8bdd5ca532d6b6887e386648e408c7ed433c6af502fa250eb5b58a"
+    },
+    {
+      "path": "docs/benchmarks/packed-row-buffered-copy-2026-11-05.patch",
+      "sha256": "e47ed322b2c64c7e893b3ea24c049cf21d191dc5e769ecb69197154833f292b9"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

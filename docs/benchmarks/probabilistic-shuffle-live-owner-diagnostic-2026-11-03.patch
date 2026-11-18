@@ -1,0 +1,8 @@
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -484 +484 @@
+-    for candidate in [false, true] {
++    for candidate in [true] {
+@@ -530 +530 @@
+-                    serde_json::json!({"error":format!("{e:#}")}),
++                    serde_json::json!({"error":format!("{e:#}"),"backtrace":e.backtrace().to_string()}),

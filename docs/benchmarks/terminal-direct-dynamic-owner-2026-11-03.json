@@ -1,0 +1,309 @@
+{
+  "type": "derived_terminal_direct_dynamic_owner_control",
+  "runtime": "Linux/WSL Rust test harness; synthetic grants, no RSS or timing inference",
+  "records": [
+    {
+      "cleanup": true,
+      "direct": false,
+      "events": [
+        {
+          "grant": 16777216,
+          "phase": "Serializing output",
+          "pool_reserved": 17061687,
+          "rows": 65536
+        },
+        {
+          "grant": 16777216,
+          "phase": "Ready for confirmation",
+          "pool_reserved": 16844308,
+          "rows": 65537
+        }
+      ],
+      "final_pool_reserved_bytes": 0,
+      "input_visits": 1,
+      "matched_emission_grant_bytes": 16777216,
+      "mode": "held",
+      "outcome": "success_exact",
+      "pool_bytes": 33554432,
+      "retained_competitor_bytes_after_job": 16777216,
+      "rows": 65537
+    },
+    {
+      "cleanup": true,
+      "direct": true,
+      "events": [
+        {
+          "grant": 16777216,
+          "phase": "Serializing output",
+          "pool_reserved": 17061973,
+          "rows": 65536
+        },
+        {
+          "grant": 16777216,
+          "phase": "Finalizing direct terminal output",
+          "pool_reserved": 16852493,
+          "rows": 65537
+        }
+      ],
+      "final_pool_reserved_bytes": 0,
+      "input_visits": 1,
+      "matched_emission_grant_bytes": 16777216,
+      "mode": "held",
+      "outcome": "success_exact",
+      "pool_bytes": 33554432,
+      "retained_competitor_bytes_after_job": 16777216,
+      "rows": 65537
+    },
+    {
+      "cleanup": true,
+      "direct": false,
+      "events": [
+        {
+          "grant": 16777216,
+          "phase": "Serializing output",
+          "pool_reserved": 17061687,
+          "rows": 65536
+        },
+        {
+          "grant": 0,
+          "phase": "Ready for confirmation",
+          "pool_reserved": 67092,
+          "rows": 65537
+        }
+      ],
+      "final_pool_reserved_bytes": 0,
+      "input_visits": 1,
+      "matched_emission_grant_bytes": 16777216,
+      "mode": "released",
+      "outcome": "success_exact",
+      "pool_bytes": 33554432,
+      "retained_competitor_bytes_after_job": 0,
+      "rows": 65537
+    },
+    {
+      "cleanup": true,
+      "direct": true,
+      "events": [
+        {
+          "grant": 16777216,
+          "phase": "Serializing output",
+          "pool_reserved": 17061973,
+          "rows": 65536
+        },
+        {
+          "grant": 0,
+          "phase": "Finalizing direct terminal output",
+          "pool_reserved": 75277,
+          "rows": 65537
+        }
+      ],
+      "final_pool_reserved_bytes": 0,
+      "input_visits": 1,
+      "matched_emission_grant_bytes": 16777216,
+      "mode": "released",
+      "outcome": "success_exact",
+      "pool_bytes": 33554432,
+      "retained_competitor_bytes_after_job": 0,
+      "rows": 65537
+    },
+    {
+      "cleanup": true,
+      "direct": false,
+      "events": [
+        {
+          "grant": 16777216,
+          "phase": "Serializing output",
+          "pool_reserved": 17061687,
+          "rows": 65536
+        },
+        {
+          "grant": 33487340,
+          "phase": "Ready for confirmation",
+          "pool_reserved": 33554432,
+          "rows": 65537
+        }
+      ],
+      "final_pool_reserved_bytes": 0,
+      "input_visits": 1,
+      "matched_emission_grant_bytes": 16777216,
+      "mode": "deny-final",
+      "outcome": "typed_shared_denial",
+      "pool_bytes": 33554432,
+      "retained_competitor_bytes_after_job": 33487340,
+      "rows": 65537
+    },
+    {
+      "cleanup": true,
+      "direct": true,
+      "events": [
+        {
+          "grant": 16777216,
+          "phase": "Serializing output",
+          "pool_reserved": 17061973,
+          "rows": 65536
+        },
+        {
+          "grant": 33479155,
+          "phase": "Finalizing direct terminal output",
+          "pool_reserved": 33554432,
+          "rows": 65537
+        }
+      ],
+      "final_pool_reserved_bytes": 0,
+      "input_visits": 1,
+      "matched_emission_grant_bytes": 16777216,
+      "mode": "deny-final",
+      "outcome": "typed_shared_denial",
+      "pool_bytes": 33554432,
+      "retained_competitor_bytes_after_job": 33479155,
+      "rows": 65537
+    },
+    {
+      "cleanup": true,
+      "direct": false,
+      "events": [
+        {
+          "grant": 16777216,
+          "phase": "Serializing output",
+          "pool_reserved": 17061687,
+          "rows": 65536
+        },
+        {
+          "grant": 33487340,
+          "phase": "Ready for confirmation",
+          "pool_reserved": 33554432,
+          "rows": 65537
+        }
+      ],
+      "final_pool_reserved_bytes": 0,
+      "input_visits": 1,
+      "matched_emission_grant_bytes": 16777216,
+      "mode": "cancel-final",
+      "outcome": "cancelled",
+      "pool_bytes": 33554432,
+      "retained_competitor_bytes_after_job": 33487340,
+      "rows": 65537
+    },
+    {
+      "cleanup": true,
+      "direct": true,
+      "events": [
+        {
+          "grant": 16777216,
+          "phase": "Serializing output",
+          "pool_reserved": 17061973,
+          "rows": 65536
+        },
+        {
+          "grant": 33479155,
+          "phase": "Finalizing direct terminal output",
+          "pool_reserved": 33554432,
+          "rows": 65537
+        }
+      ],
+      "final_pool_reserved_bytes": 0,
+      "input_visits": 1,
+      "matched_emission_grant_bytes": 16777216,
+      "mode": "cancel-final",
+      "outcome": "cancelled",
+      "pool_bytes": 33554432,
+      "retained_competitor_bytes_after_job": 33479155,
+      "rows": 65537
+    }
+  ],
+  "scope": "Eight untimed synthetic native Linux controls on isolated prototype revision; no performance or universal admission-domain claim",
+  "base_prototype_patch": "docs/benchmarks/terminal-direct-prototype-2026-11-03.patch",
+  "revision_patch": "docs/benchmarks/terminal-direct-dynamic-owner-2026-11-03.patch",
+  "host": {
+    "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]"
+  },
+  "decision": "Reject unchanged prototype cancellation precedence. Revised publication entry checks cancellation before any allocation; unchanged controls pass. No production promotion, selector, default or deployment change.",
+  "coverage": {
+    "successes": "Four successful jobs preserve exact CSV names/bytes/order, output records and17logicalAnalysisfields; independently verify all65537uniqueIDs and fields, one partition/100percent and named zero-percent allocation,2000row/65536byte caps.",
+    "pressure": "Matched fixed16MiBcompetitor acquired after65536serialized rows in32MiBpool, held through job or released after serialization. A16KiBlate row remains. Final-denial/cancel grants deliberately fill each path remaining headroom, differ by path, not a matched completion-domain comparison.",
+    "cleanup": "All8revised scenarios assert privateoutput/temp cleanup, competitor-only residual grants, final zero grants and one input-start visit; no raw replay.",
+    "limitations": "Synthetic callback-synchronized grants model a live competing ledger owner without OSthread scheduling. No realhostpressure rechecks, multigroup/skew, browser, codecs, RSS, physicalIO, totalstorage, speed, admission-domain inclusion or promotion claim."
+  },
+  "attempts": {
+    "proxy_launch": "Failed before compilation; runner resolved cargo symlink to rustup. Real toolchain cargo used thereafter.",
+    "compile_failure": "Independent verifier assumed unavailable externalcsvcrate; no scenario ran. Fresh source uses plain ASCII parsing for frozen no-quoting fixture.",
+    "scientific_failure": "Original prototype first7scenarios passed, eighth failed cancellation assertion with typed shared denial before cleanup assertions. No false completed8scenario pass.",
+    "remedy": "Fresh source-v4 adds ctx.check before pressureboundary/path allocation. Same8scenarios pass.",
+    "new_control_job_attempts": 16,
+    "prior_cli_attempts": 34,
+    "new_cli_performance_runs": 0
+  },
+  "provenance": {
+    "references_sha256": {
+      "scratch/terminal-dynamic-20261103T1418/session.json": "2003d89c56b66841f00dd1fe8bbf08ee5e139ad96eaaf1cb0e136dfd9a72d1f2",
+      "scratch/terminal-dynamic-20261103T1418/plan-v4.json": "fce983f3d69167c9ed2158d200017f787faa5c22d29a8325806358d0f83661be",
+      "scratch/terminal-dynamic-20261103T1418/batch-v4/status.json": "e96e917f7ae719722d700b2580bafaf9085a508e96ca9d6ff7eaa2fcade8f972",
+      "scratch/terminal-dynamic-20261103T1418/batch-v4/manifest.json": "fce983f3d69167c9ed2158d200017f787faa5c22d29a8325806358d0f83661be",
+      "scratch/terminal-dynamic-20261103T1418/batch-v4/1-stdout.log": "50d493bb37a96a09af4f1ec61d6952be25b49fc1a19cabc74d83e7b8e899e062",
+      "scratch/terminal-dynamic-20261103T1418/batch-v4/1-stderr.log": "0aeee1b490d88211d305003723983577971d60e666e726a5d46e00af2c1b99da",
+      "scratch/terminal-dynamic-20261103T1418/verify.py": "de4eb6f674cb129aedd1b779339213499d74180ac25319f3a11bd91f8d0505c7",
+      "scratch/terminal-dynamic-20261103T1418/verify-batch/status.json": "9d8ba3302bd4f11415a7f832c281baf823e10f8d6db3fff3d23ec2a6dc5af8a6",
+      "scratch/terminal-dynamic-20261103T1418/focused-test-binary": "f4121834cdfd61323c9845544937744e77c6b68098ccf77f3aa236e480c5edb1",
+      "scratch/terminal-dynamic-20261103T1418/remedy-1.json": "5785ecc79e5460a230b2e1b781360a4e789835cee46b40798dfa7103f336a5a0",
+      "scratch/terminal-dynamic-20261103T1418/remedy-2.json": "ba2199c10855fbd17998b1dcc995a7426a79ad92725fcb0cbe8fdf33975505b1",
+      "scratch/terminal-dynamic-20261103T1418/remedy-3.json": "ca37bb9a83bb681ce8d767f17aad03238ab8d810712721fba4394741add57a7b",
+      "scratch/terminal-dynamic-20261103T1418/batch/status.json": "d7d3eaeb66c5005721a229fbea570c9049dce7e430ab00cdf9943934d5c0d2f3",
+      "scratch/terminal-dynamic-20261103T1418/batch-v2/status.json": "98f6ac2fd97abe8f8ac4ef9604fc1d23227196beb52368389781fd9a8b7032d9",
+      "scratch/terminal-dynamic-20261103T1418/batch-v3/status.json": "928224a6b7228c22a9b9b5915484fe595a4716d91699cbf988e6d4815d15236f",
+      "scratch/terminal-dynamic-20261103T1418/source-v4/crates/chopper/src/output/direct.rs": "279779ece3407fdfec7575e1831ae3ac67a4c6507ca503fe90283d5f7ebee354",
+      "scratch/terminal-dynamic-20261103T1418/source-v4/crates/chopper/src/engine/terminal_controls.rs": "2867ac1c62f444eaad455dab030ea930fe6a46e72c9ac099095d9fb570e6439e",
+      "scratch/terminal-dynamic-20261103T1418/validation-batch/status.json": "3077d1355daf74d6030a2b89ee3093cdfbb963e54a4884b86227a231788f94a7",
+      "scratch/terminal-dynamic-20261103T1418/validation-batch/manifest.json": "cb399eed055cf276acbcca19288b83e0966822838e0340977223e85fe51ce8ed",
+      "scratch/terminal-dynamic-20261103T1418/validation-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "scratch/terminal-dynamic-20261103T1418/validation-batch/2-stderr.log": "82057901955fb28a90f8c1c32dad15b3cf209e572798a36598b6145985822727",
+      "scratch/terminal-dynamic-20261103T1418/validation-batch/3-stdout.log": "0fe31a4e9e17c4081d4f9cbe494cb860b38c5b760ca1756d157025d72a891a33",
+      "scratch/terminal-dynamic-20261103T1418/validation-batch/3-stderr.log": "65a00c18538a52376d822756e67be867b28cb30b171b1d07d8fc7de036a8f31b"
+    },
+    "complete_build_inputs": "All cratessources, lock/manifests, both complete vendor directories and native embeddedUI assets hashed by batch-v4 manifest/status. No production build input modified.",
+    "replay": "Apply base prototype plus original trafficinstrument patch to original recorded frozen source, then revision patch; use retained manifest for exact source identity."
+  },
+  "time_window": {
+    "objective": "TODO.md workload-led terminal-direct dynamic concurrent-owner feasibility; continue successive authorized goals",
+    "original_objective_start_utc": "2026-11-03T08:27:43Z",
+    "window_start_utc": "2026-11-03T14:18:00+00:00",
+    "window_duration_seconds": 7200,
+    "deadline_utc": "2026-11-03T16:18:00+00:00",
+    "launch_cutoff_utc": "2026-11-03T15:58:00+00:00",
+    "prior_record": "scratch/todo-continuation-limit-audit-20261103/session.json",
+    "prior_actual_cli_attempts": 34,
+    "prior_conservative_admissions": 37,
+    "prior_terminal_records_unchanged": true,
+    "new_scope": "Untimed Linux synthetic complete-Run pressure controls on copied frozen prototype, comparing explicit Prepare+Execute baseline to experimental direct Run. No timed CLI jobs; no production changes or promotion.",
+    "limits": {
+      "new_control_scenarios": 8,
+      "new_build_attempts": 2,
+      "additional_storage_bytes": 4294967296
+    },
+    "non_time_policy": "Prior study34CLI limit remains terminal; fresh reviewed test-only plan uses no CLI performance runs. No user-specified cumulative non-time cap exists. Preserve all lifetime counts.",
+    "expected_duration_seconds": 180,
+    "expected_disk_bytes": 2147483648,
+    "head": "f6fe9ef73f7bc9dd5dfec130ed67cb41b2185ab0"
+  },
+  "native_validation": {
+    "batch": "scratch/terminal-dynamic-20261103T1418/validation-batch/status.json",
+    "steps": [
+      {
+        "id": "fmt",
+        "status": "passed",
+        "exit_code": 0
+      },
+      {
+        "id": "clippy",
+        "status": "passed",
+        "exit_code": 0
+      },
+      {
+        "id": "workspace-tests",
+        "status": "passed",
+        "exit_code": 0
+      }
+    ],
+    "focused_test_reused": "Full workspace test command skips only terminal_dynamic_matched_owner_controls, whose8scenario focused pass is retained separately."
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "buffered-spool-field-copy-2026-11-05",
+  "title": "Copy complete buffered short spool fields directly",
+  "date": "2026-11-05",
+  "subsystem": "storage",
+  "question": "Can an admitted buffered field copy avoid redundant zero-fill/read_exact work while preserving strict spool decoding?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Adopt the behavior-preserving fast path after both opposite-order primary elapsed/total-CPU pairs and the frozen practical elapsed rule pass. Scope remains the small native development cell.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "One million plain probe-v1 pipeline rows, fixed seed, four workers and 32-MiB job/shared limits.",
+      "Separate unreplicated ordered-export negative control."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Six complete jobs independently preserve fields, unique IDs, groups, strict caps, CSV/output records, seventeen logical Analysis fields and cleanup. Recorded measured-head Linux/browser/Windows local workflows pass; final changed commit/base requires fresh gated delivery."
+  },
+  "limitations": [
+    "Two primary observations per variant and uncontrolled warm cache/background do not establish general device, workload, scale or tail performance.",
+    "The ordered negative control also favors the candidate; it does not exercise packed decoding and exposes uncontrolled variation.",
+    "Total process CPU benefit is in kernel time; user CPU is flat/mixed. No function attribution, new RSS, physical-I/O or whole-Run peak-capacity claim."
+  ],
+  "exclusions": [
+    "Ordered controls and derived summaries are not primary observations and are not pooled or subtracted.",
+    "Failed preparation/schema preflight attempts remain failures; no experimental build or Run occurred before their separately retained correction.",
+    "Earlier rejected SIMD and empty-grant experiments remain closed; no tuning, repeated jobs or shape expansion."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#buffered-spool-field-copy-2026-11-05",
+      "sha256": "710c56678d9e5021359bfc0cb99ca46213fe1d6c6f3cadcded75f3b4e1336092"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/buffered-field-copy-2026-11-05.json",
+      "sha256": "82be73319e0ea955d51f0de6e9a9cd1b948b1b05ed00f1c16645dde76b127577"
+    },
+    {
+      "path": "docs/benchmarks/buffered-field-copy-2026-11-05.patch",
+      "sha256": "1c2c86f0b1e5608586c622ccbb95fa806c582e7e8e3a3949a66d84c4bf65d047"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/resource-policy-research.md#validated-packed-field-traversal-2026-11-05",
+    "docs/validation.md"
+  ]
+}

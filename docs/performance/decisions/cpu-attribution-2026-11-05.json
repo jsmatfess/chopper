@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "cpu-attribution-2026-11-05",
+  "title": "Use complete-Run CPU attribution to select a hypothesis",
+  "date": "2026-11-05",
+  "subsystem": "execution",
+  "question": "Which current user-CPU costs justify a bounded next experiment?",
+  "disposition": "informational",
+  "outcome": "diagnostic",
+  "delivery": "unchanged",
+  "summary": "Investigate fixed-size spool-key decoding; sampled CPU shares are hypothesis selection, not predicted speedups.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "Two complete Runs of the pinned default source, release debug metadata and recorded perf capture/recovery."
+    ],
+    "measurement": "diagnostic"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Pinned source, perf capture/recovery, independent output verifier and provenance records support attribution of the captured build."
+  },
+  "limitations": [
+    "CPU attribution applies to its pinned build and workload; later default changes can alter the cost distribution.",
+    "Stack samples and unresolved caller attribution do not establish isolated component costs."
+  ],
+  "exclusions": [
+    "No sampled CPU share is converted into a whole-job gain or pooled with a later experiment."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#current-complete-run-user-cpu-attribution-2026-11-05",
+      "sha256": "4114f40580bd9ceb8a2c2d853e4b96113d57cd8847f10b9710f40e29719cd277"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/current-cpu-attribution-2026-11-05.json",
+      "sha256": "708e7a725bac8d3177f4e75a3f967ecd9f9d47d87f3658bbe174affe787b20c3"
+    },
+    {
+      "path": "docs/benchmarks/current-cpu-attribution-2026-11-05-recovery.json",
+      "sha256": "35235a74fc74682c23c580375834782179f7c2365264c2cd1f66193b0616979a"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

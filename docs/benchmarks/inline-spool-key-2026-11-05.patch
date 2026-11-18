@@ -1,0 +1,289 @@
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+index f63a9e9..1de4cdb 100644
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -16,0 +17,2 @@ mod adaptive;
++mod frame_key;
++use frame_key::FrameKey;
+@@ -897 +898,0 @@ struct RowHeader {
+-    key_reservation: Option<Reservation>,
+@@ -900 +901,3 @@ struct RowHeader {
+-    key: Vec<u8>,
++    // Key bytes must deallocate before their independent allocation grant.
++    key: FrameKey,
++    key_reservation: Option<Reservation>,
+@@ -935,11 +938,26 @@ fn read_header_reserved(
+-    if let Some(charge) = &mut key_reservation {
+-        charge.resize(length)?;
+-    }
+-    let mut key = Vec::new();
+-    key.try_reserve_exact(length)?;
+-    if let Some(charge) = &mut key_reservation {
+-        charge.resize(key.capacity())?;
+-    }
+-    key.resize(length, 0);
+-    r.read_exact(&mut key)
+-        .with_context(|| format!("reading sort key for row {id}"))?;
++    let key = if length == 8 || length == 16 {
++        if let Some(charge) = &mut key_reservation {
++            charge.resize(0)?;
++        }
++        let mut bytes = [0; 16];
++        r.read_exact(&mut bytes[..length])
++            .with_context(|| format!("reading sort key for row {id}"))?;
++        if length == 16 {
++            FrameKey::Random(bytes)
++        } else {
++            FrameKey::Index(bytes[..8].try_into().unwrap())
++        }
++    } else {
++        if let Some(charge) = &mut key_reservation {
++            charge.resize(length)?;
++        }
++        let mut key = Vec::new();
++        key.try_reserve_exact(length)?;
++        if let Some(charge) = &mut key_reservation {
++            charge.resize(key.capacity())?;
++        }
++        key.resize(length, 0);
++        r.read_exact(&mut key)
++            .with_context(|| format!("reading sort key for row {id}"))?;
++        FrameKey::Heap(key)
++    };
+@@ -964 +982 @@ fn owned_fields(r: &mut impl BufRead, maximum: usize, header: RowHeader) -> Resu
+-        key: header.key,
++        key: header.key.into_vec(),
+@@ -989,0 +1008,2 @@ fn owned_fields_reserved(
++    // Declare the owned key after its grant, including all decode failures.
++    let key = header.key.into_vec_reserved(&mut reservation)?;
+@@ -998 +1018 @@ fn owned_fields_reserved(
+-    let mut bytes = header.key.capacity();
++    let mut bytes = key.capacity();
+@@ -1036 +1056 @@ fn owned_fields_reserved(
+-            key: header.key,
++            key,
+@@ -2628,0 +2649,102 @@ mod merge_tests {
++    #[test]
++    fn fixed_header_keys_preserve_frames_without_heap_admission() -> Result<()> {
++        for length in [8, 16] {
++            let row = Row {
++                id: 7,
++                ordinal: 13,
++                key: vec![0xff; length],
++                fields: vec![],
++            };
++            let mut frame = Vec::new();
++            write_row(&mut frame, &row)?;
++            let workspace = Arc::new(Workspace::new(0));
++            let mut reader = io::Cursor::new(&frame);
++            let header = read_header_reserved(
++                &mut reader,
++                1024,
++                Some(Reservation::for_workspace(workspace.clone())),
++            )?
++            .unwrap();
++            assert_eq!(header.parts(), (row.key.as_slice(), row.id, row.ordinal));
++            assert_eq!(header.key.capacity(), 0);
++            assert_eq!(workspace.used(), 0);
++            let mut encoded = Vec::new();
++            header.write(&mut encoded)?;
++            assert_eq!(encoded, frame[..24 + length]);
++            drop(header);
++            let decoded = read_row(&mut io::Cursor::new(&frame), 1024)?.unwrap();
++            assert_eq!(decoded.key, row.key);
++            assert_eq!(decoded.id, row.id);
++            assert_eq!(decoded.ordinal, row.ordinal);
++            for end in 24..24 + length {
++                assert!(read_header_reserved(
++                    &mut io::Cursor::new(&frame[..end]),
++                    1024,
++                    Some(Reservation::for_workspace(workspace.clone()))
++                )
++                .is_err());
++                assert_eq!(workspace.used(), 0);
++            }
++        }
++        Ok(())
++    }
++
++    #[test]
++    fn fixed_header_owned_conversion_requires_and_retains_its_vec_grant() -> Result<()> {
++        for length in [8usize, 16] {
++            for delta in [-1isize, 0, 1] {
++                let workspace = Arc::new(Workspace::new(length.checked_add_signed(delta).unwrap()));
++                let row = Row {
++                    id: 7,
++                    ordinal: 13,
++                    key: vec![0xff; length],
++                    fields: vec![],
++                };
++                let mut frame = Vec::new();
++                write_row(&mut frame, &row)?;
++                let mut reader = io::Cursor::new(frame);
++                let header = read_header_reserved(
++                    &mut reader,
++                    1024,
++                    Some(Reservation::for_workspace(workspace.clone())),
++                )?
++                .unwrap();
++                assert_eq!(workspace.used(), 0);
++                let decoded = owned_fields_reserved(&mut reader, 1024, header);
++                assert_eq!(decoded.is_ok(), delta >= 0);
++                if let Ok(decoded) = &decoded {
++                    assert_eq!(decoded.key, row.key);
++                    assert_eq!(workspace.used(), decoded.key.capacity() as u64);
++                }
++                drop(decoded);
++                assert_eq!(workspace.used(), 0);
++            }
++            for corrupt in [false, true] {
++                let workspace = Arc::new(Workspace::new(4096));
++                let row = Row {
++                    id: 7,
++                    ordinal: 13,
++                    key: vec![0xff; length],
++                    fields: vec!["x".into()],
++                };
++                let mut frame = Vec::new();
++                write_row(&mut frame, &row)?;
++                if corrupt {
++                    *frame.last_mut().unwrap() = 0xff;
++                } else {
++                    frame.pop();
++                }
++                let mut reader = io::Cursor::new(frame);
++                let header = read_header_reserved(
++                    &mut reader,
++                    1024,
++                    Some(Reservation::for_workspace(workspace.clone())),
++                )?
++                .unwrap();
++                assert!(owned_fields_reserved(&mut reader, 1024, header).is_err());
++                assert_eq!(workspace.used(), 0);
++            }
++        }
++        Ok(())
++    }
++
+@@ -2631 +2753 @@ mod merge_tests {
+-        for key_length in [0, 16, 17, 4000] {
++        for key_length in [0, 8, 16, 17, 4000] {
+@@ -2648 +2770,6 @@ mod merge_tests {
+-            assert_eq!(workspace.used(), key_length as u64);
++            let header_heap = if key_length == 8 || key_length == 16 {
++                0
++            } else {
++                key_length
++            };
++            assert_eq!(workspace.used(), header_heap as u64);
+@@ -2651 +2778,5 @@ mod merge_tests {
+-            let key_heap = if key_length == 16 { 0 } else { key_length };
++            let key_heap = if key_length == 8 || key_length == 16 {
++                0
++            } else {
++                key_length
++            };
+@@ -2675 +2806 @@ mod merge_tests {
+-                key,
++                key: key.into(),
+diff --git a/crates/chopper/src/storage/adaptive.rs b/crates/chopper/src/storage/adaptive.rs
+index 094fc4b..b8a8a4b 100644
+--- a/crates/chopper/src/storage/adaptive.rs
++++ b/crates/chopper/src/storage/adaptive.rs
+@@ -376 +376,4 @@ impl PackedRow {
+-        let mut key_capacity = header.key.capacity();
++        // Move key ownership after the aggregate grant, before any fallible
++        // field construction, so errors drop bytes before releasing admission.
++        let key = header.key;
++        let mut key_capacity = key.capacity();
+@@ -414 +417 @@ impl PackedRow {
+-        if header.key.len() != 16 && header.key.len() < key_capacity {
++        if key.len() != 16 && key.len() < key_capacity {
+@@ -416 +419 @@ impl PackedRow {
+-                charge.resize(bytes.capacity() + key_capacity + header.key.len())?;
++                charge.resize(bytes.capacity() + key_capacity + key.len())?;
+@@ -419 +422 @@ impl PackedRow {
+-        let key = PackedKey::new(header.key);
++        let key = key.into_packed();
+@@ -1127 +1130 @@ mod tests {
+-                key: vec![],
++                key: vec![].into(),
+@@ -1148 +1151 @@ mod tests {
+-                key: vec![]
++                key: vec![].into()
+@@ -1176 +1179 @@ mod tests {
+-                    key: vec![],
++                    key: vec![].into(),
+@@ -1214 +1217 @@ mod tests {
+-                        key: vec![],
++                        key: vec![].into(),
+diff --git a/crates/chopper/src/storage/frame_key.rs b/crates/chopper/src/storage/frame_key.rs
+new file mode 100644
+index 0000000..e9d593a
+--- /dev/null
++++ b/crates/chopper/src/storage/frame_key.rs
+@@ -0,0 +1,64 @@
++//! Temporary spool-header key storage. Fixed keys stay inline until their
++//! consumer chooses packed or independently admitted owned-row storage.
++use super::{PackedKey, Reservation};
++use anyhow::Result;
++
++pub(super) enum FrameKey {
++    Random([u8; 16]),
++    Index([u8; 8]),
++    Heap(Vec<u8>),
++}
++
++impl FrameKey {
++    pub(super) fn capacity(&self) -> usize {
++        match self {
++            Self::Random(_) | Self::Index(_) => 0,
++            Self::Heap(bytes) => bytes.capacity(),
++        }
++    }
++
++    pub(super) fn into_packed(self) -> PackedKey {
++        match self {
++            Self::Random(bytes) => PackedKey::Random(bytes),
++            Self::Index(bytes) => PackedKey::Index(bytes),
++            Self::Heap(bytes) => PackedKey::new(bytes),
++        }
++    }
++
++    pub(super) fn into_vec(self) -> Vec<u8> {
++        match self {
++            Self::Random(bytes) => bytes.to_vec(),
++            Self::Index(bytes) => bytes.to_vec(),
++            Self::Heap(bytes) => bytes,
++        }
++    }
++
++    pub(super) fn into_vec_reserved(self, charge: &mut Reservation) -> Result<Vec<u8>> {
++        if let Self::Heap(bytes) = self {
++            return Ok(bytes);
++        }
++        let mut bytes = Vec::new();
++        charge.reserve_vec(&mut bytes, self.len())?;
++        bytes.extend_from_slice(&self);
++        Ok(bytes)
++    }
++}
++
++impl From<Vec<u8>> for FrameKey {
++    fn from(bytes: Vec<u8>) -> Self {
++        // Retain the original capacity for variable-key boxing overlap tests.
++        Self::Heap(bytes)
++    }
++}
++
++impl std::ops::Deref for FrameKey {
++    type Target = [u8];
++
++    fn deref(&self) -> &[u8] {
++        match self {
++            Self::Random(bytes) => bytes,
++            Self::Index(bytes) => bytes,
++            Self::Heap(bytes) => bytes,
++        }
++    }
++}

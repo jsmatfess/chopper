@@ -1,0 +1,270 @@
+{
+  "acceptance": false,
+  "raw_sha256": "7d23349d7c5be4f9304da40a0c35b2bd07920348f8859054aa6c5436e1e14c78",
+  "verified_jobs": 6,
+  "runs": [
+    {
+      "sample": "external-diagnostic-0-disabled",
+      "mode": "disabled",
+      "elapsed_seconds": 46.70782499992848,
+      "public_complete_seconds": 47.08171499991417,
+      "page": {
+        "observations": 0,
+        "physicalEntries": 0,
+        "mutations": 51
+      },
+      "main_metrics_delta": {
+        "TaskDuration": 0.7767170000000001,
+        "ScriptDuration": 0.107585,
+        "LayoutDuration": 0.013869000000000001,
+        "RecalcStyleDuration": 0.003406
+      },
+      "process_cpu": [
+        {
+          "type": "browser",
+          "id": 2649548,
+          "seconds": 23.31
+        },
+        {
+          "type": "renderer",
+          "id": 2649660,
+          "seconds": 37.629999999999995
+        },
+        {
+          "type": "GPU",
+          "id": 2649575,
+          "seconds": 0.5599999999999999
+        },
+        {
+          "type": "network.mojom.NetworkService",
+          "id": 2649577,
+          "seconds": 0.009999999999999995
+        }
+      ],
+      "main_profile": {
+        "path": ".tools/execution-graph/58-diagnose-001/external-diagnostic-0-disabled-main-cpu.json",
+        "sha256": "c4d3e6d0e1c58c0c57f030b17d7d62885c7c58f396cb74f676b16658d4568487"
+      }
+    },
+    {
+      "sample": "external-diagnostic-0-collapsed",
+      "mode": "collapsed",
+      "elapsed_seconds": 51.555125,
+      "public_complete_seconds": 52.20805500006676,
+      "page": {
+        "observations": 285,
+        "physicalEntries": 1228,
+        "mutations": 343
+      },
+      "main_metrics_delta": {
+        "TaskDuration": 1.3099830000000001,
+        "ScriptDuration": 0.240919,
+        "LayoutDuration": 0.052529,
+        "RecalcStyleDuration": 0.011756
+      },
+      "process_cpu": [
+        {
+          "type": "browser",
+          "id": 2649548,
+          "seconds": 25.299999999999997
+        },
+        {
+          "type": "renderer",
+          "id": 2649660,
+          "seconds": 41.209999999999994
+        },
+        {
+          "type": "GPU",
+          "id": 2649575,
+          "seconds": 0.6500000000000001
+        },
+        {
+          "type": "network.mojom.NetworkService",
+          "id": 2649577,
+          "seconds": 0.009999999999999995
+        }
+      ],
+      "main_profile": {
+        "path": ".tools/execution-graph/58-diagnose-001/external-diagnostic-0-collapsed-main-cpu.json",
+        "sha256": "386797d2ddc97b35c0f2a26b8b67a41815b8d0ed953796ec34813d609eb901bb"
+      }
+    },
+    {
+      "sample": "external-diagnostic-0-expanded",
+      "mode": "expanded",
+      "elapsed_seconds": 50.93252499997616,
+      "public_complete_seconds": 51.444659999966625,
+      "page": {
+        "observations": 260,
+        "physicalEntries": 1165,
+        "mutations": 317
+      },
+      "main_metrics_delta": {
+        "TaskDuration": 1.390766,
+        "ScriptDuration": 0.242937,
+        "LayoutDuration": 0.082096,
+        "RecalcStyleDuration": 0.020688
+      },
+      "process_cpu": [
+        {
+          "type": "browser",
+          "id": 2649548,
+          "seconds": 25.75
+        },
+        {
+          "type": "renderer",
+          "id": 2649660,
+          "seconds": 40.34
+        },
+        {
+          "type": "GPU",
+          "id": 2649575,
+          "seconds": 0.6900000000000002
+        },
+        {
+          "type": "network.mojom.NetworkService",
+          "id": 2649577,
+          "seconds": 0.020000000000000004
+        }
+      ],
+      "main_profile": {
+        "path": ".tools/execution-graph/58-diagnose-001/external-diagnostic-0-expanded-main-cpu.json",
+        "sha256": "05cb67873641557a4242f8b8101643147324b711a48390158b959b4f0526ff40"
+      }
+    },
+    {
+      "sample": "external-diagnostic-1-expanded",
+      "mode": "expanded",
+      "elapsed_seconds": 50.405405000090596,
+      "public_complete_seconds": 51.27462000000477,
+      "page": {
+        "observations": 273,
+        "physicalEntries": 1197,
+        "mutations": 329
+      },
+      "main_metrics_delta": {
+        "TaskDuration": 1.2356529999999997,
+        "ScriptDuration": 0.219952,
+        "LayoutDuration": 0.083934,
+        "RecalcStyleDuration": 0.020648
+      },
+      "process_cpu": [
+        {
+          "type": "browser",
+          "id": 2666793,
+          "seconds": 24.810000000000002
+        },
+        {
+          "type": "renderer",
+          "id": 2666893,
+          "seconds": 39.919999999999995
+        },
+        {
+          "type": "GPU",
+          "id": 2666823,
+          "seconds": 0.69
+        },
+        {
+          "type": "network.mojom.NetworkService",
+          "id": 2666825,
+          "seconds": 0.009999999999999995
+        }
+      ],
+      "main_profile": {
+        "path": ".tools/execution-graph/58-diagnose-001/external-diagnostic-1-expanded-main-cpu.json",
+        "sha256": "5165e9db3a2d4b07860a35c6a5b596baf5ebdcd66fcaeebeefdda0cbf432a3e3"
+      }
+    },
+    {
+      "sample": "external-diagnostic-1-collapsed",
+      "mode": "collapsed",
+      "elapsed_seconds": 48.12199000000954,
+      "public_complete_seconds": 48.99595999991894,
+      "page": {
+        "observations": 279,
+        "physicalEntries": 1211,
+        "mutations": 333
+      },
+      "main_metrics_delta": {
+        "TaskDuration": 1.1637250000000001,
+        "ScriptDuration": 0.212575,
+        "LayoutDuration": 0.049863,
+        "RecalcStyleDuration": 0.011828
+      },
+      "process_cpu": [
+        {
+          "type": "browser",
+          "id": 2666793,
+          "seconds": 24.340000000000003
+        },
+        {
+          "type": "renderer",
+          "id": 2666893,
+          "seconds": 39.3
+        },
+        {
+          "type": "GPU",
+          "id": 2666823,
+          "seconds": 0.7100000000000001
+        },
+        {
+          "type": "network.mojom.NetworkService",
+          "id": 2666825,
+          "seconds": 0.010000000000000009
+        }
+      ],
+      "main_profile": {
+        "path": ".tools/execution-graph/58-diagnose-001/external-diagnostic-1-collapsed-main-cpu.json",
+        "sha256": "0ee8239882f3bc811cf9ea613fb95b3d9bd451b89b637be07bfa035a516bbeaa"
+      }
+    },
+    {
+      "sample": "external-diagnostic-1-disabled",
+      "mode": "disabled",
+      "elapsed_seconds": 46.410710000038144,
+      "public_complete_seconds": 47.329024999976156,
+      "page": {
+        "observations": 0,
+        "physicalEntries": 0,
+        "mutations": 52
+      },
+      "main_metrics_delta": {
+        "TaskDuration": 0.7965390000000001,
+        "ScriptDuration": 0.109387,
+        "LayoutDuration": 0.010415,
+        "RecalcStyleDuration": 0.002999
+      },
+      "process_cpu": [
+        {
+          "type": "browser",
+          "id": 2666793,
+          "seconds": 23.78
+        },
+        {
+          "type": "renderer",
+          "id": 2666893,
+          "seconds": 38.03999999999999
+        },
+        {
+          "type": "GPU",
+          "id": 2666823,
+          "seconds": 0.6100000000000001
+        },
+        {
+          "type": "network.mojom.NetworkService",
+          "id": 2666825,
+          "seconds": 0.009999999999999995
+        }
+      ],
+      "main_profile": {
+        "path": ".tools/execution-graph/58-diagnose-001/external-diagnostic-1-disabled-main-cpu.json",
+        "sha256": "1a0364028798a8740acddd990a36eb47dddbe5153be6c7463298f81335e02199"
+      }
+    }
+  ],
+  "derived_from": {
+    "path": ".tools/execution-graph/58-diagnose-001/diagnosis.json",
+    "sha256": "15525627c971ceaf6e636444b4d58f242ac919ab5303eed1d55a5aa07ab0b49d",
+    "scope": "compact projection; raw and original diagnostic summaries retained locally"
+  }
+}

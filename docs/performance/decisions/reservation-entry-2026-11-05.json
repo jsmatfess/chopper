@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "reservation-entry-2026-11-05",
+  "title": "Unchanged-size reservation entry complete-Run decision",
+  "date": "2026-11-05",
+  "subsystem": "execution",
+  "question": "Does a tiny inline equal-size guard with byte-identical changed-size reservation body improve matched complete native Runs without whole-Run transfer regression?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Frozen primary and whole-Run transfer conditions pass; retain the inline entry with every original call/grant/drop and changed-size body preserved.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "Plain1M partition/probabilistic allocation/uniform shuffle ABBA4 primary; separate plain4M ordered export pair2 transfer."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows",
+      "wasi-chromium"
+    ],
+    "summary": "Premeasurement exact committed candidate/current-main local workflow Linux/native Windows passes; independent field/ID/group/order/strict-cap/byte/17Analysis/cleanup checks pass all six native jobs and seven runner steps. Final delivery requires fresh matching committed head/base receipts; no matching macOS claim."
+  },
+  "limitations": [
+    "Pipeline primary n2 per variant, ordered transfer n1 per variant; warm uncontrolled cache/background and finite/coarse CPU accounting. No general or tail/device-scale claim.",
+    "Transfer includes resize calls and is not a completely bypassed negative control. Its predeclared falsifiers are wall/totalCPU only; user/kernel components are reported separately and no component nonregression is implied. Primary userCPU favorable in both pairs remains mandatory.",
+    "Earlier marker-cache/ASCII-escape/digest/empty-grant/SIMD decisions stay closed with their own frozen rules and counters. No previous source was rerun under this study rule.",
+    "Old native baseline was ineligible after parent config/CLI source changes. Fresh current baseline/candidate have matching recorded source/vendor/assets/compiler/env/features; unrecorded backend details remain unknown.",
+    "Current preceding WSL sampled shares select a hypothesis, not predicted native gain. Static oldELF entry shape does not prove equal-call sample share or current Windows instructions.",
+    "No heap/layout/ownership/pressure/atomic/error/drop changes. Analysis diagnostics precede final publication, not wholeRun physicalIO/RSS/capacity peaks.",
+    "Only fixed development recipes measured; no browser throughput, new default/Auto policy, wizard runtime, release or deployment authorization."
+  ],
+  "exclusions": [
+    "No retuning, extra measured Runs or pooling. Separate primary/transfer reviewed locations; user/kernel components retain separate roles.",
+    "Fresh current baseline required after parent source changes. Earlier binary/source/passes remain historical; old scientific rejections stay closed."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#unchanged-size-reservation-entry-2026-11-05",
+      "sha256": "acaa32d43295f7b3e98ba972b17f67c73101179fea384817532db2e4d18a6e29"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/reservation-entry-2026-11-05.json",
+      "sha256": "1d560523bf3055be05821b0af73c73f47ddefe10e0abde1b57abb3b6e1ae68b7"
+    },
+    {
+      "path": "docs/benchmarks/reservation-entry-2026-11-05.patch",
+      "sha256": "aeac39f6fed7bc54fcd2f8de3808155b3db9c31abf57f3520c115981872c5231"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

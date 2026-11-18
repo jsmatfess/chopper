@@ -1,0 +1,921 @@
+{
+  "type": "derived_probabilistic_shuffle_browser_transfer_and_interruption",
+  "source_base": "8bc75c93a08bec30bb2c783103767db411e79748",
+  "scope": "OnefreshnativeCLIreference andonebaseline/candidatepersistentChrome transferpair, plus scopedbrowsercontracts/interruption. No elapsedperformancepanel, defaultpromotion or deployment.",
+  "fixture": "Events-transfer-v1,20000rows/foureventtypes,Unicode/quotedmultilinefields;partitionevent_type->prob80/20->uniform;seed events-transfer-pipeline-v1;64MiBjob/workers1/1024row+65536byteCSVcaps.",
+  "packages": {
+    "test_free": true,
+    "assets": {
+      "baseline": {
+        "_headers": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1",
+        "app.js": "951232201b98ce2659608ade09ac76a8ef94bf9f3fb5cc8fb3ad4b9b275112ff",
+        "engine-worker.js": "cf407b6ce2b7d47f0909a352193c8260231a8f6c740f779f487806af8c8425f8",
+        "engine.wasm": "fbd5ab81cf1b78c25d421f4e7b37f01b951aa406d214241f873dc47ce3475f23",
+        "index.html": "7c5a0dea3884a3faaf03f3f37956f0bed3f7133a8ecfb253d5414160517a0c2a",
+        "storage-worker.js": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6",
+        "style.css": "88aab5cf3dea0675da220de01d5049908273ea4dab332facbca030c27de12a4b"
+      },
+      "candidate": {
+        "_headers": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1",
+        "app.js": "951232201b98ce2659608ade09ac76a8ef94bf9f3fb5cc8fb3ad4b9b275112ff",
+        "engine-worker.js": "cf407b6ce2b7d47f0909a352193c8260231a8f6c740f779f487806af8c8425f8",
+        "engine.wasm": "ab086f8b031d278f4d1ec598ec7e7c71abe6623150b8030fb40e70251a9497fd",
+        "index.html": "7c5a0dea3884a3faaf03f3f37956f0bed3f7133a8ecfb253d5414160517a0c2a",
+        "storage-worker.js": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6",
+        "style.css": "88aab5cf3dea0675da220de01d5049908273ea4dab332facbca030c27de12a4b"
+      }
+    }
+  },
+  "cells": {
+    "baseline": {
+      "status": "complete",
+      "browser_version": "156.0.8078.48",
+      "channel": "chrome",
+      "context": "fresh persistent disk-backed profile",
+      "platform": "win32",
+      "node": "v22.23.4",
+      "wasm_sha256": "fbd5ab81cf1b78c25d421f4e7b37f01b951aa406d214241f873dc47ce3475f23",
+      "engine_temporary_traffic": {
+        "read": 9482079,
+        "written": 9107470
+      },
+      "workspace_cleanup_verified": true,
+      "native_parity": {
+        "exact_native_csv_lineage_parity": true,
+        "rows": 20000,
+        "groups": 8
+      },
+      "analysis_parity": {
+        "logical_analysis_equal": [
+          "algorithm_version",
+          "column_values",
+          "seed",
+          "rows",
+          "columns",
+          "header",
+          "preview",
+          "logical_digest",
+          "groups",
+          "output_files",
+          "output_csv_bytes",
+          "largest_record_bytes",
+          "stages",
+          "accuracy"
+        ],
+        "expected_browser_export_warning_verified": true
+      },
+      "diagnostic_clocks_excluded_from_performance": true
+    },
+    "candidate": {
+      "status": "complete",
+      "browser_version": "156.0.8078.48",
+      "channel": "chrome",
+      "context": "fresh persistent disk-backed profile",
+      "platform": "win32",
+      "node": "v22.23.4",
+      "wasm_sha256": "ab086f8b031d278f4d1ec598ec7e7c71abe6623150b8030fb40e70251a9497fd",
+      "engine_temporary_traffic": {
+        "read": 3975297,
+        "written": 3750929
+      },
+      "workspace_cleanup_verified": true,
+      "native_parity": {
+        "exact_native_csv_lineage_parity": true,
+        "rows": 20000,
+        "groups": 8
+      },
+      "analysis_parity": {
+        "logical_analysis_equal": [
+          "algorithm_version",
+          "column_values",
+          "seed",
+          "rows",
+          "columns",
+          "header",
+          "preview",
+          "logical_digest",
+          "groups",
+          "output_files",
+          "output_csv_bytes",
+          "largest_record_bytes",
+          "stages",
+          "accuracy"
+        ],
+        "expected_browser_export_warning_verified": true
+      },
+      "diagnostic_clocks_excluded_from_performance": true
+    }
+  },
+  "native_reference": {
+    "rows": 20000,
+    "groups": 8,
+    "csv_signatures": [
+      [
+        "event_type-click-allocation-treatment-part-00000001.csv",
+        1024,
+        57875,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "click"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "77f4ab4638eef2f26505adf58a04d547a253af4db37773ad6900ef2e6c787011"
+      ],
+      [
+        "event_type-click-allocation-treatment-part-00000002.csv",
+        1024,
+        58075,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "click"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "c6dd9c3767fb53f62550e3027a54ae1ebfe9ff70b3e0bc3b9b585e054ce597c5"
+      ],
+      [
+        "event_type-click-allocation-treatment-part-00000003.csv",
+        1024,
+        57948,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "click"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "8266573fbe9a5ed9a77e2cb2f910d0bbd6e0086c81d6988836de6bc33903c97e"
+      ],
+      [
+        "event_type-click-allocation-treatment-part-00000004.csv",
+        978,
+        55088,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "click"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "acc0dcff07afd9e2e3b21e3cf23feee5a08372c9dfb81b1b8cf191db7aa1d79b"
+      ],
+      [
+        "event_type-click-allocation-control-part-00000005.csv",
+        948,
+        53822,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "click"
+            ]
+          },
+          {
+            "allocation": "control",
+            "operation": 1
+          }
+        ],
+        "49b609954bd45460cd67efd9e400dacadaa8b6d54c10450191205b84d01c6e3b"
+      ],
+      [
+        "event_type-purchase-allocation-treatment-part-00000006.csv",
+        1024,
+        61294,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "purchase"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "adf28b6a682a8a2ae6987e63c2e9d7073f0e8060f55cac81a11086b8633b791e"
+      ],
+      [
+        "event_type-purchase-allocation-treatment-part-00000007.csv",
+        1024,
+        60939,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "purchase"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "af70e9d4c6f34076b873ad17c2f29c4fc70a977ec55221205fb11fc605792f99"
+      ],
+      [
+        "event_type-purchase-allocation-treatment-part-00000008.csv",
+        1024,
+        60875,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "purchase"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "a9877ed2ac6e92841983ee7f11c28a034add6db25c41bf2b37720909083bf0b5"
+      ],
+      [
+        "event_type-purchase-allocation-treatment-part-00000009.csv",
+        896,
+        53629,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "purchase"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "59c7dc1b05d76d2f86879943b47d21b3c8d58d374f227aa9369ecf3306866114"
+      ],
+      [
+        "event_type-purchase-allocation-control-part-00000010.csv",
+        1019,
+        61119,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "purchase"
+            ]
+          },
+          {
+            "allocation": "control",
+            "operation": 1
+          }
+        ],
+        "16603366ede969c73cf31d3c2b2a3447bedf4380f321403700294ffd17c7f117"
+      ],
+      [
+        "event_type-return-allocation-treatment-part-00000011.csv",
+        1024,
+        58808,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "return"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "c2b2698bb68da32f40b79bc9c63142a2209770fd2b9b4f86612482746f3b186e"
+      ],
+      [
+        "event_type-return-allocation-treatment-part-00000012.csv",
+        1024,
+        58889,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "return"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "372ce82e3f8fb44b5bd7654481ad1be4e05798e739c2e23d871890eb499ca62f"
+      ],
+      [
+        "event_type-return-allocation-treatment-part-00000013.csv",
+        1024,
+        59187,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "return"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "c589957503f5c893fc5341838bf6c47d7876aae7f43ad7bfa4e7e884e20fccdc"
+      ],
+      [
+        "event_type-return-allocation-treatment-part-00000014.csv",
+        978,
+        56600,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "return"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "5f44ae12d434c39e7bb4af6174d036ee3456e9b7eaed72e39db3dc5c5baa5745"
+      ],
+      [
+        "event_type-return-allocation-control-part-00000015.csv",
+        978,
+        56512,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "return"
+            ]
+          },
+          {
+            "allocation": "control",
+            "operation": 1
+          }
+        ],
+        "1a0e114294535e8357975a0fe55831c3b94bd5bceacebea231c4184618324dfb"
+      ],
+      [
+        "event_type-view-allocation-treatment-part-00000016.csv",
+        1024,
+        57610,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "view"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "e7a12372bd4e7a3810e6ba1adae32af1ccd392decdbefdeb9065b484dc148c24"
+      ],
+      [
+        "event_type-view-allocation-treatment-part-00000017.csv",
+        1024,
+        57093,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "view"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "21c14363446643b3e5c4ece8901fdb79f0287bdcfa106b0f0adec7e8a7fbef9b"
+      ],
+      [
+        "event_type-view-allocation-treatment-part-00000018.csv",
+        1024,
+        56853,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "view"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "45ad0b2041fa6e7b24f10ccdb3641b8d3485055166bdfe102490dfd0d18b4c1d"
+      ],
+      [
+        "event_type-view-allocation-treatment-part-00000019.csv",
+        936,
+        52238,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "view"
+            ]
+          },
+          {
+            "allocation": "treatment",
+            "operation": 1
+          }
+        ],
+        "0336eab6f96d452266733a584ed6759f7dcf8fd6dd81fe2b327fdb5b538ac853"
+      ],
+      [
+        "event_type-view-allocation-control-part-00000020.csv",
+        979,
+        54603,
+        [
+          {
+            "operation": 0,
+            "values": [
+              "view"
+            ]
+          },
+          {
+            "allocation": "control",
+            "operation": 1
+          }
+        ],
+        "c716be9531a9e170e10bdb298474033c62dc198c08302fd894e24def6d3761b3"
+      ]
+    ],
+    "fresh_build": "native-build-batch/status.json",
+    "binary_sha256": "8f55f6bc8bb1a566703bdd5642441670367c724b738b125aa882a314860ba4a4"
+  },
+  "browser_acceptance": {
+    "standard_contracts": 35,
+    "standard_results": [
+      {
+        "name": "removed bucket and XOF requests fail through WASI without publication",
+        "seconds": 0.5655100000500679
+      },
+      {
+        "name": "removed shuffle requests fail through WASI without publication",
+        "seconds": 0.7751800000071526
+      },
+      {
+        "name": "optional CSV sniffing shares the native engine",
+        "seconds": 0.10645999997854233
+      },
+      {
+        "name": "full input profiling sees late keys and caches across config edits",
+        "seconds": 0.1039450000524521
+      },
+      {
+        "name": "input profiling cancellation cannot leave a publishable job",
+        "seconds": 0.004920000016689301
+      },
+      {
+        "name": "automatic memory direct and prepared runs preserve requested and effective manifest resources",
+        "seconds": 0.1263649999499321
+      },
+      {
+        "name": "automatic memory refuses an oversized explicit record limit and permits retry",
+        "seconds": 0.2167849999666214
+      },
+      {
+        "name": "direct Run returns final analysis and enforces serialized byte and row caps",
+        "seconds": 0.1610349999666214
+      },
+      {
+        "name": "direct Run supports pipelines requiring internal preparation",
+        "seconds": 0.15269999998807907
+      },
+      {
+        "name": "direct Run codec outputs roundtrip through admitted input adapters",
+        "seconds": 0.3668100000023842
+      },
+      {
+        "name": "direct Run cancellation cleans workspace and cannot publish prepared output",
+        "seconds": 0.027474999964237214
+      },
+      {
+        "name": "direct Run rejects late malformed input before destination export and retries cleanly",
+        "seconds": 0.09769499999284745
+      },
+      {
+        "name": "row limits preserve order and exact bytes",
+        "seconds": 0.10051499998569488
+      },
+      {
+        "name": "balanced split rejects fewer records than files",
+        "seconds": 0.046625
+      },
+      {
+        "name": "strict malformed CSV rejection",
+        "seconds": 0.05119999998807907
+      },
+      {
+        "name": "shuffle fisher_yates matches native seeded output",
+        "seconds": 0.09172000002861024
+      },
+      {
+        "name": "interleaved  matches native seeded output",
+        "seconds": 0.07797500002384186
+      },
+      {
+        "name": "assign_probabilistic  matches native seeded output",
+        "seconds": 0.0779200000166893
+      },
+      {
+        "name": "compact streaming ingestion matches pre-change native seeded pipelines",
+        "seconds": 0.2496399999856949
+      },
+      {
+        "name": "retained-parent shuffle then partition matches native seeded output",
+        "seconds": 0.14491500002145768
+      },
+      {
+        "name": "interleaved splitting retains nonempty and exact file-count caps",
+        "seconds": 0.2456100000143051
+      },
+      {
+        "name": "partition then stratified assignment then shuffle",
+        "seconds": 1.0966599999666213
+      },
+      {
+        "name": "combined partition/shuffle/allocation/balanced is deterministic",
+        "seconds": 0.67025
+      },
+      {
+        "name": "automatic memory preserves seeded probabilistic stratified membership",
+        "seconds": 0.20163499999046325
+      },
+      {
+        "name": "gzip output and input roundtrip",
+        "seconds": 0.19356999999284744
+      },
+      {
+        "name": "zstd output and input roundtrip",
+        "seconds": 0.18896499997377394
+      },
+      {
+        "name": "zip output and input roundtrip",
+        "seconds": 0.2179899999499321
+      },
+      {
+        "name": "UTF-16 serialization and byte cap",
+        "seconds": 0.08026499998569489
+      },
+      {
+        "name": "intermediate scans preserve wide UTF-8 fields across reader boundaries",
+        "seconds": 0.16140499997138977
+      },
+      {
+        "name": "temporary budget fails without export",
+        "seconds": 0.057860000014305114
+      },
+      {
+        "name": "disk-backed shuffle larger than working budget",
+        "seconds": 2.8490500000119208
+      },
+      {
+        "name": "adaptive grouping and forced sorting preserve identical output",
+        "seconds": 3.6816549999713897
+      },
+      {
+        "name": "per-group shuffle selection preserves order across resident and external budgets",
+        "seconds": 2.602215000033379
+      },
+      {
+        "name": "cancellation cleans active workspace",
+        "seconds": 0.027405000030994414
+      },
+      {
+        "name": "hosted page Run action submits current settings and exports complete results",
+        "seconds": 2.6509486000000035
+      }
+    ],
+    "bridge": {
+      "contract": "browser-storage-error-bridge-v1",
+      "browserChannel": "chrome",
+      "browserVersion": "156.0.8078.48",
+      "utf8_storage_error_preserved": true
+    },
+    "peer_cleanup": {
+      "type": "contract",
+      "contract": "peer-tab-worker-workspace-cleanup-v1",
+      "browserChannel": "chrome",
+      "browserVersion": "156.0.8078.48",
+      "context": "two pages and one dedicated worker in a fresh shared browser context; real OPFS",
+      "initial_abandoned_removed": 1,
+      "after_worker_termination_removed": 1,
+      "after_tab_close_removed": 1,
+      "active_tab_preserved": true,
+      "active_worker_sync_handle_preserved": true,
+      "unrelated_file_preserved": true,
+      "unrelated_directory_preserved": true,
+      "exported_results_preserved": true,
+      "test_owned_entries_removed": true,
+      "scope": "workspace deletion coordination only; no aggregate memory, engine cancellation or external-destination claim"
+    },
+    "adapted_lifecycle": {
+      "contract": "production-engine-termination-and-export-v4",
+      "browserVersion": "156.0.8078.48",
+      "restart_method": "forced-browser-process-kill",
+      "cases": [
+        {
+          "phase": "prepare",
+          "action": "cancel",
+          "pause": {
+            "phase": "prepare",
+            "engine_phase": "Serializing output",
+            "rows": 65536,
+            "temp_bytes": 11145646
+          },
+          "workspace_absent_after": true
+        },
+        {
+          "phase": "prepare",
+          "action": "tab_close",
+          "pause": {
+            "phase": "prepare",
+            "engine_phase": "Serializing output",
+            "rows": 65536,
+            "temp_bytes": 11145646
+          },
+          "workspace_absent_after": true
+        },
+        {
+          "phase": "export_write",
+          "action": "cancel",
+          "pause": {
+            "phase": "export_write",
+            "file": "part-00000001.csv",
+            "bytes": 27,
+            "writer_closed": false
+          },
+          "workspace_absent_after": true
+        },
+        {
+          "phase": "export_write",
+          "action": "tab_close",
+          "pause": {
+            "phase": "export_write",
+            "file": "part-00000001.csv",
+            "bytes": 27,
+            "writer_closed": false
+          },
+          "workspace_absent_after": true
+        },
+        {
+          "phase": "export_closed",
+          "action": "cancel",
+          "pause": {
+            "phase": "export_closed",
+            "engine_phase": "Saving results (2/6)",
+            "closed_csv_files": 1
+          },
+          "workspace_absent_after": true
+        },
+        {
+          "phase": "export_closed",
+          "action": "tab_close",
+          "pause": {
+            "phase": "export_closed",
+            "engine_phase": "Saving results (2/6)",
+            "closed_csv_files": 1
+          },
+          "workspace_absent_after": true
+        },
+        {
+          "phase": "marker_write",
+          "action": "cancel",
+          "pause": {
+            "phase": "marker_write",
+            "file": "CHOPPER-COMPLETE.json",
+            "bytes": 67,
+            "writer_closed": false
+          },
+          "workspace_absent_after": true
+        },
+        {
+          "phase": "marker_write",
+          "action": "tab_close",
+          "pause": {
+            "phase": "marker_write",
+            "file": "CHOPPER-COMPLETE.json",
+            "bytes": 67,
+            "writer_closed": false
+          },
+          "workspace_absent_after": true
+        },
+        {
+          "phase": "marker_closed",
+          "action": "cancel",
+          "pause": {
+            "phase": "marker_closed",
+            "file": "CHOPPER-COMPLETE.json",
+            "writer_closed": true,
+            "closed_csv_files": 5
+          },
+          "workspace_absent_after": true
+        },
+        {
+          "phase": "marker_closed",
+          "action": "tab_close",
+          "pause": {
+            "phase": "marker_closed",
+            "file": "CHOPPER-COMPLETE.json",
+            "writer_closed": true,
+            "closed_csv_files": 5
+          },
+          "workspace_absent_after": true
+        }
+      ],
+      "restart": {
+        "new_browser_process": true,
+        "same_profile_and_origin": true,
+        "active_jobs_before": 5,
+        "workspaces_retained_until_cleanup": 5,
+        "locks_released": true,
+        "abandoned_cleanup_removed": 5,
+        "closed_result_files_byte_identical": true,
+        "completed_exports_byte_identical": true,
+        "earlier_success_control_byte_identical": true,
+        "invalid_marker_stays_invalid": true,
+        "completed_marker_stays_complete": true,
+        "unrelated_entries_preserved": true,
+        "fresh_job_preserves_existing_exports": true
+      },
+      "profile_directory_removed": true,
+      "production_worker_artifacts_unchanged": true,
+      "adaptation": "100000row preparephase usesRun-direct partition->prob80/20->uniform;pause onlySerializingoutput>=65536. Otherexport/marker phases retainoriginalsmalllimits-onlyexplicitprepareflow. Rawdirect_run=false refersgenericoriginalharnessflag, notadaptedpreparephase. Forcekill onlytestownedbrowserPID fromCDP."
+    }
+  },
+  "build_and_validation": {
+    "paired_default_build_steps": 5,
+    "fresh_native_build_steps": 1,
+    "transfer_and_verification_steps": 10,
+    "candidate_acceptance_steps": 5,
+    "all_passed": true,
+    "production_assets_preserved_after_contracts": true,
+    "only_engine_wasm_differs_between_cells": true
+  },
+  "decision": "Close scopedbrowsernativeCSV/metadata/marker/cleanup transfer and actualfused-serialization interruption/recovery. Logicaltemporarypass reductiontransfers; clocksretainedrawonly, no speedclaim. Retaincandidatepending admission/retry acceptance.",
+  "limits": "OPFS-backed picker, notactualexternalFileSystemAccessdestination. InstalledChrome156ononeWindowsmachine; nootherbrowser/device/quota/powerloss claim. Full resource-reactor/optionalfeature matrix notrun. NativeCSV and14Analysisfields plusknownbrowserwarningchecked; no general sharedpressure/fallbackdomainproof.",
+  "references_sha256": {
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/1-stderr.log": "9f70d5aa75bca003ba1b61160b1ef260eaf05591c46f7de79e8d5d338e73bf28",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/2-stdout.log": "0b604fa483ab56b20652014905d9ea6f0484bff384c1615f0bbf383fa1c8f9cd",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/3-stderr.log": "a4289a5f55ff5a5b2b732df8433741821768866896b83cd7a0d8efb59d173ba3",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/4-stdout.log": "0b604fa483ab56b20652014905d9ea6f0484bff384c1615f0bbf383fa1c8f9cd",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/5-stdout.log": "99f527a09ea1dddb887713ab08fcac6423eb799a2e8aec5195be9e59613bc0b4",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/manifest.json": "e083656cae15f19ac4147dab0616acfbdc593952ba0320fa1ced43c388f71c05",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/build-batch/status.json": "ec9be8142c011e1bd30f2c00023ac43165b2cceed92c3767078bab60d0fb4c9b",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/native-build-batch/1-stderr.log": "0fc9c66a79d609ea06c96506e481563e9bf05e9fdf23b6e3d166f115d81c73c9",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/native-build-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/native-build-batch/manifest.json": "fffac9de566b95d835e5695fd3d1ddc674f054d6169017f770d67fcb0ddd0dde",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/native-build-batch/status.json": "212cc3a764093f42f60246915faff052b977808ca05bbe814d9a09dc3b7c5532",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/10-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/10-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/2-stdout.log": "424080be7102076a5bbd4d524f85af1a7dd736bfb33e8ef49aee94a7e10df714",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/4-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/5-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/6-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/6-stdout.log": "73171958584c1bafe5d43203379ddb418c7b163a77b2b42898fd2bc0b85f0784",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/7-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/7-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/8-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/8-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/9-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/9-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/decision-packet.json": "82a5cf08c4303d1fdb92092e634e007283acdb5c698316436685bb6df2f6a45b",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/manifest.json": "b56fb4b8617c745745847288ab7517b1c09de8c5856e9849b142e5ce0cc38004",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/run-batch/status.json": "8b7f798c78613d3ec8724c2f6b25d0799e5c2d9ff70babb0f146d0d333f527b6",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/2-stdout.log": "86feba95a515b08faf6c67b661671cdbe019da80a7b6f485aa725fe9550a467b",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/3-stdout.log": "1b982a926b660430add0edbf90e844eea7aa1fc23e49b393b4c5b65920513b8e",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/4-stdout.log": "7cdb425751ca0bb25ea9dd88ec97ee97a12bce8948334bbf17c606e48ab6c765",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/5-stdout.log": "8171fb15e6f68a22b27f923627eca78c63919d4eaae3553fb03f391a245c4b48",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/manifest.json": "1544c55fe5cbff1316c4f23e65dfa728216d1dff718ed04b85f5b01966e37231",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/contracts-batch/status.json": "df2c47341eebba874826c73190d43a279fe49ae1e2f9c82335a37af36fdb2bf2",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/native/job.json": "822f28c9e71509f86354ce40fb973c5b4e9412c2716286bab04ce4e8ad0494e9",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/native/analysis.json": "8e4409e499d4562ccb6fd77c257826feb94fbda0bb6fb45d1ce2052f50098289",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/native/verified.json": "2e747dde2864933ac99b11ff0979779a659946cb43d8a05daf8b5b6185d06450",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/baseline/job.json": "4a16af970ff6135a2fe22400b3327dc8929d2eb273414265004bff6b896c943e",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/baseline/verified.json": "2e747dde2864933ac99b11ff0979779a659946cb43d8a05daf8b5b6185d06450",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/baseline/run.json": "34706b158100f7f09b6dbde3db79e50df68670f4dc0eb075f7ed226bb0d12ba6",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/baseline/native-parity.json": "d826da1cd81a848e84c56a9c69044daae1c85072a714f1a638dc08cd17227afc",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/baseline/metadata.json": "96024d1efd87e5643f8e6173c4fd2b12074ab9d110e6c84091618cfffc89539b",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/candidate/job.json": "1b1fdd12c91dec0c52d74ff1569965a50027eae8e5fa8de7d2689059d903b01b",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/candidate/verified.json": "2e747dde2864933ac99b11ff0979779a659946cb43d8a05daf8b5b6185d06450",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/candidate/run.json": "4530900c7aa1c40d5f7e5b20c46e65fd23b39231d5b28eb6842af1cbab47cf4c",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/candidate/native-parity.json": "d826da1cd81a848e84c56a9c69044daae1c85072a714f1a638dc08cd17227afc",
+    "WIN:scratch/prob-shuffle-browser-20261103T1510/candidate/metadata.json": "96024d1efd87e5643f8e6173c4fd2b12074ab9d110e6c84091618cfffc89539b",
+    "scratch/prob-shuffle-browser-20261103T1510/run-launch.stdout": "add161f02d79ada37555932e68f6fe7537f79aa5ac81d75e4b29d07e84bf3a6f",
+    "scratch/prob-shuffle-browser-20261103T1510/run-batch-manifest.json": "b56fb4b8617c745745847288ab7517b1c09de8c5856e9849b142e5ce0cc38004",
+    "scratch/prob-shuffle-browser-20261103T1510/run-plan.json": "0e883a853131814ef3754b44e83dd1836ddc871ee948023adcea24afe8cf0871",
+    "scratch/prob-shuffle-browser-20261103T1510/contracts-launch.stdout": "5f5236a051294628357a404e772cc81929342f6b481680365979ddf3d7edd469",
+    "scratch/prob-shuffle-browser-20261103T1510/build-batch-manifest.json": "e083656cae15f19ac4147dab0616acfbdc593952ba0320fa1ced43c388f71c05",
+    "scratch/prob-shuffle-browser-20261103T1510/candidate-metadata.json": "96024d1efd87e5643f8e6173c4fd2b12074ab9d110e6c84091618cfffc89539b",
+    "scratch/prob-shuffle-browser-20261103T1510/candidate-verified.json": "2e747dde2864933ac99b11ff0979779a659946cb43d8a05daf8b5b6185d06450",
+    "scratch/prob-shuffle-browser-20261103T1510/build-launch.stdout": "5f5236a051294628357a404e772cc81929342f6b481680365979ddf3d7edd469",
+    "scratch/prob-shuffle-browser-20261103T1510/baseline-metadata.json": "96024d1efd87e5643f8e6173c4fd2b12074ab9d110e6c84091618cfffc89539b",
+    "scratch/prob-shuffle-browser-20261103T1510/native-verified.json": "2e747dde2864933ac99b11ff0979779a659946cb43d8a05daf8b5b6185d06450",
+    "scratch/prob-shuffle-browser-20261103T1510/build-launch.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/prob-shuffle-browser-20261103T1510/run-launch.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/prob-shuffle-browser-20261103T1510/candidate-run.json": "4530900c7aa1c40d5f7e5b20c46e65fd23b39231d5b28eb6842af1cbab47cf4c",
+    "scratch/prob-shuffle-browser-20261103T1510/contracts-review.json": "1bf54157fc296514027a012d9b4bd83a3ff882396e977be3b4875e4d70037312",
+    "scratch/prob-shuffle-browser-20261103T1510/contracts-plan.json": "9e9c91d07be96b90cda74fcfd9235de0b7ca9db22d698fcf4c28d7e7edd2e79f",
+    "scratch/prob-shuffle-browser-20261103T1510/baseline-native-parity.json": "d826da1cd81a848e84c56a9c69044daae1c85072a714f1a638dc08cd17227afc",
+    "scratch/prob-shuffle-browser-20261103T1510/candidate-native-parity.json": "d826da1cd81a848e84c56a9c69044daae1c85072a714f1a638dc08cd17227afc",
+    "scratch/prob-shuffle-browser-20261103T1510/baseline-job.json": "4a16af970ff6135a2fe22400b3327dc8929d2eb273414265004bff6b896c943e",
+    "scratch/prob-shuffle-browser-20261103T1510/verify-events.py": "dd0fb5892149d1ade1fb3ac8d3f51c8f8f002d03b89ee4d19ec93aa34602ac9f",
+    "scratch/prob-shuffle-browser-20261103T1510/native-build-launch.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/prob-shuffle-browser-20261103T1510/native-build-plan.json": "397ae62c6679e680172d6110a6a40147d26697ec2a817a5a11def4b4ea6413f2",
+    "scratch/prob-shuffle-browser-20261103T1510/native-job.json": "822f28c9e71509f86354ce40fb973c5b4e9412c2716286bab04ce4e8ad0494e9",
+    "scratch/prob-shuffle-browser-20261103T1510/contracts-batch-manifest.json": "1544c55fe5cbff1316c4f23e65dfa728216d1dff718ed04b85f5b01966e37231",
+    "scratch/prob-shuffle-browser-20261103T1510/build-plan.json": "f8fc9009f9d083134650364a22066cdcd7f770ffe5906fe347fa7bd58027e310",
+    "scratch/prob-shuffle-browser-20261103T1510/baseline-verified.json": "2e747dde2864933ac99b11ff0979779a659946cb43d8a05daf8b5b6185d06450",
+    "scratch/prob-shuffle-browser-20261103T1510/candidate-job.json": "1b1fdd12c91dec0c52d74ff1569965a50027eae8e5fa8de7d2689059d903b01b",
+    "scratch/prob-shuffle-browser-20261103T1510/session.json": "ce2094bed7826e2e7ab859f888e0514de14f5b5b59397e90ca54a62ec499b4bb",
+    "scratch/prob-shuffle-browser-20261103T1510/paired-parity.json": "29ff55c8c66748cacad69ce7f13ccb48cd263395e4293e6f4077d57580ea9e5b",
+    "scratch/prob-shuffle-browser-20261103T1510/native-build-batch-manifest.json": "fffac9de566b95d835e5695fd3d1ddc674f054d6169017f770d67fcb0ddd0dde",
+    "scratch/prob-shuffle-browser-20261103T1510/packages.json": "aa98f231c05f474eb421f2c5d93b76b71c58b0952e59fd913c140ad9fa6fab39",
+    "scratch/prob-shuffle-browser-20261103T1510/native-reference-review.json": "244a16bf94ee05ee98a8e61505eff9c3cde9f95ca7e45b67dbe9251ad33e6b4c",
+    "scratch/prob-shuffle-browser-20261103T1510/native-analysis.json": "8e4409e499d4562ccb6fd77c257826feb94fbda0bb6fb45d1ce2052f50098289",
+    "scratch/prob-shuffle-browser-20261103T1510/run-review.md": "62a34111f72a080cbe28f8373f37f468da64fac1b3590b3091de1eeaefde9854",
+    "scratch/prob-shuffle-browser-20261103T1510/baseline-run.json": "34706b158100f7f09b6dbde3db79e50df68670f4dc0eb075f7ed226bb0d12ba6",
+    "scratch/prob-shuffle-browser-20261103T1510/native-build-launch.stdout": "b12b9c64fcdc1aa26da4285a038452aa7e47de0dde9bdd54cab0b164ef116693",
+    "scratch/prob-shuffle-browser-20261103T1510/contracts-launch.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "replay_patches": [
+    "docs/benchmarks/probabilistic-shuffle-browser-trace-2026-11-03.patch",
+    "docs/benchmarks/probabilistic-shuffle-browser-harness-2026-11-03.patch"
+  ],
+  "session": {
+    "objective": "TODO.md browsertransfer of unchangedprobabilistic-allocation/uniformshuffle fusion",
+    "prior_handoff": "scratch/prob-shuffle-semantics-20261103T1454/handoff.json",
+    "original_objective_start_utc": "2026-11-03T08:27:43Z",
+    "window_start_utc": "2026-11-03T15:10:00+00:00",
+    "window_duration_seconds": 7200,
+    "deadline_utc": "2026-11-03T17:10:00+00:00",
+    "launch_cutoff_utc": "2026-11-03T16:50:00+00:00",
+    "limits": {
+      "browser_jobs": 2,
+      "native_reference_jobs": 1,
+      "wasi_build_attempts": 3,
+      "additional_storage_bytes": 6442450944
+    },
+    "estimated_seconds": 300,
+    "estimated_disk_bytes": 3221225472,
+    "scope": "One persistentinstalledChrome baseline/candidate transfer pair, not timingpanel. Fresh default WASIpackages with identicalhostworkers; matchingpostpublicationtraffic instrument inboth. Events-transfer-v1 20000rows/fourtypes quotedUnicode/multiline; partition->prob80/20->uniform,strict1024rows/65536bytes. Independentfields/IDs/group/caps/marker/cleanup, exactbaseline andnativeCSV/lineage/metadata controls. No promotion/deployment/default changes.",
+    "prior_usage": {
+      "cli_attempts": 34,
+      "dynamic_control_jobs": 16,
+      "fusion_debug_attempts": 9,
+      "fusion_optimized_jobs": 6,
+      "fixed_capacity_jobs": 4,
+      "native_semantic_jobs": 20
+    }
+  }
+}

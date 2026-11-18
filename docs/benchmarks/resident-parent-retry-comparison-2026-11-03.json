@@ -1,0 +1,373 @@
+{
+  "type": "derived_resident_parent_retry_investigation",
+  "scope": "Synthetic native allocation controls plus four matched complete native CLI Runs. Experimental patch unapplied; production unchanged.",
+  "delivery_source_base": "21bf61a0d8c1852293b363c3b1ac20ce01edf2b9",
+  "compiled_engine_base": "1cf44a9961bd5ca67e03df79b3dcf9370648a13f engine source plus isolated patch; later main changes are docs/harness",
+  "patch_sha256": "89865f4b586256503a4797d202e551b59df62b3c81c181087671b70ed65e0af8",
+  "first_wide_probe_sha256": "100c7531c04e35bcd0363828359f33548013f5d5371448039de0d8567e07002e",
+  "first_wide_scope": "4 matched immediate/prepared pairs: one row,128000/200000payload bytes,owned/compact,2possiblekeys,4MiB nominal override,2MiB local workspace before directory allowance,300000 bytes after other before directory allowance. Unsupported CLI test settings, no complete jobs/probability occurrence inference.",
+  "controls": [
+    {
+      "batch": "first-wide-batch",
+      "observations": [
+        "FIRST_WIDE payload=128000 compact=false immediate=true success=true error=None held=1797200 remaining=1797200 peak=1990891",
+        "FIRST_WIDE payload=128000 compact=false immediate=false success=false error=Some(record cannot fit available sort workspace; increase memory_mb",
+        "FIRST_WIDE payload=128000 compact=true immediate=true success=true error=None held=1797200 remaining=1797200 peak=1990891",
+        "FIRST_WIDE payload=128000 compact=true immediate=false success=false error=Some(record cannot fit available sort workspace; increase memory_mb",
+        "FIRST_WIDE payload=200000 compact=false immediate=true success=true error=None held=1797200 remaining=1797200 peak=2062891",
+        "FIRST_WIDE payload=200000 compact=false immediate=false success=false error=Some(concurrent algorithm workspaces exceed memory budget; increase memory_mb) held=1797200 remaining=1797200 peak=1930454",
+        "FIRST_WIDE payload=200000 compact=true immediate=true success=true error=None held=1797200 remaining=1797200 peak=2062891",
+        "FIRST_WIDE payload=200000 compact=true immediate=false success=false error=Some(record cannot fit available sort workspace; increase memory_mb"
+      ]
+    },
+    {
+      "batch": "parent-retry-v4-batch",
+      "observations": [
+        "PARENT_TERMINAL cancel scans=1 cleanup=true",
+        "PARENT_RETRY count=64 payload=128 resident=false retried=false",
+        "PARENT_TERMINAL malformed scans=1 cleanup=true",
+        "PARENT_TERMINAL emission scans=1 cleanup=true",
+        "PARENT_RETRY count=64 payload=128 resident=true retried=false",
+        "PARENT_RETRY count=2500 payload=128 resident=false retried=false",
+        "PARENT_RETRY count=2500 payload=128 resident=true retried=true",
+        "PARENT_RETRY count=1 payload=200000 resident=false retried=false",
+        "PARENT_RETRY count=1 payload=200000 resident=true retried=false"
+      ]
+    }
+  ],
+  "parent_retry_scope": "Materialized Dataset parent, same original domain/membership/encounter order. Typed admission before emission drops attempt then ctx.check and immediate retry. Root ingestion stays immediate; cancellation/malformed input/output errors are terminal.",
+  "parent_retry_cases": [
+    {
+      "rows": 64,
+      "payload_bytes": 128,
+      "available_local_bytes": 300000
+    },
+    {
+      "rows": 2500,
+      "payload_bytes": 128,
+      "available_local_bytes": 300000
+    },
+    {
+      "rows": 1,
+      "payload_bytes": 200000,
+      "available_local_bytes": 500000
+    }
+  ],
+  "timing_scope": "CLI launch through successful Run/publication, all candidate work included. Build/preflight/verification excluded.",
+  "parameters": {
+    "rows": 20000,
+    "possible_regions": 8,
+    "hot_percent": 30,
+    "independent_notes_bytes": [
+      24,
+      128
+    ],
+    "memory_mib": 64,
+    "workers": 1,
+    "grouping_both": "auto",
+    "fixture_cohort": "development",
+    "cache_host_load": "uncontrolled",
+    "features_both": []
+  },
+  "pairs": [
+    {
+      "pair": 1,
+      "order": [
+        "baseline",
+        "candidate"
+      ],
+      "cells": {
+        "baseline": {
+          "seconds": 0.3680451000109315,
+          "record": "scratch/unattended-continuation-20261102/comparison/session/result-pair1-sort/run.json",
+          "record_sha256": "318ad7c177a69642e92f88a057d131f9ad25e59e79c2592ad8054ee8cd22a77c",
+          "manifest": "scratch/unattended-continuation-20261102/comparison/session/result-pair1-sort/output/manifest.jsonl",
+          "manifest_sha256": "b03fcbb926f62d36ccf477063450b046c2a6d5a02d7dcacf1ec1576793ce6baa",
+          "manifest_physical_line": 1,
+          "diagnostic_pointer": "/analysis/diagnostics",
+          "source_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+          "binary_sha256": "8ac210295891a08dc732564576b847140bed1f41fe7b4d3d0208c929f4a03092",
+          "algorithm_version": "chopper-v1-blake3-1",
+          "diagnostics": {
+            "temporary_bytes_read": 14490224,
+            "temporary_bytes_written": 16798172,
+            "temporary_files_created": 22,
+            "resident_sorts": 17,
+            "routed_groupings": 8,
+            "routing_fallbacks": 0,
+            "sort_calls": 17,
+            "sort_rows": 40000,
+            "peak_workspace_reserved_bytes": 8057150,
+            "temporary_cleanup_failures": 0
+          }
+        },
+        "candidate": {
+          "seconds": 0.28021389996865764,
+          "record": "scratch/unattended-continuation-20261102/comparison/session/result-pair1-auto/run.json",
+          "record_sha256": "421fbe16e7256de3c1b19342d1b1ebc31510bc80ce040e5ba03e3319fd445b90",
+          "manifest": "scratch/unattended-continuation-20261102/comparison/session/result-pair1-auto/output/manifest.jsonl",
+          "manifest_sha256": "25fe12e63e9562839a24597904b4197e5a206498706885ba8af2c68b40f797e7",
+          "manifest_physical_line": 1,
+          "diagnostic_pointer": "/analysis/diagnostics",
+          "source_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+          "binary_sha256": "bb2e5c641b18d7ddcca7f48f047db089a018b0737b718ced838936ae717a25ce",
+          "algorithm_version": "chopper-v1-blake3-1",
+          "diagnostics": {
+            "temporary_bytes_read": 9788045,
+            "temporary_bytes_written": 12095993,
+            "temporary_files_created": 6,
+            "resident_sorts": 25,
+            "routed_groupings": 0,
+            "routing_fallbacks": 0,
+            "sort_calls": 25,
+            "sort_rows": 60000,
+            "peak_workspace_reserved_bytes": 8057150,
+            "temporary_cleanup_failures": 0
+          }
+        }
+      },
+      "candidate_minus_baseline_seconds": -0.08783120004227385,
+      "verified": true,
+      "seeded_csv_parity": true
+    },
+    {
+      "pair": 2,
+      "order": [
+        "candidate",
+        "baseline"
+      ],
+      "cells": {
+        "baseline": {
+          "seconds": 0.22617059998447075,
+          "record": "scratch/unattended-continuation-20261102/comparison/session/result-pair2-sort/run.json",
+          "record_sha256": "eb873b5b6abe76074ff999ee436dc3a405045e3cceeac826f35f271332c510f1",
+          "manifest": "scratch/unattended-continuation-20261102/comparison/session/result-pair2-sort/output/manifest.jsonl",
+          "manifest_sha256": "86be76ce23429964313d2ee64c3cc9d03a109b4567fa0fda72d259291cc15a60",
+          "manifest_physical_line": 1,
+          "diagnostic_pointer": "/analysis/diagnostics",
+          "source_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+          "binary_sha256": "8ac210295891a08dc732564576b847140bed1f41fe7b4d3d0208c929f4a03092",
+          "algorithm_version": "chopper-v1-blake3-1",
+          "diagnostics": {
+            "temporary_bytes_read": 14490224,
+            "temporary_bytes_written": 16798172,
+            "temporary_files_created": 22,
+            "resident_sorts": 17,
+            "routed_groupings": 8,
+            "routing_fallbacks": 0,
+            "sort_calls": 17,
+            "sort_rows": 40000,
+            "peak_workspace_reserved_bytes": 8057150,
+            "temporary_cleanup_failures": 0
+          }
+        },
+        "candidate": {
+          "seconds": 0.1487501000519842,
+          "record": "scratch/unattended-continuation-20261102/comparison/session/result-pair2-auto/run.json",
+          "record_sha256": "57f4fe752a558cd30bd8206ea73849530913283482f5c00a08bb5a59a966c494",
+          "manifest": "scratch/unattended-continuation-20261102/comparison/session/result-pair2-auto/output/manifest.jsonl",
+          "manifest_sha256": "b2ec327d7cd02b53baa227894e61316d0d3991f0f00bc024c2e8c4944a735ccc",
+          "manifest_physical_line": 1,
+          "diagnostic_pointer": "/analysis/diagnostics",
+          "source_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+          "binary_sha256": "bb2e5c641b18d7ddcca7f48f047db089a018b0737b718ced838936ae717a25ce",
+          "algorithm_version": "chopper-v1-blake3-1",
+          "diagnostics": {
+            "temporary_bytes_read": 9788045,
+            "temporary_bytes_written": 12095993,
+            "temporary_files_created": 6,
+            "resident_sorts": 25,
+            "routed_groupings": 0,
+            "routing_fallbacks": 0,
+            "sort_calls": 25,
+            "sort_rows": 60000,
+            "peak_workspace_reserved_bytes": 8057150,
+            "temporary_cleanup_failures": 0
+          }
+        }
+      },
+      "candidate_minus_baseline_seconds": -0.07742049993248656,
+      "verified": true,
+      "seeded_csv_parity": true
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "n": 2,
+      "seconds": [
+        0.3680451000109315,
+        0.22617059998447075
+      ],
+      "median": 0.2971078499977011,
+      "min": 0.22617059998447075,
+      "max": 0.3680451000109315
+    },
+    "candidate": {
+      "n": 2,
+      "seconds": [
+        0.28021389996865764,
+        0.1487501000519842
+      ],
+      "median": 0.21448200001032092,
+      "min": 0.1487501000519842,
+      "max": 0.28021389996865764
+    }
+  },
+  "controller": {
+    "terminal_status": "stopped",
+    "raw_state": "scratch/unattended-continuation-20261102/comparison/session/controller-status.json",
+    "limit_seconds": 300,
+    "limit_storage_bytes": 536870912,
+    "limit_runs": 4,
+    "limits": "Cumulative including waits; sampled storage is not quota or RSS."
+  },
+  "validation": "v4 focused controls, fmt, workspace/all-target Clippy and full locked native workspace pass. Fresh separate baseline/candidate release builds; patch roundtrip matches v4.",
+  "failures": [
+    "Parent retry initial compile E0308 in test borrowing DecodedRow; v2 binds owner before borrowing.",
+    "v3 focused controls and formatting passed, Clippy rejected test err().expect; v4 uses expect_err. Dependent workspace halted until correction."
+  ],
+  "decision": "Reject prepared-router patch as general remedy due first-wide counterexample. Retain materialized-parent pre-emission retry as isolated experimental successor: controlled admission recovery and complete-job benefit supported, no selector/default promotion or matrix expansion.",
+  "limitations": [
+    "No proof of entire immediate-routing success-domain inclusion, arbitrary shared pressure or later emission metadata admission.",
+    "Retry terminal boundary is pre-emission; output-side denial is not retried.",
+    "Fitting timing case does not estimate frequency or whole-job cost of adverse retries.",
+    "n2 per cell, uncontrolled cache/startup/host load; no tails or generalization to corpus/scale/browser.",
+    "Workspace reservations are not RSS; logical byte/file counters are not physical I/O. Independent peaks are not additive.",
+    "CI does not execute unapplied experimental patch; its validation is separately retained native evidence."
+  ],
+  "references_sha256": {
+    "scratch/unattended-continuation-20261102/first-wide-batch/1-stderr.log": "b3f05bc19bbca81813ea4b14e501ddaffb54bedfb93617c2b41fba8d2601b7df",
+    "scratch/unattended-continuation-20261102/first-wide-batch/1-stdout.log": "05e1d4f0bb43be786d965e85c2d48da3c5be4e3fab3aaec2b0213ac325c02729",
+    "scratch/unattended-continuation-20261102/first-wide-batch/manifest.json": "f5fc87dded49b81d81be0165da1b2cace2925ad672a6c69e6df04131d441ae3a",
+    "scratch/unattended-continuation-20261102/first-wide-batch/status.json": "dc4bed1c524f6930180200674aa31be193ed1a7c13d77b7b6909f41560383e09",
+    "scratch/unattended-continuation-20261102/parent-retry-batch/1-stderr.log": "ee46fed0a20b6a73921f15863442c7d45d3bae333b32dd812aa4be432c6876c2",
+    "scratch/unattended-continuation-20261102/parent-retry-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/parent-retry-batch/manifest.json": "b2de5836ed6f7ae6c012a5f693b89b470bf8b5136a5aa74d762a02192bd321ed",
+    "scratch/unattended-continuation-20261102/parent-retry-batch/status.json": "b1ef617fe53ad42981dc4813cb9a2feb6674b229adb74596f304be27c6db56f5",
+    "scratch/unattended-continuation-20261102/parent-retry-v2-batch/1-stderr.log": "8d9bfa83e1cfa3576fc58227d0a0ca12c5fe744d4ddd0d5424e450ea77ea1178",
+    "scratch/unattended-continuation-20261102/parent-retry-v2-batch/1-stdout.log": "ccb401edc2d38d649e37208a6e6841191d154126d8bd0c22e200c53fe7ef6a69",
+    "scratch/unattended-continuation-20261102/parent-retry-v2-batch/manifest.json": "205bc2576ebda18901d060ce21b1d4f5021f117e81b9be3fe62316d389a0d283",
+    "scratch/unattended-continuation-20261102/parent-retry-v2-batch/status.json": "adf5ba05b86b75c1e55367a8b63bfcb95cb7660d7845d3830be1c3cb57c38346",
+    "scratch/unattended-continuation-20261102/parent-retry-v3-batch/1-stderr.log": "139959b4160d3ee0cd3f706bf8f7702d5c73e00aeac2f721c936fae3df4dcde5",
+    "scratch/unattended-continuation-20261102/parent-retry-v3-batch/1-stdout.log": "5c534bd24595306c5388d60c441288a75cde7214a31369b521516131e19b9cc8",
+    "scratch/unattended-continuation-20261102/parent-retry-v3-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/parent-retry-v3-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/parent-retry-v3-batch/3-stderr.log": "4a5e33197e3ece88407a75dc04e9ea3e566e16f84e2f91a6e4ff76abd46ef5c8",
+    "scratch/unattended-continuation-20261102/parent-retry-v3-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/parent-retry-v3-batch/manifest.json": "9ffc4551f6280f7d3bac795e124a0496e07fbf872d61f1d3eafe97ee7fda1222",
+    "scratch/unattended-continuation-20261102/parent-retry-v3-batch/status.json": "b8f22f26f61650a215d920ef7e42fed34eac5e911e77206ec4cb832e2e736953",
+    "scratch/unattended-continuation-20261102/parent-retry-v4-batch/1-stderr.log": "884952cd2741ccade8a412a9985e358a8450ae5022771afac40cd1bfd8f9fe4f",
+    "scratch/unattended-continuation-20261102/parent-retry-v4-batch/1-stdout.log": "9fda24dc8df9fcd5ca6181c4143c823b75521322165fd63c8d56ceb602eddd56",
+    "scratch/unattended-continuation-20261102/parent-retry-v4-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/parent-retry-v4-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/parent-retry-v4-batch/3-stderr.log": "79c52e66e1ab083bbdc9b114f9512bdf48e99a3ad942651b0cb0aa614ccd54bf",
+    "scratch/unattended-continuation-20261102/parent-retry-v4-batch/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/parent-retry-v4-batch/4-stderr.log": "b31a42d9b3ebc95be7c4f8020bdf3b6d0ad190f9e7515a7322cc94a09f0d89b6",
+    "scratch/unattended-continuation-20261102/parent-retry-v4-batch/4-stdout.log": "0b721e2f5e0bcf0657dbeddf43c8cdbd12c32abd0d2b3786b3704cdb37e65c06",
+    "scratch/unattended-continuation-20261102/parent-retry-v4-batch/manifest.json": "ccb2acb5b12b05fd1fb97626af56628674683b690b8189a0071ca436d722af3b",
+    "scratch/unattended-continuation-20261102/parent-retry-v4-batch/status.json": "92f4a89ccadc774b756ebb010261d06619708e16ff45a39a83cd5e8e30a4db75",
+    "scratch/unattended-continuation-20261102/timing-build-batch/1-stderr.log": "ab1b643c339ff45c46af0056c139daf47eef416fb1491c4196329f9da87f5a62",
+    "scratch/unattended-continuation-20261102/timing-build-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/timing-build-batch/2-stderr.log": "0706f5d599a5fbf84d2d681add2dc34d860e78aa4b93ce4b028261ff03c1c35f",
+    "scratch/unattended-continuation-20261102/timing-build-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/timing-build-batch/manifest.json": "dd04df4ccd985db5fbc8379d251395f83d9af53eeaf7311d63a628c4015e03ee",
+    "scratch/unattended-continuation-20261102/timing-build-batch/status.json": "1d21f605196a9dcb603a0f2d10ab95a82ca36f9d7a2add8bbbbc419bd6a5e0a3",
+    "scratch/unattended-continuation-20261102/packages-batch/manifest.json": "b63c1c99169338aa7230885e675046795325de901510e62f2ea9876d4cdd45a2",
+    "scratch/unattended-continuation-20261102/packages-batch/status.json": "73865d97175386da0d666fcb1a65b59a2056f997d62aba68b991bd62a6485c44",
+    "scratch/unattended-continuation-20261102/packages-v2-batch/1-stderr.log": "377de7d896506376a8a039487f5f1a2d071010819947c8dbbc2a1f825e574c6d",
+    "scratch/unattended-continuation-20261102/packages-v2-batch/1-stdout.log": "57e55fe6bc8d77bb0bace4fcc8ce67880e3f33e06d2d7a9916b339cec91d4de2",
+    "scratch/unattended-continuation-20261102/packages-v2-batch/2-stderr.log": "831ad8906cd548d1be0b512110752469e0a5b4f23e8ea459eb4bf438761bef31",
+    "scratch/unattended-continuation-20261102/packages-v2-batch/2-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/packages-v2-batch/manifest.json": "b63c1c99169338aa7230885e675046795325de901510e62f2ea9876d4cdd45a2",
+    "scratch/unattended-continuation-20261102/packages-v2-batch/status.json": "c6f870eeba924a47ee1fef8c59225adb2f3218d908cc7812a16bdd3ee2f0b66b",
+    "scratch/unattended-continuation-20261102/sdk-native-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/sdk-native-batch/1-stdout.log": "15a4d45a60f72b0bd470e4d257d9a9aaedc6681bf70ae51cbcf4cae1425ff071",
+    "scratch/unattended-continuation-20261102/sdk-native-batch/manifest.json": "658d3f6ad075db64b049dd9067262a997dedc019735c2aad1e979465540980fe",
+    "scratch/unattended-continuation-20261102/sdk-native-batch/status.json": "de77aed868d0b966c5a721e6f46c221ac3f174a5b0a30ce7c20a91f9c8c3184c",
+    "scratch/unattended-continuation-20261102/browser-build-batch/1-stderr.log": "c4794914f87c61676e4771a299d0202834cae3833e30d20dd703324908c78c8b",
+    "scratch/unattended-continuation-20261102/browser-build-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/browser-build-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/browser-build-batch/2-stdout.log": "0b604fa483ab56b20652014905d9ea6f0484bff384c1615f0bbf383fa1c8f9cd",
+    "scratch/unattended-continuation-20261102/browser-build-batch/manifest.json": "63206ef1f22bd12228f9a2a9783081cf10c48e387f7f551a063422a585793249",
+    "scratch/unattended-continuation-20261102/browser-build-batch/status.json": "a390b6c14ab7a0a1858993d0ebc81b630c220fad388691d4c950916225b0810d",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/1-stdout.log": "82d8f545e0134e3f547650d40ea6001b04cb505f03ee501e0326a485fdb97bca",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/2-stdout.log": "3b26049b2629d623ae4306d767b0c234021a8a882a84f51e4b9530ac4c1bf523",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/3-stdout.log": "c30cd6626c3ca8a3ae3240a5ed1556930db350bcdfed6b885fbe89473c808a02",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/4-stdout.log": "8e2d224d55eb6164f0036aec0633287cb7592f7236800f8bed201ae572137529",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/5-stdout.log": "9de61a0bd61997f7b3044fd08ba1255e2c11e687406ba9960306bc5644527dd9",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/decision-packet.json": "7a28e81c5e843cc0bcf81e930397dce0f56b303c9fe4bc16620600a617a0fa23",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/manifest.json": "14e7d7e6e50565091696fd2a4899c7389fd204f71bcea45aa08c557336cd141c",
+    "scratch/unattended-continuation-20261102/browser-smoke-batch/status.json": "911b46a23c8086046722e6828d0257640504dd4fffbf7586a607e6006bc77295",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/2-stdout.log": "318ad7c177a69642e92f88a057d131f9ad25e59e79c2592ad8054ee8cd22a77c",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/4-stdout.log": "421fbe16e7256de3c1b19342d1b1ebc31510bc80ce040e5ba03e3319fd445b90",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/5-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/6-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/6-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/decision-packet.json": "88808c63315390538fdf7ab843788e773ea9be427da126ccaebf87fe5ab1683c",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/manifest.json": "6c43522585ab13fa384f8c320ef20a2af1963078345bd4b9b149e3daceda11a6",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair1/status.json": "88e39c0aafa6440ebc71f1bd96fe261913acdba907054a5c3909130afbe249a4",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/2-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/2-stdout.log": "57f4fe752a558cd30bd8206ea73849530913283482f5c00a08bb5a59a966c494",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/3-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/3-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/4-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/4-stdout.log": "eb873b5b6abe76074ff999ee436dc3a405045e3cceeac826f35f271332c510f1",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/5-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/5-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/6-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/6-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/decision-packet.json": "c8012ee27e1f048eafd612087d0aa91a1e5a17f4bb564b2e4a155dfc652a1ed8",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/manifest.json": "e3b800f2ad61bcc888106fccf6bf940d676780037b95232706af504cdf7b3bac",
+    "scratch/unattended-continuation-20261102/comparison/session/batch-pair2/status.json": "b6a515607e03e31024d72ba3ce35ee5637f86204a8f41a5c36ca6813340043d1",
+    "WSL:scratch/unattended-continuation-20261102/sdk-batch/status.json": "a99b52d2a9cca4db51b7cf2f5bc1995fae60ef73603dd2944a0265b2e8b33b91",
+    "WSL:scratch/unattended-continuation-20261102/sdk-batch/manifest.json": "ee9c4ddc90f05ece2d5156bb0d0ecdfde4e522f973cbb6b7f2a978c557a21f73",
+    "WSL:scratch/unattended-continuation-20261102/sdk-batch/1-stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WSL:scratch/unattended-continuation-20261102/sdk-batch/1-stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "WSL:scratch/unattended-continuation-20261102/browser-smoke-review.md": "ac971488d97f931c490017bb72a4eb7f755be62b6778e75b923cd64bca9f4a25",
+    "WSL:scratch/unattended-continuation-20261102/first-wide-review.md": "3328aaa67283ee03bc3e262b5ae06750fd96eb2b6a9f364abe3b617aced25d80",
+    "WSL:scratch/unattended-continuation-20261102/comparison-concrete-review.md": "342bebabceda314139185e5fd15dd279ac7112e5bb9b1faeb9d918200e0f5add",
+    "WSL:scratch/unattended-continuation-20261102/browser-build-review.md": "8e4d0ea92b867a941aa8c587aa6d38e12358b65d66ba4776e83dbb320bf78fb3",
+    "WSL:scratch/unattended-continuation-20261102/parent-retry-v2-review.md": "ae11b217bb7f5ff4677aa56f7829f78a7237e7890f88be3d409f13e04cc6aa88",
+    "WSL:scratch/unattended-continuation-20261102/parent-retry-v4-review.md": "b5c9eae3aeac3e1025354eb2ca99d93cad30ed4fd4d0d3ee6e83d3105ce1475b",
+    "WSL:scratch/unattended-continuation-20261102/sdk-native-review.md": "c2bcef213e30efd36c17016c38d22129fb971634dd5c9b5517044e19685fd544",
+    "WSL:scratch/unattended-continuation-20261102/parent-retry-v3-review.md": "7ccba8f877fffd7ffeb58c6dc71a62f295738aa900efac854caf8a7cc916bd54",
+    "WSL:scratch/unattended-continuation-20261102/parent-retry-source-review.md": "4d69547a4bb2970b1427e3eb99957ad640d27d5575416fc1670ad7952587b4e0",
+    "WSL:scratch/unattended-continuation-20261102/packages-v2-review.md": "ec7b0c475462ba70f02499788cc36b014bdf10e8f644fb4de8cc30f34f41c9e7",
+    "WSL:scratch/unattended-continuation-20261102/timing-design-review.md": "1ecbc5acc8d3b63ea7ee36376595fc4be2ff0c3c77bced8df960764cb3209422",
+    "WSL:scratch/unattended-continuation-20261102/parent-retry-review.md": "ead112c8f3722db674b8e38c20ffacdd6d71e3ac4655ca978c50269042175585",
+    "WSL:scratch/unattended-continuation-20261102/skill-review.md": "6744c57b61a8b0e175020c291490707088d8a64f6885c2e499ce9ddb30691928",
+    "WSL:scratch/unattended-continuation-20261102/browser-prereq-review.md": "c1936edb5a54e973c7c1c8b6bc84640bff6e2f572da83593e44e6e3c425eacbd",
+    "scratch/unattended-continuation-20261102/sdk-native-install.json": "16f242ab6344cc83800f1b3ec549fff08d68bcca7d9b0672074ae09d42b4a8eb",
+    "scratch/unattended-continuation-20261102/comparison/control.json": "17268d35b39e033478d5d3a6977e628c6da6d99d8790661d3fdbd27d28e9d944",
+    "scratch/unattended-continuation-20261102/comparison/pair1.json": "2a2f87f3ea148db2d7e1fbaba03e838762543e2ab07112f9199339a3efc51926",
+    "scratch/unattended-continuation-20261102/comparison/pair2.json": "29a9f67671fad59b537093389d08d3a67aa2fe3c491f7ae65fd246a33b7ea9bf",
+    "scratch/unattended-continuation-20261102/comparison/session/session.json": "7d29e148b69454be9d5c7eb0b11a573f7a6c25d321e0070615c4ee8d506bb2ea",
+    "scratch/unattended-continuation-20261102/comparison/session/controller-status.json": "863b975977b4287b7a512dae6184569f8a1ee2760e76b63dae6e61d1559ca1fb",
+    "scratch/unattended-continuation-20261102/comparison/session/packet-01.json": "1f0f4d011f95db5502914f2816633968e5bdc7f5b2fd1d1bf4035ceeb5023390",
+    "scratch/unattended-continuation-20261102/comparison/session/packet-02.json": "cbac06926999a98316f054da7ed82fdfe35c5a53e8871330502119c18048a602",
+    "scratch/unattended-continuation-20261102/comparison/session/result-pair1-sort/run.json": "318ad7c177a69642e92f88a057d131f9ad25e59e79c2592ad8054ee8cd22a77c",
+    "scratch/unattended-continuation-20261102/comparison/session/result-pair1-sort/output/manifest.jsonl": "b03fcbb926f62d36ccf477063450b046c2a6d5a02d7dcacf1ec1576793ce6baa",
+    "scratch/unattended-continuation-20261102/comparison/session/result-pair1-auto/run.json": "421fbe16e7256de3c1b19342d1b1ebc31510bc80ce040e5ba03e3319fd445b90",
+    "scratch/unattended-continuation-20261102/comparison/session/result-pair1-auto/output/manifest.jsonl": "25fe12e63e9562839a24597904b4197e5a206498706885ba8af2c68b40f797e7",
+    "scratch/unattended-continuation-20261102/comparison/session/check-pair1/verified.json": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef",
+    "scratch/unattended-continuation-20261102/comparison/session/result-pair2-sort/run.json": "eb873b5b6abe76074ff999ee436dc3a405045e3cceeac826f35f271332c510f1",
+    "scratch/unattended-continuation-20261102/comparison/session/result-pair2-sort/output/manifest.jsonl": "86be76ce23429964313d2ee64c3cc9d03a109b4567fa0fda72d259291cc15a60",
+    "scratch/unattended-continuation-20261102/comparison/session/result-pair2-auto/run.json": "57f4fe752a558cd30bd8206ea73849530913283482f5c00a08bb5a59a966c494",
+    "scratch/unattended-continuation-20261102/comparison/session/result-pair2-auto/output/manifest.jsonl": "b2ec327d7cd02b53baa227894e61316d0d3991f0f00bc024c2e8c4944a735ccc",
+    "scratch/unattended-continuation-20261102/comparison/session/check-pair2/verified.json": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef"
+  }
+}

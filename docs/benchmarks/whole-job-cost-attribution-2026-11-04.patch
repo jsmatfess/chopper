@@ -1,0 +1,221 @@
+--- a/crates/chopper/src/digest.rs
++++ b/crates/chopper/src/digest.rs
+@@ -44,0 +45 @@
++        let _research_span = chopper_core::csv::research_costs::start(2);
+@@ -51,0 +53 @@
++        let _research_span = chopper_core::csv::research_costs::start(2);
+@@ -54,0 +57 @@
++        let _research_span = chopper_core::csv::research_costs::start(2);
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -99 +99 @@
+-    assert_eq!(a.groups, 12);
++    assert_eq!(a.groups, if job.operations.is_empty() { 1 } else { 12 });
+@@ -638,0 +639,141 @@
++
++#[test]
++fn probabilistic_shuffle_cost_attribution() -> Result<()> {
++    chopper_core::csv::research_costs::reset(true);
++    let calibration_start = std::time::Instant::now();
++    for _ in 0..100000 {
++        drop(chopper_core::csv::research_costs::start(0));
++    }
++    let calibration_seconds = calibration_start.elapsed().as_secs_f64();
++    let calibration = chopper_core::csv::research_costs::finish();
++    assert_eq!(calibration[0].1, 100000);
++    println!(
++        "COST_CALIBRATION {}",
++        serde_json::json!({"iterations":100000,"seconds":calibration_seconds,"counters":calibration})
++    );
++
++    let label = "cost-attribution";
++    let n = 200000;
++    let schedule = [(false, false), (false, true), (true, false), (true, true)];
++    let mut last_recipe = None;
++    let mut reference = None;
++    for (rep, (fusion_recipe, instrumented)) in schedule.into_iter().enumerate() {
++        let candidate = true;
++        let grouping = Grouping::Auto;
++        if last_recipe != Some(fusion_recipe) {
++            reference = None;
++        }
++        last_recipe = Some(fusion_recipe);
++        ENABLED.set(candidate);
++        let (dir, mut job) = setup(n)?;
++        job.resources.grouping = grouping;
++        if !fusion_recipe {
++            job.operations.clear();
++        }
++        let input_hash = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        chopper_core::csv::research_costs::reset(instrumented);
++        let started = std::time::Instant::now();
++        let prepared = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let ctx = prepared.ctx.clone();
++        let a = prepared.execute()?;
++        let seconds = started.elapsed().as_secs_f64();
++        let costs = chopper_core::csv::research_costs::finish();
++        let phases = serde_json::to_value(&a.timings)?;
++        let diagnostics = ctx.diagnostics();
++        // Verification is outside the complete engine preparation/publication timer.
++        let checked = verify(dir.path(), &job, n, &a)?;
++        if let Some(ref old) = reference {
++            assert_eq!(&checked, old);
++        } else {
++            reference = Some(checked);
++        }
++        drop(a);
++        drop(ctx);
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "COST_ATTRIBUTION {}",
++            serde_json::json!({"label":label,"fusion_recipe":fusion_recipe,"instrumented":instrumented,"costs":costs,"phases":phases,"grouping":match grouping { Grouping::Auto => "auto", Grouping::Sort => "sort" },"rows":n,"candidate":candidate,"rep":rep,"seconds":seconds,"input_blake3":input_hash,"diagnostics":diagnostics,"exact_output_verified":true,"cleanup":true})
++        );
++    }
++    ENABLED.set(false);
++    Ok(())
++}
++
++#[test]
++fn probabilistic_shuffle_cost_phase_boundary() -> Result<()> {
++    chopper_core::csv::research_costs::reset(true);
++    let calibration_start = std::time::Instant::now();
++    for _ in 0..100000 {
++        drop(chopper_core::csv::research_costs::start(0));
++    }
++    let calibration_seconds = calibration_start.elapsed().as_secs_f64();
++    let calibration = chopper_core::csv::research_costs::finish();
++    assert_eq!(calibration[0].1, 100000);
++    println!(
++        "COST_CALIBRATION {}",
++        serde_json::json!({"iterations":100000,"seconds":calibration_seconds,"counters":calibration})
++    );
++
++    let label = "cost-attribution";
++    let n = 200000;
++    let schedule = [(false, true), (true, true)];
++    let mut last_recipe = None;
++    let mut reference = None;
++    for (rep, (fusion_recipe, instrumented)) in schedule.into_iter().enumerate() {
++        let candidate = true;
++        let grouping = Grouping::Auto;
++        if last_recipe != Some(fusion_recipe) {
++            reference = None;
++        }
++        last_recipe = Some(fusion_recipe);
++        ENABLED.set(candidate);
++        let (dir, mut job) = setup(n)?;
++        job.resources.grouping = grouping;
++        if !fusion_recipe {
++            job.operations.clear();
++        }
++        let input_hash = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        chopper_core::csv::research_costs::reset(instrumented);
++        let started = std::time::Instant::now();
++        let prepared = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let preparation_seconds = started.elapsed().as_secs_f64();
++        let execution_started = std::time::Instant::now();
++        let ctx = prepared.ctx.clone();
++        let a = prepared.execute()?;
++        let execution_seconds = execution_started.elapsed().as_secs_f64();
++        let seconds = started.elapsed().as_secs_f64();
++        let costs = chopper_core::csv::research_costs::finish();
++        let phases = serde_json::to_value(&a.timings)?;
++        let diagnostics = ctx.diagnostics();
++        // Verification is outside the complete engine preparation/publication timer.
++        let checked = verify(dir.path(), &job, n, &a)?;
++        if let Some(ref old) = reference {
++            assert_eq!(&checked, old);
++        } else {
++            reference = Some(checked);
++        }
++        drop(a);
++        drop(ctx);
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "COST_PHASE_BOUNDARY {}",
++            serde_json::json!({"label":label,"preparation_seconds":preparation_seconds,"execution_seconds":execution_seconds,"fusion_recipe":fusion_recipe,"instrumented":instrumented,"costs":costs,"phases":phases,"grouping":match grouping { Grouping::Auto => "auto", Grouping::Sort => "sort" },"rows":n,"candidate":candidate,"rep":rep,"seconds":seconds,"input_blake3":input_hash,"diagnostics":diagnostics,"exact_output_verified":true,"cleanup":true})
++        );
++    }
++    ENABLED.set(false);
++    Ok(())
++}
+--- a/crates/chopper-core/src/csv.rs
++++ b/crates/chopper-core/src/csv.rs
+@@ -66,0 +67 @@
++        let _research_span = research_costs::start(1);
+@@ -519,0 +521 @@
++        let _research_span = research_costs::start(0);
+@@ -912,0 +915 @@
++        let _research_span = research_costs::start(5);
+@@ -1150,0 +1154,51 @@
++
++/// Private experiment instrumentation, absent from production source.
++#[doc(hidden)]
++pub mod research_costs {
++    use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
++    use std::time::Instant;
++    static ENABLED: AtomicBool = AtomicBool::new(false);
++    static NS: [AtomicU64; 6] = [const { AtomicU64::new(0) }; 6];
++    static CALLS: [AtomicU64; 6] = [const { AtomicU64::new(0) }; 6];
++    pub struct Span(usize, Instant);
++    pub fn start(slot: usize) -> Option<Span> {
++        ENABLED
++            .load(Ordering::Relaxed)
++            .then(|| Span(slot, Instant::now()))
++    }
++    impl Drop for Span {
++        fn drop(&mut self) {
++            let elapsed = self.1.elapsed().as_nanos().min(u64::MAX as u128) as u64;
++            NS[self.0].fetch_add(elapsed, Ordering::Relaxed);
++            CALLS[self.0].fetch_add(1, Ordering::Relaxed);
++        }
++    }
++    pub fn reset(enabled: bool) {
++        ENABLED.store(false, Ordering::Relaxed);
++        for v in NS.iter().chain(CALLS.iter()) {
++            v.store(0, Ordering::Relaxed);
++        }
++        ENABLED.store(enabled, Ordering::Relaxed);
++    }
++    pub fn finish() -> Vec<(&'static str, u64, u64)> {
++        ENABLED.store(false, Ordering::Relaxed);
++        [
++            "parse_inclusive",
++            "decode_nested_in_parse",
++            "logical_digest",
++            "random_block_nested_in_categorical_or_key",
++            "categorical_inclusive",
++            "serialize_reserved",
++        ]
++        .into_iter()
++        .enumerate()
++        .map(|(i, n)| {
++            (
++                n,
++                CALLS[i].load(Ordering::Relaxed),
++                NS[i].load(Ordering::Relaxed),
++            )
++        })
++        .collect()
++    }
++}
+--- a/crates/chopper-core/src/random.rs
++++ b/crates/chopper-core/src/random.rs
+@@ -38,0 +39 @@
++    let _research_span = crate::csv::research_costs::start(3);
+@@ -140,0 +142 @@
++    let _research_span = crate::csv::research_costs::start(4);

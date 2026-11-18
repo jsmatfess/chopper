@@ -1,0 +1,172 @@
+//! Optional fixed-key experiment. Scratch failure leaves comparison sorting usable.
+use super::*;
+
+pub(super) fn try_sort(rows: &mut [PackedRow], order: &SortOrder, ctx: &Context) -> bool {
+    if !matches!(order, SortOrder::Random(_))
+        || rows
+            .iter()
+            .any(|row| !matches!(row.key, PackedKey::Random(_)))
+    {
+        return false;
+    }
+    let Some(bytes) = rows
+        .len()
+        .checked_mul(2 * std::mem::size_of::<usize>())
+        .and_then(|bytes| bytes.checked_add(256 * std::mem::size_of::<usize>()))
+    else {
+        return false;
+    };
+    let mut reservation = Reservation::new(ctx);
+    if reservation.resize(bytes).is_err() {
+        return false;
+    }
+    let mut indices = Vec::new();
+    let mut scratch = Vec::new();
+    if indices.try_reserve_exact(rows.len()).is_err()
+        || scratch.try_reserve_exact(rows.len()).is_err()
+    {
+        return false;
+    }
+    indices.extend(0..rows.len());
+    scratch.resize(rows.len(), 0usize);
+    // Stable LSD passes produce the existing lexicographic 128-bit order.
+    for byte in (0..16).rev() {
+        let mut counts = [0usize; 256];
+        for row in rows.iter() {
+            counts[row.key[byte] as usize] += 1;
+        }
+        if counts.contains(&rows.len()) {
+            continue;
+        }
+        let mut offset = 0;
+        for count in &mut counts {
+            let length = *count;
+            *count = offset;
+            offset += length;
+        }
+        for &index in &indices {
+            let bucket = rows[index].key[byte] as usize;
+            scratch[counts[bucket]] = index;
+            counts[bucket] += 1;
+        }
+        std::mem::swap(&mut indices, &mut scratch);
+    }
+    // Equal primary keys must use the v1 domain-specific collision refinement,
+    // never row ID or the stable order of the radix passes.
+    let mut start = 0;
+    while start < indices.len() {
+        let mut end = start + 1;
+        while end < indices.len()
+            && rows[indices[start]].key.as_slice() == rows[indices[end]].key.as_slice()
+        {
+            end += 1;
+        }
+        indices[start..end].sort_unstable_by(|&a, &b| order.compare_packed(&rows[a], &rows[b]));
+        start = end;
+    }
+    // Invert destination -> source into source -> destination using the spare
+    // array. Swap permutation cycles in place without cloning any payloads.
+    for (destination, &source) in indices.iter().enumerate() {
+        scratch[source] = destination;
+    }
+    for index in 0..rows.len() {
+        while scratch[index] != index {
+            let destination = scratch[index];
+            rows.swap(index, destination);
+            scratch.swap(index, destination);
+        }
+    }
+    true
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn context() -> Result<Context> {
+        // These algorithm fixtures exhaust their own workspace deliberately;
+        // unrelated parallel tests must not consume their process allowance.
+        Context::with_memory_pool(
+            &chopper_core::Resources::default(),
+            Arc::new(AtomicBool::new(false)),
+            Arc::new(|_| {}),
+            Arc::new(crate::resources::MemoryPool::new(128 * 1024 * 1024)),
+        )
+    }
+
+    #[test]
+    fn differential_keys_collisions_and_permutations() -> Result<()> {
+        let ctx = context()?;
+        let domain = chopper_core::random::domain("radix-test", 0, "[]");
+        let order = SortOrder::Random(domain);
+        for length in [0u64, 1, 2, 257, 17_000] {
+            for distribution in 0..4 {
+                let mut rows = (0..length)
+                    .rev()
+                    .map(|id| {
+                        let key = match distribution {
+                            0 => blake3::hash(&id.to_le_bytes()).as_bytes()[..16].to_vec(),
+                            1 => vec![(id % 3) as u8; 16],
+                            2 => vec![42; 16],
+                            _ => (id as u128).to_be_bytes().to_vec(),
+                        };
+                        Row {
+                            id,
+                            ordinal: length - id,
+                            key,
+                            fields: vec![format!("row-{id},界\n")],
+                        }
+                    })
+                    .collect::<Vec<_>>();
+                let mut packed = rows
+                    .iter()
+                    .cloned()
+                    .map(PackedRow::new)
+                    .collect::<Result<Vec<_>>>()?;
+                rows.sort_unstable_by(|a, b| order.compare(a, b));
+                assert!(try_sort(&mut packed, &order, &ctx));
+                for (actual, expected) in packed.iter().zip(rows) {
+                    let mut encoded = Vec::new();
+                    actual.write(&mut encoded)?;
+                    let actual = read_row(&mut encoded.as_slice(), ctx.max_record)?.unwrap();
+                    assert_eq!(
+                        (actual.id, actual.ordinal, actual.key, actual.fields),
+                        (expected.id, expected.ordinal, expected.key, expected.fields)
+                    );
+                }
+                assert_eq!(ctx.workspace.used(), ctx.directory_reserved_bytes());
+            }
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn unavailable_scratch_and_ineligible_keys_leave_rows_untouched() -> Result<()> {
+        let ctx = context()?;
+        let order = SortOrder::Random([0; 32]);
+        let mut rows = (0..3)
+            .rev()
+            .map(|id| {
+                PackedRow::new(Row {
+                    id,
+                    ordinal: id,
+                    key: vec![id as u8; 16],
+                    fields: vec![],
+                })
+            })
+            .collect::<Result<Vec<_>>>()?;
+        let mut held = Reservation::new(&ctx);
+        held.resize(ctx.memory / 2 - ctx.directory_reserved_bytes() as usize)?;
+        assert!(!try_sort(&mut rows, &order, &ctx));
+        assert_eq!(rows.iter().map(|r| r.id).collect::<Vec<_>>(), [2, 1, 0]);
+        drop(held);
+        for order in [SortOrder::Key, SortOrder::GroupRandom] {
+            assert!(!try_sort(&mut rows, &order, &ctx));
+        }
+        rows[0].key = PackedKey::Bytes(vec![1; 17].into_boxed_slice());
+        assert!(!try_sort(&mut rows, &order, &ctx));
+        assert_eq!(rows.iter().map(|r| r.id).collect::<Vec<_>>(), [2, 1, 0]);
+        assert_eq!(ctx.workspace.used(), ctx.directory_reserved_bytes());
+        Ok(())
+    }
+}

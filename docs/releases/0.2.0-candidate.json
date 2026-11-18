@@ -1,0 +1,345 @@
+{
+  "schema_version": 1,
+  "version": "0.2.0",
+  "status": "Historical unshipped focused639 candidate; superseded by the full current-source 0.2 release. Retained identities and acceptance apply only to this candidate.",
+  "version_approved": false,
+  "current_declared_version": "0.2.0",
+  "base_commit": "77eec95f8aa52f61bae1742bf8d5d3177d32a249",
+  "base_tree": "6be411bfeb8c1e88e61a7ed3e3f16ab775f93bd0",
+  "base_role": "preparation inventory only; not final release source",
+  "release_source_commit": "639d1fe97d985b1544df0932321c6a93cca2567b",
+  "release_source_tree": "b3bde79d552ee29760cb283d07938f9248cee0bb",
+  "dirty_source": false,
+  "included_delivered_issues": [
+    48,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    72,
+    74,
+    75,
+    76,
+    93,
+    96,
+    99,
+    118,
+    120,
+    151,
+    153,
+    154
+  ],
+  "excluded_pending_candidate": "Guide/Guided CLI, hosted redesign, server retirement, experimental promotion and unrelated later main changes excluded. Main ca481595 is documentation integration base only; selected branch omits Guide/redesign.",
+  "defaults": "unchanged; experiments remain opt-in",
+  "native": {
+    "windows_x86_64": {
+      "target": "x86_64-pc-windows-msvc",
+      "bytes": 4368896,
+      "sha256": "42772aa8bb8a76e27fe9d7a0e479b445250e164bdcb4da25fdae88a83536c5d2"
+    },
+    "linux_x86_64": {
+      "target": "x86_64-unknown-linux-gnu",
+      "bytes": 5380336,
+      "sha256": "979ade07540ac251d60da377e4d536d8cdaf414fcdcaaeefb61978fdbc1ce169",
+      "maximum_required_glibc_symbol": "2.39"
+    }
+  },
+  "hosted": {
+    "_headers": {
+      "bytes": 385,
+      "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1"
+    },
+    "app.js": {
+      "bytes": 62608,
+      "sha256": "89a6a6940765c6db1a0a8eb08f0d1ba1d7fefba09c2968b773fc059c77acde23"
+    },
+    "engine-worker.js": {
+      "bytes": 42781,
+      "sha256": "41e26203c5fba5d4751bf45aac940a2a17b27043d15902b29d2a90c4677d9e80"
+    },
+    "engine.wasm": {
+      "bytes": 2469712,
+      "sha256": "036abf2b61a9735b9bc9c0650d1fc0179793c37fb9ba383804681de3d725550c"
+    },
+    "index.html": {
+      "bytes": 8836,
+      "sha256": "7c5a0dea3884a3faaf03f3f37956f0bed3f7133a8ecfb253d5414160517a0c2a"
+    },
+    "storage-worker.js": {
+      "bytes": 3034,
+      "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6"
+    },
+    "style.css": {
+      "bytes": 14911,
+      "sha256": "da123fd1cc919783fb90e94f0c3c076fc57ff357879e53ba08a252f37fc8eef6"
+    }
+  },
+  "packages": {
+    "chopper-0.2.0-hosted.zip": {
+      "bytes": 873522,
+      "sha256": "c321df0c684439da7c622578b7685705cbf667e65f0039d7318674c7fc1f8e9d"
+    },
+    "chopper-0.2.0-windows-x86_64.zip": {
+      "bytes": 1804401,
+      "sha256": "bba46786609777f2722c6fec0563f6ce5ae32fb2dd630032889f56f3ab27be01"
+    },
+    "chopper-0.2.0-linux-x86_64.zip": {
+      "bytes": 2190534,
+      "sha256": "6a09fea10f62cdd1d504e83de06f597dcb218f3077ca745ac049d1d7df33e076"
+    }
+  },
+  "package_format_status": "Three exact ZIPs verified,23 members (8 Windows/8 Linux/7 hosted). Selected actual acceptance and exact local delivery passed; owner package/version/publication approval remains pending.",
+  "artifact_receipt": {
+    "name": "chopper-0.2.0-artifact-receipt.json",
+    "bytes": 6495,
+    "sha256": "1720f28a01cbbd7a30cbb8c8614b9efc2da01e57c765c625f51e8a5e3455c30d"
+  },
+  "checksums": {
+    "name": "SHA256SUMS",
+    "bytes": 389,
+    "sha256": "0a1c8a5c3ce4f60b6f21e861c7764acb99f568014082c38bb4f9f54455cb8b6a"
+  },
+  "source_input_sets": {
+    "evidence": "0.2.0-focused639-evidence.json",
+    "original_build_source_files": 1119,
+    "unchanged_runtime_input_files": 1116,
+    "original_build_commit": "feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d",
+    "source_reconciliation": {
+      "custody": "candidate_source",
+      "path": "scratch/focused-package-notices/source-reconciliation.json",
+      "bytes": 68141,
+      "sha256": "a5034cab5d27c3244aec4d08637f62afa0382faeaa43afc63ca59ba317da90f8"
+    },
+    "scope": "Original complete source inventories bound to feb9 attempts; selected639 changes three packaging/docs paths only. No new build-source claim."
+  },
+  "toolchains": {
+    "evidence": "0.2.0-focused639-evidence.json",
+    "linux_hosted_record": {
+      "custody": "candidate_source",
+      "path": "scratch/focused-production-artifacts-20261107T061837Z/records/toolchains.json",
+      "bytes": 2182,
+      "sha256": "a516d138b7c57c69e0a835824f83655c49ad356b60ef18decb051035eac58032"
+    },
+    "windows_record": {
+      "custody": "parent_evidence",
+      "path": "scratch/focused-windows-release-r1/native/build-binding.json",
+      "bytes": 191090,
+      "sha256": "666edb1ce9271888062e4d9056c75d1cadee4cc79c8f87e006868ff128dda3b4"
+    },
+    "actual_rust_cargo_rustdoc": "1.99.1",
+    "windows_sysroot_caveat": "Current actual Rust/Cargo/Rustdoc 1.99.1 binaries pinned. Prior failed Windows r1 rust-src install/rollback effect unassessed; no full-sysroot unchanged, repair or hermetic-build claim."
+  },
+  "validation_attempts": {
+    "evidence": "0.2.0-focused639-evidence.json",
+    "original_build_commit": "feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d",
+    "credit": "Linux default qualification 426 tests/9 checks; native Windows debug 422 tests/11 decoder-layout controls/4 encoding API cases. Three Linux/hosted production builds; one Windows release build/version/help. Eight combined real UI flows (7 fresh r3 + 1 hash-bound r2). Current extracted Linux package smoke 7 steps and Windows release package smoke passed.",
+    "not_credit": "Publication requires separate owner approval. No general throughput, total RSS, hardware-fault or unselected-platform claim."
+  },
+  "selected_targets": {
+    "native_platforms": [
+      "Windows CLI",
+      "Linux CLI",
+      "Windows native server UI",
+      "Linux native server UI"
+    ],
+    "hosted_platforms": [
+      "Windows desktop Chrome",
+      "Windows desktop Edge"
+    ],
+    "native_input_bytes": 10000000000,
+    "browser_input_bytes": 1000000000,
+    "status": "Selected native10GB Linux/Windows D/G, hosted1GB Chrome/Edge D/G and eight final-package cancellation/retry cases passed and delivered. Publication requires separate owner approval.",
+    "native_gui_limits": "Windows actual native input/output dialogs and ordinary filesystem smoke passed; Linux selected native claim is CLI-only, so Linux portal/Zenity dialogs are unrun and outside the selected milestone. No device-fault claim."
+  },
+  "predecessor": {
+    "version": "0.1.0",
+    "publication_record": "0.1.0-publication.json",
+    "github_retrieval": "verified locally; not R2 readback",
+    "native_windows_runtime": "isolated two-row strict-cap rehearsal passed",
+    "private_archive_readback": "Fresh scoped-reader readback passed: all 98 archive members, four exact released assets and 13 ZIP members; delivered in PR #188 at 7b061. No remote mutation or production restoration.",
+    "hosted_runtime_restoration": "Isolated Linux/WSL bundled Chromium 156.0.8078.4 rehearsal passed from exact retained GitHub 0.1.0 hosted assets; injected File/OPFS handles, exact two 33-byte CSVs under a 40-byte cap and valid completion marker; no fresh R2 runtime execution, installed Windows or deployment claim; separate scoped private archive readback is complete",
+    "historical_private_archive": "Existing 98-member, 11120640-byte archive and historical independent reader readback recorded in private operations release-publication-2026-10-29.md; no replacement upload",
+    "hosted_runtime_record": "0.1.0-hosted-rollback-2026-11-07.json",
+    "private_archive_readback_record": "0.1.0-private-readback-2026-11-12.json"
+  },
+  "automatic_hosted_ci": "CI disabled_manually by owner instruction; #101 trigger patch retained, failed run42107563826 preserved, #79 restoration deferred until new owner instruction",
+  "publication_approved": false,
+  "tag_created": false,
+  "deployment_id": null,
+  "included_delivered_slices": [
+    {
+      "issue": 80,
+      "commit": "a6d38ca85a8910a9f91b9b8c3c75e673c37cb971",
+      "scope": "unchanged-size reservation entry only; #80 remains open"
+    }
+  ],
+  "packaging_inputs": {
+    "windows_x86_64": null,
+    "linux_x86_64": null,
+    "hosted_directory": null
+  },
+  "packaging_schema_version": 1,
+  "ci_policy": {
+    "mode": "local-only",
+    "required_delivery": "local-ci.py land with matching Linux and applicable native Windows receipts",
+    "hosted_restoration": "owner-deferred; not a gate while local-only CI is selected",
+    "product_release_acceptance": "still required"
+  },
+  "release_source_branch": "release/0.2.0-focused-source-151-153-154",
+  "runtime_build_commit": "feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d",
+  "runtime_build_tree": "57f6675f4e216d0b504c3063c17a2b37ab16ac20",
+  "evidence": "0.2.0-focused639-evidence.json",
+  "historical_evidence": "0.2.0-frozen606-evidence.json",
+  "acceptance_ledger": {
+    "103": {
+      "status": "closed",
+      "record": "0.2.0-native-scale-acceptance.json",
+      "scope": "Exact 10,000,000,000-byte D/G accepted on Linux/WSL and native Windows, independently verified with same-input seeded report parity. Windows G observed 712 sort runs and 16 merge operations; logical counters are not physical I/O or RSS. All four native slots consumed; failed sessions remain failed. Delivered through exact Linux/native Windows local gates at3f02e85.",
+      "delivery_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+      "delivery_pr": "https://github.com/jsmatfess/chopper/pull/193",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/103#issuecomment-6897408155",
+      "local_ci": {
+        "linux_sha256": "9d63a2de5fffdf34c7ad7b6b321562f6a5960b0f2a8b97f74a82c4cd2b7f280a",
+        "windows_sha256": "ab97d10a277c66bbef719ba03a38112263df5d01f97328b0299c91760243cb68"
+      },
+      "delivery_record_sha256": "50803e5fde07abd923a172baa52cabf49ef742986de6a37b6eda055b5cedf533"
+    },
+    "104": {
+      "status": "closed",
+      "scope": "All four selected1,000,000,000-byte Chrome/Edge D/G cells independently verified with exact same-input seeded cross-channel parity,64MiB/one worker and strict10MB CSV caps. G observed actual spill and truthful full-row interrupted merge traversal. Chrome G original harness failure remains failed; separate read-only completed-export recovery added no Run/claim. Current Edge SMALL15 at6afaffb and complete scale Tiny/D/G at94a4b76 passed normal and independent cleanup. Four canonical claims remain consumed. Delivered through exact Linux/native Windows local gates at3f02e85.",
+      "record": "0.2.0-browser-scale-acceptance.json",
+      "delivery_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+      "delivery_pr": "https://github.com/jsmatfess/chopper/pull/194",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/104#issuecomment-6897408897",
+      "local_ci": {
+        "linux_sha256": "9d63a2de5fffdf34c7ad7b6b321562f6a5960b0f2a8b97f74a82c4cd2b7f280a",
+        "windows_sha256": "ab97d10a277c66bbef719ba03a38112263df5d01f97328b0299c91760243cb68"
+      },
+      "delivery_record_sha256": "50803e5fde07abd923a172baa52cabf49ef742986de6a37b6eda055b5cedf533"
+    },
+    "105": {
+      "status": "closed",
+      "record": "0.2.0-final-package-smoke-acceptance.json",
+      "scope": "All8 selected final-package cancellation/recovery cases passed: Native processing/export cancellation; Chrome and Edge processing/export cancellation and malformed-after-valid-rows with preserved completed baseline and same-client retry. Actual system pickers/ordinary filesystems, no injected handle claim. Earlier native-dialog success and Windows CLI malformed/cleanup/overwrite proofs and Linux ordinary success plus Q8 malformed/preserved-export proof remain credited separately. Main/runtime/verifier identities and every failed attempt/charge retain their scopes. Delivered through exact Linux/native Windows local gates at3f02e85.",
+      "delivery_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+      "delivery_pr": "https://github.com/jsmatfess/chopper/pull/194",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/105#issuecomment-6897409755",
+      "local_ci": {
+        "linux_sha256": "9d63a2de5fffdf34c7ad7b6b321562f6a5960b0f2a8b97f74a82c4cd2b7f280a",
+        "windows_sha256": "ab97d10a277c66bbef719ba03a38112263df5d01f97328b0299c91760243cb68"
+      },
+      "delivery_record_sha256": "50803e5fde07abd923a172baa52cabf49ef742986de6a37b6eda055b5cedf533"
+    },
+    "91_recovery": {
+      "status": "scoped_checks_passed",
+      "scope": "Exact predecessor private readback delivered at 7b061: all 98 archive members, four released assets and 13 ZIP members verified. Existing isolated same-byte native/hosted runtime rehearsals retain their limits; no production restoration or deployment. Retain recovery archives through publication smoke and retention review.",
+      "record": "0.1.0-private-readback-2026-11-12.json",
+      "sha256": "b088ee092d5fee2ca916393734fd63a6c392779d5e75ba38e6880929518a2231",
+      "delivery_commit": "7b061b7467da93ddc1c727de0c9e97e4d8176cb4"
+    },
+    "version": {
+      "approved": false
+    },
+    "publication": {
+      "approved": false,
+      "tag_created": false,
+      "deployment_id": null
+    },
+    "178": {
+      "status": "closed",
+      "scope": "Complete native Tiny qualified at Linux harness 7aa7fe1 and Windows runtime 50c6465 with separately pinned verifier 919757f; both Windows 127-row D/G Runs, independent verification, malformed failure, all nine cleanup phases and independent Original/process proof passed. Harness delivered through exact Linux/native Windows local gates at 1f76; no scale or product-build relabelling.",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/178#issuecomment-6873691808",
+      "delivery_commit": "1f76a980f9eaccad65d253eb604d79e90e7e5480",
+      "delivery_record_sha256": "37290a4593faa2956dd728a90a3102d21d6b4d80d14e1c38c7a4c00158342516",
+      "linux_ci_sha256": "baf3c204f0673076c77cbd02babc00121f0bdedcbc51a3c7d1fbb84fee5f5ed0",
+      "windows_ci_sha256": "ec393cf62429c5607a8280d107e3fa28bf155de1f82c149f18e563dc2fe3d55b",
+      "windows_qualification_sha256": "7ac88169956cacf00c2568936e59497720540c9567a253cbec3742a1c1f90da8",
+      "windows_independent_sha256": "6779bd13c28d3b5bee593a63f9f59fe60ce519bfa45c617e29c7e226a93bdbe8"
+    },
+    "179": {
+      "status": "delivered",
+      "scope": "Actual-picker success/header-cap failure, all 15 SMALL contracts including deliberate-kill cases, and BrowserScale Tiny success/inline controlled failure have distinct Chrome/Edge runtime proofs. Delivered at 217dff6 through exact final Linux/Windows local gates; no 1 GB scale, complete #105 or publication credit. Failed attempts and charges remain retained.",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/179#issuecomment-6875376519",
+      "chrome_small": {
+        "harness": "63c01f2d34815bd60f672251e38aa592f48b4f77",
+        "runtime": "74cf796b4c86b898303644f074e94231f48d72dd",
+        "independent_sha256": "43e5ef0b82387395ccc4953fdd898bbd0bb3af63f0266b50e46a994b0f47fae9"
+      },
+      "edge_small": {
+        "harness": "4ef8aa6519ff38130ffa1b771ca71915bb6b6509",
+        "outcome_sha256": "85f6e564f8ff7f02a14aadd9e0c8cc4c4df559976cdbd7dbb70633caaaef455d",
+        "independent_supplement_sha256": "fa6158017401c2fdec614593891d405b77b98b39888d4ffaf494b1019a17ff99",
+        "audit_scope": "Raw independent audit remains failed for one access-denied PID; checked read-only supplement establishes that PID absent and combines all 349 process facts with the prior unchanged-Original proof. No administrative recovery or product retry."
+      },
+      "browser_scale": {
+        "harness": "ce245d243ad3828ed710ebd1534229719b95e2b6",
+        "chrome": {
+          "version": "157.0.8103.51",
+          "tiny_sha256": "2dc7e8b09a7a4dcb9f2a76bd190ed6b22fd16e987dd965bf2087eb04c99df523",
+          "independent_sha256": "fb4d8bfb2c409994bba815f900df2850a767afb7ce2584a004a68f4b4f8be1d4"
+        },
+        "edge": {
+          "version": "157.0.4341.46",
+          "tiny_sha256": "03b5345202202da83e16a2499575a1b63ecbe9c5b80962e043c879548def3b4f",
+          "independent_sha256": "3ac5d0f2c17ed25ecbfec69778dbbb6c733cffa9b0062eceb28c1bb3faad5c5a"
+        },
+        "scope": "Distinct installed-channel public Tiny success, independent CSV/manifest/marker verification, inline public one-byte engine failure, empty incomplete output/workspace/Web Lock cleanup, normal Original release and independent current-birth/byte0 proof. No scale or other-profile substitution."
+      },
+      "picker_browser_identity_comparison_sha256": "6511682fec660afe3afe6e0acb902330cf842c07f3960147127809a53bd62ad5",
+      "delivered_commit": "217dff6a52446417a79fa87581f3c03e5ada4aa6",
+      "delivery_pr": "https://github.com/jsmatfess/chopper/pull/187",
+      "delivery_comment": "https://github.com/jsmatfess/chopper/issues/179#issuecomment-6879821279",
+      "local_ci": {
+        "windows_sha256": "4702addace002051d43569ee68e8bfe2bf4dc70a2ed2df3efb44ee106361d230",
+        "linux_sha256": "34c56bdeadd7f5fd6560b2a224966dc6ffa713e06dfe363bf4717a884dce2ea4",
+        "windows_after_exit_sha256": "63fdec914d9114a9bc0dcf8777098a065986a0c20c7d2be6b9f6df3d79f6b553",
+        "delivery_outcome_sha256": "80b0eaaf7f8ddc07691875525fb1015360b70cea858392b11f9ca93608d45eb2"
+      }
+    },
+    "180": {
+      "status": "closed",
+      "scope": "Generated frozen-batch gate and actual bounded Windows generated batch passed at harness 6d4cda4; maintained Linux Tiny passed at 27a8466 with both D/G Runs, actual malformed-input failure, all nine cleanup roles and independent Original/process proof. Delivered at 2485fd4 through exact Linux/native Windows local gates. Tiny is not 10 GB/1 GB scale, complete #105 or publication acceptance; #176 stays open.",
+      "delivery_commit": "2485fd40167c5314d58f8398c63b179399801798",
+      "delivery_pr": "https://github.com/jsmatfess/chopper/pull/192",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/180#issuecomment-6883890593",
+      "delivery_record_sha256": "1196c22058faf6c39e95c53fd9e6b623ab0b15cf624887ec7226ced35cfd4f39",
+      "windows": {
+        "harness": "6d4cda449438b02926f789b36fb7e283e72fe0fa",
+        "batch_sha256": "b4ea4c82ecc0cdbaae48af0a4e479e4e81b301478df060f20bcafa6529103a34",
+        "independent_sha256": "169190a4b9543c460dc85ebcae2e1dd5ee818d77ab3aecd4bd46ad3bb66f608f",
+        "reused_input_bytes": 12800,
+        "generated_input_bytes": 0
+      },
+      "linux": {
+        "harness": "27a8466eedfca90043270fd8fb4f305797a6f5f3",
+        "qualification_sha256": "9654d7ee710f836be297164966541a04cb1de8be3e8007a7aecf74d27e200f29",
+        "independent_sha256": "2db95b583a7f4f2c31c4fdb3fe16c74cd35b8e9123f4f42969dc18d3255da878",
+        "administrative_recovery": false
+      },
+      "local_ci": {
+        "windows_sha256": "1191c215c9310c7fe8ff59a60cb0a8e38ec8d8cc507ca4a0f5f2fd0eace632f6",
+        "linux_sha256": "33f78ebf5684c17f51fb6bd12d6d48c5d139f81aecf17267457ba973b71dc02a",
+        "windows_after_exit_sha256": "c80b17822f09c58fce1c1f5ad966aa2c9d6cff6b9aa11a410c819993237e4dd9"
+      }
+    },
+    "87": {
+      "status": "closed",
+      "delivery_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+      "issue_comment": "https://github.com/jsmatfess/chopper/issues/87#issuecomment-6897410430",
+      "scope": "Selected Windows/Linux native10GB D/G, Windows Chrome/Edge hosted1GB D/G and actual final-package smoke mapped to exact accepted identities; deferred platforms/device faults/RSS/general workload claims remain outside scope."
+    }
+  },
+  "focused_fix_scope": {
+    "151": "Admitted native CLI Job decoding",
+    "153": "Preserve selected cp1252/Shift-JIS encoding through UI submission/export",
+    "154": "Native HTTP request deadlines, admission and shutdown fixes; complete vendored tiny_http notices included"
+  },
+  "focused_fix_delivery": "Main PR #155 (a4e295f), #156 (57ec6a0) and #157 (ca48159) delivered through local gates; issues #153/#154 closed with comments. These delivery receipts do not certify the divergent selected source or replace product acceptance.",
+  "superseded_for_publication": true,
+  "current_release_record": "https://github.com/jsmatfess/chopper/releases/tag/v0.2.0"
+}

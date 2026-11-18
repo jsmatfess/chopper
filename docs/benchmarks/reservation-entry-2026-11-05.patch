@@ -1,0 +1,13 @@
+diff --git a/crates/chopper/src/storage/adaptive.rs b/crates/chopper/src/storage/adaptive.rs
+index 1153a7a..bc58b03 100644
+--- a/crates/chopper/src/storage/adaptive.rs
++++ b/crates/chopper/src/storage/adaptive.rs
+@@ -166,0 +167 @@ impl Reservation {
++    #[inline]
+@@ -171,0 +173,6 @@ impl Reservation {
++        self.resize_changed(bytes)
++    }
++    // Changing a charge performs admission or releases bytes. Isolate that
++    // body so unchanged-size calls retain a small inline entry.
++    #[inline(never)]
++    fn resize_changed(&mut self, bytes: u64) -> Result<()> {

@@ -1,0 +1,136 @@
+{
+  "expected_facts": {
+    "known_pids": [
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111
+    ],
+    "unidentified_pids": [
+      112
+    ]
+  },
+  "forest": {
+    "captured": {
+      "pids": [
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111
+      ]
+    },
+    "identities": [
+      {
+        "created": 1010,
+        "pid": 101
+      },
+      {
+        "created": 1020,
+        "pid": 102
+      },
+      {
+        "created": 1030,
+        "pid": 103
+      },
+      {
+        "created": 1040,
+        "pid": 104
+      },
+      {
+        "created": 1050,
+        "pid": 105
+      },
+      {
+        "created": 1060,
+        "pid": 106
+      },
+      {
+        "created": 1070,
+        "pid": 107
+      },
+      {
+        "created": 1080,
+        "pid": 108
+      },
+      {
+        "created": 1090,
+        "pid": 109
+      },
+      {
+        "created": 1100,
+        "pid": 110
+      },
+      {
+        "created": 1110,
+        "pid": 111
+      }
+    ],
+    "last": {
+      "flags": 8192,
+      "kill_on_close": true,
+      "pids": [
+        103,
+        111,
+        107,
+        104,
+        101,
+        109,
+        102,
+        106,
+        112,
+        110,
+        105,
+        108
+      ]
+    },
+    "membershipChange": {
+      "actual": {
+        "pids": [
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111,
+          112
+        ]
+      },
+      "expected": {
+        "pids": [
+          101,
+          102,
+          103,
+          104,
+          105,
+          106,
+          107,
+          108,
+          109,
+          110,
+          111
+        ]
+      }
+    },
+    "retiredIdentities": []
+  },
+  "scope": "SOURCE-ONLY sanitized actual producer schema; PID/birth aliases, no runtime/acceptance credit"
+}

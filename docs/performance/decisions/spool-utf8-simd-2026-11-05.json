@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "spool-utf8-simd-2026-11-05",
+  "title": "Reject the unchanged spool UTF-8 SIMD wrapper",
+  "date": "2026-11-05",
+  "subsystem": "storage",
+  "question": "Does a safe SIMD wrapper reduce complete-Run cost while preserving strict errors?",
+  "disposition": "reject",
+  "outcome": "unfavorable",
+  "delivery": "unapplied",
+  "summary": "Both opposite-order pipeline pairs miss the frozen benefit rule; the wrapper and dependency change were reverted.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "One million plain probe-v1 rows; partition -> probabilistic allocation -> child uniform shuffle; four workers and 32-MiB job/shared limits.",
+      "Separate ordered-export negative control."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Six complete jobs preserve fields, IDs, groups, caps, CSV/Analysis parity and cleanup; recorded Linux/Windows local workflows cover their actual builds."
+  },
+  "limitations": [
+    "Small development cells and uncontrolled cache/background state do not establish general device, shape or tail performance.",
+    "Historical percentage gains are not additive; every comparison uses its own pinned baseline.",
+    "Sampled UTF-8 CPU share did not isolate spool callers.",
+    "Success on these checks does not show SIMD is unhelpful for every workload."
+  ],
+  "exclusions": [
+    "Unreplicated ordered control is not pooled with pipeline samples.",
+    "Component scans, old timing samples and coarse CPU counters are not independent speed evidence."
+  ],
+  "reopen_when": "A different named cost or materially different, justified integration is required; do not retune or relabel the unchanged rejected wrapper.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#strict-spool-utf-8-simd-wrapper-rejected-2026-11-05",
+      "sha256": "200ea7f403a84d3bab52c56cdffa09d81f420841b5b9eb18102756b9ea9a4e23"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/spool-utf8-simd-2026-11-05.json",
+      "sha256": "91938e88778dc2ea8cee192606641117c7a5238569af220b54d933724521d41a"
+    },
+    {
+      "path": "docs/benchmarks/spool-utf8-simd-2026-11-05.patch",
+      "sha256": "ae0a4e374a5ff5f866ba84e4c42f4e1f3c80e660ed7226e1356d30969ab44fe8"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

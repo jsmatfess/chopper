@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chopper performance decision v1",
+  "description": "Reviewed interpretation and applicability; never an independent benchmark observation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "title", "date", "subsystem", "question", "disposition", "outcome", "delivery", "summary", "scope", "validation", "limitations", "exclusions", "reopen_when", "supersedes", "sources", "artifacts", "contracts"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"},
+    "title": {"$ref": "#/$defs/text"},
+    "date": {"type": "string", "format": "date"},
+    "subsystem": {"enum": ["input", "storage", "output", "execution", "resources"]},
+    "question": {"$ref": "#/$defs/text"},
+    "disposition": {"enum": ["adopt", "retain-experimental", "reject", "block-promotion", "informational"]},
+    "outcome": {"enum": ["favorable", "unfavorable", "mixed", "inconclusive", "diagnostic", "acceptance-only"]},
+    "delivery": {"enum": ["default", "opt-in", "unapplied", "unchanged"]},
+    "summary": {"$ref": "#/$defs/text"},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtimes", "workloads", "measurement"],
+      "properties": {
+        "runtimes": {"$ref": "#/$defs/runtimes"},
+        "workloads": {"$ref": "#/$defs/texts"},
+        "measurement": {"enum": ["complete-run", "diagnostic", "acceptance-only", "mixed"]}
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtimes", "summary"],
+      "properties": {
+        "runtimes": {"$ref": "#/$defs/runtimes"},
+        "summary": {"$ref": "#/$defs/text"}
+      }
+    },
+    "limitations": {"$ref": "#/$defs/texts"},
+    "exclusions": {"$ref": "#/$defs/texts"},
+    "reopen_when": {"type": ["string", "null"], "minLength": 1},
+    "supersedes": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["section", "sha256"],
+        "properties": {
+          "section": {"type": "string", "pattern": "^docs/performance\\.md#[a-z0-9_-]+$"},
+          "sha256": {"$ref": "#/$defs/hash"}
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string", "pattern": "^docs/benchmarks/[^#]+$"},
+          "sha256": {"$ref": "#/$defs/hash"}
+        }
+      }
+    },
+    "contracts": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}}
+  },
+  "$defs": {
+    "text": {"type": "string", "minLength": 1},
+    "texts": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "runtime": {"enum": ["native-windows", "native-linux", "wasi-chromium", "wasi-chrome-persistent"]},
+    "runtimes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/runtime"}}
+  }
+}

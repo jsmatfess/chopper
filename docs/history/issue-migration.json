@@ -1,0 +1,194 @@
+{
+  "repository": "jsmatfess/chopper",
+  "issues": [
+    {
+      "original_kind": "issue",
+      "original_number": 79,
+      "original_title": "Restore automatic GitHub PR and main CI",
+      "original_state": "open",
+      "current_number": 21,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/21",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 80,
+      "original_title": "Resolve workload-led execution direction through targeted complete-job decisions",
+      "original_state": "open",
+      "current_number": 20,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/20",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 81,
+      "original_title": "Resolve terminal-direct output admission and delivery eligibility",
+      "original_state": "open",
+      "current_number": 19,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/19",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 82,
+      "original_title": "Resolve resident allocation retry value beyond explicit sort",
+      "original_state": "open",
+      "current_number": 18,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/18",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 83,
+      "original_title": "Resolve production eligibility for probabilistic allocation and shuffle fusion",
+      "original_state": "open",
+      "current_number": 17,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/17",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 84,
+      "original_title": "Reconcile future Auto, stage policy and default promotion with workload evidence",
+      "original_state": "open",
+      "current_number": 16,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/16",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 85,
+      "original_title": "Resolve E1 persistent-browser compact-spill retention",
+      "original_state": "open",
+      "current_number": 15,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/15",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 86,
+      "original_title": "Close the remaining resource-ownership boundaries",
+      "original_state": "open",
+      "current_number": 14,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/14",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 88,
+      "original_title": "Deliver the guided native CLI workflow after execution direction is established",
+      "original_state": "open",
+      "current_number": 13,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/13",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 89,
+      "original_title": "Retire the local web UI and native server while preserving CLI and hosted capabilities",
+      "original_state": "open",
+      "current_number": 12,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/12",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 90,
+      "original_title": "Adapt bounded experiment control to persistent-browser jobs when needed",
+      "original_state": "open",
+      "current_number": 11,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/11",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 91,
+      "original_title": "Prepare and validate the next selected release snapshot and hosted cutover",
+      "original_state": "open",
+      "current_number": 10,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/10",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 94,
+      "original_title": "Admit retained absolute publication destination paths after discovery",
+      "original_state": "open",
+      "current_number": 9,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/9",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 107,
+      "original_title": "Guided CLI B: compose ordered pipelines and explore bounded column values",
+      "original_state": "open",
+      "current_number": 8,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/8",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 108,
+      "original_title": "Guided CLI C: complete CSV formats, archives and optional native pickers",
+      "original_state": "open",
+      "current_number": 7,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/7",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 181,
+      "original_title": "Escalate repeated acceptance failures to a bounded design review",
+      "original_state": "open",
+      "current_number": 6,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/6",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 182,
+      "original_title": "Share proven controller cleanup behavior across native and hosted paths",
+      "original_state": "open",
+      "current_number": 5,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/5",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 183,
+      "original_title": "Report verified product observations separately from attempt integrity",
+      "original_state": "open",
+      "current_number": 4,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/4",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 184,
+      "original_title": "Base release forecasts on completed acceptance milestones",
+      "original_state": "open",
+      "current_number": 3,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/3",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 195,
+      "original_title": "Close parser-owned PackedRow field shrink overlap in memory accounting",
+      "original_state": "open",
+      "current_number": 2,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/2",
+      "state": "open"
+    },
+    {
+      "original_kind": "issue",
+      "original_number": 196,
+      "original_title": "Resolve 0.2 Rust dependency advisories and validate the vendored WASI allocator",
+      "original_state": "open",
+      "current_number": 1,
+      "current_url": "https://github.com/jsmatfess/chopper/issues/1",
+      "state": "open"
+    }
+  ]
+}

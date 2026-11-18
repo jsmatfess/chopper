@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-11-15",
+  "scope": "Selected native D/G scale acceptance for issue #103; validation tooling delivered at3f02e85; publication requires separate approval.",
+  "issue": "https://github.com/jsmatfess/chopper/issues/103",
+  "separate_browser_scale_scope": "https://github.com/jsmatfess/chopper/issues/104",
+  "selected_product": {
+    "source_commit": "639d1fe97d985b1544df0932321c6a93cca2567b",
+    "runtime_build_commit": "feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d",
+    "artifact_receipt_sha256": "1720f28a01cbbd7a30cbb8c8614b9efc2da01e57c765c625f51e8a5e3455c30d",
+    "linux_elf_sha256": "979ade07540ac251d60da377e4d536d8cdaf414fcdcaaeefb61978fdbc1ce169",
+    "windows_pe_sha256": "42772aa8bb8a76e27fe9d7a0e479b445250e164bdcb4da25fdae88a83536c5d2"
+  },
+  "workload": {
+    "input_bytes_each": 10000000000,
+    "engine_working_memory_bytes": 67108864,
+    "workers": 1,
+    "maximum_serialized_csv_bytes": 10000000,
+    "maximum_rows_per_chunk": 1000000,
+    "temporary_limit_bytes": 107374182400,
+    "windows_owned_storage_limit_bytes": 171798691840,
+    "memory_scope": "Engine working-allocation accounting, not RSS. Inputs exceed the selected working memory; G additionally demonstrates external sorting."
+  },
+  "linux": {
+    "plan_sha256": "4beb2941b38de4bdb2a39b62b18245b8710e4fa3e8fe4e11e8f705afd1a1e695",
+    "completion_sha256": "28adafb41ba52ca3111cb39f0fb295110f769e7c2263f5b81a79b763f096583e",
+    "D": {
+      "report_sha256": "17bd91e5360003f7b4ecf41a2a33f18a08d71eebb8e248c4f0f6f8bf6b23b1ad",
+      "canonical_claim_sha256": "da172e9194842dc4b205902babc9c30f17c87cb4bdfa1467ae8b352c593b9a38"
+    },
+    "G": {
+      "report_sha256": "25587c74b4ed9548ef675b1abfb39dff40b90a9df58cb81cfd17613600570796",
+      "canonical_claim_sha256": "d0d41d618f7fcc8a278ac05d814456f82933e1309e16824bc40f2e23b7bb1187"
+    },
+    "scope": "Existing accepted Linux D/G retained without rerun or slot refund."
+  },
+  "windows": {
+    "D": {
+      "harness_commit": "3f06f23355638542cad10eac0388e4c68d74b435",
+      "plan_sha256": "53f96ffe6a48db2ec1d5f251c902c6acb0c1463f9f51186940e1392d391c2189",
+      "report_sha256": "a4f29d7b16f549ace1c2c7e8b2cc13e21f3989cffad9c3eae392d99e20df68d1",
+      "canonical_claim_sha256": "023538a24b311ee54fb837a95d8bd2c8f51d7c3f79db17c68b1d53f878e6f581",
+      "normal_failed_session_independent_sha256": "fc72dfffbc05dc5b2d165a7c4051324eb55e6e983ad9cb068b71e39da4608525",
+      "data_rows": 99999999,
+      "scope": "Accepted D report retained separately. Its overall session failed during later G generation; it remains failed. D does not claim external sorting.",
+      "seeded_report_equal_linux_peer": true
+    },
+    "G": {
+      "harness_commit": "8a543afc50be4748144d84654db13f3d38b333dc",
+      "plan_sha256": "33dadf0b148f0a2b98b1754b2d3c0ad0d1e1472af9926362e92f332e1088a563",
+      "preflight_sha256": "caed548ce156212b5d1c281933f2aa7b65a046da55cc4e8c8f24484818fad06d",
+      "report_sha256": "600273bbffe9e637abfba1030f2e1f3b4498d28cf4a8ce666f1217c61bca64f0",
+      "canonical_claim_sha256": "093541dbbf90e9c99e3ffa9f974bc464e0196fda090efaf9daa1506aec86fd1b",
+      "scale_result_sha256": "8be3e723ca9b1c88011026dfa78d2e898d01d7c529c6625b2fdbbe7f48fbff34",
+      "independent_after_exit_sha256": "20d2402b6da667bd048ba3140d58db9f27fafdf64d79d8d6e0a289a3ea7feae0",
+      "data_rows": 9999999,
+      "chunks": 1016,
+      "groups": 16,
+      "maximum_chunk_bytes": 10000000,
+      "seeded_report_equal_linux_peer": true,
+      "spill_facts": {
+        "merge_inputs": 720,
+        "merge_operations": 16,
+        "resident_sorts": 0,
+        "sort_runs": 712,
+        "temporary_bytes_read": 40215112667,
+        "temporary_bytes_written": 50216042204,
+        "temporary_cleanup_failures": 0
+      },
+      "current_session_slots_consumed": 1,
+      "current_cleanup_roles": [
+        "G-generation",
+        "G-Run",
+        "G-verify"
+      ],
+      "normal_original_release": true,
+      "independent_owned_birth_proofs": 65,
+      "administrative_cleanup": false
+    },
+    "family_slots_consumed": 2,
+    "fresh_changed_guard_tiny": {
+      "qualification_sha256": "0f24bb2f652dd35101913f739fc3611a13709310d0dca6a36b4e4f86318e6bdb",
+      "independent_sha256": "ea0d25d9743f732bd64ce0e331c98db857e98dbc06135389d7afeaf7d26c4fff",
+      "scope": "Complete 127-row D/G, malformed recovery and nine cleanup roles; separate from Large acceptance."
+    }
+  },
+  "custody_and_limits": {
+    "private_raw_evidence_retained": true,
+    "final_outcome_sha256": "e37f96bda12fbf7806edb757dabc5e54ba8c240101a369ed8b58876a240923d9",
+    "source_relevance_sha256": "e49ca192a64f5d1ea785ef3e44f3ed7349adc852310ec0412c582caa81886cb5",
+    "failed_attempts_and_all_charges_retained": true,
+    "observer_administrative_retirement": "Failed read-only capacity helper only; not product, normal Original closure or acceptance proof. Both failed full samples remain failed; unknown usage is not reconstructed.",
+    "metric_scope": "Temporary read/write counters are logical engine traffic, not physical I/O, RSS or measured allocation peaks.",
+    "claim_scope": "Selected binaries, workloads, seeds and host/runtime bindings only; no general performance, browser-scale, macOS or arbitrary-build claim.",
+    "publication_authorized": false,
+    "integrated_code_relevance": {
+      "code_commit": "94a4b7687648835f83e5d7e3404e5b98da90496c",
+      "record_sha256": "b31c6cdb9cf8e6397f420ff53acdc12d5392baf731dce3bc452bde2a65d76e15",
+      "scope": "Four actual native scale proofs retain their original identities; only Windows G qualified at8a. All14 native helper files are byte-identical in integrated94; changed qualification functions are BrowserScale-only cold admission and Small after-exit. Separate live browser root extraction is equivalent. This is relevant-path reuse, not full-module timing equivalence or relabeling of original proofs."
+    }
+  },
+  "delivery": {
+    "code_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+    "local_ci": {
+      "linux_sha256": "9d63a2de5fffdf34c7ad7b6b321562f6a5960b0f2a8b97f74a82c4cd2b7f280a",
+      "windows_sha256": "ab97d10a277c66bbef719ba03a38112263df5d01f97328b0299c91760243cb68"
+    },
+    "record_sha256": "50803e5fde07abd923a172baa52cabf49ef742986de6a37b6eda055b5cedf533",
+    "scope": "Validation-tooling/documentation delivery; selected product and actual qualification harnesses retain their original identities. Publication requires separate owner approval."
+  }
+}

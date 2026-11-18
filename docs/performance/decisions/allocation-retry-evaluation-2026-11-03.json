@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "allocation-retry-evaluation-2026-11-03",
+  "title": "Retain materialized-parent retry for scoped evaluation",
+  "date": "2026-11-03",
+  "subsystem": "execution",
+  "question": "Does resident allocation retry retain fitting-case pass savings across pressure and browser controls?",
+  "disposition": "retain-experimental",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Fitting cases remove a pass, while pressure retries add traffic and have inconclusive elapsed effects.",
+  "scope": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chrome-persistent"
+    ],
+    "workloads": [
+      "Pinned materialized-parent allocation development workloads, headroom controls and persistent Chrome."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chrome-persistent"
+    ],
+    "summary": "Exact metadata/row-frame and observed pre-emission retry checks pass in the recorded cases; post-preparation pressure remained unresolved at this decision."
+  },
+  "limitations": [
+    "Small development cells and uncontrolled cache/background state do not establish general device, shape or tail performance.",
+    "Historical percentage gains are not additive; every comparison uses its own pinned baseline.",
+    "No admission-domain inclusion proof or calibrated selector follows."
+  ],
+  "exclusions": [
+    "Retained baseline and harness failures remain excluded; no general speed or success claim."
+  ],
+  "reopen_when": "Resolve post-preparation emission pressure and benefit beyond explicit sort before general activation.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#allocation-retry-safety-and-runtime-evaluation-2026-11-03",
+      "sha256": "7f335d1390df4ff0ed15f1db2e83c9d8c8fa29eb4f9bdee91d9c588728f1b763"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/allocation-retry-evaluation-2026-11-03.json",
+      "sha256": "28bf9a88d29a654dac35ec371a2d2fa0af4f803a614dec6fec49e1e8e6c68183"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

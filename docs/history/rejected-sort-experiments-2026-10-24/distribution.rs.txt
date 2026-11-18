@@ -1,0 +1,345 @@
+//! Order-preserving experiment: lexicographic key-prefix distribution, followed
+//! by the existing comparator at leaves. Never substitutes random bucket order.
+use super::*;
+
+const FAN_OUT: usize = 16;
+const BUFFER: usize = 8192;
+const MAX_DEPTH: usize = 4;
+const MAX_PASSES: usize = 64;
+
+struct Bucket {
+    writer: BufWriter<SpillFile>,
+    memory: usize,
+}
+pub(super) struct Distribution {
+    ctx: Context,
+    depth: usize,
+    buckets: Vec<Option<Bucket>>,
+    _reservation: Reservation,
+}
+impl Distribution {
+    pub(super) fn new(ctx: &Context, depth: usize) -> Result<Self> {
+        ensure!(depth < MAX_DEPTH, "distribution depth exceeded");
+        let mut reservation = Reservation::new(ctx);
+        // Includes all writer buffers, metadata, and one buffered input reader.
+        reservation.resize(FAN_OUT * (BUFFER + 512) + 65536)?;
+        ctx.budget
+            .distribution_passes
+            .fetch_add(1, AtomicOrdering::Relaxed);
+        ctx.budget
+            .distribution_max_depth
+            .fetch_max((depth + 1) as u64, AtomicOrdering::Relaxed);
+        Ok(Self {
+            ctx: ctx.clone(),
+            depth,
+            buckets: (0..FAN_OUT).map(|_| None).collect(),
+            _reservation: reservation,
+        })
+    }
+    pub(super) fn push(&mut self, row: &PackedRow) -> Result<()> {
+        self.ctx.check()?;
+        let key = row.key.as_slice();
+        ensure!(
+            key.len() == 16,
+            "distribution requires a 16-byte random key"
+        );
+        let byte = key[self.depth / 2];
+        let index = if self.depth.is_multiple_of(2) {
+            byte >> 4
+        } else {
+            byte & 15
+        } as usize;
+        if self.buckets[index].is_none() {
+            self.buckets[index] = Some(Bucket {
+                writer: self.ctx.spill_writer(BUFFER)?,
+                memory: 0,
+            });
+        }
+        let bucket = self.buckets[index].as_mut().unwrap();
+        row.write(&mut bucket.writer)?;
+        // Saturation chooses further distribution/fallback, never resident fit.
+        bucket.memory = bucket.memory.saturating_add(row.memory());
+        self.ctx
+            .budget
+            .distribution_rows
+            .fetch_add(1, AtomicOrdering::Relaxed);
+        Ok(())
+    }
+    fn buckets(self) -> Result<Vec<(SpillFile, usize)>> {
+        let mut files = Vec::new();
+        for bucket in self.buckets.into_iter().flatten() {
+            let mut writer = bucket.writer;
+            writer.flush()?;
+            files.push((
+                writer.into_inner().map_err(|e| e.into_error())?,
+                bucket.memory,
+            ));
+        }
+        Ok(files)
+    }
+    pub(super) fn finish(
+        self,
+        order: SortOrder,
+        largest_row: usize,
+        largest_key: usize,
+    ) -> Result<SortedRows> {
+        let ctx = self.ctx.clone();
+        let mut reservation = Reservation::new(&ctx);
+        reservation.resize(65536)?;
+        let mut output = ctx.spill_writer(65536)?;
+        let buckets = self.buckets()?;
+        let mut passes = 1;
+        for (file, memory) in buckets {
+            emit_bucket(file, memory, 1, &mut passes, &ctx, &order, &mut output)?;
+        }
+        output.flush()?;
+        let file = output.into_inner().map_err(|e| e.into_error())?;
+        drop(reservation);
+        // A single composite ordered stream keeps final output consumers intact.
+        let mut runs = Catalog::new(&ctx);
+        runs.push(SortRun::single(&ctx, file)?)?;
+        Ok(SortedRows::Merge(MergeRows::new(
+            runs,
+            order,
+            &ctx,
+            largest_row,
+            largest_key,
+        )?))
+    }
+}
+fn emit_bucket(
+    file: SpillFile,
+    memory: usize,
+    depth: usize,
+    passes: &mut usize,
+    ctx: &Context,
+    order: &SortOrder,
+    output: &mut impl Write,
+) -> Result<()> {
+    ctx.check()?;
+    if memory > ctx.memory / 8 && depth < MAX_DEPTH && *passes < MAX_PASSES {
+        *passes += 1;
+        let mut distribution = Distribution::new(ctx, depth)?;
+        {
+            let mut decoding = Reservation::new(ctx);
+            decoding.resize(DISK_READ_BUFFER)?;
+            let mut reader = file.reader()?;
+            let mut previous = None;
+            while let Some(header) =
+                read_header_reserved(&mut reader, ctx.max_record, Some(decoding.sibling()))?
+            {
+                let row =
+                    PackedRow::read_fields_reusing(&mut reader, ctx.max_record, header, previous)?;
+                ensure!(
+                    row.memory() <= ctx.memory / 4,
+                    "packed record exceeds sort memory budget"
+                );
+                distribution.push(&row)?;
+                previous = Some(row);
+            }
+        }
+        drop(file);
+        // Release parent buffers before descending. Only the pending bucket
+        // files (at most 16 per level) remain open; no recursive writer tree.
+        for (file, memory) in distribution.buckets()? {
+            emit_bucket(file, memory, depth + 1, passes, ctx, order, output)?;
+        }
+    } else {
+        if memory > ctx.memory / 8 {
+            ctx.budget
+                .distribution_fallbacks
+                .fetch_add(1, AtomicOrdering::Relaxed);
+        }
+        // The existing bounded multiway sorter handles oversized/equal-prefix
+        // buckets and all collision refinement, even at the recursion limit.
+        let mut sorter = Sorter::new(ctx, order.clone());
+        sorter.distribution_enabled = false;
+        {
+            let mut decoding = Reservation::new(ctx);
+            decoding.resize(DISK_READ_BUFFER)?;
+            let mut reader = file.reader()?;
+            while let Some(header) =
+                read_header_reserved(&mut reader, ctx.max_record, Some(decoding.sibling()))?
+            {
+                ensure!(
+                    header.key.len() == 16,
+                    "distribution requires a 16-byte random key"
+                );
+                let capacity = header.key.capacity();
+                sorter.push_compact(
+                    PackedRow::read_fields(&mut reader, ctx.max_record, header)?,
+                    capacity,
+                )?;
+            }
+        }
+        drop(file);
+        sorter
+            .finish()?
+            .try_for_each_packed(|row| row.write(output))?;
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn context() -> Result<Context> {
+        Context::new(
+            &chopper_core::Resources {
+                memory_mb: 2,
+                workers: 1,
+                max_record_bytes: 65536,
+                ..Default::default()
+            },
+            Arc::new(AtomicBool::new(false)),
+            Arc::new(|_| {}),
+        )
+    }
+    #[test]
+    fn prefixes_collisions_and_multilevel_fallback_match_v1() -> Result<()> {
+        for mode in 0..3 {
+            let ctx = context()?;
+            let baseline = context()?;
+            let order = SortOrder::Random([9; 32]);
+            let mut expected = Sorter::new(&baseline, order.clone());
+            expected.distribution_enabled = false;
+            let mut candidate = Sorter::new(&ctx, order);
+            candidate.distribution_enabled = true;
+            for id in 0u64..12000 {
+                let mut key: [u8; 16] =
+                    blake3::hash(&id.to_le_bytes()).as_bytes()[..16].try_into()?;
+                match mode {
+                    0 => key.fill(7), // Force full-key collision refinement, including merges.
+                    1 => {
+                        key[0] = 0x11;
+                    } // Force multiple distribution levels.
+                    _ => {}
+                }
+                let row = Row {
+                    id,
+                    ordinal: 12000 - id,
+                    key: key.to_vec(),
+                    fields: vec![id.to_string(), "界\0\n".repeat(40)],
+                };
+                candidate.push(row.clone())?;
+                expected.push(row)?;
+            }
+            let expected: Vec<_> = expected
+                .finish()?
+                .map(|row| row.map(|row| row.id))
+                .collect::<Result<_>>()?;
+            let actual: Vec<_> = candidate
+                .finish()?
+                .map(|row| {
+                    row.map(|row| {
+                        assert_eq!(row.fields, vec![row.id.to_string(), "界\0\n".repeat(40)]);
+                        row.id
+                    })
+                })
+                .collect::<Result<_>>()?;
+            assert_eq!(actual, expected);
+            let diagnostics = ctx.diagnostics();
+            assert!(diagnostics["distribution_passes"].as_u64().unwrap() <= MAX_PASSES as u64);
+            assert!(diagnostics["distribution_max_depth"].as_u64().unwrap() <= MAX_DEPTH as u64);
+            if mode == 0 {
+                assert_eq!(diagnostics["distribution_max_depth"], MAX_DEPTH);
+                assert!(diagnostics["distribution_fallbacks"].as_u64().unwrap() > 0);
+                assert!(diagnostics["merge_operations"].as_u64().unwrap() > 2);
+            }
+            if mode == 1 {
+                assert!(diagnostics["distribution_passes"].as_u64().unwrap() > 2);
+            }
+            assert_eq!(ctx.used(), 0);
+            assert_eq!(ctx.workspace.used(), ctx.directory_reserved_bytes());
+        }
+        Ok(())
+    }
+    #[test]
+    fn total_pass_cap_falls_back_without_losing_rows() -> Result<()> {
+        let mut ctx = context()?;
+        // Tiny leaf threshold with the normal I/O workspace isolates the global
+        // pass cap without a huge fixture. Production memory policy is unchanged.
+        ctx.memory = 4096;
+        let mut distribution = Distribution::new(&ctx, 0)?;
+        for id in 0u64..1024 {
+            distribution.push(&PackedRow::new(Row {
+                id,
+                ordinal: id,
+                key: blake3::hash(&id.to_le_bytes()).as_bytes()[..16].to_vec(),
+                fields: vec![id.to_string(), "x".repeat(32)],
+            })?)?;
+        }
+        let rows = distribution.finish(SortOrder::Random([0; 32]), 512, 16)?;
+        let mut ids = rows
+            .map(|row| row.map(|row| row.id))
+            .collect::<Result<Vec<_>>>()?;
+        ids.sort_unstable();
+        assert_eq!(ids, (0..1024).collect::<Vec<_>>());
+        assert_eq!(ctx.diagnostics()["distribution_passes"], MAX_PASSES);
+        assert!(
+            ctx.diagnostics()["distribution_fallbacks"]
+                .as_u64()
+                .unwrap()
+                > 0
+        );
+        assert_eq!(ctx.used(), 0);
+        assert_eq!(ctx.workspace.used(), ctx.directory_reserved_bytes());
+        Ok(())
+    }
+
+    #[test]
+    fn corrupt_cancelled_and_disk_exhausted_distribution_releases_resources() -> Result<()> {
+        for bytes in [vec![0; 7], vec![0; 32], {
+            let mut bytes = Vec::new();
+            write_row(
+                &mut bytes,
+                &Row {
+                    id: 0,
+                    ordinal: 0,
+                    key: vec![1; 16],
+                    fields: vec!["x".into()],
+                },
+            )?;
+            bytes.pop();
+            bytes
+        }] {
+            let ctx = context()?;
+            let mut file = ctx.file()?;
+            file.write_all(&bytes)?;
+            #[cfg(feature = "experimental-spill-blocks")]
+            let file = SpillFile::from(file);
+            assert!(emit_bucket(
+                file,
+                0,
+                1,
+                &mut 1,
+                &ctx,
+                &SortOrder::Random([0; 32]),
+                &mut Vec::new()
+            )
+            .is_err());
+            assert_eq!(ctx.used(), 0);
+            assert_eq!(ctx.workspace.used(), ctx.directory_reserved_bytes());
+        }
+        for cancel in [true, false] {
+            let mut ctx = context()?;
+            if !cancel {
+                Arc::get_mut(&mut ctx.budget).unwrap().maximum = 1;
+            }
+            let mut distribution = Distribution::new(&ctx, 0)?;
+            ctx.budget.cancel.store(cancel, AtomicOrdering::Relaxed);
+            let result = distribution.push(&PackedRow::new(Row {
+                id: 1,
+                ordinal: 1,
+                key: vec![1; 16],
+                fields: vec!["x".repeat(BUFFER * 2)],
+            })?);
+            assert!(result.is_err());
+            drop(distribution);
+            assert_eq!(ctx.used(), 0);
+            assert_eq!(ctx.workspace.used(), ctx.directory_reserved_bytes());
+        }
+        Ok(())
+    }
+}

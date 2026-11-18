@@ -1,0 +1,98 @@
+{
+  "kind": "derived_storage_attribution",
+  "new_measured_runs": 0,
+  "scope": "Existing four complete native Windows Runs; logical temporary counters at returned Analysis, not physical I/O or a causal wall-time estimate.",
+  "correctness": "Fresh independent verifier for all four outputs and exact same-version seeded parity per pair; all recorded build/batch input and artifact hashes rechecked.",
+  "samples": [
+    {
+      "pair": 1,
+      "grouping": "sort",
+      "run": "scratch/cost-attribution-001/session/result-pair1-sort/run.json",
+      "analysis": "scratch/cost-attribution-001/session/result-pair1-sort/run.stdout.log",
+      "elapsed_seconds": 0.16845170001033694,
+      "predicted_routed_frame_bytes": 4702179,
+      "metrics": {
+        "temporary_bytes_read": 9788045,
+        "temporary_bytes_written": 12095993,
+        "temporary_files_created": 6,
+        "routed_groupings": 0,
+        "resident_sorts": 25,
+        "sort_rows": 60000,
+        "sort_seconds": 0.0052915
+      }
+    },
+    {
+      "pair": 1,
+      "grouping": "auto",
+      "run": "scratch/cost-attribution-001/session/result-pair1-auto/run.json",
+      "analysis": "scratch/cost-attribution-001/session/result-pair1-auto/run.stdout.log",
+      "elapsed_seconds": 0.23321739997481927,
+      "predicted_routed_frame_bytes": 4702179,
+      "metrics": {
+        "temporary_bytes_read": 14490224,
+        "temporary_bytes_written": 16798172,
+        "temporary_files_created": 22,
+        "routed_groupings": 8,
+        "resident_sorts": 17,
+        "sort_rows": 40000,
+        "sort_seconds": 0.0035008
+      }
+    },
+    {
+      "pair": 2,
+      "grouping": "sort",
+      "run": "scratch/cost-attribution-001/session/result-pair2-sort/run.json",
+      "analysis": "scratch/cost-attribution-001/session/result-pair2-sort/run.stdout.log",
+      "elapsed_seconds": 0.1526241999818012,
+      "predicted_routed_frame_bytes": 4702179,
+      "metrics": {
+        "temporary_bytes_read": 9788045,
+        "temporary_bytes_written": 12095993,
+        "temporary_files_created": 6,
+        "routed_groupings": 0,
+        "resident_sorts": 25,
+        "sort_rows": 60000,
+        "sort_seconds": 0.0050493
+      }
+    },
+    {
+      "pair": 2,
+      "grouping": "auto",
+      "run": "scratch/cost-attribution-001/session/result-pair2-auto/run.json",
+      "analysis": "scratch/cost-attribution-001/session/result-pair2-auto/run.stdout.log",
+      "elapsed_seconds": 0.23644400003831834,
+      "predicted_routed_frame_bytes": 4702179,
+      "metrics": {
+        "temporary_bytes_read": 14490224,
+        "temporary_bytes_written": 16798172,
+        "temporary_files_created": 22,
+        "routed_groupings": 8,
+        "resident_sorts": 17,
+        "sort_rows": 40000,
+        "sort_seconds": 0.0038775
+      }
+    }
+  ],
+  "sources_sha256": {
+    "scratch/baseline-20261102/native-build-approved/status.json": "28bcd4031108fa6dd7a865ee4dfa2bd3595b7f3ae03979a8fab62468942635d2",
+    "scratch/baseline-20261102/native-build-approved/manifest.json": "26f9272388ecd280610e32ce2a6399a38a342ece708ad4eee60414552194fc82",
+    "scratch/cost-attribution-001/session/controller-status.json": "2215105cdd4f910de1ab03c33c520881bbf40e1ca605a945f0c57b56b4f9a1ce",
+    "scratch/cost-attribution-001/session/batch-pair1/status.json": "2a765e138f76923b5609903c4b358b3f4eed9250e8f4d03c6fad6e9f6334f2e5",
+    "scratch/cost-attribution-001/session/fixture-pair1-sort/campaign.json": "9efee103cb621ca4fec439e99a073efd56edaf665c248bf5584fa98c3b62f2f8",
+    "scratch/cost-attribution-001/session/result-pair1-sort/run.json": "40f6d97b5c9b0a966eeb2fccfaf20011227f99ec95bfdff1ec7bb6d8350b75f4",
+    "scratch/cost-attribution-001/session/result-pair1-sort/run.stdout.log": "fc1e7e26f5ed603c091d29f179228a05ede1ad4e9643b7d242229bddc3300074",
+    "scratch/cost-attribution-001/session/fixture-pair1-auto/campaign.json": "247fc3d994cf2d5152bf60a3a7523aa3abb99cbf404d0367f31ef6d0a453953d",
+    "scratch/cost-attribution-001/session/result-pair1-auto/run.json": "23c510de351ef8da5bb1bedce5236c28e443606ae57d3e1c894d1abc9f756169",
+    "scratch/cost-attribution-001/session/result-pair1-auto/run.stdout.log": "394e95967a8a7599a5403903fc26caa579b17dfabc662ec5159fe41945a8b841",
+    "scratch/cost-attribution-001/session/batch-pair2/status.json": "e85848daad928809a5209c43804aff239dd0ec18cf98f7bfc5f4aaf45a89f083",
+    "scratch/cost-attribution-001/session/fixture-pair2-sort/campaign.json": "1f08192c84a0a8f0e8020ff1436b1093b329c949c5d98fff9e79bee4fc19f4ef",
+    "scratch/cost-attribution-001/session/result-pair2-sort/run.json": "fee3072743f02c26b1ad6be2e7c0fb176aaef867cfbc1fe3ffbcab1e294abfd1",
+    "scratch/cost-attribution-001/session/result-pair2-sort/run.stdout.log": "3c22516ae65c7be8ab14a90c409cba7ced3350e9d118850dbfcca8b1c7a915e4",
+    "scratch/cost-attribution-001/session/fixture-pair2-auto/campaign.json": "84d9a187acb9cd511b6a405649035320084b57753a2cb679fa10d0d2f6f36550",
+    "scratch/cost-attribution-001/session/result-pair2-auto/run.json": "001331c50271f137a9e44878eae64a8d25862b242e48e01b93d453970ac898bc",
+    "scratch/cost-attribution-001/session/result-pair2-auto/run.stdout.log": "a135643908af7eb60d072b1d8c11fa27a3a7ea3c0098e7ad23ed0270845a6e84"
+  },
+  "analysis_script_sha256": "6e88474ca0ce55aa1a5caf1a6face1395257924ae0eae97f9f68c0728887682a",
+  "runner_status_sha256": "0931c0b265e2da0f3e6c2a411b74da7dbb8d9c94956797bdd9bd70f54447ce53",
+  "source_contract": "PackedRow::write: 40 bytes fixed framing including 8-byte allocation key, plus 8-byte length and UTF-8 payload per field; all 20000 rows traverse routing once."
+}

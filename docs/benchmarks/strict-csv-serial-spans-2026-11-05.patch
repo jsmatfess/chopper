@@ -1,0 +1,98 @@
+--- a/crates/chopper-core/src/csv.rs
++++ b/crates/chopper-core/src/csv.rs
+@@ -555,0 +556,23 @@
++                        // A complete unquoted field can be copied straight into
++                        // an admitted destination. Structural/quoted/split
++                        // fields keep the strict scalar path and scratch owner.
++                        let end = data.get(n).copied();
++                        if state == 0
++                            && field.is_empty()
++                            && end.is_some_and(|b| b == self.settings.delimiter as u8 || b == b'\n')
++                            && fields.field_slice(
++                                count,
++                                &data[..n],
++                                bytes.saturating_add(1).saturating_add(count * 32),
++                                self.maximum,
++                            )?
++                        {
++                            self.reader.consume(n + 1);
++                            bytes += 1;
++                            count += 1;
++                            touched = true;
++                            if end == Some(b'\n') {
++                                return Ok(Some(count));
++                            }
++                            continue;
++                        }
+@@ -641,0 +665,9 @@
++    fn field_slice(
++        &mut self,
++        _index: usize,
++        _bytes: &[u8],
++        _working_bytes: usize,
++        _maximum: usize,
++    ) -> Result<bool> {
++        Ok(false)
++    }
+@@ -703,0 +736,36 @@
++    fn field_slice(
++        &mut self,
++        index: usize,
++        bytes: &[u8],
++        working_bytes: usize,
++        maximum: usize,
++    ) -> Result<bool> {
++        let Some(field) = self.fields.get(index) else {
++            return Ok(false);
++        };
++        ensure!(
++            working_bytes <= maximum,
++            "record exceeds max_record_bytes working limit"
++        );
++        let value = std::str::from_utf8(bytes)?;
++        let old = field.capacity();
++        if value.len() <= old {
++            let field = &mut self.fields[index];
++            field.clear();
++            field.push_str(value);
++            return Ok(true);
++        }
++        let other = self.total() - old;
++        let mut buffer = std::mem::take(&mut self.fields[index]).into_bytes();
++        buffer.clear();
++        let result = grow_buffer(&mut buffer, value.len(), other, self.reserve);
++        if result.is_ok() {
++            buffer.extend_from_slice(value.as_bytes());
++        }
++        self.payload_capacity = self.payload_capacity - old + buffer.capacity();
++        self.fields[index] = String::from_utf8(buffer)?;
++        result?;
++        self.update()?;
++        Ok(true)
++    }
++
+@@ -752,0 +821,24 @@
++    fn field_slice(
++        &mut self,
++        _index: usize,
++        bytes: &[u8],
++        working_bytes: usize,
++        maximum: usize,
++    ) -> Result<bool> {
++        ensure!(
++            working_bytes <= maximum,
++            "record exceeds max_record_bytes working limit"
++        );
++        std::str::from_utf8(bytes)?;
++        grow_buffer(
++            &mut self.record.bytes,
++            8 + bytes.len(),
++            self.scratch_capacity,
++            self.reserve,
++        )?;
++        self.record
++            .bytes
++            .extend_from_slice(&(bytes.len() as u64).to_le_bytes());
++        self.record.bytes.extend_from_slice(bytes);
++        Ok(true)
++    }

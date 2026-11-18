@@ -1,0 +1,2 @@
+# Optional authenticated R2 S3 reader; ordinary evidence checks remain stdlib-only.
+boto3==1.43.121

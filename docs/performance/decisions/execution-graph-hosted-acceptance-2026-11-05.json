@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "execution-graph-hosted-acceptance-2026-11-05",
+  "title": "Retain hosted execution graph acceptance within its measured build",
+  "date": "2026-11-05",
+  "subsystem": "execution",
+  "question": "Does the recorded graph instrumentation meet the overhead and artifact acceptance gates in its tested hosted scope?",
+  "disposition": "informational",
+  "outcome": "acceptance-only",
+  "delivery": "unapplied",
+  "summary": "All 126 retained eligible jobs verify and all eight overhead cells pass on the pre-merge build; the execution graph remains local and performance of the main-integrated engine is unmeasured.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Direct, resident/fused, external merge and high-cardinality synthetic complete Runs, graph disabled/collapsed/expanded, fresh persistent Chromium Headless Shell OPFS profiles on Linux/WSL."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "The unchanged compact receipt references pre-merge native/UI, portable WASM compile, hosted graph/lifecycle, resource-denial and production-package attempts. Actual Linux checks run in WSL; this does not establish native Windows/macOS coverage. Merged-source correctness is separate and does not transfer old performance acceptance. Merged source db1ae50 separately passes Linux/WSL default/all-feature/UI/portable checks, bundled Chromium graph/lifecycle/termination and both resource variants, with production restored. The first hosted plan omitted a codec-helper launch-time hash; its supplemental snapshot and limitation are retained."
+  },
+  "limitations": [
+    "Acceptance belongs to source 488525ef0c6465f994b39247c8237ff70c8eb3ca and the exact production assets recorded in the report, not the engine after integrating origin/main 80894c6f0ba13ce1fa940e87002a97450b0dff06.",
+    "Precision extensions followed unmet gates; uncertainty is conditional paired bootstrap with no population, tail or optional-stopping-adjusted confidence claim.",
+    "Local raw originals remain outside the public catalog; summary extraction is not normalized speed-comparison eligibility.",
+    "No native Windows/macOS, installed Chrome/Edge, browser RSS cap or physical-I/O performance claim."
+  ],
+  "exclusions": [
+    "Interrupted first cohort, calibration, controls and diagnostics remain retained but excluded from eligible cells.",
+    "Earlier unmet 72/108-job reports reuse original observations and are not independent executions.",
+    "Correctness durations and cleanup/polling completion clocks are not primary overhead samples."
+  ],
+  "reopen_when": "A changed build requires separately authorized matched measurements before claiming its performance acceptance; this record does not authorize a rerun.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#hosted-execution-graph-126-retained-jobs-accepted-2026-11-05",
+      "sha256": "2b71c1a7c7eabe4b54c41923fbf64a752f72bb5fca7babca27180d99826d44aa"
+    },
+    {
+      "section": "docs/performance.md#execution-graph-evidence-conformance-and-merge-scope-2026-11-05",
+      "sha256": "99b25b27fe6707b3ed503981be5faec9596d0382da16fcf8b5e0b320ee1d0757"
+    },
+    {
+      "section": "docs/performance.md#execution-graph-merged-source-correctness-2026-11-05",
+      "sha256": "0ed3f5d43372b7b2c6ff92cfe0f269c85b7a43fa87ae393b575859fe989440f4"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/execution-graph-overhead-004-summary-2026-11-05.json",
+      "sha256": "0accc096510b5e7767bffed9ec557fb6d4614b6ee0e4e171f1dab8ece0631830"
+    },
+    {
+      "path": "docs/benchmarks/execution-graph-validation-summary-2026-11-05.json",
+      "sha256": "0ed7cf8da268afa1244953385e1200f77ca90079223d23dc63539f9a4a98c169"
+    },
+    {
+      "path": "docs/benchmarks/execution-graph-comparison-locations-2026-11-05.json",
+      "sha256": "aefe8d6d354813f680fba31ac90314011d69c5e7120fb6e5add0191b3d1b86d5"
+    },
+    {
+      "path": "docs/benchmarks/execution-graph-merge-validation-2026-11-05.json",
+      "sha256": "c1bd573196f9b3cc545246f760b9609606dc4485ec39b9f3984fec29bc19f055"
+    }
+  ],
+  "contracts": [
+    "docs/execution-observation.md",
+    "docs/execution-graph-acceptance.md",
+    "docs/specification.md",
+    "docs/validation.md",
+    "docs/ci.md"
+  ]
+}

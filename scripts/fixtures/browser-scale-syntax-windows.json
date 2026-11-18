@@ -1,0 +1,26 @@
+{
+  "schema": "chopper-recorded-syntax-closure-v1",
+  "source_log_sha256": "e3f5a2de6d9e1a325cc919dac974fce7c786a87b333b26aea60c20c2b8f6a489",
+  "source_commit": "9bd5ebc11a1968d68b6b5465750fc9c305947bb9",
+  "platform": "Windows",
+  "file_inputs": [
+    "scripts/scale_acceptance/browser-bundle.mjs",
+    "scripts/scale_acceptance/browser-export.mjs",
+    "scripts/browser-artifacts.mjs",
+    "scripts/browser-graph-codec.mjs",
+    "scripts/browser-small-observer.mjs",
+    "scripts/browser-launch.mjs",
+    "scripts/scale_acceptance/browser-driver.mjs",
+    "scripts/scale_acceptance/browser-scale-driver.mjs"
+  ],
+  "compiler": "ui/node_modules/esbuild/lib/main.js",
+  "package_files": [
+    "ui/node_modules/esbuild/lib/main.js",
+    "ui/node_modules/playwright/index.mjs"
+  ],
+  "undeclared_in_original": [
+    "scripts/browser-graph-codec.mjs",
+    "scripts/browser-small-observer.mjs",
+    "scripts/browser-launch.mjs"
+  ]
+}

@@ -1,0 +1,392 @@
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -1,4 +1,6 @@
+ mod analysis_text;
++#[cfg(test)]
++mod prob_shuffle_controls;
+ pub use analysis_text::AnalysisText;
+ mod timings;
+ pub use timings::Timings;
+@@ -566,18 +568,21 @@
+             index += 1;
+             continue;
+         }
+-        let following_shuffles = if matches!(
+-            operation,
+-            Operation::Partition { .. } | Operation::Assign { .. }
+-        ) {
+-            job.operations
+-                .iter()
+-                .skip(index + 1)
+-                .take_while(|op| uniform(op))
+-                .count()
+-        } else {
+-            0
+-        };
++        let following_shuffles =
++            if matches!(
++                operation,
++                Operation::Partition { .. } | Operation::Assign { .. }
++            ) || (matches!(operation, Operation::AssignProbabilistic { .. })
++                && prob_shuffle_enabled())
++            {
++                job.operations
++                    .iter()
++                    .skip(index + 1)
++                    .take_while(|op| uniform(op))
++                    .count()
++            } else {
++                0
++            };
+         let shuffle_after = (following_shuffles > 0).then_some(index + following_shuffles);
+         let balanced_after = if uniform(operation) {
+             if let Some(Operation::Balanced { files }) = next {
+@@ -1636,6 +1641,19 @@
+     let domain = random::json_domain(job.seed.as_ref().unwrap(), step as u64, &parent.lineage)?;
+     match operation {
+         Operation::Interleaved { .. } | Operation::AssignProbabilistic { .. } => {
++            if let Some(shuffle_step) = shuffle_after {
++                return streaming::fused_probabilistic_shuffle(
++                    data,
++                    parent,
++                    operation,
++                    step,
++                    job.seed.as_deref().unwrap(),
++                    shuffle_step,
++                    analysis,
++                    output,
++                    ctx,
++                );
++            }
+             let mut routed = StreamingGroups::new(
+                 operation,
+                 analysis.header.as_deref(),
+@@ -2450,3 +2468,15 @@
+         Ok(())
+     }
+ }
++
++// Isolated experiment selector; production sources are untouched.
++fn prob_shuffle_enabled() -> bool {
++    #[cfg(test)]
++    {
++        prob_shuffle_controls::enabled()
++    }
++    #[cfg(not(test))]
++    {
++        true
++    }
++}
+--- a/crates/chopper/src/engine/streaming.rs
++++ b/crates/chopper/src/engine/streaming.rs
+@@ -542,3 +542,83 @@
+         Ok(())
+     }
+ }
++
++// Isolated whole-plan candidate. The membership generator and every logical domain
++// stay unchanged; one GroupRandom sort replaces routing+Dataset+child sorts.
++#[allow(clippy::too_many_arguments)]
++pub(super) fn fused_probabilistic_shuffle(
++    data: &Dataset,
++    parent: &Group,
++    operation: &Operation,
++    step: usize,
++    seed: &str,
++    shuffle_step: usize,
++    analysis: &Analysis,
++    output: &mut impl RowSink,
++    ctx: &Context,
++) -> Result<()> {
++    ensure!(
++        matches!(operation, Operation::AssignProbabilistic { .. }),
++        "probabilistic fusion only"
++    );
++    let domain = random::json_domain(seed, step as u64, &parent.lineage)?;
++    let mut membership = Membership::new(
++        operation,
++        analysis.header.as_deref(),
++        analysis.columns,
++        domain,
++        ctx,
++    )?;
++    let mut memory = Reservation::new(ctx);
++    let mut domains = Vec::new();
++    memory.reserve_vec(&mut domains, membership.counts().len())?;
++    for index in 0..membership.counts().len() {
++        domains.push(child_metadata::domain(
++            parent,
++            &membership.entry(step, index),
++            seed,
++            shuffle_step,
++            ctx,
++        )?);
++    }
++    let mut sorter = Sorter::new(ctx, SortOrder::GroupRandom);
++    for row in data.packed_rows(parent, ctx.max_record)? {
++        ctx.check()?;
++        let mut row = row?;
++        let index = membership.index(row.id, row.fields());
++        let key = OperationKey::allocation(
++            index as u64,
++            &domains[index],
++            row.id,
++            Reservation::new(ctx),
++            &mut sorter,
++        )?;
++        let capacity = key.install(&mut row, &mut sorter)?;
++        sorter.push_compact(row, capacity)?;
++    }
++    membership.validate_seen(membership.seen())?;
++    let mut rows = sorter.finish()?.reusing();
++    for (index, count) in membership.counts().iter().enumerate() {
++        ctx.check()?;
++        let mut owned = group_metadata::ClonedGroup::begin_child(
++            parent,
++            &membership.entry(step, index),
++            false,
++            output,
++            ctx,
++        )?;
++        let group = &mut owned.group;
++        for _ in 0..*count {
++            ctx.check()?;
++            let row = rows
++                .next()?
++                .context("truncated fused probabilistic allocation")?;
++            row.ordinal = group.rows;
++            row.key = PackedKey::Bytes(Box::default());
++            output.packed_row_ref(group, row)?;
++        }
++        ctx.check()?;
++        owned.finish(output)?;
++    }
++    Ok(())
++}
+--- /dev/null
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -0,0 +1,224 @@
++use super::*;
++use std::{
++    cell::Cell,
++    collections::{BTreeMap, BTreeSet},
++    fs,
++    sync::atomic::Ordering,
++};
++thread_local! { static ENABLED: Cell<bool> = const { Cell::new(false) }; }
++pub(super) fn enabled() -> bool {
++    ENABLED.get()
++}
++fn payload(id: usize) -> String {
++    format!("note-{id}-{}", "x".repeat(24 + id % 97))
++}
++fn setup(n: usize) -> Result<(tempfile::TempDir, Job)> {
++    let dir = tempfile::tempdir()?;
++    let mut text = String::from("id,region,payload\n");
++    for id in 0..n {
++        text.push_str(&format!("{id},R{},{}\n", id % 4, payload(id)));
++    }
++    fs::write(dir.path().join("input.csv"), text)?;
++    fs::create_dir(dir.path().join("temp"))?;
++    let mut job = Job {
++        input: dir.path().join("input.csv").to_string_lossy().into(),
++        output: dir.path().join("output").to_string_lossy().into(),
++        seed: Some("prob-shuffle-fusion-v1".into()),
++        operations: vec![
++            Operation::Partition {
++                columns: vec![Column::Index(1)],
++            },
++            Operation::AssignProbabilistic {
++                groups: vec![
++                    Allocation {
++                        name: "treatment".into(),
++                        percent: "80".into(),
++                    },
++                    Allocation {
++                        name: "control".into(),
++                        percent: "20".into(),
++                    },
++                    Allocation {
++                        name: "empty".into(),
++                        percent: "0".into(),
++                    },
++                ],
++                strata: vec![],
++            },
++            Operation::Shuffle {
++                strategy: Shuffle::Uniform,
++            },
++        ],
++        ..Default::default()
++    };
++    job.resources.memory_mb = 32.into();
++    job.resources.workers = 1;
++    job.resources.max_record_bytes = 1048576;
++    job.resources.temp_dir = Some(dir.path().join("temp").to_string_lossy().into());
++    job.limits.rows = Some(1024);
++    job.limits.bytes = Some(65536);
++    Ok((dir, job))
++}
++fn verify(dir: &std::path::Path, job: &Job, n: usize, a: &Analysis) -> Result<serde_json::Value> {
++    let mut files = BTreeMap::new();
++    let mut records = Vec::new();
++    let mut ids = BTreeSet::new();
++    for entry in fs::read_dir(&job.output)? {
++        let e = entry?;
++        let name = e.file_name().to_string_lossy().into_owned();
++        let bytes = fs::read(e.path())?;
++        if name.ends_with(".csv") {
++            assert!(bytes.len() <= 65536);
++            let text = std::str::from_utf8(&bytes)?;
++            let mut lines = text.lines();
++            assert_eq!(lines.next(), Some("id,region,payload"));
++            let mut count = 0;
++            for line in lines {
++                let fields: Vec<_> = line.split(',').collect();
++                assert_eq!(fields.len(), 3);
++                let id = fields[0].parse::<usize>()?;
++                assert!(id < n && ids.insert(id));
++                assert_eq!(fields[1], format!("R{}", id % 4));
++                assert_eq!(fields[2], payload(id));
++                count += 1;
++            }
++            assert!(count <= 1024);
++            files.insert(name, bytes);
++        } else {
++            assert_eq!(name, "manifest.jsonl");
++            for line in bytes.split(|b| *b == b'\n').filter(|l| !l.is_empty()) {
++                let v: serde_json::Value = serde_json::from_slice(line)?;
++                if v["type"] == "output" {
++                    records.push(v);
++                }
++            }
++        }
++    }
++    assert_eq!(ids, (0..n).collect());
++    assert_eq!(a.rows, n as u64);
++    assert_eq!(a.groups, 12);
++    assert_eq!(files.len() as u64, a.output_files);
++    assert!(!fs::read_dir(dir)?.any(|e| e
++        .unwrap()
++        .file_name()
++        .to_string_lossy()
++        .starts_with(".chopper-staging-")));
++    let analysis = serde_json::to_value(a)?;
++    let logical: serde_json::Map<String, serde_json::Value> = [
++        "algorithm_version",
++        "column_values",
++        "seed",
++        "rows",
++        "columns",
++        "header",
++        "preview",
++        "logical_digest",
++        "groups",
++        "output_files",
++        "output_csv_bytes",
++        "largest_record_bytes",
++        "memory_budget_bytes",
++        "workers",
++        "stages",
++        "warnings",
++        "accuracy",
++    ]
++    .into_iter()
++    .map(|k| (k.into(), analysis[k].clone()))
++    .collect();
++    Ok(serde_json::json!({"files":files,"outputs":records,"analysis":logical}))
++}
++#[test]
++fn probabilistic_shuffle_whole_plan_control() -> Result<()> {
++    panel("gate", 2000, vec![false, true], Grouping::Auto)?;
++    panel(
++        "measure",
++        20000,
++        vec![false, true, true, false],
++        Grouping::Auto,
++    )?;
++    for candidate in [false, true] {
++        ENABLED.set(candidate);
++        let (dir, job) = setup(2000)?;
++        let cancel = Arc::new(AtomicBool::new(false));
++        let set = cancel.clone();
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let e = run_with_memory_pool(
++            job.clone(),
++            cancel,
++            Arc::new(move |p| {
++                if p.phase == "Ready for confirmation" {
++                    set.store(true, Ordering::Relaxed);
++                }
++            }),
++            pool.clone(),
++        )
++        .expect_err("cancel final preparation");
++        assert!(format!("{e:#}").contains("job cancelled"));
++        assert!(!std::path::Path::new(&job.output).exists());
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert_eq!(fs::read_dir(dir.path())?.count(), 2);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "PROB_SHUFFLE_CANCEL {}",
++            serde_json::json!({"candidate":candidate,"cleanup":true,"outcome":"cancelled"})
++        );
++    }
++    ENABLED.set(false);
++    Ok(())
++}
++
++fn panel(label: &str, n: usize, schedule: Vec<bool>, grouping: Grouping) -> Result<()> {
++    let mut reference = None;
++    for (rep, candidate) in schedule.into_iter().enumerate() {
++        ENABLED.set(candidate);
++        let (dir, mut job) = setup(n)?;
++        job.resources.grouping = grouping;
++        let input_hash = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let started = std::time::Instant::now();
++        let prepared = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let ctx = prepared.ctx.clone();
++        let a = prepared.execute()?;
++        let seconds = started.elapsed().as_secs_f64();
++        let diagnostics = ctx.diagnostics();
++        // Verification is outside the complete engine preparation/publication timer.
++        let checked = verify(dir.path(), &job, n, &a)?;
++        if let Some(ref old) = reference {
++            assert_eq!(&checked, old);
++        } else {
++            reference = Some(checked);
++        }
++        drop(a);
++        drop(ctx);
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "PROB_SHUFFLE {}",
++            serde_json::json!({"label":label,"rows":n,"candidate":candidate,"rep":rep,"seconds":seconds,"input_blake3":input_hash,"diagnostics":diagnostics,"exact_output_verified":true,"cleanup":true})
++        );
++    }
++    Ok(())
++}
++#[test]
++fn probabilistic_shuffle_optimized_panel() -> Result<()> {
++    panel(
++        "optimized-auto",
++        20000,
++        vec![false, true, true, false],
++        Grouping::Auto,
++    )?;
++    panel(
++        "explicit-sort-control",
++        20000,
++        vec![false, true],
++        Grouping::Sort,
++    )?;
++    ENABLED.set(false);
++    Ok(())
++}

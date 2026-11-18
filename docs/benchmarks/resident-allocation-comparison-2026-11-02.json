@@ -1,0 +1,200 @@
+{
+  "type": "derived_resident_allocation_comparison",
+  "scope": "Four existing development-fixture complete native Windows CLI Runs. Two opposite-order pairs; no physical I/O, causal wall-time fraction, tail or selector claim.",
+  "features": [],
+  "cache": "uncontrolled",
+  "samples": [
+    {
+      "pair": 1,
+      "cell": "baseline-auto",
+      "order": 0,
+      "elapsed_seconds": 0.35592930001439527,
+      "timing_scope": "CLI process launch through successful Run/publication; verification separate",
+      "binary_sha256": "b9a8f8c890472b0ab012e462e08e37092e329aeadd589236daf900ff2d813e79",
+      "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+      "seed": "workload-baseline-v1",
+      "policy": "seeded_v1",
+      "rows": 20000,
+      "columns": 7,
+      "memory_budget_bytes": 67108864,
+      "workers": 1,
+      "analysis_timings": {
+        "final_serialization": 0.0,
+        "ingest_and_fused_operations": 0.0334385,
+        "remaining_operations": 0.1300026
+      },
+      "diagnostics": {
+        "temporary_bytes_read": 14490224,
+        "temporary_bytes_written": 16798172,
+        "temporary_files_created": 22,
+        "routed_groupings": 8,
+        "routing_fallbacks": 0,
+        "routing_reused_runs": 0,
+        "resident_sorts": 17,
+        "sort_rows": 40000,
+        "sort_runs": 0,
+        "sort_seconds": 0.003622,
+        "peak_workspace_reserved_bytes": 8057072,
+        "temporary_cleanup_failures": 0
+      },
+      "sources": {
+        "scratch/resident-allocation/comparison/session/result-pair1-sort/run.json": "2e8cf8daee479ddb922ca1b1e212d83dba11d2cefd81502db82d197b189ec6a9",
+        "scratch/resident-allocation/comparison/session/result-pair1-sort/run.stdout.log": "2759a0f075397c1b70dd92d9d1ccb2f8635af6b0c630b369f7653e405456d0c6"
+      }
+    },
+    {
+      "pair": 1,
+      "cell": "resident-auto",
+      "order": 1,
+      "elapsed_seconds": 0.27199499995913357,
+      "timing_scope": "CLI process launch through successful Run/publication; verification separate",
+      "binary_sha256": "fbc0c9e87150b59422829747029212e8e3a96a91046c6973f627fc2a7c234515",
+      "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+      "seed": "workload-baseline-v1",
+      "policy": "seeded_v1",
+      "rows": 20000,
+      "columns": 7,
+      "memory_budget_bytes": 67108864,
+      "workers": 1,
+      "analysis_timings": {
+        "final_serialization": 1e-07,
+        "ingest_and_fused_operations": 0.0289015,
+        "remaining_operations": 0.0536143
+      },
+      "diagnostics": {
+        "temporary_bytes_read": 9788045,
+        "temporary_bytes_written": 12095993,
+        "temporary_files_created": 6,
+        "routed_groupings": 0,
+        "routing_fallbacks": 0,
+        "routing_reused_runs": 0,
+        "resident_sorts": 25,
+        "sort_rows": 60000,
+        "sort_runs": 0,
+        "sort_seconds": 0.0049086,
+        "peak_workspace_reserved_bytes": 8057072,
+        "temporary_cleanup_failures": 0
+      },
+      "sources": {
+        "scratch/resident-allocation/comparison/session/result-pair1-auto/run.json": "4391fd541ae77309735b1e7982be57fd01e5fbf40c3dd99ed01cd4c269910c56",
+        "scratch/resident-allocation/comparison/session/result-pair1-auto/run.stdout.log": "1dc522f4834b7e769b8706c25ee19765c0a8d4bc31a732014d581f2543bf6de8"
+      }
+    },
+    {
+      "pair": 2,
+      "cell": "baseline-auto",
+      "order": 1,
+      "elapsed_seconds": 0.22837649995926768,
+      "timing_scope": "CLI process launch through successful Run/publication; verification separate",
+      "binary_sha256": "b9a8f8c890472b0ab012e462e08e37092e329aeadd589236daf900ff2d813e79",
+      "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+      "seed": "workload-baseline-v1",
+      "policy": "seeded_v1",
+      "rows": 20000,
+      "columns": 7,
+      "memory_budget_bytes": 67108864,
+      "workers": 1,
+      "analysis_timings": {
+        "final_serialization": 1e-07,
+        "ingest_and_fused_operations": 0.0284767,
+        "remaining_operations": 0.1302907
+      },
+      "diagnostics": {
+        "temporary_bytes_read": 14490224,
+        "temporary_bytes_written": 16798172,
+        "temporary_files_created": 22,
+        "routed_groupings": 8,
+        "routing_fallbacks": 0,
+        "routing_reused_runs": 0,
+        "resident_sorts": 17,
+        "sort_rows": 40000,
+        "sort_runs": 0,
+        "sort_seconds": 0.0036712,
+        "peak_workspace_reserved_bytes": 8057072,
+        "temporary_cleanup_failures": 0
+      },
+      "sources": {
+        "scratch/resident-allocation/comparison/session/result-pair2-sort/run.json": "72a9b4cf6484508c831d9204866b78e6a8c4fc3185fd9bdec13b5a8b346b5396",
+        "scratch/resident-allocation/comparison/session/result-pair2-sort/run.stdout.log": "7b0675a052f118ec9d1e384c4a38967d37fffccc48d2b0bf48ef56b3c01de245"
+      }
+    },
+    {
+      "pair": 2,
+      "cell": "resident-auto",
+      "order": 0,
+      "elapsed_seconds": 0.15242299996316433,
+      "timing_scope": "CLI process launch through successful Run/publication; verification separate",
+      "binary_sha256": "fbc0c9e87150b59422829747029212e8e3a96a91046c6973f627fc2a7c234515",
+      "input_sha256": "5309d94e9a4d8d9ead497b20f70711d00fc61c67049cf068266098b25ab3f2ba",
+      "seed": "workload-baseline-v1",
+      "policy": "seeded_v1",
+      "rows": 20000,
+      "columns": 7,
+      "memory_budget_bytes": 67108864,
+      "workers": 1,
+      "analysis_timings": {
+        "final_serialization": 0.0,
+        "ingest_and_fused_operations": 0.0289701,
+        "remaining_operations": 0.0520372
+      },
+      "diagnostics": {
+        "temporary_bytes_read": 9788045,
+        "temporary_bytes_written": 12095993,
+        "temporary_files_created": 6,
+        "routed_groupings": 0,
+        "routing_fallbacks": 0,
+        "routing_reused_runs": 0,
+        "resident_sorts": 25,
+        "sort_rows": 60000,
+        "sort_runs": 0,
+        "sort_seconds": 0.0050345,
+        "peak_workspace_reserved_bytes": 8057072,
+        "temporary_cleanup_failures": 0
+      },
+      "sources": {
+        "scratch/resident-allocation/comparison/session/result-pair2-auto/run.json": "a5cd662865f3bc6781445ad3b97b79352a41f120a6f1019aa93827722469a9a0",
+        "scratch/resident-allocation/comparison/session/result-pair2-auto/run.stdout.log": "e7c80f2d878137afb013fc33a1ae51299829b2f2ab5893ceac50f1a75208bb1b"
+      }
+    }
+  ],
+  "references": {
+    "scratch/resident-allocation/build-batch-v3/status.json": "0e276a2b2714059c5b204dbf9dc65b9c4ad4cc439b235077eba158f725297210",
+    "scratch/resident-allocation/build-batch-v3/manifest.json": "9e0445637904a2b1271f6801344885fee1909fbb1d8aa6cdbb560f85f75d7e06",
+    "scratch/resident-allocation/comparison/session/controller-status.json": "008809d6c5a0a8338b2a62963c152cbdf45b1882835309fee26130d5c5a019e1",
+    "scratch/resident-allocation/comparison/session/session.json": "da644d6fe6776b21e5918fb5b793d74e35d785f603895b8acfa8b80a46f6e408",
+    "scratch/resident-allocation/comparison/session/check-pair1/verified.json": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef",
+    "scratch/resident-allocation/comparison/session/check-pair2/verified.json": "d6ae5826e5b69cafe02e828dceb7216f90fb249cddd3637a17339a1d416d67ef"
+  },
+  "summary": {
+    "baseline-auto": {
+      "n": 2,
+      "median_seconds": 0.29215289998683147,
+      "min_seconds": 0.22837649995926768,
+      "max_seconds": 0.35592930001439527
+    },
+    "resident-auto": {
+      "n": 2,
+      "median_seconds": 0.21220899996114895,
+      "min_seconds": 0.15242299996316433,
+      "max_seconds": 0.27199499995913357
+    }
+  },
+  "candidate_minus_baseline_seconds": [
+    -0.0839343000552617,
+    -0.07595349999610335
+  ],
+  "postflight": {
+    "all_recorded_build_and_batch_inputs_artifacts_rehashed": true,
+    "file_identity_checks": 9597
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+  "controller_accounting": {
+    "status": "stopped",
+    "elapsed_seconds": 67.98738670349121,
+    "stored_bytes": 29223853,
+    "peak_observed_bytes": 31276624,
+    "runs": 4
+  },
+  "experimental_patch_sha256": "5a3a12ec8fe70ff1f29769e5c3fb31136d79926bc36b0b12f98afbf062dcbeb4"
+}

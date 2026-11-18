@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "buffered-random-draws-2026-11-16",
+  "title": "Reuse all words of keyed blocks for bounded draws",
+  "date": "2026-11-16",
+  "subsystem": "execution",
+  "question": "Can fixed-block word reuse improve current-path randomization without seed replay requirements?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Buffer repeated bounded draws and retain the original single-use categorical path; remove public seed inputs independently. Final native resident Fisher\u2013Yates improves modestly; hosted effects are small and variable.",
+  "scope": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "120003-row resident Fisher\u2013Yates, 150003-row exact allocation, 250003-row external uniform/direct controls; one worker and 32/256 MiB.",
+      "Separate 1000000-row native direct control; five native/three browser primary pairs and seven confirmation pairs."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Independent exact fields, ID conservation, quotas, lineage, metadata, encoded caps and cleanup; bounded-word/rejection oracle and permutation multiplicity; seed-input rejection and saved-job omission. Final native/browser checks recorded in the comparison receipt."
+  },
+  "limitations": [
+    "Small warm WSL2/ext4 and persistent bundled Chromium cells; no native Windows/macOS, installed-browser, 25-million-row or scale claim.",
+    "Initial direct control regressed; a separately scoped larger repeat did not reproduce it. Neither result establishes a direct-split gain.",
+    "External uniform shuffle has no demonstrated improvement; browser exact-allocation effect is negligible.",
+    "Raw receipts and frozen source forests are local ignored scratch artifacts; no external archive upload or public evidence publication.",
+    "Final seed-free hosted rechecks did not reproduce the initial browser gain. Probabilistic controls have overlapping ranges and small mixed effects; no probabilistic speedup is claimed."
+  ],
+  "exclusions": [
+    "Failed native temporary-directory warmup and rounded timed-wait measurements.",
+    "Browser warmups with warning/path-translation verifier assumptions."
+  ],
+  "reopen_when": "A current target-workload profile attributes material cost to remaining random-key generation or storage passes; require new matched complete-job evidence.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#buffered-random-final-transfer-2026-11-16",
+      "sha256": "347622ab0eb7d7fc7cd13fd7607754abdebac7c44fcd8845be24d6278e5c436a"
+    },
+    {
+      "section": "docs/performance.md#buffered-random-draws-and-seed-removal-2026-11-16",
+      "sha256": "a5fdaddfb976e2d74b3a90bfb9d69bb904da8a33bad451119d68f407180a9939"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/buffered-random-draws-summary-2026-11-16.json",
+      "sha256": "6a959c77feb7ee1d7612ebb10980c89ebf5e9a720c3673f6a1236a74d06ef1fb"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/resource-policy-research.md#random-source-buffering-and-public-seed-removal-2026-11-16"
+  ]
+}

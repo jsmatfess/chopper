@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-15",
+  "subsystem": "execution",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#shuffle-swarm-decisions-2026-11-15",
+      "sha256": "9d6630a478f692ff092bf8158c374588ef0c8b799bc7e186b73c67cc0af2e81a"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/shuffle-swarm-summary-2026-11-15.json",
+      "sha256": "30e3beb60e4b02e8f9c01393664c0ea5bbb236249aa5bc6f19b1aeeb4f9468ae"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-swarm-archive-receipt-2026-11-15.json",
+      "sha256": "af4e167cf48ffe2eabb3a0a9e8568daf80ec101b1707b119ea82d188863a9a6c"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/execution-decisions.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md"
+  ],
+  "id": "shuffle-mixed-elision-2026-11-15",
+  "title": "Elide earlier random-key shuffles before final Fisher-Yates",
+  "question": "Can earlier adjacent auto/uniform shuffles be removed while preserving every explicit resident requirement?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Use narrow mixed elision in ordinary builds, preserving final-method execution and every earlier explicit Fisher-Yates obligation.",
+  "scope": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Native root/retained, wide, upstream-fusion bypass and downstream exact assignment; three alternating pairs.",
+      "WASI root/retained and integrated downstream/composed complete jobs."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Independent final-permutation proof, original-index/domain and logical/physical observations, explicit resident-only failures, parent isolation, immutable prepared Analysis ownership and output/cleanup verification."
+  },
+  "limitations": [
+    "Native root effect is small; upstream fusion is an unchanged bypass, not a gain.",
+    "Wide-row fitting path increases RSS/reservations; identical shared-pressure success domains are not promised.",
+    "Small warm WSL2/bundled-Chromium development samples do not establish native Windows/macOS, other browsers, scale or tails.",
+    "Working reservations are not RSS; Analysis temporary counters precede publication; final committed-head CI is separate.",
+    "An inherited parser-owned shrink replacement-overlap gap remains in unchanged baseline producers; new mixed-prefix intake retains actual capacity.",
+    "Private archive readback used the existing OAuth principal; no separate scoped-reader or public publication claim."
+  ],
+  "exclusions": [
+    "Warmups, failed attempts and source-mismatched/quarantined WASM output are excluded from measured comparisons.",
+    "Derived summaries and repeated verification records are not additional observations; cells/runtimes are not pooled."
+  ],
+  "reopen_when": "Reopen broader mixed-method rules only with explicit-method/failure obligations and a separate measured eligible path."
+}

@@ -1,0 +1,1562 @@
+# Native acceptance controller (#126)
+
+Release execution requires the approved [actual-host preflight, complete tiny
+journeys and frozen batches](../../docs/validation-runner.md#actual-host-acceptance-preflight).
+Read-only preparation grants no session, slot or publication authority. Existing
+Linux evidence and Windows admission denials retain their recorded scope.
+
+`scripts/native-scale-runner.py` is distinct from the existing tiny/native
+`scale-acceptance.py plan/run` interface. It changes no product or existing
+planner behavior. Scale sessions implement only Linux D, Linux G, native Windows
+D, native Windows G, in that order. These tools do not authorize those Runs.
+Actions, real containment probes, product integration, builds, local CI, Windows
+dispatch, publication and archive operations remain parent-owned and unrun by
+the tooling controls. GitHub Actions remain disabled.
+
+## Complete tiny qualification (#178)
+
+Linux Tiny preparation uses the same maintained `prepare`, `supervise` and
+`after-exit` commands as Windows. Its `native-tiny-linux-preparation-v1`
+declaration pins `previous_plan`, `authorization` and `continuation`, selects
+`harness` (`root`/`commit`) and a fresh `namespace`, and supplies finite
+`preparation_limits` and `preflight_limits`. Optional `execution_kind` and
+`frozen_batch` have the qualification/batch meaning below. Optional
+`metadata_per_process` may lower the inherited positive `read_bytes`/`visits`
+allowances; it cannot increase either cap or reset cumulative usage. Preparation derives
+the complete harness map and new disabled plan; product/package/runtime, source
+ceiling and retained histories remain inherited. Its two fresh static preparation
+roots also count toward the source reservation. No old namespace is edited or
+enabled. Linux termination verifies its original flock descriptor and kernel
+release; the independent audit checks all nine phase EOF/reap receipts, empty or
+absent owned cgroups and absent owned PIDs. Windows retains its distinct Job,
+keeper and capture-EOF requirements.
+
+The native preflight consumer hashes the selected checker's complete recorded
+files before loading its pinned inventory function. It uses that producer's own
+`checker_sources()` rather than copying a helper list; historical producer roots
+retain their original inventories. Linux declarations may lower
+`metadata_per_process` within the retained template's limits. Budget the separate
+Linux operator meter as well as the controller's 25-process grant; neither a new
+namespace nor a continuation refunds earlier reads, visits or failed preparation.
+
+### Maintained Linux qualification
+
+The complete maintained Linux journey passed at frozen harness
+`27a8466eedfca90043270fd8fb4f305797a6f5f3`, with the selected `639d1fe` product
+and original package/runtime attribution. Both 127-row D/G Runs and independent
+output verification passed, followed by a real malformed-input failure after 127
+valid rows with prior exports preserved. All nine specific cleanup roles passed.
+The operator exited normally; independent audit
+`2db95b583a7f4f2c31c4fdb3fe16c74cd35b8e9123f4f42969dc18d3255da878`
+proved 19 owned PIDs absent, empty/absent owned cgroups and no locks on the original
+inode. Qualification receipt SHA-256 is
+`9654d7ee710f836be297164966541a04cb1de8be3e8007a7aecf74d27e200f29`.
+No administrative recovery was used. The cold constructor took 0.877 seconds
+under its two-second bound; all 74 disk observations passed, maximum 2.330 seconds
+under the separate 30-second bound. This is Tiny, with no scale-slot or
+external-memory acceptance. The older `7aa` Linux proof and all failed packets
+retain their original identities, charges and scope.
+
+The protocol control now exercises a real Linux declaration and all five owning
+proposal validators before the finish/audit path. A transport-only control that
+declared Windows and mocked those validators did not establish Linux coverage.
+Keep process controls distinct from this actual product journey.
+
+Independent exit auditing preserves each raw process-open denial. For an unknown
+historical birth, access denied can be discharged by a complete kernel process
+snapshot only when the target PID is absent, the observer canary is present,
+PIDs are unique, enumeration ends normally and the snapshot handle closes within
+the same audit deadline. A present PID or incomplete snapshot still denies; no
+birth or reuse is inferred. This follows the positive ordered keeper/Popen reap
+and all phase cleanup proofs. A separately reviewed verifier may use
+`after-exit --verifier-sha256 MODULE_SHA` to pin its own `native_tiny.py` while
+checking the qualified runtime's original frozen source hashes. Its receipt
+records the distinct verifier role; it does not rewrite or rerun the qualified
+product journey.
+
+Native preparation may select `execution_kind: "batch"` with a pinned
+`frozen_batch` definition generated by the [existing batch-definition command](../../docs/hosted-tiny-qualification.md#frozen-acceptance-batches).
+The native gate consumes the original matching preflight, complete Tiny,
+nine-phase independent proof and separately pinned verifier; the new attempt still
+runs its own actual-host preflight and full live admission. It compares execution
+file maps, package/executable/lineage contents, tools, host and guard policy while
+allowing fresh attempt roots/clocks. A relevant change requires a new immutable
+qualification/definition, never an amendment of old receipts. Explicit
+`execution_kind: "qualification"` remains the complete Tiny entry point and cannot
+present itself as a qualified acceptance batch. The explicit Windows Large
+preparer below requires its own matching qualification; Tiny never grants scale credit.
+
+Only two live Native JSON channels use Windows mutable snapshots:
+`capacity-sample.json` and `owner-sample.json`. Readers bind one opened version
+with share-read/write/delete and checked descriptor close; writers use the
+canonical same-directory POSIX replacement helper. Startup, approvals, history,
+worker results and closed cleanup records retain their immutable readers/writers;
+JSONL census streams retain their append protocol. Linux uses its existing I/O.
+The Native reader keeps its existing 1 MiB bound; smaller consumer bounds remain
+unchanged. Its budget callback admits an open visit before native acquisition,
+then charges the held descriptor's `fstat` size before reading. It never charges
+a possibly replaced pathname's new version or refunds a failed read. Descriptor
+close uncertainty latches the parent owner fence even after an empty worker Job.
+The native rename buffer must contain an explicit UTF-16 terminator; structure
+alignment padding is not a terminator guarantee. A real schedule produced a
+garbled destination suffix when the earlier buffer had no spare padding.
+Canonical small-consumer publication evidence does not establish compatibility
+with Native allocation sampling: the maintained six-case NTFS publication probe
+must also exercise the selected POSIX writer before a new whole Tiny attempt.
+`test-native-scale-runner.py --native-storage-control-probe DIR` selects that
+producer for the existing six allocation schedules, then checks 33 replacements
+while a bound reader retains the preceding version (including bodies above
+64 KiB and all four UTF-16 destination-length alignments). It records completed old allocation identities separately from the
+visible final file; those retired charges are not refunded. A completed probe
+can report an unsupported sampler and must then stop any conditional Tiny run.
+
+### Windows Large admission and canonical claims
+
+The `native-windows-scale-preparation-v1` declaration selects a fresh complete
+Windows Tiny plan and preflight, its frozen batch definition, accepted Linux
+D/G reports and their original claim chain, an OS-local retained storage point,
+and exact Linux claim-parent Python/runner pins. The existing `prepare` command
+produces the disabled Large plan and `native-scale-operator-v1` packet. Bootstrap
+inputs and preparation outputs remain disjoint, measured source reservations;
+prior elapsed time, allocation charges and failed envelopes are retained.
+A closed successful Tiny sibling advances the existing namespace baseline only
+with its exact plan, qualification, completion and nine-phase independent proof.
+The old point/history remain pinned. A terminal 64 MiB ceiling is retained as an
+upper debt with known final metadata; current files do not establish a historical
+physical peak. Fresh Windows Tiny uses the authorized cumulative 256 MiB disk
+ceiling, without a second growth metric or changes to its 1 MiB input recipe cap.
+When Large absorbs that namespace, the producer and lineage consumer use the
+same carry calculation: retain the missing closed-namespace upper debt after
+current file charges, including known final metadata, without counting those
+current files twice or claiming a physical peak.
+
+The generated `supervise --execute` command uses the existing controller,
+workers, live guards and six D/G generation/Run/verification cleanup roles.
+Before each actual Run, the generated Linux `claim-run --windows` command
+challenges the idle Windows Original owner and checks current native capacity
+and captured controller identity. Linux remains the sole writer of the original
+canonical family under its existing flock. Windows receives a byte-identical
+single-claim receipt; it never receives a copied or reset family ledger.
+A failed claimed Run still consumes that slot. D must verify before G starts.
+If D verified but the session subsequently failed before claiming G, an explicit
+`retained_windows_d` declaration may carry that D into a fresh G-only session.
+It pins the original plan, canonical/consumed/verified chain, independent report,
+normal failed-session closure, capacity log and original Windows start. Host,
+product and policy must match; all owned roots, sampled highwater floors and the
+original eight-hour OS stop remain inherited. This never repeats D or restores
+a consumed slot. The fresh harness still needs complete Tiny qualification.
+The continuation executes and independently audits exactly the three G roles;
+its successful result records one current-session slot, and the accepted D stays
+a separate historical proof. The original two-shape session still records two.
+The observer copies the already qualified Linux peer JSON into the fresh Tiny
+namespace before emitting its plan. It preserves the exact source bodies and
+pins, rejects aliases and existing destinations, and charges the imports to the
+namespace ceiling. A new namespace cannot keep peer paths in its predecessor.
+Before those writes, the producer canonicalizes inherited owned roots with the
+same disjoint-union helper used by its baselines and runs the full preparation
+validator. A retained ancestor subsumes its descendant roots without dropping
+their charges. If preparation stops after importing metadata but before Tiny,
+the existing retained-preparation record can bind that exact metadata namespace
+and its positive no-worker custody as an ordinary DATA envelope. Its ceiling is
+a conservative upper bound, not a measured physical peak or Tiny qualification.
+A newer pinned same-host source observation contributes its carried floor plus
+positive growth since that observation. The producer and History consumer use
+the same calculation; the accepted predecessor remains the execution lineage.
+This preserves intervening preparation charges even when an older retained-D
+floor dominates the predecessor calculation.
+The native reader waits for a complete bounded local claim record under the
+same campaign clock, then checks its identity before consumption. A partial file
+does not create a new deadline; a complete malformed or mismatched record denies.
+
+Each workload remains exactly 10 GB with 64 MiB engine working memory and one
+worker. Independent verification compares the accepted same-input Linux peer;
+G additionally requires positive disk sort-run and merge counters.
+`after-exit` checks the current execution's roles, owned process absence and the
+unchanged Original descriptor's release: six roles for a full D/G session, three
+for a retained-D/fresh-G continuation. Historical D proof remains separate.
+
+Selected native D/G scale acceptance is recorded in the
+[sanitized release evidence](../../docs/releases/0.2.0-native-scale-acceptance.json).
+The accepted Windows D report uses harness `3f06f23`; its later G-generation
+failure remains a failed overall session. Fresh G on `8a543af` consumed only the
+remaining G slot, matched the accepted Linux seeded report and demonstrated
+712 disk sort runs, 720 merge inputs and 16 merge operations. Its normal cleanup
+and independent after-exit proof cover exactly three current G roles and retain
+old D's proof separately. Both Linux and Windows canonical D/G claims remain
+consumed; no slot or historical charge was reset. Temporary byte counters describe
+logical engine traffic, not physical I/O, peak allocation or RSS. Failed read-only
+observer administrative retirement is not part of normal product acceptance.
+This is selected-build/workload coverage, not a general performance or publication
+claim.
+
+Mutable allocation observations distinguish checked same-identity monotone
+growth from replacement. The mutable, nonbaseline, unsealed sampler charges all
+three captured snapshots for growth without restarting the entire census.
+Replacement still requires a complete rescan; immutable, baseline and sealed
+files retain strict denial. Failures preserve bounded path, query and snapshot
+notes. A component regression establishes this handling, not the cause of an
+older failure whose path and snapshots were not retained.
+
+### Maintained Windows preparation and execution
+
+The complete Windows Tiny journey passed on the frozen `50c6465` harness with
+product `639d1fe`: real D and G Runs each processed 127 rows, independent
+membership/order verification passed, the malformed-input case failed as
+expected after 127 valid rows, and all nine phase cleanup proofs passed. Normal
+Original release and independent byte-zero availability were verified; no
+administrative recovery was used for this journey. The separately pinned
+`919757f` verifier preserved the qualified runtime and produced audit SHA-256
+`6779bd13c28d3b5bee593a63f9f59fe60ce519bfa45c617e29c7e226a93bdbe8`.
+Its final 212 process proofs include nine unknown historical births discharged
+by strict PID absence (`87`); the snapshot fallback was not exercised on that
+final audit. The earlier denied audit and raw access-denied observations remain.
+The private receipt is `native178-maintained-preparation-r7/terminal.json`,
+SHA-256 `01c301c59678a0d026e87a397507d3b1bab0c816b20da42fea3df8bb19d093cc`.
+This is Tiny coverage, with no scale-slot or external-memory acceptance. The
+earlier Linux proof retains its frozen `7aa` scope; the maintained Linux proof
+above has its own runtime identity. Exact final-head local CI and delivery are
+separate gates.
+
+The selected default path performs fresh full observations; the optional
+`source_pool` argument remains `None`. The custody/performance prototype below
+was not adopted by this qualification. The actual six-schedule allocation and
+33-publication control checks exposed and verified the UTF-16 rename terminator
+and retired-handle accounting fixes before this complete journey.
+
+Use `native-scale-runner.py stage` in the clean Linux/WSL source first. Its pinned
+`native-tiny-stage-v1` definition names the exact commit, fresh C: checkout,
+preparation DATA pin, separate output directory and finite staging allowances.
+It uses local Git init/fetch/checkout with independent full objects, no credential
+or network setup, and positively reaps its private Git process groups. It copies
+named Linux proof DATA to fresh NTFS inputs with same-producer source checks and
+destination hashes, then emits the exact native preparer command with its real
+Python override. Neither a private stager nor an old harness supplies the new CLI.
+`prepare` verifies the actual complete native Git/blob/body map again. No command
+resets, synchronizes or repairs a checkout. Private dated collectors, operator
+scripts and RPC drivers are historical evidence, not execution dependencies.
+
+The pinned `native-tiny-preparation-v1` definition supplies the previous admitted
+plan/preflight, selected harness root/commit, authority and continuation pins,
+fresh attempt name, finite preparation/preflight allowances, source charge ceiling
+and retained provenance records. Those records include the last complete source
+point, namespace point/history, retired fixture identities, component points,
+failed namespace audits and unknown-interval reservations. They are immutable
+data, never executable helpers. Optional pinned `preparation_reservation_updates`
+refine an existing DATA root through `native-preparation-reservation-refinement-v1`
+(root, previous/current byte bounds and unchanged source-q owner). Historical
+references merge by maximum regardless of order; an active declaration cannot
+reduce that maximum. Only positive growth is new debt, and every old reference
+remains provenance. Other DATA roots must remain disjoint from each other and
+observed source roots; a larger envelope is not measured allocation or a refund.
+Preparation derives current host/runtime file
+pins, source maps, nine-field baselines, no-refund carry, clocks and all current
+attempt paths. An absent failed-attempt data/campaign root can be omitted only
+with its independently audited no-start retirement; existing roots remain charged.
+
+```sh
+python3 -B scripts/native-scale-runner.py stage /ABS/stage.json /ABS/stage-receipt.json --sha256 STAGE_SHA
+# Execute the receipt's exact wsl_preparer_argv on the staged current commit.
+PYTHON -B scripts/native-scale-runner.py prepare /ABS/preparation.json /ABS/fresh-preparation --sha256 DEFINITION_SHA
+# After review, run the literal commands in fresh-preparation/prepared/packet.json.
+PYTHON -B scripts/native-scale-runner.py supervise /ABS/fresh-preparation/prepared/operator.json --sha256 OPERATOR_SHA --execute
+# Run only after the operator has exited, with its captures closed and reaped.
+PYTHON -E -s -B scripts/native-scale-runner.py after-exit /ABS/fresh-preparation/prepared/operator.json --sha256 OPERATOR_SHA
+```
+
+Preparation first runs the maintained temporary-file keeper lifecycle component
+through the same suspended `start_controller` and post-ACK Job as qualification.
+It introduces no extra strict containment ancestor; external ancestor Jobs stay
+unknown. It exercises the unchanged keeper guard and normal
+close, plus an injected constructor rejection whose reap/EOF/handle closure are
+native. It never opens the acceptance lock or requests a caretaker. Actor/keeper
+births and the temporary byte-zero release are checked independently before the
+fresh baseline includes its files and directory growth. Its 128 MiB read allowance
+is logical open accounting, not an RSS bound. An unsupported or incomplete result
+stops preparation; it cannot become Tiny qualification.
+The maintained Sally R3 component at harness `f10eee9` passed in 0.387 seconds:
+normal keeper close, constructor rejection, empty startup Job and independent
+three-birth/temporary-lock audit. The whole preparation then failed on the old
+Git byte pin; this is component evidence, not Tiny qualification. Its retained
+receipt is `/opt/chopper/private-acceptance/release-blockers-20261107/native178-maintained-preparation-r3/terminal.json`
+(SHA-256 `8a1af61967874234d511dfaa2f4c9072cebc30165112067adf31fe024ad7eb0b`).
+
+For the remaining Windows failure lifetimes, the maintained test entry supports
+`test-native-scale-runner.py --native-lifecycle-faults SELECTED_HARNESS FIXTURE DRIVER_SHA`.
+The separately pinned driver imports runtime modules from the selected frozen
+harness and changes only fixed fixture child argv. Real keeper, caretaker,
+suspended creation, Job census, stop/reap and response capture remain selected.
+The cases cover worker failure, explicit owned finish, controller EOF, missing
+cleanup-proof retention and failed-caretaker pipe cleanup. The driver supplies a manual `0x800` self-Job and fresh
+timestamp/ready setup records; these are not claims of a fresh full capacity
+guard or another actual ACK (the preparation lifecycle proves that ACK path).
+The retained-proof case records administrative teardown of its
+exact temporary keeper only after the contained tree is proven quiescent; it is
+not normal acceptance-owner release. A fresh process runs
+`--native-lifecycle-audit SELECTED_HARNESS FIXTURE DRIVER_SHA RESULT_SHA` for exact
+birth and temporary-lock release checks. Neither mode opens the acceptance lock,
+uses Chopper, qualifies Tiny, nor replaces its nine phase cleanups. Ordinary test
+descendants must follow actual readiness, and the parent must complete that
+handshake before awaiting their identities. Record the parent backup handle and
+actor birth immediately after duplication, before its first query. A completed
+producer failure ends the event wait; existing finish/close may release a failed
+fixture only after positive Job/worker/thread/capture cleanup. Unknown closure
+still retains ownership. Independent audit labels a closed failed measurement
+separately from a passing measurement. Unexpected pending calls or uncertain fixture ownership retain the component actor.
+Cleanup publication precedes caretaker process exit. Before testing a failed
+pipe, bind the caretaker's held birth and wait for its signal within the original
+fixture deadline; publication alone is not an exit proof.
+
+The first current-runtime failure component passed worker exit `7`, then rejected
+its own early descendant at the worker-only Job handoff. Its event wait reached
+90 seconds and retained the actor; administrative actor stop led to keeper EOF
+exit `0`, and an independent ten-birth/two-fixture audit passed. The retained
+record is `native178-current-lifecycle-r1` under the private release investigation;
+its administrative audit SHA-256 is
+`4fe2f787b7545c36c64127769bc9a1909aa98f627a1344c05d686a25811b0d8d`.
+The corrected four-case ordering and early-failure/positive-close behavior passed
+the recorded `native178-current-lifecycle-r2` component. The five-case
+`native178-maintained-r6-driver-supplement-r1` proof then passed the actual failed
+pipe path: the pulse rejected failed progress within two seconds, the keeper
+retained its temporary lock until existing finish/close, and the independent
+21-birth/five-fixture audit passed. This fixture proof remains separate from the
+complete Tiny journey above.
+
+`supervise --execute` explicitly grants just the pinned Tiny definition. It
+freezes the enabled plan, runs maintained actual-host preflight, starts the
+controller through the existing suspended/Job/ACK barrier, and validates each of
+the five complete owning proposal payloads before calling the existing approval
+writer. It does not poll for human approvals or invoke another private driver.
+Cold admission and the initial full live guard must pass before generation;
+every worker still requires a fresh complete guard. Product assertions remain
+the actual 127-row D/G work, streaming verification and malformed-input path.
+The separate after-exit command requires all nine phase cleanups on success and
+independent process-birth and unchanged-inode byte-zero proof. This Tiny protocol consumes no scale slots and grants no publication authority.
+
+A constructor rejection can close the no-worker attempt only after positive
+keeper reap, actual response EOF/join, capture/handle closure and zero caretaker
+requests, followed by complete controller Job closure. ACK delivery, pending
+queries and uncertain closes still retain ownership. A setup-only audit records
+cleanup without creating a qualification pass. Preserve the first failure and
+its costs; after two further failures in the same infrastructure subsystem,
+redesign that boundary before another retry.
+
+Preparation explicitly pins current tools at the retained role/path set. Stage
+and native preparation verify their bytes before work, and one list feeds the
+disabled reference, current plan and bindings. A same-path tool-byte refresh may
+advance retained Tiny history; all other policy/product changes still deny and
+Windows Large additionally requires the selected lineage and frozen-batch gate
+described below. Failed preparations retain their DATA envelopes
+through pinned manifest/declaration provenance even without a final observation.
+Historical raw declarations retain their producer paths and hashes. Nested
+reservation refinements resolve only through an explicitly declared current
+local pin with the same SHA, at staging, preparation and observation boundaries;
+all root, source-cap and monotone-reservation checks still apply.
+
+The same preparation function derives inherited component pins from the completed
+source point linked to the exact previous plan. It also discovers a closed
+temporary lifecycle receipt only at each retained preparation's owning output,
+checks its fixture owner and accounting fields, and adds every resulting body
+to Windows-history provenance. Staging, preparation and observation validate this
+closure before output writes; do not rebuild it by copying an older preparation's
+partial component list. Missing evidence still denies and failed envelopes remain.
+
+For WSL dispatch of a prepared packet, hash-bind the stage receipt and packet,
+then use `windows-native.py`'s `prepared_argv` with the emitted full stage prefix
+and owning native command. It checks the staged/packet source role, checkout,
+revision, Python and entry before returning argv; it launches nothing. Retain the
+stage's Linux dispatcher path and its source hash. Do not copy a previous attempt's
+outer `--checkout` while substituting only the native command tail.
+
+The native preflight consumer uses the runner's own record-key resolver for both
+the selected plan and worker artifact. Current absolute declarations and retained
+relative declarations still bind the same actual file digest; duplicate aliases,
+wrong roots/resolved files and failed runner states remain denials.
+
+A retained `preflight-no-controller` failure is distinct from administrative
+recovery and normal nine-phase cleanup. Its pinned nonzero/reaped terminal,
+null-controller failure and passed preflight must agree; data/campaign and every
+qualify/startup/controller marker must remain absent. The legacy audit-binding
+slot carries this terminal receipt; it grants no ADMIN, Original-close or Tiny
+pass claim. The failed namespace and all charges remain in the next census.
+
+Preparation DATA and its bootstrap sibling must be outside every observed source
+and namespace root. Their full write envelopes remain disjoint reservations in
+pinned bindings and observation points, including future preparations; they are
+not sampled allocations or physical peaks. Advancing a retained point adds only
+the new envelopes to its floor and keeps every prior envelope on the current
+source side. The destination predicate runs before staging writes.
+
+Copied path literals and partial source maps caused repeated preparation denials.
+The maintained generator now derives current paths and full closure and calls the
+owning request/payload validators. Focused controls check these boundaries; actual
+Windows lifecycle and complete-journey verification remain required for new bytes.
+
+`qualify` is an explicit domain of this controller's existing session, workers,
+caretakers, maintained validation runner, complete Identity/Monitor inventories
+and streaming verifier. It does not call `scale-acceptance.py`'s smaller controls.
+The ordinary `session` command still accepts only the fixed scale domain. Large
+Windows admission requires its explicit OS-local lineage, matching frozen batch
+and parent claim. Neither fake controls nor a Tiny receipt establish scale
+correctness, spill behavior or release publication.
+
+Start from an immutable selected scale plan. Keep its full product, package,
+build, Python, tool and dependency maps, limits and retained roots. A new complete
+clean harness role may supply the implementation being qualified; reserve its
+actual root in addition to every existing source root, within the unchanged source
+reservation. Replace only the D/G dimensions with `native_tiny.recipe(shape, rows)`.
+The aggregate D + G + malformed D fixtures, including headers and the seven-byte
+malformed suffix, must fit 1 MiB. Job operations, resource settings, seeded policy
+and configured row/byte caps stay unchanged. The independent verifier checks
+every row/field, D order, G group order/quotas/membership conservation, strict caps,
+manifest and complete native artifacts. G random draws are not reconstructed;
+the report retains exact order/membership hashes for separately qualified platform
+parity. Do not claim reconstructed G shuffle correctness from those hashes.
+
+Add `qualification` with these fields:
+
+| Field | Contract |
+| --- | --- |
+| `schema` | `native-tiny-qualification-v1` |
+| `scale_plan` | Original immutable scale plan `path` and `sha256`; never execute or edit it. |
+| `namespace` | Separate parent of fresh qualification data/campaign and preparation evidence. Reusing its old parent requires `namespace_history` below; no prior file or charge is reset. It must not overlap any original data/source root. A separately frozen harness root needs its own place in the unchanged source reservation. |
+| `input_bytes`, `new_bytes` | Input is exactly 1048576: the complete journey's D, G and derived malformed recipes must fit this aggregate; this is distinct from #105's campaign input cap. Namespace disk accounting is cumulative and retains old charges. Linux and frozen Windows plans keep 67108864; a fresh Windows plan may select 268435456 with both pinned owner disk authority and its reviewed selection. Individual JSON/read/memory bounds stay unchanged. |
+| `metadata_per_process` | Explicit positive integer `read_bytes` and `visits`, reviewed for the complete inventory and journey including review waits. Separate conservative Python-open/directory-enumeration accounting; not physical I/O or every native metadata syscall. No implicit increase or reset is supplied. |
+| `original_lock_stat` | `native_scale_identity.stamp` of the existing original host lock. No replacement lock is admitted. |
+| `launch_cutoff_unix`, `stop_unix` | Parent's existing absolute authority. They do not renew clocks, historical debt or non-time limits. |
+| `windows_history` | Windows only: actual OS-local path/SHA descriptor described below; absence blocks preparation. Linux reuses the original sealed lineage and both no-refund baselines, without reading the large input. |
+| `namespace_history` | Windows only, optional pinned `native-tiny-namespace-history-v1` record: exact old direct-child roots, complete nine-field regular-file baseline, original carry and a pinned completed current-point observation. The nonempty baseline is deducted exactly once; its current sum plus original carry becomes the retained high-water floor. New data/campaign must be outside every retained child. Missing or changed old entries deny admission. |
+| `unstarted_scale_roots` | Windows only, optional: absent original `owned_root`/`campaign` names. They stay absent and cannot omit an existing retained root. Never create a Large namespace to qualify tiny. |
+| `peers` | Windows only: D/G tiny peer custody described below. Clean completed Linux tiny qualification is required; a partial or failed Linux journey cannot qualify its product reports. |
+
+Use fresh `owned_root` and `campaign` under the new namespace, retaining every
+original `owned_roots` entry and adding both fresh roots. Use `peers: {}` for tiny:
+scale peer receipts cannot qualify smaller inputs. The original generation debit,
+physical floors and all phase/OS limits remain enforced. Disk observations have a
+30-second bound, at most 45 seconds between starts, and a 90-second maximum age
+measured from the oldest observation start. Hot identity and caretaker checks
+retain their separate fast bounds. `guard-initialization.json` records the first
+full constructor in the fresh controller (without dropping OS caches), and
+`guard-operations.jsonl` records full successful and failed observations.
+Failed/incomplete initialization and its elapsed cost remain in the namespace.
+
+First run the maintained [actual-host preflight](../../docs/validation-runner.md#actual-host-acceptance-preflight)
+against this exact enabled, parent-scheduled tiny plan, with separately reviewed
+preparation allowances. Then use the selected actual Python:
+
+```sh
+# PYTHON -B scripts/native-scale-runner.py qualify /ABS/tiny-plan.json --sha256 EXACT_PLAN_SHA --preflight /ABS/namespace/preflight/result.json --preflight-sha256 EXACT_RESULT_SHA
+```
+
+Qualification matches the host, exact plan, complete checker map, unchanged worker
+receipt and terminal maintained preflight runner inputs/artifacts. Mutable capacity,
+source identities and original host lock are checked live. Preflight grants no slot.
+As in scale sessions, approve each actual generation and Run proposal separately
+with the existing `approve` command. No automatic approval, retry or resume is added.
+
+After independently verified D/G success, the same controller prepares a fresh
+malformed D fixture and requests a separate `failure` proposal approval. The real
+product must parse every valid prefix row and report the exact malformed suffix
+record through native `CsvIntake`. The verifier independently checks the prefix
+bytes and suffix; the CLI does not report a byte offset. The runner's original failed attempt stays failed. A later
+verification phase checks absent failed output/staging, empty temp and unchanged
+earlier complete exports. Configuration/launch denial and unexpected success fail
+qualification. This covers actual parser failure, not every cancellation/fault.
+
+The first sampled public-directory appearance must already contain the complete
+native manifest and all listed CSVs; full streaming checks follow. This is sampled
+visibility evidence backed by native atomic-publication behavior, not a proof of
+every filesystem scheduling interleaving. The observer joins before the worker
+result; runner captures are files, closed before that result. Caretaker controller
+pipe EOF, monitor joins, stop/reap and owned-process quiescence precede original
+lock closure. Windows owner capture additionally requires EOF/reader join and reap.
+Unproven asynchronous work retains the original owner. Administrative retirement
+cannot produce a pass. Only after original lock release can `qualification-result.json`
+and `OS-tiny-completed.json` establish a clean tiny result. Scale consumption and
+scale completed/verified records are never written in this domain.
+
+Metadata accounting covers at most 25 controller processes: the supervisor, nine
+caretakers, nine workers and six phase children. Each uses the explicitly declared
+per-process allowances; the finite aggregate ceiling is 25 times those values.
+The parent must retain prior failed-attempt expenditures in its cumulative authority;
+a new namespace grants no refund or fresh global allowance. Insufficient allowances
+fail rather than change themselves. Product launches are exactly D, G and malformed D,
+reading only the declared tiny fixtures. Read charges before main conservatively
+include loaded module files. Read exhaustion fails admission without disabling
+owned cleanup. Fixed Git subprocesses retain their existing four-second limit;
+their internal I/O and the Windows lock owner are not whole-process I/O accounting.
+No old 10 GB payload is hashed by qualification.
+
+Windows uses this same controller and the ordinary native allocation sampler. Its
+`native-tiny-windows-history-v1` descriptor binds the actual host, scale-plan pin,
+nonempty immutable `provenance` path/SHA records, nonnegative `prior_generation_ms`,
+`baselines` for native/source pools and `prior_storage` for both pools. Baselines use
+the existing sealed entry/root schema. Complete retained roots, fresh actual native
+allocations and entry counts/sums must agree with `Storage` admission.
+`allocation_origin.kind` is exactly `fresh-native-baseline; legacy metrics retained separately`;
+its nonempty `legacy_records` path/SHA list retains the reviewed original metrics
+and unmeasured intervals. At the initial measured origin, both pools' `sum_bytes`,
+`carry_bytes` and
+`prior_sampled_aggregate_highwater_bytes` equal that actual fresh baseline, marking
+the beginning of this qualified allocation series. They do not assert a historical
+physical high water. Earlier logical debits, limits and unknown allocation intervals
+remain in their original records; never convert a logical allowance into a measured
+allocation or label an unmeasured interval zero. The qualification receipt explicitly
+leaves `historical_allocation_bound` null. A descriptor does not certify itself.
+
+Retained baseline admission uses one complete current inventory. Every regular
+file gets a fresh native allocation query, full sealed-stat comparison and exact
+charge check during that visit. Complete membership, root identity and reparse
+checks precede acceptance. Subsequent observations query allocations afresh.
+Windows `session` and `qualify` first enter through the existing suspended bootstrap and a
+strict child-only Job through `SuspendedWorker.start_controller`. Direct Windows
+invocations without the supervised token are denied before waiting for stdin.
+The owning supervisor supplies an exact startup token and
+one absolute preparation deadline. Existing stderr captures record earliest
+Python entry, imports complete, and readiness; a 30-second parent bound covers
+entry/imports. The controller waits for the exact stdin ACK before calling main,
+so missing or late ACK cannot acquire the original lock. Before ACK, only that
+held Job may be stopped/reaped automatically. Persist held identity and ACK
+intent before enabling the independent keeper's explicit breakaway. At that
+transition remove kill-on-close: parent death after possible ACK must preserve
+pending queries and an uncertain original owner rather than kill the controller.
+The intent callback only writes its journal and cannot write the private ACK
+pipe. Before the sole ACK-write callback starts, even a persisted intent or Job
+transition failure can use proven no-start cleanup. Partial/uncertain ACK
+delivery requires retention; it cannot use no-start cleanup.
+Post-ACK parent death leaves controller/original ownership unresolved and does
+not release the host lease. Close that Job only after controller/tree quiescence
+is proven.
+
+The startup Job contains the controller itself. It is separate from the workload
+Jobs that the controller must drain before releasing the original lock. After
+controller exit, the parent must also prove the startup Job empty before its
+own finish receipt and independent after-exit audit.
+
+Windows preparation uses one shared 180-second deadline, not a fresh allowance
+for each plan, preflight or history check. It is separate from cold admission and
+live monitoring. Phase/failure markers identify the owning call; timed-out
+tracked queries prevent advancement and keep the process until they quiesce.
+Linux keeps its existing direct preparation path. The observed failed start did
+not prove entry into Python validation, so it establishes neither a cold failure
+nor a validation-cost measurement. Capturing phases before retrying prevents an
+opaque setup stall from being misclassified as a product failure; actual startup
+and complete Windows Tiny qualification remain required.
+
+The owner-approved Windows cold `Monitor` admission has one 30-second bound
+under the original HostLock, before any caretaker or worker is created. Linux
+keeps its two-second constructor bound. The tracked unfinished-call fence and
+existing campaign/OS clock remain active; initialization does not renew time.
+Persist the original reservation/owner proof before cold setup, so admission
+failure still identifies the held owner. Windows host discovery runs before the
+runtime image freeze within that same cold bound: platform discovery can load
+native images on its first call. Preloading imports alone does not prove that
+closure. The normal hot host and exact runtime-image checks still run; newly
+unreviewed images remain a denial.
+The default live monitor places fresh allocation visits and both complete source
+and runtime filesystem namespace audits inside one tracked 30-second observation.
+The same nonoverlap gate covers the audits through completion. Fast runtime
+mapping/root-set, history/Git/external file tokens, host, clock/progress and held
+lock checks retain their two-second bound and repeat while filesystem work runs.
+A failed filesystem audit cannot publish capacity or advance a worker, and every
+worker/Run handoff requires a new complete observation. An actual phase trace
+showed the complete namespace walks exceeding the nested two-second allowance;
+that allowance was a harness grouping choice, not a separate owner filesystem
+policy. The split keeps every metadata comparison and the eight query workers.
+Disk starts must remain less than 45 seconds apart; completed capacity expires
+90 seconds after its oldest start, not its completion or the last heartbeat.
+Caretaker process census, controller identity pulses and the independent kill watchdog
+retain their five-second freshness, with the four-second ownership handshake
+completed before a later disk wait. Cancellation/termination bounds stay fast. Initialization receipts report the bound actually used. Old
+two-second constructor failures remain failed under their original policy.
+
+Windows caretaker censuses hold each queried process and check membership in the
+exact Job. An image-query failure is an exit only when that handle is signaled,
+its stable birth is bound to actual held-handle Job membership or the preceding
+completed identity, and a fresh Job census excludes it. Successful identity queries
+keep their handles until the final census, so a later exit needs the same proof.
+New members are observed within the same bound and 256 distinct-held-member limit. Live failures, PID reuse and unknown membership deny. The image API error number
+is diagnostic, not an exit oracle. After the fresh exclusion census, the same
+held object is rechecked for a signaled state, a non-active exit code and unchanged
+birth; an earlier live observation cannot decide its later state. Notes retain
+both observations and the fresh exact-Job membership before the exit predicate.
+An image failure with a non-active exit code may be in process rundown while its
+handle is not yet signaled or the Job still lists it. Reconciliation may wait only
+within the caller's original absolute deadline, then still requires the complete
+held-object and fresh-exclusion proof. Live status, failed queries, reuse and an
+exhausted deadline deny; no image failure is ignored. Native caretakers use the
+existing two-second endpoint. Callers without a deadline remain instant-strict.
+Caretaker failures retain a bounded traceback so an API error identifies its
+owning operation; an exited-process reproduction alone does not attribute an old
+failure. The explicit `test-native-scale-runner.py --native-job-exit-probe DIR`
+control exits an owned child between its real Job snapshot and image query.
+Session and keeper-stop failures save bounded exception notes and tracebacks
+before cleanup can retain an owner. A prior failed session lost the nested
+callable and keeper-stop reason by recording only the exception text; the new
+diagnostic controls cover preservation, while actual race verification remains
+separate from complete Tiny qualification.
+
+A caretaker pipe write or close error must not skip independent reap and cleanup
+verification. Proven failed cleanup is reported as a latched `caretaker_failed`
+response, which the controller rejects as failed progress. The keeper continues
+holding Original through the existing finish/close handshake; the failure never
+becomes a successful phase. A pending observation may join only before its original
+thirty-second endpoint, with hot checks retained. Unjoined callbacks, uncertain
+handles, poisoned RPC state or incomplete cleanup still retain ownership.
+
+Workers currently perform complete Git/source provenance at both Identity
+admissions: thirteen Git invocations each, including packaging attribution. The
+runner's input hashing itself launches no Git. Observed Git launcher descendants
+therefore explain source-validation process churn, but do not identify an old
+unknown failed PID. Moving provenance out of the live Job would require a new
+proof handoff; this repair keeps those checks and handles process exit correctly.
+
+Windows directory `size` seals, native stamps and source/runtime metadata
+snapshots capture `FileStandardInfo.EndOfFile` through a non-inheritable
+READ_ATTRIBUTES handle with BACKUP_SEMANTICS and OPEN_REPARSE_POINT. Full file ID,
+device, creation/write times, link count, directory type, path mode and reparse
+checks bind that handle to the observed path. Two handle queries must agree on
+EOF before closure. Every sealed field remains checked. Regular-file allocation
+and charges retain the existing native helper. Directory allocation contributes
+no regular-file charge.
+
+The native metadata wrapper expands an exact `['**/*']` request into escaped
+top-level child names before calling the existing inventory implementation.
+Each disjoint subtree is traversed once. The complete metadata entries,
+symlink/special-file denials and bound directory EOF seals remain required.
+Other declared patterns keep their existing behavior. Fresh metadata is captured
+on every call.
+
+Windows allocation ancestry builds immutable string names once per file, then
+runs two fresh `os.lstat` passes over exactly the leaf and its Windows parents.
+The bound handle, descriptor, after-path, allocation and deletion checks remain
+unchanged. No live attributes or identities are cached or shared between files.
+
+The maintained allocation test can compare a pinned old helper against the
+current helper through complete Storage admission and samples:
+
+```sh
+python -I -B scripts/test-native-file-allocation.py --native-metadata FRESH_LINUX_UNC_OUTPUT \
+  --evidence-owner LINUX_UNC_OWNER --baseline PATH SHA256 --plan PATH SHA256 \
+  --bindings PATH SHA256 --previous-result PATH SHA256 --control-helper PATH SHA256 \
+  --tiny-origin-carry BYTES
+```
+
+Declare each additional imported native image with `--runtime-addition PATH
+SHA256`; undeclared images deny the comparison. All complete roots come from the
+pinned inputs. Eight bounded workers, caller merging, sealed fields and exact
+membership remain active. The control's complete per-file stat/allocation
+digests and sums must match the previous point before the candidate runs. Input
+namespaces and runtime bindings must remain stable. Output belongs to a fresh
+Linux UNC directory outside all measured roots. Control runs first, so cache
+and order effects remain. Separate cold admission from recurring enforcement:
+Windows cold construction has its approved 30-second bound. The owner later
+superseded the disk performance policy with a 30-second disk observation, a
+45-second maximum start interval and 90-second oldest-start capacity freshness.
+Prior timing failures remain failures under their original policy. A pulse carries the prior
+completed capacity timestamps unchanged while a new disk pass is pending; it
+cannot turn hot identity activity into fresh capacity. The default bounded-call
+helper remains two seconds, and failed polling leaves its disk worker tracked
+until the actual query and executor joins finish. The actual disk callback owns
+a nonblocking per-monitor operation gate through its final cleanup; a failed
+waiter cannot start a second scan of the same high-water maps while the first
+callback is unfinished. The rejected
+compiled strategy and paused custody strategy are retained as experiments; the
+default complete census is preferred when it meets the current contract. Hot
+identity, memory/resource ownership, cancellation and process-census timers do
+not inherit the disk allowance.
+
+Reuse the same baseline and original carry for a repeated point comparison.
+A sampled total cannot become another empty-baseline carry: doing so would add
+visible files again. Preserve prior envelopes, retired identities and unknown
+intervals. An identity/digest mismatch stops this comparison rather than
+rebasing debt. The attribute-only and direct-descriptor ctypes experiments
+failed actual complete-inventory timing; their retained evidence does not
+establish a benefit. The default helper retains its CRT descriptor.
+
+Declare each reviewed newly generated file using `--point-addition PATH SHA256`. The
+complete control point, after removing exactly these pinned new regular files,
+must match the preceding point's full stat/allocation digest and sum. Existing
+files therefore cannot be silently replaced or rebaselined. Every new identity
+still contributes its full charge to the complete source sample. Retain the
+original baseline/carry, retired identity debit and unknown unsampled intervals.
+
+After normal complete process exit, independently run the same test with
+`--after-exit COMPLETED_LINUX_OUTPUT --result-sha256 SHA256`. It requires both
+original process births absent or reused and probes the original byte zero.
+An uncertain HANDLE/CRT close or worker lifetime retains the original owner and
+failed evidence for exact audit. Confirmed quiescent failures may close it.
+Isolated execution resolves the package from the pinned script directory.
+The caller keeps HostLock while one existing bounded callback owns all patches,
+snapshots, queries and worker joins. A timeout records immutable phase/completed
+file references, and the callback keeps its patches until actual quiescence.
+
+The retained failed observations contain raw Python directory sizes of zero and
+8,192 for the same identity and timestamps. Their exact Python producer branch
+remains unknown. CPython supports both by-name and handle/find-data metadata
+paths. Windows documents attribute/find-data directory file-size fields as
+undefined. New seals consistently use the bound-handle EOF metric. Raw historical
+records remain intact. [CPython metadata paths](https://github.com/python/cpython/blob/v3.14.6/Modules/posixmodule.c),
+[Windows attribute data](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/ns-fileapi-win32_file_attribute_data),
+[handle standard information](https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_standard_info).
+
+Each Windows `Storage.sample` call owns an eight-worker metadata executor.
+Directory traversal and all sealed comparisons remain on the caller. At most
+eight unchanged `_allocated_bytes` calls are pending, and each root drains before
+its final identity check. A failed batch stops later submission and retains every
+successful sibling's sampled charge. Traversal failures also drain pending work.
+Executor shutdown waits for all workers on every path. A blocked helper therefore
+keeps the enclosing bounded call pending and the original lock owner retained.
+No executor survives a completed observation. The executor imports load with the
+monitor module before runtime inventory capture. Complete cold construction,
+samples, shutdown and cleanup still require actual matching-host qualification.
+
+A later descriptor can carry previously admitted allocation through an explicit
+`retained_transition` object. Its schema is `native-tiny-retained-transition-v1`
+and its `previous_plan` and `previous_preflight` are exact path/SHA pins. The
+maintained passed preflight must bind that previous plan and its history, match
+the current host and retained scale policy, and report the previous pools' admitted
+allocation and carry. Worker, runner, preparation and history custody remain
+watched. Each pool retains the exact previous root set.
+
+A fresh immutable disabled scale reference may refresh `dependencies` and
+`environment_sha256`. Every other scale field must match the previous reference.
+Both references remain pinned, with the previous history bound to its previous
+reference and the new history bound to the new reference. The selected current
+native runtime still requires complete live validation. Windows Large admission
+stays denied.
+
+The new baseline contains the complete current census. Its carry is the previous
+carry plus each identity's positive allocation growth, charging the full amount
+for new `(path, device, file ID)` keys. Shrinkage and retired identities receive
+no refund. A replaced Git index therefore retains its previous sampled charge
+and adds its replacement's charge. Current sum/count and the computed carry must
+match the descriptor exactly. Old baselines and failed observations stay intact.
+The preflight reports actual current allocation as `current_origin_bytes` and
+the no-refund carry as `sampled_highwater_carry_bytes`. The qualification origin
+records the transition and each pool's retired/growth/carry amounts. Historical
+allocation gaps remain unknown.
+
+The source HANDLE
+component below is not silently substituted for the complete ordinary guard.
+Missing final Windows source roles, accounting/custody or a failed current
+disk/hot-identity bound remains a precise runtime blocker. Root alone schedules actual Windows
+preflight/qualification and owns final platform acceptance.
+
+Each Windows `qualification.peers.D/G` supplies `report`, `campaign_record`,
+`qualification` and `completion` path/SHA pins copied into the fresh tiny namespace.
+The native Linux tiny report and campaign hash must match its clean qualification
+and final completion seal after original-lock release. Source digest, shape and
+tiny row count must match the actual Windows checkpoint. The existing streaming
+verifier then compares the entire report, including exact G membership/order and
+CSV hashes. Scale peers, incomplete Linux sessions and pre-release per-shape
+observations cannot replace this final tiny custody chain.
+
+The selected Linux/WSL journey at harness `89933cb3e0197a96ffd43fd9953b763b77191577`
+has complete D/G 127-row verification, actual malformed-prefix work, all nine
+phase cleanup receipts and independent after-exit original-lock/cgroup/PID proof.
+Its private summary is
+`/opt/chopper/private-acceptance/release-blockers-20261107/approved-prerequisites/native178-linux-q4-summary.json`.
+The frozen-harness preflight and final completion are pinned there. Earlier
+environment, metadata-allowance and failure-oracle attempts remain failed and
+charged. This establishes the recorded Linux tiny path only; native Windows,
+delivery gates, scale acceptance and publication remain pending.
+
+## Review boundaries and clocks
+
+One live `session` owns an OS's actual shared `local-ci` host lock through both
+shapes, all review waits and cleanup. It creates an exclusive durable
+`OS-started.json` before work; a new invocation cannot resume that OS. Wall and
+monotonic deadlines share one fixed eight-hour window. Parent review consumes
+that window. This is deliberately not a scheduler/recovery framework.
+
+For each shape the controller writes a **generation proposal**, then waits for
+its separate exact-SHA approval file. The approved stage generates the selected
+10,000,000,000-byte fixture and independently checks every field, sequential ID,
+header, row count and byte count, streaming the actual SHA-256 in the same pass.
+It compares that digest with generator metadata; a generator claim alone never
+qualifies. An optional independently known SHA is only an additional check.
+Generation **plus** this
+checkpoint and its maintained-runner pre/post hashes share one hour. The
+independent checker imports neither generator nor recipe/row constructor and
+streams one fixed-width record at a time.
+
+After that worker is stopped and descendants are proven empty, the controller
+freezes actual input metadata, fixture/Job/checkpoint bytes, source roles, tools,
+executable, independently measured actual SHA, policy, peer and held reservation into a **Run
+proposal**. Generation approval cannot approve this proposal. No Run starts while
+its explicit approval is absent. Its permanent slot is fsynced **before launch**;
+failure, launch denial after consumption, crash or cleanup failure never returns
+the slot. Prelaunch failures are retained separately in the session/phase files.
+No retries, fallback, resume or additional matrix cells exist. Generation failure
+also ends the OS session; another generation invocation cannot reset its clock.
+
+Run gets at most two hours including source admission, runner input/artifact
+hashes and cleanup. Verification gets at most one hour including independent
+source recheck, output reads, bitmap/membership passes, post-source/tool proof and
+cleanup. Final metadata writes remain within the OS window. Only successful
+verification plus empty owned process membership can create a verified campaign
+record. Windows D also requires Linux's final completed-session seal.
+
+## Exact plan and proof schema
+
+There is no default executable configuration or auto-discovery of approvable
+identities. A parent must assemble and review the actual execution layout and
+maps. Preparation in the parent checkout is a proposal, not an execution-root
+map. Never copy new harness scripts into selected product639 or modify its package
+receipt. The required product commit is
+`639d1fe97d985b1544df0932321c6a93cca2567b`, tree
+`b3bde79d552ee29760cb283d07938f9248cee0bb`; the package receipt SHA is
+`1720f28a01cbbd7a30cbb8c8614b9efc2da01e57c765c625f51e8a5e3455c30d`.
+
+The following is intentionally **incomplete, disabled and rejected**. It is not a
+launch manifest; omitted fields cannot be replaced with labels, nulls or booleans.
+
+```json
+{
+  "schema": "native-scale-v1",
+  "actions_enabled": false,
+  "parent_scheduled": false,
+  "features": [],
+  "os": "Linux"
+}
+```
+
+The full manifest fields are defined by `native_scale_control.validate`,
+`native_scale_identity.Identity` and `native_scale_monitor.Monitor`:
+
+| Field | Required actual binding |
+| --- | --- |
+| `product`, `harness` | Distinct absolute nonsymlink roots, actual `commit`, `tree`, complete tracked `git_blobs` (path → Git blob SHA-1), complete `sha256` (path → SHA-256). Both worktrees clean. Actual bytes must match both maps and Git. Full vendor trees, Rust/build inputs and all native embedded UI assets are included; no single-root relabelling. |
+| `python` | Real readable executable `path`, expected `sha256`, exact `sys.version` as `version`. Actual interpreter must match. |
+| `tools` | Nonempty array of expected `path`/`sha256` objects, including actual selected Git and required runtime/tool binaries. Recorded runner hashes alone are insufficient. |
+| `dependencies` | Nonempty array of nonempty runtime/dependency groups: absolute `root`, exact `inputs` patterns and complete matched `sha256` map. Coverage must include independently discovered actual Python stdlib/extension roots, existing stdlib ZIPs, interpreter and all mapped native images (including loader/shared libraries). Empty and unrelated maps fail. Linux uses `/proc/self/maps`; Windows uses the current process module census. Unsupported/unreadable census fails closed. No new third-party dependency is introduced. |
+| `environment_sha256` | `native_scale_identity.environment_digest()` from the reviewed environment. Values are not recorded. Only internal `CHOPPER_NATIVE_*` handoff keys are excluded. |
+| `host` | Exact `native_scale_identity.host()` result: OS, release, version, architecture, hostname, CPU count and physical RAM. WSL reports Linux; it cannot establish native Windows coverage. |
+| `executable`, `package`, `package_receipt`, `build_proof` | Absolute paths and expected SHA-256. Package receipt must have the immutable SHA above. No extraction/repackaging is performed. |
+| `selected639_lineage` | Exact fixed parent descriptor path/SHA above; Linux-only admission. |
+| `campaign` | Shared campaign metadata directory, with Linux consumed/verified/completed records retained for native Windows. Parent custody transfers preserve those bytes. Never start a new campaign to retry a consumed slot. |
+| `owned_root`, `owned_roots` | Fresh OS-session root and explicit nonoverlapping existing retained-history roots, including the campaign. Both D/G data, logs, verifier bitmaps, failed/partial roots and evidence count. Current root is created by the controller. |
+| `volumes` | Every involved data, history, source, package, dependency/tool volume: array of absolute existing `path` and actual `device` (`str(path.stat().st_dev)`). Runtime remapping fails. |
+| `reservation` | Parent-reviewed `id`, `owner`, `os`, and exact local CI `lock_path`. Runtime actually acquires that OS lock nonblockingly. No reservation file establishes ownership. |
+| `source_reservation` | Separate `id`, `owner`, positive `bytes` and nonoverlapping `roots` covering source roots, package/build artifacts and any owned staging/cache. No overlap with native data/history roots. Measured separately; source/cache storage cannot borrow the native data budget. |
+| `fixtures` | Exactly the D/G commitments returned by `native_scale_control.native_recipe(shape)`: `generator: release-acceptance-v1`, matching `shape`, `runtime: native`, widths 100/1000, rows 99999999/9999999, `bytes: 10000000000`, `tiny: false`, and complete fixed `job` semantics with `@input`/`@output`/`@temp` path placeholders. Unknown fields, omitted fields, tiny/arbitrary sizes and altered Job values/types fail. Optional `sha256` must be an independently known lowercase SHA-256 and is an additional check, never a generation prerequisite. |
+| `limits` | Exact `native_scale_control.LIMITS`; no overrides, increases or extra checkpoint hour. |
+| `linux_cgroup_parent` | Linux only: actual delegated cgroup-v2 directory, kernel `cgroup.kill` support and ability to create a fresh child. No process-group-only fallback. |
+| `peers` | Linux: `{}`. Windows: D/G Linux report `path`, expected `sha256`, `slot`, matching `source_sha256`, and producing `plan_sha256`. Must match campaign verified records and the native Linux envelope, shape, product, same-size row count and input SHA. |
+
+The [disabled packet example](native-plan.DISABLED.example.json) contains both
+complete recipe/Job commitments with no source digest. It is deliberately
+incomplete and rejected before any path or lock access. Setting its flags alone
+cannot make it a launch manifest. Regenerate/review final harness source maps and
+all actual identities; the readonly c63 supporting packet is stale for this code.
+Do not edit an approved plan after generation to add the newly learned digest.
+
+Within a commitment, `job` is the full fixed native Job from `recipe.job`, with
+the three path placeholders above. The independent checker imports neither
+that constructor nor the generator; it independently validates Job semantics
+and binds actual paths to that shape's `input.csv`, `output` and `temp` siblings.
+Its checkpoint records actual SHA, exact shape/rows/bytes, native runtime and
+`independent_source_check: true`. Source file identity and change checks span the
+stream. Windows cross-API identity compares shared birth time because path and
+handle `ctime` can have different meanings; descriptor change-time comparisons
+still span the read, alongside path identity checks. Ordinary session validation
+accepts only the fixed 10 GB commitments; the explicit qualification domain above
+admits bounded tiny dimensions while retaining the full guard and inventory.
+
+The separate Run proposal contains that entire checkpoint, `input_sha256`
+equal to its actual SHA, and an exact `actual` map of Job/fixture/checkpoint
+paths to their hashes and file identities. Worker admission and guards require
+the exact approved Run stage, original plan, slot, unchanged files and matching
+actual digest. Both Run and verification runner plans hash these inputs and
+the proposal/approval; their source hash must equal the approved actual SHA.
+Output verification must report the same source digest. Windows checks the
+declared Linux peer digest against its envelope first, then against the actual
+Windows checkpoint before offering a Run proposal and throughout Run/verification.
+A same-size peer with different source bytes fails before Run approval.
+
+The additive `native-scale-build-binding-v2` proof is a parent-produced binding
+to existing immutable evidence, not permission to rebuild or rewrite receipts.
+It contains `features: []`, exact `product_commit`, `product_tree`, full product
+`source_sha256`, `executable_sha256`, `package_sha256`, immutable
+`package_receipt_sha256`, plus `artifact_build_commit`, `artifact_build_tree`,
+`artifact_build_source_sha256` and `source_reconciliation` (a local path/SHA object).
+The original build commit is `feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d`, tree
+`57f6675f4e216d0b504c3063c17a2b37ab16ac20`. The immutable reconciliation SHA is
+`a5034cab5d27c3244aec4d08637f62afa0382faeaa43afc63ca59ba317da90f8`.
+`producing_source` checks the actual Git delta: only `docs/release-packaging.md`,
+`docs/releases/native-usage.txt` and `scripts/package-release.py` differ, with all
+1,116 other selected source files listed unchanged. Original packaging-file hashes
+come from the original Git blobs without text normalization; all other hashes
+retain the admitted selected-source values. The original full map must match
+`artifact_build_source_sha256`. A v1 binding or relabelled build is rejected.
+
+Nonempty `runner_receipts` are path/SHA objects pointing
+to original maintained validation-runner status receipts. Those receipts must
+have no incomplete steps, successful attempts, actual native build input hashes
+covering Cargo/crates/full vendor/native embedded assets/build configuration, and
+the matching executable artifact hash **in the same executable-producing attempt**.
+Inputs and artifacts from unrelated attempts cannot be unioned. Maintained runner
+`dependencies` names successful attempt IDs; those IDs alone do not prove consumed
+intermediate bytes. This adapter currently requires direct full build-input coverage;
+it does not accept a transitive dependency chain or manufacture missing coverage. An unmatched receipt schema/coverage is a blocked
+integration prerequisite; do not invent a successful receipt, relax checks or
+run a new build under this task. Parent must reconcile its existing package,
+feature, build and source proofs to this binding before execution approval.
+
+## Selected639 LinuxD adoption and lifetime accounting
+
+Published `/opt/chopper/private-acceptance/` locators in this document and the
+campaign record are sanitized aliases. Original sealed locators and source stay
+privately retained. The aliases do not establish a new or recertified runtime;
+see the [public source boundary](../../docs/history/public-source-boundary.md).
+Exact path equality and all cryptographic pins still apply.
+
+Linux entry requires `selected639_lineage` with the exact path in
+`native_scale_identity.LINEAGE_PATH` and SHA-256
+`19289b1e120b26610e2df0f4f7a62ed336aeedb2ad132f4b8e3435c3f16996d2`.
+The descriptor is parent-sealed predecessor metadata, **not workload approval**.
+Its exact bytes fix the old plan/history, old input identity and expected digest,
+new campaign/OS roots, canonical Linux family ledger and both storage baselines.
+Small sealed records are hashed; old input is stat-checked without reading it.
+Missing/mutated records, prior consumed/verified markers or old completion seals
+fail closed. Original failure (`source freeze drift`), expired clocks, approvals,
+input and metadata remain historical and unchanged. There is no resume or retry.
+
+Only LinuxD uses a new public `checkpoint-adoption` proposal and NEW exact
+stage/plan/proposal approval. It runs the existing independent checkpoint against
+the original sibling Job/fixture inside that phase. Actual digest, rows, recipe,
+open-handle identity and sealed checkpoint must agree before exclusive creation
+of fresh Job/fixture/checkpoint/temp metadata. The new Job retains the original
+input path and points output/temp at the fixed new D root. No new input file,
+copy, rename, chmod, regeneration, symlink or hardlink is made. Only the validated
+adopted path can override `validate_metadata`'s ordinary input-sibling rule.
+New D's verified data directory has exactly Job/fixture/checkpoint/temp/output;
+G retains its six-entry sibling rule. Old entries/stamps remain guarded through
+review, Run, verification and cleanup. Worker/phase Python uses `-B`; the controller
+also disables bytecode writes before importing harness modules.
+
+The adoption runner declares only small sealed metadata, plan, operation and NEW
+approval inputs, with new metadata artifacts. It never declares the large input
+for a runner prehash: the approved independent checkpoint owns that content read
+and row progress. Later Run and verification keep their existing full source
+hashing inside their respective phase limits, using the actual old source path.
+Run proposals bind that path/stat, new metadata hashes/stamps, lineage, selected
+source/tools/package identity, held reservation and current session authority.
+
+Linux's fixed wall and monotonic allowances are both `28800 - 324.064` seconds.
+D adoption receives at most `3600 - 324.064` seconds; adoption elapsed time and
+parent review waits also consume the new OS clock. G generation, Run (7200),
+verification (3600), useful progress (600), memory (64 MiB), workers (1), strict
+10 MB CSV, 100 GiB temp and physical/native storage limits remain unchanged.
+The sealed native carry is 10,012,405,760 bytes; source carry is 334,606,336 bytes.
+Each pool admits the sealed retained baseline inventory/stamps and charges:
+
+```text
+carry = max(prior sampled aggregate highwater, sum(retained baseline))
+charge = carry + sum(max(0, high[key] - baseline.get(key, 0)))
+key = (absolute path, device, inode)
+```
+
+Old roots remain reserved and sampled. Shrink/removal earns no credit; new
+identities charge fully. The old input baseline is counted once. Source capacity
+stays at the sealed reservation; it cannot silently borrow or grow.
+
+`claim-run PLAN PROPOSAL --sha256 EXACT_NEW_PLAN_SHA` is the single Linux parent
+canonical writer. It accepts only an existing actual NEW approved Run at the
+fixed current root, verifies current start/reservation authority, both clocks,
+original live flock owner from read-only kernel metadata, a fresh matching capacity
+sample, lineage/old absences,
+source/new metadata bindings and the verified previous canonical slot. A separate
+family metadata flock serializes writers; it never acquires the host lock held
+by the waiting session. Exclusive creation/fsync burns the canonical slot before
+local consumption and launch. Partial/corrupt records, duplicate writers and a
+crash between canonical/local records never permit another claim. Linux session
+uses this same writer after actual Run approval. Operations bind the claim hash;
+local consumption and continuous guards require the matching canonical receipt.
+
+The four lifetime slots remain LinuxD, LinuxG, WindowsD, WindowsG. Canonical
+receipt bytes explicitly bind product, lineage, OS plan, slot, actual proposal,
+namespace/root and session authority for parent transport. The original source
+slice denied Windows before OS-start because prior accounting was deferred, not
+zero. The explicit [Windows Large path](#windows-large-admission-and-canonical-claims)
+now supplies OS-local admission, the accepted Linux seal/parity and parent-issued
+canonical receipts. No Windows mirror writer, imported availability snapshot or
+internal CLI bypass is provided. Actual scale qualification remains pending.
+
+The Windows lock-owner protocol binds its startup acknowledgement to the original
+byte-zero lock descriptor and a separately queried native PID/creation identity.
+Each start, pulse and finish request uses a fresh challenge; the owner rechecks
+the descriptor/path identity before acting and before acknowledging. Finish
+acknowledges only after stop/empty/reap proof. Missing, replayed or mismatched
+acknowledgements and timeouts permanently deny further RPCs; EOF still follows
+the existing cleanup/retained-lock path. Monitor reservation copies are stable
+identity records, not fresh lock observations. This component is a continuation
+prerequisite, not Windows admission: parent claim transport still needs a fresh
+native observation binding the exact plan/start/reservation/proposal/approval,
+capacity and completed cleanup. Parent-owned native qualification is specific to
+the tested source. The [focused b561ff5 protocol check](../../docs/releases/native-owner-rpc-2026-11-07.json)
+passed challenged requests, late-acknowledgement rejection and real EOF cleanup
+with genuine Windows helpers. All eight recorded process births were subsequently
+absent and the same original lock file was available. This two-phase toy result
+does not qualify Windows scale admission, claim transport or untested OS failures.
+
+The focused D127/G137 controls use synthetic files and injected host interfaces.
+Their success does not qualify real containment, build proofs, scale acceptance,
+Windows admission or any actual large read/Run. No concrete workload plan or
+approval is shipped here; final harness/source maps and all existing runtime,
+containment, capacity and parent approval gates must still be qualified.
+
+Plan, per-phase operation and native data must share a filesystem drive for the
+maintained runner's relative input/artifact patterns. Product, harness, tools and
+package may live on other drives: their separate full proofs run in the guarded
+worker before and after each maintained runner invocation. The runner itself is
+unchanged. Its one-step plans contain only generation/checkpoint, one Run, or
+verification; it cannot advance to a subsequent phase automatically.
+
+## Inert operator command shapes
+
+All examples below are comments and contain deliberately missing approval
+values. They must not be uncommented until parent review, concrete identities,
+native integration/platform gates and costly-run authorization are complete.
+Use the selected expected Python, not a convenient executable from PATH.
+
+```sh
+# PYTHON -B scripts/native-scale-runner.py session /ABS/plan.json --sha256 MISSING_EXACT_PLAN_SHA
+# PYTHON -B scripts/native-scale-runner.py approve /ABS/D-checkpoint-adoption-proposal.json /ABS/D-checkpoint-adoption-approved.json --sha256 MISSING_EXACT_ADOPTION_SHA
+# Review the actual independent checkpoint, Job, all paths/maps, capacity and held lock.
+# Run proposal input_sha256 must equal checkpoint.sha256 and fixture.sha256;
+# review actual Job/fixture/checkpoint hashes, not a pre-generation source guess.
+# PYTHON -B scripts/native-scale-runner.py approve /ABS/D-Run-proposal.json /ABS/D-Run-approved.json --sha256 MISSING_EXACT_RUN_SHA
+# Repeat separate G generation/Run approvals only after successful D verification.
+```
+
+`approve` only writes an exclusive exact proposal approval; it launches nothing.
+Approval stage, original plan and proposal SHA must all match. Keep the session
+alive while reviewing; stopping it abandons that OS, not a resumable checkpoint.
+Internal `_worker`, `_caretaker`, `_lock_owner`, `_phase` modes are ownership handoff details,
+not operator commands or arbitrary command runners.
+
+## Continuous guard and ownership boundaries
+
+The supervisor checks host/source/tool/dependency identity between operations
+and every 0.5 seconds while a disk observation is pending; each hot check retains
+its two-second bound. The disk worker retains a separate 30-second observation
+bound, a 45-second maximum start interval and 90-second oldest-start capacity age.
+Both continue while the maintained runner synchronously hashes inputs/artifacts
+before/after a command. It watches owning source directories, the selected
+checkout's Git HEAD/index/configuration and selected symbolic ref, external file
+identities and independently pinned fixture/Job/checkpoint. Unrelated remote
+refs and another worktree's HEAD/index are not selected source identities.
+Native Git proofs disable replacement objects so their commit/tree/blob queries
+always inspect the canonical selected objects.
+A source metadata rejection records the exact changed path/field; it does not
+attribute an unknown historical mismatch to a background fetch.
+Required runtime roots receive independent full name/metadata watches even when
+approved dependency maps list explicit files. Newly mapped native images, changed
+runtime roots, added stdlib modules and admitted file drift stop the session.
+Parent must preload/reconcile the actual runtime before freezing both supervisor
+and worker dependency maps; a configured group label never establishes coverage. Full
+byte and actual Git-blob checks run before/after inside containment. This does
+not claim that the runner's guard callback covers hashing.
+
+If a hot poll rejects an in-flight observation, join that observation only until
+its original deadline before propagating the rejection. Completion cannot restore
+a pass or start a worker. An unfinished call still fences cleanup and retains the
+original lock; a completed call need not cause permanent administrative recovery.
+Direct caller interruption does not wait for that drain before stopping owned
+work. Linux session cancellation is latched into the existing hot campaign check,
+which stops future heartbeats and preserves the original observation deadline;
+the independent caretaker's stopping bounds remain unchanged.
+
+An operator failure is written and printed with bounded exception notes and its
+call site before retention. The Linux operator cancels only its own direct
+controller, then waits and reaps within the existing disk/finish/reap bounds and
+the original plan stop. A matching failed qualification with positive Original
+release permits a failed exit; missing or uncertain ownership proof stays retained.
+Hard parent death cannot claim the cooperative cancellation path.
+
+An independent caretaker queries real owned process membership, publishes its
+observations and retains raw process-census samples. A separate watchdog thread
+in that caretaker stops owned work if its census/receipt operation completes no
+sample for five seconds. Supervisor heartbeat follows completed hot identity
+checks and actual caretaker process census, never just a timer. It carries the
+last completed capacity timestamps unchanged while the next disk scan is pending.
+The caretaker independently rejects capacity older than 90 seconds from its
+oldest start. Five-second hot identity/census staleness, pipe EOF on controller death,
+missing worker result, blocked sampling, phase/OS deadline, source/tool/input
+drift or lost reservation fails closed. Startup waits are four seconds; no native
+command can start before a fresh completed capacity observation and containment
+handshake. Cleanup continues fast bounded source/identity checks while stop,
+empty membership and reaping finish; the complete disk audit follows owned stop
+rather than delaying cancellation/reap by a disk scan.
+Failed cleanup retains primary and secondary errors and cannot pass acceptance.
+
+On native Windows an external lock-owner process acquires the actual local-CI
+byte-zero lock before the supervisor can launch a caretaker. It keeps that lock
+through the complete OS session and launches each caretaker with its own parent
+pipe. Start/pulse/finish acknowledgements fail closed; no worker is launched by
+the supervisor as a fallback. Supervisor EOF closes the active caretaker pipe.
+The lock owner stops/waits for that caretaker and requires its empty membership
+and successful stop/reap proof before releasing the lock. Primary controller-death
+errors remain failures but are distinct from cleanup errors. Missing/failed cleanup
+proof retains the actual lock indefinitely for explicit parent intervention; never
+terminate that owner or retire its reservation until native owned cleanup has been
+reconciled. There is no unlock/relock handoff gap between the supervisor and
+caretaker. The lock owner is launched with `CREATE_BREAKAWAY_FROM_JOB` and must query itself
+as outside all inherited Jobs before acknowledging ownership. A host Job that
+prevents this separation blocks startup without fallback. The worker Job still
+forbids breakaway. Native parent probes must verify launch ancestry and EOF behavior.
+
+On native Windows the caretaker first verifies that it is outside inherited Jobs,
+then holds a new unnamed kill-on-close Job forbidding breakaway. The private
+`native_scale_windows.py` helper creates the worker with its primary thread
+suspended, inherits only explicit duplicates of NUL stdin and the two worker log
+handles, assigns the process to that Job, and only then resumes its primary
+thread. Python bootstrap and any early births are therefore owned before startup
+IPC can fail. Assignment/resume failures never fall back to an executing launch.
+A held unassigned suspended process is separately terminated and waited on.
+
+The worker still creates its nested Job through the maintained runner interface.
+The caretaker duplicates and checks that nested Job, its own outer Job, and the
+actual worker identity. The supervisor duplicates the outer Job as independent
+backup and acknowledges ownership before commands may start. Both Job handles
+remain held through owned stop, outer-Job empty census and primary-process wait.
+Cleanup selects the platform independently of whether Job creation succeeded;
+a missing Job is unknown ownership, never a Linux cgroup query or an empty census.
+Unknown ownership, failed wait or missing cleanup proof keeps the original lock.
+The existing Windows census helper remains read-only; there is no global
+process-name termination. Controller death uses a duplicated raw pipe read end
+with bounded polling (PeekNamedPipe on Windows, select on Linux), closed during
+cleanup; no background buffered-stdin reader survives shutdown.
+
+The [bounded native toy qualification](#windows-bootstrap-toy-qualification)
+passed the recorded Windows startup/EOF/failure cases below. Native scale admission
+and current-session claim transport remain denied; these toy results do not
+qualify a complete Windows acceptance session.
+
+Linux starts the worker in its own process group, assigns it to an exclusively
+created child of a real cgroup-v2 filesystem before allowing commands, and uses
+that cgroup for all runner-created sessions/descendants (including `setsid`).
+The caretaker is a child subreaper; it kills only that cgroup and reaps its
+worker/adopted descendants. The supervisor retains the actual cgroup identity as
+backup before acknowledging command startup. The Linux worker also installs a
+kernel parent-death signal and rechecks its actual parent before the handshake;
+caretaker death before handoff cannot release an unowned command. Controller
+death closes its pipe; the caretaker retains the inherited
+exclusive host-lock fd until stop/reap. If empty membership, reaping or cleanup
+proof retention fails, it stays alive holding the lock and requires parent
+intervention; it cannot release the reservation or resume the campaign. There is no cgroup creation, containment
+probe or system service installation in the fake tests. Required delegation and
+real controller/caretaker death behavior remain native integration gates.
+
+Every involved volume needs at least 200 GiB physical free initially and stops
+below 20 GiB. The native sampled allocation high-water ceiling is 160 GiB across
+both shapes and all declared retained histories. Each observed file charges the
+larger of logical size and allocated blocks; shrink/removal never refunds its
+sampled charge. Separate source/cache/artifact reservations are sampled too.
+These are conservative sampled storage bounds, not RSS, complete transient
+allocation accounting, data traffic or physical I/O measurements. No-progress
+stops after 600 seconds without a monotone actual generated byte, native row,
+published CSV byte or independent verifier row checkpoint. Repeated rows,
+quota/time/log chatter and phase oscillation cannot keep work alive. Review
+waits use the fixed OS clock, with all source/physical guards still active.
+
+No data deletion or archival command exists. If retained successes leave
+insufficient capacity, stop and submit a separate enumerated retirement proposal
+with sizes/hashes and explicit parent approval. Failures/partials never retire to
+fit. Retirement does not reset this controller's conservative high-water charge.
+
+## Verification, evidence and remaining gates
+
+The existing independent streaming verifier checks strict decoded fields/IDs,
+disk-backed exact conservation, header/serialized caps, exact D order/chunk
+boundaries, G named quotas/lineage, version/config manifest, truncated/extra
+outputs and hashes. Windows unwraps only a hash-bound native Linux same-size
+report and supplies it to the verifier's `peer` API (the same implementation as
+`scale-acceptance.py verify --peer`). Seeded parity does not reconstruct random
+draws or prove uniformity. Browser/native different-size parity is rejected.
+Raw native analysis is retained; positive sort-run and merge facts are required
+to mark external-memory coverage present, otherwise the claim is **unmet**.
+Reported cleanup failures or residual temp/staging reject verification.
+
+Retained artifacts include proposals/approvals, permanent campaign slots/clocks,
+actual reservation and volume maps, capacity/process-census logs, runner
+manifests/status/stdout/stderr, independent checkpoints, native reports,
+cleanup/secondary errors and session result. A timeout, launch denial or missing
+receipt is never an acceptance pass. OS completion seals are separate from a
+verifier's successful return and are required for cross-OS progression.
+
+Safe focused command (fresh directory; only fake OS interfaces, synthetic
+fixtures at most 137 rows each; retains mutations and failures):
+
+```sh
+python3 -B scripts/test-native-scale-runner.py scratch/native126-fake-controls
+```
+
+Parent review, custody/schema reconciliation of actual frozen artifact proofs,
+real Linux/Windows containment/lock/death/hash-gap tests, frozen-product tiny
+integration, native platform gates, applicable `local-ci.py land`, and every
+actual generation/Run approval remain pending. No native scale, Windows, spill,
+timing or release claim follows from fake controls. Keep #103/#91 open.
+
+
+## Controller controls and native integration
+
+Polled ownership/startup/sample/result IPC files publish atomically through the
+maintained runner writer, so file existence never exposes a partial JSON record.
+Campaign slots, approvals and durable one-shot records keep exclusive creation.
+Windows atomic metadata publication retries only transient access/sharing errors
+(WinError 5 or 32), with a one-second retry window inside the existing two-second
+operation bound. Persistent errors fail closed; retries never renew census
+freshness, workload attempts or approvals. Readers retain the maintained bounded
+JSON parser. The existing stale-sample deadline remains unchanged.
+
+The fake controls exercise rejected Windows lock-owner launch, supervisor EOF
+while the lock is held, sequential phases, retained-lock cleanup failure, empty/
+unrelated/missing stdlib/loader maps, runtime additions/drift, and split-attempt
+build proofs. They use injected OS interfaces and tiny synthetic source files;
+they do not establish native lock exclusion or containment. Baseline mutation
+failures and subsequent passes are retained in the implementation worktree's
+`scratch/native131-review-logs/`; raw partials remain beside each control run.
+Parent reconciliation matched all 1,061 frozen606 source files and the package
+executables to their original successful Linux and Windows executable-producing
+attempts. Both stricter same-attempt proofs pass; no receipt or frozen byte was
+rewritten. The local reconciliation is retained in
+`scratch/native131-review-logs/actual606-receipt-reconciliation.json`.
+
+Component probes remain narrower than a full controller session. Linux/WSL
+probes at `9ce5a33` cover real cgroup/flock ownership, supervisor death, descendant
+cleanup and retained-lock proof failure; their initial JSON race is corrected by
+the atomic publication regression. Native Windows probes at `b495a48` cover a
+real replacement conflict that succeeds after its reader closes, persistent
+conflict failing after about one second while preserving the old value, delayed
+supervisor-death lock exclusion and cleanup-proof-failure lock retention. The
+failed-startup/handoff case retained its lock conservatively after a probe timeout;
+automatic cleanup of that case remains unqualified. Independent owned-process
+absence was established before exact guardian remediation. Full-session identity,
+costly scale phases and release acceptance remain separate and unclaimed.
+
+The `.github/workflows/ci.yml` tooling job runs the fake controller suite after
+its browser scale controls:
+
+```yaml
+      - run: python -B scripts/test-native-scale-runner.py scratch/ci-native-scale-controls
+```
+
+The directory is fresh. This invokes fake controls only, with no `session`.
+Native parent gates
+remain required: especially kill the actual Windows supervisor during maintained
+runner hashing and delayed worker cleanup, prove a second local-CI lock contender
+remains denied until stop/empty membership/reap, and retain the failure receipts.
+Also probe caretaker/lock-owner failure, failed startup/handoff, blocked census,
+runtime drift and the Linux inherited-fd path. Do not infer any native pass from
+the fake protocol's simulated lock state.
+
+## Windows allocation prerequisite (not admission)
+
+Storage samples and retained baseline charges use the private `_native_file.py`
+helper: Linux retains `max(st_size, st_blocks*512)` exactly. Windows opens a
+metadata-only `FILE_READ_ATTRIBUTES` handle with `FILE_FLAG_OPEN_REPARSE_POINT`,
+queries [FileStandardInfo](https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_standard_info),
+and uses [FileCompressionInfo](https://learn.microsoft.com/en-us/windows/win32/api/winbase/ns-winbase-file_compression_info)
+for sparse/compressed physical allocation. Charge remains the larger of logical
+and allocated bytes. Handle `fstat` and post-query path metadata must match the
+observed Python volume/file identity; API/metadata failures, deletion pending,
+replacement during measurement and reparse points fail closed. This uses Python's
+own Windows file-ID representation rather than importing Linux inode identities.
+`sealed_stat` uses the same regular-file allocation measurement; Linux sealed
+fields and fixed lineage hashes are unchanged. Shrink/deletion never refunds a
+sample, and a replacement observed at a later sample adds its own identity charge.
+As before, samples cannot establish unobserved transient allocation.
+
+Fake API controls (no Windows access):
+
+```sh
+python3 -B scripts/test-native-file-allocation.py
+```
+
+After the parent releases WindowsCI and authorizes native controls, use the
+selected native Windows Python from the repository root, with a **fresh** path:
+
+```powershell
+python -B scripts/test-native-file-allocation.py --native scratch/native103-allocation-controls
+```
+
+This command creates only tiny new files (at most 64 KiB per file), queries
+metadata, and retains its test directory. It checks normal allocation, the actual
+Storage baseline/carry path, shrink without refund, replacement, sparse and
+compressed allocation, reparse rejection and a delete-pending file kept alive
+by an owned metadata/delete handle. The sparse fixture explicitly clears its
+range with [FSCTL_SET_ZERO_DATA](https://learn.microsoft.com/en-us/windows/win32/fileio/sparse-file-operations):
+ordinary zero writes can allocate disk space. Compression is flushed with Python
+`flush` plus `fsync` before measurement; closing alone need not flush the
+[system buffer](https://learn.microsoft.com/en-us/windows/win32/fileio/flushing-system-buffered-i-o-data-to-disk).
+The production helper never flushes or changes files.
+
+The deletion control proves `FileStandardInfo.DeletePending` on the held handle
+and requires allocation and sealed-path metadata to fail closed. It accepts
+missing-name/access-denied/delete-pending errors: [POSIX deletion can remove the
+name while handles remain open](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-deletefilew).
+A removed name need not remain visible to directory enumeration, so this control
+does not require Storage to rediscover it. The separate normal control checks
+Storage's no-refund rule. An exclusive data handle is not a metadata-denial
+fixture: attribute-only access is outside ordinary read/write/delete
+[sharing checks](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-iochecklinkshareaccess).
+
+Unsupported sparse/compression operations and unavailable symlink privileges are
+reported as skips, not passes for those cases. ACL-denial and API failures remain
+fake controls. This command acquires no host/session lock or Job, runs no
+product, build or CI command, and takes no historical root as input.
+The [scoped Windows qualification](../../docs/history/prior-issues.md#issue-103)
+passed normal/baseline/carry/replacement, sparse, compressed and delete-pending
+controls. Symlink creation was skipped for missing privilege. Earlier failed
+fixture assumptions and the deletion error-code assertion remain retained in
+private operational evidence. This does not establish general reparse/ACL
+coverage or change Windows admission, lineage, campaign, claim transport or
+runtime qualification denial.
+
+<a id="windows-bootstrap-toy-qualification-unrun"></a>
+
+## Windows bootstrap toy qualification
+
+The reviewed private toy driver passed all five cases on 2026-11-07 against
+`1620fd219ee8db8bf6d5031698c72f0d170d10a1`: Windows build 26200 x64 and
+native Python 3.14.6. Its single observation took 25.565452 seconds and retained
+47,566 evidence bytes. The first application marker appeared at 0.451140 seconds, after suspended
+creation and Job assignment. Startup exit with a descendant, missing
+startup, missing supervisor ACK and controller EOF each produced an empty owned
+Job, primary-process wait and no cleanup errors. The injected final cleanup-proof
+publication failure retained the original lock owner and denied the independent
+contender, as required.
+
+The parent then checked all 15 recorded process births: the 14 nonowners were
+quiescent before administrative retirement of the exact held retained owner.
+Its signaled process handle and subsequent acquisition of the same durable lock
+were recorded separately. This retirement does not claim the failed proof was
+published or that the retained owner explicitly released its descriptor.
+
+Private receipts are `C:\chopper-bootstrap-toy-evidence-1620-r1\driver-result.json`
+(SHA-256 `a0fa24208397c50d72c07f104807bb736c954c2f97716f7ae70d73afcc965cef`)
+and `C:\chopper-bootstrap-toy-reconcile-1620-r1\result.json`
+(SHA-256 `22c844714c8225d4493c89217ccd05ecb477cba69fe818bcb7b10364bba3ab66`). The driver SHA-256 is
+`27a058828f1fb5d28e63b2350e6511e53138cc1d8f6c2c812fe85885b9aacbf4`;
+the exact eleven-source manifest is
+`9dc72af171fc9734c2f595cfae496a1801614dcc97a4d4e22e7a7e9de2be399a`.
+The runtime preparation bound 195 files and 38 loaded native modules; it was
+metadata/import preparation, not a product workload. No scale Run slot was used.
+Ambiguous API failures remain covered by fake controls; these five native cases
+do not establish every Win32 error, storage/custody admission or canonical claim
+transport. The original bounded plan follows; it does not authorize another run.
+
+The caretaker retains the worker owner before process creation. Ambiguous handle
+transfer raises cleanup errors even when the outer Job is empty; that cannot
+authorize release of the original host lock.
+
+Parent review and release of WindowsCI's original host lock are prerequisites.
+Do not run this concurrently with CI, acquire a replacement lock, change a cap,
+or touch the frozen product, prior receipts, reservations or claimed scale slots.
+This is one native Python toy observation window of **at most 30 seconds**, not
+product, full-session or scale acceptance. It is not authorization to run it.
+
+Bind the final reviewed commit and SHA-256 bytes of `native_scale_host.py`,
+`native_scale_windows.py`, `browser-small-windows.py`, `validation-runner.py`,
+the native Python executable/runtime, and the parent-reviewed toy driver. Use a
+fresh parent-owned evidence directory. The driver must call the actual
+`lock_owner_loop` → `stop_locked_caretaker` → `caretaker` chain with an actual
+byte-zero lock on `local-ci.host_lock_path()`, held by an owner outside inherited
+Jobs. Preserve real start/pulse/finish pipe traffic and asynchronous caretaker
+launch; no wrapper may wait for completion before returning the start ACK.
+Only the private driver's call to `SuspendedWorker.start` may substitute toy worker
+argv; it must call the saved, unchanged production helper with that argv. Do not
+substitute census, assignment, resume, process identity or cleanup operations.
+No production command-line bypass or arbitrary-argv mode is added.
+
+Use one monotonic deadline set before lock acquisition, with these absolute
+subdeadlines (all offsets from that deadline's start):
+
+1. **0–3 seconds:** verify the owner/caretaker are outside inherited Jobs; obtain
+   the original host lock and prove an independent contender is denied. Before
+   invoking the production worker `resume`, query the outer Job and require
+   kill-on-close/no-breakaway and exactly the suspended worker PID; require its
+   first-instruction marker to be absent. Resume only through the production
+   method, once, after assignment. Keep parent/control/lock handles out of its
+   explicit stdio handle list.
+2. **3–8 seconds:** the toy Python worker writes the marker, starts one Python
+   child sleeping for 20 seconds, writes its PID to evidence, and exits with code
+   7 before writing `startup.json`. Require caretaker failure with the startup
+   error, actual outer-Job termination, empty outer census, primary wait and
+   `cleanup_errors=[]`. The owned child's absence must follow queried Job
+   ownership, not worker exit. No Linux/cgroup error or buffered-stdin finalization
+   abort is permitted. The original lock can release only after that proof.
+3. **8–14 seconds:** fresh owned directory/phase: toy worker stays alive for
+   20 seconds without publishing startup. Preserve the production four-second
+   startup timeout. Require the same stop/empty/wait proof and original-lock
+   exclusion through cleanup. No parent ACK is relevant before startup exists.
+4. **14–20 seconds:** fresh phase: toy worker uses
+   `validation-runner.contain_session()` / `owned_windows_job()` to publish the
+   real nested handle and PID, then waits for `ready.json`. Parent duplicates and
+   queries the actual outer handle from `containment.json`, but deliberately
+   withholds `supervisor-ready.json`. Preserve the production four-second ACK
+   timeout. Require no `ready.json`, the ownership-handoff error, and proven
+   cleanup. Keep both parent pipes open until the intended timeout is observed.
+5. **20–25 seconds:** fresh phase: provide the real supervisor ACK only after
+   outer-Job duplication and census. After `ready.json`, close the controller's
+   writer while the toy has no result. Require controller-death failure,
+   stop/empty/wait proof, and no shutdown abort. A toy descendant must not retain
+   any control writer or lock handle and thereby hide EOF.
+6. **25–30 seconds:** fresh phase: repeat early startup failure, but inject failure
+   only at cleanup-proof publication. Require the actual original owner to stay
+   alive holding its lock, and a contender to remain denied after caretaker exit.
+   Record its exact PID/creation identity and remediation responsibility. Do not
+   kill that owner on deadline or infer an unlock from empty membership alone.
+
+At each subdeadline stop admission of further phases if its proof is incomplete;
+mark the qualification failed/incomplete. The 30-second deadline ends observation
+and new launches. It never releases an unproven original lock: leave its exact
+owner for explicit parent reconciliation, recording any still-owned processes.
+Stop only recorded held Jobs, reap direct children, query emptiness and retain
+all primary/secondary failures, stdout/stderr, Job/process identities, timestamped
+marker/startup/containment/ACK/ready/cleanup files, contender results and driver
+exit status. No global PID-name cleanup, timeout extension or automatic retry.
+
+Creation/configuration/assignment/resume denial, foreign inherited Job, invalid
+nested proof, census/reap failure and failed proof retention are additionally
+covered by the maintained fake-only suite. Those controls do not replace native
+qualification of this final helper against the selected Python/Windows runtime.
+
+## Sealed source HANDLE component (native qualification UNRUN)
+
+The private `_native_source._SourcePool` is an implementation prerequisite, not
+Windows admission. `Lineage`, `validate`, current descriptor hashes, product639,
+producing build feb9, the four lifetime slots and all capacity ceilings are
+unchanged. No source-H descriptor, Windows historical allocation bound, claim
+transport or admission route is supplied. Mutable native D/G data and temporary
+files always use the ordinary fresh path helper. The standalone helper retains
+fresh pre/post `lstat` ancestry, Python identity, error and close checks. Its only
+shared setup is private cached FFI signatures/types; there is no GetAttributesW
+replacement or file attribute/allocation result cache. Linux is unchanged.
+
+The root-owned future descriptor adapter must supply **every** source-reservation
+root and an exact immutable stat-like map of all roots, directories and regular
+files. Names, Python device/full file ID, size and mtime must remain fixed through
+the session; new/missing/replaced/mutated entries or reparse points deny. Inputs,
+Git metadata, interpreter/runtime, dependencies and artifacts must be covered;
+Python uses `-B`/`sys.dont_write_bytecode`, Git uses `GIT_OPTIONAL_LOCKS=0`, and all
+phase/approval/capture writes belong to native-owned operation/data roots. These
+are future admission prerequisites, not a claim that share flags prevent writes.
+
+The existing READ_ATTRIBUTES/share-read-write-delete pins establish object
+ownership, not an immutable allocation or namespace lease. Adding ancestor
+handles or restricting share flags alone does not prove immutability: attribute
+and extended-attribute access bypass sharing restrictions, and metadata/reparse
+operations can use FILE_WRITE_ATTRIBUTES. Keep the full fresh checks unless a
+replacement proves equivalent coverage, including hardlink names, existing
+writers/mappings and WSL aliases. That proof and selected-lineage admission
+remain absent. [Windows sharing rules](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew),
+[reparse access](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/4aeefef8-92c3-4abc-af7a-a610caf8a165).
+
+Internal integration sequence, after that descriptor is independently admitted:
+
+1. Hold the original `HostLock`. Call `_prepare_source(plan, lock, campaign,
+   entries, absolute_os_deadline)`. Registration first sends challenged
+   `source-arm` to that same external lock owner, before any native opening or
+   duplication. Every <=256-file chunk has its own unchanged two-second bound;
+   lock, campaign/OS clock, host, all volume identities, initial free floors and
+   partial source capacity are checked before and after each chunk. No bulk
+   constructor timeout override exists. `finish_prime` separately bounds the
+   complete source census. A partial/poisoned pool cannot start a caretaker.
+   The final census repeats owner/campaign/capacity admission before readiness;
+   every checkpoint rechecks the absolute OS deadline after volume/free queries.
+2. Construct `Monitor(..., source_pool=pool)` under `pool.bounded(...)`, keeping
+   the existing two-second constructor bound. The prepared component rejects a
+   lineage plan: root-owned Windows lineage/accounting admission is still absent.
+   `Monitor.sample()` itself bounds and fences the **whole** component operation;
+   call it directly, without another abandoning timeout wrapper. It samples
+   mutable native Storage through the existing helper and source Storage through
+   the actual pool. Component observations return only after successful fenced
+   completion; they deliberately do not append acceptance capacity receipts.
+   Future root integration owns reviewed receipt publication/claim binding.
+3. Each source sample enumerates the full namespace before and after fresh
+   TagInfo/StandardInfo/(sparse or compressed) CompressionInfo queries. Source
+   sampling follows the other Monitor capacity guards so its final census ends
+   the observation. Every directory and root ancestry
+   is freshly checked. Queries use the original kernel objects; post-query path
+   metadata must match the original Python 128-bit-capable identity. No per-file
+   ancestry walk is needed for a retained-object query. Alias paths still charge
+   separately, and Storage high water never refunds shrink/removal.
+4. After final samples and owned stop/empty/reap, call `lock.close_source_pool()`
+   before any passed/completed seal. The session has a cleanup hook before its
+   result; a future root adapter must also use the component's completed returned
+   observation for its final guard. Closing requires proven operation quiescence.
+   A timeout permanently poisons reuse; a late open/duplicate/query/close stays
+   tracked until its callback exits. Temporary CRT descriptors bind `fstat` and
+   immediately close; only non-inheritable native HANDLEs remain. Native opens
+   retain READ_ATTRIBUTES and share-read/write/delete, without modifying files.
+   Descriptor binding compares device, full file ID, size and modification time;
+   full mode checks remain on paths because Windows `fstat` omits execute bits.
+
+Unknown close ownership is never retried with a potentially reused numeric
+HANDLE. Blocked operations or uncertain cleanup retain the supervisor and its
+original owner pipe; HostLock cannot close the owner during unwinding. Armed
+owner EOF first stops any caretaker, then retains the original lock because EOF
+cannot prove source-handle cleanup. Successful quiescent close sends challenged
+`source-closed` only after native handles are gone. No-pool/Linux lock behavior
+is unchanged. Parent reconciliation remains necessary for retained uncertainty.
+
+Run only the fake controls during implementation:
+
+```sh
+python3 -B scripts/test-native-file-allocation.py
+python3 -B scripts/test-native-scale-runner.py FRESH_PRIVATE_CONTROL_DIRECTORY
+python3 -B scripts/test-ci-scope.py
+```
+
+The optional pool’s parent-owned native qualification remains **UNRUN**. First independently review
+this source and the root descriptor/transport adapter. Under the original host
+lock, prime every file in the actual maintained 23-root source/native coverage,
+measure individual chunks, complete source/native Storage pair and full Monitor
+observations against the then-applicable two-second operation/five-second
+freshness limits. Those private-component limits do not override the current
+default disk policy above or retroactively change failed observations. Keep exact root/file counts, Python/Windows/source hashes, logical and
+fresh allocation totals, late-call/cleanup receipts and failed attempts. Exercise
+one-open/fresh-allocation, normal/sparse/compressed, name/metadata/FileID drift,
+reparse/API failures, CRT nonretention, late create/duplicate/query/close and
+original-owner exclusion/EOF retention. The existing `--native` allocation
+command above qualifies only its standalone tiny fixtures, not this pool.
+A new positive 23-root pool qualification is required; earlier cached-FFI/lstat
+measurements and fake passes cannot establish it. Do not reuse the rejected
+GetAttributesW candidate or infer unmeasured historical allocation bounds.
+
+The implementation phase is limited to 30 minutes, 32 MiB explicit source reads
+and 8 MiB new private logs, with no payload/large fixture reads, native API,
+product/producer, build, CI, Windows dispatch or GitHub action. Record explicit
+read/log estimates separately from unmetered interpreter/import/filesystem/Git
+metadata I/O; these are not a syscall-level traffic measurement or permission
+for the future native qualification.
+
+During a live Windows capacity observation, only the current attempt's declared
+mutable data/campaign roots may reconcile a vanished unsealed name. The sampler
+drains all eight queries, retains every successful charge and rescans that root
+at most eight times within the same observation deadline. Baseline names, sealed
+admission, immutable source/runtime roots and non-absence denials remain strict.
+The explicit `test-native-scale-runner.py --native-storage-rename-probe DIR`
+control performs real NTFS atomic renames before lstat/allocation and after fstat;
+it uses the complete allocation helper and the original HostLock. Existing JSON
+replacement through the maintained publisher and ordinary same-file growth are
+measured too: a complete measurement is distinct from a supported candidate,
+and strict identity/allocation denials are retained rather than converted to passes.
+
+A mutable observation change is typed only after the second fresh ancestry pass.
+Only regular single-link objects on one volume, stable modes and a bound current
+path qualify: a stable replacement or nondecreasing growth of the same object.
+The sampler retains every measured handle allocation and logical highwater,
+then requires a new complete root scan. A predecessor that was never opened has
+unknown allocation, not zero physical allocation. Sealed/source/default callers
+still deny the typed exception. A deleted old handle is retryable only after
+fresh proof of its original full identity/size/mtime, valid allocation and zero
+native links, plus a different regular single-link nonreparse current name on
+the same volume. Both fresh ancestry passes and checked handle close still run.
+The mutable sampler retains that old allocation and requires a complete fresh
+root scan; deleted files without that replacement proof and other invalid
+allocations remain denials. The six-case POSIX publication component covers the
+actual replacement-after-open race before another full Tiny attempt.

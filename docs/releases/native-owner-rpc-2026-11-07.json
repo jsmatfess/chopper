@@ -1,0 +1,86 @@
+{
+  "schema": "chopper-native-owner-rpc-qualification-v1",
+  "date_utc": "2026-11-07",
+  "status": "passed-scoped-native",
+  "source_commit": "b561ff5ca0d43740c89614c475f79156abc45aab",
+  "runtime": {
+    "os": "native Windows",
+    "version_tuple": [
+      10,
+      0,
+      26200,
+      2,
+      ""
+    ],
+    "architecture": "x86_64",
+    "python": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
+    "bound_files": 354,
+    "loaded_native_modules": 46,
+    "bound_hash_bytes": 51846026
+  },
+  "scope": [
+    "actual WindowsLockOwner client and windows_lock_owner entry",
+    "original byte-zero lock descriptor and independently queried owner creation identity",
+    "independent contender denied",
+    "challenged start/pulse/finish with genuine suspended worker and owned child cleanup",
+    "valid pulse acknowledgement rejected after actual receive deadline; further request rejected before serialization/write",
+    "real controller EOF, owned stop/empty/reap and original owner exit"
+  ],
+  "toy_substitution": "Only declared owner/caretaker/worker argv are redirected; production OS helpers, process identities, acknowledgements and cleanup are not faked",
+  "limits": {
+    "observation_seconds": 30,
+    "absolute_phase_ends_seconds": [
+      14,
+      30
+    ],
+    "combined_packet_evidence_bytes": 1048576,
+    "automatic_retries": 0
+  },
+  "result": {
+    "elapsed_seconds": 1.8051970999949845,
+    "both_original_owner_exit_codes": [
+      0,
+      0
+    ],
+    "cleanup_errors": [],
+    "known_original_births_quiescent": 8,
+    "same_original_lock_file_available_after_quiescence": true,
+    "combined_retained_packet_execution_and_audit_bytes": 202811,
+    "administrative_owner_termination": false
+  },
+  "evidence": {
+    "driver-result.json": {
+      "bytes": 4548,
+      "sha256": "f9c7c8ef1b9353a90555b50e68dda349190e87dc0cc9a10202d28a4703b985ce"
+    },
+    "post-exit-audit.json": {
+      "bytes": 2554,
+      "sha256": "5abb0542c50f4d446074b71542527ea2f11c879732efa7280ff1c715af45ef1e"
+    },
+    "runtime-discovery.json": {
+      "bytes": 132615,
+      "sha256": "8c21229275aec4dfdbfce4228ea7db33b4c07d28184ce88297fc63d4fafb67a2"
+    },
+    "parent-binding.REVIEWED.json": {
+      "bytes": 60041,
+      "sha256": "a574de01eeb3ba609add052daa7c68f23397554da44b3e03208e38b0f2e3a1ca"
+    },
+    "source-pins.json": {
+      "bytes": 2947,
+      "sha256": "9716308c4985eb361e0619da492f0063e040e3013d67da1b83b8c281c43e5f81"
+    },
+    "toy_driver.py": {
+      "bytes": 13765,
+      "sha256": "261b66ae847a31de58c65a9db9d0bc5f8a256a75af4c2e2429e2cd9e9261f014"
+    }
+  },
+  "retained_preparation_failures": [
+    "Initial runtime probe exceeded its 3000 metadata-visit ceiling before qualification; full allowance and logs retained. A separately declared 6000-visit probe passed at 3,260 visits.",
+    "Original private toy review found final-deadline and partial-owner-recording defects; both regressions reproduced and passed after a fresh revision. No native qualification ran from the rejected packet."
+  ],
+  "limits_of_claim": [
+    "Two scoped toy phases on this native Windows/Python/source only; not an OS API/application-policy failure matrix",
+    "No product, scale workload, slot claim, Windows admission descriptor, cross-OS claim transport or publication acceptance",
+    "No total RSS, durability or performance comparison claim"
+  ]
+}

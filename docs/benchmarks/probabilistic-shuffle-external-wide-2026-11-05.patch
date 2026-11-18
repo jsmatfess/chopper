@@ -1,0 +1,83 @@
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -11,0 +12 @@
++thread_local! { static WIDE_PAYLOAD: Cell<bool> = const { Cell::new(false) }; }
+@@ -13 +14,2 @@
+-    format!("note-{id}-{}", "x".repeat(24 + id % 97))
++    let base = if WIDE_PAYLOAD.get() { 4096 } else { 24 };
++    format!("note-{id}-{}", "x".repeat(base + id % 97))
+@@ -86 +88,6 @@
+-            files.insert(name, bytes);
++            let checked_bytes = if WIDE_PAYLOAD.get() {
++                blake3::hash(&bytes).as_bytes().to_vec()
++            } else {
++                bytes
++            };
++            files.insert(name, checked_bytes);
+@@ -822,0 +830,66 @@
++
++#[test]
++fn probabilistic_shuffle_prepared_spill_external_wide() -> Result<()> {
++    WIDE_PAYLOAD.set(true);
++    let mut reference = None;
++    for candidate in [false, true] {
++        ENABLED.set(candidate);
++        let (dir, job) = setup(16384)?;
++        let input_blake3 = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let visits = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++        let seen = visits.clone();
++        let prepared = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(move |p| {
++                if p.phase == "Reading and validating CSV" && p.rows == 0 {
++                    seen.fetch_add(1, Ordering::Relaxed);
++                }
++            }),
++            pool.clone(),
++        )?;
++        let ctx = prepared.ctx.clone();
++        let analysis = prepared.execute()?;
++        let checked = verify(dir.path(), &job, 16384, &analysis)?;
++        let fingerprint = blake3::hash(&serde_json::to_vec(&checked)?)
++            .to_hex()
++            .to_string();
++        if let Some(ref expected) = reference {
++            assert_eq!(&checked, expected);
++        } else {
++            reference = Some(checked);
++        }
++        let diagnostics = ctx.diagnostics();
++        ensure!(
++            diagnostics["sort_runs"].as_u64().unwrap() > 0
++                && diagnostics["merge_operations"].as_u64().unwrap() > 0,
++            "external sorting not exposed"
++        );
++        let output_files = analysis.output_files;
++        let output_bytes = analysis.output_csv_bytes;
++        drop(analysis);
++        drop(ctx);
++        ensure!(visits.load(Ordering::Relaxed) == 1, "input replayed");
++        ensure!(
++            fs::read_dir(dir.path().join("temp"))?.next().is_none(),
++            "wide temp leaked"
++        );
++        ensure!(
++            !fs::read_dir(dir.path())?.any(|entry| entry
++                .unwrap()
++                .file_name()
++                .to_string_lossy()
++                .starts_with(".chopper-staging-")),
++            "wide stage leaked"
++        );
++        ensure!(pool.usage().reserved_bytes == 0, "wide pool leaked");
++        println!(
++            "PROB_EXTERNAL_WIDE {}",
++            serde_json::json!({"candidate":candidate,"rows":16384,"payload_base_bytes":4096,"input_blake3":input_blake3,"verified_fingerprint_blake3":fingerprint,"output_files":output_files,"output_csv_bytes":output_bytes,"csv_hash_output_analysis_parity":true,"independent_fields_ids_groupcount_caps":true,"input_visits":1,"cleanup":true,"final_pool_reserved":0,"diagnostics":diagnostics,"performance_measurement":false})
++        );
++    }
++    ENABLED.set(false);
++    WIDE_PAYLOAD.set(false);
++    Ok(())
++}

@@ -1,0 +1,172 @@
+diff --git a/crates/chopper-core/src/csv.rs b/crates/chopper-core/src/csv.rs
+index f3139b9..9f8d640 100644
+--- a/crates/chopper-core/src/csv.rs
++++ b/crates/chopper-core/src/csv.rs
+@@ -1217,5 +1217,19 @@ fn write_csv_text<'a>(
+-            for (index, special) in value.match_indices([settings.quote, escape]) {
+-                text.push_text(&value[start..index])?;
+-                text.push_char(escape)?;
+-                text.push_text(special)?;
+-                start = index + special.len();
++            if settings.quote.is_ascii() && escape.is_ascii() {
++                // An ASCII match is always a UTF-8 character boundary, including
++                // when the surrounding field contains multibyte text. Emit the
++                // same ordinary span, escape prefix and matched character.
++                for index in
++                    memchr::memchr2_iter(settings.quote as u8, escape as u8, value.as_bytes())
++                {
++                    text.push_text(&value[start..index])?;
++                    text.push_char(escape)?;
++                    text.push_text(&value[index..index + 1])?;
++                    start = index + 1;
++                }
++            } else {
++                for (index, special) in value.match_indices([settings.quote, escape]) {
++                    text.push_text(&value[start..index])?;
++                    text.push_char(escape)?;
++                    text.push_text(special)?;
++                    start = index + special.len();
++                }
+diff --git a/crates/chopper-core/tests/quoted_serialization.rs b/crates/chopper-core/tests/quoted_serialization.rs
+index 7caf704..02ac0b4 100644
+--- a/crates/chopper-core/tests/quoted_serialization.rs
++++ b/crates/chopper-core/tests/quoted_serialization.rs
+@@ -55,0 +56,138 @@ fn quoted_spans_preserve_literal_escape_bytes_and_admitted_retry() -> anyhow::Re
++
++fn reference_record(fields: &[String], settings: &CsvSettings) -> String {
++    let mut text = String::new();
++    for (index, value) in fields.iter().enumerate() {
++        if index != 0 {
++            text.push(settings.delimiter);
++        }
++        let quoted = value.is_empty()
++            || value
++                .chars()
++                .any(|c| c == settings.delimiter || c == settings.quote || c == '\r' || c == '\n');
++        if quoted {
++            text.push(settings.quote);
++        }
++        for c in value.chars() {
++            if quoted && (c == settings.quote || settings.escape == Some(c)) {
++                text.push(settings.escape.unwrap_or(settings.quote));
++            }
++            text.push(c);
++        }
++        if quoted {
++            text.push(settings.quote);
++        }
++    }
++    text.push_str(if settings.line_ending == "crlf" {
++        "\r\n"
++    } else {
++        "\n"
++    });
++    text
++}
++
++#[test]
++fn quoted_ascii_search_matches_scalar_reference_at_utf8_and_span_edges() -> anyhow::Result<()> {
++    let mut lengths: Vec<usize> = (0..=80).collect();
++    lengths.extend([255, 256, 257, 4095, 4096, 4097]);
++    for (quote, escape) in [
++        ('"', None),
++        ('"', Some('"')),
++        ('"', Some('\\')),
++        ('@', Some('!')),
++        ('"', Some('§')),
++        ('界', Some('\\')),
++        ('界', Some('§')),
++    ] {
++        for length in &lengths {
++            let fields = vec![
++                format!(
++                    "{},界{quote}a{}b{quote}\r\nend",
++                    "x".repeat(*length),
++                    escape.unwrap_or(quote)
++                ),
++                String::new(),
++                "ordinary 界".into(),
++                format!("{quote}{quote}{quote}"),
++            ];
++            for encoding in ["utf-8", "utf-16le", "utf-16be"] {
++                for crlf in [false, true] {
++                    let settings = CsvSettings {
++                        quote,
++                        escape,
++                        encoding: encoding.into(),
++                        line_ending: if crlf { "crlf" } else { "lf" }.into(),
++                        ..Default::default()
++                    };
++                    let text = reference_record(&fields, &settings);
++                    let expected: Vec<u8> = match encoding {
++                        "utf-16le" => text.encode_utf16().flat_map(u16::to_le_bytes).collect(),
++                        "utf-16be" => text.encode_utf16().flat_map(u16::to_be_bytes).collect(),
++                        _ => text.into_bytes(),
++                    };
++                    let mut serializer = Serializer::new(&settings)?;
++                    assert_eq!(serializer.serialize(&fields)?, expected);
++                    let mut reserved = Serializer::new(&settings)?;
++                    let mut held = 0;
++                    assert_eq!(
++                        reserved.serialize_fields_reserved(
++                            fields.iter().map(String::as_str),
++                            &mut |bytes| {
++                                held = bytes;
++                                Ok(())
++                            }
++                        )?,
++                        expected
++                    );
++                    assert_eq!(held, reserved.capacity());
++                    // Reuse a larger buffer with a short row, then this row again.
++                    reserved.serialize_fields_reserved(["short,\"row"], &mut |bytes| {
++                        held = bytes;
++                        Ok(())
++                    })?;
++                    assert_eq!(
++                        reserved.serialize_fields_reserved(
++                            fields.iter().map(String::as_str),
++                            &mut |bytes| {
++                                held = bytes;
++                                Ok(())
++                            }
++                        )?,
++                        expected
++                    );
++                    assert_eq!(held, reserved.capacity());
++                }
++            }
++        }
++    }
++    Ok(())
++}
++
++#[test]
++fn ascii_quoted_search_denial_retains_charge_and_exact_retry() -> anyhow::Result<()> {
++    let settings = CsvSettings {
++        escape: Some('\\'),
++        ..Default::default()
++    };
++    let fields = vec!["plain".into(), "界,\"quoted\\\r\ntext\"".repeat(8)];
++    let expected = reference_record(&fields, &settings).into_bytes();
++    for budget in 0..=1024 {
++        let mut serializer = Serializer::new(&settings)?;
++        let mut held = 0;
++        let result =
++            serializer.serialize_fields_reserved(fields.iter().map(String::as_str), &mut |bytes| {
++                anyhow::ensure!(bytes <= budget, "synthetic quote admission denial");
++                held = bytes;
++                Ok(())
++            });
++        if let Ok(bytes) = result {
++            assert_eq!(bytes, expected);
++        }
++        assert_eq!(held, serializer.capacity());
++        assert_eq!(
++            serializer
++                .serialize_fields_reserved(fields.iter().map(String::as_str), &mut |_| Ok(()))?,
++            expected
++        );
++    }
++    Ok(())
++}

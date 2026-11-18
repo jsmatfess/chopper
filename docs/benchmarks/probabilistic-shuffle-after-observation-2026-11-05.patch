@@ -1,0 +1,150 @@
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -1515,0 +1516,4 @@
++    }
++    #[cfg(test)]
++    pub(crate) fn research_buffer_limit(&self) -> usize {
++        self.buffer_limit
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -585,0 +586,129 @@
++
++type TargetHook = Box<dyn FnMut(&'static str, Option<usize>)>;
++thread_local! {
++    static TARGET_HOOK: std::cell::RefCell<Option<TargetHook>> = const { std::cell::RefCell::new(None) };
++}
++pub(super) fn observe_sort_target(point: &'static str, target: Option<usize>) {
++    TARGET_HOOK.with(|slot| {
++        if let Some(hook) = slot.borrow_mut().as_mut() {
++            hook(point, target);
++        }
++    });
++}
++struct TargetHookReset;
++impl Drop for TargetHookReset {
++    fn drop(&mut self) {
++        TARGET_HOOK.with(|slot| slot.borrow_mut().take());
++    }
++}
++fn target_hook(hook: impl FnMut(&'static str, Option<usize>) + 'static) -> TargetHookReset {
++    TARGET_HOOK.with(|slot| {
++        assert!(slot.borrow().is_none());
++        *slot.borrow_mut() = Some(Box::new(hook));
++    });
++    TargetHookReset
++}
++
++#[test]
++fn probabilistic_shuffle_after_observation_owner_control() -> Result<()> {
++    ENABLED.set(true);
++    let mut reference = None;
++    for when in ["before", "after"] {
++        let (dir, mut job) = setup(20000)?;
++        let mut text = String::from("id,region,payload\n");
++        for id in 0..20000 {
++            text.push_str(&format!("{id},R0,{}\n", payload(id)));
++        }
++        fs::write(&job.input, text)?;
++        if let Operation::AssignProbabilistic { groups, .. } = &mut job.operations[1] {
++            groups[0].percent = "50".into();
++            groups[1].percent = "50".into();
++        }
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let grant = Arc::new(std::sync::Mutex::new(Reservation::for_workspace(Arc::new(
++            Workspace::shared(32 * 1024 * 1024, pool.clone()),
++        ))));
++        let peer = grant.clone();
++        let shared = pool.clone();
++        let injection = Arc::new(std::sync::Mutex::new(None));
++        let injected = injection.clone();
++        let target = Arc::new(std::sync::Mutex::new(None));
++        let observed_target = target.clone();
++        let hook = target_hook(move |point, limit| {
++            if let Some(limit) = limit {
++                *observed_target.lock().unwrap() = Some(limit);
++            }
++            if point == when {
++                assert!(injected.lock().unwrap().is_none());
++                let before = shared.usage().reserved_bytes;
++                peer.lock().unwrap().resize(28 * 1024 * 1024).unwrap();
++                *injected.lock().unwrap() = Some(
++                    serde_json::json!({"point":point,"pool_before":before,"pool_after":shared.usage().reserved_bytes,"grant_bytes":28*1024*1024}),
++                );
++            }
++        });
++        let visits = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++        let seen = visits.clone();
++        let result = prepare_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(move |p| {
++                if p.phase == "Reading and validating CSV" && p.rows == 0 {
++                    seen.fetch_add(1, Ordering::Relaxed);
++                }
++            }),
++            pool.clone(),
++        )
++        .and_then(|prepared| {
++            let ctx = prepared.ctx.clone();
++            let analysis = prepared.execute()?;
++            let checked = verify_live_owner(dir.path(), &job, 20000, &analysis)?;
++            if let Some(ref expected) = reference {
++                assert_eq!(&checked, expected);
++            } else {
++                reference = Some(checked);
++            }
++            let diagnostics = ctx.diagnostics();
++            drop(analysis);
++            drop(ctx);
++            Ok(diagnostics)
++        });
++        let (outcome, details) = match result {
++            Ok(diagnostics) => ("success_exact", diagnostics),
++            Err(error) => {
++                assert_eq!(when, "after", "positive control failed: {error:#}");
++                assert!(
++                    matches!(
++                        error.downcast_ref::<crate::resources::MemoryAdmission>(),
++                        Some(crate::resources::MemoryAdmission::Shared { .. })
++                    ),
++                    "{error:#}"
++                );
++                assert!(!std::path::Path::new(&job.output).exists());
++                (
++                    "typed_shared_denial",
++                    serde_json::json!({"error":format!("{error:#}"),"debug":format!("{error:?}")}),
++                )
++            }
++        };
++        assert!(injection.lock().unwrap().is_some());
++        assert!(target.lock().unwrap().is_some());
++        assert_eq!(visits.load(Ordering::Relaxed), 1);
++        assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
++        assert!(!fs::read_dir(dir.path())?.any(|entry| entry
++            .unwrap()
++            .file_name()
++            .to_string_lossy()
++            .starts_with(".chopper-staging-")));
++        assert_eq!(pool.usage().reserved_bytes, 28 * 1024 * 1024);
++        drop(hook);
++        grant.lock().unwrap().resize(0)?;
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        println!(
++            "PROB_AFTER_OBSERVATION {}",
++            serde_json::json!({"when":when,"candidate":true,"outcome":outcome,"details":details,"injection":*injection.lock().unwrap(),"buffer_target":*target.lock().unwrap(),"input_visits":1,"cleanup":true,"final_pool_reserved":0,"performance_measurement":false})
++        );
++    }
++    ENABLED.set(false);
++    Ok(())
++}
+--- a/crates/chopper/src/engine/streaming.rs
++++ b/crates/chopper/src/engine/streaming.rs
+@@ -250,0 +251,2 @@
++    #[cfg(test)]
++    super::prob_shuffle_controls::observe_sort_target("before", None);
+@@ -251,0 +254,5 @@
++    #[cfg(test)]
++    super::prob_shuffle_controls::observe_sort_target(
++        "after",
++        Some(sorter.research_buffer_limit()),
++    );

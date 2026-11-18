@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "recorded_date": "2026-11-15",
+  "status": "selected four-cell browser-scale evidence accepted and delivered",
+  "scope": "Selected Chrome/Edge 1GB decimal D/G actual acceptance for issue #104; original Chrome G harness failure remains separate from read-only completed-export recovery. Delivered validation tooling at3f02e85; publication requires separate approval.",
+  "issue": "https://github.com/jsmatfess/chopper/issues/104",
+  "selected_product": {
+    "source_commit": "639d1fe97d985b1544df0932321c6a93cca2567b",
+    "runtime_build_commit": "feb9e099e5e0f22c4da8d0f5ba7269e221c91e9d",
+    "artifact_receipt_sha256": "1720f28a01cbbd7a30cbb8c8614b9efc2da01e57c765c625f51e8a5e3455c30d"
+  },
+  "workload": {
+    "input_bytes_each": 1000000000,
+    "engine_working_memory_bytes": 67108864,
+    "workers": 1,
+    "maximum_serialized_csv_bytes": 10000000,
+    "maximum_rows_per_chunk": 1000000,
+    "browser_temporary_limit_bytes": 8589934592,
+    "channel_owned_limit_bytes": 25769803776,
+    "memory_scope": "Working-allocation accounting, not RSS; no general performance claim."
+  },
+  "chrome": {
+    "version": "157.0.8103.51",
+    "executable_sha256": "5b835c10836045119334d9524e62437110e00e1bd20612c9072a0ae155f94a17",
+    "os": "Windows 11 Pro 10.0.26300",
+    "D": {
+      "status": "accepted",
+      "harness_commit": "dc0c53db3f4d62663f3e610f30827e61c2ecc7f9",
+      "outcome_sha256": "a7f202ab274918915aebc493b70a2b8ae5d6527af6b5510e863d82d0f9ece62b",
+      "fixture_sha256": "b9f39def15561eebc6eeb72f6cb4ff1c1c0e35f0d76cd06d7e8775aec82f0b5a",
+      "verified_report_sha256": "6729f8036345469b0940b29a9e8075d42c396b7d5abd46d28dad88eaddc5ea0b",
+      "browser_receipt_sha256": "cfaa3165ce92644a49cff9ff8500e46ffe7b7327bc6a21616b6473751ea389df",
+      "independent_sha256": "191a11ae4d4ecdce2f1770cad1e2fa8c74f255d4c56580edcaf5199ee1bfac48",
+      "canonical_claim_sha256": "9ce72063776f15138bd91f22326379d6dd0f1f7c8a6f809b8c1482bd8ebcfd66",
+      "rows": 9999999,
+      "chunks": 101,
+      "groups": 1,
+      "maximum_chunk_bytes": 10000000,
+      "normal_original_release": true,
+      "independent_owned_process_proofs": 4,
+      "administrative_cleanup": false,
+      "peer_parity": "passed; Edge verified report SHA exactly equals Chrome report",
+      "normal_release_sha256": "876f38faa56234c0f2a01943500d56738080dba0a8d4377f3d05f2431b7d7ed5"
+    },
+    "G": {
+      "status": "accepted completed export; original harness remains FAILED",
+      "fixture_sha256": "ab6750fb7f09ee0a1f07d29eb3f030f95433ef2218f316c4282aeae44712bd99",
+      "original_harness_commit": "dc0c53db3f4d62663f3e610f30827e61c2ecc7f9",
+      "original_packet_sha256": "e7d0361761bcadf82939b6affb70da90a71da3cf7d85198c292cd089b5ef4f12",
+      "original_failed_browser_receipt_sha256": "37e17fb9565dead849b2de8bbbdcb844e316eed8295553c6864afd758058567e",
+      "original_failed_independent_sha256": "f7991a7bace8b7058fab04605b3d624782f73d9e510a652379e51c02be5c8006",
+      "original_normal_release_sha256": "715ca15644868eab8f9078c8506d9ed49135373fe4c4a672e6c28fb10564699b",
+      "canonical_claim_sha256": "28190af843f2fe65a8e81e563f03b2cb18bacfe6fcc858d36796e13744d32d22",
+      "original_failure": [
+        {
+          "phase": "execution",
+          "error": "AssertionError [ERR_ASSERTION]: Completed physical spill/merge metrics required"
+        }
+      ],
+      "completed_public_state_sha256": "fb95d7acbecf20b84a3875a09362d89333c855d7c2d5ebd4293b43098344d5a3",
+      "completed_public_status": "complete",
+      "recovery_harness_commit": "df8bd9aa14a0d5eb7056e9766c5808b9b971f0c3",
+      "recovery_outcome_sha256": "b0ca15ce580d6dbe9b3bcf42f0af84c647ee458fe572a7fa5195d9b78be45906",
+      "verified_report_sha256": "9b7095c4d2c6defac0e539d530e0e7d0e181eee9791d05560cb091562544bc43",
+      "extraction_receipt_sha256": "dfdd502f163edb017aedaeb3b5a756ef92553888bee615e5738fcd3734e3e1c7",
+      "recovery_independent_sha256": "9ec736462ba077031158b25318a92d6594ef2880725e6c8911d2e0a818f6ef43",
+      "recovery_normal_release_sha256": "8b960e8404bd2a2706290eb7b9aeacf3e397d26e65dd3e027d0fdf33ecd6b57d",
+      "rows": 999999,
+      "chunks": 112,
+      "groups": 16,
+      "maximum_chunk_bytes": 10000000,
+      "spill_facts": {
+        "completed_spill_runs": 72,
+        "completed_spill_rows": 999999,
+        "merge_cursor_completed_attempts": 0,
+        "merge_cursor_interrupted_attempts": 8,
+        "merge_cursor_interrupted_rows": 999999,
+        "scope": "Interrupted merge cursors retain truthful engine outcomes; completed public export independently streamed and verified. Not a completed-only merge metric claim."
+      },
+      "recovery_product_runs": 0,
+      "recovery_new_scale_claims": 0,
+      "normal_original_release": true,
+      "administrative_cleanup": false,
+      "peer_parity": "passed; actual Edge report SHA exactly equals independently recovered Chrome report",
+      "original_session_passed": false,
+      "original_normal_cleanup_errors": []
+    }
+  },
+  "edge": {
+    "D": {
+      "status": "accepted",
+      "harness_commit": "94a4b7687648835f83e5d7e3404e5b98da90496c",
+      "outcome_sha256": "8cb4a4759c4fc41a0be9b2f82f653f39224f836fd40b3988239efd618c2e558b",
+      "fixture_sha256": "b9f39def15561eebc6eeb72f6cb4ff1c1c0e35f0d76cd06d7e8775aec82f0b5a",
+      "verified_report_sha256": "6729f8036345469b0940b29a9e8075d42c396b7d5abd46d28dad88eaddc5ea0b",
+      "browser_receipt_sha256": "9baf809fdf12fe36a8df5c8bc6a7a15f55dab971025c2229ba586296a8e659be",
+      "browser_version": "157.0.4341.60",
+      "browser_executable_sha256": "2497874639116d8edc3de34b3fd83f72fa099112a5d2a426e1f08fcf39a99612",
+      "independent_sha256": "577a7dd7b531b880b87260a8fdef95a2ed38352207991010a36980a8dd61f28c",
+      "normal_release_sha256": "5059e75c004d85b6ebc8c6a7a52939c0a8ca358761d574c8f82f616fc94956c1",
+      "canonical_claim_sha256": "01b43c178e86f4f439bb0fa7717774ec7aa0b026cfbeba1a56d9b3189be63963",
+      "rows": 9999999,
+      "chunks": 101,
+      "groups": 1,
+      "maximum_chunk_bytes": 10000000,
+      "seeded_report_exact_equal_chrome_peer": true,
+      "normal_original_release": true,
+      "independent_owned_process_proofs": 4,
+      "administrative_cleanup": false,
+      "all_outer_eof_reaped_joined": true,
+      "all_four_phases_elapsed_seconds": 307.8379995659925
+    },
+    "G": {
+      "status": "accepted",
+      "harness_commit": "94a4b7687648835f83e5d7e3404e5b98da90496c",
+      "outcome_sha256": "22360f4f33ba0889fd09bfd5322e10d7796ac4d2f541e2e7dd27519e80b53d6b",
+      "fixture_sha256": "ab6750fb7f09ee0a1f07d29eb3f030f95433ef2218f316c4282aeae44712bd99",
+      "verified_report_sha256": "9b7095c4d2c6defac0e539d530e0e7d0e181eee9791d05560cb091562544bc43",
+      "browser_receipt_sha256": "cf218a471d1734a81c0a3763a42b79a20435f856887dc32715a663ee483948fe",
+      "public_state_sha256": "13f4bc5aa768aeaa01484412e2b1fe67f3227ed1a32f9c4dbb35baaa7ce7f78d",
+      "browser_version": "157.0.4341.60",
+      "browser_executable_sha256": "2497874639116d8edc3de34b3fd83f72fa099112a5d2a426e1f08fcf39a99612",
+      "independent_sha256": "c1aa7413cdf109f57e8c1ed61d5354a677e47e5d813d3c59275ed93469086de0",
+      "normal_release_sha256": "733339ce5fb49eaa4cfdb885a10d8dacd14cc16e688144ca684e3f8a43dd1614",
+      "canonical_claim_sha256": "b6c5538c7319a91fc72322e57f3d4c32fa88ec610d69a629e41d29abd60ed631",
+      "rows": 999999,
+      "chunks": 112,
+      "groups": 16,
+      "maximum_chunk_bytes": 10000000,
+      "seeded_report_exact_equal_chrome_recovered_peer": true,
+      "spill_facts": {
+        "completed_spill_runs": 72,
+        "completed_spill_rows": 999999,
+        "completed_spill_attempts": 72,
+        "merge_cursor_completed_attempts": 0,
+        "merge_cursor_interrupted_attempts": 8,
+        "merge_cursor_interrupted_rows": 999999,
+        "merge_cursor_failed_attempts": 0,
+        "graph_event_details_omitted": 0,
+        "scope": "Actual completed spill runs; merge cursors remain truthfully interrupted despite complete verified public export. Not a completed-only merge claim."
+      },
+      "normal_original_release": true,
+      "independent_owned_process_proofs": 4,
+      "administrative_cleanup": false,
+      "all_outer_eof_reaped_joined": true,
+      "all_four_phases_elapsed_seconds": 223.3585621060338
+    }
+  },
+  "canonical_family": {
+    "original_reservation_sha256": "94e37d0a2d6016def01e426472e0be6f3b35c442fc136f35914acd8595a30859",
+    "original_plan_ids": [
+      "hosted104-chrome-D-r1",
+      "hosted104-chrome-G-r1",
+      "hosted104-msedge-D-r1",
+      "hosted104-msedge-G-r1"
+    ],
+    "chrome_claims_consumed": 2,
+    "consumed_claims_permanent": true,
+    "no_rerun_or_refund": true,
+    "accepted_chrome_cells": 2,
+    "accepted_edge_cells": 2,
+    "prior_edge_unspent_count_before_current_D_attempt": 2,
+    "accepted_cells": 4,
+    "large_claims_consumed": 4,
+    "edge_claims_consumed": 2,
+    "edge_claims_unspent": 0
+  },
+  "custody_and_limits": {
+    "coverage": "injected File/OPFS client bridge; no real dialog/external filesystem or served app.js claim",
+    "all_failed_attempts_and_charges_retained": true,
+    "metric_scope": "Graph counters are engine logical facts, not physical I/O, RSS or measured allocation peaks.",
+    "private_raw_evidence_retained": true,
+    "hash_verified_record_pins": 21,
+    "fixture_sha_scope": "Fixture hashes are pinned actual report/receipt identities; this documentation task did not reread 1GB inputs.",
+    "publication_authorized": false,
+    "remaining_criteria": [
+      "Owner version/publication approval and subsequent actual served-app verification"
+    ],
+    "new_prerequisite_record_pins_verified": 19,
+    "source_draft_sha256": "ffb70903f814337468d7d8d98fe1d8c3c85603f217741a31f4bd61ee9e0c3364",
+    "edge_D_record_pins_verified": 7,
+    "edge_G_record_pins_verified": 7,
+    "final_sampled_logical_highwater_bytes": 36863279133
+  },
+  "prerequisites": {
+    "msedge": {
+      "browser_version": "157.0.4341.60",
+      "small": {
+        "status": "passed complete15 contracts and independent ownership",
+        "harness_commit": "6afaffb36f9ad0a0b877bcc94af2c7db49f33f0b",
+        "outcome_sha256": "0fb813042a9c07168bf5ea53f222713e9c1d3f57d0a59c3379374406d26f2e02",
+        "qualification_sha256": "c4bd499a88b4f7d4f168a668367bc0778ffeaff43de5530c27cb0f2d67af1493",
+        "main_sha256": "314573fa8a4d142d20ac7759744a489b8982f2a608b703c08a09a45f66998d4a",
+        "normal_release_sha256": "50ebe86f4307674487d6b1a2fb0dee0f4230dd52b0bff489cce31fef6af6c959",
+        "cleanup_sha256": "02de10a3ab74515c4462c287c90caa8d0b63db8b67f8c4624acf8c29cd69738a",
+        "independent_sha256": "4c7c00f6d694b42871860b3a6d6dac332192be60dd6b5a36d1070a709b1eda65",
+        "independent_process_proofs": 400,
+        "independent_status_counts": {
+          "absent": 399,
+          "positive_birth_reuse_original_ended": 1
+        },
+        "normal_original_release": true,
+        "input_generated_bytes": 0,
+        "scale_slots_consumed": 0
+      },
+      "browser_scale_tiny": {
+        "status": "passed complete Tiny and independent; not Large acceptance",
+        "harness_commit": "94a4b7687648835f83e5d7e3404e5b98da90496c",
+        "outcome_sha256": "a547492df4743f90c42d7f55e5997ece17d8b93c575e64a3f4d599e09a227f49",
+        "qualification_sha256": "95f2226ad03fc58240639b953f824ba550cffe3a5cb23dc686a68b900aab9e91",
+        "preflight_sha256": "c1818a3ad730f234470403a5e92167a5b59f7c59670cabcb96fa9413cd79d9c3",
+        "independent_sha256": "ac9a441fe7f9b05742b2a2c2f4b2044d7f4a9a30c046728757ad1fb4eea48e87",
+        "packet_sha256": "bc02fbdb614cbaeb4c56cb56d20e05e63aafbf86d11ee723f8926093135dd919",
+        "reservation_sha256": "063b35239542f78999815db43380c0ffcbe3ce16a9266cc9d626784157790765",
+        "all_outer_eof_reaped_joined": true,
+        "generated_input_bytes": 0,
+        "reused_input_bytes": 12800,
+        "original_byte0_available": true,
+        "probe_closed": true,
+        "timer_joined": true
+      },
+      "time_continuation": {
+        "original_reservation_sha256": "94e37d0a2d6016def01e426472e0be6f3b35c442fc136f35914acd8595a30859",
+        "new_reservation_sha256": "063b35239542f78999815db43380c0ffcbe3ce16a9266cc9d626784157790765",
+        "declaration_sha256": "1f43f8feeb2a6819110085f9d3d9546415208313f2e2fa5cfd7ed06a34f7a486",
+        "same_original_four_ids_and_directories": true,
+        "same_claims_root": true,
+        "chrome_clock_unchanged": true,
+        "old_chrome_deadline_utc": "2026-11-15T11:13:11.727364+00:00",
+        "new_edge_start_utc": "2026-11-15T14:34:30.456353+00:00",
+        "new_edge_deadline_utc": "2026-11-15T19:48:52.882785+00:00",
+        "all_prior_non_time_debt_and_failed_records_retained": true,
+        "no_old_controller_or_deadline_extension": true
+      }
+    }
+  },
+  "delivery": {
+    "code_commit": "3f02e852a4bece2b93d389cc011faa2cb7e7e246",
+    "local_ci": {
+      "linux_sha256": "9d63a2de5fffdf34c7ad7b6b321562f6a5960b0f2a8b97f74a82c4cd2b7f280a",
+      "windows_sha256": "ab97d10a277c66bbef719ba03a38112263df5d01f97328b0299c91760243cb68"
+    },
+    "record_sha256": "50803e5fde07abd923a172baa52cabf49ef742986de6a37b6eda055b5cedf533",
+    "scope": "Validation-tooling/documentation delivery; selected product and actual qualification harnesses retain their original identities. Publication requires separate owner approval."
+  }
+}

@@ -1,0 +1,78 @@
+diff --git a/crates/chopper/src/storage/adaptive.rs b/crates/chopper/src/storage/adaptive.rs
+index b8a8a4b..cf9df45 100644
+--- a/crates/chopper/src/storage/adaptive.rs
++++ b/crates/chopper/src/storage/adaptive.rs
+@@ -408,4 +408,18 @@ impl PackedRow {
+-            bytes.resize(start + length, 0);
+-            reader
+-                .read_exact(&mut bytes[start..])
+-                .with_context(|| format!("reading field {} for row {}", index + 1, header.id))?;
++            let read = (|| -> io::Result<()> {
++                // The complete destination capacity is already admitted. Copy
++                // ordinary buffered fields directly instead of zeroing bytes
++                // that read_exact immediately overwrites. Keep the original
++                // large-field path and zero-length I/O behavior.
++                if length != 0 && length < DISK_READ_BUFFER {
++                    let buffered = reader.fill_buf()?;
++                    if length <= buffered.len() {
++                        debug_assert!(bytes.capacity() - start >= length);
++                        bytes.extend_from_slice(&buffered[..length]);
++                        reader.consume(length);
++                        return Ok(());
++                    }
++                }
++                bytes.resize(start + length, 0);
++                reader.read_exact(&mut bytes[start..])
++            })();
++            read.with_context(|| format!("reading field {} for row {}", index + 1, header.id))?;
+@@ -1116,0 +1131,50 @@ mod tests {
++    #[test]
++    fn buffered_spool_fields_preserve_owned_bytes_positions_and_failure_release() -> Result<()> {
++        for capacity in [1, 3, 8, 64, 4096] {
++            for invalid in [0, 1, 2] {
++                let workspace = Arc::new(Workspace::new(4096));
++                let row = Row {
++                    id: 7,
++                    ordinal: 13,
++                    key: vec![7; 17],
++                    fields: vec![String::new(), "界".into(), "x".repeat(100)],
++                };
++                let mut frame = Vec::new();
++                write_row(&mut frame, &row)?;
++                if invalid == 1 {
++                    *frame.last_mut().unwrap() = 0xff;
++                }
++                if invalid == 2 {
++                    frame.pop();
++                }
++                let expected_position = frame.len() as u64;
++                let mut reader = BufReader::with_capacity(capacity, io::Cursor::new(frame));
++                let header = read_header_reserved(
++                    &mut reader,
++                    1024,
++                    Some(Reservation::for_workspace(workspace.clone())),
++                )?
++                .unwrap();
++                let decoded =
++                    PackedRow::read_fields_reserved(&mut reader, 1024, header, None, None);
++                assert_eq!(reader.stream_position()?, expected_position);
++                if invalid == 0 {
++                    let decoded = decoded?;
++                    assert_eq!(decoded.fields().collect::<Vec<_>>(), row.fields);
++                    assert_eq!(decoded.key.as_slice(), row.key);
++                    let held = workspace.used();
++                    assert!(held > 0);
++                    drop(reader);
++                    assert_eq!(workspace.used(), held);
++                    assert_eq!(decoded.fields().collect::<Vec<_>>(), row.fields);
++                    drop(decoded);
++                } else {
++                    assert!(decoded.is_err());
++                    drop(decoded);
++                }
++                assert_eq!(workspace.used(), 0);
++            }
++        }
++        Ok(())
++    }
++

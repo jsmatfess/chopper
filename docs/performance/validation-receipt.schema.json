@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Chopper validation-receipt v1",
+  "description": "Normalized source projection; not a new independent observation or reusable acceptance receipt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "source",
+    "source_sha256",
+    "aliases",
+    "location",
+    "record_kind",
+    "check_id",
+    "attempt",
+    "status",
+    "raw_status",
+    "exit_code",
+    "runtime",
+    "reported_platform",
+    "batch",
+    "contract",
+    "contract_refs",
+    "browser",
+    "features",
+    "build_identity",
+    "command",
+    "logs",
+    "inputs",
+    "artifacts",
+    "runtime_identity",
+    "duration_seconds",
+    "error",
+    "freshness",
+    "latest"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source": {
+      "type": "string"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pointer": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer"
+        },
+        "manifest_pointer": {
+          "type": "string"
+        }
+      }
+    },
+    "record_kind": {
+      "type": "string"
+    },
+    "check_id": {},
+    "attempt": {},
+    "status": {
+      "enum": [
+        "passed",
+        "failed",
+        "blocked",
+        "unrun",
+        "skipped",
+        "invalidated",
+        "incomplete",
+        "unknown"
+      ]
+    },
+    "raw_status": {},
+    "exit_code": {},
+    "runtime": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reported_platform": {},
+    "batch": {},
+    "contract": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "contract_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "browser": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "features": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "string"
+      }
+    },
+    "build_identity": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "command": {},
+    "logs": {},
+    "inputs": {},
+    "artifacts": {},
+    "runtime_identity": {},
+    "duration_seconds": {},
+    "error": {},
+    "freshness": {
+      "type": "string"
+    },
+    "latest": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "metadata_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "pointer",
+          "source",
+          "source_sha256"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "pointer": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "manifest": {
+      "type": "object",
+      "required": [
+        "source",
+        "sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "attempt_key": {
+      "type": "string"
+    }
+  },
+  "$defs": {}
+}

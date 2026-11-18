@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-15",
+  "subsystem": "execution",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#shuffle-swarm-decisions-2026-11-15",
+      "sha256": "9d6630a478f692ff092bf8158c374588ef0c8b799bc7e186b73c67cc0af2e81a"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/shuffle-swarm-summary-2026-11-15.json",
+      "sha256": "30e3beb60e4b02e8f9c01393664c0ea5bbb236249aa5bc6f19b1aeeb4f9468ae"
+    },
+    {
+      "path": "docs/benchmarks/shuffle-swarm-archive-receipt-2026-11-15.json",
+      "sha256": "af4e167cf48ffe2eabb3a0a9e8568daf80ec101b1707b119ea82d188863a9a6c"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/execution-decisions.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md"
+  ],
+  "id": "shuffle-ingestion-adaptive-2026-11-15",
+  "title": "Reject the measured ingestion-adaptive shuffle pilot",
+  "question": "Does same-buffer ingestion admission followed by fitting Fisher-Yates avoid enough complete-job cost?",
+  "disposition": "reject",
+  "outcome": "inconclusive",
+  "delivery": "unapplied",
+  "summary": "Remove the single-buffer adaptive prototype after no demonstrated complete-job benefit; preserve lossless-transition source/tests/evidence without additional tuning.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "12000 by 192-byte fitting and 50000 by 192-byte external root-auto cells; three alternating pairs each."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Actual fitting FY selection and external three-run/one-merge path verified; source IDs/fields/order conservation, parser-relief/threshold transition and cancellation controls passed before removal."
+  },
+  "limitations": [
+    "Overlapping elapsed ranges and mixed paired signs do not establish consistent slowdown.",
+    "No WASI or native Windows performance experiment; no restored resident-data selector.",
+    "Small warm WSL2/bundled-Chromium development samples do not establish native Windows/macOS, other browsers, scale or tails.",
+    "Working reservations are not RSS; Analysis temporary counters precede publication; final committed-head CI is separate.",
+    "An inherited parser-owned shrink replacement-overlap gap remains in unchanged baseline producers; new mixed-prefix intake retains actual capacity.",
+    "Private archive readback used the existing OAuth principal; no separate scoped-reader or public publication claim."
+  ],
+  "exclusions": [
+    "Warmups, failed attempts and source-mismatched/quarantined WASM output are excluded from measured comparisons.",
+    "Derived summaries and repeated verification records are not additional observations; cells/runtimes are not pooled."
+  ],
+  "reopen_when": "Reopen only for a concrete ingestion-integrated cost reduction that changes complete-job economics without a second complete spool or raw reread."
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "empty-reservation-2026-11-05",
+  "title": "Keep empty reservation accounting changes unpromoted",
+  "date": "2026-11-05",
+  "subsystem": "resources",
+  "question": "Does removing empty grants and zero-byte ledger releases meet the frozen whole-Run benefit rule?",
+  "disposition": "retain-experimental",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Restore production: elapsed benefit misses the practical threshold and one CPU pair regresses; retain the unchanged patch as unpromoted evidence.",
+  "scope": {
+    "runtimes": [
+      "native-windows"
+    ],
+    "workloads": [
+      "One million plain probe-v1 pipeline rows; four workers, 32-MiB job/shared limits, fixed seed and strict output caps.",
+      "Separate unreplicated ordered-export control."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Six jobs preserve fields, IDs, groups, caps, CSV/Analysis parity and cleanup. Recorded measured-head local workflows cover Linux/Windows and browser/WASI; final production sources are restored before delivery."
+  },
+  "limitations": [
+    "Two observations per primary variant, uncontrolled cache/background state, overlapping ranges and coarse CPU counters do not establish general gains.",
+    "The two accounting changes are not isolated; reservations are not an RSS cap."
+  ],
+  "exclusions": [
+    "The ordered control and earlier timing/percentage gains are not pooled into the primary cell.",
+    "No retuning, extra shapes, repeated jobs or cleanup-label promotion follows from this result."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#empty-reservation-accounting-candidate-not-promoted-2026-11-05",
+      "sha256": "2e694c3c28d82af73eb0addf131b8f773aba70a804549189f6047c35a5ba49fe"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/zero-reservation-2026-11-05.json",
+      "sha256": "5a1bc54de633945753a067164d501dabd87b057eecba7940f03d9c9ac01cd518"
+    },
+    {
+      "path": "docs/benchmarks/zero-reservation-2026-11-05.patch",
+      "sha256": "a4d4ab2934af981152335ca6f7b3f6a062fd72e411538e4d290bb41bfd49b133"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

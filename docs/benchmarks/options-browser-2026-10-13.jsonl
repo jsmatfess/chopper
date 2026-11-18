@@ -1,0 +1,22 @@
+{"type": "environment", "wasm_sha256": "c5fcf9f42dba1a8f5cf77959c2f573a924213e30084ba6af44d1ef027a78d05e", "scope": "Chromium correctness and native parity; not an A/B performance comparison"}
+{"type": "contract", "name": "optional CSV sniffing shares the native engine", "seconds": 0.1564450000000652}
+{"type": "contract", "name": "full input profiling sees late keys and caches across config edits", "seconds": 0.1223200000000652}
+{"type": "contract", "name": "input profiling cancellation cannot leave a publishable job", "seconds": 0.01759499999997206}
+{"type": "contract", "name": "row limits preserve order and exact bytes", "seconds": 0.17205499999993482}
+{"type": "contract", "name": "balanced split rejects fewer records than files", "seconds": 0.09270999999996275}
+{"type": "contract", "name": "strict malformed CSV rejection", "seconds": 0.08792000000015833}
+{"type": "contract", "name": "shuffle fisher_yates matches native seeded output", "seconds": 0.16841500000003726}
+{"type": "contract", "name": "interleaved  matches native seeded output", "seconds": 0.19389999999990687}
+{"type": "contract", "name": "assign_probabilistic  matches native seeded output", "seconds": 0.1464299999999348}
+{"type": "contract", "name": "interleaved splitting retains nonempty and exact file-count caps", "seconds": 0.3965300000000279}
+{"type": "contract", "name": "streaming buffer shuffle preserves the pre-fusion native order", "seconds": 0.11429000000003725}
+{"type": "contract", "name": "partition then stratified assignment then shuffle", "seconds": 2.1483200000000653}
+{"type": "contract", "name": "combined partition/shuffle/allocation/balanced is deterministic", "seconds": 0.7595549999999348}
+{"type": "contract", "name": "gzip output and input roundtrip", "seconds": 0.22070499999984167}
+{"type": "contract", "name": "zstd output and input roundtrip", "seconds": 0.22264999999990687}
+{"type": "contract", "name": "zip output and input roundtrip", "seconds": 0.32546999999997206}
+{"type": "contract", "name": "UTF-16 serialization and byte cap", "seconds": 0.13930000000004655}
+{"type": "contract", "name": "temporary budget fails without export", "seconds": 0.08442500000004656}
+{"type": "contract", "name": "disk-backed shuffle larger than working budget", "seconds": 5.210310000000056}
+{"type": "contract", "name": "adaptive grouping and forced sorting preserve identical output", "seconds": 5.816995000000111}
+{"type": "contract", "name": "cancellation cleans active workspace", "seconds": 0.041094999999972064}

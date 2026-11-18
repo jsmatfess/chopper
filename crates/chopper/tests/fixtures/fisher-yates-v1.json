@@ -1,0 +1,5 @@
+{
+  "seed": "fisher-yates-v1-contract",
+  "input": "id,payload\n0,duplicate\n1,duplicate\n2,duplicate\n3,duplicate\n4,duplicate\n5,duplicate\n6,duplicate\n7,duplicate\n8,duplicate\n9,duplicate\n10,duplicate\n11,duplicate\n",
+  "ids": [11, 1, 2, 3, 10, 8, 9, 4, 0, 6, 7, 5]
+}

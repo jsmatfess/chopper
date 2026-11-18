@@ -1,0 +1,271 @@
+{
+  "type": "derived_probabilistic_shuffle_live_owner_completion_counterexample",
+  "decision": "Reject unchangedfusionpromotion: baselinecompletes, candidatefails typedSharedmemoryadmission under matchedpost-rootlive28MiBreservation in32MiBpool, reproducedLinux/nativeWindows. Cleanup/grantownership remaincorrect. No graph/retryimplementation.",
+  "fixture": "20000uniqueIDs,singleR0parent,unchangedprobe-v1payloads,50/50/0probabilityallocation->Uniform;seedprob-shuffle-fusion-v1;job32MiB/workers1/1024row+65536bytecaps.",
+  "observations": {
+    "linux": [
+      {
+        "candidate": false,
+        "cleanup": true,
+        "diagnostics": {
+          "compact_spill_blocks": 0,
+          "compact_spill_fallbacks": 0,
+          "compact_spill_files": 0,
+          "compact_spill_rows": 0,
+          "compact_spill_source_bytes": 0,
+          "compact_spill_stored_bytes": 0,
+          "consecutive_partition_fusions": 0,
+          "consecutive_partition_retries": 0,
+          "consecutive_partition_rows": 0,
+          "directory_path_reserved_bytes": 35,
+          "fisher_yates_calls": 0,
+          "fisher_yates_rows": 0,
+          "fisher_yates_seconds": 0.0,
+          "grouping_policy": "auto",
+          "merge_inputs": 0,
+          "merge_operations": 0,
+          "partition_balanced_fusions": 0,
+          "partition_balanced_retries": 0,
+          "partition_balanced_rows": 0,
+          "peak_temporary_files": 6,
+          "peak_workspace_reserved_bytes": 6569938,
+          "process_memory": {
+            "admission_limit_bytes": 33554432,
+            "limit_bytes": 33554432,
+            "peak_reserved_bytes": 32729157,
+            "pressure_baseline_reserved_bytes": null,
+            "pressure_observation": null,
+            "pressure_rechecks": 0,
+            "reserved_bytes": 29427076,
+            "startup_observation": null
+          },
+          "resident_sorts": 4,
+          "routed_groupings": 1,
+          "routing_fallbacks": 0,
+          "routing_reused_runs": 0,
+          "shuffle_partition_fusions": 0,
+          "shuffle_partition_retries": 0,
+          "shuffle_partition_rows": 0,
+          "sort_calls": 4,
+          "sort_rows": 40000,
+          "sort_runs": 0,
+          "sort_seconds": 0.011226785,
+          "spill_format_candidate": false,
+          "streaming_chain_fusions": 0,
+          "streaming_chain_retries": 0,
+          "streaming_chain_rows": 0,
+          "temporary_bytes_read": 10759791,
+          "temporary_bytes_written": 10694803,
+          "temporary_cleanup_failures": 0,
+          "temporary_files_created": 8,
+          "temporary_path_reserved_bytes": 0,
+          "workspace_reserved_bytes": 66948
+        },
+        "final_pool_reserved": 0,
+        "injection": {
+          "grant_bytes": 29360128,
+          "phase": "Preparing operation 2 of 3",
+          "pool_reserved": 29363551,
+          "rows": 0
+        },
+        "input_visits": 1,
+        "outcome": "success_exact"
+      },
+      {
+        "candidate": true,
+        "cleanup": true,
+        "diagnostics": {
+          "error": "preparing operation 2: shared process memory admission limit exceeded (current 33554432 bytes, startup ceiling 33554432 bytes); release retained work or reduce concurrent work"
+        },
+        "final_pool_reserved": 0,
+        "injection": {
+          "grant_bytes": 29360128,
+          "phase": "Preparing operation 2 of 3",
+          "pool_reserved": 29363551,
+          "rows": 0
+        },
+        "input_visits": 1,
+        "outcome": "typed_memory_denial"
+      }
+    ],
+    "windows": [
+      {
+        "candidate": false,
+        "cleanup": true,
+        "diagnostics": {
+          "compact_spill_blocks": 0,
+          "compact_spill_fallbacks": 0,
+          "compact_spill_files": 0,
+          "compact_spill_rows": 0,
+          "compact_spill_source_bytes": 0,
+          "compact_spill_stored_bytes": 0,
+          "consecutive_partition_fusions": 0,
+          "consecutive_partition_retries": 0,
+          "consecutive_partition_rows": 0,
+          "directory_path_reserved_bytes": 64,
+          "fisher_yates_calls": 0,
+          "fisher_yates_rows": 0,
+          "fisher_yates_seconds": 0.0,
+          "grouping_policy": "auto",
+          "merge_inputs": 0,
+          "merge_operations": 0,
+          "partition_balanced_fusions": 0,
+          "partition_balanced_retries": 0,
+          "partition_balanced_rows": 0,
+          "peak_temporary_files": 6,
+          "peak_workspace_reserved_bytes": 6570112,
+          "process_memory": {
+            "admission_limit_bytes": 33554432,
+            "limit_bytes": 33554432,
+            "peak_reserved_bytes": 32729389,
+            "pressure_baseline_reserved_bytes": null,
+            "pressure_observation": null,
+            "pressure_rechecks": 0,
+            "reserved_bytes": 29427105,
+            "startup_observation": null
+          },
+          "resident_sorts": 4,
+          "routed_groupings": 1,
+          "routing_fallbacks": 0,
+          "routing_reused_runs": 0,
+          "shuffle_partition_fusions": 0,
+          "shuffle_partition_retries": 0,
+          "shuffle_partition_rows": 0,
+          "sort_calls": 4,
+          "sort_rows": 40000,
+          "sort_runs": 0,
+          "sort_seconds": 0.0123271,
+          "spill_format_candidate": false,
+          "streaming_chain_fusions": 0,
+          "streaming_chain_retries": 0,
+          "streaming_chain_rows": 0,
+          "temporary_bytes_read": 10759791,
+          "temporary_bytes_written": 10694803,
+          "temporary_cleanup_failures": 0,
+          "temporary_files_created": 8,
+          "temporary_path_reserved_bytes": 0,
+          "workspace_reserved_bytes": 66977
+        },
+        "final_pool_reserved": 0,
+        "injection": {
+          "grant_bytes": 29360128,
+          "phase": "Preparing operation 2 of 3",
+          "pool_reserved": 29363725,
+          "rows": 0
+        },
+        "input_visits": 1,
+        "outcome": "success_exact"
+      },
+      {
+        "candidate": true,
+        "cleanup": true,
+        "diagnostics": {
+          "error": "preparing operation 2: shared process memory admission limit exceeded (current 33554432 bytes, startup ceiling 33554432 bytes); release retained work or reduce concurrent work"
+        },
+        "final_pool_reserved": 0,
+        "injection": {
+          "grant_bytes": 29360128,
+          "phase": "Preparing operation 2 of 3",
+          "pool_reserved": 29363725,
+          "rows": 0
+        },
+        "input_visits": 1,
+        "outcome": "typed_memory_denial"
+      }
+    ]
+  },
+  "coverage": "Baseline independentlyverifiedallIDs/fields/caps and3groups. Candidatehasnocompleteoutput; no pairCSVparityclaim. Bothcasesoneinput-start,no ownedtemp/stagingresidue;only29360128bytecompetitor survivesuntilexplicitrelease,thenpoolzero.",
+  "source_findings": [
+    {
+      "symbol": "Workspace::sort_buffer_limit",
+      "finding": "Uses configured aggregateadmissionlimit andnominaljobtarget, not remainingheadroom afterlivegrants."
+    },
+    {
+      "symbol": "Sorter::reserve_input/flush",
+      "finding": "Failed growth canflush retainedrows, but spillIO itself needs65536bytegrant overlapping rows. This is a source-supported risk, not exactfailed-allocation attribution."
+    }
+  ],
+  "limits": "Callback-synchronizedsyntheticledgerowner, not OSallocation/RSS or arbitrarythreadinterleavings. Onefixedcase, no sweep or timing. Candidatefailure losesdetailedContextdiagnostics; Linuxfollowupbacktrace locates spillIOgrant before firstfusedsinkrow; Windowsallocationpoint nottraced. Earlierfixed4MiBpool success doesnotprove dynamicownercompletion.",
+  "validation": {
+    "linux_focused_pair": "passed asclassifiedoutcomes",
+    "windows_focused_pair": "samecounterexample,byte-matchedsource/MSVC1.99.1",
+    "new_linux_fmt_clippy": "passed",
+    "workspace_suite_reuse": "Core/vendor/UI identical topriorworkspace-validatedsnapshot;onlynewtesthelpersdiffer.",
+    "scientific_result": "Candidate hypothesis rejected, not an orchestration/testharness failure."
+  },
+  "usage": {
+    "new_linux_jobs": 2,
+    "new_windows_jobs": 2,
+    "new_timed_or_cli_jobs": 0,
+    "additional_linux_diagnostic_jobs": 1
+  },
+  "owner_boundary": "Executiongraphcode/docs, GLOSSARY/ADR/prototypeHTML ownedbyotherthread; no modificationshere.",
+  "references_sha256": {
+    "scratch/prob-shuffle-live-owner-20261103T1854/session.json": "1f9c85f7e1eadb434ad89c2fc107b7990ab5a48e35e64bf016c4c5483c45c844",
+    "scratch/prob-shuffle-live-owner-20261103T1854/plan.json": "fa26bcf1b836786157c8cd31c160351d6f7ee307a65d2573d7e05ed7a4ccf922",
+    "scratch/prob-shuffle-live-owner-20261103T1854/review.md": "5da301cf3658c4b9aae21b1140af9b01f480fd04948faa5f3ede4e9712228826",
+    "scratch/prob-shuffle-live-owner-20261103T1854/batch/status.json": "6bdc35a287fd7342afa8de0a35236fbc5b0490b1d06d9adf579d3bb341a94932",
+    "scratch/prob-shuffle-live-owner-20261103T1854/batch/manifest.json": "d645c4a11b409f4963cfe30276ed76b61f267a5f14979cacc84ff7081f7f161e",
+    "scratch/prob-shuffle-live-owner-20261103T1854/batch/1-stdout.log": "ef647f45e6a08476fe8ca1a1be8e475fe2ccf1e8000220675733cf0d29edafb4",
+    "scratch/prob-shuffle-live-owner-20261103T1854/batch/1-stderr.log": "23b1816b1e8827c47a139d7598dd931e7656f0dea12dbcfe2136b91a7020b3cd",
+    "scratch/prob-shuffle-live-owner-20261103T1854/records.json": "16d7ffec92a200d34659b1996c1d357a53c6e2c5e6c7b0568c8561ca9a1a9294",
+    "scratch/prob-shuffle-live-owner-20261103T1854/validation-batch/status.json": "6f2cd17354d32f3a09f919a04b6b7fab7ea3636b24b3588baba6a8020c2ce367",
+    "scratch/prob-shuffle-live-owner-20261103T1854/validation-batch/manifest.json": "30d72edcef0f7cea464cdb67d83f92dff6e3563d1a03149dcf27d54f98dd6e65",
+    "scratch/prob-shuffle-live-owner-20261103T1854/validation-batch/2-stderr.log": "3382fe24b69a0ba4b9b01b07d4970cdc962ce988b9c766cda64d417e8f045b9a",
+    "scratch/prob-shuffle-live-owner-20261103T1854/windows-plan.json": "f777099ff7418df309f132a99d1fc612d4f915fb71b6848dd532db1e01edc81e",
+    "scratch/prob-shuffle-live-owner-20261103T1854/windows-review.json": "c489001bbcf36ba036f34cbb685de7a9b8f3ed4226ac577b47f687313be40f81",
+    "scratch/prob-shuffle-live-owner-20261103T1854/windows-source-match.json": "920c15e0b5304c0ac9745cd50dd7df838a291b0852aff7c3f3cd9110e292504a",
+    "scratch/prob-shuffle-live-owner-20261103T1854/windows-launch.stdout": "5912be34a532beeb1e1ddc7817b33e346af073ee79378a630329dd7bc05df7bd",
+    "scratch/prob-shuffle-live-owner-20261103T1854/windows-launch.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scratch/prob-shuffle-live-owner-20261103T1854/windows-records.json": "70ec533fc1c21bc0aa8ef58307936301855b8d0d35396c0ae1b9034dccc0eae7",
+    "scratch/prob-shuffle-live-owner-20261103T1854/windows-status.json": "ff4671bef073286f3b78b37c87fd3660eaf380191b9c683c784095968285f59b",
+    "scratch/prob-shuffle-live-owner-20261103T1854/windows-manifest.json": "5d5423affa0b12bd471ef0c6206be7c7538dee3102ba716e7f24d4d9a66cec80",
+    "scratch/prob-shuffle-live-owner-20261103T1854/source-match.json": "b40869af89ba3daa17fad2989b7c25bd38dc1ec5827f779c8a4cee6c80111cef",
+    "WIN:scratch/prob-shuffle-live-owner-20261103T1854/batch/status.json": "ff4671bef073286f3b78b37c87fd3660eaf380191b9c683c784095968285f59b",
+    "WIN:scratch/prob-shuffle-live-owner-20261103T1854/batch/manifest.json": "5d5423affa0b12bd471ef0c6206be7c7538dee3102ba716e7f24d4d9a66cec80",
+    "WIN:scratch/prob-shuffle-live-owner-20261103T1854/batch/1-stdout.log": "10f95f618be42b160cccbd4bf3c7bce15487d6a061c953e42636e72694df63b5",
+    "WIN:scratch/prob-shuffle-live-owner-20261103T1854/batch/1-stderr.log": "c4e43adadefe485302234226461c2f2f856b0bb8bcaac3a57318b1ba22bfe5ef",
+    "scratch/prob-shuffle-live-owner-20261103T1854/diagnostic-plan.json": "656e48069f046c671bda9c194d3c06b2faa7e0e65d89a11708e88016a75fb400",
+    "scratch/prob-shuffle-live-owner-20261103T1854/diagnostic-review.json": "5ba59e645fc9248992d98b7d3a78fd82a7ae995ec902069e048cfe90d05f8a6c",
+    "scratch/prob-shuffle-live-owner-20261103T1854/diagnostic-batch/status.json": "0dfa14d57bef11717f2f2df7f212aacc1a167f0d66bf0a2f81be229bf033574b",
+    "scratch/prob-shuffle-live-owner-20261103T1854/diagnostic-batch/manifest.json": "656e48069f046c671bda9c194d3c06b2faa7e0e65d89a11708e88016a75fb400",
+    "scratch/prob-shuffle-live-owner-20261103T1854/diagnostic-batch/1-stdout.log": "d69d97ad331e9b1c1b134495ed48ad9fd821a21a1e64ed3c5442e6026692503d",
+    "scratch/prob-shuffle-live-owner-20261103T1854/diagnostic-batch/1-stderr.log": "7bb848dbb881a2a70d903b1654996f2afafc8f6fbcd7112a812de8cc83a4bc6b",
+    "scratch/prob-shuffle-live-owner-20261103T1854/original-control-binary": "7b49567f7d8cdfc6264f1ca2706ab1ebe0eda6d37d5c3f8af03abe7a1ac09c8a"
+  },
+  "session": {
+    "objective": "TODO.md evidence-only live-owner completion comparison for unchangedprobabilistic/shuffle fusion",
+    "prior_handoff": "scratch/prob-shuffle-browser-20261103T1510/handoff.json",
+    "original_start_utc": "2026-11-03T08:27:43Z",
+    "window_start_utc": "2026-11-03T18:54:40+00:00",
+    "window_duration_seconds": 7200,
+    "deadline_utc": "2026-11-03T20:54:40+00:00",
+    "launch_cutoff_utc": "2026-11-03T20:34:40+00:00",
+    "limits": {
+      "research_jobs": 2,
+      "build_attempts": 2,
+      "additional_storage_bytes": 1073741824
+    },
+    "estimate_seconds": 45,
+    "estimate_disk_bytes": 805306368,
+    "scope": "One20k/singleR0parent/50-50-0allocation/Uniform pair,32MiBjob+pool/workers1/1024row+65536bytecaps. Independent28MiBreservation acquiredatoperation2 afterrootmaterialization, heldthroughcompletion. Samecandidatecore, onlyappenddiagnostic test. Classifysuccess/typedmemorydenial,compareexactoutputsifbothsuccess;allcleanup/competitorlifetimes asserted. No sweeps/timing/graphchanges.",
+    "owner_boundary": "Do not touch executiongraphcode/docs, GLOSSARY/ADR orprototypeHTML; otherthread owns them."
+  },
+  "allocation_diagnostic": {
+    "runtime": "Linuxonly, oneadditionalcandidate job, RUST_BACKTRACE=1",
+    "outcome": "Same typedShared denial and cleanup",
+    "failed_allocation": "Sorter::flush io.resize(65536) while retainedrowslive",
+    "frames": [
+      "MemoryPool::acquire resources.rs:168",
+      "Reservation::resize storage/adaptive.rs:183",
+      "Sorter::flush storage.rs:1725",
+      "Sorter::push_packed storage.rs:1638",
+      "Sorter::push_compact_reusing storage.rs:1598",
+      "Sorter::push_compact storage.rs:1574",
+      "fused_probabilistic_shuffle engine/streaming.rs:264"
+    ],
+    "emission_boundary": "Accumulationloop sorter.push_compact fails before sorter.finish and child/output-emissionloop; oneparentcase, no fusedsinkrow emitted.",
+    "windows_site": "Not separatelybacktraced; onlycounterexampleoutcome reproduced.",
+    "patch": "docs/benchmarks/probabilistic-shuffle-live-owner-diagnostic-2026-11-03.patch"
+  }
+}

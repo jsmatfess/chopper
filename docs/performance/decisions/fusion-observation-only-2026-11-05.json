@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "fusion-observation-only-2026-11-05",
+  "title": "Block the observation-only fusion storage variant",
+  "date": "2026-11-05",
+  "subsystem": "storage",
+  "question": "Does observing available buffer headroom guarantee later spill admission?",
+  "disposition": "block-promotion",
+  "outcome": "unfavorable",
+  "delivery": "unapplied",
+  "summary": "A peer arriving after observation denies the candidate although the before-observation case completes.",
+  "scope": {
+    "runtimes": [
+      "native-windows",
+      "native-linux"
+    ],
+    "workloads": [
+      "20k one-parent probe rows, 50/50/0 allocation and child shuffle; 32-MiB job/shared pool and a timed competing grant."
+    ],
+    "measurement": "diagnostic"
+  },
+  "validation": {
+    "runtimes": [
+      "native-windows",
+      "native-linux"
+    ],
+    "summary": "Typed Shared denials, owner lifetimes, exact successful output and cleanup pass; the denial is a scientific falsifier, not a harness failure."
+  },
+  "limitations": [
+    "This synthetic boundary does not measure performance or physical OOM."
+  ],
+  "exclusions": [
+    "Earlier fitting and resident-wide successes cannot prove late-owner completion."
+  ],
+  "reopen_when": "A separately reviewed real-owner remedy is required before a new admission claim.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#probabilistic-shuffle-fusion-peer-after-buffer-observation-2026-11-05",
+      "sha256": "4c26c679f599222119b203cbfd6885428fb74317612675a600d71ae46108b746"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/probabilistic-shuffle-after-observation-2026-11-05.json",
+      "sha256": "41956c94620846e64ec55441a1e33df5d4bf6a19447ede6779b69833e50cd8b0"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

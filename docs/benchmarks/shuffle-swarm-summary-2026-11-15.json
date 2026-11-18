@@ -1,0 +1,4740 @@
+{
+  "schema_version": 1,
+  "type": "derived_shuffle_swarm_summary",
+  "date": "2026-11-15",
+  "baseline": "de93a7a728fd8652f01627b1d1483409ed499455",
+  "population": "Per-cell three alternating measured pairs after one warmup/variant; summaries and repeated verification records are not observations. No cross-cell/runtime pooling.",
+  "clocks": {
+    "native-linux": "GNU time wrapper launch through CLI exit including snapshot/publication/product cleanup; verification/generation excluded.",
+    "wasi-chromium": "After defaults/pickers through prepare, confirmation, export/marker/session retirement in persistent Chromium; collection/verification/browser startup excluded. Same profiling overhead both variants."
+  },
+  "scope_notes": [
+    "Linux is WSL2, warm uncontrolled ext4/OPFS; no physical-device/native-Windows performance claim.",
+    "Working reservations are not RSS. Native Analysis temporary counters precede publication. Browser CPU/RSS/device I/O unavailable.",
+    "Raw originals and source/replay receipts remain private; compact projections are derived, not additional samples.",
+    "Combined native fitting sample with 53ms elapsed is retained; no outlier removal or tail claim.",
+    "Balanced actual predeclared harness used shuffle-swarm-v1, rather than illustrative balanced-revision-v1 in initial design; no seed search/retry."
+  ],
+  "decisions": {
+    "exact": "retain narrow current-path unstratified ranges; upstream/suffix fusion priority and terminal admission errors preserved",
+    "mixed": "retain narrow auto/uniform-before-final-FY elision; earlier explicit FY remains; parser-capacity/fit limitation explicit",
+    "adaptive": "reject/no retained code: no demonstrated native complete-job gain; no WASI inference",
+    "balanced": "defer/no retained code: predefined all-three-paired primary falsifier failed and fitting control median slower; no size selector"
+  },
+  "variants": {
+    "baseline": {
+      "manifest_sha256": "2eb2fad0a3f43cd8634472e4496b796030ea84f2f0adf58885aba756789cd034",
+      "source_head": "de93a7a728fd8652f01627b1d1483409ed499455",
+      "features": [],
+      "artifacts": [
+        {
+          "name": "chopper",
+          "bytes": 5619400,
+          "sha256": "a58a5a7cb3cb50a2f9e26ce88e94aa9652a48a9eee76eb1681e5a9043d6289c1"
+        },
+        {
+          "name": "chopper_browser.wasm",
+          "bytes": 2489127,
+          "sha256": "72810e08bcd904008cd961252c0109a3282873c29f6be9bcfc0d46152da08233"
+        },
+        {
+          "name": "_headers",
+          "bytes": 385,
+          "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1"
+        },
+        {
+          "name": "app.js",
+          "bytes": 92380,
+          "sha256": "3a5d2a19638e87c378857292506239cb24a5b621840a5c64ccf884091aeafb20"
+        },
+        {
+          "name": "engine-worker.js",
+          "bytes": 45011,
+          "sha256": "a2b77651032802c81e679bf730218c53f5b1c8c675fe23782a0c1d7d63cc18ea"
+        },
+        {
+          "name": "engine.wasm",
+          "bytes": 2489127,
+          "sha256": "72810e08bcd904008cd961252c0109a3282873c29f6be9bcfc0d46152da08233"
+        },
+        {
+          "name": "index.html",
+          "bytes": 8605,
+          "sha256": "0a2033fdc414ad5a823d48a3653ff4e685b98543932589265727c6c118d87211"
+        },
+        {
+          "name": "storage-worker.js",
+          "bytes": 3034,
+          "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6"
+        },
+        {
+          "name": "style.css",
+          "bytes": 28875,
+          "sha256": "c4f140d83fd3657f4ad84802afad4a52d330b5b6ad497d5ed0cdb6953961d4b5"
+        }
+      ],
+      "runner_receipt_sha256": "b52bb2c9676bcf26efb217709f4c234e6d25486006e0b8589e5713ba8907ea3d"
+    },
+    "exact-candidate": {
+      "manifest_sha256": "f7b0b15b050a9a327d7e1318ae9591948fb55b2eb2bae9a03a626cc495f69fe1",
+      "source_head": "de93a7a728fd8652f01627b1d1483409ed499455",
+      "features": [],
+      "artifacts": [
+        {
+          "name": "chopper",
+          "bytes": 5646496,
+          "sha256": "f65b82579d2fe24724e0dc2e2825708de3cf25a2c45bb6c61ec1dd0748297019"
+        }
+      ],
+      "runner_receipt_sha256": "894b5ff6dbda70669a83f58ca01b2a45d7373aa633ba575f75c8388dbdb843e2"
+    },
+    "mixed-candidate": {
+      "manifest_sha256": "60c8f34b272d02864d01ef8859910b8d4fdd4395baab02068c82baa4ae3f77f7",
+      "source_head": "de93a7a728fd8652f01627b1d1483409ed499455",
+      "features": [],
+      "artifacts": [
+        {
+          "name": "chopper",
+          "bytes": 5619680,
+          "sha256": "4edfc291cc96afbd7846847461197921e716c91be22abda1a744f685def5a88c"
+        }
+      ],
+      "runner_receipt_sha256": "4b98eec73d73213874f19ab313dd1f4da8a3d3d184041519436373c6be12fc40"
+    },
+    "adaptive-candidate": {
+      "manifest_sha256": "52103f1c4ef6c77522356a1d72f01a4d9360d4938c3ceb045011c447c5488bb7",
+      "source_head": "de93a7a728fd8652f01627b1d1483409ed499455",
+      "features": [],
+      "artifacts": [
+        {
+          "name": "chopper",
+          "bytes": 5624248,
+          "sha256": "edf5410a1801c08a1d4c003cdf0fe19b3cbcc30631542774f0e03bc29a874dad"
+        }
+      ],
+      "runner_receipt_sha256": "d33fd5e6068b3c555ba92d0c429494fa166e16b565960e353775dc67e3ae7ab6"
+    },
+    "balanced-candidate": {
+      "manifest_sha256": "56fe4635480cec3eba72b61691d8f6ab8a82125f344e08aac5862c1298b2b019",
+      "source_head": "de93a7a728fd8652f01627b1d1483409ed499455",
+      "features": [],
+      "artifacts": [
+        {
+          "name": "chopper",
+          "bytes": 5644624,
+          "sha256": "0123b75f19395b39d75ae7340937f99e83bcc1711492c613050c019c7e4004c5"
+        }
+      ],
+      "runner_receipt_sha256": "eb15f66051511b2c1f056387cb6edf30fb9d76bb8be61ed766d6523424a98ef7"
+    },
+    "combined-candidate": {
+      "manifest_sha256": "b2b2b8bffe9baaea2244edd563130ad96d98cb39e5705f59f2dec369948df610",
+      "source_head": "de93a7a728fd8652f01627b1d1483409ed499455",
+      "features": [],
+      "artifacts": [
+        {
+          "name": "chopper",
+          "bytes": 5646896,
+          "sha256": "5c468635c2678afab6a51208495dbf15329bcbebba68e54195c7eadf6e862c26"
+        }
+      ],
+      "runner_receipt_sha256": "d220df17f6ca3bf6b1b3e5bd3472255f97aca823e22636d481b2448ccb69c5f0"
+    },
+    "exact-wasm": {
+      "manifest_sha256": "09ae89c749e524491906adec9f797b6e448a1bfda780c3ad0f14bfdb279a7c22",
+      "source_head": "de93a7a728fd8652f01627b1d1483409ed499455",
+      "features": [],
+      "artifacts": [
+        {
+          "name": "chopper_browser.wasm",
+          "bytes": 2510272,
+          "sha256": "a9becbb00bc2c237ebf7fe097a13ab2ee7dabe8899595f012c337f0f866944fc"
+        }
+      ],
+      "runner_receipt_sha256": "0c6adc4af3b36d1997f5554f0ac43b53f280b82d8bc583061a0b164afaeb7848"
+    },
+    "mixed-wasm": {
+      "manifest_sha256": "c8b980628e970c3f1aa8e532dab2e8f7f334011e2585c5fb22601da0c59bbfe4",
+      "source_head": "de93a7a728fd8652f01627b1d1483409ed499455",
+      "features": [],
+      "artifacts": [
+        {
+          "name": "chopper_browser.wasm",
+          "bytes": 2489021,
+          "sha256": "decafba884409f54afbcfe3535d50fdf1d67494e67de5065850fbbf055bbcd81"
+        }
+      ],
+      "runner_receipt_sha256": "59228b4d4c9c1f1f7b235ef34d63c896d80af1c5273ccd6fb26a38a05ccadec3"
+    },
+    "combined-wasm": {
+      "manifest_sha256": "3625753b9be273b2a5b43a2a57b407540dec7d9f68924653b33c59b4d845dd47",
+      "source_head": "de93a7a728fd8652f01627b1d1483409ed499455",
+      "features": [],
+      "artifacts": [
+        {
+          "name": "chopper_browser.wasm",
+          "bytes": 2510518,
+          "sha256": "8099f11d73d52942d1992e290c73c10d0d0e015c5318bed94f4fb8e232e8adb7"
+        }
+      ],
+      "runner_receipt_sha256": "90a06cbc0d4059906e1035b589aaf0142c35481321b8f31f1938997834dc5de2"
+    }
+  },
+  "raw_artifacts": [
+    {
+      "local": "scratch/swarm-20261115/exact-pilot-01.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-exact-pilot-native-2026-11-15.jsonl",
+      "sha256": "77ff2794cb1bcdb7a7665a11452db0e5ffdeb3ee5da64bc8ca6088bb1c45b945",
+      "bytes": 124504,
+      "runtime": "native-linux",
+      "eligible": true
+    },
+    {
+      "local": "scratch/swarm-20261115/exact-controls-01.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-exact-controls-native-2026-11-15.jsonl",
+      "sha256": "1285af2b8779050a680d09ca93521f3f8ee0c7753d710cb109ca293c3e032e03",
+      "bytes": 185249,
+      "runtime": "native-linux",
+      "eligible": true
+    },
+    {
+      "local": "scratch/swarm-20261115/mixed-pilot-01.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-mixed-pilot-native-2026-11-15.jsonl",
+      "sha256": "9b9397619353d72eeeb082be4a06b378af7d009be0a3ea967e58c244b7ccc484",
+      "bytes": 124742,
+      "runtime": "native-linux",
+      "eligible": true
+    },
+    {
+      "local": "scratch/swarm-20261115/mixed-controls-01.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-mixed-controls-native-2026-11-15.jsonl",
+      "sha256": "c66d054d3e202facf6da46dccedc696da17f4cc8d54e56326dfb195bee3fcc06",
+      "bytes": 185613,
+      "runtime": "native-linux",
+      "eligible": true
+    },
+    {
+      "local": "scratch/swarm-20261115/adaptive-pilot-01.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-adaptive-native-2026-11-15.jsonl",
+      "sha256": "892212d4bbe72dcd7bfa7fde7379e83494c5d4238672cfee5ccd4e523f2d11dc",
+      "bytes": 124535,
+      "runtime": "native-linux",
+      "eligible": true
+    },
+    {
+      "local": "scratch/swarm-20261115/balanced-pilot-01.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-balanced-native-2026-11-15.jsonl",
+      "sha256": "1fa53efffa7f15e5ebb745f8ac672b20a15546364621e85727c2de6e1375159e",
+      "bytes": 124780,
+      "runtime": "native-linux",
+      "eligible": true
+    },
+    {
+      "local": "scratch/swarm-20261115/combined-native-01.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-combined-native-2026-11-15.jsonl",
+      "sha256": "e377c340638849009c163c81bd3de41935233a03c857e8f93098bc4229574c12",
+      "bytes": 306158,
+      "runtime": "native-linux",
+      "eligible": true
+    },
+    {
+      "local": "scratch/swarm-20261115/browser-exact-pilot-01.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-exact-browser-failed-2026-11-15.jsonl",
+      "sha256": "2983b7f39dcd3574dc77e34f81fedce721824e07cbe235b687ee5d5f021c2dba",
+      "bytes": 26597,
+      "runtime": "wasi-chromium",
+      "eligible": false
+    },
+    {
+      "local": "scratch/swarm-20261115/browser-exact-pilot-02.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-exact-browser-2026-11-15.jsonl",
+      "sha256": "3c0800d25565d9523e142d10e1199c41ac60b93a88fdf9b7ee64cbc1be049229",
+      "bytes": 174899,
+      "runtime": "wasi-chromium",
+      "eligible": true
+    },
+    {
+      "local": "scratch/swarm-20261115/browser-mixed-pilot-01.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-mixed-browser-2026-11-15.jsonl",
+      "sha256": "6705a5d824ee7086ecdf6747d3a3be73b2a50a52bb54a4af66956f64827d6070",
+      "bytes": 187507,
+      "runtime": "wasi-chromium",
+      "eligible": true
+    },
+    {
+      "local": "scratch/swarm-20261115/browser-combined-01.jsonl",
+      "alias": "docs/benchmarks/shuffle-swarm-combined-browser-2026-11-15.jsonl",
+      "sha256": "e81661e96b6b0484fb528049b2ea9e8a68e9e53d07deee5503e9dadb1be010c3",
+      "bytes": 322293,
+      "runtime": "wasi-chromium",
+      "eligible": true
+    }
+  ],
+  "cells": [
+    {
+      "cohort": "exact-pilot-native",
+      "recipe": "exact-fit",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-exact-pilot-native-2026-11-15.jsonl",
+      "raw_sha256": "77ff2794cb1bcdb7a7665a11452db0e5ffdeb3ee5da64bc8ca6088bb1c45b945",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.041638575,
+            "min": 0.04105199,
+            "max": 0.050279648
+          },
+          "source_lines": [
+            12,
+            21,
+            24
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.01,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 8960,
+            "min": 8808,
+            "max": 8984
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 6432,
+            "min": 6432,
+            "max": 6432
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 3203847,
+              "min": 3203847,
+              "max": 3203847
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 1506263,
+              "min": 1506263,
+              "max": 1506263
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2377009,
+              "min": 2377009,
+              "max": 2377009
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 2377009,
+            "min": 2377009,
+            "max": 2377009
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.034904833,
+            "min": 0.03455521,
+            "max": 0.034921635
+          },
+          "source_lines": [
+            15,
+            18,
+            27
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 8020,
+            "min": 7988,
+            "max": 8144
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 3480,
+            "min": 3480,
+            "max": 3480
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 3195163,
+              "min": 3195163,
+              "max": 3195163
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 870746,
+              "min": 870746,
+              "max": 870746
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 870746,
+            "min": 870746,
+            "max": 870746
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.16171883884114657
+    },
+    {
+      "cohort": "exact-pilot-native",
+      "recipe": "exact-spill",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-exact-pilot-native-2026-11-15.jsonl",
+      "raw_sha256": "77ff2794cb1bcdb7a7665a11452db0e5ffdeb3ee5da64bc8ca6088bb1c45b945",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.134280982,
+            "min": 0.13412505,
+            "max": 0.137427963
+          },
+          "source_lines": [
+            38,
+            47,
+            50
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.05,
+            "min": 0.04,
+            "max": 0.07
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.03,
+            "min": 0.01,
+            "max": 0.04
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14788,
+            "min": 14768,
+            "max": 14848
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 116256,
+            "min": 116256,
+            "max": 116256
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8798849,
+              "min": 8798849,
+              "max": 8798849
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 39330842,
+              "min": 39330842,
+              "max": 39330842
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 49392254,
+              "min": 49392254,
+              "max": 49392254
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 3,
+              "min": 3,
+              "max": 3
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 29269861,
+            "min": 29269861,
+            "max": 29269861
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.09936637,
+            "min": 0.099308472,
+            "max": 0.105785807
+          },
+          "source_lines": [
+            41,
+            44,
+            53
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.03,
+            "min": 0.03,
+            "max": 0.03
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.02,
+            "min": 0.02,
+            "max": 0.03
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14208,
+            "min": 14024,
+            "max": 14292
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 65792,
+            "min": 65792,
+            "max": 65792
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8657658,
+              "min": 8657658,
+              "max": 8657658
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 13510287,
+              "min": 13510287,
+              "max": 13510287
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 23571699,
+              "min": 23571699,
+              "max": 23571699
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 3,
+              "min": 3,
+              "max": 3
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 23514678,
+            "min": 23514678,
+            "max": 23514678
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.2600115927064043
+    },
+    {
+      "cohort": "exact-controls-native",
+      "recipe": "exact-many",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-exact-controls-native-2026-11-15.jsonl",
+      "raw_sha256": "1285af2b8779050a680d09ca93521f3f8ee0c7753d710cb109ca293c3e032e03",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 4.427398724,
+            "min": 4.372582683,
+            "max": 4.539800221
+          },
+          "source_lines": [
+            12,
+            21,
+            24
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.06,
+            "min": 0.06,
+            "max": 0.07
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.23,
+            "min": 0.22,
+            "max": 0.23
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 6260,
+            "min": 6224,
+            "max": 6320
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 25640,
+            "min": 25640,
+            "max": 25640
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 237544,
+              "min": 237544,
+              "max": 237544
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 36730990,
+              "min": 36730990,
+              "max": 36730990
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 8590279,
+              "min": 8590279,
+              "max": 8590279
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 514,
+              "min": 514,
+              "max": 514
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 6517848,
+            "min": 6517848,
+            "max": 6517848
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 4.376402842,
+            "min": 4.35608742,
+            "max": 4.389122767
+          },
+          "source_lines": [
+            15,
+            18,
+            27
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.07,
+            "min": 0.06,
+            "max": 0.07
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.21,
+            "min": 0.21,
+            "max": 0.22
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 6396,
+            "min": 6268,
+            "max": 6444
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 19264,
+            "min": 19264,
+            "max": 19264
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 235741,
+              "min": 235741,
+              "max": 235741
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 20005420,
+              "min": 20005420,
+              "max": 20005420
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 5331355,
+              "min": 5331355,
+              "max": 5331355
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 257,
+              "min": 257,
+              "max": 257
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 5331302,
+            "min": 5331302,
+            "max": 5331302
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.011518249242735146
+    },
+    {
+      "cohort": "exact-controls-native",
+      "recipe": "exact-wide",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-exact-controls-native-2026-11-15.jsonl",
+      "raw_sha256": "1285af2b8779050a680d09ca93521f3f8ee0c7753d710cb109ca293c3e032e03",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.066978365,
+            "min": 0.066524176,
+            "max": 0.067123784
+          },
+          "source_lines": [
+            38,
+            47,
+            50
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.02,
+            "min": 0.02,
+            "max": 0.03
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.01,
+            "max": 0.02
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14016,
+            "min": 13960,
+            "max": 14028
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 22096,
+            "min": 22096,
+            "max": 22096
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 9804995,
+              "min": 9804995,
+              "max": 9804995
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 5861402,
+              "min": 5861402,
+              "max": 5861402
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 8567100,
+              "min": 8567100,
+              "max": 8567100
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 8567100,
+            "min": 8567100,
+            "max": 8567100
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.053136178,
+            "min": 0.052994784,
+            "max": 0.053985403
+          },
+          "source_lines": [
+            41,
+            44,
+            53
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.01,
+            "max": 0.02
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14044,
+            "min": 14044,
+            "max": 14184
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 10640,
+            "min": 10640,
+            "max": 10640
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 9805000,
+              "min": 9805000,
+              "max": 9805000
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2705700,
+              "min": 2705700,
+              "max": 2705700
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 2705700,
+            "min": 2705700,
+            "max": 2705700
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.20666654075536184
+    },
+    {
+      "cohort": "exact-controls-native",
+      "recipe": "exact-downstream",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-exact-controls-native-2026-11-15.jsonl",
+      "raw_sha256": "1285af2b8779050a680d09ca93521f3f8ee0c7753d710cb109ca293c3e032e03",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.173836092,
+            "min": 0.172652495,
+            "max": 0.175118393
+          },
+          "source_lines": [
+            64,
+            73,
+            76
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.08,
+            "min": 0.07,
+            "max": 0.09
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.03,
+            "min": 0.03,
+            "max": 0.04
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14576,
+            "min": 14476,
+            "max": 14768
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 153928,
+            "min": 153928,
+            "max": 153928
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8799064,
+              "min": 8799064,
+              "max": 8799064
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 58598918,
+              "min": 58598918,
+              "max": 58598918
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 68658891,
+              "min": 68658891,
+              "max": 68658891
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 3,
+              "min": 3,
+              "max": 3
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 3,
+              "min": 3,
+              "max": 3
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 31939874,
+            "min": 31939874,
+            "max": 31939874
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.158662102,
+            "min": 0.146334732,
+            "max": 0.164920705
+          },
+          "source_lines": [
+            67,
+            70,
+            79
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.06,
+            "min": 0.04,
+            "max": 0.06
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.04,
+            "min": 0.04,
+            "max": 0.05
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14684,
+            "min": 14608,
+            "max": 14724
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 103464,
+            "min": 103464,
+            "max": 103464
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8734886,
+              "min": 8734886,
+              "max": 8734886
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 32777758,
+              "min": 32777758,
+              "max": 32777758
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 42838226,
+              "min": 42838226,
+              "max": 42838226
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 3,
+              "min": 3,
+              "max": 3
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 3,
+              "min": 3,
+              "max": 3
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 26785305,
+            "min": 26785305,
+            "max": 26785305
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.08728906538004777
+    },
+    {
+      "cohort": "mixed-pilot-native",
+      "recipe": "mixed-fit",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-mixed-pilot-native-2026-11-15.jsonl",
+      "raw_sha256": "9b9397619353d72eeeb082be4a06b378af7d009be0a3ea967e58c244b7ccc484",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.020053603,
+            "min": 0.019743256,
+            "max": 0.020172898
+          },
+          "source_lines": [
+            12,
+            21,
+            24
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 7832,
+            "min": 7828,
+            "max": 8024
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 6680,
+            "min": 6680,
+            "max": 6680
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 1744363,
+              "min": 1744363,
+              "max": 1744363
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 1269538,
+              "min": 1269538,
+              "max": 1269538
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2327003,
+              "min": 2327003,
+              "max": 2327003
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 2327003,
+            "min": 2327003,
+            "max": 2327003
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.019072043,
+            "min": 0.017940761,
+            "max": 0.019660902
+          },
+          "source_lines": [
+            15,
+            18,
+            27
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 7648,
+            "min": 7468,
+            "max": 7648
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 8
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 4192,
+            "min": 4192,
+            "max": 4192
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 1807084,
+              "min": 1807084,
+              "max": 1807084
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 1057465,
+              "min": 1057465,
+              "max": 1057465
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 1057465,
+            "min": 1057465,
+            "max": 1057465
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.04894681519325972
+    },
+    {
+      "cohort": "mixed-pilot-native",
+      "recipe": "mixed-retained",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-mixed-pilot-native-2026-11-15.jsonl",
+      "raw_sha256": "9b9397619353d72eeeb082be4a06b378af7d009be0a3ea967e58c244b7ccc484",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.139239684,
+            "min": 0.137593111,
+            "max": 0.142108864
+          },
+          "source_lines": [
+            38,
+            47,
+            50
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.05,
+            "min": 0.04,
+            "max": 0.07
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.03,
+            "min": 0.02,
+            "max": 0.04
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14232,
+            "min": 14224,
+            "max": 14320
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 117368,
+            "min": 117368,
+            "max": 117368
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8657982,
+              "min": 8657982,
+              "max": 8657982
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 39487338,
+              "min": 39487338,
+              "max": 39487338
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 49427768,
+              "min": 49427768,
+              "max": 49427768
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 26072652,
+            "min": 26072652,
+            "max": 26072652
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.118298893,
+            "min": 0.116921824,
+            "max": 0.118630362
+          },
+          "source_lines": [
+            41,
+            44,
+            53
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.04,
+            "min": 0.02,
+            "max": 0.06
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.03,
+            "min": 0.01,
+            "max": 0.05
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14332,
+            "min": 14240,
+            "max": 14352
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 92496,
+            "min": 92496,
+            "max": 92496
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8657988,
+              "min": 8657988,
+              "max": 8657988
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 26427172,
+              "min": 26427172,
+              "max": 26427172
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 36700810,
+              "min": 36700810,
+              "max": 36700810
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 26072652,
+            "min": 26072652,
+            "max": 26072652
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.1503938417441395
+    },
+    {
+      "cohort": "mixed-controls-native",
+      "recipe": "mixed-wide",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-mixed-controls-native-2026-11-15.jsonl",
+      "raw_sha256": "c66d054d3e202facf6da46dccedc696da17f4cc8d54e56326dfb195bee3fcc06",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.029505499,
+            "min": 0.02895853,
+            "max": 0.031160387
+          },
+          "source_lines": [
+            12,
+            21,
+            24
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 10148,
+            "min": 10132,
+            "max": 10188
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 8
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 10464,
+            "min": 10464,
+            "max": 10464
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 5782910,
+              "min": 5782910,
+              "max": 5782910
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 2477494,
+              "min": 2477494,
+              "max": 2477494
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 3902395,
+              "min": 3902395,
+              "max": 3902395
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 3902395,
+            "min": 3902395,
+            "max": 3902395
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.026336648,
+            "min": 0.026287264,
+            "max": 0.026553681
+          },
+          "source_lines": [
+            15,
+            18,
+            27
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 10736,
+            "min": 10604,
+            "max": 10804
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 8
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 5616,
+            "min": 5616,
+            "max": 5616
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 7237325,
+              "min": 7237325,
+              "max": 7237325
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 1424901,
+              "min": 1424901,
+              "max": 1424901
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 1424901,
+            "min": 1424901,
+            "max": 1424901
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.10739865812810012
+    },
+    {
+      "cohort": "mixed-controls-native",
+      "recipe": "mixed-upstream",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-mixed-controls-native-2026-11-15.jsonl",
+      "raw_sha256": "c66d054d3e202facf6da46dccedc696da17f4cc8d54e56326dfb195bee3fcc06",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.090863567,
+            "min": 0.087869421,
+            "max": 0.091423982
+          },
+          "source_lines": [
+            38,
+            47,
+            50
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 8060,
+            "min": 7988,
+            "max": 8164
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 8
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 6792,
+            "min": 6792,
+            "max": 6792
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 1957479,
+              "min": 1957479,
+              "max": 1957479
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 2174513,
+              "min": 2174513,
+              "max": 2174513
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2330938,
+              "min": 2330938,
+              "max": 2330938
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 17,
+              "min": 17,
+              "max": 17
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 2330938,
+            "min": 2330938,
+            "max": 2330938
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.090364966,
+            "min": 0.088714717,
+            "max": 0.090675287
+          },
+          "source_lines": [
+            41,
+            44,
+            53
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 8016,
+            "min": 8008,
+            "max": 8080
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 6792,
+            "min": 6792,
+            "max": 6792
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 1957484,
+              "min": 1957484,
+              "max": 1957484
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 2174513,
+              "min": 2174513,
+              "max": 2174513
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2330938,
+              "min": 2330938,
+              "max": 2330938
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 17,
+              "min": 17,
+              "max": 17
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 2330938,
+            "min": 2330938,
+            "max": 2330938
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.005487358866287928
+    },
+    {
+      "cohort": "mixed-controls-native",
+      "recipe": "mixed-downstream",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-mixed-controls-native-2026-11-15.jsonl",
+      "raw_sha256": "c66d054d3e202facf6da46dccedc696da17f4cc8d54e56326dfb195bee3fcc06",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.279339026,
+            "min": 0.268956405,
+            "max": 0.305990882
+          },
+          "source_lines": [
+            64,
+            73,
+            76
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.08,
+            "min": 0.08,
+            "max": 0.09
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.04,
+            "min": 0.03,
+            "max": 0.04
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14356,
+            "min": 14188,
+            "max": 14552
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 142384,
+            "min": 142384,
+            "max": 142384
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8658524,
+              "min": 8658524,
+              "max": 8658524
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 52548147,
+              "min": 52548147,
+              "max": 52548147
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 62159642,
+              "min": 62159642,
+              "max": 62159642
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 16,
+              "min": 16,
+              "max": 16
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 26072652,
+            "min": 26072652,
+            "max": 26072652
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.253966607,
+            "min": 0.251002748,
+            "max": 0.257860483
+          },
+          "source_lines": [
+            67,
+            70,
+            79
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.06,
+            "min": 0.05,
+            "max": 0.07
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.04,
+            "min": 0.04,
+            "max": 0.05
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14364,
+            "min": 14324,
+            "max": 14400
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 8
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 117512,
+            "min": 117512,
+            "max": 117512
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8658530,
+              "min": 8658530,
+              "max": 8658530
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 39487981,
+              "min": 39487981,
+              "max": 39487981
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 49432684,
+              "min": 49432684,
+              "max": 49432684
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 26072652,
+            "min": 26072652,
+            "max": 26072652
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.09083019785427326
+    },
+    {
+      "cohort": "adaptive-native",
+      "recipe": "adaptive-fit",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-adaptive-native-2026-11-15.jsonl",
+      "raw_sha256": "892212d4bbe72dcd7bfa7fde7379e83494c5d4238672cfee5ccd4e523f2d11dc",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.029224764,
+            "min": 0.028956293,
+            "max": 0.031250676
+          },
+          "source_lines": [
+            12,
+            21,
+            24
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 9404,
+            "min": 9400,
+            "max": 9456
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 9456,
+            "min": 9456,
+            "max": 9456
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 4399370,
+              "min": 4399370,
+              "max": 4399370
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2406125,
+              "min": 2406125,
+              "max": 2406125
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 2406125,
+            "min": 2406125,
+            "max": 2406125
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.029708317,
+            "min": 0.028248803,
+            "max": 0.031250465
+          },
+          "source_lines": [
+            15,
+            18,
+            27
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 9800,
+            "min": 9760,
+            "max": 9936
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 8
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 9456,
+            "min": 9456,
+            "max": 9456
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 4561782,
+              "min": 4561782,
+              "max": 4561782
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2406125,
+              "min": 2406125,
+              "max": 2406125
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 2406125,
+            "min": 2406125,
+            "max": 2406125
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": -0.016546001877038252
+    },
+    {
+      "cohort": "adaptive-native",
+      "recipe": "adaptive-spill",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-adaptive-native-2026-11-15.jsonl",
+      "raw_sha256": "892212d4bbe72dcd7bfa7fde7379e83494c5d4238672cfee5ccd4e523f2d11dc",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.090132343,
+            "min": 0.088472817,
+            "max": 0.093158429
+          },
+          "source_lines": [
+            38,
+            47,
+            50
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.03,
+            "min": 0.03,
+            "max": 0.04
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.02,
+            "min": 0.01,
+            "max": 0.02
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14192,
+            "min": 14192,
+            "max": 14216
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 65776,
+            "min": 65776,
+            "max": 65776
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8657416,
+              "min": 8657416,
+              "max": 8657416
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 13509477,
+              "min": 13509477,
+              "max": 13509477
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 23569767,
+              "min": 23569767,
+              "max": 23569767
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 3,
+              "min": 3,
+              "max": 3
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 23513838,
+            "min": 23513838,
+            "max": 23513838
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.090622496,
+            "min": 0.089035865,
+            "max": 0.10213177
+          },
+          "source_lines": [
+            41,
+            44,
+            53
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.04,
+            "min": 0.02,
+            "max": 0.04
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.02,
+            "min": 0.01,
+            "max": 0.03
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14168,
+            "min": 14072,
+            "max": 14324
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 65768,
+            "min": 65768,
+            "max": 65768
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8657569,
+              "min": 8657569,
+              "max": 8657569
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 13509477,
+              "min": 13509477,
+              "max": 13509477
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 23569767,
+              "min": 23569767,
+              "max": 23569767
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 3,
+              "min": 3,
+              "max": 3
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 23513838,
+            "min": 23513838,
+            "max": 23513838
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": -0.005438147768997759
+    },
+    {
+      "cohort": "balanced-native",
+      "recipe": "balanced-fit",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-balanced-native-2026-11-15.jsonl",
+      "raw_sha256": "1fa53efffa7f15e5ebb745f8ac672b20a15546364621e85727c2de6e1375159e",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.048938806,
+            "min": 0.0487209,
+            "max": 0.051011464
+          },
+          "source_lines": [
+            12,
+            21,
+            24
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 7364,
+            "min": 7360,
+            "max": 7420
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 8
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 5208,
+            "min": 5208,
+            "max": 5208
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 1490904,
+              "min": 1490904,
+              "max": 1490904
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 2023575,
+              "min": 2023575,
+              "max": 2023575
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 1812648,
+              "min": 1812648,
+              "max": 1812648
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 1812596,
+            "min": 1812596,
+            "max": 1812596
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.05009323,
+            "min": 0.049850888,
+            "max": 0.051053632
+          },
+          "source_lines": [
+            15,
+            18,
+            27
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 6540,
+            "min": 6496,
+            "max": 6752
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 8
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 7256,
+            "min": 7256,
+            "max": 7256
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 746029,
+              "min": 746029,
+              "max": 746029
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 3067248,
+              "min": 3067248,
+              "max": 3067248
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2856321,
+              "min": 2856321,
+              "max": 2856321
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 2121341,
+            "min": 2121341,
+            "max": 2121341
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": -0.02358913292653697
+    },
+    {
+      "cohort": "balanced-native",
+      "recipe": "balanced-spill",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-balanced-native-2026-11-15.jsonl",
+      "raw_sha256": "1fa53efffa7f15e5ebb745f8ac672b20a15546364621e85727c2de6e1375159e",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.198127911,
+            "min": 0.191055558,
+            "max": 0.201619187
+          },
+          "source_lines": [
+            38,
+            47,
+            50
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.08,
+            "min": 0.08,
+            "max": 0.09
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.06,
+            "min": 0.05,
+            "max": 0.06
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14580,
+            "min": 14580,
+            "max": 14660
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 180920,
+            "min": 180920,
+            "max": 180920
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8669192,
+              "min": 8669192,
+              "max": 8669192
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 77769298,
+              "min": 77769298,
+              "max": 77769298
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 72470407,
+              "min": 72470407,
+              "max": 72470407
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 5,
+              "min": 5,
+              "max": 5
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 72419440,
+            "min": 72419440,
+            "max": 72419440
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.192604896,
+            "min": 0.191204176,
+            "max": 0.197677141
+          },
+          "source_lines": [
+            41,
+            44,
+            53
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.09,
+            "min": 0.09,
+            "max": 0.09
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.05,
+            "min": 0.04,
+            "max": 0.05
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 10484,
+            "min": 10380,
+            "max": 10552
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 179392,
+            "min": 179392,
+            "max": 179392
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 4538501,
+              "min": 4538501,
+              "max": 4538501
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 76969274,
+              "min": 76969274,
+              "max": 76969274
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 71670383,
+              "min": 71670383,
+              "max": 71670383
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 54068007,
+            "min": 54068007,
+            "max": 54068007
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.02787600682874003
+    },
+    {
+      "cohort": "combined-native",
+      "recipe": "exact-spill",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-combined-native-2026-11-15.jsonl",
+      "raw_sha256": "e377c340638849009c163c81bd3de41935233a03c857e8f93098bc4229574c12",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.145521003,
+            "min": 0.13877076,
+            "max": 0.147767302
+          },
+          "source_lines": [
+            12,
+            21,
+            24
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.06,
+            "min": 0.05,
+            "max": 0.06
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.03,
+            "min": 0.02,
+            "max": 0.03
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14740,
+            "min": 14556,
+            "max": 14796
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 116256,
+            "min": 116256,
+            "max": 116256
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8798893,
+              "min": 8798893,
+              "max": 8798893
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 39330842,
+              "min": 39330842,
+              "max": 39330842
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 49392254,
+              "min": 49392254,
+              "max": 49392254
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 3,
+              "min": 3,
+              "max": 3
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 29269861,
+            "min": 29269861,
+            "max": 29269861
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.105634775,
+            "min": 0.104530125,
+            "max": 0.110480367
+          },
+          "source_lines": [
+            15,
+            18,
+            27
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.03,
+            "min": 0.02,
+            "max": 0.03
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.03,
+            "min": 0.03,
+            "max": 0.03
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14308,
+            "min": 14256,
+            "max": 14312
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 65792,
+            "min": 65792,
+            "max": 65792
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8657690,
+              "min": 8657690,
+              "max": 8657690
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 13510287,
+              "min": 13510287,
+              "max": 13510287
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 23571699,
+              "min": 23571699,
+              "max": 23571699
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 3,
+              "min": 3,
+              "max": 3
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 23514678,
+            "min": 23514678,
+            "max": 23514678
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.2740925857967046
+    },
+    {
+      "cohort": "combined-native",
+      "recipe": "exact-wide",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-combined-native-2026-11-15.jsonl",
+      "raw_sha256": "e377c340638849009c163c81bd3de41935233a03c857e8f93098bc4229574c12",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.067054636,
+            "min": 0.066997789,
+            "max": 0.068581104
+          },
+          "source_lines": [
+            38,
+            47,
+            50
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.02,
+            "min": 0.02,
+            "max": 0.03
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.01,
+            "max": 0.01
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14024,
+            "min": 13988,
+            "max": 14048
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 22096,
+            "min": 22096,
+            "max": 22096
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 9805001,
+              "min": 9805001,
+              "max": 9805001
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 5861402,
+              "min": 5861402,
+              "max": 5861402
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 8567100,
+              "min": 8567100,
+              "max": 8567100
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 8567100,
+            "min": 8567100,
+            "max": 8567100
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.054261968,
+            "min": 0.053743391,
+            "max": 0.057541538
+          },
+          "source_lines": [
+            41,
+            44,
+            53
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.01,
+            "max": 0.02
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.0,
+            "max": 0.02
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14416,
+            "min": 14300,
+            "max": 14420
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 10640,
+            "min": 10640,
+            "max": 10640
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 9805006,
+              "min": 9805006,
+              "max": 9805006
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2705700,
+              "min": 2705700,
+              "max": 2705700
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 2705700,
+            "min": 2705700,
+            "max": 2705700
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.1907797695002028
+    },
+    {
+      "cohort": "combined-native",
+      "recipe": "mixed-retained",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-combined-native-2026-11-15.jsonl",
+      "raw_sha256": "e377c340638849009c163c81bd3de41935233a03c857e8f93098bc4229574c12",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.146121173,
+            "min": 0.141815108,
+            "max": 0.147390532
+          },
+          "source_lines": [
+            64,
+            73,
+            76
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.06,
+            "min": 0.04,
+            "max": 0.07
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.03,
+            "min": 0.02,
+            "max": 0.05
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14396,
+            "min": 14252,
+            "max": 14432
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 117368,
+            "min": 117368,
+            "max": 117368
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8658010,
+              "min": 8658010,
+              "max": 8658010
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 39487338,
+              "min": 39487338,
+              "max": 39487338
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 49427768,
+              "min": 49427768,
+              "max": 49427768
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 26072652,
+            "min": 26072652,
+            "max": 26072652
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.117433654,
+            "min": 0.116467808,
+            "max": 0.120713549
+          },
+          "source_lines": [
+            67,
+            70,
+            79
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.04,
+            "min": 0.03,
+            "max": 0.05
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.02,
+            "min": 0.01,
+            "max": 0.03
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14380,
+            "min": 14320,
+            "max": 14648
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 92496,
+            "min": 92496,
+            "max": 92496
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8658016,
+              "min": 8658016,
+              "max": 8658016
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 26427172,
+              "min": 26427172,
+              "max": 26427172
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 36700810,
+              "min": 36700810,
+              "max": 36700810
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 26072652,
+            "min": 26072652,
+            "max": 26072652
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.1963269142384998
+    },
+    {
+      "cohort": "combined-native",
+      "recipe": "mixed-downstream",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-combined-native-2026-11-15.jsonl",
+      "raw_sha256": "e377c340638849009c163c81bd3de41935233a03c857e8f93098bc4229574c12",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.26537062,
+            "min": 0.264556178,
+            "max": 0.308043385
+          },
+          "source_lines": [
+            90,
+            99,
+            102
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.08,
+            "min": 0.07,
+            "max": 0.09
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.04,
+            "min": 0.04,
+            "max": 0.05
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14388,
+            "min": 14292,
+            "max": 14392
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 8
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 142384,
+            "min": 142384,
+            "max": 142384
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8658531,
+              "min": 8658531,
+              "max": 8658531
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 52548147,
+              "min": 52548147,
+              "max": 52548147
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 62159642,
+              "min": 62159642,
+              "max": 62159642
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 16,
+              "min": 16,
+              "max": 16
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 26072652,
+            "min": 26072652,
+            "max": 26072652
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.22486675,
+            "min": 0.224015272,
+            "max": 0.229580926
+          },
+          "source_lines": [
+            93,
+            96,
+            105
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.04,
+            "min": 0.04,
+            "max": 0.05
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.04,
+            "min": 0.02,
+            "max": 0.04
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 14504,
+            "min": 14380,
+            "max": 14612
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 92640,
+            "min": 92640,
+            "max": 92640
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 8658537,
+              "min": 8658537,
+              "max": 8658537
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 26427815,
+              "min": 26427815,
+              "max": 26427815
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 36705726,
+              "min": 36705726,
+              "max": 36705726
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 8,
+              "min": 8,
+              "max": 8
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 26072652,
+            "min": 26072652,
+            "max": 26072652
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.1526313274619474
+    },
+    {
+      "cohort": "combined-native",
+      "recipe": "combined-fit",
+      "runtime": "native-linux",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-combined-native-2026-11-15.jsonl",
+      "raw_sha256": "e377c340638849009c163c81bd3de41935233a03c857e8f93098bc4229574c12",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.045801354,
+            "min": 0.045795192,
+            "max": 0.046030761
+          },
+          "source_lines": [
+            116,
+            125,
+            128
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.01,
+            "min": 0.01,
+            "max": 0.01
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.01
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 8828,
+            "min": 8672,
+            "max": 8932
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 9384,
+            "min": 9384,
+            "max": 9384
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 3203964,
+              "min": 3203964,
+              "max": 3203964
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 3012579,
+              "min": 3012579,
+              "max": 3012579
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 3883272,
+              "min": 3883272,
+              "max": 3883272
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 2,
+              "min": 2,
+              "max": 2
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 3012526,
+            "min": 3012526,
+            "max": 3012526
+          }
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.033701117,
+            "min": 0.033514658,
+            "max": 0.053311214
+          },
+          "source_lines": [
+            119,
+            122,
+            131
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ],
+          "user_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "system_seconds": {
+            "n": 3,
+            "median": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "max_rss_kib": {
+            "n": 3,
+            "median": 8400,
+            "min": 8392,
+            "max": 8448
+          },
+          "fs_inputs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0
+          },
+          "fs_outputs": {
+            "n": 3,
+            "median": 3480,
+            "min": 3480,
+            "max": 3480
+          },
+          "prepublication_resources": {
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 3243514,
+              "min": 3243514,
+              "max": 3243514
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 870746,
+              "min": 870746,
+              "max": 870746
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "merge_operations": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "resident_sorts": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            },
+            "fisher_yates_calls": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0
+            }
+          },
+          "prepublication_temp_peak_bytes": {
+            "n": 3,
+            "median": 870746,
+            "min": 870746,
+            "max": 870746
+          }
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.2641895040919533
+    },
+    {
+      "cohort": "exact-browser",
+      "recipe": "exact-spill",
+      "runtime": "wasi-chromium",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-exact-browser-2026-11-15.jsonl",
+      "raw_sha256": "3c0800d25565d9523e142d10e1199c41ac60b93a88fdf9b7ee64cbc1be049229",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.680710000038147,
+            "min": 0.6587650000452995,
+            "max": 0.6886949999928474
+          },
+          "source_lines": [
+            12,
+            21,
+            24
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.46829000002145765,
+            "min": 0.466089999973774,
+            "max": 0.4873700000047684
+          },
+          "source_lines": [
+            15,
+            18,
+            27
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.31205652921917604
+    },
+    {
+      "cohort": "exact-browser",
+      "recipe": "exact-fit",
+      "runtime": "wasi-chromium",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-exact-browser-2026-11-15.jsonl",
+      "raw_sha256": "3c0800d25565d9523e142d10e1199c41ac60b93a88fdf9b7ee64cbc1be049229",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.18283000004291533,
+            "min": 0.17572500002384187,
+            "max": 0.18355500000715255
+          },
+          "source_lines": [
+            37,
+            46,
+            49
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.16507500004768372,
+            "min": 0.16361000001430512,
+            "max": 0.16539500004053115
+          },
+          "source_lines": [
+            40,
+            43,
+            52
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.09711207127421106
+    },
+    {
+      "cohort": "mixed-browser",
+      "recipe": "mixed-retained",
+      "runtime": "wasi-chromium",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-mixed-browser-2026-11-15.jsonl",
+      "raw_sha256": "6705a5d824ee7086ecdf6747d3a3be73b2a50a52bb54a4af66956f64827d6070",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.6928700000047684,
+            "min": 0.6690600000023842,
+            "max": 0.7123299999833107
+          },
+          "source_lines": [
+            12,
+            21,
+            24
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.5677999999523163,
+            "min": 0.5675450000166893,
+            "max": 0.5789250000119209
+          },
+          "source_lines": [
+            15,
+            18,
+            27
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.18051005246524066
+    },
+    {
+      "cohort": "mixed-browser",
+      "recipe": "mixed-fit",
+      "runtime": "wasi-chromium",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-mixed-browser-2026-11-15.jsonl",
+      "raw_sha256": "6705a5d824ee7086ecdf6747d3a3be73b2a50a52bb54a4af66956f64827d6070",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.14218500000238418,
+            "min": 0.14211000001430513,
+            "max": 0.14296000003814696
+          },
+          "source_lines": [
+            37,
+            46,
+            49
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.12370499998331069,
+            "min": 0.12111499994993209,
+            "max": 0.13300999999046326
+          },
+          "source_lines": [
+            40,
+            43,
+            52
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.12997151611466484
+    },
+    {
+      "cohort": "combined-browser",
+      "recipe": "exact-spill",
+      "runtime": "wasi-chromium",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-combined-browser-2026-11-15.jsonl",
+      "raw_sha256": "e81661e96b6b0484fb528049b2ea9e8a68e9e53d07deee5503e9dadb1be010c3",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.6599050000309944,
+            "min": 0.648625,
+            "max": 0.6894350000023842
+          },
+          "source_lines": [
+            12,
+            21,
+            24
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.47749500000476836,
+            "min": 0.4685949999690056,
+            "max": 0.48848499995470046
+          },
+          "source_lines": [
+            15,
+            18,
+            27
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.27641857542776405
+    },
+    {
+      "cohort": "combined-browser",
+      "recipe": "mixed-downstream",
+      "runtime": "wasi-chromium",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-combined-browser-2026-11-15.jsonl",
+      "raw_sha256": "e81661e96b6b0484fb528049b2ea9e8a68e9e53d07deee5503e9dadb1be010c3",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 1.0145600000023842,
+            "min": 0.9933799999952316,
+            "max": 1.0242800000309944
+          },
+          "source_lines": [
+            37,
+            46,
+            49
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.8105799999833107,
+            "min": 0.8025849999785424,
+            "max": 0.8216200000047684
+          },
+          "source_lines": [
+            40,
+            43,
+            52
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.20105267309828323
+    },
+    {
+      "cohort": "combined-browser",
+      "recipe": "combined-fit",
+      "runtime": "wasi-chromium",
+      "raw_alias": "docs/benchmarks/shuffle-swarm-combined-browser-2026-11-15.jsonl",
+      "raw_sha256": "e81661e96b6b0484fb528049b2ea9e8a68e9e53d07deee5503e9dadb1be010c3",
+      "variants": {
+        "baseline": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.2044399999976158,
+            "min": 0.2033400000333786,
+            "max": 0.21347000002861022
+          },
+          "source_lines": [
+            62,
+            71,
+            74
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        },
+        "candidate": {
+          "wall_seconds": {
+            "n": 3,
+            "median": 0.15517500001192092,
+            "min": 0.15424000000953675,
+            "max": 0.15690500003099442
+          },
+          "source_lines": [
+            65,
+            68,
+            77
+          ],
+          "repetitions": [
+            0,
+            1,
+            2
+          ]
+        }
+      },
+      "median_elapsed_reduction_fraction": 0.24097534722299663
+    }
+  ],
+  "validation_status": "Independent integrated source reviews and final committed-head local CI are recorded separately; benchmark success is not delivery approval."
+}

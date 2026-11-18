@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "type": "private_archive_verification",
+  "date": "2026-11-15",
+  "bucket": "chopper-archive-private",
+  "key": "sha256/300865fa98064d18ca607eaae2517c73e8c9fd9fce6fe9392f39eb034b37b244",
+  "bundle": {
+    "bytes": 29091840,
+    "sha256": "300865fa98064d18ca607eaae2517c73e8c9fd9fce6fe9392f39eb034b37b244"
+  },
+  "upload": "Wrangler 4.162.0 authenticated remote object put",
+  "verification": "Separate remote object get; complete bundle SHA-256 and all 22 regular-member SHA-256/size identities matched the retained originals.",
+  "reader_coverage": "Same existing OAuth principal for upload and readback. No claim of a separate scoped-reader live check or public publication.",
+  "verified": true,
+  "artifacts": [
+    {
+      "alias": "docs/benchmarks/shuffle-policy-auto-fit-native-2026-11-15.jsonl",
+      "original_local_path": "docs/benchmarks/shuffle-policy-auto-fit-native-2026-11-15.jsonl",
+      "bytes": 68900,
+      "sha256": "89f9381a68361c894bbaf4bb636d03fc35c7e92d8268283fc0c1818dc38432b3",
+      "member": "objects/89f9381a68361c894bbaf4bb636d03fc35c7e92d8268283fc0c1818dc38432b3"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-auto-spill-native-2026-11-15.jsonl",
+      "original_local_path": "docs/benchmarks/shuffle-policy-auto-spill-native-2026-11-15.jsonl",
+      "bytes": 68973,
+      "sha256": "c9101f76a175d705d2f1a4e1f18edd413dd3ead716e540ce5f463b9191c4d91c",
+      "member": "objects/c9101f76a175d705d2f1a4e1f18edd413dd3ead716e540ce5f463b9191c4d91c"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-browser-harness-stale-2026-11-15.jsonl",
+      "original_local_path": "docs/benchmarks/shuffle-policy-browser-harness-stale-2026-11-15.jsonl",
+      "bytes": 1556,
+      "sha256": "a74465d78914b12b2b8f7d9490ca5fc555d94380d18a3b28abdd387145e2d7f9",
+      "member": "objects/a74465d78914b12b2b8f7d9490ca5fc555d94380d18a3b28abdd387145e2d7f9"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-forward-native-2026-11-15.jsonl",
+      "original_local_path": "docs/benchmarks/shuffle-policy-forward-native-2026-11-15.jsonl",
+      "bytes": 112096,
+      "sha256": "1e8f571f86af1b72595d0d72ba43a4df6dcb6019493c19628fdcde8bfb1799a3",
+      "member": "objects/1e8f571f86af1b72595d0d72ba43a4df6dcb6019493c19628fdcde8bfb1799a3"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-fusion-native-2026-11-15.jsonl",
+      "original_local_path": "docs/benchmarks/shuffle-policy-fusion-native-2026-11-15.jsonl",
+      "bytes": 112111,
+      "sha256": "df52794cdaa8d74d868081e58611cca37a2509a6530cb6d2fa8ee75242520e8d",
+      "member": "objects/df52794cdaa8d74d868081e58611cca37a2509a6530cb6d2fa8ee75242520e8d"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-production-browser-2026-11-15.jsonl",
+      "original_local_path": "docs/benchmarks/shuffle-policy-production-browser-2026-11-15.jsonl",
+      "bytes": 54443,
+      "sha256": "b12041efac96ced22df6f5977f27b38bd0703bb3f257c413f989ce7845541c9f",
+      "member": "objects/b12041efac96ced22df6f5977f27b38bd0703bb3f257c413f989ce7845541c9f"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-production-native-2026-11-15.jsonl",
+      "original_local_path": "docs/benchmarks/shuffle-policy-production-native-2026-11-15.jsonl",
+      "bytes": 111862,
+      "sha256": "f732913761afdbec1e7b117e997e6faa826156da7cf239b6e22bc872f04594f2",
+      "member": "objects/f732913761afdbec1e7b117e997e6faa826156da7cf239b6e22bc872f04594f2"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-removal-native-2026-11-15.jsonl",
+      "original_local_path": "docs/benchmarks/shuffle-policy-removal-native-2026-11-15.jsonl",
+      "bytes": 112107,
+      "sha256": "a425ee02735b7967c922bbad2954246067ee14acf614a2947114ed6e5736f0c6",
+      "member": "objects/a425ee02735b7967c922bbad2954246067ee14acf614a2947114ed6e5736f0c6"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-partition-first-engine-2026-11-15.rs",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/partition-first-engine.rs",
+      "bytes": 111009,
+      "sha256": "1a7dcb36dabf4d371802f18f7380918d7da607da97c3060014da201b6a3b4e1b",
+      "member": "objects/1a7dcb36dabf4d371802f18f7380918d7da607da97c3060014da201b6a3b4e1b"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-partition-first-source-2026-11-15.patch",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/partition-first.patch",
+      "bytes": 434567,
+      "sha256": "f69f47dafb7928a196ff82ebb9a4974c2fa1ab091741ddc7717622aa948b57d7",
+      "member": "objects/f69f47dafb7928a196ff82ebb9a4974c2fa1ab091741ddc7717622aa948b57d7"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-baseline-source-2026-11-15.patch",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/baseline.patch",
+      "bytes": 368611,
+      "sha256": "af5f0c7e0e226bea0aeb8f7d141f8579f68806d701472833e33095c0913359b8",
+      "member": "objects/af5f0c7e0e226bea0aeb8f7d141f8579f68806d701472833e33095c0913359b8"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-resident-candidate-2026-11-15.rs",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/auto_shuffle.rs",
+      "bytes": 819,
+      "sha256": "9ab81fe66ce2db11a91368794cb7caa233e8bda238cbd47fd68eb063178920b6",
+      "member": "objects/9ab81fe66ce2db11a91368794cb7caa233e8bda238cbd47fd68eb063178920b6"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-browser-harness-stale-2026-11-15.log",
+      "original_local_path": "docs/benchmarks/shuffle-policy-browser-harness-stale-2026-11-15.log",
+      "bytes": 460,
+      "sha256": "24ff835788fa98b94f9f90bb41cd46910819cef23c45f1efd4118979815b57d4",
+      "member": "objects/24ff835788fa98b94f9f90bb41cd46910819cef23c45f1efd4118979815b57d4"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-native-harness-2026-11-15.py",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/bench-shuffle-policy-removal.py",
+      "bytes": 5076,
+      "sha256": "a497fe2d481f30a03d4ba8647d2a0c8ecce1eb1189c5052c168c2a47ee97ea80",
+      "member": "objects/a497fe2d481f30a03d4ba8647d2a0c8ecce1eb1189c5052c168c2a47ee97ea80"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-browser-harness-2026-11-15.mjs",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/benchmark-external-browser.mjs",
+      "bytes": 24855,
+      "sha256": "a8bd7eb3c92db8f8dae4c53edcba6eb6ec177675124f574f53f66c1a48d1abc1",
+      "member": "objects/a8bd7eb3c92db8f8dae4c53edcba6eb6ec177675124f574f53f66c1a48d1abc1"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-baseline-native-2026-11-15.bin",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/baseline",
+      "bytes": 5647520,
+      "sha256": "0286b8403e2b7f611c70381a8371b68ce26239515e47d7fe6db3b0024b455293",
+      "member": "objects/0286b8403e2b7f611c70381a8371b68ce26239515e47d7fe6db3b0024b455293"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-partition-first-native-2026-11-15.bin",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/partition-first-candidate",
+      "bytes": 5611616,
+      "sha256": "39343bb5b74e3b5836f57b3ef5070d1d61fccc07c11bfea519ea8cddaf061d79",
+      "member": "objects/39343bb5b74e3b5836f57b3ef5070d1d61fccc07c11bfea519ea8cddaf061d79"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-fused-resident-native-2026-11-15.bin",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/fused-with-resident-candidate",
+      "bytes": 5624360,
+      "sha256": "13404a8b57f3805659e7734fa785d0e64400a1bc404118c711709024cff87c85",
+      "member": "objects/13404a8b57f3805659e7734fa785d0e64400a1bc404118c711709024cff87c85"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-production-native-2026-11-15.bin",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/production-candidate",
+      "bytes": 5619392,
+      "sha256": "5473baec2b362a38b9795a5a768fe8bf3f35a181597d118925a8287845076d55",
+      "member": "objects/5473baec2b362a38b9795a5a768fe8bf3f35a181597d118925a8287845076d55"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-baseline-2026-11-15.wasm",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/baseline.wasm",
+      "bytes": 2484554,
+      "sha256": "264f240a5b33bd6489300f05d2f38b9ebd645c15bb91e97a01c032f936818bf3",
+      "member": "objects/264f240a5b33bd6489300f05d2f38b9ebd645c15bb91e97a01c032f936818bf3"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-production-2026-11-15.wasm",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/production.wasm",
+      "bytes": 2488937,
+      "sha256": "d39cbef22153a5a7a8331ac06f622456fb099f932e754dbbd776ab9b353a9676",
+      "member": "objects/d39cbef22153a5a7a8331ac06f622456fb099f932e754dbbd776ab9b353a9676"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-policy-archive-provenance-2026-11-15.json",
+      "original_local_path": "docs/benchmarks/local-shuffle-policy-2026-11-15/archive-provenance.json",
+      "bytes": 4406,
+      "sha256": "97e1b93f6bf381686da94f0a9df29a4842d8373e84cdee17cf8336026b48045a",
+      "member": "objects/97e1b93f6bf381686da94f0a9df29a4842d8373e84cdee17cf8336026b48045a"
+    }
+  ]
+}

@@ -1,0 +1,302 @@
+diff --git a/crates/chopper-core/src/csv.rs b/crates/chopper-core/src/csv.rs
+index f3139b9..9e1908a 100644
+--- a/crates/chopper-core/src/csv.rs
++++ b/crates/chopper-core/src/csv.rs
+@@ -528,13 +528,25 @@ impl<R: BufRead> Parser<R> {
+         field.clear();
+         let mut bytes = 0usize;
+         let mut touched = false;
++        // Offset to the next quote/CR/LF in the current unread buffer. Every
++        // consumption below advances it; zero also requests a fresh search.
++        let mut structural = 0usize;
++        let mut expected_window = 0usize;
+         let result = (|| {
+             loop {
+                 // Copy ordinary spans in one go. Keep all structural bytes on the
+                 // scalar state machine, including CRLF's historical byte accounting.
+                 if state <= 2 {
+                     let data = self.reader.fill_buf()?;
++                    // BufRead may narrow or extend its visible unread prefix
++                    // after consumption. Reuse offsets only for the expected
++                    // remaining extent; otherwise search this window afresh.
++                    if data.len() != expected_window {
++                        structural = 0;
++                    }
++                    expected_window = data.len();
+                     let n = if state == 2 {
++                        structural = 0;
+                         memchr::memchr2(
+                             self.settings.quote as u8,
+                             self.settings.escape.unwrap_or(self.settings.quote) as u8,
+@@ -542,14 +554,14 @@ impl<R: BufRead> Parser<R> {
+                         )
+                         .unwrap_or(data.len())
+                     } else {
+-                        let end = memchr::memchr3(
+-                            self.settings.delimiter as u8,
+-                            self.settings.quote as u8,
+-                            b'\n',
+-                            data,
+-                        )
+-                        .unwrap_or(data.len());
+-                        memchr::memchr(b'\r', &data[..end]).unwrap_or(end)
++                        if structural == 0 {
++                            structural =
++                                memchr::memchr3(self.settings.quote as u8, b'\r', b'\n', data)
++                                    .unwrap_or(data.len());
++                        }
++                        debug_assert!(structural <= data.len());
++                        memchr::memchr(self.settings.delimiter as u8, &data[..structural])
++                            .unwrap_or(structural)
+                     };
+                     if n > 0 {
+                         bytes = bytes.saturating_add(n);
+@@ -572,6 +584,8 @@ impl<R: BufRead> Parser<R> {
+                             )?
+                         {
+                             self.reader.consume(n + 1);
++                            structural = structural.saturating_sub(n + 1);
++                            expected_window = expected_window.saturating_sub(n + 1);
+                             bytes += 1;
+                             count += 1;
+                             touched = true;
+@@ -583,6 +597,8 @@ impl<R: BufRead> Parser<R> {
+                         fields.reserve_scratch(&mut field, n)?;
+                         field.extend_from_slice(&data[..n]);
+                         self.reader.consume(n);
++                        structural = structural.saturating_sub(n);
++                        expected_window = expected_window.saturating_sub(n);
+                         touched = true;
+                         if state == 0 {
+                             state = 1;
+@@ -598,6 +614,8 @@ impl<R: BufRead> Parser<R> {
+                     finish_field(fields, &mut count, &mut field)?;
+                     return Ok(Some(count));
+                 };
++                structural = structural.saturating_sub(1);
++                expected_window = expected_window.saturating_sub(1);
+                 bytes += 1;
+                 ensure!(
+                     bytes.saturating_add(count * 32) <= self.maximum,
+diff --git a/crates/chopper-core/tests/serial_span_contracts.rs b/crates/chopper-core/tests/serial_span_contracts.rs
+index 1f41f46..5e69e3c 100644
+--- a/crates/chopper-core/tests/serial_span_contracts.rs
++++ b/crates/chopper-core/tests/serial_span_contracts.rs
+@@ -2,7 +2,7 @@ use chopper_core::{
+     csv::{CompactRecord, Parser},
+     CsvSettings,
+ };
+-use std::io::BufReader;
++use std::io::{self, BufRead, BufReader, Read};
+ 
+ #[test]
+ fn admitted_spans_match_scalar_fields_across_every_small_refill_and_working_edge(
+@@ -119,3 +119,208 @@ fn admitted_span_denial_keeps_every_retained_capacity_charged() {
+         }
+     }
+ }
++
++#[test]
++fn structural_markers_preserve_literal_records_through_quotes_and_buffer_reuse(
++) -> anyhow::Result<()> {
++    let literal = "a,b,c\n\"x\ny\",z,\"q\"\"r\"\r\n,,\n界,\"with,comma\",tail";
++    let literal_rows: Vec<Vec<String>> = [
++        ["a", "b", "c"],
++        ["x\ny", "z", "q\"r"],
++        ["", "", ""],
++        ["界", "with,comma", "tail"],
++    ]
++    .into_iter()
++    .map(|row| row.into_iter().map(str::to_owned).collect())
++    .collect();
++    let wide: Vec<String> = (0..48).map(|column| format!("c{column}")).collect();
++    let mut quoted = wide.clone();
++    quoted[0] = "quoted,\n\"field".into();
++    quoted[47] = "界".into();
++    let wide_rows = vec![wide.clone(), quoted, wide];
++    let mut wide_input = Vec::new();
++    for row in &wide_rows {
++        wide_input.extend(chopper_core::csv::serialize(row, &CsvSettings::default())?);
++    }
++    for (input, expected) in [
++        (literal.as_bytes().to_vec(), literal_rows),
++        (wide_input, wide_rows),
++    ] {
++        for capacity in [1, 2, 3, 7, 16, 32, 64, 4096, 65536] {
++            let mut owned = Parser::new(
++                BufReader::with_capacity(capacity, input.as_slice()),
++                CsvSettings::default(),
++                8192,
++            );
++            let mut compact = Parser::new(
++                BufReader::with_capacity(capacity, input.as_slice()),
++                CsvSettings::default(),
++                8192,
++            );
++            let mut record = CompactRecord::default();
++            for row in &expected {
++                assert_eq!(owned.next_record()?.as_ref(), Some(row));
++                assert!(compact.next_compact_record_into(&mut record)?);
++                assert_eq!(
++                    record.fields().collect::<Vec<_>>(),
++                    row.iter().map(String::as_str).collect::<Vec<_>>()
++                );
++                assert_eq!(owned.record, compact.record);
++            }
++            assert!(owned.next_record()?.is_none());
++            assert!(!compact.next_compact_record_into(&mut record)?);
++        }
++    }
++    Ok(())
++}
++
++// A conforming BufRead need not retain the previous fill_buf extent after
++// consume. Keep stream bytes fixed while independently changing its prefix.
++struct ChangingWindow<'a> {
++    remaining: &'a [u8],
++    windows: &'a [usize],
++    consumed: usize,
++}
++impl Read for ChangingWindow<'_> {
++    fn read(&mut self, output: &mut [u8]) -> io::Result<usize> {
++        let data = self.fill_buf()?;
++        let count = output.len().min(data.len());
++        output[..count].copy_from_slice(&data[..count]);
++        self.consume(count);
++        Ok(count)
++    }
++}
++impl BufRead for ChangingWindow<'_> {
++    fn fill_buf(&mut self) -> io::Result<&[u8]> {
++        let extent = self.windows[self.consumed % self.windows.len()];
++        Ok(&self.remaining[..extent.min(self.remaining.len())])
++    }
++    fn consume(&mut self, count: usize) {
++        assert!(count <= self.windows[self.consumed % self.windows.len()]);
++        self.remaining = &self.remaining[count..];
++        self.consumed += 1;
++    }
++}
++fn changing<'a>(input: &'a [u8], windows: &'a [usize]) -> ChangingWindow<'a> {
++    ChangingWindow {
++        remaining: input,
++        windows,
++        consumed: 0,
++    }
++}
++
++#[test]
++fn structural_cache_tracks_changing_unread_windows() -> anyhow::Result<()> {
++    let inputs: &[&[u8]] = &[
++        b"a,b,c,d\nnext,last,,\n",
++        b"a,b,c,d",
++        b"a,b,c,d\r\n\r\n\"x\ny\",z,\"q\"\"r\"\r\n",
++        "α,界,tail\n\"a,b\",\"x\"\"y\",z\n".as_bytes(),
++        b"a;\"b\\\"c\";d\n",
++        b"a,b\"c,d\n",
++        b"a,\"b\"junk\n",
++        b"a,\"b",
++        b"a,\xff,c\n",
++        b"a,b\rc,d\n",
++        b"a,,b,\n\n",
++        b"a\0b,c,d\n",
++    ];
++    for windows in [
++        &[65536, 1][..],
++        &[1, 65536],
++        &[8, 1, 4, 2, 65536],
++        &[3, 2, 1],
++    ] {
++        for input in inputs {
++            for maximum in [0, 1, 5, 31, 32, 37, 38, 63, 64, 65, 128, 4096] {
++                for custom in [false, true] {
++                    let settings = CsvSettings {
++                        delimiter: if custom { ';' } else { ',' },
++                        escape: custom.then_some('\\'),
++                        skip_empty_lines: custom,
++                        ..Default::default()
++                    };
++                    let mut reference = Parser::new(
++                        BufReader::with_capacity(1, *input),
++                        settings.clone(),
++                        maximum,
++                    );
++                    let mut owned =
++                        Parser::new(changing(input, windows), settings.clone(), maximum);
++                    let mut compact =
++                        Parser::new(changing(input, windows), settings.clone(), maximum);
++                    let mut admitted = Parser::new(changing(input, windows), settings, maximum);
++                    let mut record = CompactRecord::default();
++                    let mut fields = Vec::new();
++                    loop {
++                        let expected = reference.next_record();
++                        let actual = owned.next_record();
++                        let packed = compact.next_compact_record_into(&mut record);
++                        let reserved =
++                            admitted.next_record_into_reserved(&mut fields, &mut |_| Ok(()));
++                        assert_eq!(reference.record, owned.record);
++                        assert_eq!(reference.record, compact.record);
++                        assert_eq!(reference.record, admitted.record);
++                        match (expected, actual, packed, reserved) {
++                            (Ok(Some(expected)), Ok(Some(actual)), Ok(true), Ok(true)) => {
++                                assert_eq!(actual, expected);
++                                assert_eq!(record.fields().collect::<Vec<_>>(), expected);
++                                assert_eq!(fields, expected);
++                            }
++                            (Ok(None), Ok(None), Ok(false), Ok(false)) => {
++                                assert!(record.is_empty());
++                                assert!(fields.is_empty());
++                                break;
++                            }
++                            (Err(a), Err(b), Err(c), Err(d)) => {
++                                assert_eq!(format!("{a:#}"), format!("{b:#}"));
++                                assert_eq!(format!("{a:#}"), format!("{c:#}"));
++                                assert_eq!(format!("{a:#}"), format!("{d:#}"));
++                                assert!(record.is_empty());
++                                break;
++                            }
++                            results => panic!("changing window mismatch {windows:?}/{maximum}/{input:?}: {results:?}"),
++                        }
++                    }
++                }
++            }
++        }
++        for budget in 0..=320 {
++            let input = b"a,b,c,d\nthird,\"quoted\nfield\",last\n";
++            let mut compact = Parser::new(changing(input, windows), CsvSettings::default(), 4096);
++            let mut record = CompactRecord::default();
++            let mut granted = 0;
++            loop {
++                let result = compact.next_compact_record_into_reserved(&mut record, &mut |bytes| {
++                    anyhow::ensure!(bytes <= budget, "synthetic admission denial");
++                    granted = bytes;
++                    Ok(())
++                });
++                assert!(granted >= record.capacity() + compact.scratch_capacity());
++                if !matches!(result, Ok(true)) {
++                    break;
++                }
++            }
++            let mut admitted = Parser::new(changing(input, windows), CsvSettings::default(), 4096);
++            let mut fields = Vec::new();
++            let mut granted = 0;
++            loop {
++                let result = admitted.next_record_into_reserved(&mut fields, &mut |bytes| {
++                    anyhow::ensure!(bytes <= budget, "synthetic admission denial");
++                    granted = bytes;
++                    Ok(())
++                });
++                assert!(
++                    granted
++                        >= fields.capacity() * std::mem::size_of::<String>()
++                            + fields.iter().map(String::capacity).sum::<usize>()
++                            + admitted.scratch_capacity()
++                );
++                if !matches!(result, Ok(true)) {
++                    break;
++                }
++            }
++        }
++    }
++    Ok(())
++}

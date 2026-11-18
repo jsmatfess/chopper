@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "type": "private_archive_verification",
+  "date": "2026-11-15",
+  "bucket": "chopper-archive-private",
+  "key": "sha256/7089e97af7ba2dece5fc51e4026f7a24fcf39e0c9bd95a5f39c278154ca647d8",
+  "bundle": {
+    "sha256": "7089e97af7ba2dece5fc51e4026f7a24fcf39e0c9bd95a5f39c278154ca647d8",
+    "bytes": 55592960
+  },
+  "upload": "Wrangler 4.162.0 authenticated remote object put",
+  "verification": "Fresh remote object get; full bundle and all 12 regular members match original byte/SHA-256 identities. Nested replay verifies all 2098 content objects and 4606 path aliases against its index.",
+  "reader_coverage": "Existing OAuth principal for both operations; no separate scoped-reader or public-publication claim.",
+  "verified": true,
+  "replay": {
+    "files": 4606,
+    "unique_objects": 2098,
+    "uncompressed_unique_bytes": 458932874,
+    "index_sha256": "f2eaedf7867f34bbb96b7f966a1c9deec86bb4a029b964fae6ddb68bb95a2ef3"
+  },
+  "artifacts": [
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-exact-pilot-native-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/exact-pilot-01.jsonl",
+      "bytes": 124504,
+      "sha256": "77ff2794cb1bcdb7a7665a11452db0e5ffdeb3ee5da64bc8ca6088bb1c45b945",
+      "member": "objects/77ff2794cb1bcdb7a7665a11452db0e5ffdeb3ee5da64bc8ca6088bb1c45b945"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-exact-controls-native-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/exact-controls-01.jsonl",
+      "bytes": 185249,
+      "sha256": "1285af2b8779050a680d09ca93521f3f8ee0c7753d710cb109ca293c3e032e03",
+      "member": "objects/1285af2b8779050a680d09ca93521f3f8ee0c7753d710cb109ca293c3e032e03"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-mixed-pilot-native-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/mixed-pilot-01.jsonl",
+      "bytes": 124742,
+      "sha256": "9b9397619353d72eeeb082be4a06b378af7d009be0a3ea967e58c244b7ccc484",
+      "member": "objects/9b9397619353d72eeeb082be4a06b378af7d009be0a3ea967e58c244b7ccc484"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-mixed-controls-native-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/mixed-controls-01.jsonl",
+      "bytes": 185613,
+      "sha256": "c66d054d3e202facf6da46dccedc696da17f4cc8d54e56326dfb195bee3fcc06",
+      "member": "objects/c66d054d3e202facf6da46dccedc696da17f4cc8d54e56326dfb195bee3fcc06"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-adaptive-native-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/adaptive-pilot-01.jsonl",
+      "bytes": 124535,
+      "sha256": "892212d4bbe72dcd7bfa7fde7379e83494c5d4238672cfee5ccd4e523f2d11dc",
+      "member": "objects/892212d4bbe72dcd7bfa7fde7379e83494c5d4238672cfee5ccd4e523f2d11dc"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-balanced-native-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/balanced-pilot-01.jsonl",
+      "bytes": 124780,
+      "sha256": "1fa53efffa7f15e5ebb745f8ac672b20a15546364621e85727c2de6e1375159e",
+      "member": "objects/1fa53efffa7f15e5ebb745f8ac672b20a15546364621e85727c2de6e1375159e"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-combined-native-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/combined-native-01.jsonl",
+      "bytes": 306158,
+      "sha256": "e377c340638849009c163c81bd3de41935233a03c857e8f93098bc4229574c12",
+      "member": "objects/e377c340638849009c163c81bd3de41935233a03c857e8f93098bc4229574c12"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-exact-browser-failed-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/browser-exact-pilot-01.jsonl",
+      "bytes": 26597,
+      "sha256": "2983b7f39dcd3574dc77e34f81fedce721824e07cbe235b687ee5d5f021c2dba",
+      "member": "objects/2983b7f39dcd3574dc77e34f81fedce721824e07cbe235b687ee5d5f021c2dba"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-exact-browser-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/browser-exact-pilot-02.jsonl",
+      "bytes": 174899,
+      "sha256": "3c0800d25565d9523e142d10e1199c41ac60b93a88fdf9b7ee64cbc1be049229",
+      "member": "objects/3c0800d25565d9523e142d10e1199c41ac60b93a88fdf9b7ee64cbc1be049229"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-mixed-browser-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/browser-mixed-pilot-01.jsonl",
+      "bytes": 187507,
+      "sha256": "6705a5d824ee7086ecdf6747d3a3be73b2a50a52bb54a4af66956f64827d6070",
+      "member": "objects/6705a5d824ee7086ecdf6747d3a3be73b2a50a52bb54a4af66956f64827d6070"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-combined-browser-2026-11-15.jsonl",
+      "original_local_path": "scratch/swarm-20261115/browser-combined-01.jsonl",
+      "bytes": 322293,
+      "sha256": "e81661e96b6b0484fb528049b2ea9e8a68e9e53d07deee5503e9dadb1be010c3",
+      "member": "objects/e81661e96b6b0484fb528049b2ea9e8a68e9e53d07deee5503e9dadb1be010c3"
+    },
+    {
+      "alias": "docs/benchmarks/shuffle-swarm-replay-2026-11-15.tar.gz",
+      "original_local_path": "scratch/swarm-20261115/archive-v1/shuffle-swarm-replay-2026-11-15.tar.gz",
+      "bytes": 53688940,
+      "sha256": "7bac9d054e3e201e844fba0d4c69bde806737c645812b2712fddac27508d6ebb",
+      "member": "objects/7bac9d054e3e201e844fba0d4c69bde806737c645812b2712fddac27508d6ebb"
+    }
+  ]
+}

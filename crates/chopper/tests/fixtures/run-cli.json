@@ -1,0 +1,167 @@
+{
+  "job": {
+    "version": 1,
+    "input": "C:\\O'Brien\\$(touch ignored) input.csv",
+    "output": "C:\\data\\new results",
+    "zip_member": "nested/å.csv",
+    "input_csv": {
+      "encoding": "utf-16le",
+      "headers": false,
+      "delimiter": "\t",
+      "quote": "'",
+      "escape": "\\",
+      "line_ending": "crlf",
+      "bom": true,
+      "skip_empty_lines": true
+    },
+    "output_csv": {
+      "encoding": "utf-8",
+      "headers": false,
+      "delimiter": ";",
+      "quote": "'",
+      "escape": "\\",
+      "line_ending": "crlf",
+      "bom": false,
+      "skip_empty_lines": true
+    },
+    "compression": "zip",
+    "operations": [
+      {
+        "type": "partition",
+        "columns": [
+          "123",
+          2,
+          "a,b",
+          "-q'\"; $(ignored)"
+        ]
+      },
+      {
+        "type": "assign",
+        "groups": [
+          {
+            "name": "x,=y",
+            "percent": "40"
+          },
+          {
+            "name": "O'Brien",
+            "percent": "60"
+          }
+        ],
+        "strata": [
+          1,
+          "0"
+        ]
+      },
+      {
+        "type": "shuffle",
+        "strategy": "fisher_yates"
+      },
+      {
+        "type": "partition",
+        "columns": [
+          "country",
+          "segment"
+        ]
+      },
+      {
+        "type": "assign_probabilistic",
+        "groups": [
+          {
+            "name": "yes",
+            "percent": "25"
+          },
+          {
+            "name": "no",
+            "percent": "75"
+          }
+        ],
+        "strata": [
+          "country",
+          "segment"
+        ]
+      },
+      {
+        "type": "balanced",
+        "files": 3
+      },
+      {
+        "type": "interleaved",
+        "files": 2
+      }
+    ],
+    "limits": {
+      "rows": 100,
+      "bytes": 1048576,
+      "compressed_bytes": 512000
+    },
+    "resources": {
+      "memory_mb": 512,
+      "workers": 2,
+      "grouping": "sort",
+      "max_files": 2000,
+      "max_record_bytes": 1048576,
+      "temp_dir": "C:\\temporary files",
+      "temp_bytes": 2000000000
+    },
+    "full_shuffle_rng": "blake3_counter_v1",
+    "full_shuffle_algorithm": "adaptive_v1"
+  },
+  "args": [
+    "run",
+    "--input=C:\\O'Brien\\$(touch ignored) input.csv",
+    "--output=C:\\data\\new results",
+    "--zip-member=nested/å.csv",
+    "--compression=zip",
+    "--rows=100",
+    "--bytes=1048576",
+    "--compressed-bytes=512000",
+    "--memory-mb=512",
+    "--workers=2",
+    "--grouping=sort",
+    "--max-files=2000",
+    "--max-record-bytes=1048576",
+    "--temp-dir=C:\\temporary files",
+    "--temp-bytes=2000000000",
+    "--full-shuffle-rng=blake3_counter_v1",
+    "--full-shuffle-algorithm=adaptive_v1",
+    "--input-encoding=utf-16le",
+    "--input-headers=false",
+    "--input-delimiter=\t",
+    "--input-quote='",
+    "--input-escape=\\",
+    "--input-line-ending=crlf",
+    "--input-bom=true",
+    "--input-skip-empty-lines=true",
+    "--output-headers=false",
+    "--output-delimiter=;",
+    "--output-quote='",
+    "--output-escape=\\",
+    "--output-line-ending=crlf",
+    "--output-skip-empty-lines=true",
+    "--step=partition",
+    "--column=123",
+    "--column-index=2",
+    "--column=a,b",
+    "--column=-q'\"; $(ignored)",
+    "--step=assign",
+    "--group=x,=y=40",
+    "--group=O'Brien=60",
+    "--stratum-index=1",
+    "--stratum=0",
+    "--step=shuffle",
+    "--strategy=fisher_yates",
+    "--step=partition",
+    "--column=country",
+    "--column=segment",
+    "--step=assign_probabilistic",
+    "--group=yes=25",
+    "--group=no=75",
+    "--stratum=country",
+    "--stratum=segment",
+    "--step=balanced",
+    "--files=3",
+    "--step=interleaved",
+    "--files=2",
+    "--yes"
+  ]
+}

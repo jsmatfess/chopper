@@ -1,0 +1,82 @@
+--- a/crates/chopper-core/src/csv.rs
++++ b/crates/chopper-core/src/csv.rs
+@@ -1063,0 +1064,16 @@
++#[inline]
++fn needs_quotes(settings: &SerializationSettings, value: &str) -> bool {
++    if value.is_empty() {
++        return true;
++    }
++    if settings.delimiter.is_ascii() && settings.quote.is_ascii() {
++        // ASCII structural bytes cannot occur inside another UTF-8 scalar.
++        // Keep character matching for the public serializer's Unicode dialects.
++        let bytes = value.as_bytes();
++        memchr::memchr3(settings.delimiter as u8, settings.quote as u8, b'\n', bytes).is_some()
++            || memchr::memchr(b'\r', bytes).is_some()
++    } else {
++        value.contains([settings.delimiter, settings.quote, '\r', '\n'])
++    }
++}
++
+@@ -1070,2 +1086 @@
+-        let quoted =
+-            value.is_empty() || value.contains([settings.delimiter, settings.quote, '\r', '\n']);
++        let quoted = needs_quotes(settings, value);
+@@ -1197,2 +1212 @@
+-        let quoted =
+-            value.is_empty() || value.contains([settings.delimiter, settings.quote, '\r', '\n']);
++        let quoted = needs_quotes(settings, value);
+@@ -1249,0 +1264,54 @@
++
++#[cfg(test)]
++mod quote_predicate_contracts {
++    use super::*;
++
++    #[test]
++    fn byte_search_matches_character_quote_rules_at_alignment_edges() {
++        for (delimiter, quote) in [
++            (',', '"'),
++            (';', '\''),
++            ('\r', '\n'),
++            ('\0', '\0'),
++            ('\u{7f}', ':'),
++            ('界', '"'),
++            (',', '界'),
++            ('界', '§'),
++        ] {
++            let settings = SerializationSettings {
++                delimiter,
++                quote,
++                escape: None,
++                crlf: false,
++            };
++            for padding in [0, 1, 2, 7, 15, 16, 31, 32, 63, 64] {
++                for character in (0..=127).map(|n| char::from_u32(n).unwrap()).chain([
++                    '\u{80}',
++                    '\u{7ff}',
++                    '\u{800}',
++                    '界',
++                    '§',
++                    '\u{d7ff}',
++                    '\u{e000}',
++                    '\u{ffff}',
++                    '\u{10000}',
++                    '\u{10ffff}',
++                ]) {
++                    let value = format!(
++                        "{}{}{}",
++                        "x".repeat(padding),
++                        character,
++                        "界".repeat(padding)
++                    );
++                    let expected = value.contains([delimiter, quote, '\r', '\n']);
++                    assert_eq!(
++                        needs_quotes(&settings, &value),
++                        expected,
++                        "dialect {delimiter:?}/{quote:?}, padding {padding}, char {character:?}"
++                    );
++                }
++            }
++            assert!(needs_quotes(&settings, ""));
++        }
++    }
++}

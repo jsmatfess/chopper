@@ -1,0 +1,457 @@
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -8,0 +9,2 @@
++#[cfg(test)]
++mod terminal_controls;
+@@ -253,0 +256,27 @@
++    } else if terminal_direct_eligible(&job) {
++        match process_using(
++            job,
++            cancel,
++            notify,
++            pool,
++            true,
++            |job, ctx, partitions, balanced, streaming| {
++                with_input(job, Reservation::new(ctx), |source| {
++                    ingest_options(source, job, ctx, partitions, balanced, streaming)
++                })
++            },
++        )? {
++            Processed::Direct {
++                job,
++                analysis,
++                publication,
++                ctx,
++            } => {
++                publication.publish(&job, &analysis, &ctx)?;
++                study_traffic(&ctx);
++                Ok(analysis)
++            }
++            Processed::Snapshot(_) => {
++                anyhow::bail!("terminal direct experiment did not produce direct output")
++            }
++        }
+@@ -283 +312 @@
+-    mut read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
++    read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
+@@ -284,0 +314,41 @@
++    match process_using(job, cancel, notify, pool, false, read_input)? {
++        Processed::Snapshot(prepared) => Ok(prepared),
++        Processed::Direct { .. } => anyhow::bail!("explicit preparation requires a snapshot"),
++    }
++}
++
++// Isolated experiment only: no production selector or schema change.
++fn terminal_direct_eligible(job: &Job) -> bool {
++    job.full_shuffle_policy.is_seeded()
++        && job.compression == chopper_core::Compression::None
++        && job.resources.workers == 1
++        && matches!(
++            job.operations.as_slice(),
++            [
++                Operation::Partition { .. },
++                Operation::AssignProbabilistic { .. }
++            ]
++        )
++}
++
++// This synchronous result stays on the stack. Boxing solely for the size lint
++// would introduce an unnecessary separately admitted allocation.
++#[allow(clippy::large_enum_variant)]
++enum Processed {
++    Snapshot(Prepared),
++    Direct {
++        job: PreparedJob,
++        analysis: Analysis,
++        publication: output::DirectPublication,
++        ctx: Context,
++    },
++}
++
++fn process_using(
++    job: Job,
++    cancel: Arc<AtomicBool>,
++    notify: Notify,
++    pool: Arc<crate::resources::MemoryPool>,
++    direct_terminal: bool,
++    mut read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
++) -> Result<Processed> {
+@@ -374,0 +445 @@
++    let mut terminal_publication = None;
+@@ -604 +675,5 @@
+-            let mut writer = output::PlanWriter::new(&job, analysis.header.as_deref(), &ctx)?;
++            let mut writer = if direct_terminal {
++                output::PlanWriter::direct_grouped(&job, analysis.header.as_ref(), &ctx)?
++            } else {
++                output::PlanWriter::new(&job, analysis.header.as_deref(), &ctx)?
++            };
+@@ -630 +705,5 @@
+-            final_plan = Some(writer.finish()?);
++            if direct_terminal {
++                terminal_publication = Some(writer.finish_direct()?);
++            } else {
++                final_plan = Some(writer.finish()?);
++            }
+@@ -668,2 +747,4 @@
+-    let output_plan = if let Some(plan) = final_plan {
+-        plan
++    let output_plan = if terminal_publication.is_some() {
++        None
++    } else if let Some(plan) = final_plan {
++        Some(plan)
+@@ -672 +753,6 @@
+-        output::plan(&dataset, &job, analysis.header.as_deref(), &ctx)?
++        Some(output::plan(
++            &dataset,
++            &job,
++            analysis.header.as_deref(),
++            &ctx,
++        )?)
+@@ -679,2 +765,7 @@
+-    analysis.output_files = output_plan.files;
+-    analysis.output_csv_bytes = output_plan.bytes;
++    let (files, bytes) = match (&terminal_publication, &output_plan) {
++        (Some((_, files, bytes)), None) => (*files, *bytes),
++        (None, Some(plan)) => (plan.files, plan.bytes),
++        _ => anyhow::bail!("ambiguous terminal output target"),
++    };
++    analysis.output_files = files;
++    analysis.output_csv_bytes = bytes;
+@@ -689,8 +780,18 @@
+-    ctx.event("Ready for confirmation", analysis.rows)?;
+-    Ok(Prepared {
+-        job,
+-        analysis,
+-        output_plan,
+-        ctx,
+-        execution_plan,
+-    })
++    if let Some((publication, _, _)) = terminal_publication {
++        ctx.event("Finalizing direct terminal output", analysis.rows)?;
++        Ok(Processed::Direct {
++            job,
++            analysis,
++            publication,
++            ctx,
++        })
++    } else {
++        ctx.event("Ready for confirmation", analysis.rows)?;
++        Ok(Processed::Snapshot(Prepared {
++            job,
++            analysis,
++            output_plan: output_plan.context("missing prepared snapshot")?,
++            ctx,
++            execution_plan,
++        }))
++    }
+@@ -2109 +2209,0 @@
+-
+--- a/crates/chopper/src/output.rs
++++ b/crates/chopper/src/output.rs
+@@ -246,0 +247,18 @@
++    pub(crate) fn direct_grouped(
++        job: &'a Job,
++        header: Option<&crate::engine::Header>,
++        ctx: &'a Context,
++    ) -> Result<Self> {
++        let target = || {
++            Ok(EncodedTarget::Direct(DirectPublication::grouped(
++                job, header, ctx,
++            )?))
++        };
++        Self::with_target(
++            job,
++            header.map(|h| &h[..]),
++            ctx,
++            Reservation::new(ctx),
++            target,
++        )
++    }
+--- a/crates/chopper/src/output/direct.rs
++++ b/crates/chopper/src/output/direct.rs
+@@ -15,0 +16,2 @@
++    header: Option<crate::engine::Header>,
++    grouped: bool,
+@@ -43,0 +46,2 @@
++            header: None,
++            grouped: false,
+@@ -48,0 +53,11 @@
++    pub(super) fn grouped(
++        job: &Job,
++        header: Option<&crate::engine::Header>,
++        ctx: &Context,
++    ) -> Result<Self> {
++        let mut result = Self::new(job, ctx)?;
++        // Analysis Header clones share its immutable admitted owner and grant.
++        result.header = header.cloned();
++        result.grouped = true;
++        Ok(result)
++    }
+@@ -53 +68 @@
+-            chunk.group.lineage.is_empty(),
++            self.grouped || chunk.group.lineage.is_empty(),
+@@ -56 +71,7 @@
+-        let name = output_name(chunk.index, &chunk.group, job, None, Reservation::new(ctx))?;
++        let name = output_name(
++            chunk.index,
++            &chunk.group,
++            job,
++            self.header.as_deref(),
++            Reservation::new(ctx),
++        )?;
+--- /dev/null
++++ b/crates/chopper/src/engine/terminal_controls.rs
+@@ -0,0 +1,130 @@
++use super::*;
++use crate::resources::MemoryPool;
++use std::{fs, path::Path, sync::atomic::Ordering};
++
++fn setup(input: &[u8]) -> Result<(tempfile::TempDir, Job)> {
++    let dir = tempfile::tempdir()?;
++    fs::write(dir.path().join("input.csv"), input)?;
++    fs::create_dir(dir.path().join("temp"))?;
++    let mut job = Job {
++        input: dir.path().join("input.csv").to_string_lossy().into(),
++        output: dir.path().join("output").to_string_lossy().into(),
++        seed: Some("terminal-test".into()),
++        resources: Resources {
++            memory_mb: 32.into(),
++            workers: 1,
++            max_record_bytes: 1048576,
++            temp_dir: Some(dir.path().join("temp").to_string_lossy().into()),
++            ..Default::default()
++        },
++        ..Default::default()
++    };
++    terminal_recipe(&mut job);
++    Ok((dir, job))
++}
++fn terminal_recipe(job: &mut Job) {
++    job.operations = vec![
++        Operation::Partition {
++            columns: vec![Column::Index(1)],
++        },
++        Operation::AssignProbabilistic {
++            groups: vec![
++                Allocation {
++                    name: "all".into(),
++                    percent: "100".into(),
++                },
++                Allocation {
++                    name: "empty".into(),
++                    percent: "0".into(),
++                },
++            ],
++            strata: vec![],
++        },
++    ];
++}
++fn clean(dir: &Path, job: &Job) -> Result<()> {
++    assert!(!Path::new(&job.output).exists());
++    assert_eq!(fs::read_dir(dir.join("temp"))?.count(), 0);
++    assert!(!fs::read_dir(dir)?.any(|e| e
++        .unwrap()
++        .file_name()
++        .to_string_lossy()
++        .starts_with(".chopper-staging-")));
++    Ok(())
++}
++#[test]
++fn terminal_direct_post_emission_shared_denial_never_replays() -> Result<()> {
++    use std::sync::{atomic::AtomicUsize, Mutex};
++    for phase in ["Serializing output", "Finalizing direct terminal output"] {
++        let text = format!("id,kind,text\n{}", "1,A,x\n".repeat(65537));
++        let (dir, mut job) = setup(text.as_bytes())?;
++        terminal_recipe(&mut job);
++        let pool = Arc::new(MemoryPool::new(64 * 1024 * 1024));
++        let other = Context::with_memory_pool(
++            &Resources {
++                memory_mb: 256.into(),
++                workers: 1,
++                ..Default::default()
++            },
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let held = Arc::new(Mutex::new(Reservation::new(&other)));
++        let grant = held.clone();
++        let shared = pool.clone();
++        let visits = Arc::new(AtomicUsize::new(0));
++        let input_visits = visits.clone();
++        let injected = Arc::new(AtomicBool::new(false));
++        let did_inject = injected.clone();
++        let result = run_with_memory_pool(
++            job.clone(),
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(move |progress| {
++                if progress.phase == "Reading and validating CSV" && progress.rows == 0 {
++                    input_visits.fetch_add(1, Ordering::Relaxed);
++                }
++                if progress.phase == phase && !did_inject.swap(true, Ordering::Relaxed) {
++                    let usage = shared.usage();
++                    grant
++                        .lock()
++                        .unwrap()
++                        .resize((usage.limit_bytes - usage.reserved_bytes - 256) as usize)
++                        .unwrap();
++                }
++            }),
++            pool.clone(),
++        );
++        assert!(
++            injected.load(Ordering::Relaxed),
++            "phase not reached: {phase}"
++        );
++        if phase == "Finalizing direct terminal output" {
++            let error = result
++                .map(|_| ())
++                .expect_err("finalization admission must fail");
++            assert!(
++                format!("{error:#}").contains("shared process memory admission"),
++                "{error:#}"
++            );
++        } else {
++            // Resident emission releases row grants after injection; the fixed
++            // competitor need not deny later manifest construction.
++            let analysis = result?;
++            assert_eq!(analysis.rows, 65537);
++            assert_eq!(analysis.output_files, 2);
++            drop(analysis);
++            fs::remove_dir_all(&job.output)?;
++        }
++        assert_eq!(
++            visits.load(Ordering::Relaxed),
++            1,
++            "consumed input must not replay"
++        );
++        clean(dir.path(), &job)?;
++        drop(held);
++        drop(other);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++    }
++    Ok(())
++}
+--- a/crates/chopper/tests/direct_run.rs
++++ b/crates/chopper/tests/direct_run.rs
+@@ -581,0 +582,120 @@
++
++fn terminal_recipe(job: &mut Job) {
++    job.operations = vec![
++        Operation::Partition {
++            columns: vec![Column::Index(1)],
++        },
++        Operation::AssignProbabilistic {
++            groups: vec![
++                Allocation {
++                    name: "all".into(),
++                    percent: "100".into(),
++                },
++                Allocation {
++                    name: "empty".into(),
++                    percent: "0".into(),
++                },
++            ],
++            strata: vec![Column::Index(1)],
++        },
++    ];
++}
++
++#[test]
++fn terminal_direct_parity_caps_names_empty_and_encoding() -> Result<()> {
++    for (headers, encoding, bom) in [
++        (true, "utf-8", false),
++        (false, "utf-8", false),
++        (true, "utf-16le", true),
++    ] {
++        let input = if headers {
++            "id,kind,text\n1,A,\"comma,quote\"\"\"\n2,A,\"line\nbreak\"\n3,B,界\n4,B,\n"
++        } else {
++            "1,A,x\n2,A,y\n3,B,z\n4,B,\n"
++        };
++        let (_dir, mut job) = setup(input.as_bytes())?;
++        terminal_recipe(&mut job);
++        job.input_csv.headers = headers;
++        job.output_csv.headers = headers;
++        job.output_csv.encoding = encoding.into();
++        job.output_csv.bom = bom;
++        job.limits.rows = Some(1);
++        job.limits.bytes = Some(128);
++        let result = parity(job.clone())?;
++        assert_eq!(result.rows, 4);
++        assert_eq!(result.groups, 4);
++        let records = manifest(&job.output)?;
++        assert_eq!(
++            records
++                .iter()
++                .filter(|r| r["type"] == "output" && r["rows"] == 0)
++                .count(),
++            2
++        );
++        for record in records.iter().skip(1) {
++            let name = record["path"].as_str().unwrap();
++            assert!(
++                name.starts_with(if headers { "kind-" } else { "column-2-" }),
++                "{name}"
++            );
++            assert!(record["csv_bytes"].as_u64().unwrap() <= 128);
++        }
++    }
++    // Empty source and header-only sources retain existing empty-output rules.
++    for data in [b"id,kind,text\n".as_slice(), b"".as_slice()] {
++        let (_dir, mut job) = setup(data)?;
++        terminal_recipe(&mut job);
++        if data.is_empty() {
++            job.input_csv.headers = false;
++            job.output_csv.headers = false;
++        }
++        // A completely empty source cannot resolve column1: both paths must fail safely.
++        if data.is_empty() {
++            assert!(run(job).is_err());
++        } else {
++            parity(job)?;
++        }
++    }
++    Ok(())
++}
++
++#[test]
++fn terminal_direct_late_failure_cancel_and_destination_race_cleanup() -> Result<()> {
++    for mode in ["encoding", "files", "cancel-final", "race"] {
++        let (dir, mut job) = setup("id,kind,text\n1,A,first\n2,A,界\n3,B,last\n".as_bytes())?;
++        terminal_recipe(&mut job);
++        job.limits.rows = Some(1);
++        if mode == "encoding" {
++            job.output_csv.encoding = "windows-1252".into();
++        }
++        if mode == "files" {
++            job.resources.max_files = 3;
++        }
++        let signal = Arc::new(AtomicBool::new(false));
++        let cancel = signal.clone();
++        let output = job.output.clone();
++        let result = engine::run(
++            job.clone(),
++            signal,
++            Arc::new(move |progress| {
++                if progress.phase == "Finalizing direct terminal output" {
++                    if mode == "cancel-final" {
++                        cancel.store(true, Ordering::Relaxed);
++                    }
++                    if mode == "race" {
++                        fs::create_dir(&output).unwrap();
++                        fs::write(Path::new(&output).join("other"), b"preserve").unwrap();
++                    }
++                }
++            }),
++        );
++        assert!(result.is_err(), "{mode} must fail");
++        if mode == "race" {
++            assert_eq!(fs::read(Path::new(&job.output).join("other"))?, b"preserve");
++            assert_eq!(fs::read_dir(&job.output)?.count(), 1);
++            fs::remove_dir_all(&job.output)?;
++        }
++        clean(dir.path(), &job)?;
++    }
++    Ok(())
++}

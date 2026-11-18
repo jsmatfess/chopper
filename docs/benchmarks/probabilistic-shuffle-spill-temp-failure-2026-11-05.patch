@@ -1,0 +1,160 @@
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -3996,0 +3997,74 @@
++
++#[cfg(test)]
++mod prepared_spill_failure_controls {
++    use super::*;
++
++    #[test]
++    fn prepared_spill_write_failure_cleanup() -> Result<()> {
++        for maximum in [1u64, 65536] {
++            let dir = tempfile::tempdir()?;
++            let temp = dir.path().join("temp");
++            std::fs::create_dir(&temp)?;
++            let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++            let ctx = Context::with_memory_pool(
++                &chopper_core::Resources {
++                    memory_mb: 32.into(),
++                    workers: 1,
++                    temp_dir: Some(temp.to_string_lossy().into()),
++                    temp_bytes: Some(maximum),
++                    max_record_bytes: 1024 * 1024,
++                    ..Default::default()
++                },
++                Arc::new(AtomicBool::new(false)),
++                Arc::new(|_| {}),
++                pool.clone(),
++            )?;
++            let retained = pool.usage().reserved_bytes;
++            let mut sorter = Sorter::with_available_capacity(&ctx, SortOrder::Random([7; 32]))?;
++            ensure!(
++                sorter.prepared_spill.is_some(),
++                "missing real prepared owner"
++            );
++            sorter.push(Row {
++                id: 0,
++                ordinal: 0,
++                key: vec![1; 16],
++                fields: vec!["x".repeat(128 * 1024)],
++            })?;
++            let error = sorter.flush().expect_err("spill write unexpectedly fit");
++            ensure!(
++                format!("{error:#}").contains("temporary-space budget exhausted"),
++                "{error:#}"
++            );
++            let prefix = ctx.budget.written.load(AtomicOrdering::Relaxed);
++            ensure!(prefix <= maximum, "budget exceeded");
++            ensure!(
++                (maximum == 1 && prefix == 0) || (maximum == 65536 && prefix > 0),
++                "wrong partial-write exposure"
++            );
++            let diagnostics = ctx.diagnostics();
++            ensure!(diagnostics["sort_runs"] == 1, "spill path not exercised");
++            drop(sorter);
++            ensure!(ctx.used() == 0, "failed writer bytes leaked");
++            ensure!(
++                pool.usage().reserved_bytes == retained,
++                "failed writer grants leaked"
++            );
++            ensure!(
++                std::fs::read_dir(ctx.dir.path())?.next().is_none(),
++                "failed file leaked"
++            );
++            drop(ctx);
++            ensure!(pool.usage().reserved_bytes == 0, "context grant leaked");
++            ensure!(
++                std::fs::read_dir(&temp)?.next().is_none(),
++                "job directory leaked"
++            );
++            println!(
++                "PROB_SPILL_WRITE_FAILURE {}",
++                serde_json::json!({"temp_budget":maximum,"written_prefix_bytes":prefix,"sort_runs":1,"error":format!("{error:#}"),"real_prepared_owner":true,"retained_row_bytes":128*1024,"cleanup":true,"final_pool_reserved":0})
++            );
++        }
++        Ok(())
++    }
++}
+--- a/crates/chopper/src/engine/prob_shuffle_controls.rs
++++ b/crates/chopper/src/engine/prob_shuffle_controls.rs
+@@ -822,0 +823,80 @@
++
++#[test]
++fn probabilistic_shuffle_prepared_spill_temp_budget() -> Result<()> {
++    let mut reference = None;
++    for (label, candidate, maximum) in [
++        ("reference", false, 256u64 * 1024 * 1024),
++        ("limited-baseline", false, 64 * 1024 * 1024),
++        ("limited-candidate", true, 64 * 1024 * 1024),
++    ] {
++        ENABLED.set(candidate);
++        let (dir, mut job) = setup(200000)?;
++        job.resources.temp_bytes = Some(maximum);
++        let owner_events = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++        let owner_seen = owner_events.clone();
++        let _hook = target_hook(move |point, _| {
++            if point == "after" {
++                owner_seen.fetch_add(1, Ordering::Relaxed);
++            }
++        });
++        let input_hash = blake3::hash(&fs::read(&job.input)?).to_hex().to_string();
++        let pool = Arc::new(crate::resources::MemoryPool::new(32 * 1024 * 1024));
++        let visits = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++        let seen = visits.clone();
++        let last = Arc::new(std::sync::Mutex::new(serde_json::Value::Null));
++        let observed = last.clone();
++        let result = prepare_with_memory_pool(
++            job.clone(), Arc::new(AtomicBool::new(false)),
++            Arc::new(move |progress| {
++                if progress.phase == "Reading and validating CSV" && progress.rows == 0 { seen.fetch_add(1, Ordering::Relaxed); }
++                *observed.lock().unwrap() = serde_json::json!({"phase":progress.phase,"rows":progress.rows,"temp_bytes":progress.temp_bytes});
++            }), pool.clone(),
++        ).and_then(|prepared| {
++            let ctx = prepared.ctx.clone();
++            let analysis = prepared.execute()?;
++            let checked = verify(dir.path(), &job, 200000, &analysis)?;
++            if let Some(ref expected) = reference { assert_eq!(&checked, expected); } else { reference = Some(checked.clone()); }
++            let fingerprint = blake3::hash(&serde_json::to_vec(&checked)?).to_hex().to_string();
++            let details = serde_json::json!({"verified_fingerprint_blake3":fingerprint,"peak_temp_bytes":ctx.peak(),"diagnostics":ctx.diagnostics(),"output_files":analysis.output_files,"output_csv_bytes":analysis.output_csv_bytes,"exact_csv_output_analysis":true});
++            drop(analysis); drop(ctx); Ok(details)
++        });
++        let (outcome, details) = match result {
++            Ok(details) => ("success_exact", details),
++            Err(error) => {
++                ensure!(label != "reference", "reference failed: {error:#}");
++                ensure!(
++                    format!("{error:#}").contains("temporary-space budget exhausted"),
++                    "{error:#}"
++                );
++                ensure!(
++                    !std::path::Path::new(&job.output).exists(),
++                    "failure published output"
++                );
++                (
++                    "temporary_budget_denial",
++                    serde_json::json!({"error":format!("{error:#}"),"debug":format!("{error:?}")}),
++                )
++            }
++        };
++        ensure!(visits.load(Ordering::Relaxed) == 1, "input replayed");
++        ensure!(
++            fs::read_dir(dir.path().join("temp"))?.next().is_none(),
++            "temporary data leaked"
++        );
++        ensure!(
++            !fs::read_dir(dir.path())?.any(|e| e
++                .unwrap()
++                .file_name()
++                .to_string_lossy()
++                .starts_with(".chopper-staging-")),
++            "private staging leaked"
++        );
++        ensure!(pool.usage().reserved_bytes == 0, "pool leaked");
++        println!(
++            "PROB_SPILL_TEMP_JOB {}",
++            serde_json::json!({"label":label,"candidate":candidate,"temp_budget":maximum,"rows":200000,"input_blake3":input_hash,"outcome":outcome,"details":details,"owner_constructions":owner_events.load(Ordering::Relaxed),"last_progress":*last.lock().unwrap(),"input_visits":1,"cleanup":true,"final_pool_reserved":0,"performance_measurement":false})
++        );
++    }
++    ENABLED.set(false);
++    Ok(())
++}

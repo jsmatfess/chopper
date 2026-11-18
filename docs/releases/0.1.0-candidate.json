@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "version": "0.1.0",
+  "status": "candidate; not published",
+  "base_commit": "9f3d408918002d7fd8d9d7122ffd3751374621b6",
+  "dirty_source": true,
+  "native": {
+    "bytes": 4139008,
+    "sha256": "771a33f8cc34e6bf871bdbe1349669251adc30d48c4fa51d4a585cf75a12409b"
+  },
+  "hosted": {
+    "_headers": {
+      "bytes": 385,
+      "sha256": "204a252c2a752375446d6f27b5d8670fe761fa021884ac0797e844847fadc5d1"
+    },
+    "app.js": {
+      "bytes": 40493,
+      "sha256": "951232201b98ce2659608ade09ac76a8ef94bf9f3fb5cc8fb3ad4b9b275112ff"
+    },
+    "engine-worker.js": {
+      "bytes": 35153,
+      "sha256": "cf407b6ce2b7d47f0909a352193c8260231a8f6c740f779f487806af8c8425f8"
+    },
+    "engine.wasm": {
+      "bytes": 2358817,
+      "sha256": "afe7e8a61837e6317af70090a112158149725d9af909ea1eb2e60a66369787ce"
+    },
+    "index.html": {
+      "bytes": 8867,
+      "sha256": "ee73456f9b1afa8801244a3fbfbae2308d51f514c6a7b7f3cac6d8ee9d8e6898"
+    },
+    "storage-worker.js": {
+      "bytes": 3034,
+      "sha256": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6"
+    },
+    "style.css": {
+      "bytes": 12292,
+      "sha256": "edddae5c4a2aab3cfa8bcc3c2a79bd69a9bd9c7463ec3d9c2ec5a14d72ed2787"
+    }
+  },
+  "packages": {
+    "chopper-0.1.0-windows-x86_64.zip": {
+      "bytes": 1713965,
+      "sha256": "9c3be7b2ca3a7be587bfb83befd7de2c3526e03ff63c114ec1d7facd5c975e46"
+    },
+    "chopper-0.1.0-hosted.zip": {
+      "bytes": 821738,
+      "sha256": "bdd914517252d7cb1849ccae11955dad919ed052f912e891c3535417885e4606"
+    }
+  },
+  "validation_steps_passed": 29,
+  "source_input_sets": {
+    "native-release": {
+      "files": 327,
+      "sha256": "b8dd800f1a8143a6ca92aa4d143bd52f24b9ffea8ad867463d29506f0419061b"
+    },
+    "production-export-assets": {
+      "files": 19408,
+      "sha256": "c4f17ed22f535b97946a930ce03032cea3f11d1c2338768982494ec7424d88d4"
+    }
+  },
+  "cli_smoke": {
+    "commands": [
+      {
+        "label": "version",
+        "exit_code": 0
+      },
+      {
+        "label": "split",
+        "exit_code": 0
+      },
+      {
+        "label": "malformed",
+        "exit_code": 1
+      }
+    ],
+    "exact_fields_and_order": true,
+    "row_cap": 2,
+    "csv_byte_cap": 64,
+    "malformed_failure_cleanup": true,
+    "actual_system_pickers": false
+  },
+  "human_release_gates_open": false,
+  "candidate_revision": 2,
+  "supersedes_native_sha256": "c87a724d4b9d39ec5911e5f8470dae4397cda65546a5d266beac5b374511cc45",
+  "manual_memory_regression": {
+    "native_complete_job_rows": 6500000,
+    "fixture": {
+      "bytes": 694388909,
+      "sha256": "c51566367f1155f4a4b23cf60099d474d442de89cb265b9194b5cabc1a057632"
+    },
+    "explicit_memory_mb": 512,
+    "csv_files": 16,
+    "seeded_csv_bytes_match_256_mib": true,
+    "native_and_wasi_shared_pool_contract": true,
+    "installed_chrome_steps_passed": 19,
+    "installed_edge_steps_passed": 19,
+    "original_user_file_tested": false
+  },
+  "owner_acceptance": {
+    "recorded_utc": "2026-10-29T03:54:57.176881+00:00",
+    "reporter": "owner in release conversation",
+    "native_original_676_mb_job_at_512_mib": "worked",
+    "hosted_original_676_mb_job_at_512_mib": "worked",
+    "real_picker_export_cancellation_and_malformed_input_smoke": "complete; no issues reported",
+    "approval": "Approved as is",
+    "platform": "Windows PowerShell environment; hosted browser version not reported",
+    "scope": "owner-reported acceptance; no additional automated/device-fault claims",
+    "candidate_commit": "9e87415f2c218618a0dcfb8cc46428c92ebc9258"
+  }
+}
