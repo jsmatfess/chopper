@@ -1,6 +1,9 @@
 import type {Job, State} from './app';
 import {configureTheme} from './theme';
 import {runCommand,defaultCommandPlatform,type CommandPlatform} from './run-command';
+import {version} from '../package.json';
+
+const cliVersion=version.split('.').slice(0,2).join('.');
 
 // Presentation only: move the existing form controls, preserving their listeners,
 // validation and configuration. The native entry point never calls this module.
@@ -249,7 +252,7 @@ export function configureHostedWorkspace() {
     get('cli-command').textContent=equivalent?.command??'';
     cli.querySelector<HTMLButtonElement>('[command="--copy"]')!.disabled=!equivalent;
     get('cli-help').textContent=!equivalent?'Finish the configuration to generate a command.':equivalent.usesJson?`This job needs JSON to preserve its settings within native command-line limits. Export the job, replace input and output with full local paths, then run beside ${executable} and chopper-job.json.`:`Steps follow editor order. Replace the browser names with full local paths on the target system; output must name a new folder. Run beside ${executable}. JSON export remains available.`;
-    get('cli-platform-help').textContent=windows?'Use Chopper 0.3 with PowerShell 7.3+ and its default argument handling.':'Use the Chopper 0.3 Linux CLI package. macOS currently requires a source build.';
+    get('cli-platform-help').textContent=windows?`Use Chopper ${cliVersion} with PowerShell 7.3+ and its default argument handling.`:`Use the Chopper ${cliVersion} Linux CLI package. macOS currently requires a source build.`;
     const download=get('cli-download') as HTMLAnchorElement;
     download.href=windows?'https://github.com/jsmatfess/chopper/releases':'https://github.com/jsmatfess/chopper';
     download.textContent=windows?'CLI releases':'Build CLI from source';
