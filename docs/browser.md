@@ -152,8 +152,8 @@ Large gzip and ZIP output can use up to four dedicated compression Web Workers
 under Auto. They run the same DEFLATE codec in separate WASM instances. The
 engine retains an admission grant for the shared block buffers and codec
 scratch until the Run retires the workers. The selected file and output bytes
-stay local. The engine has one processing worker, and an explicit worker setting
-of 1 uses serial compression. The Auto details report parallel compression
+stay local. The engine has one processing worker. An explicit worker count
+caps compression concurrency, and a count of 1 uses serial compression. The Auto details report parallel compression
 slots when used. See [compression selection](direct-execution.md#compression-selection).
 
 Analyze scans every record without producing output spools or retaining an

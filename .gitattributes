@@ -15,7 +15,6 @@ docs/evidence-registry.v1.json text eol=lf
 docs/evidence-originals.md text eol=lf
 # Preserve the audited upstream copy and local patch identities.
 vendor/zip-2.4.2/** -text
-vendor/zstd-sys-2.1.1/** -text
 # Keep rejected experiment snapshots byte-for-byte, outside executable sources.
 docs/history/rejected-sort-experiments-2026-10-24/*.rs.txt -text
 docs/history/rejected-parallel-groups-2026-10-25/*.rs -text

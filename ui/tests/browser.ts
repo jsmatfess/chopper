@@ -298,16 +298,17 @@ async function main(){
       assert(decoded.plan.rows===3,'direct '+compression+' row count changed');
     }
   });
-  await test('Auto gzip and ZIP compression preserve bytes and honor a single-worker override',async()=>{
+  await test('Auto gzip and ZIP compression preserve bytes and honor worker overrides',async()=>{
     const source=csv('id,payload\n'+Array.from({length:8192},(_,row)=>row+','+'abcdef0123456789'.repeat(32)+'\n').join(''));
     const expected=await source.text();
     for(const compression of ['gzip','zip'] as const){
-      for(const workers of [0,1]){
+      for(const workers of [0,1,2]){
         const encoded=await run(source,job({compression,resources:{...defaults.resources,workers},
           limits:{rows:null,bytes:source.size,compressed_bytes:null}}),true);
         const slots=encoded.plan.auto_plan?.measurements.peak_deflate_workers??0;
         if(navigator.hardwareConcurrency>=3&&workers===0)assert(slots>=2,'Auto did not dispatch codec workers');
         if(workers===1)assert(slots===0,'Explicit single-worker Run used parallel compression');
+        if(navigator.hardwareConcurrency>=3&&workers===2)assert(slots===2,'Run ignored the two-worker compression limit');
         const file=encoded.files.find(file=>file.name.endsWith(compression==='gzip'?'.gz':'.zip'));
         assert(file,'Missing compressed result');
         const decoded=await run(file!,job(),true);

@@ -26,9 +26,9 @@ export class CompressionWorkers {
     this.exports = exports;
   }
 
-  async begin(enabled: boolean) {
-    if (!enabled || !crossOriginIsolated || typeof SharedArrayBuffer !== 'function' || !this.module) return;
-    const count = Math.min(4, Math.max(0, navigator.hardwareConcurrency - 1));
+  async begin(requestedWorkers: number) {
+    if (!crossOriginIsolated || typeof SharedArrayBuffer !== 'function' || !this.module) return;
+    const count = Math.min(requestedWorkers || 4, 4, navigator.hardwareConcurrency - 1);
     if (count < 2) return;
     try {
       // Start the nested workers while the engine can still deliver events.

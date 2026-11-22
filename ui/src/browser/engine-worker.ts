@@ -97,8 +97,10 @@ scope.onmessage=async({data})=>{
         root.contents.set('auto-observations.json',new MemoryFile(encoder.encode(JSON.stringify(data.autoObservations)),{readonly:true}));
       }
       if(data.resetProfile)invoke('chopper_clear_profile');
-      await compression.begin(type==='run-direct'&&['gzip','zip'].includes(job.compression)
-        &&job.resources.workers!==1&&data.file.size>=2*1024*1024);
+      if(type==='run-direct'&&['gzip','zip'].includes(job.compression)
+        &&job.resources.workers!==1&&data.file.size>=2*1024*1024){
+        await compression.begin(job.resources.workers);
+      }
       result=invoke(type==='profile'?'chopper_analyze':type==='columns'?'chopper_columns':type==='preview'?'chopper_preview':type==='sniff'?'chopper_sniff':'chopper_run');
       compression.close();
     }
