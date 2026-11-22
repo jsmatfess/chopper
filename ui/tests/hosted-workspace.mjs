@@ -1020,7 +1020,8 @@ test('CLI handoff exports the current draft and copies a shell-safe command with
   assert.equal(await cli.getByRole('button',{name:'Copy command'}).isDisabled(),true);
   await page.locator('#memory').fill('256');assert.equal(await cli.getByRole('button',{name:'Copy command'}).isEnabled(),true);
   await page.locator('#memory').evaluate(el=>el.closest('details').open=false);
-  assert.match(await cli.innerText(),/Chopper 0.2/);
+  const {version}=JSON.parse(await readFile('package.json','utf8'));
+  assert.ok((await cli.innerText()).includes(`Use Chopper ${version.split('.').slice(0,2).join('.')} with PowerShell`));
   assert.equal(await cli.getByRole('link').getAttribute('href'),'https://github.com/jsmatfess/chopper/releases');
   const checkCopy=async()=>{
    await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async text=>{if(window.denyClipboard)throw Error('Denied');window.copiedCommand=text;}}}));

@@ -5,7 +5,7 @@ A separate candidate coalesced adjacent writes into a single 1 MiB buffer.
 The candidate improved streaming more than partitioning. Its evidence supports
 more testing on user-selected folders before a product change.
 
-[Individual runs and build identities](../../benchmarks/browser-direct-destination-writes-2026-11-21.json)
+[Individual runs and build identities](../../benchmarks/browser-direct-destination-writes-2026-11-21.json)  
 [Replay harness](../../../scripts/benchmark-browser-destination.mjs)
 
 | Job | Destination path | Runs | Median complete seconds [range] | Median peak OPFS workspace MiB |

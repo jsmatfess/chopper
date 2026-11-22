@@ -674,7 +674,17 @@ class Controls(unittest.TestCase):
                 self.assertIsNotNone(process.returncode)
                 descendant = int(pidfile.read_text())
                 status = Path(f'/proc/{descendant}/stat')
-                self.assertTrue(not status.exists() or status.read_text().split()[2] == 'Z')
+                # The leader has exited. Give the signaled descendant time to
+                # finish exiting or be reaped before sampling its final state.
+                deadline = time.monotonic() + 2
+                while True:
+                    try:
+                        if status.read_text().split()[2] == 'Z':
+                            break
+                    except (FileNotFoundError, ProcessLookupError):
+                        break
+                    self.assertLess(time.monotonic(), deadline, 'signaled descendant is still running')
+                    time.sleep(0.01)
             finally:
                 if process.poll() is None:
                     runner.stop(process)
