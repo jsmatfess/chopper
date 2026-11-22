@@ -282,6 +282,7 @@ export class BrowserLifecycle {
       const permissionGeneration=this.generation;await this.permission(output);if(permissionGeneration!==this.generation)return {};
       if(this.active())throw new Error('A job is active.');
       this.state.status='running';this.state.error=null;
+      this.state.progress={phase:'',rows:0,temp_bytes:0};
       const cleanup=this.stop(),current=this.generation;
       await this.setup((async()=>{
         await cleanup;if(current!==this.generation)return;

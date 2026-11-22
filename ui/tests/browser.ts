@@ -535,10 +535,10 @@ async function main(){
       await api('run-direct',job({compression}));
       const deadline=Date.now()+15000;
       let state=await api<State>('state');
-      while(state.status==='running'&&state.progress.rows<65536&&Date.now()<deadline){
+      while(state.status==='running'&&(state.progress.phase!=='Serializing output'||state.progress.rows<65536)&&Date.now()<deadline){
         await pause();state=await api<State>('state');
       }
-      assert(state.status==='running'&&state.progress.rows>=65536,'compression never reached active output');
+      assert(state.status==='running'&&state.progress.phase==='Serializing output'&&state.progress.rows>=65536,'compression never reached active output');
       await api('cancel',{});
       assert((await api<State>('state')).status==='cancelled','cancel failed');
       for await(const [name] of (workspaces as any).entries())assert(before.has(name),'cancellation leaked temporary workspace');
