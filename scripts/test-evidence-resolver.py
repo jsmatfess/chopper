@@ -21,7 +21,7 @@ catalog = module('catalog', 'benchmark-catalog.py')
 
 
 class ResolverTests(unittest.TestCase):
-    def fixture(self, root, extra_member=None):
+    def fixture(self, root, extra_member=None, duplicate=None):
         (root / 'docs/benchmarks').mkdir(parents=True)
         (root / 'docs/performance.md').write_text('## Test\n[raw](benchmarks/raw.jsonl)\n')
         cache = root / resolver.CACHE
@@ -35,6 +35,9 @@ class ResolverTests(unittest.TestCase):
             info = tarfile.TarInfo('objects/' + identity['sha256'])
             info.size = len(data)
             archive.addfile(info, io.BytesIO(data))
+            if duplicate is not None:
+                info.size = len(duplicate)
+                archive.addfile(info, io.BytesIO(duplicate))
             if extra_member:
                 archive.addfile(tarfile.TarInfo(extra_member), io.BytesIO())
         bundle_identity = resolver.identity(bundle)
@@ -92,6 +95,19 @@ class ResolverTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Unsafe bundle member'):
                 resolver.hydrate(root, 'unused')
             self.assertFalse((root / 'escape').exists())
+
+    def test_duplicate_members_must_both_match_the_content_address(self):
+        raw = b'\n{"type":"measurement","verified":false,"seconds":0.5}\nnull\n'
+        for duplicate in (raw, b'invalid copy'):
+            with self.subTest(duplicate=duplicate), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                self.fixture(root, duplicate=duplicate)
+                if duplicate == raw:
+                    self.assertEqual(resolver.hydrate(root), 1)
+                    self.assertEqual(resolver.resolve(root, 'docs/benchmarks/raw.jsonl').read_bytes(), raw)
+                else:
+                    with self.assertRaisesRegex(ValueError, 'Conflicting duplicate bundle member'):
+                        resolver.hydrate(root)
 
     def test_registry_rejects_unapproved_reader_and_alias(self):
         with tempfile.TemporaryDirectory() as directory:

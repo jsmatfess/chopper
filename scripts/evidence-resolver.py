@@ -144,10 +144,21 @@ def hydrate(root, wrangler=None, s3_client=None):
                         dst.write(block)
         with tarfile.open(target) as archive:
             entries = archive.getmembers()
-            require(len({e.name for e in entries}) == len(entries), 'Duplicate bundle members')
             require(all(e.isfile() and not e.issparse() and
                         re.fullmatch('objects/[a-f0-9]{64}', e.name) for e in entries),
                     'Unsafe bundle member')
+            # Historical bundles can repeat a content-addressed member for
+            # several aliases. Accept only copies that match the address.
+            members = {}
+            for entry in entries:
+                members.setdefault(entry.name, []).append(entry)
+            for name, copies in members.items():
+                if len(copies) > 1:
+                    for copy in copies:
+                        with archive.extractfile(copy) as stream:
+                            require(hashlib.file_digest(stream, 'sha256').hexdigest() ==
+                                    name.removeprefix('objects/'),
+                                    'Conflicting duplicate bundle member')
             for alias, item in sorted(data['artifacts'].items()):
                 if item['bundle'] != sha:
                     continue
