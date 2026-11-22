@@ -206,6 +206,6 @@ export function describePlan(operations: Step[], limits: {rows: string; bytes: s
   }
   if (operations.some(op => [...(op.columns || []), ...(op.strata || [])].some(c => typeof c === 'number'))) detail('Column numbers start at 0.','pipeline');
   if (compression === 'zip') deliver('Package all CSVs and the manifest together in one ZIP archive.','compression');
-  else if (compression === 'gzip' || compression === 'zstd') deliver(`Compress each CSV separately with ${compression === 'zstd' ? 'Zstandard' : 'gzip'}.`,'compression');
+  else if (compression === 'gzip') deliver(`Compress each CSV separately with gzip.`,'compression');
   return [narrative.join(' '), details.join(' '), delivery.join(' ')].filter(Boolean).join('\n\n');
 }

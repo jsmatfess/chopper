@@ -42,58 +42,33 @@ pub(super) fn counted_eligible(job: &Job) -> bool {
     {
         return false;
     }
-    input_signature(job).is_some_and(|kind| {
-        kind.is_none()
-            || (!partition
-                && cfg!(feature = "experimental-counted-zstd-input-balanced")
-                && kind == Some(crate::observation::physical::Kind::ZstandardInput))
-    })
+    input_signature(job).is_some_and(|kind| kind.is_none())
 }
 
 fn input_signature(job: &Job) -> Option<Option<crate::observation::physical::Kind>> {
-    let (header, read) = input_prefix(job)?;
-    Some(input_kind(header[..4].try_into().ok()?, read.min(4)))
-}
-
-fn input_prefix(job: &Job) -> Option<([u8; 18], usize)> {
     if !std::fs::metadata(&job.input).ok()?.is_file() {
         return None;
     }
     let mut file = File::open(&job.input).ok()?;
-    let mut header = [0; 18];
-    let read = file.read(&mut header).ok()?;
-    Some((header, read))
+    let mut magic = [0; 4];
+    let read = file.read(&mut magic).ok()?;
+    if is_removed_compression(magic, read) {
+        return None;
+    }
+    Some(input_kind(magic, read))
 }
 
-pub(super) fn native_input_hint(job: &Job) -> Option<(u64, bool)> {
-    use crate::observation::physical::Kind;
-    let (header, read) = input_prefix(job)?;
-    match input_kind(header[..4].try_into().ok()?, read.min(4)) {
-        None => Some((std::fs::metadata(&job.input).ok()?.len(), false)),
-        Some(Kind::ZstandardInput) => Some((
-            zstd::zstd_safe::get_frame_content_size(&header[..read])
-                .ok()
-                .flatten()
-                .unwrap_or(0),
-            true,
-        )),
-        _ => None,
-    }
+pub(super) fn native_input_hint(job: &Job) -> Option<u64> {
+    input_signature(job)?.is_none().then_some(())?;
+    Some(std::fs::metadata(&job.input).ok()?.len())
 }
 
 #[derive(Clone, Copy)]
 pub(super) enum Plan {
     Streaming,
     BatchedFanout,
-    Counted {
-        partition: bool,
-        automatic: bool,
-        from_analyze: bool,
-    },
-    Fanout {
-        chain: bool,
-        automatic: bool,
-    },
+    Counted { partition: bool, automatic: bool },
+    Fanout { chain: bool, automatic: bool },
 }
 
 impl Plan {
@@ -130,16 +105,6 @@ impl Plan {
         ctx.memory >= memory && ctx.working_headroom() >= headroom
     }
 
-    pub(super) fn uses_analyze(self) -> bool {
-        matches!(
-            self,
-            Self::Counted {
-                from_analyze: true,
-                ..
-            }
-        )
-    }
-
     pub(super) fn strategy(self) -> Option<auto::Strategy> {
         match self {
             Self::Streaming => None,
@@ -156,11 +121,7 @@ impl Plan {
     }
 }
 
-pub(super) fn select(
-    job: &Job,
-    pool: &crate::resources::MemoryPool,
-    hint: Option<auto::AutoObservations>,
-) -> Option<Plan> {
+pub(super) fn select(job: &Job, pool: &crate::resources::MemoryPool) -> Option<Plan> {
     if job.operations.is_empty() {
         return Some(Plan::Streaming);
     }
@@ -168,7 +129,6 @@ pub(super) fn select(
         return Some(Plan::Counted {
             partition: counted_partition_eligible(job),
             automatic: false,
-            from_analyze: false,
         });
     }
     if fanout_eligible(job) || chain_eligible(job) {
@@ -178,7 +138,7 @@ pub(super) fn select(
         });
     }
 
-    auto::native_direct_candidate(job, pool, hint)
+    auto::native_direct_candidate(job, pool)
 }
 
 struct Counted {

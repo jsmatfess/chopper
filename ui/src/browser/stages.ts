@@ -14,8 +14,8 @@ export class StageCompletions {
 // Plan linkage is not lifecycle ownership: codecs use the output plan's number
 // but run during publication, after the retained CSV snapshot has finalized.
 export const lifecycleScopes:Record<import('./physical-history').Kind,'input'|'operation'|'serialization'|'publication'|'intermediate'>={
- read:'input',gzip_input:'input',zstandard_input:'input',zip_input:'input',
- serialize:'serialization',materialize:'publication',gzip_output:'publication',zstandard_output:'publication',zip_deflate:'publication',zip_archive:'publication',
+ read:'input',gzip_input:'input',zip_input:'input',
+ serialize:'serialization',materialize:'publication',gzip_output:'publication',zip_deflate:'publication',zip_archive:'publication',
  dataset_materialize:'intermediate',
  resident_sort:'operation',fisher_yates:'operation',grouping:'operation',elided:'operation',routed_grouping:'operation',spill:'operation',merge:'operation',hierarchical_merge:'operation',merge_traversal:'operation',routing:'operation',fallback:'operation',reuse:'operation',exact_membership:'operation',probabilistic_membership:'operation',stratification:'operation',shared_ranges:'operation',interleaved_membership:'operation',balanced_traversal:'operation',fused_balanced:'operation',
 };

@@ -1,5 +1,7 @@
 # Rust dependency review for Chopper 0.2
 
+This dated review describes builds that still included Zstandard. It is preserved with links to those source revisions.
+
 The 2026-11-17 lockfile audit reported three vulnerabilities and twelve
 unsoundness warnings. Updating four registry packages cleared those findings.
 The vendored Zstandard WASI allocator has a separately verified upstream
@@ -31,7 +33,7 @@ The resolved `zstd-sys` remains the workspace's vendored
 `experimental`, `legacy`, `std`, `vendored` and `zdict_builder` features
 as before. The C source, legacy callbacks, build selection and codec
 parameters are unchanged by the wrapper update. The vendored build guard
-continues to reject a system library. [Allocator bridge](../vendor/zstd-sys-2.1.1/CHOPPER.md)
+continues to reject a system library. [Allocator bridge](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/vendor/zstd-sys-2.1.1/CHOPPER.md)
 
 Input keeps its own `ZSTD_createDCtx_advanced` context and uses the same
 `zio::Reader` state machine. The wrapper update leaves the reader's frame
@@ -41,7 +43,7 @@ denial. The stable callback controller outlives context destruction. The
 modern context and legacy 0.4–0.7 children release their payload and layout
 header grants after deallocation, including on version-switch failure. The
 source buffer and reader/controller boxes retain their separate grants.
-[Input adapter and controller](../crates/chopper/src/engine/input_zstandard.rs),
+[Input adapter and controller](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/crates/chopper/src/engine/input_zstandard.rs),
 [Input ownership contract](resource-policy-research.md#zstandard-input-streaming-allocation-ownership-2026-10-23)
 
 Output still uses level 3, window log 21, a checksum and unknown source size.
@@ -55,7 +57,7 @@ estimator and 32 KiB allowance are admitted before construction and held
 through destruction on finish, error or abandonment. The allowance covers
 requested codec storage and the writer buffer. Process RSS, stacks and
 allocator overhead are outside that estimate.
-[Output adapter](../crates/chopper/src/output/zstandard.rs),
+[Output adapter](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/crates/chopper/src/output/zstandard.rs),
 [Output ownership contract](resource-policy-research.md#zstandard-output-context-admission-2026-10-23),
 [Released wrapper source](https://github.com/gyscos/zstd-rs/blob/357eb72b038676f8609dcb9e3f727e7da050e055/src/stream/zio/writer.rs),
 [Released binding source](https://github.com/gyscos/zstd-rs/blob/357eb72b038676f8609dcb9e3f727e7da050e055/zstd-safe/src/lib.rs)
@@ -71,7 +73,7 @@ The pinned source applies the exact upstream RUSTSEC-2026-0410 change to this
 shim. It rejects `calloc` multiplication and header-size overflow, enforces
 Rust's aligned layout bound, returns null on allocator failure and accepts
 `free(NULL)`. The pinned C allocator bridge and legacy callbacks are preserved.
-[WASI shim](../vendor/zstd-sys-2.1.1/src/wasm_shim.rs),
+[WASI shim](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/vendor/zstd-sys-2.1.1/src/wasm_shim.rs),
 [RUSTSEC-2026-0410](https://rustsec.org/advisories/RUSTSEC-2026-0410),
 [upstream fix](https://github.com/gyscos/zstd-rs/commit/165d1625553c236b9700ca794b8a7c51f5d98314)
 
@@ -103,7 +105,7 @@ native picker dependency graph are absent from the final product source.
   same shim source, make the native test allocator return null through both
   `alloc` and `alloc_zeroed`, and check size rejection, null deallocation,
   zeroing, payload bytes and the recovered deallocation layout.
-  [Native shim tests](../crates/chopper/tests/zstd_wasm_shim.rs)
+  [Native shim tests](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/crates/chopper/tests/zstd_wasm_shim.rs)
 - A release build of the `wasm32-wasip1` resource-contract reactor linked
   successfully using WASI SDK 33. The test-only output codec contract calls
   the linked shim and checks overflow, the layout bound and null deallocation.
@@ -111,4 +113,4 @@ native picker dependency graph are absent from the final product source.
   the test build. The existing `chopper_resource_contracts` entry point was the
   only export difference. Hosted runtime validation and the exact final Linux
   and native Windows release gates are pending.
-  [WASI codec contract](../crates/chopper/src/output/zstandard/resource_contracts.rs)
+  [WASI codec contract](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/crates/chopper/src/output/zstandard/resource_contracts.rs)

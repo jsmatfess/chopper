@@ -27,7 +27,7 @@ export async function browserApi<T>(path:string,data?:any):Promise<T>{
     supported();
     try{
       if(data.mode==='input'){
-        const [handle]=await(window as unknown as PickerWindow).showOpenFilePicker({types:[{description:'CSV and compressed files',accept:{'text/csv':['.csv','.tsv','.txt'], 'application/octet-stream':['.gz','.gzip','.zst','.zstd','.zip']}}]});
+        const [handle]=await(window as unknown as PickerWindow).showOpenFilePicker({types:[{description:'CSV and compressed files',accept:{'text/csv':['.csv','.tsv','.txt'], 'application/octet-stream':['.gz','.gzip','.zip']}}]});
         const input=await handle.getFile();const control=document.getElementById('input') as HTMLInputElement|null;if(control){control.dataset.fileName=input.name;control.dataset.fileBytes=String(input.size);}lifecycle.selectInput(input);showTemporaryEstimate(input);return {path:input.name} as T;
       }
       const output=await(window as unknown as PickerWindow).showDirectoryPicker({mode:'readwrite'});
@@ -38,7 +38,7 @@ export async function browserApi<T>(path:string,data?:any):Promise<T>{
 }
 export function temporarySpaceEstimate(file:{size:number;name:string}){
   const gib=(bytes:number)=>(bytes/1024**3).toLocaleString('en-US',{maximumFractionDigits:1,minimumFractionDigits:1})+' GiB';
-  if(/\.(gz|gzip|zst|zstd|zip)$/i.test(file.name))return 'Temporary storage can greatly exceed the compressed file size. No default temporary-space limit; available browser storage still applies.';
+  if(/\.(gz|gzip|zip)$/i.test(file.name))return 'Temporary storage can greatly exceed the compressed file size. No default temporary-space limit; available browser storage still applies.';
   return `Allow roughly ${gib(file.size*2)}–${gib(file.size*8)} of temporary storage for sorting or grouping. This is a rough guide, not an upper bound; pipelines and row shape can use more. No default temporary-space limit; available browser storage still applies.`;
 }
 function showTemporaryEstimate(file:File){
@@ -50,7 +50,13 @@ function showTemporaryEstimate(file:File){
 export function configureBrowserUI(){
   for(const id of ['input','output']){const el=document.getElementById(id) as HTMLInputElement;el.readOnly=true;el.placeholder='Choose with Browse';}
   (document.getElementById('memory') as HTMLInputElement).max='2048';
-  (document.getElementById('workers') as HTMLInputElement).max='1';
+  const workers=document.getElementById('workers') as HTMLInputElement;
+  workers.max='1';
+  const workerHelp=document.createElement('small');
+  workerHelp.id='workers-help';
+  workerHelp.textContent='Use 0 to let Chopper choose parallel gzip or ZIP compression. Use 1 to compress on a single worker.';
+  workers.setAttribute('aria-describedby',workerHelp.id);
+  workers.closest('label')!.append(workerHelp);
   const temporary=document.getElementById('temp-dir') as HTMLInputElement;
   temporary.disabled=true;temporary.setAttribute('aria-describedby','temp-dir-help');
   const help=document.createElement('small');help.id='temp-dir-help';help.textContent='Browser-managed storage is used automatically. This directory setting does not apply.';

@@ -216,12 +216,7 @@ fn publication_controls() -> Result<serde_json::Value> {
     let input = root.join("input.csv");
     std::fs::write(&input, "id,key\n1,\u{754c}\n2,a\n")?;
     let mut cases = Vec::new();
-    for compression in [
-        Compression::None,
-        Compression::Gzip,
-        Compression::Zstd,
-        Compression::Zip,
-    ] {
+    for compression in [Compression::None, Compression::Gzip, Compression::Zip] {
         let output = root.join(format!("result-{compression:?}"));
         let job = Job {
             input: input.to_string_lossy().into_owned(),
@@ -306,7 +301,6 @@ fn publication_controls() -> Result<serde_json::Value> {
                     .read_to_end(&mut bytes)?;
                 bytes
             }
-            Compression::Zstd => zstd::stream::decode_all(File::open(output.join(name))?)?,
             Compression::Zip => {
                 let mut archive = zip::ZipArchive::new(File::open(output.join("outputs.zip"))?)?;
                 let mut bytes = Vec::new();

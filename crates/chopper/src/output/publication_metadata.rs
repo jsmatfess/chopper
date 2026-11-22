@@ -45,7 +45,7 @@ impl PublicationBatch {
     }
 }
 
-// 180 prefix bytes, separator, part-, maximal u64 index, .csv and .zst.
+// 180 prefix bytes, separator, part-, maximal u64 index, .csv and a compression suffix.
 const NAME_CAPACITY: usize = 180 + 1 + 5 + 20 + 4 + 4;
 // column-<usize> and split-<u64> fit on supported 32/64-bit targets.
 const LABEL_CAPACITY: usize = 32;
@@ -141,7 +141,6 @@ pub(super) fn output_name(
         "part-{index:08}.csv{}",
         match job.compression {
             Compression::Gzip => ".gz",
-            Compression::Zstd => ".zst",
             _ => "",
         }
     )?;

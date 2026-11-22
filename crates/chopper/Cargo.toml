@@ -39,8 +39,6 @@ experimental-cgroup-cache-headroom = []
 experimental-direct-decode = ["chopper-core/experimental-direct-decode"]
 # Opt-in native count/validate pass followed by exact Balanced streaming.
 experimental-counted-balanced = []
-# Opt-in two-pass counted Balanced for Zstandard CSV input.
-experimental-counted-zstd-input-balanced = ["experimental-counted-balanced"]
 # Opt-in bounded native count and emit passes for Partition followed by Balanced.
 experimental-counted-partition-balanced = ["experimental-counted-balanced", "experimental-bounded-final-partition"]
 # Opt-in root external shuffle/balanced serialization into private publication.
@@ -91,10 +89,6 @@ tempfile = "3"
 # Codec admission is audited against these implementations; re-audit on update.
 flate2 = "=1.1.10"
 miniz_oxide = "=0.9.1"
-zstd = "=0.13.4"
-# Expose pinned stream-size estimation APIs; codec settings remain unchanged.
-zstd-safe = { version = "=7.4.0", default-features = false, features = ["experimental"] }
-zstd-sys = { version = "=2.1.1", default-features = false, features = ["vendored"] }
 zip = { version = "2", default-features = false, features = ["deflate"] }
 crc32fast = "1"
 getrandom = "0.2"

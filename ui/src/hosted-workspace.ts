@@ -345,7 +345,7 @@ export function configureHostedWorkspace() {
       cliJob=job;renderCommand();
       get('pipeline-count').textContent = operations ? `${operations} step${operations===1?'':'s'}` : 'Optional';
       get('draft-source').textContent = job?.input ? `Read ${job.input}${job.zip_member?` → ${job.zip_member}`:''}.` : 'Choose a source file to begin.';
-      const format=job?.compression==='zip'?'a ZIP of CSVs':job?.compression==='gzip'?'gzip-compressed CSVs':job?.compression==='zstd'?'Zstandard-compressed CSVs':'uncompressed CSVs';
+      const format=job?.compression==='zip'?'a ZIP of CSVs':job?.compression==='gzip'?'gzip-compressed CSVs':'uncompressed CSVs';
       const amount=(id:string)=>{const input=get(id) as HTMLInputElement;const unit=(document.getElementById(id+'-unit') as HTMLSelectElement|null)?.value;return input.value?`${input.value}${unit?' '+unit:''}`:'';};
       const caps=[job?.limits.rows?`${job.limits.rows.toLocaleString()} rows`:'',job?.limits.bytes?amount('max-bytes'):''].filter(Boolean);
       const destination=job?.output?` to a new folder in ${job.output}`:'';

@@ -4,7 +4,7 @@ import {lstat,readdir,readFile,realpath} from 'node:fs/promises';
 import {join,relative,isAbsolute,resolve} from 'node:path';
 import {createHash} from 'node:crypto';
 const required=['Cargo.toml','Cargo.lock','ui/package.json','ui/package-lock.json','ui/tsconfig.json'];
-const directories=['crates','scripts','ui/src','ui/tests','vendor/zip-2.4.2','vendor/zstd-sys-2.1.1'];
+const directories=['crates','scripts','ui/src','ui/tests','vendor/zip-2.4.2'];
 export async function sourceIdentity(root){
   assert(isAbsolute(root),'absolute source required');
   const paths=[...required];

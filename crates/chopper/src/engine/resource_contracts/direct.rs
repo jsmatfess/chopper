@@ -94,10 +94,15 @@ pub(super) fn run() -> Result<serde_json::Value> {
     // Late-wide serialization overlap exceeds the local 32 MiB job envelope.
     std::fs::write(
         &input,
-        format!("{}\n{}\n", "h".repeat(1_900_000), "x".repeat(1_900_000)),
+        format!(
+            "{}\n{}\n",
+            "h".repeat(1_900_000),
+            '"'.to_string().repeat(1_900_000)
+        ),
     )?;
+    job.input_csv.quote = '\'';
     job.output_csv.encoding = "utf-16le".into();
-    job.compression = Compression::Zstd;
+    job.compression = Compression::Gzip;
     let pool = Arc::new(MemoryPool::new(128 * 1024 * 1024));
     let error = attempt(job.clone(), pool.clone())
         .err()

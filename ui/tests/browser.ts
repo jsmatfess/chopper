@@ -289,14 +289,53 @@ async function main(){
   });
   await test('direct Run codec outputs roundtrip through admitted input adapters',async()=>{
     const source=csv('id,key\n1,a\n2,界\n3,"a,b"\n');
-    for(const compression of ['gzip','zstd','zip'] as const){
+    for(const compression of ['gzip','zip'] as const){
       const encoded=await run(source,job({compression}),true);
-      const file=encoded.files.find(f=>f.name.endsWith(compression==='gzip'?'.gz':compression==='zstd'?'.zst':'.zip'));
+      const file=encoded.files.find(f=>f.name.endsWith(compression==='gzip'?'.gz':'.zip'));
       assert(file,'missing direct compressed output');
       const decoded=await run(file!,job(),true);
       assert(JSON.stringify(await texts(decoded.files))===JSON.stringify([await source.text()]),'direct '+compression+' roundtrip changed fields/order');
       assert(decoded.plan.rows===3,'direct '+compression+' row count changed');
     }
+  });
+  await test('Auto gzip and ZIP compression preserve bytes and honor a single-worker override',async()=>{
+    const source=csv('id,payload\n'+Array.from({length:8192},(_,row)=>row+','+'abcdef0123456789'.repeat(32)+'\n').join(''));
+    const expected=await source.text();
+    for(const compression of ['gzip','zip'] as const){
+      for(const workers of [0,1]){
+        const encoded=await run(source,job({compression,resources:{...defaults.resources,workers},
+          limits:{rows:null,bytes:source.size,compressed_bytes:null}}),true);
+        const slots=encoded.plan.auto_plan?.measurements.peak_deflate_workers??0;
+        if(navigator.hardwareConcurrency>=3&&workers===0)assert(slots>=2,'Auto did not dispatch codec workers');
+        if(workers===1)assert(slots===0,'Explicit single-worker Run used parallel compression');
+        const file=encoded.files.find(file=>file.name.endsWith(compression==='gzip'?'.gz':'.zip'));
+        assert(file,'Missing compressed result');
+        const decoded=await run(file!,job(),true);
+        assert(JSON.stringify(await texts(decoded.files))===JSON.stringify([expected]),'Parallel output changed CSV bytes');
+        await destination.removeEntry(encoded.folder.name,{recursive:true});
+        await destination.removeEntry(decoded.folder.name,{recursive:true});
+      }
+    }
+  });
+  await test('Prepared gzip files can compress concurrently and finish in manifest order',async()=>{
+    const source=csv('id,payload\n'+Array.from({length:8192},(_,row)=>row+','+'abc123'.repeat(88)+'\n').join(''));
+    const encoded=await run(source,job({compression:'gzip',operations:[{type:'balanced',files:4}]}),true);
+    const measurements=encoded.plan.auto_plan?.measurements;
+    if(navigator.hardwareConcurrency>=3){
+      assert((measurements?.peak_deflate_workers??0)>=2,'Prepared outputs did not dispatch codec workers');
+      assert((measurements?.peak_writer_slots??0)>=2,'Prepared outputs did not overlap files');
+    }
+    const manifest=await encoded.files.find(file=>file.name==='manifest.jsonl')!.text();
+    const names=manifest.trim().split('\n').map(line=>JSON.parse(line)).filter(line=>line.type==='output').map(line=>line.path);
+    const decoded:string[]=[];
+    for(const name of names){
+      const stream=encoded.files.find(file=>file.name===name)!.stream().pipeThrough(new DecompressionStream('gzip'));
+      decoded.push(await new Response(stream).text());
+    }
+    assert(decoded.length===4,'Balanced job did not produce four files');
+    assert(decoded[0]+decoded.slice(1).map(text=>text.slice(text.indexOf('\n')+1)).join('')===await source.text(),
+      'Concurrent output changed order or CSV bytes');
+    await destination.removeEntry(encoded.folder.name,{recursive:true});
   });
   await test('direct Run cancellation cleans workspace and cannot publish prepared output',async()=>{
     const workspaces=await root.getDirectoryHandle('chopper-workspaces',{create:true});
@@ -408,8 +447,8 @@ async function main(){
     const automatic=await run(input,job({operations,resources:{...defaults.resources,memory_mb:'auto'}}));
     await verifyPlainRows(automatic.files,input);await verifyPlainRows(numeric.files,input);
   });
-  for(const compression of ['gzip','zstd','zip'])await test(compression+' output and input roundtrip',async()=>{
-    const a=await run(input,job({compression}));const compressed=a.files.find(f=>/\.(gz|zst|zip)$/.test(f.name))!;
+  for(const compression of ['gzip','zip'])await test(compression+' output and input roundtrip',async()=>{
+    const a=await run(input,job({compression}));const compressed=a.files.find(f=>/\.(gz|zip)$/.test(f.name))!;
     const b=await run(compressed,job());assert((await texts(b.files))[0]===await input.text(),'roundtrip failed');
   });
   await test('UTF-16 serialization and byte cap',async()=>{

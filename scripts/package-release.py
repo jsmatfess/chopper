@@ -17,8 +17,6 @@ PLATFORMS = {'windows_x86_64': ('windows-x86_64', 'chopper.exe', 'x86_64-pc-wind
              'linux_x86_64': ('linux-x86_64', 'chopper', 'x86_64-unknown-linux-gnu')}
 PAYLOADS = {'LICENSE': 'LICENSE',
             'licenses/zip-2.4.2/LICENSE': 'vendor/zip-2.4.2/LICENSE',
-            'licenses/zstd-sys-2.1.1/LICENSE': 'vendor/zstd-sys-2.1.1/LICENSE',
-            'licenses/zstd-sys-2.1.1/LICENSE.BSD-3-Clause': 'vendor/zstd-sys-2.1.1/LICENSE.BSD-3-Clause',
             'README.txt': 'docs/releases/native-usage.txt'}
 
 

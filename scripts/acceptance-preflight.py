@@ -320,13 +320,6 @@ def inspect(value, budget):
         # Parse the selected stdin-driven helper without running its top level.
         helper = Path(plan['root']) / 'scripts/graph-codec-fixtures.py'
         compile(budget.read(helper), str(helper), 'exec')
-        import ctypes
-        import ctypes.util
-        import io
-        import zipfile
-        codec = ctypes.CDLL(plan['zstd_dll'])
-        for name in ('ZSTD_isError', 'ZSTD_compressBound', 'ZSTD_compress', 'ZSTD_decompress'):
-            need(callable(getattr(codec, name)), 'missing selected codec API: ' + name)
     # Kernel symbol/signature binding creates no Job and opens no process.
     small.windows.kernel()
     scripts = [str(Path(plan['root']) / 'scripts' / command['script']) for command in plan['commands']]

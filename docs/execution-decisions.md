@@ -90,6 +90,30 @@ after successful engine publication and is separate from the manifest snapshot.
 It counts a retained-exact preparation denial when the engine retries with
 ordinary exact allocation.
 
+### Current gzip and ZIP compression
+
+```mermaid
+flowchart TD
+    Start[Validated gzip or ZIP output] --> Route{Prepared catalog?}
+    Route -->|Native| NativeFiles{Admit multiple prepared writers?}
+    NativeFiles -->|Yes| FileParallel[Compress separate files concurrently]
+    NativeFiles -->|One writer| Large
+    Route -->|Hosted| HostedFiles{Several small files and codec buffers fit?}
+    HostedFiles -->|Yes| FileParallel
+    HostedFiles -->|Otherwise| Large
+    Route -->|Direct Run| Hint[Use current source size and declared byte cap]
+    Hint --> Large{Enough bytes and workers for bounded blocks?}
+    Large -->|Yes| BlockParallel[Compress DEFLATE blocks and write them in order]
+    Large -->|No| Serial[Use streaming DEFLATE]
+    FileParallel --> Publish[Finalize and publish in catalog order]
+    BlockParallel --> Publish
+    Serial --> Publish
+```
+
+The [codec contract](specification.md#compression-and-archives) owns CSV and ZIP
+semantics. [Direct execution](direct-execution.md#compression-selection) describes
+the eligibility, owner bounds, and ZIP scratch paths.
+
 The terminal-shuffle experiment retains root Uniform/Auto–Balanced eligibility.
 Its native unobserved extension permits a standalone full Shuffle or root
 Uniform/Auto–Partition; physical/snapshot observation and WASI keep their prior
@@ -167,13 +191,9 @@ file ceiling within the writer capacity. The count pass retains bounded tuple
 counts and a logical digest. The write pass uses exact per-key remainder quotas
 and canonical publication order, and compares its digest with the first pass.
 
-Counted Balanced accepts plain UTF-8 source by default within the experiment.
-The separate `experimental-counted-zstd-input-balanced` feature admits a Zstandard
-source and uses an independently admitted decoder for each pass.
-
-Counted Balanced output is plain unless `experimental-counted-codec-balanced`
-extends it to the existing gzip/Zstandard/ZIP direct adapters. Both input paths
-validate CSV and UTF-8 on both passes. Singleton Balanced compares the decoded
+Counted Balanced accepts plain UTF-8 source and validates it on both passes.
+Output is plain unless `experimental-counted-codec-balanced` enables the gzip
+and ZIP direct adapters. Singleton Balanced compares the decoded
 header, row count, source length and modification time before publication.
 An edit that preserves all four can go undetected. Analysis and the manifest
 use the digest of the emitted rows. Exact quotas and error cleanup still apply.

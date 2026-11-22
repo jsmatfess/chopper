@@ -37,7 +37,7 @@ await withHostedBrowser({port:8423},async({context,url,browserVersion})=>{
  const balanced=files=>({type:'balanced',files}),interleaved=files=>({type:'interleaved',files});
  const codecSource=Buffer.from('id,key\n1,a\n2,b\n3,a\n4,b\n5,a\n6,b\n');
  const corruptGzip=gzipSync(codecSource);corruptGzip[corruptGzip.length-8]^=1;
- fixtures.push({family:'codec',name:'gzip input',input:Array.from(gzipSync('id,key\n1,a\n2,b\n3,a\n4,b\n5,a\n6,b\n')),operations:[],expected:/Decode gzip input/},{family:'codec',name:'gzip output',compression:'gzip',operations:[],expected:/Compress gzip CSV/},{family:'codec',name:'Zstandard input',input:Array.from(codecFixture('zstd-input',Buffer.from('id,key\n1,a\n2,b\n3,a\n4,b\n5,a\n6,b\n'))),operations:[],expected:/Decode Zstandard input/},{family:'codec',name:'ZIP input',input:Array.from(codecFixture('zip-input',Buffer.from('id,key\n1,a\n2,b\n3,a\n4,b\n5,a\n6,b\n'))),operations:[],expected:/Read selected ZIP member/},{family:'codec',name:'Zstandard output',compression:'zstd',operations:[],expected:/Compress Zstandard CSV/},{family:'codec',name:'ZIP output',compression:'zip',operations:[],expected:/Build and finalize ZIP archive/},{family:'codec',name:'selected ZIP member',zip_member:'selected.csv',input:Array.from(codecFixture('zip-selected-input',codecSource)),operations:[],expected:/Read selected ZIP member/},
+ fixtures.push({family:'codec',name:'gzip input',input:Array.from(gzipSync('id,key\n1,a\n2,b\n3,a\n4,b\n5,a\n6,b\n')),operations:[],expected:/Decode gzip input/},{family:'codec',name:'gzip output',compression:'gzip',operations:[],expected:/Compress gzip CSV/},{family:'codec',name:'ZIP input',input:Array.from(codecFixture('zip-input',Buffer.from('id,key\n1,a\n2,b\n3,a\n4,b\n5,a\n6,b\n'))),operations:[],expected:/Read selected ZIP member/},{family:'codec',name:'ZIP output',compression:'zip',operations:[],expected:/Build and finalize ZIP archive/},{family:'codec',name:'selected ZIP member',zip_member:'selected.csv',input:Array.from(codecFixture('zip-selected-input',codecSource)),operations:[],expected:/Read selected ZIP member/},
  {family:'codec',name:'gzip UTF-16 input',input_encoding:'utf-16le',input_decoded_bytes:64,input:Array.from(gzipSync(Buffer.concat([Buffer.from([255,254]),Buffer.from(codecSource.toString(),'utf16le')]))),operations:[],expected:/Decode gzip input/},
  {family:'codec',name:'gzip prepared output',compression:'gzip',operations:[p,u],expected:/Compress gzip CSV.*operations 3/},
  {family:'codec',name:'corrupt gzip input',input:Array.from(corruptGzip),operations:[],error:/checksum|corrupt/i},
@@ -98,7 +98,7 @@ await withHostedBrowser({port:8423},async({context,url,browserVersion})=>{
     const parent=await(await navigator.storage.getDirectory()).getDirectoryHandle(window.graphParent);
     const directory=await parent.getDirectoryHandle(folder),csvs={},artifacts={};let manifest,marker,savedFiles=0;
     for await(const [name,handle]of directory.entries()){
-     const file=await handle.getFile(),text=await file.text();if(name!=='CHOPPER-COMPLETE.json')savedFiles++;if(/\.(gz|zst|zip)$/.test(name))artifacts[name]=Array.from(new Uint8Array(await file.arrayBuffer()));
+     const file=await handle.getFile(),text=await file.text();if(name!=='CHOPPER-COMPLETE.json')savedFiles++;if(/\.(gz|zip)$/.test(name))artifacts[name]=Array.from(new Uint8Array(await file.arrayBuffer()));
      if(name.endsWith('.csv')){if(file.size>bytes)throw Error('CSV byte cap');if(text.trimEnd().split('\n').length-1>rows)throw Error('CSV row cap');csvs[name]=text;}
      if(name==='manifest.jsonl')manifest=text.split('\n').filter(Boolean).map(line=>JSON.parse(line));
      if(name==='CHOPPER-COMPLETE.json')marker=JSON.parse(text);
@@ -107,7 +107,6 @@ await withHostedBrowser({port:8423},async({context,url,browserVersion})=>{
    },{bytes:fixture.bytes??20,rows:fixture.row_limit??(fixture.source?1000:2),folder:completion.folder});
    for(const [name,bytes]of Object.entries(result.artifacts)){
     if(name.endsWith('.gz'))result.csvs[name]=gunzipSync(Buffer.from(bytes)).toString('utf8');
-    else if(name.endsWith('.zst'))result.csvs[name]=codecFixture('zstd-output',Buffer.from(bytes)).toString('utf8');
     else if(name.endsWith('.zip')){const members=JSON.parse(codecFixture('zip-output',Buffer.from(bytes)));for(const [path,member]of Object.entries(members)){if(path.endsWith('.csv'))result.csvs[path]=member.text;else if(path==='manifest.jsonl')assert.deepEqual(member.text.trim().split('\n').map(line=>JSON.parse(line)),result.manifest);}for(const record of result.manifest.filter(r=>r.type==='output'))assert.equal(record.stored_bytes,members[record.path].stored_bytes);}
    }
    for(const record of result.manifest.filter(r=>r.type==='output')){

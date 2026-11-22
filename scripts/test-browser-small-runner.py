@@ -684,47 +684,13 @@ class Controls(unittest.TestCase):
         state = small.StatusReader(os.getpid(), small.runner.digest(path), 'unique-owner', steps).read(self.root/'runner-observation.json')
         self.assertTrue(state['terminal'])
 
-    def test_graph_codec_explicit_library_and_ordinary_discovery(self):
-        import io
-        import runpy
-        from unittest.mock import Mock
-        helper = Path(__file__).with_name('graph-codec-fixtures.py')
-        for mode in ('zstd-input', 'zstd-output'):
-            for explicit in (None, str(self.root / 'declared-zstd.dll')):
-                codec = Mock()
-                codec.ZSTD_isError.return_value = 0
-                codec.ZSTD_compressBound.return_value = 64
-                codec.ZSTD_compress.return_value = 0
-                codec.ZSTD_decompress.return_value = 0
-                output = io.BytesIO()
-                argv = [str(helper), mode] + ([explicit] if explicit else [])
-                with patch.object(sys, 'argv', argv), \
-                     patch.object(sys, 'stdin', io.TextIOWrapper(io.BytesIO(b'id\n1\n'))), \
-                     patch.object(sys, 'stdout', io.TextIOWrapper(output)), \
-                     patch('ctypes.util.find_library', return_value='system-zstd') as find, \
-                     patch('ctypes.CDLL', return_value=codec) as load:
-                    runpy.run_path(str(helper), run_name='__main__')
-                    load.assert_called_once_with(explicit or 'system-zstd')
-                    if explicit:
-                        find.assert_not_called()
-                    else:
-                        find.assert_called_once_with('zstd')
-
-        with patch.object(sys, 'argv', [str(helper), 'zstd-input', str(self.root / 'missing.dll')]), \
-             patch.object(sys, 'stdin', io.TextIOWrapper(io.BytesIO(b'id\n1\n'))), \
-             patch('ctypes.util.find_library') as find, \
-             patch('ctypes.CDLL', side_effect=OSError('DLL missing')):
-            with self.assertRaisesRegex(OSError, 'DLL missing'):
-                runpy.run_path(str(helper), run_name='__main__')
-            find.assert_not_called()
-
     def test_prepare_emits_exact_inert_manifest_and_rejects_variants_hashes_retries(self):
         root = self.root
         for name in ('scripts', 'ui/dist', 'ui/src', 'ui/tests', 'ui/node_modules'):
             (root / name).mkdir(parents=True, exist_ok=True)
         files = ['Cargo.toml', 'ui/package.json', 'ui/package-lock.json', 'ui/src/app.ts',
                  'ui/tests/resource-contract-tests.ts', 'ui/tests/resource-contract-worker.ts',
-                 'node.exe', 'python.exe', 'browser.exe', 'zstd.dll']
+                 'node.exe', 'python.exe', 'browser.exe']
         support = ['browser-small-runner.py', 'browser-small-windows.py', 'browser-small-bootstrap.mjs',
                    'browser-small-contract.mjs', 'browser-small-observer.mjs', 'browser-launch.mjs',
                    'browser-artifacts.mjs', 'browser-acceptance.mjs', 'serve-hosted.mjs',
@@ -881,13 +847,10 @@ class Controls(unittest.TestCase):
             reject(changed, 'actual selected harness source proof')
             self.assertEqual(resource_plan['batch_started_ms'], resource_plan['packets'][1]['value']['batch_started_ms'])
             config['commands'] = [dict(script='test-browser-graph.mjs', flags=[], origin='http://127.0.0.1:8423', timeout_seconds=600)]
-            reject(config, 'Explicit Graph zstd_dll required')
-            config['zstd_dll'] = str(root / 'zstd.dll')
             graph_plan = small.prepare(config)
             graph_packet = graph_plan['packets'][0]['value']
             self.assertEqual(graph_packet['python'], config['python'])
-            self.assertEqual(graph_packet['zstd_dll'], config['zstd_dll'])
-            for name in ('python.exe', 'zstd.dll', 'scripts/graph-codec-fixtures.py', 'scripts/browser-graph-codec.mjs'):
+            for name in ('python.exe', 'scripts/graph-codec-fixtures.py', 'scripts/browser-graph-codec.mjs'):
                 changed = copy.deepcopy(config)
                 changed['inputs'] = [e for e in changed['inputs'] if e['path'] != str(root / name)]
                 reject(changed, 'Undeclared required input')
@@ -896,7 +859,7 @@ class Controls(unittest.TestCase):
                 changed['harness_source'] = [e for e in changed['harness_source'] if e['git_path'] != name]
                 reject(changed, 'actual selected harness source proof')
             changed = copy.deepcopy(config)
-            next(e for e in changed['inputs'] if e['path'] == config['zstd_dll'])['sha256'] = '0'*64
+            next(e for e in changed['inputs'] if e['path'] == config['python'])['sha256'] = '0'*64
             reject(changed, 'Input hash mismatch')
             changed = copy.deepcopy(config)
             changed['python'] = 'python3'

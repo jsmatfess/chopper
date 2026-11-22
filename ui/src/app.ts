@@ -23,7 +23,7 @@ type AutoPlan = {
   largest_decoded_row_bytes:AutoFact;partition_joint_keys:AutoFact;largest_partition_rows:AutoFact;
   expected_live_fanout:AutoFact;effective_grouping:string;validated_root_partitions?:AutoFact;
   probabilistic_shuffle_retries:number;routing_fallbacks:number;
-  measurements:{peak_writer_slots:number;retained_exact_fallbacks?:number};
+  measurements:{peak_writer_slots:number;peak_deflate_workers?:number;retained_exact_fallbacks?:number};
 };
 export type Analysis = {auto_plan?:AutoPlan;algorithm_version?: string; execution?: {replay_guarantee: string; plan_version: number; records: number; rng_version: string; plan_digest_blake3: number[]}; diagnostics?: {shuffle_partition_retries?: number;partition_balanced_retries?: number;streaming_chain_retries?: number;consecutive_partition_retries?: number;compact_spill_fallbacks?: number;routing_reused_runs?: number; resident_sorts: number; routed_groupings: number; routing_fallbacks: number; sort_runs: number; merge_operations: number; peak_workspace_reserved_bytes: number}; column_values?: {column: number; values: string[]; frequencies?:Record<string,number>; truncated: boolean}[]; analysis_seconds: number; peak_temp_bytes: number; memory_budget_bytes: number; workers: number; rows: number; columns: number; header: string[] | null; preview: string[][]; groups: number; output_files: number; output_csv_bytes: number; temp_bytes: number; seed: string; accuracy: string; warnings: string[]; stages: {operation: number; input_groups: number; output_groups: number}[]};
 export type InputProfile = {auto_observations?:unknown;suggested_run_memory_mb?:number;rows:number;columns:number;cache_hit:boolean;seconds:number;accuracy:string;header:string[]|null;column_values:{column:number;values:string[];frequencies?:Record<string,number>;truncated:boolean;distinct:number;distinct_exact:boolean}[];stages:{operation:number;strategy:string;input_distinct_keys:number|null;distinct_exact:boolean}[]};
@@ -238,6 +238,9 @@ function renderAnalysis(a: Analysis) {
     ['Expected live fanout',explain(auto.expected_live_fanout)],
     ...(auto.validated_root_partitions?[['Validated root partitions',explain(auto.validated_root_partitions)] as [string,string]]:[]),
     ['Peak writer slots used',format(auto.measurements.peak_writer_slots)],
+    ...(auto.measurements.peak_deflate_workers?[
+      ['Peak parallel compression workers',format(auto.measurements.peak_deflate_workers)] as [string,string],
+    ]:[]),
     ['Grouping fallbacks',format(auto.routing_fallbacks)],
     ['Retained exact fallbacks',format(auto.measurements.retained_exact_fallbacks??0)],
     ['Probabilistic shuffle retries',format(auto.probabilistic_shuffle_retries)],
@@ -436,7 +439,7 @@ $('job-form').onsubmit=async e=>{
 $('cancel').onclick=async()=>{try{await api('cancel',{});await poll();}catch(e){error(e);}};
 $('export').onclick=()=>{try{const blob=new Blob([JSON.stringify(readJob(),null,2)+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='chopper-job.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){error(e);}};
 $('import').onclick=()=>$<HTMLInputElement>('import-file').click();
-$<HTMLInputElement>('import-file').onchange=async e=>{try{const file=(e.target as HTMLInputElement).files?.[0];if(!file)return;if(file.size>1048576)throw new Error('Job JSON exceeds 1 MiB.');const config=JSON.parse(await file.text());if(Object.hasOwn(config,"seed")||Object.hasOwn(config,"random_seed"))throw new Error("Seed settings are no longer supported. Remove the seed field from the job JSON.");const defaults=await api<Job>('defaults');job={...defaults,...config,input_csv:{...defaults.input_csv,...config.input_csv},output_csv:{...defaults.output_csv,...config.output_csv},limits:{...defaults.limits,...config.limits},resources:{...defaults.resources,...config.resources}};
+$<HTMLInputElement>('import-file').onchange=async e=>{try{const file=(e.target as HTMLInputElement).files?.[0];if(!file)return;if(file.size>1048576)throw new Error('Job JSON exceeds 1 MiB.');const config=JSON.parse(await file.text());if(config.compression==='zstd')throw new Error('Zstandard output is no longer supported. Change compression to gzip, zip, or none in the job JSON.');if(Object.hasOwn(config,"seed")||Object.hasOwn(config,"random_seed"))throw new Error("Seed settings are no longer supported. Remove the seed field from the job JSON.");const defaults=await api<Job>('defaults');job={...defaults,...config,input_csv:{...defaults.input_csv,...config.input_csv},output_csv:{...defaults.output_csv,...config.output_csv},limits:{...defaults.limits,...config.limits},resources:{...defaults.resources,...config.resources}};
 const manual=typeof config.resources?.memory_mb==='number'||job.resources.workers!==0||job.resources.grouping==='sort'
   ||job.operations.some(op=>op.type==='shuffle'&&op.strategy&&op.strategy!=='auto');
 $<HTMLInputElement>('execution-mode').checked=manual;populate();}catch(e){error(e);}};

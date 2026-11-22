@@ -142,12 +142,7 @@ fn tree_controls() -> Result<serde_json::Value> {
         if !flexible {
             analysis.execution = None;
         }
-        for compression in [
-            Compression::None,
-            Compression::Gzip,
-            Compression::Zstd,
-            Compression::Zip,
-        ] {
+        for compression in [Compression::None, Compression::Gzip, Compression::Zip] {
             job.compression = compression;
             let expected = original(&job, &analysis)?;
             let source = JobRecord::new(&job, &analysis);

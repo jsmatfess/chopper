@@ -85,7 +85,7 @@ production feature. UI tests and generated bundle checks live in
 [ui/package.json](../ui/package.json); CI commands live in
 [ci.yml](../.github/workflows/ci.yml). Native builds produce the CLI only and
 have no Node or UI-bundle dependency. Hosted `ui/dist` contains the WASI engine
-and browser UI. Use [browser.md](browser.md) for WASI SDK, browser selection and
+and browser UI. Use [browser.md](browser.md) for WASI target setup, browser selection and
 clean packaging.
 
 For evidence work, start with the [current performance overview](performance-overview.md)

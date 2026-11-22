@@ -733,7 +733,7 @@ fn direct_gzip_input_reports_actual_decoded_bytes_and_keeps_csv_parity() {
 }
 
 #[test]
-fn direct_zstandard_and_zip_inputs_report_selected_decoded_bytes() {
+fn direct_zip_input_reports_selected_decoded_bytes() {
     use chopper::observation::physical::{Fact, Kind};
     use std::{
         io::{Cursor, Write},
@@ -752,13 +752,9 @@ fn direct_zstandard_and_zip_inputs_report_selected_decoded_bytes() {
         .start_file("ignored.txt", zip::write::SimpleFileOptions::default())
         .unwrap();
     archive.write_all(b"not a csv").unwrap();
-    for (encoded, kind) in [
-        (
-            zstd::stream::encode_all(&b"id\n1\n2\n"[..], 0).unwrap(),
-            Kind::ZstandardInput,
-        ),
-        (archive.finish().unwrap().into_inner(), Kind::ZipInput),
-    ] {
+    let encoded = archive.finish().unwrap().into_inner();
+    let kind = Kind::ZipInput;
+    {
         let dir = tempfile::tempdir().unwrap();
         let input = dir.path().join("misleading.csv");
         let output = dir.path().join("out");
@@ -842,11 +838,11 @@ fn direct_gzip_output_counts_encoded_csv_bytes_at_actual_compressor() {
 }
 
 #[test]
-fn zstandard_and_zip_output_observe_csv_compression_and_archive_bytes_separately() {
+fn gzip_and_zip_output_observe_csv_compression_and_archive_bytes_separately() {
     use chopper::observation::physical::{Fact, Kind};
     use std::sync::Mutex;
     for (compression, kind) in [
-        (Compression::Zstd, Kind::ZstandardOutput),
+        (Compression::Gzip, Kind::GzipOutput),
         (Compression::Zip, Kind::ZipDeflate),
     ] {
         let dir = tempfile::tempdir().unwrap();
@@ -900,10 +896,18 @@ fn zstandard_and_zip_output_observe_csv_compression_and_archive_bytes_separately
             let path = fs::read_dir(output)
                 .unwrap()
                 .map(|e| e.unwrap().path())
-                .find(|p| p.extension().is_some_and(|e| e == "zst"))
+                .find(|p| p.extension().is_some_and(|e| e == "gz"))
                 .unwrap();
             assert_eq!(
-                zstd::stream::decode_all(fs::File::open(path).unwrap()).unwrap(),
+                {
+                    let mut bytes = Vec::new();
+                    std::io::Read::read_to_end(
+                        &mut flate2::read::MultiGzDecoder::new(fs::File::open(path).unwrap()),
+                        &mut bytes,
+                    )
+                    .unwrap();
+                    bytes
+                },
                 b"id\n1\n2\n"
             );
         }

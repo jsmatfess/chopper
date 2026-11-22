@@ -46,7 +46,7 @@ const GLOBAL: &[(&str, &str)] = &[
     ("output", "New output directory path"),
     ("job-version", "Job schema version (default 1)"),
     ("zip-member", "Input ZIP member"),
-    ("compression", "none, gzip, zstd or zip"),
+    ("compression", "none, gzip or zip"),
     ("rows", "Maximum rows per output CSV"),
     ("bytes", "Maximum serialized bytes per CSV"),
     ("compressed-bytes", "Advisory compressed-byte target"),

@@ -68,7 +68,7 @@ enum Command {
         probabilistic: bool,
         #[arg(long, value_parser = ["uniform", "auto", "fisher_yates"])]
         shuffle: Option<String>,
-        #[arg(long, default_value = "none", value_parser = ["none", "gzip", "zstd", "zip"])]
+        #[arg(long, default_value = "none", value_parser = ["none", "gzip", "zip"])]
         compression: String,
         #[arg(long)]
         zip_member: Option<String>,

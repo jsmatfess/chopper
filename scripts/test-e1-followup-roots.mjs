@@ -20,8 +20,8 @@ await symlink(old,join(invocation,'escape'),'junction');await test('linked Cargo
 await writeFile(join(old,'old.wasm'),'old');await test('artifact junction escape rejected',()=>assert.rejects(ownedFile(invocation,join(invocation,'escape','old.wasm'))));
 await writeFile(join(invocation,'fresh.wasm'),'fresh');await test('fresh artifact admitted',()=>ownedFile(invocation,join(invocation,'fresh.wasm')));
 // An ignored mirror deliberately has no Git metadata. Pin application, harness,
-// locks and both entire vendors rather than accepting Git's empty listing.
-const names=['Cargo.toml','Cargo.lock','ui/package.json','ui/package-lock.json','ui/tsconfig.json','crates/test/src/lib.rs','scripts/benchmark-e1-followup.mjs','ui/src/app.ts','ui/tests/e1-followup.ts','vendor/zip-2.4.2/src/lib.rs','vendor/zstd-sys-2.1.1/zstd/lib.c'];
+// locks and the entire vendor tree instead of accepting Git's empty listing.
+const names=['Cargo.toml','Cargo.lock','ui/package.json','ui/package-lock.json','ui/tsconfig.json','crates/test/src/lib.rs','scripts/benchmark-e1-followup.mjs','ui/src/app.ts','ui/tests/e1-followup.ts','vendor/zip-2.4.2/src/lib.rs'];
 for(const name of names){await mkdir(resolve(source,name,'..'),{recursive:true});await writeFile(join(source,name),'fixture');}
 await test('ignored staged mirror pins complete bounded inputs and rejects drift',async()=>{const before=await sourceIdentity(source);assert.equal(before.length,names.length);await writeFile(join(source,'ui/src/app.ts'),'drift');assert.notDeepEqual(await sourceIdentity(source),before);});
 await test('empty/incomplete manifest rejected',()=>assert.rejects(sourceIdentity(old)));

@@ -42,7 +42,7 @@ export const scenarios = [
   scenario('Repeated shuffles',[shuffle,shuffle,shuffle,balanced]),
   scenario('One balanced file',[{...balanced,files:1}]),
   scenario('Compressed target without hard limits',[partition],{limits:{...limits,compressed:'10MB'},compression:'gzip'}),
-  scenario('Balanced files with compressed target',[balanced],{limits:{...limits,compressed:'10MB'},compression:'zstd'}),
+  scenario('Balanced files with compressed target',[balanced],{limits:{...limits,compressed:'10MB'},compression:'gzip'}),
   scenario('Compressed target without compression',[],{limits:{...limits,compressed:'10MB'}}),
   scenario('Unfinished partition',[{type:'partition',columns:[]}]),
   scenario('Unfinished allocation',[{type:'assign',groups:[]}]),
@@ -59,7 +59,7 @@ export function* combinations(depth = 4, prefix = []) {
 
 export function* simulations() {
   for (const operations of combinations()) {
-    for (const compression of ['none','gzip','zstd','zip']) {
+    for (const compression of ['none','gzip','zip']) {
       for (const configuration of [limits,{...limits,rows:'1000',bytes:'64MiB'},{...limits,compressed:'10MB'}]) {
         yield {operations,compression,limits:configuration};
       }

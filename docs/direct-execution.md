@@ -238,17 +238,10 @@ this experiment. Failure in either pass is terminal and private outputs are
 discarded. It remains opt-in pending complete-job and contract evidence.
 
 The separate native `experimental-counted-codec-balanced` control extends the
-same source checks and exact Balanced traversal to gzip, Zstandard
+same source checks and exact Balanced traversal to gzip
 and ZIP outputs through the existing grouped direct publication adapter. Output
 codec versions, ownership, checksums, strict uncompressed serialized caps and
 advisory compressed targets remain unchanged.
-
-The separate native `experimental-counted-zstd-input-balanced` feature admits
-Zstandard input with UTF-8 CSV records. Each pass opens and fully consumes the
-existing checked decoder under its own reservation. Source metadata, decoded
-headers and counts are checked before commit. The first decoder closes
-before the second opens. Gzip and ZIP inputs keep the original single-decode
-path. Explicit preparation and observed dispatch still use their original paths.
 
 The native `experimental-counted-partition-balanced` experiment handles a
 plain UTF-8 source and plain output with exactly Partition followed by Balanced.
@@ -296,7 +289,7 @@ Windows uses admitted verbatim UTF-16 paths and `MoveFileExW` without replacemen
 or copy flags; a competing empty destination is rejected as on Linux. Native
 output remains private on the destination filesystem until complete
 validation, finalization and the existing no-replacement directory commit.
-Browser CSV, gzip and Zstandard publication writes final result files to the
+Browser CSV and gzip publication writes final result files to the
 selected destination through the storage worker. ZIP retains staged export
 because finalization reads the manifest. Both paths close every result stream
 before committing and verifying `CHOPPER-COMPLETE.json`. The browser attempts
@@ -321,6 +314,33 @@ The ordered publisher writes the manifest and commits the destination after
 all tasks succeed.
 
 
+### Compression selection
+
+Parallel compression processes bounded 256 KiB DEFLATE blocks. Independent
+blocks start with empty dictionaries and are written in order in one gzip stream
+or one ZIP member. CRCs and stored sizes describe the finished result.
+
+Direct Run uses the current source size and serialized byte cap. A source and cap
+of at least 2 MiB can use parallel compression. For sources at least 64 MiB,
+byte caps of at least 512 KiB can also use multiple blocks. An explicit row cap
+keeps limits-only compression serial. Native Run uses up to four codec tasks
+from the resolved worker pool. Native prepared publication can instead use
+multiple existing writers and can parallelize blocks when one writer is active.
+
+Hosted Run coordinates from one WASI engine worker. With automatic workers it
+can start up to four codec Web Workers. A prepared batch can compress separate
+files when the planned average is at least 256 KiB and each file in the batch is
+below 2 MiB. Larger files may use several workers within a file. Compression
+buffer admission or unavailable Web Workers can reduce parallelism. An explicit
+single worker uses serial compression.
+
+Direct ZIP writes each member into its private archive and fills its ZIP64 local
+header once the CRC and sizes are known. Ordered prepared publication may
+retain up to 512 KiB of compressed bytes for an eligible member up to 2 MiB of
+CSV. The writer can use a temporary file when memory admission is denied or a
+member outgrows its buffer. Native atomic commit and browser completion-marker
+rules still apply to the completed archive.
+
 ### Native Auto paths
 
 Unobserved native Run can use bounded Partition, a two-step Interleaved and
@@ -336,9 +356,7 @@ use their configured fanout. Linux Interleaved with sixteen plain UTF-16LE
 outputs may share one row serializer from 1.5 GiB of input and a declared
 1 MiB record ceiling. Counted Partition uses the declared file limit up to 64
 and actual descriptor capacity. Counted singleton Balanced starts at 2 GiB.
-A checksummed input is still validated normally. For Zstandard inputs up to 8 MiB on disk, a frame's declared
-decoded size or applicable Analyze facts may guide the counted choice.
-Larger compressed containers keep the ordinary path.
+Gzip and ZIP inputs use the ordinary single-decode path.
 
 Large uncapped plain Interleaved jobs on Linux can batch syncs for 8,192 to
 16,384 known outputs. The path requires at least 2 GiB of input, a declared

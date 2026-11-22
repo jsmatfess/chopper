@@ -10,7 +10,6 @@ fn representations(source: &[u8]) -> anyhow::Result<Vec<(&'static str, Vec<u8>)>
     Ok(vec![
         ("plain", source.to_vec()),
         ("gzip", gzip.finish()?),
-        ("zstd", zstd::stream::encode_all(source, 1)?),
         ("zip", zip.finish()?.into_inner()),
     ])
 }
@@ -75,7 +74,7 @@ fn public_inspection_preserves_bom_dialect_and_headers_through_input_adapters() 
         assert!(!std::path::Path::new(&job.output).exists());
     }
     // Inspection must not prepare a workspace or create output artifacts.
-    assert_eq!(std::fs::read_dir(directory.path())?.count(), 4);
+    assert_eq!(std::fs::read_dir(directory.path())?.count(), 3);
     Ok(())
 }
 

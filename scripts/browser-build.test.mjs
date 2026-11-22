@@ -9,10 +9,8 @@ import {spawnSync} from 'node:child_process';
 
 function fixture(){
  const root=mkdtempSync(join(tmpdir(),'chopper-browser-build-'));
- for(const dir of ['scripts','sdk/bin','target/wasm32-wasip1/release','ui/dist'])mkdirSync(join(root,dir),{recursive:true});
+ for(const dir of ['scripts','target/wasm32-wasip1/release','ui/dist'])mkdirSync(join(root,dir),{recursive:true});
  for(const name of ['build-browser.mjs','build-browser.sh','browser-artifacts.mjs'])copyFileSync(new URL(name,import.meta.url),join(root,'scripts',name));
- const suffix=process.platform==='win32'?'.exe':'';
- for(const name of ['clang','llvm-ar'])writeFileSync(join(root,'sdk/bin',name+suffix),'placeholder');
  writeFileSync(join(root,'target/wasm32-wasip1/release/chopper_browser.wasm'),'OLD ENGINE');
  writeFileSync(join(root,'ui/dist/engine.wasm'),'PUBLISHED BEFORE ATTEMPT');
  const hook=join(root,'fake-cargo.mjs');
@@ -34,7 +32,7 @@ cp.spawnSync=(command,args,options)=>{
  return {status:0};
 };syncBuiltinESMExports();`);
  const run=(args=[],shell=false,extra={})=>{
-  const env={...process.env,WASI_SDK_PATH:join(root,'sdk'),CARGO_TARGET_DIR:'target',...extra};
+  const env={...process.env,CARGO_TARGET_DIR:'target',...extra};
   // Node's preload replaces only Cargo dispatch inside this isolated child.
   const preload=`--import=${pathToFileURL(hook).href}`;
   env.NODE_OPTIONS=preload;

@@ -5,12 +5,15 @@ import {WASI, File as MemoryFile, ConsoleStdout} from '@bjorn3/browser_wasi_shim
 import {DiskBridge, DiskDirectory, DiskFile, RootFd} from './fs';
 import {exportResults} from './export';
 import {publicationResult} from './publication';
+import {CompressionWorkers} from './compression';
+import {compressBlock,initCompression} from './compression-worker';
 import type {Job} from '../app';
 const streamingOverlapEnabled=true;
 const scope=globalThis as unknown as {onmessage:(e:MessageEvent)=>void;postMessage:(v:unknown)=>void};
 let root:DiskDirectory;
 let bridge:DiskBridge;
 let instance:WebAssembly.Instance;
+const compression=new CompressionWorkers();
 let last:Record<string,unknown>={};
 let inputPath='';
 let observations:ObservationDelivery|null=null;
@@ -27,6 +30,8 @@ function accountExport(bytes:number,start:number){
 function invoke(name:string){last={};(instance.exports[name] as ()=>number)();if(last.error)throw new Error(String(last.error));return last;}
 scope.onmessage=async({data})=>{
   const {id,type}=data;
+  if(type==='compression-init'){await initCompression(data.module);return;}
+  if(type==='compress-block'){compressBlock(data);return;}
   try {
     let result:unknown, directDestination=false;
     if(type==='init'){
@@ -46,8 +51,13 @@ scope.onmessage=async({data})=>{
         if(result===0&&free.length){const fd=free.pop()!;wasi.fds[fd]=wasi.fds.pop()!;new DataView(wasi.inst.exports.memory.buffer).setUint32(args[8],fd,true);}
         return result;
       };
-      instance=(await WebAssembly.instantiateStreaming(fetch('/engine.wasm'),{wasi_snapshot_preview1:wasi.wasiImport})).instance;
+      const loaded=await WebAssembly.instantiateStreaming(fetch('/engine.wasm'),{
+        wasi_snapshot_preview1:wasi.wasiImport,
+        chopper_compression:compression.imports,
+      });
+      instance=loaded.instance;
       wasi.initialize(instance as WebAssembly.Instance & {exports:{memory:WebAssembly.Memory}});
+      compression.init(loaded.module,instance.exports);
       result=invoke('chopper_defaults');
     } else if(type==='run-direct'||type==='columns'||type==='preview'||type==='sniff'||type==='profile'){
       physicalHistory=new PhysicalHistory();stages=new StageCompletions();physicalLastSent=0;
@@ -70,7 +80,7 @@ scope.onmessage=async({data})=>{
         ||(plainCsv&&operations?.length===1&&operations[0]?.type==='partition');
       root.contents.set(inputPath,new DiskFile(bridge,data.file));
       // ZIP reopens its manifest for archiving and needs the private filesystem.
-      directDestination=type==='run-direct'&&['none','gzip','zstd'].includes(data.job.compression);
+      directDestination=type==='run-direct'&&['none','gzip'].includes(data.job.compression);
       if(directDestination){
         bridge.call('destination_init',{parent:data.output,folder:data.folder});
         root.directPublication=true;
@@ -87,7 +97,10 @@ scope.onmessage=async({data})=>{
         root.contents.set('auto-observations.json',new MemoryFile(encoder.encode(JSON.stringify(data.autoObservations)),{readonly:true}));
       }
       if(data.resetProfile)invoke('chopper_clear_profile');
+      await compression.begin(type==='run-direct'&&['gzip','zip'].includes(job.compression)
+        &&job.resources.workers!==1&&data.file.size>=2*1024*1024);
       result=invoke(type==='profile'?'chopper_analyze':type==='columns'?'chopper_columns':type==='preview'?'chopper_preview':type==='sniff'?'chopper_sniff':'chopper_run');
+      compression.close();
     }
     if(type==='run-direct'){
       const analysis=(result as {analysis:unknown}).analysis;
@@ -115,5 +128,5 @@ scope.onmessage=async({data})=>{
     collectPhysical(true);
     scope.postMessage({id,result,observationFinal:observations?.snapshot(),observationRun:data.observationRun});
     observations=null;
-  }catch(e){collectPhysical(true);scope.postMessage({id,error:e instanceof Error?e.message:String(e),observationFinal:observations?.snapshot(),observationRun:data.observationRun});observations=null;}
+  }catch(e){compression.close();collectPhysical(true);scope.postMessage({id,error:e instanceof Error?e.message:String(e),observationFinal:observations?.snapshot(),observationRun:data.observationRun});observations=null;}
 };

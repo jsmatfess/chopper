@@ -54,7 +54,7 @@ Job-wide flags may occur anywhere and do not start or end a step:
 | Job fields | Flags |
 | --- | --- |
 | Paths / schema | Required `--input`, `--output`; optional `--zip-member`, `--job-version` (only 1 supported) |
-| Output format / caps | `--compression none\|gzip\|zstd\|zip`, `--rows`, `--bytes`, `--compressed-bytes` |
+| Output format / caps | `--compression none\|gzip\|zip`, `--rows`, `--bytes`, `--compressed-bytes` |
 | Resources | `--memory-mb N\|auto`, `--workers`, `--grouping auto\|sort`, `--max-files`, `--max-record-bytes`, `--temp-dir`, `--temp-bytes` |
 | Input CSV | `--input-encoding`, `--input-headers`, `--input-delimiter`, `--input-quote`, `--input-escape`, `--input-line-ending`, `--input-bom`, `--input-skip-empty-lines` |
 | Output CSV | The same eight options with `--output-` prefix |

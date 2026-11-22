@@ -85,7 +85,7 @@ Every Run validates again; a profile is never an execution snapshot.
 Always permit a typed local path. Show its absolute interpretation and current
 working directory before accepting it. No glob expansion, shell evaluation,
 recursive discovery or multiple-input concatenation. Input support remains the
-engine's CSV/gzip/Zstandard/ZIP support. Detect container type through the engine,
+engine's CSV/gzip/ZIP support. Detect container type through the engine,
 not filename guesses. A multi-CSV ZIP needs an explicit member; show the engine's
 error and allow editing the member name rather than adding an independent ZIP
 reader. Reject unsupported/encrypted archives through existing validation.
@@ -200,7 +200,7 @@ publication and failure cleanup. Do not pre-create output results to test access
 An empty selected directory is handled only by existing publication code. Recheck
 at commit through that code; wizard preflight does not remove destination races.
 
-Packaging choices map to none/gzip/zstd/zip. ZIP is one archive containing all CSV
+Packaging choices map to none/gzip/zip. ZIP is one archive containing all CSV
 members and a manifest, plus the existing adjacent manifest. Row/strict-byte caps
 apply per CSV member; `compressed_bytes` is an advisory member-payload target,
 not a total archive ceiling. Explain filenames, safe labels and where manifests
@@ -373,7 +373,7 @@ Required journey coverage, apportioned in child bodies:
   cache reuse/invalidation and Windows rescan. Prove profile-only selection never
   enters executable operations. Cancel during prepared pipeline processing and
   publication; no partial success or leaked private outputs, configuration retained.
-- C: gzip/zstd/ZIP with explicit multi-member choice, nondefault delimiter/encoding,
+- C: gzip/ZIP with explicit multi-member choice, nondefault delimiter/encoding,
   BOM and multiline records; independent decoded-field and encoded-cap checks,
   ZIP member/manifest counts and advisory-target wording. Exercise codec failure,
   unrepresentable output and cancellation during finalization without publication.

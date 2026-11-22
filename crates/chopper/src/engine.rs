@@ -31,7 +31,6 @@ pub use inspection_result::Inspection;
 pub use stages::Stages;
 mod input_sniff;
 mod input_zip;
-mod input_zstandard;
 mod job_owner;
 #[cfg(not(target_os = "wasi"))]
 pub(crate) use job_owner::capacity as job_capacity;
@@ -286,7 +285,7 @@ fn run_using(
     } else if observed {
         None
     } else {
-        direct::select(&job, &pool, hint)
+        direct::select(&job, &pool)
     };
     let proposed_direct = direct_plan.is_some();
     let direct_context = if let Some(mode) = direct_plan {
@@ -297,7 +296,11 @@ fn run_using(
             cancel.clone(),
             notify.clone(),
             pool.clone(),
-            1,
+            if output::parallel_direct_compression(&job) {
+                usize::MAX
+            } else {
+                1
+            },
             mode.memory_targets(),
         )?;
         if mode.ready(&ctx) {
@@ -332,7 +335,6 @@ fn run_using(
     plan.set_native_merge_fan_in(merge);
     plan.try_retained_exact = try_retained_exact;
     plan.direct_preflight_fallback = proposed_direct && direct_plan.is_none();
-    plan.direct_from_analyze = direct_plan.is_some_and(direct::Plan::uses_analyze);
     let published = match route {
         Route::Streaming | Route::Counted | Route::BoundedWriters => direct::run(
             job,
@@ -1210,16 +1212,18 @@ impl Read for ObservedInput<'_> {
 pub fn input_is_plain_csv(job: &Job) -> Result<bool> {
     let mut magic = [0u8; 4];
     let read = File::open(&job.input)?.read(&mut magic)?;
-    Ok(input_kind(magic, read).is_none())
+    Ok(!is_removed_compression(magic, read) && input_kind(magic, read).is_none())
 }
+// Reject former Zstandard inputs by signature, even if named like plain CSV.
+fn is_removed_compression(magic: [u8; 4], read: usize) -> bool {
+    read == 4
+        && (magic == [0x28, 0xb5, 0x2f, 0xfd]
+            || u32::from_le_bytes(magic) & 0xfffffff0 == 0x184d2a50)
+}
+
 fn input_kind(magic: [u8; 4], read: usize) -> Option<crate::observation::physical::Kind> {
     if read >= 2 && magic[..2] == [0x1f, 0x8b] {
         Some(crate::observation::physical::Kind::GzipInput)
-    } else if read == 4
-        && (magic == [0x28, 0xb5, 0x2f, 0xfd]
-            || u32::from_le_bytes(magic) & 0xfffffff0 == 0x184d2a50)
-    {
-        Some(crate::observation::physical::Kind::ZstandardInput)
     } else if read == 4 && matches!(&magic, b"PK\x03\x04" | b"PK\x05\x06" | b"PK\x07\x08") {
         Some(crate::observation::physical::Kind::ZipInput)
     } else {
@@ -1236,6 +1240,10 @@ fn with_input_report<T>(
     let mut magic = [0u8; 4];
     let read = file.read(&mut magic)?;
     file.seek(SeekFrom::Start(0))?;
+    ensure!(
+        !is_removed_compression(magic, read),
+        "Zstandard input is no longer supported; decompress it before running Chopper"
+    );
     let kind = input_kind(magic, read);
     let mut observation =
         ctx.and_then(|ctx| kind.and_then(|kind| InputObservation::new(ctx, kind)));
@@ -1251,8 +1259,6 @@ fn with_input_report<T>(
                 InputBuffer::new(file, 8192, buffer)?,
                 codec,
             )?)
-        } else if kind == Some(crate::observation::physical::Kind::ZstandardInput) {
-            input_zstandard::consume(file, job, buffer, invoke)
         } else if kind == Some(crate::observation::physical::Kind::ZipInput) {
             input_zip::consume(file, job, buffer, invoke)
         } else {
@@ -3048,7 +3054,8 @@ mod performance_tests {
 
     #[test]
     fn input_buffer_capacity_edges_and_exhausted_concurrent_owners() -> Result<()> {
-        for capacity in [8192, zstd::zstd_safe::DCtx::in_size()] {
+        let capacity = 8192;
+        {
             for limit in [capacity - 1, capacity, capacity + 1] {
                 let workspace = Arc::new(Workspace::new(limit));
                 let result = InputBuffer::new(
@@ -3082,7 +3089,7 @@ mod performance_tests {
     fn input_adapters_shared_admission_multiframe_and_error_release() -> Result<()> {
         let report = resource_contracts::input_adapters()?;
         assert_eq!(report["contract"], "input-adapter-resource-contracts-v1");
-        assert_eq!(report["cases"].as_array().unwrap().len(), 4);
+        assert_eq!(report["cases"].as_array().unwrap().len(), 3);
         assert_eq!(report["fixture_directory_removed"], true);
         Ok(())
     }

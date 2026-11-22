@@ -1,8 +1,0 @@
-{
-  "url": "https://raw.githubusercontent.com/facebook/zstd/v1.5.7/tests/legacy.c",
-  "sha256": "8777219624109da3b1c1332e2a6dd3f20ed84f64054cbbef144594fae5627e9d",
-  "compressed_sha256": "72085d634b14ee9f1d24d18acb8f573e4b7eac633b3140fca8c1d2062ae00ece",
-  "expected_sha256": "61fe0952b65c9dcdd714451ca1b653076a967bfd42ae1b0b83dcf1c30c7a4841",
-  "expected_bytes": 1195,
-  "license": "Zstandard BSD-3-Clause; upstream copyright/license notice retained in legacy.c and package license."
-}

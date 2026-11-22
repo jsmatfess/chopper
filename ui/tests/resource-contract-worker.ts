@@ -1,3 +1,4 @@
+import {serialCompressionImports} from '../src/browser/compression';
 // Dedicated test reactor. The production worker has no resource-injection API.
 import {WASI, File as MemoryFile, ConsoleStdout} from '@bjorn3/browser_wasi_shim';
 import {DiskBridge, DiskDirectory, DiskFile, RootFd} from '../src/browser/fs';
@@ -171,7 +172,7 @@ scope.onmessage=async({data})=>{
       ConsoleStdout.lineBuffered(line=>{diagnostics.push(line);scope.postMessage({diagnostic:line});}),
       new RootFd(root)
     ]);
-    const instance=(await WebAssembly.instantiateStreaming(fetch(new URLSearchParams(location.search).has('shuffle-partition')?'/engine-resource-tests-shuffle-partition.wasm':'/engine-resource-tests.wasm'),{wasi_snapshot_preview1:wasi.wasiImport})).instance;
+    const instance=(await WebAssembly.instantiateStreaming(fetch(new URLSearchParams(location.search).has('shuffle-partition')?'/engine-resource-tests-shuffle-partition.wasm':'/engine-resource-tests.wasm'),{wasi_snapshot_preview1:wasi.wasiImport,chopper_compression:serialCompressionImports})).instance;
     wasi.initialize(instance as WebAssembly.Instance & {exports:{memory:WebAssembly.Memory}});
     const contract=instance.exports.chopper_resource_contracts;
     if(typeof contract!=='function')throw new Error('Resource-contract test export is missing');

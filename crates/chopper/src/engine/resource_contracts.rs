@@ -11,19 +11,16 @@ mod manual_memory;
 mod progress;
 
 pub(super) fn input_adapters() -> Result<serde_json::Value> {
-    let zstandard = input_zstandard::resource_contracts::run()?;
     #[cfg(target_os = "wasi")]
     let dir = tempfile::tempdir_in("/tmp")?;
     #[cfg(not(target_os = "wasi"))]
     let dir = tempfile::tempdir()?;
     let fixture_directory = dir.path().to_owned();
     let mut gzip = Vec::new();
-    let mut zstd = Vec::new();
     for part in [b"id\n".as_slice(), b"1\n".as_slice()] {
         let mut encoder = flate2::write::GzEncoder::new(Vec::new(), Default::default());
         encoder.write_all(part)?;
         gzip.extend(encoder.finish()?);
-        zstd.extend(zstd::stream::encode_all(part, 0)?);
     }
     let mut zip = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
     zip.start_file("data.csv", zip::write::SimpleFileOptions::default())?;
@@ -33,13 +30,8 @@ pub(super) fn input_adapters() -> Result<serde_json::Value> {
     for (name, encoded, capacity) in [
         ("plain", b"id\n1\n".to_vec(), 0),
         ("gzip", gzip, 8192 + input_gzip::capacity::<File>()),
-        ("zstd", zstd, zstd::zstd_safe::DCtx::in_size()),
         ("zip", zip, 8192),
     ] {
-        if name == "zstd" {
-            cases.push(zstandard["standard_case"].clone());
-            continue;
-        }
         let path = dir.path().join(name);
         std::fs::write(&path, &encoded)?;
         let job = Job {
@@ -188,7 +180,7 @@ pub(super) fn input_adapters() -> Result<serde_json::Value> {
             workspace.used() == 0,
             "{name}: consumer error leaked charge"
         );
-        let truncated = name == "gzip" || name == "zstd";
+        let truncated = name == "gzip";
         if truncated {
             let mut broken = encoded.clone();
             broken.pop();
@@ -230,9 +222,7 @@ pub(super) fn input_adapters() -> Result<serde_json::Value> {
         "zip_metadata": input_zip::resource_contracts::run()?,
         "zip_codec": input_zip::codec_contracts::run()?,
         "gzip_codec": input_gzip::resource_contracts::run()?,
-        "zstandard_input": zstandard,
         "output_deflate_codec": crate::output::deflate_contracts::run()?,
-        "output_zstandard_codec": crate::output::zstandard_contracts::run()?,
         "directory_paths": crate::storage::directory_resource_contracts()?,
         "publication_metadata": crate::output::publication_metadata_contracts::run()?,
         "publication_paths": crate::output::publication_path_contracts::run()?,

@@ -357,7 +357,7 @@ lineage, encounter order, seeded ordering or publication/cleanup behavior.
 
 ## Compressed input and output
 
-Issue #55 observes actual gzip, Zstandard and ZIP adapters after signature
+Issue #55 observes actual gzip and ZIP adapters after signature
 detection, including construction, selected-member lookup, reads and finalization.
 Input adaptation is supporting work, with no configured-operation badge. Input
 counters measure successfully returned decompressed CSV bytes **before character
@@ -367,7 +367,7 @@ are attributed to adaptation; a consumer failure or cancellation interrupts an
 unfinished adapter without falsely blaming the codec. Input names/extensions do
 not select graph categories or alter existing signature/member-selection rules.
 
-Output gzip/Zstandard compressors and ZIP CSV-member deflaters measure encoded
+Output gzip compressors and ZIP CSV-member deflaters measure encoded
 CSV bytes actually accepted, including BOM/header copies for each chunk. These
 counts implement strict CSV caps; they are not compressed payload sizes. Their
 inclusive lifetimes include actual compressor finalization and writer sync.

@@ -17,7 +17,7 @@ export type Counter=RowCount|RowVisits|FrameLengths|ByteCount;
 // Exhaustive: a new engine/card kind also needs an explicit display unit.
 function counterUnit(kind:Kind|undefined):Counter['unit']|null {
  switch(kind){
- case 'gzip_input':case 'zstandard_input':case 'zip_input':case 'gzip_output':case 'zstandard_output':case 'zip_deflate':case 'zip_archive':return 'bytes';
+ case 'gzip_input':case 'zip_input':case 'gzip_output':case 'zip_deflate':case 'zip_archive':return 'bytes';
  case 'shared_ranges':return 'frame lengths';
  case 'merge':case 'hierarchical_merge':case 'merge_traversal':return 'row visits';
  case 'materialize':case 'elided':case 'fallback':case 'reuse':return null;

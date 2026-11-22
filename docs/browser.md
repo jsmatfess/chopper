@@ -35,9 +35,13 @@ calibrated shuffle fusion without Analyze. A completed Analyze remains optional.
 
 Use desktop Chrome or Edge. The application requires a secure context (HTTPS or localhost), File System Access, OPFS, Web Locks, and cross-origin isolation. The supplied server and Cloudflare `_headers` configure isolation. Opening `index.html` directly will not work.
 
-Prerequisites: Node.js 22+, Rust with the `wasm32-wasip1` target, and [WASI SDK 33](https://github.com/WebAssembly/wasi-sdk/releases/tag/wasi-sdk-33) for Zstandard's C codec. Download the SDK matching your build OS and CPU, extract it, and set `WASI_SDK_PATH` to its directory. The supported release build workflow covers Windows and Linux; macOS builds are source-only and unqualified. WSL is optional. Native Windows Rust also needs the Microsoft C++ Build Tools and Windows SDK.
+Prerequisites are Node.js 22+ and Rust with the `wasm32-wasip1` target.
+The supported release build workflow covers Windows and Linux. WSL is optional.
+Native Windows Rust also needs the Microsoft C++ Build Tools and Windows SDK.
 
-`node scripts/build-browser.mjs` discovers repository-local SDKs under `.tools/windows/wasi-sdk-33.0-<arch>-windows` on Windows and `.tools/linux/wasi-sdk-33.0-<arch>-<os>` on Unix hosts (`x86_64`/`arm64`, `linux`/`macos`). `WASI_SDK_PATH` overrides discovery. It also uses the optional repository-local Rust toolchain described in the root README when present. Otherwise Cargo must be on `PATH`. The `bash scripts/build-browser.sh` entry point delegates to this same Node implementation and requires Node.
+`node scripts/build-browser.mjs` uses the optional repository-local Rust toolchain
+described in the root README when present. Otherwise Cargo must be on `PATH`.
+The Bash entry point delegates to the same Node implementation.
 
 The wrapper fixes package `chopper-browser`, target `wasm32-wasip1` and the release
 profile so the copied engine is the requested artifact. Set `CARGO_TARGET_DIR`
@@ -64,7 +68,7 @@ npm.cmd --prefix ui run build:hosted
 npm.cmd --prefix ui run serve:hosted
 ```
 
-On Linux, run `rustup target add wasm32-wasip1`, set `WASI_SDK_PATH`, then run `node scripts/build-browser.mjs`, `npm --prefix ui ci`, `npm --prefix ui run build:hosted`, and `npm --prefix ui run serve:hosted`. `npm --prefix ui run build` is an alias for `build:hosted`. Native CLI builds do not need Node or a generated UI bundle.
+On Linux, run `rustup target add wasm32-wasip1`, then run `node scripts/build-browser.mjs`, `npm --prefix ui ci`, `npm --prefix ui run build:hosted`, and `npm --prefix ui run serve:hosted`. `npm --prefix ui run build` is an alias for `build:hosted`. Native CLI builds do not need Node or a generated UI bundle.
 
 Open **http://127.0.0.1:8421/**. Browse for an input and an output parent folder, configure the pipeline and choose Run. Analyze is optional and returns input statistics and estimates; Run validates the current configuration independently. Results go into a new `chopper-results-<UUID>` subdirectory. A `CHOPPER-COMPLETE.json` marker is written only after every result file has closed successfully.
 
@@ -123,7 +127,7 @@ field during strict Job decoding, including during profiling. Supported shuffle
 strategies remain `uniform`, `auto` and `fisher_yates`; see the
 [current contract](specification.md#shuffling-and-seeds).
 
-The original operations and the explicit probabilistic allocation, interleaved split and Fisher–Yates options, plus all native CSV encodings/dialects, gzip, ZIP, and Zstandard use the existing Rust implementation. Exact allocation and grouping semantics are preserved. There is no reproducibility checkbox or seeded-output policy; randomized output may change across execution plans and resource budgets. There is no seed field in the form or exported Job. Older jobs containing `seed` are rejected with a removal message. Results show the algorithm version. Resources contains one expandable resource-budget section. See the [seed contract](specification.md#shuffling-and-seeds). ZIP output remains one archive containing all CSV chunks.
+The original operations and the explicit probabilistic allocation, interleaved split and Fisher–Yates options, plus all native CSV encodings/dialects, gzip and ZIP use the existing Rust implementation. Exact allocation and grouping semantics are preserved. There is no reproducibility checkbox or seeded-output policy; randomized output may change across execution plans and resource budgets. There is no seed field in the form or exported Job. Older jobs containing `seed` are rejected with a removal message. Results show the algorithm version. Resources contains one expandable resource-budget section. See the [seed contract](specification.md#shuffling-and-seeds). ZIP output remains one archive containing all CSV chunks.
 
 Charged allocations in one WASI engine instance now share a 1 GiB aggregate admission ledger across profiling, cached/returned profiles, preparation and execution. Per-job Auto or explicit numeric budgets still apply. Automatic selection observes this instance’s free admission capacity without reserving it. See the [resource contract](specification.md#resources-publication-and-interfaces). Pressure can trigger spills or a bounded failure; this is not a JavaScript/WASM/process RSS cap, and separate workers/tabs do not share the ledger. [Hosted limit evidence](performance/investigations/hosted-memory-ceiling-2026-11-16.md).
 
@@ -144,11 +148,19 @@ admission policy, and avoids this browser ABI.
 See [V8's wasm32 memory explanation](https://v8.dev/blog/4gb-wasm-memory) and
 [Rust's contiguous allocation limits](https://doc.rust-lang.org/std/vec/index.html).
 
+Large gzip and ZIP output can use up to four dedicated compression Web Workers
+under Auto. They run the same DEFLATE codec in separate WASM instances. The
+engine retains an admission grant for the shared block buffers and codec
+scratch until the Run retires the workers. The selected file and output bytes
+stay local. The engine has one processing worker, and an explicit worker setting
+of 1 uses serial compression. The Auto details report parallel compression
+slots when used. See [compression selection](direct-execution.md#compression-selection).
+
 Analyze scans every record without producing output spools or retaining an
 executable snapshot. Run processes limits-only jobs and a single uncompressed
 Balanced step directly into publication output without an additional complete CSV
 snapshot; other pipelines prepare internally.
-Final CSV, gzip and Zstandard files and their manifest go directly to a fresh
+Final plain CSV and gzip files and their manifest go directly to a fresh
 folder under the selected destination. Intermediate data and retained engine
 snapshots still use OPFS. ZIP uses the staged export path because archive
 finalization reopens the manifest. The storage worker forwards one bounded write
@@ -244,7 +256,7 @@ uniform/Fisher–Yates work, exact fusion, elision and snapshot/materialization.
 History survives worker shutdown and form edits. External spill, hierarchical merge, grouping handoff and ordered-file reuse
 now have bounded physical summaries. Exact/probabilistic allocation, exact strata,
 shared balanced ranges, terminal/fused balanced traversal and interleaved
-membership report actual counts without stratum values. Actual gzip/Zstandard/ZIP input adapters, output compressors and ZIP archive
+membership report actual counts without stratum values. Actual gzip and ZIP input adapters, output compressors and ZIP archive
 assembly add byte-scoped facts; see the [observation contract and fixed
 bounds](execution-observation.md). This does not change export/cleanup semantics.
 
@@ -314,10 +326,8 @@ check the real browser path. The browser CI job runs both levels.
 limits-only and pipeline grouping, shuffle, allocation and split fixtures with independent enabled/disabled
 CSV, manifest and marker checks. Run it after the production hosted build; its
 server and picker/telemetry fixtures are test-only, not deployable assets.
-Codec fixtures independently decode exports using Node gzip, Python 3 ZIP and
-`libzstd` through Python ctypes. Install Python 3 and a discoverable system
-Zstandard library for this acceptance harness (Ubuntu provides `libzstd1`); the
-small-fixture helper is test-only and does not alter engine codec dependencies.
+Codec fixtures independently decode exports using Node gzip and Python 3 ZIP.
+The small-fixture helper is test-only.
 
 `node scripts/test-browser-graph-lifecycle.mjs` checks the public hosted Run page
 with production WASI and OPFS, specializing the worker to the staged copy path. Test-context routes inject worker,
@@ -489,15 +499,9 @@ directory fallback, retained EOF owners, exact local/shared edges, competing-own
 release/retry, CRC/consumer error and public-profile cancellation cleanup. Its
 conservative pinned-source allowance is distinct from actual heap/RSS usage; see
 the [patch contract](../vendor/zip-2.4.2/CHOPPER.md).
-Separate codec reports cover gzip input, ZIP member readers and output
-gzip/deflate/Zstandard owners. Zstandard input uses per-allocation admission for
-modern and legacy streaming contexts through its
-[pinned allocator bridge](../vendor/zstd-sys-2.1.1/CHOPPER.md). Its footprint can
-grow while reading, so a dynamic denial may occur after consumer entry; fixed
-adapter allowances still deny before constructing their reader. The report
-checks typed errors, allocation-failure cleanup, version transitions, decoding
-parity, current window limits and unchanged format detection. Requested storage
-and retained controller lifetimes remain distinct from allocator overhead/RSS.
+Separate codec reports cover gzip input, ZIP member readers, and gzip and
+raw DEFLATE output owners. The input reports exercise bounded codec buffers and
+release after parse, checksum and cancellation errors.
 The directory-path report verifies pre-admitted context/staging paths, exact
 local/shared edges, retained final owners, denial/retry and publication disarm.
 Live contexts keep an explicit directory reservation after other work is dropped;
@@ -645,30 +649,24 @@ assets. The source commit/tree and package-receipt fields are custody references
 actual files against the frozen source and exact package receipts. Use a separate
 test checkout/artifact overlay, never alter the frozen candidate or ZIP packages.
 
-Graph (`test-browser-graph.mjs`) packets additionally require `python` and
-`zstd_dll`: canonical absolute paths, each with exactly one matching SHA-256 entry
-in `inputs`. The producer copies `python` from the existing config field; Graph
-selections additionally require config `zstd_dll`. Include the Python executable,
-exact DLL, `scripts/browser-graph-codec.mjs` and `scripts/graph-codec-fixtures.py`
-in frozen inputs. The Node helper is an observer dependency for every selection;
-both codec scripts require selected harness Git-blob proof when Graph is selected.
-Missing Graph tool proof denies even with the existing v1 packet/config schemas.
+Graph (`test-browser-graph.mjs`) packets additionally require a canonical absolute
+`python` executable path with one matching SHA-256 entry in `inputs`.
+Include Python, `scripts/browser-graph-codec.mjs` and
+`scripts/graph-codec-fixtures.py` in the frozen inputs. The Node helper is an
+observer dependency for every selection. Both codec scripts require selected
+harness Git-blob proof for Graph.
 
-Before browser preflight and each Python codec spawn, Graph checks canonical,
-non-alias, nonempty regular files and their declared hashes. It invokes the exact
-packet Python with `[graph-codec-fixtures.py, mode]`, appending the exact DLL path
-only for Zstandard modes. It inherits the original cwd, environment and console
-behavior, keeps the 64 MiB capture bound and existing parent command deadline,
-and adds no Python flags, PATH rewrite or process creation options. It never
-selects a protected tool from PATH or environment overrides. Ordinary unprotected
-calls retain `python3` and Python's system `find_library("zstd")` behavior.
+Before preflight and each ZIP codec spawn, the harness checks the declared hashes
+of the canonical, nonempty Python executable and helper. It invokes the selected
+Python with `[graph-codec-fixtures.py, mode]` and a 64 MiB capture bound. Ordinary
+unprotected calls use `python3`.
 
 The producer pins its reviewed harness snapshot in `HARNESS`, separately from
 Product639. Use that exact revision for harness source mappings, including the
 observer, Graph caller and both codec scripts. Freeze controller inputs separately
 when their revision differs from the harness. Older ca48159 mappings lack the new
 caller and cannot satisfy this proof. Create a new config/plan and fresh owned
-root with config `python`/`zstd_dll`, complete input hashes and directory inventories.
+root with config `python`, complete input hashes and directory inventories.
 Re-run preparation, independently review the resulting plan hash, and obtain the
 existing parent approval before execution. Product639, its packages and historical
 receipts retain their original identities. Source/fake controls establish helper
@@ -1210,7 +1208,7 @@ small harness bounds and production WASM guards remain unchanged.
 
 Deploy only `ui/dist` after `build:hosted`. The directory includes the `.wasm` binary and `_headers` needed for worker isolation and WebAssembly execution. There are no Functions, databases, or file-storage services to configure.
 
-The CI browser job builds and validates an artifact named `chopper-hosted`. Download/extract it and use Cloudflare Pages Direct Upload, or publish that built directory using Wrangler. For Git integration, arrange the Rust/WASI SDK build in CI rather than relying on Cloudflare's default frontend image. Do not publish the native `ui/index.html`/`ui/public` build as the hosted app.
+The CI browser job builds and validates an artifact named `chopper-hosted`. Download/extract it and use Cloudflare Pages Direct Upload, or publish that built directory using Wrangler. For Git integration, arrange the Rust WASI build in CI rather than relying on Cloudflare's default frontend image. Do not publish the native `ui/index.html`/`ui/public` build as the hosted app.
 
 No Cloudflare deployment is performed by the local build scripts.
 

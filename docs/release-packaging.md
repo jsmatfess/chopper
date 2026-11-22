@@ -44,11 +44,10 @@ files in the frozen source; their hashes are recorded as `packaging_tools`.
 Source/vendor assets require complete inventories there. The assembler
 checks source identity but does not derive transitive build provenance.
 
-Native payloads come from the clean source: `LICENSE`, the three retained vendor
-license files, and [usage/attribution text](releases/native-usage.txt) as
-`README.txt`. Windows adds `chopper.exe`; Linux adds `chopper` with Unix mode
-0755. Each native ZIP has six members; with seven hosted members, the total is
-19. No native UI bundle or HTTP transport license files are packaged.
+Native payloads include `LICENSE`, the retained ZIP license and
+[usage and attribution text](releases/native-usage.txt) as `README.txt`. Windows
+adds `chopper.exe`. Linux adds `chopper` with Unix mode 0755. Each native ZIP
+has four members, and the hosted ZIP has seven. No native UI bundle or HTTP transport license files are packaged.
 The native README includes production dependency license texts and notices.
 The hosted build carries the same notices in its HTML source.
 Refresh these notices when changing production dependencies or the release Rust/WASI

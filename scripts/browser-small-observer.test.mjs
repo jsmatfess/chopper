@@ -145,30 +145,30 @@ test('wrapper denies a packet pointing outside the owning scripts before importi
 });
 
 // Exercise the actual Graph spawn seam without importing the browser harness.
-test('Graph codec pins Python/DLL/helper and preserves the original child context',async()=>{
+test('Graph codec pins Python and its helper and preserves the original child context',async()=>{
  const directory=await mkdtemp(join(tmpdir(),'chopper-graph-codec-'));
  const helper=fileURLToPath(new URL('./graph-codec-fixtures.py',import.meta.url));
  try{
-  const python=join(directory,'python.exe'),dll=join(directory,'zstd.dll');
-  await writeFile(python,'declared Python');await writeFile(dll,'declared DLL');
-  const inputs=await Promise.all([python,dll,helper].map(async path=>({path,sha256:createHash('sha256').update(await readFile(path)).digest('hex')})));
-  const p={...packet(),argv:[fileURLToPath(new URL('./test-browser-graph.mjs',import.meta.url))],python,zstd_dll:dll,inputs};
+  const python=join(directory,'python.exe');
+  await writeFile(python,'declared Python');
+  const inputs=await Promise.all([python,helper].map(async path=>({path,sha256:createHash('sha256').update(await readFile(path)).digest('hex')})));
+  const p={...packet(),argv:[fileURLToPath(new URL('./test-browser-graph.mjs',import.meta.url))],python,inputs};
   validatePacket(p,'chrome',p.argv);
   const payload=Buffer.from('id\n1\n'),stdout=Buffer.from('codec output'),calls=[];
   const spawn=(...args)=>{calls.push(args);return {status:0,stdout};};
-  for(const mode of ['zstd-input','zstd-output','zip-input','zip-output']){
+  for(const mode of ['zip-input','zip-output']){
    assert.equal(codecFixture(mode,payload,p,spawn),stdout);
-   assert.deepEqual(calls.at(-1),[python,[helper,mode,...(mode.startsWith('zstd-')?[dll]:[])],{input:payload,maxBuffer:64*1024*1024}]);
+   assert.deepEqual(calls.at(-1),[python,[helper,mode],{input:payload,maxBuffer:64*1024*1024}]);
   }
-  codecFixture('zstd-input',payload,null,spawn);
-  assert.deepEqual(calls.at(-1),['python3',[helper,'zstd-input'],{input:payload,maxBuffer:64*1024*1024}]);
+  codecFixture('zip-input',payload,null,spawn);
+  assert.deepEqual(calls.at(-1),['python3',[helper,'zip-input'],{input:payload,maxBuffer:64*1024*1024}]);
   // No ambient alias or extra packet options can become child options.
   codecFixture('zip-input',payload,{...p,env:{PATH:'alias'},cwd:'/other',python_flags:['-I'],creationflags:8},spawn);
   assert.deepEqual(calls.at(-1),[python,[helper,'zip-input'],{input:payload,maxBuffer:64*1024*1024}]);
   const denied=changed=>{
    const before=calls.length;assert.throws(()=>codecFixture('zip-input',payload,changed,spawn));assert.equal(calls.length,before);
   };
-  for(const key of ['python','zstd_dll']){
+  for(const key of ['python']){
    const missing={...p};delete missing[key];denied(missing);
    denied({...p,[key]:'python3'});denied({...p,[key]:join(directory,'missing.exe')});
    denied({...p,inputs:inputs.filter(input=>input.path!==p[key])});
@@ -178,17 +178,15 @@ test('Graph codec pins Python/DLL/helper and preserves the original child contex
   denied({...p,inputs:inputs.map(input=>input.path===helper?{...input,sha256:'0'.repeat(64)}:input)});
   const absent=join(directory,'absent-python.exe');
   denied({...p,python:absent,inputs:[...inputs,{path:absent,sha256:inputs[0].sha256}]});
-  denied({...p,zstd_dll:absent,inputs:[...inputs,{path:absent,sha256:inputs[1].sha256}]});
   denied({...p,inputs:[...inputs,inputs[0]]});
-  for(const key of ['python','zstd_dll']){
+  for(const key of ['python']){
    const alias=join(directory,key+'-alias');await symlink(directory,alias,'junction');
    const aliasedPath=join(alias,basename(p[key]));
    const aliased={...p,[key]:aliasedPath,inputs:[...inputs,{path:aliasedPath,sha256:inputs.find(input=>input.path===p[key]).sha256}]};denied(aliased);
   }
   await writeFile(python,'');denied({...p,inputs:inputs.map(input=>input.path===python?{...input,sha256:createHash('sha256').update('').digest('hex')}:input)});
-  await writeFile(python,'declared Python');
-  await writeFile(dll,'changed DLL');denied(p);
-  for(const key of ['python','zstd_dll']){const missing={...p};delete missing[key];assert.throws(()=>validatePacket(missing,'chrome',p.argv));}
+  await writeFile(python,'changed Python');denied(p);
+  for(const key of ['python']){const missing={...p};delete missing[key];assert.throws(()=>validatePacket(missing,'chrome',p.argv));}
   const error=new Error('spawn failed');
   assert.throws(()=>codecFixture('zip-input',payload,null,()=>({error})),value=>value===error);
   assert.throws(()=>codecFixture('zip-input',payload,null,()=>({status:1,stderr:Buffer.from('codec failed')})),/codec failed/);

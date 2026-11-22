@@ -48,9 +48,6 @@ Graphify Cloud as part of ordinary graph refreshes.
 - `vendor/zip-2.4.2`: pinned ZIP reader patch for metadata and member-container admission;
   see its `CHOPPER.md`. It is excluded from the workspace. Include vendor sources
   in fresh build provenance and re-audit the ownership bounds when updating it.
-- `vendor/zstd-sys-2.1.1`: pinned C streaming allocator bridge, including legacy
-  decoder children; see its `CHOPPER.md`. Preserve the vendored backend and
-  include the complete directory in build provenance when changing codecs.
 
 Preserve pipeline semantics, exact allocation/group membership and strict serialized
 CSV byte caps. Randomized output has no cross-plan seeded replay guarantee;
@@ -83,8 +80,7 @@ Preserve [Column scalar decoding and strict invalid-input validation](docs/resou
 Temporary construction/reopening follows the [ownership contract](docs/resource-policy-research.md#controlled-temporary-construction-and-reopen-2026-10-22).
 Preserve atomic creation, independent reader offsets and platform file-identity
 checks when changing those helpers.
-Codec admission depends on pinned flate2/miniz and Zstandard implementations;
-re-audit the [codec ownership contracts](docs/resource-policy-research.md#zstandard-input-streaming-allocation-ownership-2026-10-23)
+Re-audit [DEFLATE codec ownership](docs/resource-policy-research.md#zip-member-and-output-deflate-codec-admission-2026-10-22)
 when changing codec versions, backend features or stream settings.
 Experimental features and flexible replay policies remain opt-in unless the task
 authorizes promotion and the evidence supports it.
@@ -142,7 +138,7 @@ Node or embed UI assets. Hosted build provenance includes the WASI engine and
 all hosted assets; see the [runner input contract](docs/validation-runner.md).
 
 For hosted engine/worker changes, follow `docs/browser.md` for Rust target,
-WASI SDK and Chromium prerequisites. The current validation sequence is:
+WASI target and Chromium prerequisites. The current validation sequence is:
 
 ```sh
 node scripts/build-browser.mjs

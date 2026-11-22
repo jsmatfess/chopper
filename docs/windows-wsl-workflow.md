@@ -63,10 +63,9 @@ npm --prefix ui ci
 
 Install Linux Rust using [rustup](https://rust-lang.org/tools/install/) if absent;
 Node must be 22.5+ for Context Mode, with Python 3.10+ and a C compiler for
-Graphify and the native Zstandard build. This machine's user-level Rust and Node
+Graphify and native build dependencies. This machine's user-level Rust and Node
 installations survive a new checkout; repository-local `.tools` do not.
-The [browser guide](browser.md#local-development) owns WASI SDK 33 and browser
-prerequisites; a WASM target alone does not install that C toolchain or Chromium.
+The [browser guide](browser.md#local-development) owns the Rust WASI target and Chromium prerequisites.
 
 Recreate the local [Graphify environment and graph](graphify.md#install-on-linux--wsl)
 in the new checkout, then re-register its MCP server with the new absolute paths.

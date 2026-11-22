@@ -60,7 +60,7 @@ export class ExecutionHistory {
     this.configured.push({id:job.operations.length+1,label:`${job.operations.length+1}. CSV output (${settings.join(', ')})`});
     this.flow=this.configured.map(item=>item.label).join(' → ')+(job.operations.length>16?' · Additional configured operations omitted':'');
     this.prepared=job.operations.length>0;
-    this.supported=job.operations.length<=16&&job.operations.every(op=>['partition','shuffle','assign','assign_probabilistic','balanced','interleaved'].includes(op.type))&&['none','gzip','zstd','zip'].includes(job.compression);
+    this.supported=job.operations.length<=16&&job.operations.every(op=>['partition','shuffle','assign','assign_probabilistic','balanced','interleaved'].includes(op.type))&&['none','gzip','zip'].includes(job.compression);
     this.unavailable=!this.supported;
   }
   accept(run:number,observation:Observation){
@@ -99,8 +99,8 @@ export class ExecutionHistory {
       let step=this.steps.find(s=>s.id===id);
       if(!step){step={id,title:titles[id],status:'unknown',...(id===1?{operation:1}:{})};this.steps.push(step);}
       if(step.status!=='completed')Object.assign(step,incoming,{status:!this.active&&incoming.status==='active'?(step.status==='active'?'unknown':step.status):incoming.status});
-      if(id===0){const codec=this.steps.find(s=>s.kind&&['gzip_input','zstandard_input','zip_input'].includes(s.kind));if(codec)step.source=codec.id;}
-      if(id===2&&!this.prepared){const codec=this.steps.find(s=>s.kind&&['gzip_output','zstandard_output','zip_archive'].includes(s.kind));if(codec)step.source=codec.id;}
+      if(id===0){const codec=this.steps.find(s=>s.kind&&['gzip_input','zip_input'].includes(s.kind));if(codec)step.source=codec.id;}
+      if(id===2&&!this.prepared){const codec=this.steps.find(s=>s.kind&&['gzip_output','zip_archive'].includes(s.kind));if(codec)step.source=codec.id;}
       if(id===2&&this.prepared){const materialized=this.steps.find(s=>s.kind==='materialize');step.source=materialized?.id;step.source_omitted=!materialized;}
     });
     this.processingComplete ||= observation.processingComplete===true&&!this.unavailable;
@@ -215,9 +215,9 @@ export function describeStep(history:ExecutionHistory,step:ObservedStep){
       const terminalOutcome=unfinished?undefined:step.status==='handed_off'?step.outcomes?.handed_off:step.status==='failed'?step.outcomes?.failed:step.status==='interrupted'?step.outcomes?.interrupted:undefined;
       const showingActive=unfinished||step.kind&&step.status==='active'&&(step.active_seconds??0)>0;
       const observed=showingActive?{bytes:step.active_bytes??0,rows:step.active_rows??0,seconds:step.active_seconds??0,runs:step.active_runs??0}:terminalOutcome??{bytes:step.bytes??0,rows:step.rows??0,seconds:step.seconds??0,runs:step.runs??0};
-      const inputCodec=!!step.kind&&['gzip_input','zstandard_input','zip_input'].includes(step.kind);
+      const inputCodec=!!step.kind&&['gzip_input','zip_input'].includes(step.kind);
       const archive=step.kind==='zip_archive';
-      const outputCodec=!!step.kind&&['gzip_output','zstandard_output','zip_deflate'].includes(step.kind);
+      const outputCodec=!!step.kind&&['gzip_output','zip_deflate'].includes(step.kind);
       const rowUnit=archive?'archive bytes':outputCodec?'encoded CSV bytes consumed':inputCodec?'decoded CSV bytes':step.kind&&['merge','hierarchical_merge','merge_traversal'].includes(step.kind)?'row visits':step.kind==='shared_ranges'?'frame lengths scanned':step.kind==='dataset_materialize'?'framed rows written':'rows';
       const count=inputCodec||outputCodec||archive?observed.bytes:observed.rows;
       const rate=observed.seconds>0&&Number.isFinite(count/observed.seconds)?` · average ${Math.round(count/observed.seconds).toLocaleString('en-US')} ${rowUnit}/s`:'';
@@ -299,8 +299,8 @@ function dagInput(history:ExecutionHistory){
  // Remove transform rounding noise before retaining whole CSS pixels.
  const height=card?Math.ceil(Math.round(card.getBoundingClientRect().height/scale*100)/100):undefined;
  return {id:step.id,height,sources:observedSources(history,step),stage:
-  step.id===0||['read','gzip_input','zstandard_input','zip_input'].includes(step.kind||'')?0:
-  step.id===1||['materialize','serialize','gzip_output','zstandard_output','zip_deflate','zip_archive'].includes(step.kind||'')?output:step.id===2?output+1:step.id===3?output+2:
+  step.id===0||['read','gzip_input','zip_input'].includes(step.kind||'')?0:
+  step.id===1||['materialize','serialize','gzip_output','zip_deflate','zip_archive'].includes(step.kind||'')?output:step.id===2?output+1:step.id===3?output+2:
   operationsFor(step).length?Math.min(...operationsFor(step)):undefined};});
 }
 const edges=new Map<string,SVGPathElement>();
@@ -308,8 +308,8 @@ const activityLabels=new Map<number,HTMLButtonElement>();
 const svgNamespace='http://www.w3.org/2000/svg';
 function category(step:ObservedStep){
  if(step.id===3)return 'confirm';if(step.id===2)return 'export';
- if(step.id===0||['read','gzip_input','zstandard_input','zip_input'].includes(step.kind||''))return 'input';
- if(step.id===1||['serialize','gzip_output','zstandard_output','zip_deflate','zip_archive'].includes(step.kind||''))return 'output';
+ if(step.id===0||['read','gzip_input','zip_input'].includes(step.kind||''))return 'input';
+ if(step.id===1||['serialize','gzip_output','zip_deflate','zip_archive'].includes(step.kind||''))return 'output';
  if(['materialize','dataset_materialize','spill','merge','hierarchical_merge'].includes(step.kind||''))return 'storage';
  return step.kind==='elided'?'annotation':'transform';
 }

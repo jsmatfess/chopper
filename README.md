@@ -15,7 +15,7 @@ notes for older package behavior.
 
 ## Build the CLI from source
 
-Use Git, a stable Rust toolchain and a C compiler for Zstandard. Windows also
+Use Git and a stable Rust toolchain. Windows also
 requires the Microsoft C++ Build Tools and Windows SDK. Keep vendor sources when
 cloning. Native CLI builds need no Node installation and do not embed UI assets.
 
@@ -70,8 +70,7 @@ destination. See the [Run CLI reference](docs/run-cli.md) and
 
 ## Build the hosted app
 
-Hosted builds require Node.js 22+, Rust with `wasm32-wasip1`, and WASI SDK 33
-for the Zstandard C codec. Follow [browser setup](docs/browser.md#local-development)
+Hosted builds require Node.js 22+ and Rust with `wasm32-wasip1`. Follow [browser setup](docs/browser.md#local-development)
 for Windows/Linux prerequisites and commands. Build the WASI engine first, then
 the hosted UI; `npm run build` in `ui/` aliases the hosted build. The local
 static development server is `npm run serve:hosted`. Hosted output is `ui/dist`.

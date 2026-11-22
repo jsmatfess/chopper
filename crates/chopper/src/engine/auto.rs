@@ -110,6 +110,8 @@ pub(crate) struct RunMeasurements {
     pub(crate) temporary_bytes_read: u64,
     pub(crate) peak_workspace_reserved_bytes: u64,
     pub(crate) peak_writer_slots: u64,
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub(crate) peak_deflate_workers: u64,
     #[serde(default)]
     pub(crate) peak_merge_fan_in: u64,
     #[serde(default)]
@@ -118,6 +120,10 @@ pub(crate) struct RunMeasurements {
     pub(crate) retained_exact_fallbacks: u64,
     #[serde(default)]
     pub(crate) used_short_tail: bool,
+}
+
+fn is_zero(value: &u64) -> bool {
+    *value == 0
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -130,8 +136,6 @@ pub struct AutoPlan {
     native_merge_fan_in: Option<usize>,
     #[serde(default)]
     pub(super) try_retained_exact: bool,
-    #[serde(default)]
-    pub(super) direct_from_analyze: bool,
     #[serde(default)]
     pub(super) direct_preflight_fallback: bool,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -204,7 +208,7 @@ pub(crate) fn suggested_partition_max_files(
         && exact_groups <= cap
         && job.resources.max_files > cap
         && super::direct::native_input_hint(job)
-            .is_some_and(|(bytes, zstd)| !zstd && bytes >= MIN_BOUNDED_PARTITION_BYTES))
+            .is_some_and(|bytes| bytes >= MIN_BOUNDED_PARTITION_BYTES))
     .then_some(exact_groups)
 }
 
@@ -213,7 +217,6 @@ pub(crate) fn suggested_partition_max_files(
 pub(super) fn native_direct_candidate(
     job: &Job,
     pool: &crate::resources::MemoryPool,
-    hint: Option<AutoObservations>,
 ) -> Option<super::direct::Plan> {
     use super::direct::Plan;
     const MIB: u64 = 1024 * 1024;
@@ -241,13 +244,7 @@ pub(super) fn native_direct_candidate(
     {
         return None;
     }
-    let (bytes, zstd) = super::direct::native_input_hint(job)?;
-    if zstd
-        && (!matches!(job.operations.as_slice(), [Operation::Balanced { .. }])
-            || std::fs::metadata(&job.input).ok()?.len() > 8 * MIB)
-    {
-        return None;
-    }
+    let bytes = super::direct::native_input_hint(job)?;
     let memory = pool.resolve_memory(&job.resources).ok()?;
     let available = pool
         .admission_limit()
@@ -323,20 +320,10 @@ pub(super) fn native_direct_candidate(
                 automatic: true,
             })
         }
-        [Operation::Balanced { .. }]
-            if bytes >= 2048 * MIB
-                || (zstd
-                    && hint.is_some_and(|observed| {
-                        observed.decoded_field_bytes >= 2048 * MIB
-                            && crate::profile::auto_binding(job) == Some(observed.binding)
-                    })) =>
-        {
-            Some(Plan::Counted {
-                partition: false,
-                automatic: true,
-                from_analyze: zstd && bytes < 2048 * MIB,
-            })
-        }
+        [Operation::Balanced { .. }] if bytes >= 2048 * MIB => Some(Plan::Counted {
+            partition: false,
+            automatic: true,
+        }),
         [Operation::Partition { .. }, Operation::Balanced { files }]
             if bytes >= 2048 * MIB
                 && narrow
@@ -346,7 +333,6 @@ pub(super) fn native_direct_candidate(
             Some(Plan::Counted {
                 partition: true,
                 automatic: true,
-                from_analyze: false,
             })
         }
         operations @ [_, _] if bytes >= 2048 * MIB && narrow => {
@@ -379,8 +365,7 @@ pub(super) fn native_retained_exact(job: &Job, pool: &crate::resources::MemoryPo
         && matches!(job.operations.as_slice(), [Operation::Assign { groups, strata }]
             if !strata.is_empty() && (2..=8).contains(&groups.len())
                 && groups.len() <= descriptor_writer_ceiling(2))
-        && super::direct::native_input_hint(job)
-            .is_some_and(|(bytes, zstd)| !zstd && bytes >= 2048 * MIB)
+        && super::direct::native_input_hint(job).is_some_and(|bytes| bytes >= 2048 * MIB)
         && pool
             .resolve_memory(&job.resources)
             .is_ok_and(|memory| memory >= NATIVE_DIRECT_MIN_MEMORY_MB)
@@ -411,10 +396,9 @@ pub(super) fn native_terminal_merge(
     {
         return None;
     }
-    let (bytes, zstd) = super::direct::native_input_hint(job)?;
+    let bytes = super::direct::native_input_hint(job)?;
     let memory = pool.resolve_memory(&job.resources).ok()?;
-    if zstd
-        || bytes < 8 * 1024 * MIB
+    if bytes < 8 * 1024 * MIB
         || workers(&job.resources, memory, usize::MAX) != 1
         || pool
             .admission_limit()
@@ -807,7 +791,6 @@ impl AutoPlan {
             analysis_status: status,
             native_merge_fan_in: None,
             try_retained_exact: false,
-            direct_from_analyze: false,
             direct_preflight_fallback: false,
             suggested_max_files: partition
                 .filter(|facts| facts.keys_exact)
@@ -986,13 +969,13 @@ mod tests {
             ..Job::default()
         };
         assert!(matches!(
-            native_direct_candidate(&job, &pool, None),
+            native_direct_candidate(&job, &pool),
             Some(Plan::Fanout {
                 chain: false,
                 automatic: true
             })
         ));
-        assert!(native_direct_candidate(&job, &pressured, None).is_none());
+        assert!(native_direct_candidate(&job, &pressured).is_none());
         let pressured = std::sync::Arc::new(pressured);
         let ctx = super::super::Context::with_memory_pool(
             &job.resources,
@@ -1006,14 +989,14 @@ mod tests {
         }
         .ready(&ctx));
         job.resources.max_files = 100_000;
-        assert!(native_direct_candidate(&job, &pool, None).is_none());
+        assert!(native_direct_candidate(&job, &pool).is_none());
         job.resources.max_files = 16;
         job.resources.max_record_bytes *= 2;
-        assert!(native_direct_candidate(&job, &pool, None).is_none());
+        assert!(native_direct_candidate(&job, &pool).is_none());
 
         job.operations = vec![Operation::Balanced { files: 8 }];
         assert!(matches!(
-            native_direct_candidate(&job, &pool, None),
+            native_direct_candidate(&job, &pool),
             Some(Plan::Counted {
                 partition: false,
                 automatic: true,
@@ -1024,7 +1007,7 @@ mod tests {
         job.resources.max_files = 8192;
         job.resources.max_record_bytes = 4 * 1024;
         assert!(
-            native_direct_candidate(&job, &pool, None).is_none(),
+            native_direct_candidate(&job, &pool).is_none(),
             "explicit memory is binding"
         );
 
@@ -1033,11 +1016,11 @@ mod tests {
             let automatic = crate::resources::MemoryPool::new(1024 * MIB);
             job.resources.memory_mb = chopper_core::Resources::automatic().memory_mb;
             assert!(matches!(
-                native_direct_candidate(&job, &automatic, None),
+                native_direct_candidate(&job, &automatic),
                 Some(Plan::BatchedFanout)
             ));
             job.limits.rows = Some(1024);
-            assert!(native_direct_candidate(&job, &automatic, None).is_none());
+            assert!(native_direct_candidate(&job, &automatic).is_none());
         }
         Ok(())
     }

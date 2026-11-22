@@ -147,7 +147,7 @@ test('incomplete forms explain the next choice rather than fabricating an output
   }
 });
 
-test('9,372 combinations preserve ordering, fixed counts, compression, and row order',()=>{
+test('7,029 combinations preserve ordering, fixed counts, compression, and row order',()=>{
   let count = 0;
   for (const scenario of simulations()) {
     const {operations,limits,compression} = scenario;
@@ -163,10 +163,9 @@ test('9,372 combinations preserve ordering, fixed counts, compression, and row o
     assert.equal(result.includes('chosen file count'),!!limits.compressed && compression !== 'none' && lastGroup?.type === 'balanced',context);
     assert.equal(result.includes('one ZIP archive'),compression === 'zip',context);
     assert.equal(result.includes('with gzip'),compression === 'gzip',context);
-    assert.equal(result.includes('with Zstandard'),compression === 'zstd',context);
     count++;
   }
-  assert.equal(count,9372);
+  assert.equal(count,7029);
 });
 
 

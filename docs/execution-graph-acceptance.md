@@ -24,7 +24,7 @@ fixture families in `node scripts/test-browser-graph.mjs`.
 | Grouping handoff and actual ordered-file provenance/reuse | `grouping fallback reuse` |
 | Exact/probabilistic allocation, exact strata and intermediate artifacts | allocation families, including parent/strata/downstream-shuffle cases |
 | Balanced shared ranges, terminal and fused traversal, interleaved membership | split families, including nested/parent cases and cap/insufficient-row failures |
-| Gzip/Zstandard/selected ZIP input and gzip/Zstandard/ZIP output | codec families, including UTF-16 input/output and corrupt/ambiguous archive failures |
+| Gzip and selected ZIP input and gzip and ZIP output | codec families, including UTF-16 input/output and corrupt/ambiguous archive failures |
 | Saved-and-closed destination files versus marker readback confirmation | graph parity plus lifecycle/termination cases |
 
 The 42 graph families establish these concrete paths. Experimental algorithms

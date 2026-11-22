@@ -28,7 +28,7 @@ class ScopeTests(unittest.TestCase):
         self.assertEqual(self.selected('crates/chopper-core/src/config.rs'), {'native', 'features', 'core', 'browser'})
 
     def test_native_engine_and_vendored_code_also_reach_browser(self):
-        for path in ('crates/chopper/src/storage.rs', 'vendor/zstd-sys-2.1.1/src/lib.rs'):
+        for path in ('crates/chopper/src/storage.rs', 'vendor/zip-2.4.2/src/lib.rs'):
             self.assertEqual(self.selected(path), {'native', 'features', 'browser'})
 
     def test_ui_checks_embedded_and_hosted_builds(self):

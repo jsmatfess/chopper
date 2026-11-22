@@ -41,18 +41,6 @@ if (existsSync(join(localCargo, 'bin', windows ? 'cargo.exe' : 'cargo'))) {
   env.PATH = [...bins, env.PATH ?? ''].join(delimiter);
   if (!windows) env.CARGO_TARGET_DIR ??= join(root, '.tools/linux/target');
 }
-const arch = {x64: 'x86_64', arm64: 'arm64'}[process.arch];
-const platform = {win32: 'windows', darwin: 'macos', linux: 'linux'}[process.platform];
-const sdk = resolve(root, env.WASI_SDK_PATH || join('.tools', windows ? 'windows' : 'linux', `wasi-sdk-33.0-${arch}-${platform}`));
-const clang = join(sdk, 'bin', windows ? 'clang.exe' : 'clang');
-const ar = join(sdk, 'bin', windows ? 'llvm-ar.exe' : 'llvm-ar');
-if (!existsSync(clang) || !existsSync(ar)) {
-  console.error('WASI SDK not found. Set WASI_SDK_PATH to an extracted WASI SDK 33 directory (see docs/browser.md).');
-  process.exit(1);
-}
-env.CC_wasm32_wasip1 = clang;
-env.AR_wasm32_wasip1 = ar;
-env.CFLAGS_wasm32_wasip1 = `--sysroot="${join(sdk, 'share/wasi-sysroot')}"`;
 const flags = ['-C', 'link-arg=-zstack-size=1048576', '-C', 'link-arg=--max-memory=2147483648'];
 if (env.CARGO_ENCODED_RUSTFLAGS !== undefined) {
   env.CARGO_ENCODED_RUSTFLAGS = [...env.CARGO_ENCODED_RUSTFLAGS.split('\x1f').filter(Boolean), ...flags].join('\x1f');

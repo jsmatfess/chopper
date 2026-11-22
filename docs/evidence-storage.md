@@ -541,10 +541,9 @@ only with its own hash and an explicit relationship to the original; never
 silently alter historical raw evidence or claim its original checksum still fits.
 Credentials belong in a secret manager/CI secret store, not Git or public R2.
 
-Keep `vendor/zip-2.4.2` and `vendor/zstd-sys-2.1.1`, their licenses/patch notes,
+Keep `vendor/zip-2.4.2`, its license and patch notes,
 Cargo/npm lockfiles, source/harnesses, small synthetic examples such as
-`examples/customers.csv`, and hosted UI source in Git. The vendor patches are
-native and WASI build inputs. Native CLI builds contain no UI bundle; hosted
+`examples/customers.csv`, and hosted UI source in Git. The ZIP patch is a native and WASI build input. Historical Zstandard build inputs remain in the source revisions that used them. Native CLI builds contain no UI bundle; hosted
 `ui/dist` remains generated deployment output under the hosted build contract. The root
 [LICENSE](../LICENSE) now records the MIT project license with the owner's
 confirmed copyright wording; vendor licenses retain their separate attribution.

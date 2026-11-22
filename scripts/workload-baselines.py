@@ -302,15 +302,7 @@ def make_plans(directory, executable, node, parameters, byte_cap=4096, build_sta
             except (OSError, subprocess.CalledProcessError):
                 return 'unavailable; execution prerequisite'
         toolchains = {'cargo': version([cargo, '--version']), 'rustc': version(['rustc', '-vV']),
-                      'node': version([node, '--version']),
-                      'wasi_sdk': '33 required; selected compiler/archive identity must accompany build evidence'}
-        machine = {'AMD64': 'x86_64', 'x86_64': 'x86_64', 'ARM64': 'arm64', 'aarch64': 'arm64'}.get(platform.machine())
-        system = 'windows' if os.name == 'nt' else 'macos' if sys.platform == 'darwin' else 'linux'
-        sdk = Path(os.environ.get('WASI_SDK_PATH') or ROOT / '.tools' / (
-            'windows' if os.name == 'nt' else 'linux') / f'wasi-sdk-33.0-{machine}-{system}')
-        sdk_tools = [sdk / 'bin' / (name + ('.exe' if os.name == 'nt' else ''))
-                     for name in ('clang', 'llvm-ar')]
-        toolchains['wasi_sdk_tools'] = {str(path): sha256(path) if path.is_file() else None for path in sdk_tools}
+                      'node': version([node, '--version']), 'wasm_target': 'wasm32-wasip1'}
         source = ['Cargo.toml', 'Cargo.lock', 'crates', 'vendor']
         for runtime in ('native', 'browser'):
             steps = [{'id': 'engine-build', 'argv': ([cargo, 'build', '--release', '--locked', '-p', 'chopper']

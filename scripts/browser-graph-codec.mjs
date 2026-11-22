@@ -7,7 +7,7 @@ import {isAbsolute,resolve,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const helper=fileURLToPath(new URL('graph-codec-fixtures.py',import.meta.url));
 export function validateGraphCodecPacket(packet){
- for(const path of [packet.python,packet.zstd_dll,helper]){
+ for(const path of [packet.python,helper]){
   assert(typeof path==='string'&&isAbsolute(path),'Absolute Graph Python/DLL/helper path required');
   assert.equal(resolve(path),path,'Canonical Graph tool path required');
   const inputs=packet.inputs.filter(input=>input.path===path);
@@ -17,7 +17,7 @@ export function validateGraphCodecPacket(packet){
 }
 export function verifyGraphCodecInputs(packet){
  validateGraphCodecPacket(packet);
- for(const path of [packet.python,packet.zstd_dll,helper]){
+ for(const path of [packet.python,helper]){
   assert.equal(realpathSync(path),path,'Canonical Graph tool path required');
   for(let part=path;;part=dirname(part)){
    assert(!lstatSync(part).isSymbolicLink(),'Graph input alias rejected');
@@ -30,7 +30,6 @@ export function verifyGraphCodecInputs(packet){
 export function codecFixture(mode,payload,packet=null,spawn=spawnSync){
  if(packet)verifyGraphCodecInputs(packet);
  const args=[helper,mode];
- if(packet&&mode.startsWith('zstd-'))args.push(packet.zstd_dll);
  // Preserve the owning caller's inherited cwd/env/console and Python flags.
  const result=spawn(packet?packet.python:'python3',args,{input:payload,maxBuffer:64*1024*1024});
  if(result.error)throw result.error;

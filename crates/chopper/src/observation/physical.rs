@@ -37,11 +37,11 @@ pub enum Kind {
     BalancedTraversal,
     FusedBalanced,
     GzipInput,
-    ZstandardInput,
-    ZipInput,
+    ZipInput = 25,
+
     GzipOutput,
-    ZstandardOutput,
-    ZipDeflate,
+    ZipDeflate = 28,
+
     ZipArchive,
     StageComplete,
     Omitted,
@@ -75,10 +75,8 @@ impl Kind {
             | Self::BalancedTraversal
             | Self::FusedBalanced => ProgressUnit::Rows,
             Self::GzipInput
-            | Self::ZstandardInput
             | Self::ZipInput
             | Self::GzipOutput
-            | Self::ZstandardOutput
             | Self::ZipDeflate
             | Self::ZipArchive => ProgressUnit::Bytes,
             Self::ResidentSort | Self::FisherYates | Self::Spill | Self::Fallback | Self::Reuse => {

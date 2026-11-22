@@ -61,7 +61,7 @@ def inventory(root=ROOT):
                                      '.cargo', 'rust-toolchain', 'rust-toolchain.toml'], cwd=root).decode().split('\0')
     paths = {root / n for n in names if n and '__pycache__' not in Path(n).parts
              and (root / n).is_file()}
-    for directory in ('vendor/zip-2.4.2', 'vendor/zstd-sys-2.1.1'):
+    for directory in ('vendor/zip-2.4.2',):
         paths.update(p for p in (root / directory).rglob('*') if p.is_file())
     return {p.relative_to(root).as_posix(): sha(p) for p in sorted(paths)}
 

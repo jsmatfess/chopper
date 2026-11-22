@@ -519,7 +519,7 @@ def batch_projection(selected, profile):
     root = PureWindowsPath(selected['root'])
     roles['assets'] = {PureWindowsPath(name).relative_to(root).as_posix():pins[name]
                        for name in selected['product_assets']}
-    tools = {key:dict(path=selected[key],sha256=pins[selected[key]]) for key in ('python','node','browser','zstd_dll')}
+    tools = {key:dict(path=selected[key],sha256=pins[selected[key]]) for key in ('python','node','browser','zstd_dll') if key in selected}
     return dict(source=roles,tools=tools,preparation=selected['preparation'],
         package={PureWindowsPath(name).name:pins[name] for name in [selected['package_receipt'],*selected['package_zips']]},
         channel=selected['channel'],browser_version=selected['browser_version'],commands=selected['commands'],limits=selected['limits'])
@@ -1684,7 +1684,7 @@ def prepare_packet(selection_path, destination, checker):
     config = dict(**execution, schema='chopper-small-runner-config-v1', root=paths['root'], owned_root=paths['owned_root'],
         source_commit=small.PRODUCT, source_tree=small.PRODUCT_TREE, harness_commit=harness,
         channel=observed_host['channel'], overall_deadline_ms=int(timing['deadline']*1000), browser=tools['browser']['path'], browser_version=observed_host['browser_version'],
-        node=tools['node']['path'], python=tools['python']['path'], zstd_dll=observed_host['zstd_dll'],
+        node=tools['node']['path'], python=tools['python']['path'],
         package_receipt=str(receipt), package_zips=[str(packages/name) for name in sorted(release['packages'])],
         product_assets=[str(root/'ui/dist'/name) for name in sorted(release['hosted'])],
         product_source=[dict(path=str(root/PureWindowsPath(name)),git_path=name) for name in projection['product_source']],
@@ -1694,7 +1694,6 @@ def prepare_packet(selection_path, destination, checker):
         commands=commands, inputs=[dict(path=p,sha256=v) for p,v in sorted(pins.items())],
         input_directories=[str(root/PureWindowsPath(p)) for p in ('scripts','ui/src','ui/dist','ui/node_modules','.git')]
                           +list(observed_host['input_directories'])+retained_roots)
-    require(config['zstd_dll'] in pins, 'Graph native dependency absent from host closure')
     # Future owned roots and outputs all come from paths above; never copied from history.
     prefix = [tools['python']['path'],'-E','-s','-B']
     entry = str(root/'scripts/browser-small-runner.py')
@@ -2201,7 +2200,8 @@ def observe_packet_host(selection_path, destination, expected_sha256, checker, *
             require(set(map(Path,selected['browser_inventory_roots']))=={browser_root},'selected browser version directory mismatch')
         roots.add(browser_root)
         files.update(Path(p) for p in selected['tools'].values())
-        files.add(Path(selected['zstd_dll']))
+        if 'zstd_dll' in selected:
+            files.add(Path(selected['zstd_dll']))
         phase='runtime-inventory';probe_path=None
         before=host_runtime_inventory(selected,roots,destination,small)
         roots.update(map(Path,before))
@@ -2237,7 +2237,7 @@ def observe_packet_host(selection_path, destination, expected_sha256, checker, *
             git_exec_path=str(git_exec),observed_start_ms=int((time.time()-(time.monotonic()-budget.started))*1000),
             tools={role:dict(path=path,sha256=pinmap[path],signature=signatures[role],
                             version=versions.get(role,signatures[role]['version'])) for role,path in selected['tools'].items()},
-            browser_version=signatures['browser']['version'],zstd_dll=selected['zstd_dll'],
+            browser_version=signatures['browser']['version'],
             input_sizes={path:size for path,size in sizes.items() if path not in cold_names},
             inputs=[row for row in pins if row['path'] not in cold_names],
             input_directories={name:members for name,members in before.items() if Path(name) not in cold_roots},
@@ -2247,6 +2247,8 @@ def observe_packet_host(selection_path, destination, expected_sha256, checker, *
                 input_directories={name:members for name,members in before.items() if Path(name) in cold_roots}),
             read_forecast_bytes=forecast,read_metric='Python-open bytes plus bootstrap reserve; fixed child probes separately time/capture bounded',usage=budget.usage(),
             workload_started=False,acceptance_window_started=False,scale_slot_consumed=False,original_acquired=False,controller_started=False)
+        if 'zstd_dll' in selected:
+            result['zstd_dll'] = selected['zstd_dll']
         require(runtime_requirements() == runtime, 'runtime image/root drift')
         for pin in pins:
             _observed_file(pin['path'],budget,pin['sha256'])
@@ -2288,7 +2290,8 @@ def prepare_host_observation(selection_path, destination, checker):
     require(not destination.exists(), 'fresh host-plan destination required')
     selected['tools'] = {role:native_path(path) for role,path in selected['tools'].items()}
     selected['browser_inventory_roots'] = [native_path(path) for path in selected.get('browser_inventory_roots',[])]
-    selected['zstd_dll'] = native_path(selected['zstd_dll'])
+    if 'zstd_dll' in selected:
+        selected['zstd_dll'] = native_path(selected['zstd_dll'])
     if 'extra_runtime_roots' in selected:
         selected['extra_runtime_roots']=[native_path(path) for path in selected['extra_runtime_roots']]
     selected['preparation_code'] = [dict(path=native_path(p),sha256=hashlib.sha256(p.read_bytes()).hexdigest())

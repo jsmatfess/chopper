@@ -277,9 +277,6 @@ def validate_config(config, *, producer_root=None):
     entries = config['inputs']
     need(entries and len({e['path'] for e in entries}) == len(entries), 'Unique explicit input manifest required')
     declared = {e['path']: e['sha256'] for e in entries}
-    graph_selected = any(command['script'] == 'test-browser-graph.mjs' for command in config['commands'])
-    if graph_selected:
-        need(bool(config.get('zstd_dll')), 'Explicit Graph zstd_dll required')
     required = config['product_assets'] + config['package_zips'] + [config['node'], config['python'], config['browser'], config['package_receipt']]
     required += [str(root / name) for name in ('ui/package.json', 'ui/package-lock.json')]
     required += [e['path'] for key in ('product_source', 'harness_source') for e in config[key]]
@@ -289,8 +286,6 @@ def validate_config(config, *, producer_root=None):
     if 'retained_origin_manifest' in config:
         retained_origin(config)
         required.append(config['retained_origin_manifest'])
-    if graph_selected:
-        required.append(config['zstd_dll'])
     directories = config['input_directories']
     need(all(str(root / name) in directories for name in ('ui/dist', 'ui/src', 'ui/node_modules', 'scripts')), 'Complete served/source/scripts/dependency inventory required')
     inventories = {directory: inventory(directory) for directory in directories}
@@ -308,7 +303,7 @@ def validate_config(config, *, producer_root=None):
         'browser-small-contract.mjs', 'browser-small-observer.mjs', 'browser-launch.mjs',
         'browser-acceptance.mjs', 'browser-artifacts.mjs', 'browser-graph-codec.mjs', 'serve-hosted.mjs')]
     required_harness += ['scripts/' + command['script'] for command in config['commands']]
-    if graph_selected:
+    if any(command['script'] == 'test-browser-graph.mjs' for command in config['commands']):
         required_harness.append('scripts/graph-codec-fixtures.py')
     if any('--resource-contracts' in command['flags'] for command in config['commands']):
         required_harness += ['scripts/build-browser-tests.mjs',
@@ -383,7 +378,7 @@ def prepare(config):
             receipt=str(base.with_suffix('.jsonl')), reservation=reservation, batch_started_ms=started,
             volumes=volumes, limits=LIMITS, inputs=[dict(path=e['path'], sha256=e['sha256']) for e in frozen])
         if name == 'test-browser-graph.mjs':
-            packet.update(python=config['python'], zstd_dll=config['zstd_dll'])
+            packet['python'] = config['python']
         packets.append(dict(path=str(base.with_suffix('.packet.json')), value=packet))
         steps.append(dict(id=f'contract-{index+1}', argv=[config['node'], str(HERE / 'browser-small-bootstrap.mjs'), packets[-1]['path']],
             timeout_seconds=command['timeout_seconds'], inputs=[os.path.relpath(e['path'], root) for e in frozen if Path(e['path']).anchor == root.anchor] +

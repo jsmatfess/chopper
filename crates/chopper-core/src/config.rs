@@ -103,7 +103,6 @@ impl Default for CsvSettings {
 pub enum Compression {
     None,
     Gzip,
-    Zstd,
     Zip,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]

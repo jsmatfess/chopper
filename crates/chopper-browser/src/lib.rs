@@ -8,6 +8,58 @@ mod reactor {
     };
     thread_local! { static PROFILE: RefCell<chopper::profile::ProfileCache> = RefCell::new(chopper::profile::ProfileCache::default()); }
 
+    use chopper::output::{BlockEncoder, BLOCK_BYTES, COMPRESSED_BLOCK_BYTES};
+
+    struct CodecScratch {
+        input: Vec<u8>,
+        output: Vec<u8>,
+        encoder: BlockEncoder,
+    }
+
+    thread_local! {
+        static CODEC: RefCell<CodecScratch> = RefCell::new(CodecScratch {
+            input: vec![0; BLOCK_BYTES],
+            output: vec![0; COMPRESSED_BLOCK_BYTES],
+            encoder: BlockEncoder::default(),
+        });
+    }
+
+    #[no_mangle]
+    pub extern "C" fn chopper_compression_input_capacity() -> usize {
+        BLOCK_BYTES
+    }
+
+    #[no_mangle]
+    pub extern "C" fn chopper_compression_output_capacity() -> usize {
+        COMPRESSED_BLOCK_BYTES
+    }
+
+    #[no_mangle]
+    pub extern "C" fn chopper_compression_input() -> *mut u8 {
+        CODEC.with(|codec| codec.borrow_mut().input.as_mut_ptr())
+    }
+
+    #[no_mangle]
+    pub extern "C" fn chopper_compression_output() -> *const u8 {
+        CODEC.with(|codec| codec.borrow().output.as_ptr())
+    }
+
+    #[no_mangle]
+    pub extern "C" fn chopper_compression_encode(bytes: usize) -> usize {
+        CODEC.with(|codec| {
+            let mut codec = codec.borrow_mut();
+            let CodecScratch {
+                input,
+                output,
+                encoder,
+            } = &mut *codec;
+            input
+                .get(..bytes)
+                .and_then(|input| encoder.encode(input, output).ok())
+                .unwrap_or(0)
+        })
+    }
+
     #[no_mangle]
     pub extern "C" fn chopper_clear_profile() -> i32 {
         PROFILE.with(|p| p.borrow_mut().clear());

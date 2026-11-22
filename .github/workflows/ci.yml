@@ -153,11 +153,6 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: ui/package-lock.json
-      - name: Install WASI SDK
-        run: |
-          curl -fL https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-33/wasi-sdk-33.0-x86_64-linux.tar.gz -o /tmp/wasi-sdk.tar.gz
-          tar -xzf /tmp/wasi-sdk.tar.gz -C /tmp
-          echo 'WASI_SDK_PATH=/tmp/wasi-sdk-33.0-x86_64-linux' >> "$GITHUB_ENV"
       - run: node scripts/build-browser.mjs
       - run: npm ci
         working-directory: ui

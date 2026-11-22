@@ -308,13 +308,13 @@ Aim for 10 MB per compressed file; this is an approximate target and may be exce
 
 ## Balanced files with compressed target
 
-Pipeline: balanced. Limits: rows=none, bytes=none, compressed=10MB. Compression: zstd.
+Pipeline: balanced. Limits: rows=none, bytes=none, compressed=10MB. Compression: gzip.
 
 Split the input as evenly as possible into 3 CSVs.
 
 Rows keep their original order within each output. Each split produces nonempty parts whose row counts differ by at most one.
 
-Aim for 10 MB per compressed file; this is an approximate target and may be exceeded. Keep the chosen file count even if the compressed files are larger than the target. Compress each CSV separately with Zstandard.
+Aim for 10 MB per compressed file; this is an approximate target and may be exceeded. Keep the chosen file count even if the compressed files are larger than the target. Compress each CSV separately with gzip.
 
 ## Compressed target without compression
 

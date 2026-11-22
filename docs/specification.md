@@ -5,7 +5,7 @@ Status: behavior contract and original design baseline, with explicit later exte
 ## Scope
 
 - Native CLI for technical users on supported 64-bit Windows and Linux; a separate hosted browser UI uses the same engine and job configuration. macOS source builds are unqualified. No local server or native UI is part of current product scope.
-- Local files, including ZIP, gzip, and Zstandard inputs and outputs.
+- Local files, including gzip and ZIP inputs and outputs.
 - All six operations in v1: balanced file counts, maximum rows, maximum bytes, unique-value partitions, shuffling, and percentage-based treatment/control allocation.
 - Typical inputs: tens of thousands to millions of rows. Scale target: one billion rows, potentially several KB per row, with bounded working memory and sufficient external storage.
 - Analysis and confirmation, progress, cancellation and cleanup, safe publication, and output manifests.
@@ -156,10 +156,13 @@ Duplicate header names are allowed but name selection must reject ambiguity and 
 ## Compression and archives
 
 - Input: one local source per job; ZIP selects one CSV member, auto-selecting only when there is one eligible member. Multiple eligible members require selection. No automatic concatenation of archive entries.
-- Output gzip/Zstandard: one compressed stream/file per physical CSV chunk.
+- Output gzip uses one compressed file per physical CSV chunk.
 - Output ZIP: one archive containing all output CSV chunks plus the manifest. Physical CSV counts refer to members, not the outer archive count.
 - ZIP row and strict uncompressed-byte caps apply to each CSV member. Advisory compressed targets apply to each member's compressed payload; they do not cap the total archive, which includes all members and container overhead. Show this scope prominently.
+- Auto may compress blocks within one gzip file or ZIP member, or compress multiple files concurrently. Output order, the serialized CSV caps, and the contents after decompression remain the same. Stored byte counts can differ with a different compression schedule.
+- Direct ZIP writes compressed CSV payloads into the private archive and fills the local header when each entry closes. Prepared ZIP may retain a small compressed member in working memory until its turn in the archive. Larger members and denied buffers use temporary files.
 - Proposed ZIP v1 methods: Stored and Deflate input, Deflate output, ZIP64 support. Unsupported compression methods, encryption, and multi-volume archives produce actionable errors.
+- Zstandard inputs and `"compression": "zstd"` jobs are rejected. Decompress existing Zstandard input before running Chopper.
 - Validate codec checksums/truncation errors. Read selected entries directly without extracting arbitrary archive paths. Budget archive metadata as well as payload buffering.
 
 ## Analyze and Run
@@ -215,8 +218,10 @@ Validate the resolved budget using the normal 32 to 1,048,576 MiB bounds,
 `max_record_bytes <= nominal_memory_mb * MiB / 16`, and explicit workers at most
 `min(64, nominal MiB / 8)`. Fail rather than round up the budget or shrink record
 limits. Native automatic worker selection is bounded by
-`min(available CPUs, 4, max(memory_mb / 64, 1))`; WASI uses one worker and accepts
-only 0 or 1. Serial Run routes can use one automatic worker. Browser numeric
+`min(available CPUs, 4, max(memory_mb / 64, 1))`. WASI uses one engine worker.
+The hosted setting accepts 0 (Auto, which may start up to four codec Web Workers)
+or 1 (single-worker compression). Native serial Run routes can use one automatic
+worker. Browser numeric
 budgets are bounded to 2048 MiB. Default record size remains 8 MiB, so a small
 automatic budget can require an explicit lower record limit.
 

@@ -33,7 +33,6 @@ fn name_controls() -> Result<serde_json::Value> {
         (Compression::None, ""),
         (Compression::Zip, ""),
         (Compression::Gzip, ".gz"),
-        (Compression::Zstd, ".zst"),
     ] {
         job.compression = compression;
         let workspace = Arc::new(Workspace::new(4096));
@@ -58,7 +57,7 @@ fn name_controls() -> Result<serde_json::Value> {
         drop(name);
         ensure!(workspace.used() == 0, "name control leaked");
     }
-    job.compression = Compression::Zstd;
+    job.compression = Compression::Gzip;
     let wide = group(vec![json!({"allocation":"\u{754c}".repeat(200)})]);
     let workspace = Arc::new(Workspace::new(4096));
     let name = output_name(
@@ -70,9 +69,7 @@ fn name_controls() -> Result<serde_json::Value> {
     )?;
     ensure!(
         name.as_str().len() <= NAME_CAPACITY
-            && name
-                .as_str()
-                .ends_with("-part-18446744073709551615.csv.zst"),
+            && name.as_str().ends_with("-part-18446744073709551615.csv.gz"),
         "wide UTF-8 suffix/truncation changed"
     );
     let wide_name = name.as_str().to_owned();
@@ -86,7 +83,7 @@ fn name_controls() -> Result<serde_json::Value> {
         Reservation::for_workspace(workspace.clone()),
     )?;
     ensure!(
-        name.as_str() == "column-1-empty-part-00000001.csv.zst",
+        name.as_str() == "column-1-empty-part-00000001.csv.gz",
         "numeric header fallback changed"
     );
     drop(name);
@@ -99,7 +96,7 @@ fn name_controls() -> Result<serde_json::Value> {
         Reservation::for_workspace(workspace.clone()),
     )?;
     ensure!(
-        name.as_str() == "part-00000001.csv.zst",
+        name.as_str() == "part-00000001.csv.gz",
         "empty lineage name changed"
     );
     drop(name);
@@ -287,7 +284,7 @@ fn task_controls() -> Result<serde_json::Value> {
             } else {
                 stage.clone()
             };
-            task.completed = Some(write_chunk(&task.chunk, &plan, &job, None, &path, &ctx));
+            task.completed = Some(write_chunk(&task.chunk, &plan, &job, None, &path, &ctx, 1));
         });
         cancel.store(false, Ordering::Relaxed);
         let successes = batch

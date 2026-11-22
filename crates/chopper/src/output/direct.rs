@@ -332,8 +332,24 @@ impl DirectPublication {
             self.header.as_deref(),
             Reservation::new(ctx),
         )?;
-        let (sink, path) =
-            open_sink_buffered(&name, job, self.stage.path(), ctx, self.buffer_capacity)?;
+        let block_workers = parallel_deflate::direct_workers(job, ctx);
+        let archive = &mut self.archive;
+        let (sink, path) = open_sink_buffered(
+            &name,
+            job,
+            self.stage.path(),
+            ctx,
+            self.buffer_capacity,
+            block_workers,
+            || {
+                let mut memory = Reservation::new(ctx);
+                if archive.is_some() && memory.resize(std::mem::size_of::<ZipEntry>()).is_ok() {
+                    ZipTarget::start(archive.take().unwrap(), name.as_str(), memory)
+                } else {
+                    Ok(ZipTarget::Spool(ctx.file()?))
+                }
+            },
+        )?;
         self.current = Some(OpenChunk {
             sink,
             name,
@@ -344,7 +360,7 @@ impl DirectPublication {
     }
     pub(super) fn write_all(&mut self, bytes: &[u8]) -> Result<()> {
         let current = self.current.as_mut().context("direct chunk is not open")?;
-        if self.archive.is_some() {
+        if current.path.is_none() {
             current.crc.update(bytes);
         }
         current.sink.write_all(bytes)?;
@@ -369,24 +385,31 @@ impl DirectPublication {
         };
         #[cfg(not(target_os = "linux"))]
         let compressed = sink.finish()?;
-        let stored = if let Some(file) = &compressed {
-            file.len()
-        } else {
-            std::fs::metadata(path.as_ref().context("missing direct output path")?)?.len()
+        let stored = match compressed {
+            Some(ZipTarget::Archive { entry, _memory }) => {
+                let stored = entry.compressed_bytes;
+                self.archive =
+                    Some(entry.finish(name.as_str(), chunk.bytes, crc.finalize(), ctx)?);
+                drop(_memory);
+                stored
+            }
+            Some(file) => {
+                let stored = file.len();
+                self.archive
+                    .as_mut()
+                    .context("missing direct ZIP archive")?
+                    .add(
+                        name.as_str(),
+                        file.reader(ctx)?,
+                        stored,
+                        chunk.bytes,
+                        crc.finalize(),
+                        ctx,
+                    )?;
+                stored
+            }
+            None => std::fs::metadata(path.as_ref().context("missing direct output path")?)?.len(),
         };
-        if let Some(compressed) = compressed {
-            self.archive
-                .as_mut()
-                .context("missing direct ZIP archive")?
-                .add(
-                    name.as_str(),
-                    publication_reader(&compressed, ctx)?,
-                    stored,
-                    chunk.bytes,
-                    crc.finalize(),
-                    ctx,
-                )?;
-        }
         let numbers = RecordNumbers {
             compressed_target_exceeded: job
                 .limits

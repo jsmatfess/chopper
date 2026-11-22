@@ -46,6 +46,7 @@ async function workerFetch(search,available){
   const messages=[];
   const context={location:{search},URLSearchParams,DiskBridge:class {},DiskDirectory:class {contents=new Map();},
     WASI:class {wasiImport={};},MemoryFile:class {path_open(){return {fd_obj:{}};}},ConsoleStdout:{lineBuffered(){}},RootFd:class {},
+    serialCompressionImports:{},
     fetch(url){fetched=url;return {url};},WebAssembly:{async instantiateStreaming(response){
       throw new Error(available.has(response.url)?'stopped before WASM execution':'missing reactor');
     }},postMessage:value=>messages.push(value)};

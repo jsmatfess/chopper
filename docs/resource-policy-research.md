@@ -21,7 +21,7 @@ active backlog and specs. No runtime code changed in this reconciliation.
 | Engine-produced Analysis heap fields and shared clones | [Shared payload](../crates/chopper/src/engine/shared_analysis.rs), [header](#analysis-header-and-shared-payload-ownership-2026-10-23), [preview](#analysis-preview-ownership-2026-10-23), [summaries](#selected-column-summary-admission-2026-10-23), [stages](#analysis-stage-statistics-ownership-2026-10-23), [text](#analysis-text-ownership-2026-10-23), [warnings/timings](#analysis-warning-and-timing-ownership-2026-10-23), [diagnostics](#analysis-diagnostic-snapshot-ownership-2026-10-23). Shared controllers and final-clone release are covered; do not charge each ordinary clone again. |
 | Lineage/catalog, publication names and joined file paths | Existing [resource ownership tracking](https://github.com/jsmatfess/chopper/issues/14), [manifest](#job-manifest-construction-owner-2026-10-21), [batch/name owners](#publication-batch-and-name-owners-2026-10-21), [joined publication paths](#retained-publication-path-owners-2026-10-21). Arbitrary caller JSON copies are separate. |
 | Controlled temporary names/reopening | [temp_path](../crates/chopper/src/storage/temp_path.rs), [construction/reopen contract](#controlled-temporary-construction-and-reopen-2026-10-22). Absolute parent discovery and OS deletion internals are separate. |
-| Input/output codecs and ZIP metadata | [ZIP parser](#zip-parser-admission-implementation-2026-10-21), [gzip](#gzip-input-codec-admission-2026-10-22), [ZIP/deflate](#zip-member-and-output-deflate-codec-admission-2026-10-22), [Zstandard output](#zstandard-output-context-admission-2026-10-23) and [input](#zstandard-input-streaming-allocation-ownership-2026-10-23). Preserve pinned backends and dynamic allocator hooks. |
+| Input/output codecs and ZIP metadata | [ZIP parser](#zip-parser-admission-implementation-2026-10-21), [gzip](#gzip-input-codec-admission-2026-10-22), [ZIP/deflate](#zip-member-and-output-deflate-codec-admission-2026-10-22). Preserve the pinned DEFLATE backend and admission lifetimes. |
 | Native HTTP payloads and typed requests | [RawBody/JobRequest](../crates/chopper/src/server/request_body.rs), [raw bytes](#native-http-request-byte-buffer-ownership-2026-10-23), [decoded tree](#native-http-decoded-request-ownership-2026-10-23), [typed/default construction](#native-typed-job-construction-ownership-2026-10-23), [Column decoder](#column-scalar-deserialization-2026-10-23), [response bytes](#native-http-json-response-ownership-2026-10-23), [inspection result](#returned-inspection-json-owner-2026-10-21). These do not cover every caller adapter or error internal. |
 | Native scripted CLI decode-origin Job | [DecodedJob](../crates/chopper/src/cli_job.rs), [prefix construction envelope and retained lifetime](cli-job-decoding.md). Scripted analyze/run/profile use shared-only predecode admission, then immutable source retention through prompts/profile/consuming engine calls, overlapping independent PreparedJob admission. Guide/split and other callers remain separate. |
 | Retained state, progress and directly owned picker helper | [Static status](#native-static-status-source-2026-10-28), [cached output](#native-cached-output-path-source-owner-2026-10-28), [retained errors](#native-retained-state-error-ownership-2026-10-28), [portable Progress](#portable-progress-phase-ownership-2026-10-28), [parent capture/session](#native-picker-parent-capture-and-lifecycle-2026-10-23). Old paragraphs excluding those completed sources are historical, not new work. |
@@ -834,7 +834,7 @@ RSS cap or change defaults.
 
 ## Zstandard output context admission (2026-10-23)
 
-[`output/zstandard.rs`](../crates/chopper/src/output/zstandard.rs) admits the
+[`output/zstandard.rs`](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/crates/chopper/src/output/zstandard.rs) admits the
 single-threaded, dictionary-free Zstandard output context before construction.
 It preserves level 3, window log 21, checksum enabled and unknown source size.
 A consuming `finish` retains the grant through codec destruction on success or
@@ -1183,7 +1183,7 @@ This is working-allocation accounting, not an RSS cap. See the
 
 ## Zstandard input streaming allocation ownership (2026-10-23)
 
-[`engine/input_zstandard.rs`](../crates/chopper/src/engine/input_zstandard.rs)
+[`engine/input_zstandard.rs`](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/crates/chopper/src/engine/input_zstandard.rs)
 now uses Zstandard's custom allocator for CSV input. It reuses zstd-rs's `zio`
 reader state machine and mirrors the raw decoder's initialization, empty
 dictionary, cursor transfer, flush, frame reset and EOF rules. Current format
@@ -1191,7 +1191,7 @@ detection and window limits are preserved. Legacy-at-start remains outside the
 public format detector; legacy frames following modern/skippable frames retain
  their existing decoding behavior.
 
-The [pinned C bridge](../vendor/zstd-sys-2.1.1/CHOPPER.md) forwards parent callbacks
+The [pinned C bridge](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/vendor/zstd-sys-2.1.1/CHOPPER.md) forwards parent callbacks
 into buffered legacy 0.4-0.7 constructors and buffers. Versions 0.4-0.6 retain the
 bridge around their fixed inner context and outer/input/output owners; 0.7 uses
 its existing advanced API. A version switch clears the freed old-context pointer
@@ -1214,7 +1214,7 @@ fixed controller allowance lasts until its enclosing callback scope ends. The
 first admission error is terminal and restored as its typed Rust error after
 reader destruction. Source/codec errors and consumer cancellation still clean up.
 
-The [upstream legacy corpus](../vendor/zstd-sys-2.1.1/chopper-tests/SOURCE.json)
+The [upstream legacy corpus](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/vendor/zstd-sys-2.1.1/chopper-tests/SOURCE.json)
 contains four legacy frames and a modern 0.8 control. Shared contracts inject
 failure at all eighteen observed corpus allocation requests, including version
 replacement and inner construction; payload/header grants return to zero.

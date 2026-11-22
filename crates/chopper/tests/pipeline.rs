@@ -330,12 +330,7 @@ fn csv_files(dir: &std::path::Path) -> Vec<Vec<u8>> {
 
 #[test]
 fn grouped_names_include_columns_allocations_and_splits_for_every_format() {
-    for compression in [
-        Compression::None,
-        Compression::Gzip,
-        Compression::Zstd,
-        Compression::Zip,
-    ] {
+    for compression in [Compression::None, Compression::Gzip, Compression::Zip] {
         let (dir, mut job) = fixture("country,segment\nUS,retail\nUS,retail\n");
         job.compression = compression;
         job.operations = vec![
@@ -362,7 +357,6 @@ fn grouped_names_include_columns_allocations_and_splits_for_every_format() {
             let part = i + 1;
             let extension = match compression {
                 Compression::Gzip => ".gz",
-                Compression::Zstd => ".zst",
                 _ => "",
             };
             let expected = format!("country-US-segment-retail-allocation-treatment-split-{part}-part-{part:08}.csv{extension}");
@@ -643,13 +637,12 @@ fn injected_shuffle_key_collisions_use_random_refinement() {
 }
 #[test]
 fn all_compression_outputs_roundtrip_as_inputs() {
-    for compression in [Compression::Gzip, Compression::Zstd, Compression::Zip] {
+    for compression in [Compression::Gzip, Compression::Zip] {
         let (dir, mut job) = fixture("id,text\n0,\"a,b\"\n1,\"line\nline\"\n2,é\n");
         job.compression = compression;
         prepare(job.clone()).unwrap().execute().unwrap();
         let name = match compression {
             Compression::Gzip => "part-00000001.csv.gz",
-            Compression::Zstd => "part-00000001.csv.zst",
             _ => "outputs.zip",
         };
         job.input = dir
@@ -850,22 +843,16 @@ fn all_operations_compose_with_strict_caps_and_zip() {
 }
 
 #[test]
-fn zstandard_skippable_frames_and_checksum_errors() {
-    let (dir, mut job) = fixture("id\n1\n");
-    let path = dir.path().join("input.zst");
-    let mut encoder = zstd::stream::write::Encoder::new(Vec::new(), 3).unwrap();
-    encoder.include_checksum(true).unwrap();
-    encoder.write_all(b"id\n1\n").unwrap();
-    let compressed = encoder.finish().unwrap();
-    let mut bytes = vec![0x50, 0x2a, 0x4d, 0x18, 3, 0, 0, 0, b'a', b'b', b'c'];
-    bytes.extend(&compressed);
-    fs::write(&path, &bytes).unwrap();
-    job.input = path.to_string_lossy().into();
-    assert_eq!(prepare(job.clone()).unwrap().analysis.rows, 1);
-    let last = bytes.len() - 1;
-    bytes[last] ^= 1;
-    fs::write(&path, bytes).unwrap();
-    assert!(prepare(job).is_err());
+fn removed_compression_is_rejected_before_parsing_csv() {
+    let (_dir, job) = fixture("id\n1\n");
+    for signature in [[0x28, 0xb5, 0x2f, 0xfd], [0x50, 0x2a, 0x4d, 0x18]] {
+        fs::write(&job.input, signature).unwrap();
+        let error = prepare(job.clone()).map(|_| ()).unwrap_err();
+        assert!(format!("{error:#}").contains("Zstandard input is no longer supported"));
+        assert!(!std::path::Path::new(&job.output).exists());
+    }
+    let error = serde_json::from_str::<Compression>(r#""zstd""#).unwrap_err();
+    assert!(error.to_string().contains("unknown variant"));
 }
 
 #[test]
@@ -1000,7 +987,7 @@ fn optimized_pipelines_preserve_records_stages_and_unchanged_v1_cases() {
 
 #[test]
 fn parallel_compression_preserves_chunk_contents_and_manifest_order() {
-    for compression in [Compression::Gzip, Compression::Zstd, Compression::Zip] {
+    for compression in [Compression::Gzip, Compression::Zip] {
         let input = format!(
             "id,text\n{}",
             (0..1000).map(|i| format!("{i},ééé\n")).collect::<String>()

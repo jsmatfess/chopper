@@ -73,7 +73,6 @@ fn csvs(output: &str, compression: Compression) -> Result<BTreeMap<String, Vec<u
                     flate2::read::GzDecoder::new(&bytes[..]).read_to_end(&mut decoded)?;
                     decoded
                 }
-                Compression::Zstd => zstd::stream::decode_all(&bytes[..])?,
                 Compression::Zip => unreachable!(),
             };
             result.insert(name.into(), decoded);
@@ -151,12 +150,7 @@ fn clean(dir: &Path, job: &Job) -> Result<()> {
 
 #[test]
 fn formats_caps_fields_digest_names_and_manifest_parity() -> Result<()> {
-    for compression in [
-        Compression::None,
-        Compression::Gzip,
-        Compression::Zstd,
-        Compression::Zip,
-    ] {
+    for compression in [Compression::None, Compression::Gzip, Compression::Zip] {
         let (_dir, mut job) = setup(
             "id,text\n1,\"comma,quote\"\"\"\n2,\"line\nbreak\"\n3,\u{754c}\u{1f600}\n4,\n"
                 .as_bytes(),
@@ -223,12 +217,7 @@ fn late_wide_rows_and_soft_compressed_targets_match() -> Result<()> {
 #[test]
 fn no_encoded_snapshot_spool() -> Result<()> {
     let text = format!("id,value\n{}", "1,abcdefghijklmnop\n".repeat(10000));
-    for codec in [
-        Compression::None,
-        Compression::Gzip,
-        Compression::Zstd,
-        Compression::Zip,
-    ] {
+    for codec in [Compression::None, Compression::Gzip, Compression::Zip] {
         let (dir, mut job) = setup(text.as_bytes())?;
         job.compression = codec;
         job.resources.temp_bytes = Some(4096);
@@ -272,14 +261,9 @@ fn late_parse_width_cap_and_file_limit_errors_cleanup() -> Result<()> {
 #[test]
 fn cancellation_and_mutation_never_publish_or_retry() -> Result<()> {
     for (mutate, codec) in [false, true].into_iter().flat_map(|m| {
-        [
-            Compression::None,
-            Compression::Gzip,
-            Compression::Zstd,
-            Compression::Zip,
-        ]
-        .into_iter()
-        .map(move |c| (m, c))
+        [Compression::None, Compression::Gzip, Compression::Zip]
+            .into_iter()
+            .map(move |c| (m, c))
     }) {
         let text = format!("a,b\n{}", "1,x\n".repeat(65536));
         let (dir, mut job) = setup(text.as_bytes())?;
@@ -357,7 +341,7 @@ fn returned_analysis_clones_retain_admitted_owners() -> Result<()> {
 #[test]
 fn compressed_inputs_and_late_codec_corruption_cleanup() -> Result<()> {
     let text = b"a,b\n1,x\n2,y\n3,z\n";
-    for codec in [Compression::Gzip, Compression::Zstd, Compression::Zip] {
+    for codec in [Compression::Gzip, Compression::Zip] {
         let (dir, mut job) = setup(text)?;
         let encoded = match codec {
             Compression::Gzip => {
@@ -366,7 +350,6 @@ fn compressed_inputs_and_late_codec_corruption_cleanup() -> Result<()> {
                 encoder.write_all(text)?;
                 encoder.finish()?
             }
-            Compression::Zstd => zstd::stream::encode_all(&text[..], 3)?,
             Compression::Zip => {
                 let mut zip = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
                 zip.start_file(
@@ -398,12 +381,7 @@ fn compressed_inputs_and_late_codec_corruption_cleanup() -> Result<()> {
 
 #[test]
 fn all_output_codecs_late_failure_and_temp_denial_cleanup() -> Result<()> {
-    for codec in [
-        Compression::None,
-        Compression::Gzip,
-        Compression::Zstd,
-        Compression::Zip,
-    ] {
+    for codec in [Compression::None, Compression::Gzip, Compression::Zip] {
         let (dir, mut job) = setup(b"a,b\n1,x\n2,y,z\n")?;
         job.compression = codec;
         job.limits.rows = Some(1);
@@ -509,12 +487,50 @@ fn shared_denial_retained_owner_release_and_retry() -> Result<()> {
 }
 
 #[test]
+fn direct_zip_publishes_when_compressed_member_exceeds_temp_budget() -> Result<()> {
+    let mut source = b"id,payload\n".to_vec();
+    let mut state = 1u32;
+    for row in 0..1024 {
+        write!(source, "{row},")?;
+        for _ in 0..512 {
+            state ^= state << 13;
+            state ^= state >> 17;
+            state ^= state << 5;
+            source.push(b'a' + (state % 26) as u8);
+        }
+        source.push(b'\n');
+    }
+    let (_dir, mut job) = setup(&source)?;
+    job.compression = Compression::Zip;
+    let budget = 64 * 1024;
+    job.resources.temp_bytes = Some(budget);
+    job.limits.bytes = Some(source.len() as u64);
+    let analysis = run(job.clone())?;
+    assert_eq!(analysis.output_files, 1);
+    assert_eq!(analysis.output_csv_bytes, source.len() as u64);
+    assert!(analysis.peak_temp_bytes < budget);
+    let mut archive =
+        zip::ZipArchive::new(fs::File::open(Path::new(&job.output).join("outputs.zip"))?)?;
+    let mut member = archive.by_name("part-00000001.csv")?;
+    assert!(member.compressed_size() > budget);
+    let mut decoded = Vec::new();
+    member.read_to_end(&mut decoded)?;
+    assert_eq!(decoded, source);
+    Ok(())
+}
+
+#[test]
 fn local_denial_releases_all_owners() -> Result<()> {
-    let input = format!("{}\n{}\n", "h".repeat(1900000), "x".repeat(1900000));
+    let input = format!(
+        "{}\n{}\n",
+        "h".repeat(1900000),
+        '"'.to_string().repeat(1900000)
+    );
     let (dir, mut job) = setup(input.as_bytes())?;
     job.resources.max_record_bytes = 2 * 1024 * 1024;
+    job.input_csv.quote = '\'';
     job.output_csv.encoding = "utf-16le".into();
-    job.compression = Compression::Zstd;
+    job.compression = Compression::Gzip;
     let pool = Arc::new(MemoryPool::new(128 * 1024 * 1024));
     let error = engine::run_with_memory_pool(
         job.clone(),
@@ -830,7 +846,7 @@ fn counted_balanced_output_codecs_preserve_snapshot_bytes_and_terminal_cleanup()
             .map(|i| format!("{i},\"界,{}\"\"\nline\"\n", i % 7))
             .collect::<String>()
     );
-    for compression in [Compression::Gzip, Compression::Zstd, Compression::Zip] {
+    for compression in [Compression::Gzip, Compression::Zip] {
         for encoding in ["utf-8", "utf-16le"] {
             let (_dir, mut job) = setup(text.as_bytes())?;
             job.operations = vec![Operation::Balanced { files: 4 }];
@@ -1088,12 +1104,7 @@ fn counted_balanced_releases_first_header_before_publication_but_retains_analysi
 #[cfg(all(feature = "experimental-terminal-routing", not(target_os = "wasi")))]
 #[test]
 fn terminal_partition_headerless_tuple_and_compressed_fallback_parity() -> Result<()> {
-    for compression in [
-        Compression::None,
-        Compression::Gzip,
-        Compression::Zstd,
-        Compression::Zip,
-    ] {
+    for compression in [Compression::None, Compression::Gzip, Compression::Zip] {
         let (_dir, mut job) = setup(b"2,../a\n1,../a\n3,../a\n2,../a\n0,\n")?;
         job.input_csv.headers = false;
         job.output_csv.headers = false;
@@ -2012,7 +2023,7 @@ fn final_writer_intake_codecs_encodings_and_late_corruption_parity() -> Result<(
         if mode == "exact" && !cfg!(feature = "experimental-retained-exact-writers") {
             continue;
         }
-        for codec in ["utf-16le", "gzip", "zstd", "zip"] {
+        for codec in ["utf-16le", "gzip", "zip"] {
             let text = format!(
                 "id,text\n{}",
                 (0..37)
@@ -2059,7 +2070,6 @@ fn final_writer_intake_codecs_encodings_and_late_corruption_parity() -> Result<(
                     e.write_all(text.as_bytes())?;
                     e.finish()?
                 }
-                "zstd" => zstd::stream::encode_all(text.as_bytes(), 3)?,
                 "zip" => {
                     let mut e = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
                     e.start_file(
@@ -2351,41 +2361,6 @@ fn uncapped_single_catalog_capacity_preserves_512_writers_and_513_fallback() -> 
         clean(dir.path(), &job)?;
         parity(job.clone())?;
         fs::remove_dir_all(&job.output)?;
-        clean(dir.path(), &job)?;
-    }
-    Ok(())
-}
-
-#[cfg(feature = "experimental-counted-zstd-input-balanced")]
-#[test]
-fn counted_zstd_input_balanced_preserves_exact_parts_and_rejects_decoder_errors() -> Result<()> {
-    let text = "id,text\n1,\"comma,quote\"\"\"\n2,\"line\nbreak\"\n3,界😀\n4,\n5,tail\n";
-    let (dir, mut job) = setup(text.as_bytes())?;
-    job.operations = vec![Operation::Balanced { files: 2 }];
-    job.limits.bytes = Some(96);
-    let mut encoder = zstd::stream::Encoder::new(Vec::new(), 3)?;
-    encoder.include_checksum(true)?;
-    encoder.write_all(text.as_bytes())?;
-    let bytes = encoder.finish()?;
-    fs::write(&job.input, &bytes)?;
-    let analysis = parity(job.clone())?;
-    assert_eq!(analysis.output_files, 2);
-    assert_eq!(analysis.rows, 5);
-    assert!(
-        analysis.diagnostics["temporary_bytes_written"]
-            .as_u64()
-            .unwrap()
-            < 4096
-    );
-    let mut corrupt = bytes.clone();
-    *corrupt.last_mut().unwrap() ^= 1;
-    for (label, data) in [
-        ("truncated", &bytes[..bytes.len() - 3]),
-        ("checksum", &corrupt),
-    ] {
-        fs::write(&job.input, data)?;
-        job.output = dir.path().join(label).to_string_lossy().into();
-        assert!(run(job.clone()).is_err(), "{label}");
         clean(dir.path(), &job)?;
     }
     Ok(())

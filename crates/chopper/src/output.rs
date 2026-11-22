@@ -11,6 +11,13 @@ use std::{
 #[cfg(target_os = "linux")]
 mod deferred_sync;
 mod deflate;
+mod parallel_deflate;
+#[cfg(target_os = "wasi")]
+#[doc(hidden)]
+pub use deflate::{BlockEncoder, BLOCK_BYTES, COMPRESSED_BLOCK_BYTES};
+pub(crate) use parallel_deflate::direct_candidate as parallel_direct_compression;
+#[cfg(target_os = "wasi")]
+pub(crate) use parallel_deflate::hosted::Lease as HostedDeflateLease;
 mod direct;
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(crate) use deflate::resource_contracts as deflate_contracts;
@@ -21,7 +28,6 @@ mod plain_publication_contracts;
 mod planned_metadata;
 mod publication_metadata;
 mod publication_path;
-mod zstandard;
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(crate) use job_manifest::resource_contracts as job_manifest_contracts;
 #[cfg(any(test, feature = "resource-contract-tests"))]
@@ -33,8 +39,6 @@ use publication_metadata::{output_name, PublicationBatch, PublicationName};
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(crate) use publication_path::resource_contracts as publication_path_contracts;
 use publication_path::PublicationPath;
-#[cfg(any(test, feature = "resource-contract-tests"))]
-pub(crate) use zstandard::resource_contracts as zstandard_contracts;
 
 /// Proof that the platform's engine publication commit point succeeded.
 /// Browser destination export requires its separate verified marker receipt.
@@ -620,29 +624,32 @@ pub fn plan(
 enum Sink {
     Plain(PublicationWriter),
     Gzip(deflate::Encoder<flate2::write::GzEncoder<PublicationWriter>>),
-    Zstd(zstandard::Encoder<PublicationWriter>),
-    Zip(deflate::Encoder<flate2::write::DeflateEncoder<DiskFile>>),
+    ParallelGzip(parallel_deflate::Encoder<PublicationWriter>),
+    Zip(deflate::Encoder<flate2::write::DeflateEncoder<ZipTarget>>),
+    ParallelZip(parallel_deflate::Encoder<ZipTarget>),
 }
 impl Write for Sink {
     fn write(&mut self, b: &[u8]) -> std::io::Result<usize> {
         match self {
             Self::Plain(w) => w.write(b),
             Self::Gzip(w) => w.write(b),
-            Self::Zstd(w) => w.write(b),
+            Self::ParallelGzip(w) => w.write(b),
             Self::Zip(w) => w.write(b),
+            Self::ParallelZip(w) => w.write(b),
         }
     }
     fn flush(&mut self) -> std::io::Result<()> {
         match self {
             Self::Plain(w) => w.flush(),
             Self::Gzip(w) => w.flush(),
-            Self::Zstd(w) => w.flush(),
+            Self::ParallelGzip(w) => w.flush(),
             Self::Zip(w) => w.flush(),
+            Self::ParallelZip(w) => w.flush(),
         }
     }
 }
 impl Sink {
-    fn finish(self) -> Result<Option<DiskFile>> {
+    fn finish(self) -> Result<Option<ZipTarget>> {
         match self {
             Self::Plain(mut w) => {
                 w.sync_all()?;
@@ -651,11 +658,9 @@ impl Sink {
                 let mut w = w.finish(flate2::write::GzEncoder::finish)?;
                 w.sync_all()?;
             }
-            Self::Zstd(w) => {
-                let mut w = w.finish()?;
-                w.sync_all()?;
-            }
+            Self::ParallelGzip(w) => w.finish()?.sync_all()?,
             Self::Zip(w) => return Ok(Some(w.finish(flate2::write::DeflateEncoder::finish)?)),
+            Self::ParallelZip(w) => return Ok(Some(w.finish()?)),
         }
         Ok(None)
     }
@@ -745,7 +750,7 @@ impl ObservedSink {
             _ => anyhow::bail!("deferred sync requires plain output"),
         }
     }
-    fn finish(self) -> Result<Option<DiskFile>> {
+    fn finish(self) -> Result<Option<ZipTarget>> {
         let Self {
             inner,
             mut observation,
@@ -762,17 +767,9 @@ impl ObservedSink {
 }
 struct CompletedChunk {
     name: PublicationName,
-    compressed: Option<DiskFile>,
+    compressed: Option<ZipTarget>,
     stored: u64,
     crc: u32,
-}
-fn open_sink(
-    name: &PublicationName,
-    job: &Job,
-    stage: &Path,
-    ctx: &Context,
-) -> Result<(ObservedSink, Option<PublicationPath>)> {
-    open_sink_buffered(name, job, stage, ctx, PUBLICATION_BUFFER)
 }
 fn open_sink_buffered(
     name: &PublicationName,
@@ -780,6 +777,8 @@ fn open_sink_buffered(
     stage: &Path,
     ctx: &Context,
     buffer_capacity: usize,
+    block_workers: usize,
+    zip_target: impl FnOnce() -> Result<ZipTarget>,
 ) -> Result<(ObservedSink, Option<PublicationPath>)> {
     let output_path = if job.compression == Compression::Zip {
         None
@@ -793,21 +792,36 @@ fn open_sink_buffered(
     let kind = match job.compression {
         Compression::None => None,
         Compression::Gzip => Some(crate::observation::physical::Kind::GzipOutput),
-        Compression::Zstd => Some(crate::observation::physical::Kind::ZstandardOutput),
         Compression::Zip => Some(crate::observation::physical::Kind::ZipDeflate),
     };
     let mut observation = kind.and_then(|kind| OutputObservation::new(job, ctx, kind));
     let result = (|| -> Result<Sink> {
         let sink = if job.compression == Compression::Zip {
-            Sink::Zip(deflate::raw(ctx.file()?, Reservation::new(ctx))?)
+            let file = zip_target()?;
+            match parallel_deflate::reserve(ctx, block_workers) {
+                Some(memory) => Sink::ParallelZip(parallel_deflate::Encoder::new(
+                    file,
+                    false,
+                    ctx,
+                    block_workers,
+                    memory,
+                )?),
+                None => Sink::Zip(deflate::raw(file, Reservation::new(ctx))?),
+            }
         } else {
             let file = PublicationWriter::new(output_path.as_ref().unwrap(), buffer_capacity, ctx)?;
             match job.compression {
                 Compression::None => Sink::Plain(file),
-                Compression::Gzip => Sink::Gzip(deflate::gzip(file, Reservation::new(ctx))?),
-                Compression::Zstd => {
-                    Sink::Zstd(zstandard::Encoder::new(file, Reservation::new(ctx))?)
-                }
+                Compression::Gzip => match parallel_deflate::reserve(ctx, block_workers) {
+                    Some(memory) => Sink::ParallelGzip(parallel_deflate::Encoder::new(
+                        file,
+                        true,
+                        ctx,
+                        block_workers,
+                        memory,
+                    )?),
+                    None => Sink::Gzip(deflate::gzip(file, Reservation::new(ctx))?),
+                },
                 Compression::Zip => unreachable!(),
             }
         };
@@ -832,6 +846,7 @@ fn write_chunk(
     header: Option<&[String]>,
     stage: &Path,
     ctx: &Context,
+    block_workers: usize,
 ) -> Result<CompletedChunk> {
     let name = output_name(
         chunk.index,
@@ -840,7 +855,15 @@ fn write_chunk(
         header,
         Reservation::new(ctx),
     )?;
-    let (mut sink, output_path) = open_sink(&name, job, stage, ctx)?;
+    let (mut sink, output_path) = open_sink_buffered(
+        &name,
+        job,
+        stage,
+        ctx,
+        PUBLICATION_BUFFER,
+        block_workers,
+        || ZipTarget::spool(ctx, chunk.bytes),
+    )?;
     let mut input = publication_reader(&plan.data, ctx)?;
     input.seek(SeekFrom::Start(chunk.offset))?;
     let mut remaining = chunk.bytes;
@@ -970,6 +993,12 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
         } else {
             concurrency
         };
+        #[cfg(target_os = "wasi")]
+        let batch_limit = batch_limit.max(
+            parallel_deflate::hosted_files::batch_limit(job, ctx, output_plan).min(
+                usize::try_from(output_plan.files.saturating_sub(files)).unwrap_or(usize::MAX),
+            ),
+        );
         let mut batch = PublicationBatch::new(batch_limit, Reservation::new(ctx))?;
         #[cfg(all(test, not(target_family = "wasm")))]
         plain_publication_contracts::observe_batch(batch.tasks.capacity());
@@ -996,19 +1025,40 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
         if batch.tasks.is_empty() {
             break;
         }
+        #[cfg(target_os = "wasi")]
+        let hosted_files = parallel_deflate::hosted_files::write_batch(
+            &mut batch,
+            output_plan,
+            job,
+            analysis.header.as_deref(),
+            stage.path(),
+            ctx,
+        )?;
+        #[cfg(not(target_os = "wasi"))]
+        let hosted_files = false;
         if ctx.auto_run {
-            ctx.bounded_writer_slots(batch.tasks.len());
+            let concurrent = hosted_files || cfg!(not(target_os = "wasi"));
+            ctx.bounded_writer_slots(if concurrent { batch.tasks.len() } else { 1 });
         }
-        ctx.for_each_batch(&mut batch.tasks, |task| {
-            task.completed = Some(write_chunk(
-                &task.chunk,
-                output_plan,
-                job,
-                analysis.header.as_deref(),
-                stage.path(),
-                ctx,
-            ));
-        });
+        if !hosted_files {
+            let parallel_files = cfg!(not(target_os = "wasi")) && batch.tasks.len() > 1;
+            ctx.for_each_batch(&mut batch.tasks, |task| {
+                let block_workers = if parallel_files {
+                    1
+                } else {
+                    parallel_deflate::workers(job, ctx, task.chunk.bytes)
+                };
+                task.completed = Some(write_chunk(
+                    &task.chunk,
+                    output_plan,
+                    job,
+                    analysis.header.as_deref(),
+                    stage.path(),
+                    ctx,
+                    block_workers,
+                ));
+            });
+        }
         // Ordered collection keeps archive members and manifests independent of scheduling.
         for task in batch.tasks.drain(..) {
             let chunk = task.chunk;
@@ -1023,7 +1073,7 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
             if let Some(compressed) = compressed {
                 archive.as_mut().unwrap().add(
                     name.as_str(),
-                    publication_reader(&compressed, ctx)?,
+                    compressed.reader(ctx)?,
                     actual,
                     chunk.bytes,
                     crc,
@@ -1070,8 +1120,9 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
 }
 
 fn finish_archive(archive: Option<ZipStream>, manifest_path: &Path, ctx: &Context) -> Result<()> {
-    if let Some(mut archive) = archive {
-        let mut encoder = deflate::raw(ctx.file()?, Reservation::new(ctx))?;
+    if let Some(archive) = archive {
+        let mut encoder =
+            deflate::raw(archive.open_entry("manifest.jsonl")?, Reservation::new(ctx))?;
         let mut input = File::open(manifest_path)?;
         let mut crc = crc32fast::Hasher::new();
         let mut total = 0u64;
@@ -1086,16 +1137,10 @@ fn finish_archive(archive: Option<ZipStream>, manifest_path: &Path, ctx: &Contex
             encoder.write_all(&buffer[..n])?;
             total += n as u64;
         }
-        let compressed = encoder.finish(flate2::write::DeflateEncoder::finish)?;
-        archive.add(
-            "manifest.jsonl",
-            publication_reader(&compressed, ctx)?,
-            compressed.len(),
-            total,
-            crc.finalize(),
-            ctx,
-        )?;
-        archive.finish(ctx)?;
+        encoder
+            .finish(flate2::write::DeflateEncoder::finish)?
+            .finish("manifest.jsonl", total, crc.finalize(), ctx)?
+            .finish(ctx)?;
     }
     Ok(())
 }
@@ -1288,6 +1333,148 @@ struct ZipStream {
     offset: u64,
     entries: u64,
 }
+// Keep the bounded in-memory member and its grant inline.
+#[allow(clippy::large_enum_variant)]
+enum ZipTarget {
+    Spool(DiskFile),
+    Memory {
+        bytes: Vec<u8>,
+        ctx: Context,
+        _memory: Reservation,
+    },
+    Archive {
+        entry: Box<ZipEntry>,
+        _memory: Reservation,
+    },
+}
+impl ZipTarget {
+    fn spool(ctx: &Context, csv_bytes: u64) -> Result<Self> {
+        const MIB: u64 = 1024 * 1024;
+        if csv_bytes <= 2 * MIB {
+            let capacity = (csv_bytes + csv_bytes / 8 + 256).min(MIB / 2) as usize;
+            let mut memory = Reservation::new(ctx);
+            let mut bytes = Vec::new();
+            if memory.reserve_vec(&mut bytes, capacity).is_ok() {
+                return Ok(Self::Memory {
+                    bytes,
+                    ctx: ctx.clone(),
+                    _memory: memory,
+                });
+            }
+        }
+        Ok(Self::Spool(ctx.file()?))
+    }
+    fn len(&self) -> u64 {
+        match self {
+            Self::Spool(file) => file.len(),
+            Self::Memory { bytes, .. } => bytes.len() as u64,
+            Self::Archive { entry, .. } => entry.compressed_bytes,
+        }
+    }
+    fn reader(&self, ctx: &Context) -> Result<ZipMemberReader<'_>> {
+        match self {
+            Self::Spool(file) => Ok(ZipMemberReader::Disk(publication_reader(file, ctx)?)),
+            Self::Memory { bytes, .. } => Ok(ZipMemberReader::Memory(bytes)),
+            Self::Archive { .. } => anyhow::bail!("ZIP member is already in the archive"),
+        }
+    }
+    fn start(archive: ZipStream, name: &str, memory: Reservation) -> Result<Self> {
+        Ok(Self::Archive {
+            entry: Box::new(archive.open_entry(name)?),
+            _memory: memory,
+        })
+    }
+}
+impl Write for ZipTarget {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        match self {
+            Self::Spool(file) => file.write(bytes),
+            Self::Memory {
+                bytes: buffered,
+                ctx,
+                ..
+            } => {
+                if bytes.len() <= buffered.capacity() - buffered.len() {
+                    buffered.extend_from_slice(bytes);
+                    return Ok(bytes.len());
+                }
+                let mut file = ctx.file().map_err(std::io::Error::other)?;
+                file.write_all(buffered)?;
+                let written = file.write(bytes)?;
+                *self = Self::Spool(file);
+                Ok(written)
+            }
+            Self::Archive { entry, .. } => entry.write(bytes),
+        }
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        match self {
+            Self::Spool(file) => file.flush(),
+            Self::Memory { .. } => Ok(()),
+            Self::Archive { entry, .. } => entry.flush(),
+        }
+    }
+}
+
+enum ZipMemberReader<'a> {
+    Disk(PublicationReader),
+    Memory(&'a [u8]),
+}
+impl Read for ZipMemberReader<'_> {
+    fn read(&mut self, bytes: &mut [u8]) -> std::io::Result<usize> {
+        match self {
+            Self::Disk(reader) => reader.read(bytes),
+            Self::Memory(reader) => reader.read(bytes),
+        }
+    }
+}
+
+/// Own the archive while a serial publication path deflates directly into it.
+struct ZipEntry {
+    archive: ZipStream,
+    compressed_bytes: u64,
+}
+
+impl Write for ZipEntry {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        let written = self.archive.writer().write(bytes)?;
+        self.compressed_bytes = self
+            .compressed_bytes
+            .checked_add(written as u64)
+            .ok_or_else(|| std::io::Error::other("ZIP compressed size overflow"))?;
+        Ok(written)
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        self.archive.writer().flush()
+    }
+}
+impl ZipEntry {
+    fn finish(mut self, name: &str, size: u64, crc: u32, ctx: &Context) -> Result<ZipStream> {
+        let result = (|| {
+            ctx.check()?;
+            let compressed = self.compressed_bytes;
+            let offset = self.archive.offset;
+            let end = offset
+                .checked_add(50 + name.len() as u64)
+                .and_then(|bytes| bytes.checked_add(compressed))
+                .context("ZIP member offset overflow")?;
+            // Patch the private ZIP64 local header in place. Keep archive
+            // observations about the final logical byte stream, including the
+            // original placeholders once and counting no patch-write bytes.
+            let writer = &mut self.archive.output.writer;
+            writer.seek(SeekFrom::Start(offset + 14))?;
+            u32le(writer, crc)?;
+            writer.seek(SeekFrom::Start(offset + 34 + name.len() as u64))?;
+            u64le(writer, size)?;
+            u64le(writer, compressed)?;
+            writer.seek(SeekFrom::Start(end))?;
+            self.archive.record_entry(name, compressed, size, crc, end)
+        })();
+        self.archive.report_entry_error(&result);
+        result?;
+        Ok(self.archive)
+    }
+}
 fn u16le(w: &mut impl Write, n: u16) -> Result<()> {
     w.write_all(&n.to_le_bytes())?;
     Ok(())
@@ -1326,15 +1513,13 @@ impl ZipStream {
             }
         }
     }
-    fn add(
-        &mut self,
-        name: &str,
-        mut compressed: impl Read,
-        compressed_size: u64,
-        size: u64,
-        crc: u32,
-        ctx: &Context,
-    ) -> Result<()> {
+    fn writer(&mut self) -> ObservedArchiveWriter<'_> {
+        ObservedArchiveWriter {
+            writer: &mut self.output,
+            observation: &mut self.observation,
+        }
+    }
+    fn member_source(&mut self, name: &str) {
         if name != "manifest.jsonl" {
             if let Some(observation) = &mut self.observation {
                 if let Some(attempt) = &mut observation.attempt {
@@ -1346,29 +1531,56 @@ impl ZipStream {
                 }
             }
         }
-        let result = (|| -> Result<()> {
-            ensure!(name.len() <= u16::MAX as usize, "ZIP member name too long");
-            let local_offset = self.offset;
-            let w = &mut ObservedArchiveWriter {
-                writer: &mut self.output,
-                observation: &mut self.observation,
-            };
-            u32le(w, 0x04034b50)?;
-            u16le(w, 45)?;
-            u16le(w, 0x800)?;
-            u16le(w, 8)?;
-            u16le(w, 0)?;
-            u16le(w, 33)?;
-            u32le(w, crc)?;
-            u32le(w, u32::MAX)?;
-            u32le(w, u32::MAX)?;
-            u16le(w, name.len() as u16)?;
-            u16le(w, 20)?;
-            w.write_all(name.as_bytes())?;
-            u16le(w, 1)?;
-            u16le(w, 16)?;
-            u64le(w, size)?;
-            u64le(w, compressed_size)?;
+    }
+    fn local_header(&mut self, name: &str, compressed: u64, size: u64, crc: u32) -> Result<()> {
+        ensure!(name.len() <= u16::MAX as usize, "ZIP member name too long");
+        let w = &mut self.writer();
+        u32le(w, 0x04034b50)?;
+        u16le(w, 45)?;
+        u16le(w, 0x800)?;
+        u16le(w, 8)?;
+        u16le(w, 0)?;
+        u16le(w, 33)?;
+        u32le(w, crc)?;
+        u32le(w, u32::MAX)?;
+        u32le(w, u32::MAX)?;
+        u16le(w, name.len() as u16)?;
+        u16le(w, 20)?;
+        w.write_all(name.as_bytes())?;
+        u16le(w, 1)?;
+        u16le(w, 16)?;
+        u64le(w, size)?;
+        u64le(w, compressed)?;
+        Ok(())
+    }
+    fn report_entry_error<T>(&mut self, result: &Result<T>) {
+        if let (Err(error), Some(observation)) = (result, &mut self.observation) {
+            observation.finish(crate::observation::physical::error_status(error));
+        }
+    }
+    fn open_entry(mut self, name: &str) -> Result<ZipEntry> {
+        self.member_source(name);
+        let result = self.local_header(name, 0, 0, 0);
+        self.report_entry_error(&result);
+        result?;
+        Ok(ZipEntry {
+            archive: self,
+            compressed_bytes: 0,
+        })
+    }
+    fn add(
+        &mut self,
+        name: &str,
+        mut compressed: impl Read,
+        compressed_size: u64,
+        size: u64,
+        crc: u32,
+        ctx: &Context,
+    ) -> Result<()> {
+        self.member_source(name);
+        let result = (|| {
+            self.local_header(name, compressed_size, size, crc)?;
+            let w = &mut self.writer();
             let mut buffer = [0u8; 65536];
             let mut copied = 0;
             loop {
@@ -1381,43 +1593,55 @@ impl ZipStream {
                 copied += n as u64;
             }
             ensure!(copied == compressed_size, "truncated compressed ZIP member");
-            self.offset += 50 + name.len() as u64 + compressed_size;
-            let d = &mut self.directory;
-            u32le(d, 0x02014b50)?;
-            u16le(d, 45)?;
-            u16le(d, 45)?;
-            u16le(d, 0x800)?;
-            u16le(d, 8)?;
-            u16le(d, 0)?;
-            u16le(d, 33)?;
-            u32le(d, crc)?;
-            u32le(d, u32::MAX)?;
-            u32le(d, u32::MAX)?;
-            u16le(d, name.len() as u16)?;
-            u16le(d, 28)?;
-            u16le(d, 0)?;
-            u16le(d, 0)?;
-            u16le(d, 0)?;
-            u32le(d, 0)?;
-            u32le(d, u32::MAX)?;
-            d.write_all(name.as_bytes())?;
-            u16le(d, 1)?;
-            u16le(d, 24)?;
-            u64le(d, size)?;
-            u64le(d, compressed_size)?;
-            u64le(d, local_offset)?;
-            self.entries += 1;
-            if let Some(observation) = &mut self.observation {
-                observation.entries += 1;
-            }
-            Ok(())
+            let end = self
+                .offset
+                .checked_add(50 + name.len() as u64)
+                .and_then(|bytes| bytes.checked_add(compressed_size))
+                .context("ZIP member offset overflow")?;
+            self.record_entry(name, compressed_size, size, crc, end)
         })();
-        if let Err(error) = &result {
-            if let Some(observation) = &mut self.observation {
-                observation.finish(crate::observation::physical::error_status(error));
-            }
-        }
+        self.report_entry_error(&result);
         result
+    }
+    fn record_entry(
+        &mut self,
+        name: &str,
+        compressed_size: u64,
+        size: u64,
+        crc: u32,
+        end: u64,
+    ) -> Result<()> {
+        let local_offset = self.offset;
+        self.offset = end;
+        let d = &mut self.directory;
+        u32le(d, 0x02014b50)?;
+        u16le(d, 45)?;
+        u16le(d, 45)?;
+        u16le(d, 0x800)?;
+        u16le(d, 8)?;
+        u16le(d, 0)?;
+        u16le(d, 33)?;
+        u32le(d, crc)?;
+        u32le(d, u32::MAX)?;
+        u32le(d, u32::MAX)?;
+        u16le(d, name.len() as u16)?;
+        u16le(d, 28)?;
+        u16le(d, 0)?;
+        u16le(d, 0)?;
+        u16le(d, 0)?;
+        u32le(d, 0)?;
+        u32le(d, u32::MAX)?;
+        d.write_all(name.as_bytes())?;
+        u16le(d, 1)?;
+        u16le(d, 24)?;
+        u64le(d, size)?;
+        u64le(d, compressed_size)?;
+        u64le(d, local_offset)?;
+        self.entries += 1;
+        if let Some(observation) = &mut self.observation {
+            observation.entries += 1;
+        }
+        Ok(())
     }
 
     fn finish(mut self, ctx: &Context) -> Result<()> {
@@ -1585,6 +1809,26 @@ mod buffer_tests {
             Arc::new(|_| {}),
             Arc::new(crate::resources::MemoryPool::new(128 * 1024 * 1024)),
         )
+    }
+
+    #[test]
+    fn prepared_zip_member_buffer_spills_in_order_at_its_bound() -> Result<()> {
+        let ctx = context()?;
+        let mut member = ZipTarget::spool(&ctx, 1024 * 1024)?;
+        let prefix = vec![0x13; 512 * 1024];
+        member.write_all(&prefix)?;
+        assert!(matches!(member, ZipTarget::Memory { .. }));
+        assert_eq!(ctx.used(), 0);
+        member.write_all(&[0x37])?;
+        assert!(matches!(member, ZipTarget::Spool(_)));
+        assert_eq!(ctx.used(), prefix.len() as u64 + 1);
+        let mut restored = Vec::new();
+        member.reader(&ctx)?.read_to_end(&mut restored)?;
+        assert_eq!(restored.pop(), Some(0x37));
+        assert_eq!(restored, prefix);
+        drop(member);
+        assert_eq!(ctx.used(), 0);
+        Ok(())
     }
 
     #[test]
@@ -1793,11 +2037,10 @@ mod buffer_tests {
     #[test]
     fn publication_codec_writer_charge_follows_worker_and_finish() -> Result<()> {
         let dir = tempfile::tempdir()?;
-        for compression in [Compression::None, Compression::Gzip, Compression::Zstd] {
+        for compression in [Compression::None, Compression::Gzip] {
             let required = PUBLICATION_BUFFER
                 + match compression {
                     Compression::Gzip => deflate::CAPACITY,
-                    Compression::Zstd => zstandard::capacity()?,
                     _ => 0,
                 };
             let workspace = Arc::new(Workspace::new(required));
@@ -1809,10 +2052,6 @@ mod buffer_tests {
             let mut sink = match compression {
                 Compression::None => Sink::Plain(writer),
                 Compression::Gzip => Sink::Gzip(deflate::gzip(
-                    writer,
-                    Reservation::for_workspace(workspace.clone()),
-                )?),
-                Compression::Zstd => Sink::Zstd(zstandard::Encoder::new(
                     writer,
                     Reservation::for_workspace(workspace.clone()),
                 )?),
@@ -1884,12 +2123,7 @@ mod buffer_tests {
         let dir = tempfile::tempdir()?;
         let input = dir.path().join("input.csv");
         std::fs::write(&input, "id,label\n1,one\n2,two\n")?;
-        for compression in [
-            Compression::None,
-            Compression::Gzip,
-            Compression::Zstd,
-            Compression::Zip,
-        ] {
+        for compression in [Compression::None, Compression::Gzip, Compression::Zip] {
             let output = dir.path().join(format!("{compression:?}"));
             let job = Job {
                 input: input.to_string_lossy().into(),

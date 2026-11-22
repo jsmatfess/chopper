@@ -68,6 +68,8 @@ pub struct Progress {
 }
 pub type Notify = Arc<dyn Fn(Progress) + Send + Sync>;
 pub struct Budget {
+    #[cfg(target_os = "wasi")]
+    hosted_deflate: std::sync::OnceLock<crate::output::HostedDeflateLease>,
     observation_enabled: AtomicBool,
     observation_visits: AtomicU64,
     observation_attempts: AtomicU64,
@@ -108,6 +110,7 @@ pub struct Budget {
     shuffle_partition_rows: AtomicU64,
     input_record_bytes: AtomicU64,
     peak_bounded_writer_slots: AtomicU64,
+    peak_deflate_workers: AtomicU64,
     probabilistic_shuffle_attempts: AtomicU64,
     probabilistic_shuffle_retries: AtomicU64,
     indexed_exact_quota_scopes: AtomicU64,
@@ -314,6 +317,8 @@ impl Context {
         let context = Self {
             dir: Arc::new(dir),
             budget: Arc::new(Budget {
+                #[cfg(target_os = "wasi")]
+                hosted_deflate: std::sync::OnceLock::new(),
                 observation_enabled: AtomicBool::new(true),
                 observation_visits: AtomicU64::new(0),
                 observation_attempts: AtomicU64::new(0),
@@ -355,6 +360,7 @@ impl Context {
                 shuffle_partition_rows: AtomicU64::new(0),
                 input_record_bytes: AtomicU64::new(0),
                 peak_bounded_writer_slots: AtomicU64::new(0),
+                peak_deflate_workers: AtomicU64::new(0),
                 probabilistic_shuffle_attempts: AtomicU64::new(0),
                 probabilistic_shuffle_retries: AtomicU64::new(0),
                 indexed_exact_quota_scopes: AtomicU64::new(0),
@@ -493,6 +499,15 @@ impl Context {
             .peak_bounded_writer_slots
             .fetch_max(count as u64, AtomicOrdering::Relaxed);
     }
+    pub(crate) fn deflate_workers(&self, count: usize) {
+        self.budget
+            .peak_deflate_workers
+            .fetch_max(count as u64, AtomicOrdering::Relaxed);
+    }
+    #[cfg(target_os = "wasi")]
+    pub(crate) fn hosted_deflate(&self) -> &std::sync::OnceLock<crate::output::HostedDeflateLease> {
+        &self.budget.hosted_deflate
+    }
 
     pub(crate) fn used_retained_exact_writers(&self) {
         self.budget
@@ -526,6 +541,10 @@ impl Context {
                 .peak_bounded_writer_slots
                 .load(AtomicOrdering::Relaxed)
                 .max(1),
+            peak_deflate_workers: self
+                .budget
+                .peak_deflate_workers
+                .load(AtomicOrdering::Relaxed),
         }
     }
     pub fn used(&self) -> u64 {
