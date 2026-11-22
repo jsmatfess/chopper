@@ -31,9 +31,8 @@ Object.assign(window,{benchmark:async(config:Partial<Job>,verifySimple=false)=>{
   const wait=async(status:string)=>{const deadline=performance.now()+300000;while(performance.now()<deadline){const state=await api<State>('state');if(state.status===status)return state;if(state.status==='failed')throw new Error(state.error!);await new Promise(r=>setTimeout(r,10));}throw new Error('Benchmark timed out');};
   try{
     const start=performance.now();
-    await api('analyze',{...defaults,...config,input:file.name,output:'results'});
-    const ready=await wait('ready'),analyzed=performance.now();
-    await api('run',{});const done=await wait('complete'),finished=performance.now();
+    await api('run-direct',{...defaults,...config,input:file.name,output:'results'});
+    const done=await wait('complete'),finished=performance.now();
     const folder=await destination.getDirectoryHandle(done.output!.split('/').at(-1)!);
     const manifest=await (await (await folder.getFileHandle('manifest.jsonl')).getFile()).text();
     const hashes:Record<string,string>={};
@@ -54,6 +53,6 @@ Object.assign(window,{benchmark:async(config:Partial<Job>,verifySimple=false)=>{
     if(seen&&!seen.every(Boolean))throw new Error('Fixture IDs lost');
     const storage=browserDiagnostics.storage as {profiled_destination_bytes:number;workspace_bytes_after_cleanup:number;peak_open_handles:number}|undefined;
     if(!storage||storage.profiled_destination_bytes!==destinationBytes||storage.workspace_bytes_after_cleanup!==0||storage.peak_open_handles>64)throw new Error('Browser storage/export accounting mismatch');
-    return {conservation_verified:!!seen,diagnostics:structuredClone(browserDiagnostics),analysis:ready.analysis,manifest,analysis_wall_seconds:(analyzed-start)/1000,execution_seconds:(finished-analyzed)/1000,elapsed_seconds:(finished-start)/1000,hashes};
+    return {conservation_verified:!!seen,diagnostics:structuredClone(browserDiagnostics),analysis:done.analysis,manifest,timing_scope:'complete Run including publication/export and cleanup',analysis_wall_seconds:null,execution_seconds:(finished-start)/1000,elapsed_seconds:(finished-start)/1000,hashes};
   }finally{await api('cancel',{});await root.removeEntry(name,{recursive:true});}
 }});

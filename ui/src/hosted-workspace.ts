@@ -305,7 +305,7 @@ export function configureHostedWorkspace() {
       get('draft-resources').textContent = job ? `${job.resources.memory_mb==='auto'?'Auto budget · up to 256 MiB':`${(get('memory') as HTMLInputElement).value} ${(get('memory-unit') as HTMLSelectElement).value} working budget`} · ${job.resources.workers===0?'auto workers':`${job.resources.workers} worker(s)`}.` : 'Finish the highlighted configuration fields to review the draft.';
     },
     state(state: State, dirty: boolean) {
-      const busy=['profiling','analyzing','running'].includes(state.status),finished=processingStarted!==null&&!busy;processing.hidden=!busy;
+      const busy=['profiling','running'].includes(state.status),finished=processingStarted!==null&&!busy;processing.hidden=!busy;
       if(busy){processingStarted??=performance.now();get('processing-activity').textContent=state.progress.phase||'Processing';get('processing-activity').title=state.progress.phase||'Processing';get('processing-elapsed').textContent=`${Math.floor((performance.now()-processingStarted)/1000).toLocaleString()} s elapsed`;}
       else processingStarted=null;
       (get('processing-cancel') as HTMLButtonElement).disabled=(get('cancel') as HTMLButtonElement).disabled;
@@ -314,10 +314,10 @@ export function configureHostedWorkspace() {
       get('analysis').setAttribute('aria-label',dirty?'Previous processing result; draft has changed':'Processing result');
       if(dirty && state.analysis) {
         const saved=state.status==='complete'&&state.output?` Last completed result folder: ${state.output}.`:'';
-        get('result-path').textContent = `Draft changed. Processing results describe the previous submitted configuration.${saved} Run with the current settings or prepare again before confirming.`;
+        get('result-path').textContent = `Draft changed. Processing results describe the previous submitted configuration.${saved} Run again to process the current settings.`;
       }
       if(state.status==='complete' && !dirty) get('result-path').textContent = `✓ Complete. Results saved to ${state.output}. Files closed and CHOPPER-COMPLETE.json written.`;
-      if(finished&&['complete','failed','profiled','ready'].includes(state.status)&&!(document.activeElement as HTMLElement|null)?.closest('#job-form')){
+      if(finished&&['complete','failed','profiled'].includes(state.status)&&!(document.activeElement as HTMLElement|null)?.closest('#job-form')){
         const active=document.activeElement as HTMLElement|null;
         if(view==='execution'&&state.status!=='failed'){
           if(active?.closest('#processing-strip')||active===get('cancel')||active===document.body)heading.focus({preventScroll:true});

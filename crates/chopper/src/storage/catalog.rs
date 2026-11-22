@@ -13,7 +13,7 @@ impl<T> Catalog<T> {
             reservation: Reservation::new(ctx),
         }
     }
-    fn with_capacity(reservation: Reservation, capacity: usize) -> Result<Self> {
+    pub(super) fn with_capacity(reservation: Reservation, capacity: usize) -> Result<Self> {
         let mut result = Self {
             values: Vec::new(),
             reservation,

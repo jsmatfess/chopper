@@ -675,9 +675,9 @@ fn source_lifetime_profile_run_prepare_cancel_and_unwind() -> Result<()> {
                 let mut competitor = Grant::new(pool.clone());
                 competitor.grow(128 * 1024 * 1024 - source as usize)?;
                 let result = if mode == "denied" {
-                    owner.run(cancel, notify)
+                    owner.run(cancel, notify).map(|_| ())
                 } else {
-                    owner.prepare_analysis(cancel, notify)
+                    owner.analyze(cancel, notify).map(|_| ())
                 };
                 assert!(result.is_err());
                 assert_eq!(pool.usage().reserved_bytes, competitor.bytes as u64);
@@ -707,7 +707,7 @@ fn source_lifetime_profile_run_prepare_cancel_and_unwind() -> Result<()> {
                 );
                 assert!(pool.usage().reserved_bytes >= source + prepared.job.reserved_bytes());
                 drop(prepared);
-                drop(owner.prepare_analysis(cancel, notify)?);
+                drop(owner.analyze(cancel, notify)?);
             }
             "decline" => drop(owner), // prompt's early error drops this same owner
             "unwind" => {

@@ -1,7 +1,7 @@
 # Native scripted Job decoding ownership
 
 [#151](history/prior-issues.md#issue-151), child of #86, covers only
-native scripted `analyze`, `run` and `profile` decode-origin payloads. The
+native scripted `analyze` and `run` decode-origin payloads. The
 [facade](../crates/chopper/src/cli_job.rs) preserves metadata lookup, the exact
 `configuration exceeds 1 MiB` metadata rejection, File open, and direct typed
 `serde_json::from_reader::<_, Job>` with `read job JSON` context. Metadata is not
@@ -138,7 +138,7 @@ are different quantities; no performance, scale or RSS claim follows.
 After from_reader destroys scratch/Content, the existing exhaustive Job capacity
 walker must fit E; only then shrink to actual retained String/Vec capacity.
 DecodedJob declares Job before its grant. Immutable borrowing, scalar resource
-overrides and consuming run/prepare-analysis methods retain source capacity through
+overrides and consuming Run/Analyze methods retain source capacity through
 prompts, profiling and the whole engine call. PreparedJob independently admits its
 configuration; intentional overlap can deny work or reduce Auto's observed free
 headroom. No early release, bare extraction, Clone, general mutation or generic

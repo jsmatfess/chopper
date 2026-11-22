@@ -644,7 +644,7 @@ mod lifecycle_tests {
         let p = pool.clone();
         let signal = headroom.clone();
         let notify: crate::storage::Notify = Arc::new(move |progress| {
-            if progress.phase == "Ready for confirmation" {
+            if progress.phase == "Finalizing output snapshot" {
                 signal.store(0, Ordering::Relaxed);
                 p.force_pressure_check();
             }

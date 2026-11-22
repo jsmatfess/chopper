@@ -57,9 +57,8 @@ chopper run --input input.csv --output shuffled --step shuffle --step balanced -
 # Partition by country and allocate treatment/control
 chopper run --input input.csv --output experiment --step partition --by country --step assign --groups treatment=80,control=20 --yes
 
-# Analyze a configured job, or scan input statistics
+# Analyze input statistics and pipeline estimates without producing output
 chopper analyze --config examples/job.json
-chopper profile --config examples/job.json
 ```
 
 `run --step` preserves operation order; `split` is a convenience command with a

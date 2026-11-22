@@ -62,11 +62,14 @@ impl<R: Read> DecodeReader<R> {
         })
     }
 }
-impl<R: Read> Read for DecodeReader<R> {
-    fn read(&mut self, out: &mut [u8]) -> io::Result<usize> {
+impl<R: Read> DecodeReader<R> {
+    fn read_decoded<const DIRECT: bool>(&mut self, out: &mut [u8]) -> io::Result<usize> {
         if out.is_empty() {
             return Ok(0);
         }
+        // Keep pending decoded bytes and small-reader behavior unchanged.
+        let output_capacity = self.output.len();
+        let direct = DIRECT && self.pos == self.len && out.len() >= output_capacity;
         while self.pos == self.len && !self.done {
             if self.start == self.end && !self.eof {
                 self.end = self.source.read(&mut self.input)?;
@@ -75,27 +78,46 @@ impl<R: Read> Read for DecodeReader<R> {
             }
             let (result, used, written) = self.decoder.decode_to_utf8_without_replacement(
                 &self.input[self.start..self.end],
-                &mut self.output,
+                if direct {
+                    &mut out[..output_capacity]
+                } else {
+                    &mut self.output
+                },
                 self.eof,
             );
             self.start += used;
             self.pos = 0;
-            self.len = written;
+            self.len = if direct { 0 } else { written };
             match result {
                 DecoderResult::Malformed(_, _) => {
+                    // Preserve the buffered reader's state if a library caller
+                    // retries after InvalidData; Intake itself stays terminal.
+                    if direct {
+                        self.output[..written].copy_from_slice(&out[..written]);
+                        self.len = written;
+                    }
                     return Err(io::Error::new(
                         io::ErrorKind::InvalidData,
                         "invalid byte sequence in selected input encoding",
-                    ))
+                    ));
                 }
                 DecoderResult::InputEmpty if self.eof => self.done = true,
                 _ => {}
+            }
+            if direct && written != 0 {
+                return Ok(written);
             }
         }
         let n = out.len().min(self.len - self.pos);
         out[..n].copy_from_slice(&self.output[self.pos..self.pos + n]);
         self.pos += n;
         Ok(n)
+    }
+}
+
+impl<R: Read> Read for DecodeReader<R> {
+    fn read(&mut self, out: &mut [u8]) -> io::Result<usize> {
+        self.read_decoded::<{ cfg!(feature = "experimental-direct-decode") }>(out)
     }
 }
 
@@ -1312,6 +1334,117 @@ mod quote_predicate_contracts {
                 }
             }
             assert!(needs_quotes(&settings, ""));
+        }
+    }
+}
+
+#[cfg(test)]
+mod direct_decoder_contracts {
+    use super::*;
+    struct Fragmented<'a> {
+        bytes: &'a [u8],
+        fragment: usize,
+    }
+    impl Read for Fragmented<'_> {
+        fn read(&mut self, out: &mut [u8]) -> io::Result<usize> {
+            let n = out.len().min(self.fragment).min(self.bytes.len());
+            out[..n].copy_from_slice(&self.bytes[..n]);
+            self.bytes = &self.bytes[n..];
+            Ok(n)
+        }
+    }
+    fn frames<const DIRECT: bool>(
+        bytes: &[u8],
+        encoding: &str,
+        fragment: usize,
+        sizes: &[usize],
+    ) -> Vec<Result<Vec<u8>, io::ErrorKind>> {
+        let mut decoder = DecodeReader::new(Fragmented { bytes, fragment }, encoding).unwrap();
+        let mut frames = Vec::new();
+        for index in 0..bytes.len() * 2 + 100 {
+            let mut out = vec![0; sizes[index % sizes.len()]];
+            match decoder.read_decoded::<DIRECT>(&mut out) {
+                Ok(n) => {
+                    out.truncate(n);
+                    frames.push(Ok(out));
+                    if n == 0 && sizes[index % sizes.len()] != 0 {
+                        return frames;
+                    }
+                }
+                Err(e) => {
+                    frames.push(Err(e.kind()));
+                    return frames;
+                }
+            }
+        }
+        panic!("decoder failed to finish");
+    }
+    #[test]
+    fn invalid_data_retry_keeps_the_same_valid_prefix_and_decoder_state() {
+        for direct in [false, true] {
+            let mut decoder = DecodeReader::new(std::io::Cursor::new(b"a\xffb"), "utf-8").unwrap();
+            let mut out = vec![0; 65536];
+            let mut read = || {
+                if direct {
+                    decoder.read_decoded::<true>(&mut out)
+                } else {
+                    decoder.read_decoded::<false>(&mut out)
+                }
+            };
+            assert_eq!(read().unwrap_err().kind(), io::ErrorKind::InvalidData);
+            assert_eq!(read().unwrap(), 1);
+            assert_eq!(out[0], b'a');
+            let n = if direct {
+                decoder.read_decoded::<true>(&mut out)
+            } else {
+                decoder.read_decoded::<false>(&mut out)
+            }
+            .unwrap();
+            assert_eq!((n, out[0]), (1, b'b'));
+        }
+    }
+    #[test]
+    fn large_direct_output_matches_buffered_frames_bom_fragments_and_strict_errors() {
+        for (encoding, text) in [
+            ("utf-8", "ascii,界🦀\r\n"),
+            ("utf-16le", "ascii,界🦀\r\n"),
+            ("utf-16be", "ascii,界🦀\r\n"),
+            ("windows-1252", "ascii,é€\r\n"),
+            ("Shift_JIS", "ascii,日本\r\n"),
+            ("GBK", "ascii,中文\r\n"),
+            ("Big5", "ascii,中文\r\n"),
+            ("EUC-KR", "ascii,한글\r\n"),
+            ("ISO-8859-2", "ascii,é\r\n"),
+        ] {
+            let mut bytes = encode(&text.repeat(1500), encoding).unwrap();
+            let settings = CsvSettings {
+                encoding: encoding.into(),
+                bom: true,
+                ..Default::default()
+            };
+            if let Ok(mark) = bom(&settings) {
+                bytes.splice(..0, mark);
+            }
+            let mut truncated = bytes.clone();
+            truncated.pop();
+            let mut malformed = bytes.clone();
+            malformed.extend_from_slice(&[0xff, 0xd8, 0]);
+            for input in [&bytes[..], &truncated[..], &malformed[..], &[][..]] {
+                for fragment in [1, 3, 8191, 8192] {
+                    for sizes in [
+                        &[32768][..],
+                        &[65536][..],
+                        &[0, 1, 65536, 2, 32768][..],
+                        &[32767, 32768, 3][..],
+                    ] {
+                        assert_eq!(
+                            frames::<true>(input, encoding, fragment, sizes),
+                            frames::<false>(input, encoding, fragment, sizes),
+                            "{encoding} fragment={fragment} sizes={sizes:?}"
+                        );
+                    }
+                }
+            }
         }
     }
 }

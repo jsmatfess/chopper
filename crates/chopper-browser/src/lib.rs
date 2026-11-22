@@ -1,15 +1,11 @@
 //! WASI reactor: the same engine used by the CLI, hosted in a browser worker.
 #[cfg(target_os = "wasi")]
 mod reactor {
-    use chopper::{
-        core::Job,
-        engine::{self, Prepared},
-    };
+    use chopper::{core::Job, engine};
     use std::{
         cell::RefCell,
         sync::{atomic::AtomicBool, Arc},
     };
-    thread_local! { static PREPARED: RefCell<Option<Prepared>> = const { RefCell::new(None) }; }
     thread_local! { static PROFILE: RefCell<chopper::profile::ProfileCache> = RefCell::new(chopper::profile::ProfileCache::default()); }
 
     #[no_mangle]
@@ -18,10 +14,10 @@ mod reactor {
         0
     }
     #[no_mangle]
-    pub extern "C" fn chopper_profile() -> i32 {
+    pub extern "C" fn chopper_analyze() -> i32 {
         report((|| {
-            PREPARED.with(|p| p.borrow_mut().take());
             let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
+            validate_resources(&job)?;
             PROFILE.with(|p| {
                 Ok(serde_json::to_value(p.borrow_mut().profile(
                     &job,
@@ -82,7 +78,6 @@ mod reactor {
     #[no_mangle]
     pub extern "C" fn chopper_run() -> i32 {
         report((|| {
-            PREPARED.with(|p| p.borrow_mut().take());
             let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
             validate_resources(&job)?;
             fn emit(value: impl serde::Serialize, prefix: &str) -> bool {
@@ -161,34 +156,5 @@ mod reactor {
             "browser engine currently uses one processing worker; select 0 or 1"
         );
         Ok(())
-    }
-    #[no_mangle]
-    pub extern "C" fn chopper_analyze() -> i32 {
-        report((|| {
-            PREPARED.with(|p| p.borrow_mut().take());
-            let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
-            validate_resources(&job)?;
-            let prepared = engine::prepare(
-                job,
-                Arc::new(AtomicBool::new(false)),
-                Arc::new(|p| {
-                    println!("{}", serde_json::json!({"progress":p}));
-                }),
-            )?;
-            let analysis = serde_json::to_value(&prepared.analysis)?;
-            PREPARED.with(|p| *p.borrow_mut() = Some(prepared));
-            Ok(serde_json::json!({"analysis":analysis}))
-        })())
-    }
-    #[no_mangle]
-    pub extern "C" fn chopper_execute() -> i32 {
-        report(PREPARED.with(|p| {
-            let prepared = p
-                .borrow_mut()
-                .take()
-                .ok_or_else(|| anyhow::anyhow!("analyze before execution"))?;
-            prepared.execute()?;
-            Ok(serde_json::json!({"complete":true}))
-        }))
     }
 }

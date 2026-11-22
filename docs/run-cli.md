@@ -73,6 +73,13 @@ confirmation path (`--yes` for noninteractive runs), engine dispatch, cancellati
 and native atomic publication. The output path must be a new directory. CLI
 ordering changes requested logical operations, not the rewrite eligibility rules.
 
+`chopper analyze --config job.json` scans input statistics and reports pipeline
+estimates without building output files. It replaces the former exact-plan
+Analyze behavior and the former `profile` command. Run always processes its own
+submitted configuration and validates the input it consumes; no prepared-result
+approval command remains. Run's normal path confirmation still precedes input
+consumption (`--yes` for noninteractive use).
+
 ## Hosted command export and quoting
 
 The hosted output plan generates an equivalent command, using `--flag=value`

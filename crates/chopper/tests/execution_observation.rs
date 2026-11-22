@@ -604,26 +604,30 @@ fn terminal_balanced_observes_consecutive_emission() {
 }
 
 #[test]
-fn uniform_balanced_observes_one_fused_traversal() {
+fn full_shuffle_balanced_observes_one_fused_traversal() {
     use chopper::observation::physical::Kind;
-    let facts = observed_split(vec![
-        Operation::Shuffle {
-            strategy: Shuffle::Uniform,
-        },
-        Operation::Balanced { files: 3 },
-    ]);
-    let traversal = facts
-        .iter()
-        .find(|f| f.kind == Kind::FusedBalanced && f.status == Status::Completed)
-        .unwrap();
-    assert_eq!(traversal.operations, [2, 0]);
-    assert_eq!((traversal.rows, traversal.groups), (6, 3));
-    assert_eq!(&traversal.memberships[..3], &[2, 2, 2]);
-    assert!(traversal.sources.iter().flatten().any(|id| facts
-        .iter()
-        .any(|f| f.id == *id && f.kind == Kind::ResidentSort && f.operations == [1, 0])));
+    for strategy in [Shuffle::Uniform, Shuffle::FisherYates] {
+        let producer = if strategy == Shuffle::FisherYates {
+            Kind::FisherYates
+        } else {
+            Kind::ResidentSort
+        };
+        let facts = observed_split(vec![
+            Operation::Shuffle { strategy },
+            Operation::Balanced { files: 3 },
+        ]);
+        let traversal = facts
+            .iter()
+            .find(|f| f.kind == Kind::FusedBalanced && f.status == Status::Completed)
+            .unwrap();
+        assert_eq!(traversal.operations, [2, 0]);
+        assert_eq!((traversal.rows, traversal.groups), (6, 3));
+        assert_eq!(&traversal.memberships[..3], &[2, 2, 2]);
+        assert!(traversal.sources.iter().flatten().any(|id| facts
+            .iter()
+            .any(|f| f.id == *id && f.kind == producer && f.operations == [1, 0])));
+    }
 }
-
 #[test]
 fn cancellation_at_shared_ranges_preserves_input_and_cleans_private_output() {
     use chopper::observation::physical::{Fact, Kind};

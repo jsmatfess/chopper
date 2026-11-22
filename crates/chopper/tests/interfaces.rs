@@ -82,7 +82,7 @@ fn cli_rejects_obsolete_saved_jobs_before_input_io() {
                 .to_string(),
         )
         .unwrap();
-        for command in ["profile", "analyze", "run"] {
+        for command in ["analyze", "run"] {
             let result = Command::new(env!("CARGO_BIN_EXE_chopper"))
                 .arg(command)
                 .arg("--config")
@@ -139,7 +139,7 @@ fn cli_rejects_removed_experiments_before_input_io() {
         let output = temp.path().join("result");
         body["output"] = serde_json::json!(output);
         fs::write(&config, body.to_string()).unwrap();
-        for command in ["profile", "analyze", "run"] {
+        for command in ["analyze", "run"] {
             let result = Command::new(env!("CARGO_BIN_EXE_chopper"))
                 .arg(command)
                 .arg("--config")
@@ -153,4 +153,58 @@ fn cli_rejects_removed_experiments_before_input_io() {
             assert!(!output.exists());
         }
     }
+}
+
+#[test]
+fn analyze_returns_input_statistics_without_executing_the_pipeline() {
+    let temp = tempfile::tempdir().unwrap();
+    let input = temp.path().join("input.csv");
+    let output = temp.path().join("result");
+    let config = temp.path().join("job.json");
+    fs::write(&input, "id\n1\n2\n3\n").unwrap();
+    fs::write(
+        &config,
+        serde_json::json!({
+            "input":input,"output":output,"operations":[{"type":"balanced","files":100}],
+            "resources":{"memory_mb":32,"workers":1,"max_record_bytes":1024}
+        })
+        .to_string(),
+    )
+    .unwrap();
+    let analyze = || {
+        Command::new(env!("CARGO_BIN_EXE_chopper"))
+            .args(["analyze", "--config"])
+            .arg(&config)
+            .stdin(Stdio::null())
+            .output()
+            .unwrap()
+    };
+    let result = analyze();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    let statistics: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+    assert_eq!(statistics["rows"], 3);
+    assert!(statistics.get("output_files").is_none());
+    assert!(!output.exists());
+    let run = Command::new(env!("CARGO_BIN_EXE_chopper"))
+        .args(["run", "--yes", "--config"])
+        .arg(&config)
+        .output()
+        .unwrap();
+    assert!(
+        !run.status.success(),
+        "Run must enforce exact group feasibility"
+    );
+    assert!(!output.exists());
+    fs::write(&input, "id\n1\n2\n").unwrap();
+    let changed = analyze();
+    assert!(changed.status.success());
+    assert_eq!(
+        serde_json::from_slice::<serde_json::Value>(&changed.stdout).unwrap()["rows"],
+        2
+    );
+    assert!(!output.exists());
 }

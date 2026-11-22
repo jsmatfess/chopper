@@ -33,7 +33,7 @@ enum Command {
     },
     /// Print a complete example job configuration.
     Example,
-    /// Validate all rows and compute an exact output plan without publishing files.
+    /// Inspect all input rows and report bounded statistics and pipeline estimates.
     Analyze {
         #[arg(short, long)]
         config: PathBuf,
@@ -41,11 +41,6 @@ enum Command {
         memory_mb: Option<MemoryBudget>,
         #[arg(long)]
         workers: Option<usize>,
-    },
-    /// Scan all input records without preparing output files.
-    Profile {
-        #[arg(short, long)]
-        config: PathBuf,
     },
     /// Convenience form: partition, assign, shuffle, balanced split, then final limits.
     Split {
@@ -109,23 +104,16 @@ impl CliJob {
             Self::Decoded(owner) => owner.job(),
         }
     }
-    fn execute(
-        self,
-        execute: bool,
-        cancel: Arc<AtomicBool>,
-        notify: Notify,
-    ) -> Result<engine::Analysis> {
+    fn execute(self, cancel: Arc<AtomicBool>, notify: Notify) -> Result<engine::Analysis> {
         match self {
-            Self::Ordinary(job) if execute => engine::run(job, cancel, notify),
-            Self::Ordinary(job) => Ok(engine::prepare(job, cancel, notify)?.analysis),
-            Self::Decoded(owner) if execute => owner.run(cancel, notify),
-            Self::Decoded(owner) => owner.prepare_analysis(cancel, notify),
+            Self::Ordinary(job) => engine::run(job, cancel, notify),
+            Self::Decoded(owner) => owner.run(cancel, notify),
         }
     }
 }
-fn run_job(source: CliJob, execute: bool, yes: bool) -> Result<()> {
+fn run_job(source: CliJob, yes: bool) -> Result<()> {
     let job = source.job();
-    if execute && !yes {
+    if !yes {
         ensure!(
             io::stdin().is_terminal(),
             "non-interactive execution requires --yes"
@@ -144,24 +132,20 @@ fn run_job(source: CliJob, execute: bool, yes: bool) -> Result<()> {
             p.temp_bytes / 1024 / 1024
         )
     });
-    let analysis = if execute {
-        if !yes {
-            eprint!(
-                "Process {} and write output to {}? [y/N] ",
-                job.input, job.output
-            );
-            io::stderr().flush()?;
-            let mut answer = String::new();
-            io::stdin().read_line(&mut answer)?;
-            ensure!(
-                matches!(answer.trim().to_ascii_lowercase().as_str(), "y" | "yes"),
-                "execution declined"
-            );
-        }
-        source.execute(true, cancelled, notify)?
-    } else {
-        source.execute(false, cancelled, notify)?
-    };
+    if !yes {
+        eprint!(
+            "Process {} and write output to {}? [y/N] ",
+            job.input, job.output
+        );
+        io::stderr().flush()?;
+        let mut answer = String::new();
+        io::stdin().read_line(&mut answer)?;
+        ensure!(
+            matches!(answer.trim().to_ascii_lowercase().as_str(), "y" | "yes"),
+            "execution declined"
+        );
+    }
+    let analysis = source.execute(cancelled, notify)?;
     cli_json::write_pretty(&mut io::stdout().lock(), &analysis)?;
     Ok(())
 }
@@ -176,7 +160,7 @@ fn main_result() -> Result<()> {
     let matches = Cli::command().subcommand(run_cli::command()).get_matches();
     if let Some(("run", arguments)) = matches.subcommand() {
         let source = run_cli::source(arguments)?;
-        return run_job(source, true, arguments.get_flag("yes"));
+        return run_job(source, arguments.get_flag("yes"));
     }
     match Cli::from_arg_matches(&matches)?.command {
         Command::Guide { config } => guide::run(config)?,
@@ -211,22 +195,16 @@ fn main_result() -> Result<()> {
             config,
             memory_mb,
             workers,
-        } => run_job(
-            CliJob::Decoded(
-                chopper::cli_job::DecodedJob::read(config)?.resource_overrides(memory_mb, workers),
-            ),
-            false,
-            false,
-        )?,
-        Command::Profile { config } => {
+        } => {
             let cancelled = Arc::new(AtomicBool::new(false));
             let signal = cancelled.clone();
             ctrlc::set_handler(move || signal.store(true, Ordering::Relaxed))?;
-            let profile = chopper::profile::ProfileCache::default().profile(
-                chopper::cli_job::DecodedJob::read(config)?.job(),
-                cancelled,
-                Arc::new(|p| eprintln!("{} | {} rows", p.phase, p.rows)),
-            )?;
+            let profile = chopper::cli_job::DecodedJob::read(config)?
+                .resource_overrides(memory_mb, workers)
+                .analyze(
+                    cancelled,
+                    Arc::new(|p| eprintln!("{} | {} rows", p.phase, p.rows)),
+                )?;
             cli_json::write_pretty(&mut io::stdout().lock(), &profile)?;
         }
         Command::Split {
@@ -321,7 +299,7 @@ fn main_result() -> Result<()> {
                     Operation::Balanced { files }
                 });
             }
-            run_job(CliJob::Ordinary(job), true, yes)?;
+            run_job(CliJob::Ordinary(job), yes)?;
         }
     }
     Ok(())

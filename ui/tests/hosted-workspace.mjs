@@ -24,9 +24,8 @@ async function bundle(){
         if(path==='preview'){if(window.deferPreview)await new Promise(resolve=>window.releasePreview=resolve);return window.previewFixture??{columns:2,header:['country','note'],preview:[[data.input==='old.csv'?'OLD':'US','sample']],input_is_zip:false};}
         if(path==='pick-path')return {path:data.mode==='input'?'source.csv':'destination'};
         if(path==='sniff')return {settings:{...data.input_csv,delimiter:';'},note:'Fixture detection; no scan'};
-        if(path==='profile'){const finish=()=>window.fixtureState={...window.fixtureState,status:'profiled',profile:window.profileFixture??{rows:4,columns:2,header:['country','note'],seconds:1,accuracy:'Exact fixture input count',stages:[],column_values:[]}};if(window.deferProfile){window.fixtureState={...window.fixtureState,status:'profiling',profile:null};window.finishProfile=finish;}else finish();return {};}
-        if(path==='analyze'){if(window.deferPreparation){const gate=Promise.withResolvers();window.releasePreparation=gate.resolve;await gate.promise;}window.fixtureState={...window.fixtureState,status:'ready',analysis:window.analysis};return {};}
-        if(path==='run-direct'||path==='run'){window.fixtureState={...window.fixtureState,status:'running',error:null,progress:{phase:'Fixture processing',rows:1,temp_bytes:0}};return {};}
+        if(path==='profile'){if(window.deferAnalysisAck)await new Promise(resolve=>window.releaseAnalysisAck=resolve);const finish=()=>window.fixtureState={...window.fixtureState,status:'profiled',profile:window.profileFixture??{rows:4,columns:2,header:['country','note'],seconds:1,accuracy:'Exact fixture input count',stages:[],column_values:[]}};if(window.deferProfile){window.fixtureState={...window.fixtureState,status:'profiling',profile:null};window.finishProfile=finish;}else finish();return {};}
+        if(path==='run-direct'){window.fixtureState={...window.fixtureState,status:'running',error:null,progress:{phase:'Fixture processing',rows:1,temp_bytes:0}};return {};}
         if(path==='cancel'){window.fixtureState={...window.fixtureState,status:'cancelled',analysis:null};return {};}
         throw new Error('Unexpected mock client action '+path);
       }`}));
@@ -104,23 +103,14 @@ test('hosted workspace preserves configuration and real app action wiring throug
     await page.locator('#profile').click();
     assert.equal(!(await page.locator('#run-direct').textContent()).includes('Confirm & split'),true);
     assert.match(await page.locator('#input-profile').innerText(),/Records · exact/);assert.equal(await page.locator('.profile-facts dd').first().innerText(),'4');
-    await page.locator('#analyze').click();
-    assert.equal((await page.locator('#run-direct').textContent()).includes('Confirm & split'),true);
-    const before=await page.evaluate(()=>window.calls.filter(c=>c.path==='analyze').at(-1).data);
+    assert.equal(await page.locator('#analyze').count(),0);
+    const before=await page.evaluate(()=>window.calls.filter(c=>c.path==='profile').at(-1).data);
     assert.deepEqual(before.operations,reordered.operations);
-    await page.locator('#max-rows').fill('13');
-    await tick(page);assert.equal(!(await page.locator('#run-direct').textContent()).includes('Confirm & split'),true);
-    assert.match(await page.locator('#result-path').innerText(),/Draft changed/);
+    await page.locator('#max-rows').fill('13');await tick(page);
+    assert.equal(await page.locator('#run-direct').textContent(),'Run →');
     await page.locator('#max-rows').fill('12');
-    assert.equal(!(await page.locator('#run-direct').textContent()).includes('Confirm & split'),true);
-    await page.evaluate(()=>window.deferPreparation=true);
-    await page.locator('#analyze').click();
-    await page.waitForFunction(()=>window.releasePreparation);
-    await page.locator('#max-rows').fill('14');await page.locator('#max-rows').fill('12');
-    await page.evaluate(()=>{window.deferPreparation=false;window.releasePreparation();});await tick(page);
-    assert.equal(!(await page.locator('#run-direct').textContent()).includes('Confirm & split'),true,'late acknowledgement cannot validate an edited and reverted draft');
-    await page.locator('#analyze').click();await page.locator('#run-direct').click();
-    assert.equal(await page.evaluate(()=>window.calls.filter(c=>c.path!=='state').at(-1).path),'run');
+    await page.locator('#run-direct').click();
+    assert.equal(await page.evaluate(()=>window.calls.filter(c=>c.path!=='state').at(-1).path),'run-direct');
     await page.locator('#cancel').click();
     assert.match(await page.locator('#status').innerText(),/CANCELLED/);
     await page.locator('#run-direct').click();
@@ -228,11 +218,11 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} encoding aliases su
       await page.waitForFunction(()=>document.getElementById('status').textContent==='RUNNING');
       await page.locator('#cancel').click();
       await page.waitForFunction(()=>document.getElementById('status').textContent==='CANCELLED');
-      await page.locator('#analyze').evaluate(el=>el.click());
-      await page.waitForFunction(()=>document.getElementById('run-direct').textContent.includes('Confirm & split'));
-      assert.deepEqual(await page.evaluate(()=>window.calls.findLast(c=>c.path==='analyze').data),expected);
+      await page.locator('#profile').evaluate(el=>el.click());
+      await page.waitForFunction(()=>document.getElementById('input-profile').hidden===false);
+      assert.deepEqual(await page.evaluate(()=>window.calls.findLast(c=>c.path==='profile').data),expected);
       await page.locator('#run-direct').click();
-      assert.deepEqual(await page.evaluate(()=>window.calls.findLast(c=>c.path==='run').data),{});
+      assert.deepEqual(await page.evaluate(()=>window.calls.findLast(c=>c.path==='run-direct').data),expected);
       assert.deepEqual(await exported(page),expected);
       await page.waitForFunction(()=>document.getElementById('status').textContent==='RUNNING');
       await page.locator('#cancel').click();
@@ -252,7 +242,7 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} sample loads on imp
     await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({...defaults,input:'source.csv',output:'destination'}))});
     await page.waitForFunction(()=>!document.getElementById('preview-card').hidden);
     assert.match(await page.locator('#preview').innerText(),/US/);
-    for(const id of ['profile','analyze','run-direct','cancel'])assert.equal(await page.locator(`.results .plan #${id}`).count(),1);
+    for(const id of ['profile','run-direct','cancel'])assert.equal(await page.locator(`.results .plan #${id}`).count(),1);
     assert.equal(await page.locator('#execute').count(),0);
     assert.equal(await page.locator('.editor #run-direct, .editor #profile, .editor #analyze, .editor #cancel').count(),0);
     assert.equal(await page.locator('#run-direct').evaluate(button=>button.form?.id),'job-form');
@@ -263,8 +253,8 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} sample loads on imp
       assert.equal(await page.locator('#output-plan h2').innerText(),'Output plan');
     }
     assert.equal(await page.evaluate(()=>window.calls.some(c=>['profile','analyze','run','run-direct'].includes(c.path))),false);
-    await page.locator('#analyze').click();
-    await page.waitForFunction(()=>document.getElementById('run-direct').textContent.includes('Confirm & split'));
+    await page.locator('#profile').click();
+    await page.waitForFunction(()=>document.getElementById('status').textContent==='PROFILED');
     await page.locator('#max-rows').fill('7');
     assert.equal(await page.locator('#run-direct').textContent(),'Run →');
     await page.locator('#run-direct').click();
@@ -427,8 +417,8 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} imports surface uns
     await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(config))});
     await page.waitForFunction(()=>document.getElementById('validation-list').textContent.includes('missing or ambiguous'));
     assert.match(await page.locator('#validation-panel').innerText(),/encoding is unsupported/);
-    await page.locator('#analyze').click();
-    assert.equal(await page.evaluate(()=>window.calls.some(c=>c.path==='analyze')),false);
+    await page.locator('#profile').click();
+    assert.equal(await page.evaluate(()=>window.calls.some(c=>c.path==='profile')),false);
     assert.equal(await page.locator('#input-csv [data-csv="encoding"]').getAttribute('aria-invalid'),'true');
     assert.deepEqual(errors,[]);await page.close();
   }finally{await browser.close();}
@@ -695,8 +685,8 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} friendly units pres
   const config={...defaults,input:'source.csv',output:'destination',limits:{...defaults.limits,bytes:Number.MAX_SAFE_INTEGER},resources:{...defaults.resources,max_record_bytes:8388609,temp_bytes:1099511627776}};
   await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(config))});await page.waitForFunction(()=>document.getElementById('max-bytes').value==='9007199254740991');
   await page.locator('#max-bytes-unit').selectOption('GiB');await page.locator('#max-record-unit').selectOption('MiB');assert.deepEqual((await exported(page)).limits,config.limits);assert.deepEqual((await exported(page)).resources,config.resources);
-  await page.locator('#analyze').click();await page.waitForFunction(()=>window.calls.some(call=>call.path==='analyze'));const submitted=await page.evaluate(()=>window.calls.find(call=>call.path==='analyze').data);assert.deepEqual(submitted.limits,config.limits);assert.deepEqual(submitted.resources,config.resources);
-  await page.waitForFunction(()=>document.getElementById('status').textContent==='READY');await page.locator('#memory-unit').selectOption('GiB');assert.match(await page.locator('#run-direct').textContent(),/Confirm/,'display-only unit changes retain prepared confirmation');await page.locator('#memory').fill('0.5');assert.match(await page.locator('#run-direct').textContent(),/Run/,'editing the amount changes the prepared draft');
+  await page.locator('#profile').click();await page.waitForFunction(()=>window.calls.some(call=>call.path==='profile'));const submitted=await page.evaluate(()=>window.calls.find(call=>call.path==='profile').data);assert.deepEqual(submitted.limits,config.limits);assert.deepEqual(submitted.resources,config.resources);
+  await page.waitForFunction(()=>document.getElementById('status').textContent==='PROFILED');await page.locator('#memory-unit').selectOption('GiB');assert.equal(await page.locator('#run-direct').textContent(),'Run →','display-only unit changes keep Run available');await page.locator('#memory').fill('0.5');assert.match(await page.locator('#run-direct').textContent(),/Run/,'editing the amount changes the prepared draft');
   for(const width of [320,390,1280]){await page.setViewportSize({width,height:1000});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
@@ -820,18 +810,18 @@ test('CLI handoff exports the current draft and copies a shell-safe command with
  }finally{await browser.close();}
 });
 
-test('hosted theme follows system, persists explicit choices, syncs tabs and leaves prepared jobs current',async()=>{
+test('hosted theme follows system, persists explicit choices, syncs tabs and keeps input analysis available',async()=>{
  const browser=await chromium.launch({headless:true});
  const context=await browser.newContext({colorScheme:'dark'});
  try{
   const {page,errors}=await harness(context);const theme=page.getByRole('button',{name:/Switch to .* theme/});
   const background=()=>page.evaluate(()=>getComputedStyle(document.body).backgroundColor);
   assert.equal(await theme.getAttribute('data-choice'),'system');assert.equal(await background(),'rgb(17, 24, 32)');
-  await choose(page);await page.locator('#analyze').click();await page.waitForFunction(()=>document.querySelector('#run-direct').textContent.includes('Confirm'));
+  await choose(page);await page.locator('#profile').click();await page.waitForFunction(()=>document.querySelector('#status').textContent==='PROFILED');
   await setTheme(page,'light');assert.equal(await background(),'rgb(244, 245, 247)');
   assert.equal(await page.locator('#browse-input').evaluate(el=>getComputedStyle(el).backgroundColor),'rgb(255, 255, 255)','control colors switch immediately with their text');
   assert.equal(await page.evaluate(()=>localStorage.getItem('chopper-color-scheme')),'light');
-  assert.match(await page.locator('#run-direct').textContent(),/Confirm/);
+  assert.equal(await page.locator('#run-direct').textContent(),'Run →');
   await page.emulateMedia({colorScheme:'light'});await page.emulateMedia({colorScheme:'dark'});assert.equal(await background(),'rgb(244, 245, 247)');
   const {page:second,errors:secondErrors}=await harness(context);
   assert.equal(await second.getByRole('button',{name:/Switch to .* theme/}).getAttribute('data-choice'),'light');
@@ -1039,17 +1029,17 @@ test('a profile finishing after another selection of the same filename is not ap
  }finally{await browser.close();}
 });
 
-test('filtering prepared column values preserves exact confirmation and the retained analysis source',async()=>{
+test('filtering completed column values keeps the analysis source and fresh Run action',async()=>{
  const browser=await chromium.launch({headless:true});
  try{
   const {page,errors}=await harness(browser);await choose(page);
   await page.evaluate(()=>window.analysis={...window.analysis,column_values:Array.from({length:6},(_,column)=>({column,values:['a','b'],truncated:false}))});
-  await page.locator('#analyze').click();assert.match(await page.locator('#run-direct').innerText(),/Confirm/);
-  assert.match(await page.locator('#input-values-origin').innerText(),/Prepared output analysis/);
-  assert.equal(await page.locator('.column-values-row[open]').count(),0,'prepared values also start collapsed');
+  await page.locator('#run-direct').click();await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'complete',analysis:window.analysis,output:'destination/result'});await tick(page);assert.equal(await page.locator('#run-direct').innerText(),'Run →');
+  assert.match(await page.locator('#input-values-origin').innerText(),/Completed output analysis/);
+  assert.equal(await page.locator('.column-values-row[open]').count(),0,'completed values also start collapsed');
   await page.locator('[data-inspection-search]').fill('country');await tick(page);
-  assert.equal(await page.locator('.column-values-row:visible').count(),1);assert.match(await page.locator('#run-direct').innerText(),/Confirm/);
-  await page.locator('#run-direct').click();assert.equal(await page.evaluate(()=>window.calls.filter(call=>call.path!=='state').at(-1).path),'run');
+  assert.equal(await page.locator('.column-values-row:visible').count(),1);assert.equal(await page.locator('#run-direct').innerText(),'Run →');
+  await page.locator('#run-direct').click();assert.equal(await page.evaluate(()=>window.calls.filter(call=>call.path!=='state').at(-1).path),'run-direct');
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
 });
@@ -1078,7 +1068,7 @@ test('pipeline handles preview insertion gaps, retain settings, and keep arrow c
   await page.locator('[data-step="1"] [data-field=files]').fill('7');await page.locator('[data-field=strategy]').selectOption('uniform');
   await page.locator('[data-step="0"] [data-column-search]').fill('country');await page.keyboard.press('Enter');
   const original=(await exported(page)).operations;
-  await page.locator('#analyze').click();assert.match(await page.locator('#run-direct').innerText(),/Confirm/);
+  await page.locator('#profile').click();assert.equal(await page.locator('#run-direct').innerText(),'Run →');
   const drag=await page.evaluateHandle(()=>new DataTransfer());
   await page.locator('[data-step="1"] [data-step-grip]').dispatchEvent('dragstart',{dataTransfer:drag});
   const first=page.locator('[data-step="0"]'),box=await first.boundingBox();
@@ -1091,10 +1081,10 @@ test('pipeline handles preview insertion gaps, retain settings, and keep arrow c
   assert.deepEqual((await exported(page)).operations,[original[1],original[0],original[2]]);assert.doesNotMatch(await page.locator('#run-direct').innerText(),/Confirm/);
   await page.locator('[data-step="0"] [data-step-grip]').focus();await page.keyboard.press('ArrowDown');assert.deepEqual((await exported(page)).operations,original,'handle keyboard movement preserves the complete operation');
   await page.locator('[data-step="1"] [data-action=down]').click();assert.deepEqual((await exported(page)).operations,[original[0],original[2],original[1]],'existing arrows still work');
-  await page.locator('#analyze').click();
+  await page.locator('#profile').click();
   await page.locator('[data-step="0"] [data-step-grip]').dispatchEvent('dragstart',{dataTransfer:drag});
   const own=await page.locator('[data-step="0"]').boundingBox();await page.locator('[data-step="0"]').dispatchEvent('dragover',{dataTransfer:drag,clientY:own.y+2});
-  assert.equal(await page.locator('[data-drop]').count(),0);await page.locator('[data-step="0"]').dispatchEvent('drop',{dataTransfer:drag});assert.match(await page.locator('#run-direct').innerText(),/Confirm/,'dropping in place preserves exact confirmation');
+  assert.equal(await page.locator('[data-drop]').count(),0);await page.locator('[data-step="0"]').dispatchEvent('drop',{dataTransfer:drag});assert.equal(await page.locator('#run-direct').innerText(),'Run →','dropping in place leaves Run available');
   const before=(await exported(page)).operations;
   await page.locator('[data-step="0"] [data-step-grip]').dispatchEvent('dragstart',{dataTransfer:drag});
   const end=page.locator('[data-step="2"]'),endBox=await end.boundingBox();await end.dispatchEvent('dragover',{dataTransfer:drag,clientY:endBox.y+endBox.height-2});assert.equal(await end.getAttribute('data-drop'),'after');
@@ -1288,13 +1278,13 @@ test('pending commands suppress state polls until their acknowledgement settles'
  try{
   const {page,errors}=await harness(browser,true,true);await choose(page);
   await page.locator('#max-rows').fill('2');
-  await page.evaluate(()=>window.deferPreparation=true);
-  await page.locator('#analyze').click();await page.waitForFunction(()=>window.releasePreparation);
+  await page.evaluate(()=>window.deferAnalysisAck=true);
+  await page.locator('#profile').click();await page.waitForFunction(()=>window.releaseAnalysisAck);
   const before=await page.evaluate(()=>window.calls.filter(call=>call.path==='state').length);
   await page.clock.runFor(3000);
   assert.equal(await page.evaluate(()=>window.calls.filter(call=>call.path==='state').length),before);
-  await page.evaluate(()=>{window.deferPreparation=false;window.releasePreparation();});
-  await page.waitForFunction(()=>document.getElementById('status').textContent==='READY');
-  assert.equal(await page.locator('#run-direct').textContent(),'Confirm & split →');assert.deepEqual(errors,[]);
+  await page.evaluate(()=>{window.deferAnalysisAck=false;window.releaseAnalysisAck();});
+  await page.waitForFunction(()=>document.getElementById('status').textContent==='PROFILED');
+  assert.equal(await page.locator('#run-direct').textContent(),'Run →');assert.deepEqual(errors,[]);
  }finally{await browser.close();}
 });

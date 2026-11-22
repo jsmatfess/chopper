@@ -52,7 +52,7 @@ try {
       await app.goto('http://127.0.0.1:8422/');
       await app.waitForFunction(()=>document.getElementById('status')?.textContent==='IDLE');
       assert.equal(await app.locator('#run-direct').getAttribute('type'),'submit');
-      assert.equal(await app.locator('#analyze').getAttribute('type'),'button');
+      assert.equal(await app.locator('#profile').getAttribute('type'),'button');
       assert.equal(await app.locator('#require-reproducible').count(),0);
       assert.equal(await app.locator('#memory-mode').inputValue(),'manual');
       assert.equal(await app.locator('#memory').inputValue(),'256');
@@ -120,11 +120,11 @@ try {
       assert.deepEqual(disabled.manifest.config,exported.manifest.config);
       assert.equal(disabled.manifest.analysis.logical_digest,exported.manifest.analysis.logical_digest);
       await app.evaluate(()=>{window.observationDisabled=false;});
-      // Exact preparation remains available without a seed input.
-      await revealFormControl(app,'#analyze');
-      await app.locator('#analyze').click();
-      await app.waitForFunction(()=>['READY','FAILED'].includes(document.getElementById('status')?.textContent),{},{timeout:30000});
-      assert.equal(await app.locator('#status').textContent(),'READY',await app.locator('#error').textContent());
+      // Analyze reads input without retaining a prepared output result.
+      await revealFormControl(app,'#profile');
+      await app.locator('#profile').click();
+      await app.waitForFunction(()=>['PROFILED','FAILED'].includes(document.getElementById('status')?.textContent),{},{timeout:30000});
+      assert.equal(await app.locator('#status').textContent(),'PROFILED',await app.locator('#error').textContent());
       const exportJob=async()=>{
         await revealFormControl(app,'#export');
         const pending=app.waitForEvent('download');await app.locator('#export').click();

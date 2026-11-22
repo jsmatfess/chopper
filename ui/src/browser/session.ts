@@ -1,4 +1,4 @@
-import {sourceIdentity,resultOrigin,ownedResult,belongsToSource,belongsToDraft,type ResultOrigin,type OwnedResult} from '../result-ownership';
+import {sourceIdentity,resultOrigin,ownedResult,belongsToSource,type ResultOrigin,type OwnedResult} from '../result-ownership';
 import {verifyPublication,type VerifiedPublication} from './publication';
 import type {Job,State,Analysis,InputProfile} from '../app';
 import {ExecutionHistory,type Observation} from './execution-history';
@@ -130,7 +130,6 @@ export class BrowserLifecycle {
   private latestSession:WorkerSession|null=null;
   private generation=0;
   private folder='';
-  private prepared: {output:FileSystemDirectoryHandle;origin:ResultOrigin}|null=null;
   private inputSelection=0;
   private draftRevision=0;
   private currentSource:string|null=null;
@@ -183,7 +182,7 @@ export class BrowserLifecycle {
   }
   private stop():Promise<void>{
     this.history?.interrupt('unknown');this.showHistory();
-    this.generation++;const session=this.session;this.session=null;this.prepared=null;
+    this.generation++;const session=this.session;this.session=null;
     return session?.retire()??Promise.resolve();
   }
   private async completeRun(publication:VerifiedPublication){
@@ -204,7 +203,7 @@ export class BrowserLifecycle {
       throw error;
     }
   }
-  private active(){return ['profiling','analyzing','running'].includes(this.state.status);}
+  private active(){return ['profiling','running'].includes(this.state.status);}
   private async permission(output:FileSystemDirectoryHandle){
     const handle=output as FileSystemDirectoryHandle & {requestPermission?:(options:{mode:string})=>Promise<string>};
     if(handle.requestPermission&&await handle.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Output folder write permission was not granted.');
@@ -237,48 +236,34 @@ export class BrowserLifecycle {
         this.setProfile(ownedResult(origin,result));this.state.status='profiled';
       }).catch(error=>this.fail(error,current));return {};
     }
-    if(path==='analyze'||path==='run-direct'){
-      const direct=path==='run-direct';data=structuredClone(data);
+    if(path==='run-direct'){
+      data=structuredClone(data);
       if(this.active())throw new Error('A job is active.');
       if(!this.input||!this.output)throw new Error('Choose an input file and an output folder with Browse.');
       if(data.resources.temp_dir)throw new Error('Browser temporary storage is managed by the browser; leave temporary directory blank.');
       const file=this.input,output=this.output;
       const origin=resultOrigin(sourceIdentity(this.inputSelection,data),data,this.draftRevision,this.generation+1);
-      if(direct){
-        const current=this.generation;await this.permission(output);if(current!==this.generation)return {};
-        if(this.active())throw new Error('A job is active.');
-      }
-      this.state.status=direct?'running':'analyzing';this.state.error=null;
+      const permissionGeneration=this.generation;await this.permission(output);if(permissionGeneration!==this.generation)return {};
+      if(this.active())throw new Error('A job is active.');
+      this.state.status='running';this.state.error=null;
       const cleanup=this.stop(),current=this.generation;
       await this.setup((async()=>{
         await cleanup;if(current!==this.generation)return;
-        if(direct){try{this.history=new ExecutionHistory(++this.observationSerial,data);this.showHistory();}catch{this.history=null;}}
-        const session=this.start();if(direct&&this.history){try{session.beginObservation();}catch{this.history=null;}}
+        try{this.history=new ExecutionHistory(++this.observationSerial,data);this.showHistory();}catch{this.history=null;}
+        const session=this.start();if(this.history){try{session.beginObservation();}catch{this.history=null;}}
         await session.start();
       })(),current);
       if(current!==this.generation)return {};
       this.folder='chopper-results-'+this.effects.uuid();this.exporting=false;
-      this.state.status=direct?'running':'analyzing';this.state.error=null;this.clearResults();this.state.output=null;
+      this.state.status='running';this.state.error=null;this.clearResults();this.state.output=null;
       for(const key of Object.keys(this.diagnostics))delete this.diagnostics[key];
       const session=this.session!;session.exportTo(output);
-      void session.request(direct?'run-direct':'analyze',{job:data,file,profiling:this.profiling,output,folder:this.folder,...session.observationRequest(this.history?.run,direct&&!this.history?.unavailable)}).then(async result=>{
+      void session.request('run-direct',{job:data,file,profiling:this.profiling,output,folder:this.folder,...session.observationRequest(this.history?.run,!this.history?.unavailable)}).then(async result=>{
         if(current!==this.generation)return;
         const analysis=result.analysis as Analysis;
-        analysis.warnings.push('Browser export is not atomic. A valid CHOPPER-COMPLETE.json record marks successful completion.'+(direct?'':' Keep this tab open until saving finishes.'));
+        analysis.warnings.push('Browser export is not atomic. A valid CHOPPER-COMPLETE.json record marks successful completion.');
         this.setAnalysis(ownedResult(origin,analysis));
-        if(direct){await this.completeRun(verifyPublication(result,this.folder,session.exportPath(this.folder)));}
-        else{this.prepared={output,origin};this.state.status='ready';this.state.output=output.name+'/'+this.folder;}
-      }).catch(error=>this.fail(error,current));return {};
-    }
-    if(path==='run'){
-      if(this.state.status!=='ready')throw new Error('Prepare exact outputs before confirming.');
-      const prepared=this.prepared;
-      if(!prepared||!belongsToDraft(prepared.origin,this.currentSource??sourceIdentity(this.inputSelection,JSON.parse(prepared.origin.configuration)),this.draftRevision))throw new Error('Input or configuration changed. Prepare exact outputs again before confirming.');
-      this.state.status='running';const current=this.generation,output=prepared.output,folder=this.folder;
-      try{await this.permission(output);}catch(error){if(current===this.generation)this.state.status='ready';throw error;}
-      if(current!==this.generation)return {};
-      void this.session!.request('run',{output,folder}).then(async result=>{
-        if(current!==this.generation)return;await this.completeRun(verifyPublication(result,folder,output.name+'/'+folder));
+        await this.completeRun(verifyPublication(result,this.folder,session.exportPath(this.folder)));
       }).catch(error=>this.fail(error,current));return {};
     }
     if(path==='cancel'){

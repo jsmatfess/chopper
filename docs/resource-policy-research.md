@@ -135,6 +135,14 @@ Run/preparation/profiling retain the existing 64 KiB source-buffer plus
 codec internals remain outside that inspection envelope. These are the prior
 working-allocation scopes, not a complete runtime/RSS bound.
 
+The opt-in `experimental-direct-decode` path can decode directly into an already
+admitted caller buffer when it has at least the existing 32 KiB decoded-output
+capacity and no buffered decoded bytes remain. It supplies exactly 32 KiB to the
+same pinned strict decoder, preserving its BOM, malformed-input and incremental
+state handling. Small reads and pending buffered bytes retain the original path.
+The inline decoder arrays, source buffer, record owners and grant lifetimes are
+unchanged; this removes a byte copy without releasing any capacity grant early.
+
 Header transfer pre-admits retained field capacities while the parser charge is
 still live, then reduces the latter to scratch. Analysis headers keep their
 immutable shared controller; profiling keeps its independently owned Vec and
@@ -2010,3 +2018,269 @@ The focused regression keeps a 128-byte parser-owned buffer at an exhausted
 shared boundary and verifies exact fields and release; decoder shrink-denial
 coverage remains unchanged. [Issue #2](https://github.com/jsmatfess/chopper/issues/2)
 tracks delivery and final platform validation.
+
+## Clean inactive-file cgroup headroom experiment (2026-11-18)
+
+The default Linux observer retains raw ancestor `limit - memory.current`
+headroom. The opt-in `experimental-cgroup-cache-headroom` build can instead
+estimate additional room below `memory.max` after reclaiming the job leaf's own
+clean inactive-file cache. A dedicated 1 GiB cgroup experiment reproduced a
+shared-admission denial with a roughly 57 MiB reduced admission ceiling and hundreds of MiB of
+clean inactive-file cache; this motivates the experiment, not an RSS guarantee.
+
+Credit is `min(inactive_file, file) - shmem - file_dirty - file_writeback`, with
+saturating subtraction and a cap at observed current usage. Required counters
+must be present, unsigned and unique. Credit requires no leaf descendants and
+readable zero `memory.min`/`memory.low` along the accessible branch. Each finite
+ancestor can reduce the same leaf credit; sibling caches are never added. Current
+usage is sampled before and after the statistics read, using the larger value.
+The final minimum credit applies to all ancestor maximum constraints, including
+any amount already over a limit. Missing or malformed optional data disables
+credit. Incomplete hierarchy, hidden ancestors or changed membership retain the
+raw partial bounds and existing conservative discovery fallback.
+
+Finite `memory.high` retains its raw throttle boundary. Host `MemAvailable`, the
+startup aggregate ceiling, half-headroom growth margin, existing reservations
+and numeric/automatic job-budget rules remain in force. This changes an estimate
+of additional capacity; it neither revokes retained grants nor changes their
+lifetimes, retries raw input, credits swap, or turns working accounting into a
+resident-memory cap. No browser/Windows discovery change is selected.
+
+This is an engineering estimate, not a proven lower bound on reclaimable memory.
+Kernel counters are sampled separately; protected, pinned or temporarily
+unevictable pages and composition changes can defeat an estimate. The exclusions
+above narrow those risks without eliminating them. Keep this policy opt-in until
+its intended workload and pressure coverage supports promotion. The kernel owns
+the [counter, protection and throttle semantics](https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files).
+
+## Native terminal routing publication ownership (2026-11-18)
+
+The opt-in `experimental-terminal-routing` build permits a single plain-output
+Interleaved or probabilistic assignment operation, including strata, to emit its
+existing final routed traversal through `PlanWriter::direct_grouped`. It retains
+the same router, sort/spill owners, membership domains, encounter order and
+stage counters. It neither retains an encoded output snapshot nor copies one at
+publication. Explicit internal preparation still selects a snapshot; WASI does
+not select this experiment.
+
+The Context's private `direct_terminal_output` bit conveys Run eligibility to
+initial producers; it creates no resource grant. Direct output names, immutable
+shared header, serialized scratch, writer buffers, paths and disk-backed metadata
+retain their existing owners. Earlier private output overlaps the router's live
+sort/spill resources. Managed temporary counters exclude private destination
+staging and therefore cannot establish total peak disk or physical I/O savings.
+Final Analysis construction precedes the existing native atomic publication.
+Errors and cancellation after emission begins remain terminal, with no raw-input
+replay; private output drops before its ownership grants.
+
+Focused native controls compare exact internal-seed output bytes, metadata,
+lineage, empty named groups, strict caps and stable Analysis against explicit
+snapshot execution. UTF-8/UTF-16, multiline Unicode, empty input, unrepresentable
+output, final cancellation, destination races and competing-owner admission are
+covered. These controls do not establish an RSS cap, browser eligibility, native
+Windows performance or cross-plan CLI seeded replay.
+
+## Windows directory publication without replacement (2026-11-19)
+
+Native publication now uses `MoveFileExW` with flags zero on Windows. The
+standard-library rename replaced an empty destination in the new race control;
+this violated the intended no-replacement commit boundary. No replacement or
+cross-volume copy flag is supplied. The first bounded writer retains its
+original destination witness; the explicit originally-empty case still removes
+that directory only after a final emptiness check.
+
+The two UTF-16 path vectors share an admitted reservation through the OS call.
+Absolute normal paths originate from `std::path::absolute` (Windows
+`GetFullPathNameW` normalization); disk and UNC paths acquire verbatim prefixes
+for long paths, and existing verbatim/device prefixes are preserved. Each vector
+reserves its counted UTF-16 length plus nine code units before construction,
+covering prefix and terminator; interior NUL is rejected. Both vectors drop
+before the shared grant. This adds no codec or packed-field constructor and
+changes no Linux/browser publication mechanism. Native NTFS race and long/Unicode
+path controls own qualification; other filesystems remain outside those claims.
+
+## Experimental configured final writer capacity (2026-11-19)
+
+The native opt-in memory-final-writer selector bounds configured singleton or
+bounded-tree leaves by nominal memory and a hard ceiling. This is a pre-input
+selection bound, not capacity admission: every vector, membership tree, lineage,
+header prefix, catalog, publication path and active sink retains its existing
+reservation. Automatic memory is not resolved twice; eligibility conservatively
+uses the minimum valid nominal budget until the existing resolver runs. Unix's
+soft descriptor ceiling leaves 64 descriptors and allows two per configured
+writer; unrelated handles and concurrent jobs remain possible open failures.
+No descriptor reservation or complete RSS cap is implied.
+
+The separate small-buffer control uses 16 KiB buffers only in the private
+configured-fanout constructor. Ordinary publication keeps its original buffer.
+PublicationWriter admits the selected actual capacity before construction and
+retains it through flush/sync/destruction. The larger selector ceiling does not
+bypass local or shared grants. Unsupported fanout selects the original pipeline
+before input consumption; emission failures remain terminal.
+
+Shared row serialization never reuses an individual writer's header encoder.
+The header-scratch release control replaces that encoder with an identically
+configured empty one, dropping its old text and encoded allocations before
+shrinking the aggregate serialization grant to the still-owned prefix capacity.
+The encoded BOM/header remains per writer. It does not share mutable buffers,
+introduce a new Arc owner, or release the header's existing immutable owner.
+
+The compact-final-row intake prototype was rejected and removed after a measured
+primary regression. Its archived source used existing immutable parsed views and
+batched framing; direct execution retains owned records. This does not reverse
+the validated compact representation used by preparation and counting.
+
+Counted compressed Balanced output reuses existing direct codec owners and the
+same two-pass header/count/digest proof. It changes no codec version, allocation
+bridge, checksum, serialized cap, source identity check or publication lifetime.
+All controls remain opt-in and native-only in selection. Correctness, resource
+censuses and timing claims are distinct and require their own pinned evidence.
+
+## Experimental small final-writer catalogs (2026-11-19)
+
+`experimental-small-final-catalogs` is a native fanout resource control: each
+`PlanWriter::direct_fanout` requests a 512-byte private metadata catalog buffer
+instead of 8 KiB. `DirectPublication` admits the selected capacity before
+constructing its `BufWriter<DiskFile>`. Its existing owner-before-grant field
+order, disk-file lifetime, private staging cleanup and metadata EOF validation
+remain unchanged. Header/lineage strings and decoded catalog trees retain their
+separate admission. A catalog record can exceed this buffer without changing its
+metadata limit, chunk boundary or original decoded bytes.
+
+Ordinary new/grouped direct publications and snapshot catalogs keep their existing
+8 KiB setting; CSV sink sizes and the memory/descriptor writer ceiling are
+independent. Construction/release tests check both capacities and denied admission;
+the multi-chunk Partition control uses lineage records larger than 512 bytes and
+compares original snapshot publication. No complete-job performance is inferred
+from those tests. This experimental flag does not activate default behavior.
+
+## Bounded final Partition and advisory writer counts (2026-11-19)
+
+The opt-in native shape requires a single plain unobserved Partition, Auto
+routing and `max_files <= writer_capacity`. A successful group needs at least
+one output file; this existing configured ceiling is a hard cardinality bound,
+not an Analyze prediction. Further byte/row chunking still shares the original
+global physical-file ceiling. Above-bound groups, metadata/sink admission,
+parsing, codec or finalization failures remain terminal and private.
+
+The exact tuple catalog admits a conservative full internal-node envelope per
+entry before insertion (sixteen key/value/edge slots plus four pointers), as in
+other bounded tree owners. Each key's Vec capacity and resolved-column vector
+are additional aggregate charges. Re-audit the envelope for standard-library
+node-layout changes. A separate reusable tuple buffer admits growth before
+encoding the original zero-escaped, double-zero-terminated key. Its bytes are
+comparison keys, never a new packed-field or UTF-8 constructor. Original borrowed
+child-metadata schemas admit the copied lineage before construction. No hash
+substitutes for key equality.
+
+Writer slots own their individual outputs; taking them in catalog order performs
+no new row allocation. The consuming map iterator destroys keys and nodes before
+its aggregate grant is returned, including early finalization errors. Column and
+scratch owners also drop first. A seed private publication retains the original
+destination witness through canonical renaming and supplies empty-output commit.
+Other unconsumed writers remain owned and clean on failure. Entry-vector capacity
+survives until all slots and the Vec are destroyed.
+
+Analyze's optional WriterEstimate contains only Copy numeric/boolean options and
+no additional heap payload. Cached scan observations retain no advice; each
+returned job-specific profile recomputes it from existing stage statistics after
+cloning. Existing admission of stage strings, summaries, headers and previews is
+unchanged. Exactness means logical group counts if feasible, not physical file
+counts or successful admission. Conditional-parent/multiple-partition estimates
+remain unknown. HLL cardinality error is statistical, not a hard upper bound.
+No new Job field, mutable prepared configuration, executable profile or Run trust
+of prior observations is introduced.
+
+## Experimental retained exact-allocation writer ownership (2026-11-19)
+
+`experimental-retained-exact-writers` prepares only against the already retained
+immutable root Dataset. Original parent metadata remains charged during the
+existing `exact_plan::Proposal` boundary. The exact tuple catalog reserves a full
+BTree node envelope per entry, including key/State/child descriptors and split
+headroom, plus actual key, column and quota Vec capacities. The State stores the
+existing fixed-size Random object, count and remaining quota; changing that
+layout or standard-library node layout requires re-auditing this envelope.
+Keys/nodes/quota/column owners drop before their aggregate grant; TupleBuffer's
+immutable key scratch retains its separate grant. Original child metadata derives
+the legacy stratum JSON domain before its temporary owner drops. No hash replaces
+tuple equality and no packed-field constructor/mutation is added.
+
+The original empty PlanWriter is retained across preparation. Setup denial drops
+all tentative catalog/writer owners before the seam's cancellation/cleanup check
+and original-parent fallback. Reader setup can deny before a charged parent is
+available; that outer setup path likewise releases its owners and rechecks before
+falling back. There is no source CSV retry or partial statistics commitment.
+After setup the existing empty writer's `finish_direct` supplies the original
+publication seed; configured final writers retain their existing scalar/chunk
+limits and admitted lineage/prefix/serializer ownership. Every emission error is
+terminal, including shared admission denial. At EOF, complete remaining/quota
+checks precede one stage commit; catalog owners drop before canonical finalization.
+This removes row passes only for the selected opt-in shape, not for general
+unbounded strata or all execution plans.
+
+## Experimental single-record final catalogs (2026-11-19)
+
+`experimental-single-final-catalog` stores a typed record only when a bounded
+fanout Group is exact or every chunk cap is absent. The existing admitted
+PublicationName moves from the closed OpenChunk into that record; numeric fields
+need no heap owner, and the admitted Group retains lineage until merge. The
+Records field drops the name before the existing buffer grant and stage owner.
+No per-group catalog DiskFile or BufWriter allocation exists in this mode. The
+allocation-free counting serializer enforces the same JSON byte maximum at
+source merge as JsonLines, excluding the newline and including escaped names and
+lineage. Close and root materialization retain the original non-decoding path;
+adding the merge-only limit there would reject formerly valid root records.
+
+The canonical first group materializes one root disk catalog after its CSV sink
+has closed, admitting its buffer before allocation and using the same stage and
+initial destination witness. Other typed records use the existing path/name
+admission and canonical merge helpers. Failed construction, second-record
+invariants, materialization denial and cancellation remain private and terminal;
+there is no source replay. Codec, snapshot and potentially multi-chunk paths keep
+disk catalogs. Writer ceilings and their conservative descriptor guard do not
+change. Resource controls compare typed and disk metadata descriptors with equal
+open CSV counts; that census is distinct from complete-job performance evidence.
+
+## Experimental single-catalog writer capacity (2026-11-19)
+
+`experimental-single-catalog-capacity` depends on the single-record catalog and
+small CSV-buffer controls. When every chunk cap is absent, every admitted writer
+has at most one CSV descriptor and no private metadata descriptor. The configured
+ceiling becomes sixteen writers per nominal MiB, capped at 16,384; unresolved
+Auto conservatively uses 32 MiB. Unix retains 64 descriptors from the soft
+RLIMIT_NOFILE bound and allows one per writer. Canonical root materialization
+opens its one catalog after closing its CSV. This is a pre-consumption heuristic,
+not a descriptor reservation or a complete RSS cap. Concurrent opens/pressure and
+wide headers can still cause terminal admission errors with private cleanup.
+
+Jobs with any row/byte/compressed-byte cap retain the previous ceiling and
+conservative two-descriptor allowance. The metadata representation may still be
+typed when an exact Group proves one chunk, but the selector does not rely on
+that operation-specific fact. Codec, observed, WASI and above-ceiling jobs retain
+prior selection. Analyze advice recomputes this same bound from current settings;
+Run independently checks its current input and never consumes a prior estimate.
+
+## Experimental flush-before-sync ownership (2026-11-19)
+
+`experimental-batched-final-sync` is selected only for Linux native unobserved
+plain one-chunk typed catalogs. PublicationWriter flushes and consumes its
+BufWriter into the same File; both normal and into_inner error paths destroy the
+buffer before returning its grant. SingleRecord retains that File temporarily.
+It neither reopens a filename nor duplicates a descriptor. During canonical merge,
+the root queue admits Vec capacity before taking any source File; denial leaves
+the source owner intact until terminal unwinding. First/root catalog materialization
+also transfers the pending handle before replacing the typed record. Other source
+queues transfer only after destination capacity admission. Files/Vec drop before
+the queue grant and private stage.
+
+After all group buffers have flushed and canonical metadata is complete,
+Writers.finish_in_order synchronizes/drains every queued original handle before
+returning counts for Analysis. This preserves the existing Analysis/timing boundary.
+Publication repeats an empty guard before manifest creation/sync and original
+atomic commit/witness. Sync failure or cancellation drops all remaining drain
+handles, then ordinary private cleanup runs. No sync or input validation/replay
+requirement is relaxed. CSV handles remain at most the writer count; the single
+root catalog/publication descriptors use the existing fixed headroom. Buffer
+capacity is returned earlier while descriptor lifetime extends. The queue/type's
+inline size and Vec storage are covered by actual-size admissions. Default,
+Windows, WASI, observed, codec and potentially multi-chunk paths retain prior finish.

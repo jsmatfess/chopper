@@ -4,6 +4,10 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[features]
+# Opt-in decoder output directly into large caller buffers; small reads unchanged.
+experimental-direct-decode = []
+
 [dependencies]
 anyhow = "1"
 serde = { version = "1", features = ["derive"] }

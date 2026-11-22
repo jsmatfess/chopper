@@ -27,7 +27,9 @@ pub(super) fn observe() -> Observation {
             .and_then(|s| mem_available(&s));
         let (group, cgroup_result) = linux_cgroup();
         let (cgroup_complete, discovery) = match cgroup_result {
-            Ok(()) => (true, "linux proc/cgroup-v2 snapshot".into()),
+            Ok(()) => (true, if cfg!(feature = "experimental-cgroup-cache-headroom") {
+                "linux proc/cgroup-v2 snapshot; experimental clean inactive-file headroom estimate"
+            } else { "linux proc/cgroup-v2 snapshot" }.into()),
             Err(error) => (false, format!("Linux cgroup discovery incomplete: {error}")),
         };
         // Incomplete cgroup discovery must not justify a larger grant than the
@@ -117,7 +119,7 @@ fn linux_cgroup() -> (Option<u64>, Result<(), String>) {
                 .join("memory.current")
                 .try_exists()
                 .map_err(|e| e.to_string())?;
-        ancestor_headroom(&leaf, &mount, &mut headroom, |path| {
+        let cache_adjusted = ancestor_headroom(&leaf, &mount, &mut headroom, |path| {
             if exempt_root && path.parent() == Some(mount.as_path()) {
                 Ok(
                     if path.file_name() == Some(std::ffi::OsStr::new("memory.current")) {
@@ -137,6 +139,8 @@ fn linux_cgroup() -> (Option<u64>, Result<(), String>) {
         if read(Path::new("/proc/self/cgroup"))? != membership {
             return Err("cgroup membership changed during observation".into());
         }
+        // Only complete hierarchy/membership observations may use cache credit.
+        headroom = cache_adjusted;
         Ok(())
     })();
     (headroom, result)
@@ -147,21 +151,78 @@ fn ancestor_headroom(
     mount: &std::path::Path,
     headroom: &mut Option<u64>,
     mut read_value: impl FnMut(&std::path::Path) -> Result<String, String>,
-) -> Result<(), String> {
+) -> Result<Option<u64>, String> {
     if !leaf.starts_with(mount) {
         return Err("cgroup leaf outside mount".into());
     }
+    let initial = *headroom;
+    let mut tightest: Option<i128> = None;
+    let mut high_headroom: Option<u64> = None;
+    let mut credit = if cfg!(feature = "experimental-cgroup-cache-headroom")
+        && read_value(&leaf.join("cgroup.stat"))
+            .ok()
+            .and_then(|s| counter(&s, "nr_descendants"))
+            == Some(0)
+    {
+        u64::MAX
+    } else {
+        0
+    };
     let mut directory = leaf;
     loop {
-        let current = read_value(&directory.join("memory.current"))?
+        let mut current = read_value(&directory.join("memory.current"))?
             .trim()
             .parse::<u64>()
             .map_err(|e| e.to_string())?;
-        for file in ["memory.max", "memory.high"] {
-            let value = read_value(&directory.join(file))?;
-            if let Some(limit) = finite_limit(&value)? {
+        let mut limits = [None; 2];
+        for (index, file) in ["memory.max", "memory.high"].into_iter().enumerate() {
+            limits[index] = finite_limit(&read_value(&directory.join(file))?)?;
+            // Preserve each known raw bound even if a later file is unreadable.
+            if let Some(limit) = limits[index] {
                 let remaining = limit.saturating_sub(current);
-                *headroom = Some(headroom.map_or(remaining, |old: u64| old.min(remaining)));
+                *headroom = Some(headroom.map_or(remaining, |old| old.min(remaining)));
+            }
+        }
+        // Never credit sibling caches or a hierarchy with protected descendants.
+        // Root without a controller has no protection files or finite boundary.
+        if credit != 0 && (directory != mount || limits.iter().any(Option::is_some)) {
+            for protection in ["memory.min", "memory.low"] {
+                if read_value(&directory.join(protection))
+                    .ok()
+                    .and_then(|s| s.trim().parse::<u64>().ok())
+                    != Some(0)
+                {
+                    credit = 0;
+                }
+            }
+            if credit != 0 && (directory == leaf || limits.iter().any(Option::is_some)) {
+                let clean = read_value(&directory.join("memory.stat"))
+                    .ok()
+                    .and_then(|s| clean_inactive_file(&s));
+                let after = read_value(&directory.join("memory.current"))
+                    .ok()
+                    .and_then(|s| s.trim().parse::<u64>().ok());
+                if let (Some(clean), Some(after)) = (clean, after) {
+                    current = current.max(after);
+                    credit = credit.min(clean).min(current);
+                } else {
+                    credit = 0;
+                }
+            }
+        }
+        for (index, limit) in limits
+            .into_iter()
+            .enumerate()
+            .filter_map(|(i, limit)| limit.map(|limit| (i, limit)))
+        {
+            let remaining = limit.saturating_sub(current);
+            *headroom = Some(headroom.map_or(remaining, |old: u64| old.min(remaining)));
+            if index == 0 {
+                let signed = i128::from(limit) - i128::from(current);
+                tightest = Some(tightest.map_or(signed, |old| old.min(signed)));
+            } else {
+                // Preserve the original raw memory.high throttle boundary.
+                high_headroom = Some(high_headroom.map_or(remaining, |old| old.min(remaining)));
             }
         }
         if directory == mount {
@@ -169,7 +230,49 @@ fn ancestor_headroom(
         }
         directory = directory.parent().ok_or("cgroup ancestor escaped mount")?;
     }
-    Ok(())
+    let adjusted = tightest
+        .map(|remaining| {
+            let remaining = (remaining + i128::from(credit)).clamp(0, i128::from(u64::MAX)) as u64;
+            initial.map_or(remaining, |old| old.min(remaining))
+        })
+        .or(initial);
+    let adjusted = match (adjusted, high_headroom) {
+        (Some(a), Some(b)) => Some(a.min(b)),
+        (a, b) => a.or(b),
+    };
+    Ok(if credit == 0 { *headroom } else { adjusted })
+}
+#[cfg(any(test, target_os = "linux"))]
+fn counter(text: &str, key: &str) -> Option<u64> {
+    let mut found = None;
+    for line in text.lines() {
+        let mut fields = line.split_whitespace();
+        if fields.next() != Some(key) {
+            continue;
+        }
+        if found.is_some() {
+            return None;
+        }
+        let value = fields.next()?;
+        if value.is_empty() || !value.bytes().all(|byte| byte.is_ascii_digit()) {
+            return None;
+        }
+        found = Some(value.parse().ok()?);
+        if fields.next().is_some() {
+            return None;
+        }
+    }
+    found
+}
+#[cfg(any(test, target_os = "linux"))]
+fn clean_inactive_file(text: &str) -> Option<u64> {
+    Some(
+        counter(text, "inactive_file")?
+            .min(counter(text, "file")?)
+            .saturating_sub(counter(text, "shmem")?)
+            .saturating_sub(counter(text, "file_dirty")?)
+            .saturating_sub(counter(text, "file_writeback")?),
+    )
 }
 #[cfg(any(test, target_os = "linux"))]
 fn finite_limit(text: &str) -> Result<Option<u64>, String> {
@@ -335,6 +438,23 @@ mod hierarchy_tests {
         path::{Path, PathBuf},
     };
     #[test]
+    fn unreadable_high_retains_same_directory_maximum_bound() {
+        let mut raw = None;
+        let result =
+            ancestor_headroom(
+                Path::new("/c/job"),
+                Path::new("/c"),
+                &mut raw,
+                |path| match path.to_string_lossy().replace('\\', "/").as_str() {
+                    "/c/job/memory.current" => Ok("900".into()),
+                    "/c/job/memory.max" => Ok("1000".into()),
+                    _ => Err("unreadable".into()),
+                },
+            );
+        assert!(result.is_err());
+        assert_eq!(raw, Some(100));
+    }
+    #[test]
     fn ancestor_current_includes_siblings_high_pressure_and_unknown_limits() {
         let mut files = BTreeMap::new();
         for (dir, current, maximum, high) in [
@@ -352,7 +472,7 @@ mod hierarchy_tests {
                 ancestor_headroom(Path::new("/c/a/b"), Path::new("/c"), &mut known, |path| {
                     files.get(path).cloned().ok_or("missing controller".into())
                 });
-            result.map(|()| known)
+            result.map(|_| known)
         };
         assert_eq!(evaluate(&files), Ok(Some(200))); // parent's own current, not leaf current
         files.insert("/c/a/memory.high".into(), "25".into());
@@ -379,5 +499,116 @@ mod hierarchy_tests {
             files.insert(Path::new(dir).join("memory.current"), "0".into());
         }
         assert_eq!(evaluate(&files), Ok(None));
+    }
+}
+
+#[cfg(all(test, feature = "experimental-cgroup-cache-headroom"))]
+mod clean_cache_tests {
+    use super::*;
+    use std::{
+        collections::BTreeMap,
+        path::{Path, PathBuf},
+    };
+    fn files() -> BTreeMap<PathBuf, String> {
+        let mut files = BTreeMap::new();
+        for (dir, current, limit, clean) in [("/c", 900, 1000, 700), ("/c/job", 600, 800, 450)] {
+            for (name,value) in [("memory.current",current.to_string()),("memory.max",limit.to_string()),("memory.high","max".into()),("memory.min","0".into()),("memory.low","0".into()),("cgroup.stat","nr_descendants 0\n".into()),("memory.stat",format!("file {clean}\ninactive_file {clean}\nshmem 0\nfile_dirty 0\nfile_writeback 0\n"))] {
+                files.insert(Path::new(dir).join(name),value);
+            }
+        }
+        files
+    }
+    fn evaluate(files: &BTreeMap<PathBuf, String>) -> (Option<u64>, Option<u64>) {
+        let mut raw = None;
+        let adjusted = ancestor_headroom(Path::new("/c/job"), Path::new("/c"), &mut raw, |p| {
+            files.get(p).cloned().ok_or("missing".into())
+        })
+        .unwrap();
+        (raw, adjusted)
+    }
+    #[test]
+    fn only_own_clean_cache_is_credited_under_every_ancestor() {
+        let mut f = files();
+        assert_eq!(evaluate(&f), (Some(100), Some(550)));
+        f.insert("/c/job/memory.high".into(), "650".into());
+        assert_eq!(
+            evaluate(&f),
+            (Some(50), Some(50)),
+            "finite high keeps its raw throttle boundary"
+        );
+        f.insert("/c/job/memory.high".into(), "max".into());
+        // A later ancestor's lower credit must tighten earlier leaf bounds too.
+        f.insert(
+            "/c/memory.stat".into(),
+            "file 50\ninactive_file 50\nshmem 0\nfile_dirty 0\nfile_writeback 0\n".into(),
+        );
+        assert_eq!(evaluate(&f), (Some(100), Some(150)));
+        f.insert("/c/job/memory.high".into(), "40".into());
+        assert_eq!(
+            evaluate(&f),
+            (Some(0), Some(0)),
+            "credit must repay the over-limit deficit first"
+        );
+    }
+    #[test]
+    fn unavailable_stats_protection_and_descendants_retain_raw_bounds() {
+        for (path, value) in [
+            ("/c/job/memory.stat", "file 450"),
+            ("/c/memory.low", "1"),
+            ("/c/job/memory.min", "1"),
+            ("/c/job/cgroup.stat", "nr_descendants 1"),
+            (
+                "/c/job/memory.stat",
+                "file 450\nfile 500\ninactive_file 450\nshmem 0\nfile_dirty 0\nfile_writeback 0\n",
+            ),
+        ] {
+            let mut f = files();
+            f.insert(path.into(), value.into());
+            assert_eq!(evaluate(&f), (Some(100), Some(100)), "{path}");
+        }
+        let mut f = files();
+        f.remove(Path::new("/c/memory.stat"));
+        assert_eq!(evaluate(&f), (Some(100), Some(100)));
+        let mut raw = None;
+        f.remove(Path::new("/c/memory.max"));
+        assert!(
+            ancestor_headroom(Path::new("/c/job"), Path::new("/c"), &mut raw, |p| f
+                .get(p)
+                .cloned()
+                .ok_or("missing".into()))
+            .is_err()
+        );
+        assert_eq!(raw, Some(200), "partial discovery retains raw bound");
+    }
+    #[test]
+    fn strict_counters_subtract_dirty_writeback_shmem_and_use_larger_current() {
+        assert_eq!(
+            clean_inactive_file(
+                "file 1000\ninactive_file 900\nshmem 100\nfile_dirty 200\nfile_writeback 50\n"
+            ),
+            Some(550)
+        );
+        for bad in [
+            "file -1",
+            "file +1",
+            "file 18446744073709551616",
+            "file 100 extra",
+            "file 100\nfile 200",
+        ] {
+            assert_eq!(counter(bad, "file"), None);
+        }
+        assert_eq!(counter("unknown 9\nfile 12\n", "file"), Some(12));
+        let f = files();
+        let mut raw = None;
+        let mut reads = 0;
+        let adjusted = ancestor_headroom(Path::new("/c/job"), Path::new("/c"), &mut raw, |p| {
+            if p == Path::new("/c/job/memory.current") {
+                reads += 1;
+                return Ok(if reads == 1 { "600" } else { "750" }.into());
+            }
+            f.get(p).cloned().ok_or("missing".into())
+        })
+        .unwrap();
+        assert_eq!((raw, adjusted), (Some(50), Some(500)));
     }
 }

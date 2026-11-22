@@ -53,6 +53,13 @@ fn automatic_cli_overrides_work_without_seed_input() {
             String::from_utf8_lossy(&result.stderr)
         );
         let analysis: Value = serde_json::from_slice(&result.stdout).unwrap();
+        if command == "analyze" {
+            assert_eq!(analysis["rows"], 2);
+            assert!(analysis.get("output_files").is_none());
+            assert!(analysis.get("seed").is_none());
+            assert!(!output.exists());
+            continue;
+        }
         // Scripted decoding now retains a positive, sub-half-MiB source grant
         // while Auto observes headroom. The unchanged floor(F/(MiB/2)) formula
         // resolves 127 MiB; split keeps its separate caller-construction path.

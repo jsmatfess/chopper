@@ -54,7 +54,7 @@ Graphify Cloud as part of ordinary graph refreshes.
 
 Preserve pipeline semantics, exact allocation/group membership and strict serialized
 CSV byte caps. Randomized output has no cross-plan seeded replay guarantee;
-prepared confirmation still executes the retained output snapshot. Read the relevant specification and rewrite rules first.
+Analyze is advisory; Run validates current input independently. Internal snapshot execution preserves retained output bytes. Read the relevant specification and rewrite rules first.
 Keep native atomic publication and browser completion-marker semantics distinct;
 cover failure/cancellation cleanup when changing storage or execution lifetimes.
 For Run dispatch or direct-publication changes, read the

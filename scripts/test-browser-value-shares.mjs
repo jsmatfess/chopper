@@ -1,4 +1,4 @@
-// Real WASI profiling and preparation: bounded frequencies and ranked shares.
+// Real WASI input analysis and completed Run: bounded frequencies and ranked shares.
 import {withHostedBrowser} from './browser-acceptance.mjs';
 import assert from 'node:assert/strict';
 import {mkdir} from 'node:fs/promises';
@@ -15,13 +15,13 @@ await withHostedBrowser({port:8434,viewport:{width:1440,height:1050}},async({con
  const cohort=page.locator('.column-values-row[data-column="1"]');
  async function checkShares(){await cohort.evaluate(el=>el.open=true);assert.deepEqual(await cohort.locator('.value-label').allTextContents(),['B','A','(empty)']);assert.deepEqual(await cohort.locator('.value-share').allTextContents(),['66.7%','25%','8.3%']);assert.match(await cohort.innerText(),/exact counts/);}
  await checkShares();assert.equal(await page.locator('.column-values-row[data-column="0"] .value-distribution').count(),0,'120 unique IDs omit shares');
- await page.locator('#analyze').click();await page.waitForFunction(()=>['READY','FAILED'].includes(document.getElementById('status').textContent));assert.equal(await page.locator('#status').textContent(),'READY',await page.locator('#error').textContent());await page.locator('.workspace-view-controls [data-workspace-view=configuration]').click();await page.waitForFunction(()=>document.body.dataset.workspaceView==='configuration');await checkShares();
+ await page.locator('#run-direct').click();await page.waitForFunction(()=>['COMPLETE','FAILED'].includes(document.getElementById('status').textContent));assert.equal(await page.locator('#status').textContent(),'COMPLETE',await page.locator('#error').textContent());await page.locator('.workspace-view-controls [data-workspace-view=configuration]').click();await page.waitForFunction(()=>document.body.dataset.workspaceView==='configuration');await checkShares();
  const captures=process.argv.find(arg=>arg.startsWith('--screenshots='))?.slice(14);if(captures)await mkdir(captures,{recursive:true});
  await cohort.evaluate(el=>el.open=true);
  for(const theme of ['light','dark']){
   if(await page.locator('.theme-control button').getAttribute('data-resolved')!==theme)await page.locator('.theme-control button').click();
   for(const width of [390,1440]){await page.setViewportSize({width,height:1050});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);if(captures)await page.locator('#input-values').screenshot({path:`${captures}/values-${theme}-${width}.png`});}
  }
- await page.locator('#cancel').click();await page.waitForFunction(()=>document.getElementById('status').textContent==='CANCELLED');await page.evaluate(async()=>(await navigator.storage.getDirectory()).removeEntry('value-shares-fixture',{recursive:true}));assert.deepEqual(errors,[]);
- console.log('Real hosted value shares: profile + prepared counts, descending order, empty values, high-cardinality omission, both themes and mobile passed.');
+await page.evaluate(async()=>(await navigator.storage.getDirectory()).removeEntry('value-shares-fixture',{recursive:true}));assert.deepEqual(errors,[]);
+ console.log('Real hosted value shares: Analyze + completed Run counts, descending order, empty values, high-cardinality omission, both themes and mobile passed.');
 });

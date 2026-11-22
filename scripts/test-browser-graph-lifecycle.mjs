@@ -103,7 +103,7 @@ await withHostedBrowser({port:8425},async({context,url,browserVersion})=>{
   const nodes=await page.locator('.execution-list li>button').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-label'))),text=nodes.join(' '),note=await page.locator('.execution-note').textContent();
   const find=title=>nodes.find(node=>node.startsWith(title));
   for(const node of before.filter(node=>node.includes(' · Completed'))){const title=node.split(' · Completed')[0];assert.ok(nodes.some(after=>after.startsWith(title+' · Completed')),'confirmed work survives shutdown: '+title);}
-  if(mode==='result_close'){assert.match(find('Save destination files'),/ · Failed/);assert.match(find(composed?'Serialize CSV snapshot':'Write CSV'),/ · Completed/);assert.equal(find('Confirm completion marker'),undefined);}
+  if(mode==='result_close'){assert.match(find('Save destination files'),/ · Failed/);assert.match(find(composed?'Serialize CSV':'Write CSV'),/ · Completed/);assert.equal(find('Confirm completion marker'),undefined);}
   if(mode==='worker_error'){assert.ok(!find('Save destination files')||/ · Unknown/.test(find('Save destination files')));assert.doesNotMatch(text,/Save destination files · Failed/);}
   if(['marker_write','marker_close'].includes(mode)){assert.match(find('Save destination files'),/ · Completed/);assert.match(find('Confirm completion marker'),/ · Failed/);}
   if(mode==='marker_read'){assert.match(find('Confirm completion marker'),/ · Failed/);assert.match(await page.locator('#error').textContent(),/verify completion marker/);assert.equal(await page.evaluate(()=>window.graphReadbacks),1);}

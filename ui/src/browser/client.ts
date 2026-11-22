@@ -56,5 +56,5 @@ export function configureBrowserUI(){
   const help=document.createElement('small');help.id='temp-dir-help';help.textContent='Browser-managed storage is used automatically. This directory setting does not apply.';
   temporary.closest('label')!.append(help);
   configureCleanupControls(document.querySelector('.footer-cleanup')!);
-  window.addEventListener('beforeunload',e=>{if(['profiling','analyzing','ready','running'].includes(lifecycle.snapshot().status)){e.preventDefault();e.returnValue='';}});
+  window.addEventListener('beforeunload',e=>{if(['profiling','running'].includes(lifecycle.snapshot().status)){e.preventDefault();e.returnValue='';}});
 }

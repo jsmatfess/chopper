@@ -33,9 +33,7 @@ Object.assign(window, {
       }
       throw new Error('Swarm complete-job deadline exceeded');
     };
-    await api('analyze', submitted);
-    const ready = await wait('ready'), analyzed = performance.now();
-    await api('run', {});
+    await api('run-direct', submitted);
     const done = await wait('complete'), finished = performance.now();
     // complete includes marker close and session retirement/storage cleanup.
     folder = await destination.getDirectoryHandle(done.output!.split('/').at(-1)!);
@@ -50,17 +48,17 @@ Object.assign(window, {
     check(storage && storage.workspace_bytes_after_cleanup === 0, 'Workspace cleanup incomplete');
     check(storage.profiled_destination_bytes === bytes, 'Actual export byte accounting mismatch');
     check(storage.peak_open_handles <= 64, 'Open-handle limit exceeded');
-    const diagnostics = (ready.analysis as any).diagnostics;
+    const diagnostics = (done.analysis as any).diagnostics;
     const owners = ['temporary_path_reserved_bytes', 'directory_path_reserved_bytes', 'prepared_job_reserved_bytes',
       'input_header_reserved_bytes', 'analysis_preview_reserved_bytes', 'analysis_warnings_reserved_bytes',
       'analysis_timings_reserved_bytes', 'analysis_text_reserved_bytes', 'stage_stats_reserved_bytes',
       'column_values_reserved_bytes', 'analysis_diagnostics_reserved_bytes'];
     check(diagnostics && diagnostics.workspace_reserved_bytes === owners.reduce((n, k) => n + (diagnostics[k] ?? 0), 0),
       'Retained workspace owner sum mismatch');
-    return {submitted, analysis: ready.analysis, diagnostics: structuredClone(browserDiagnostics), files,
+    return {submitted, analysis: done.analysis, diagnostics: structuredClone(browserDiagnostics), files,
       export_bytes: bytes, owned_destination: ownedName, output: done.output,
-      elapsed_seconds: (finished - start) / 1000, analysis_wall_seconds: (analyzed - start) / 1000,
-      execution_seconds: (finished - analyzed) / 1000};
+      elapsed_seconds: (finished - start) / 1000, timing_scope: 'complete Run including publication/export and cleanup', analysis_wall_seconds: null,
+      execution_seconds: (finished - start) / 1000};
   },
   swarmCollect: async (name: string, offset: number) => {
     check(files.some(f => f.name === name), 'Unlisted collection path');

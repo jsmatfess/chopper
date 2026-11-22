@@ -181,7 +181,7 @@ input:disabled,select:disabled{background:#edf0ec;color:#66736b;opacity:.7;curso
 .execution-stage.is-list .execution-activity{display:none}
 .execution-activity:focus-visible{outline:2px solid #c3d0e2;outline-offset:3px}
 
-.inspection-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+.inspection-actions{display:grid;grid-template-columns:minmax(0,1fr);align-items:stretch}
 .inspection-actions .secondary{height:auto;align-self:stretch;white-space:normal;margin:0}
 .execution-measurement{display:inline-block;white-space:nowrap;overflow-wrap:normal}
 

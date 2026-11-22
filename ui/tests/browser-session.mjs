@@ -32,7 +32,7 @@ function harness(options={}){
   return {lifecycle,api:(...args)=>lifecycle.execute(...args),file,output,workers,timers,get locks(){return locks;},get history(){return history;}};
 }
 
-test('direct and prepared lifecycle preserve results, late facts and overlapping cleanup',async()=>{
+test('Analyze and Run lifecycle preserve results, late facts and overlapping cleanup',async()=>{
   const h=harness(),{api,file,output,workers}=h;
     const job={operations:[],compression:'none',output_csv:{encoding:'utf-8',headers:true},resources:{temp_dir:null},limits:{rows:2,bytes:30}};
     output.requestPermission=async()=> 'denied';
@@ -50,11 +50,13 @@ test('direct and prepared lifecycle preserve results, late facts and overlapping
     assert.equal(request.type,'run-direct');assert.equal(request.file,file);assert.equal(request.output,output);assert.deepEqual(request.job,job);
     engine.published({id:request.id,result:{analysis:{rows:3,output_files:2,warnings:[]},output:'destination/results'}});await tick();
     let state=await api('state');assert.equal(state.status,'complete');assert.equal(state.analysis.rows,3);assert.equal(h.locks,0);assert.ok(engine.stopped);
-    await assert.rejects(api('run',{}),/Prepare exact outputs/);
-    await api('analyze',job);engine=workers.at(-1);request=engine.messages.at(-1);assert.equal(request.type,'analyze');
-    engine.reply({id:request.id,result:{analysis:{rows:3,warnings:[]}}});await tick();assert.equal((await api('state')).status,'ready');assert.ok(!engine.stopped);
-    await api('run',{});request=engine.messages.at(-1);assert.equal(request.type,'run');
-    engine.published({id:request.id,result:{output:'destination/prepared'}});await tick();assert.equal((await api('state')).status,'complete');
+    await assert.rejects(api('analyze',job),/Unknown browser operation/);
+    await assert.rejects(api('run',{}),/Unknown browser operation/);
+    await api('profile',job);engine=workers.at(-1);request=engine.messages.at(-1);
+    engine.reply({id:request.id,result:{rows:3}});await tick();assert.equal((await api('state')).status,'profiled');
+    assert.equal((await api('state')).output,null);
+    await api('run-direct',job);engine=workers.at(-1);request=engine.messages.at(-1);
+    engine.published({id:request.id,result:{analysis:{rows:3,warnings:[]},output:'destination/fresh'}});await tick();assert.equal((await api('state')).status,'complete');
     await api('run-direct',job);engine=workers.at(-1);request=engine.messages.at(-1);
     engine.reply({exporting:request.folder});engine.reply({id:request.id,error:'marker close failed'});await tick();
     state=await api('state');assert.equal(state.status,'failed');assert.match(state.error,/marker close failed.*CHOPPER-COMPLETE/);assert.equal(state.analysis,null);assert.equal(h.locks,0);
@@ -73,11 +75,11 @@ test('direct and prepared lifecycle preserve results, late facts and overlapping
     engine.reply({id:request.id,error:'old Run failed'});await tick();assert.equal((await api('state')).status,'failed');
     await api('run-direct',job);engine=workers.at(-1);request=engine.messages.at(-1);oldStorage.reply({error:'late cleanup failure'});await tick();state=await api('state');assert.equal(state.status,'running');assert.equal(state.error,null);
     engine.published({id:request.id,result:{analysis:{rows:3,warnings:[]},output:'destination/after-cleanup-race'}});await tick();assert.equal((await api('state')).status,'complete');assert.equal(h.locks,0);
-    for(const sourceMode of ['direct','prepared'])for(const cleanupError of [false,true]){
-      await api(sourceMode==='direct'?'run-direct':'analyze',job);engine=workers.at(-1);request=engine.messages.at(-1);
-      if(sourceMode==='prepared'){engine.reply({id:request.id,result:{analysis:{rows:3,warnings:[]}}});await tick();await api('run',{});request=engine.messages.at(-1);}
+    for(const sourceMode of ['direct','analyzed'])for(const cleanupError of [false,true]){
+      await api(sourceMode==='direct'?'run-direct':'profile',job);engine=workers.at(-1);request=engine.messages.at(-1);
+      if(sourceMode==='analyzed'){engine.reply({id:request.id,result:{rows:3}});await tick();await api('run-direct',job);engine=workers.at(-1);request=engine.messages.at(-1);}
       const heldStorage=workers.at(-2);heldStorage.deferCleanup=true;
-      engine.published({id:request.id,result:{...(sourceMode==='direct'?{analysis:{rows:3,warnings:[]}}:{}),output:'destination/old-completed'}});await tick();assert.equal((await api('state')).status,'running');
+      engine.published({id:request.id,result:{analysis:{rows:3,warnings:[]},output:'destination/old-completed'}});await tick();assert.equal((await api('state')).status,'running');
       await api('cancel',{});await api('run-direct',job);engine=workers.at(-1);request=engine.messages.at(-1);
       heldStorage.reply(cleanupError?{error:'old successful cleanup failed'}:{cleaned:true});await tick();state=await api('state');assert.equal(state.status,'running');assert.equal(state.error,null);assert.equal(state.analysis,null);
       engine.published({id:request.id,result:{analysis:{rows:3,warnings:[]},output:'destination/new-completed'}});await tick();assert.equal((await api('state')).status,'complete');assert.equal(h.locks,0);
@@ -208,20 +210,19 @@ for(const workerType of ['storage','engine']){
   });
 }
 
-for(const phase of ['idle','profiled','ready'])for(const workerType of ['storage','engine']){
+for(const phase of ['idle','profiled'])for(const workerType of ['storage','engine']){
   test(`${workerType} failure while ${phase} retires the session without a pending request`,async()=>{
     const h=harness();await h.api('defaults');
     if(phase!=='idle'){
-      await h.api(phase==='ready'?'analyze':'profile',job());
+      await h.api('profile',job());
       const engine=h.workers.at(-1),request=engine.messages.at(-1);
-      engine.reply({id:request.id,result:phase==='ready'?{analysis:{rows:3,warnings:[]}}:{rows:3}});await tick();
+      engine.reply({id:request.id,result:{rows:3}});await tick();
     }
     assert.equal(h.lifecycle.snapshot().status,phase);
     const storage=h.workers.at(-2),engine=h.workers.at(-1);storage.deferCleanup=true;
     (workerType==='storage'?storage:engine).onerror({message:`${workerType} died while ${phase}`});await tick();
     assert.equal(h.lifecycle.snapshot().status,'failed');assert.match(h.lifecycle.snapshot().error,/died while/);
     assert.equal(engine.stopped,true);assert.equal(h.locks,1);
-    if(phase==='ready')await assert.rejects(h.api('run'),/Prepare exact outputs/);
     storage.reply({cleaned:true});await tick();assert.equal(storage.stopped,true);assert.equal(h.locks,0);
     await h.api('run-direct',job());const replacement=h.workers.at(-1);
     engine.onerror({message:'late retired engine failure'});await tick();
@@ -253,14 +254,14 @@ for(const type of ['columns','sniff']){
   });
 }
 
-test('prepared confirmation permission denial retains snapshot; cancellation invalidates a pending grant',async()=>{
-  const h=harness();await h.api('analyze',job());const engine=h.workers.at(-1),request=engine.messages.at(-1);
-  engine.reply({id:request.id,result:{analysis:{rows:3,warnings:[]}}});await tick();
-  h.output.requestPermission=async()=> 'denied';await assert.rejects(h.api('run'),/permission was not granted/);
-  assert.equal(h.lifecycle.snapshot().status,'ready');assert.equal(engine.stopped,undefined);assert.equal(h.locks,1);
+test('Run permission denial preserves input analysis; cancellation invalidates a pending grant',async()=>{
+  const h=harness();await h.api('profile',job());const engine=h.workers.at(-1),request=engine.messages.at(-1);
+  engine.reply({id:request.id,result:{rows:3}});await tick();
+  h.output.requestPermission=async()=> 'denied';await assert.rejects(h.api('run-direct',job()),/permission was not granted/);
+  assert.equal(h.lifecycle.snapshot().status,'profiled');assert.equal(engine.stopped,undefined);assert.equal(h.locks,1);
   const permission=deferred();h.output.requestPermission=()=>permission.promise;
-  const pending=h.api('run');await tick();await h.api('cancel');permission.resolve('granted');await pending;
-  assert.equal(h.lifecycle.snapshot().status,'cancelled');assert.equal(engine.messages.filter(m=>m.type==='run').length,0);assert.equal(h.locks,0);
+  const pending=h.api('run-direct',job());await tick();await h.api('cancel');permission.resolve('granted');await pending;
+  assert.equal(h.lifecycle.snapshot().status,'cancelled');assert.equal(engine.messages.filter(m=>m.type==='run-direct').length,0);assert.equal(h.locks,0);
 });
 
 test('a delayed Run permission cannot replace profiling admitted during the wait',async()=>{
@@ -271,7 +272,7 @@ test('a delayed Run permission cannot replace profiling admitted during the wait
   engine.reply({id:request.id,result:{rows:3}});await tick();assert.equal(h.lifecycle.snapshot().status,'profiled');await h.api('cancel');assert.equal(h.locks,0);
 });
 
-test('Run freezes source and destination before permissions; prepared confirmation retains its destination',async()=>{
+test('Run freezes source and destination before permissions and never reuses analysis settings',async()=>{
   const h=harness(),permission=deferred();h.output.requestPermission=()=>permission.promise;
   const waiting=h.api('run-direct',job());
   h.lifecycle.selectInput({name:'replacement.csv'});h.lifecycle.selectOutput({name:'replacement folder'});permission.resolve('granted');await waiting;
@@ -279,10 +280,12 @@ test('Run freezes source and destination before permissions; prepared confirmati
   engine.reply({exporting:request.folder});assert.equal(h.lifecycle.snapshot().output,'destination/'+request.folder);
   await h.api('cancel');
   h.lifecycle.selectInput(h.file);h.lifecycle.selectOutput(h.output);h.output.requestPermission=async()=> 'granted';
-  await h.api('analyze',job());engine=h.workers.at(-1);request=engine.messages.at(-1);
-  engine.reply({id:request.id,result:{analysis:{rows:3,warnings:[]}}});await tick();
-  h.lifecycle.selectOutput({name:'new selection',requestPermission:async()=>{throw new Error('wrong handle');}});
-  await h.api('run');assert.equal(engine.messages.at(-1).output,h.output);await h.api('cancel');assert.equal(h.locks,0);
+  await h.api('profile',job());engine=h.workers.at(-1);request=engine.messages.at(-1);
+  engine.reply({id:request.id,result:{rows:3}});await tick();
+  const fresh={name:'new selection'};h.lifecycle.selectOutput(fresh);
+  const changed={...job(),limits:{rows:17}};
+  await h.api('run-direct',changed);engine=h.workers.at(-1);request=engine.messages.at(-1);
+  assert.equal(request.output,fresh);assert.deepEqual(request.job,changed);await h.api('cancel');assert.equal(h.locks,0);
 });
 
 for(const type of ['columns','preview'])test(`${type} freezes its selected source before startup`,async()=>{
@@ -314,11 +317,13 @@ test('input analysis survives draft edits but a replacement input rejects its pe
  await h.api('profile',job());request=engine.messages.at(-1);h.lifecycle.selectInput({name:h.file.name});
  engine.reply({id:request.id,result:{rows:99}});await tick();assert.equal(h.lifecycle.snapshot().profile,null);assert.equal(h.lifecycle.snapshot().status,'idle');await h.api('cancel');
 });
-test('prepared output is bound to its input selection and draft revision',async()=>{
- for(const change of ['draft','input']){
-  const h=harness();await h.api('analyze',job());const engine=h.workers.at(-1),request=engine.messages.at(-1);
-  if(change==='draft')h.lifecycle.invalidateDraft();else h.lifecycle.selectInput({name:h.file.name});
-  engine.reply({id:request.id,result:{analysis:{rows:3,warnings:[]}}});await tick();
-  await assert.rejects(h.api('run'),/configuration changed/);assert.equal(engine.messages.filter(message=>message.type==='run').length,0);await h.api('cancel');
- }
+test('Run after analysis submits current source and revision, with no prepared handle',async()=>{
+ const h=harness();await h.api('profile',job());let engine=h.workers.at(-1),request=engine.messages.at(-1);
+ engine.reply({id:request.id,result:{rows:3}});await tick();
+ const replacement={name:'replacement.csv'};h.lifecycle.selectInput(replacement);h.lifecycle.invalidateDraft();
+ const changed={...job(),operations:[{type:'balanced',files:3}]};
+ await h.api('run-direct',changed);engine=h.workers.at(-1);request=engine.messages.at(-1);
+ assert.equal(request.file,replacement);assert.deepEqual(request.job,changed);
+ assert.equal(h.lifecycle.snapshot().status,'running');assert.equal(h.lifecycle.snapshot().profile,null);
+ await h.api('cancel');
 });

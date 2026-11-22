@@ -6,16 +6,62 @@ license.workspace = true
 default-run = "chopper"
 
 [features]
+# A guaranteed one-chunk group needs one typed record, not a temporary catalog.
+experimental-single-final-catalog = ["experimental-memory-final-writers"]
+# Linux one-chunk final writers flush all buffers before syncing original handles.
+experimental-batched-final-sync = ["experimental-single-final-catalog"]
+# One descriptor per uncapped writer; bounded memory-proportional selector.
+experimental-single-catalog-capacity = ["experimental-single-final-catalog", "experimental-small-final-buffers"]
+# Count retained strata before exact quota streams feed bounded final writers.
+experimental-retained-exact-writers = ["experimental-bounded-final-partition", "experimental-terminal-routing"]
+# Only bounded fanout catalogs use smaller metadata buffers; no selector change.
+experimental-small-final-catalogs = ["experimental-memory-final-writers"]
+# A declared output-file ceiling can bound one-pass private Partition writers.
+experimental-bounded-final-partition = ["experimental-memory-final-writers"]
+# Smaller per-file fanout buffers permit a higher memory-proportional ceiling.
+experimental-small-final-buffers = ["experimental-memory-final-writers"]
+# Extend the strict count/digest Balanced pass to existing output codecs.
+experimental-counted-codec-balanced = ["experimental-counted-balanced"]
+# Shared fanout never reuses each writer's retained header encoder buffers.
+experimental-release-final-header-scratch = ["experimental-shared-final-serializer"]
+# Opt-in memory-proportional configured writer fanout, guarded by native handles.
+experimental-memory-final-writers = ["experimental-shared-final-serializer"]
+# Opt-in bounded composed count-independent memberships into final writers.
+experimental-final-writer-chains = ["experimental-shared-final-serializer"]
+# Experiment control for sharing encoded row scratch across bounded final writers.
+experimental-shared-final-serializer = ["experimental-final-writers"]
+# Opt-in native bounded final writers for singleton count-independent grouping.
+experimental-final-writers = []
+# Opt-in native Partition/Interleaved, stratified exact and probabilistic direct publication.
+experimental-terminal-routing = []
+# Opt-in Linux clean inactive-file estimate; retained allocations remain charged.
+experimental-cgroup-cache-headroom = []
+experimental-direct-decode = ["chopper-core/experimental-direct-decode"]
+# Opt-in native count/validate pass followed by exact Balanced streaming.
+experimental-counted-balanced = []
+# Opt-in two-pass counted Balanced for Zstandard CSV input.
+experimental-counted-zstd-input-balanced = ["experimental-counted-balanced"]
+# Opt-in bounded native count and emit passes for Partition followed by Balanced.
+experimental-counted-partition-balanced = ["experimental-counted-balanced", "experimental-bounded-final-partition"]
+# Opt-in root external shuffle/balanced serialization into private publication.
+experimental-terminal-shuffle = []
 # Test-only deterministic resource contracts; never enabled by production builds.
 resource-contract-tests = []
 # Opt-in external spill block/framing experiment; v1 rows remain the default.
 experimental-spill-blocks = []
+# Opt-in larger merge fan-in for terminal native Linux Uniform shuffle.
+experimental-wide-uniform-merge = ["experimental-terminal-shuffle"]
+experimental-short-terminal-uniform-merge = ["experimental-wide-uniform-merge"]
 # Opt-in native profiling hash batches; serial profiling remains the default.
 experimental-parallel-profile = []
 # Opt-in native overlap of plain prepared-output files using requested workers.
 experimental-plain-publication = []
 # Opt-in exact-v1 uniform shuffle followed by value partition fusion.
 experimental-shuffle-partition = []
+# Opt-in Linux fusion of retained plain probabilistic assignment and Uniform.
+experimental-probabilistic-shuffle-fusion = []
+# Opt-in Linux in-place quota index for high-fanout exact assignment.
+experimental-exact-quota-index = []
 # Opt-in single traversal of nested balanced ranges.
 experimental-nested-balanced = []
 # Opt-in elimination of partition keys proven constant by previous partitions.

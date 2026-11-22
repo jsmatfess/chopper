@@ -32,6 +32,53 @@ pub(super) struct OperationKey {
     pub bytes: Vec<u8>,
     reservation: Reservation,
 }
+
+pub(super) struct TupleBuffer {
+    bytes: Vec<u8>,
+    memory: Reservation,
+}
+impl TupleBuffer {
+    pub(super) fn new(memory: Reservation) -> Self {
+        Self {
+            bytes: Vec::new(),
+            memory,
+        }
+    }
+    pub(super) fn bytes(&self) -> &[u8] {
+        &self.bytes
+    }
+    pub(super) fn replace<'a>(
+        &mut self,
+        fields: impl Iterator<Item = &'a str> + Clone,
+        columns: &[usize],
+    ) -> Result<()> {
+        let mut size = 0usize;
+        for &column in columns {
+            let value = fields
+                .clone()
+                .nth(column)
+                .context("invalid operation key column")?;
+            size = size
+                .checked_add(value.len())
+                .and_then(|n| n.checked_add(value.bytes().filter(|b| *b == 0).count()))
+                .and_then(|n| n.checked_add(2))
+                .context("operation key capacity overflow")?;
+        }
+        self.memory.reserve_vec(&mut self.bytes, size)?;
+        self.bytes.clear();
+        // Same v1 framing as OperationKey::tuple; only storage is reused.
+        for &column in columns {
+            for byte in fields.clone().nth(column).expect("checked column").bytes() {
+                self.bytes.push(byte);
+                if byte == 0 {
+                    self.bytes.push(255);
+                }
+            }
+            self.bytes.extend_from_slice(&[0, 0]);
+        }
+        Ok(())
+    }
+}
 impl OperationKey {
     fn allocate(capacity: usize, reservation: Reservation, sorter: &mut Sorter) -> Result<Self> {
         let mut reservation = reservation;
@@ -100,6 +147,26 @@ pub(super) mod resource_contracts;
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(feature = "experimental-bounded-final-partition")]
+    #[test]
+    fn reusable_partition_keys_keep_original_framing_and_release_capacity() -> Result<()> {
+        let workspace = Arc::new(Workspace::new(4096));
+        let mut key = TupleBuffer::new(Reservation::for_workspace(workspace.clone()));
+        for fields in [
+            vec!["".into(), "界\0\n\"".into(), "tail\0\0".into()],
+            vec!["a".into(), "b".into(), "c".into()],
+        ] {
+            let columns = [2, 0, 1, 2];
+            key.replace(FieldViews::owned(&fields), &columns)?;
+            assert_eq!(key.bytes(), random::tuple_key(&fields, &columns));
+            assert_eq!(workspace.used(), key.bytes.capacity() as u64);
+        }
+        assert!(key.replace(FieldViews::owned(&[]), &[0]).is_err());
+        drop(key);
+        assert_eq!(workspace.used(), 0);
+        Ok(())
+    }
 
     fn context() -> Result<Context> {
         Context::new(

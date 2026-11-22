@@ -144,6 +144,7 @@ pub struct Context {
     pub(crate) physical_operations: [usize; 2],
     pub(crate) physical_source: Option<u32>,
     pub(crate) physical_role: u8,
+    pub(crate) direct_terminal_output: bool,
     workspace: Arc<Workspace>,
     directory_path_bytes: Arc<AtomicU64>,
     grouping: chopper_core::Grouping,
@@ -334,6 +335,7 @@ impl Context {
             physical_operations: [0; 2],
             physical_source: None,
             physical_role: 0,
+            direct_terminal_output: false,
             workspace,
             directory_path_bytes,
             grouping: resources.grouping,
@@ -1578,6 +1580,90 @@ impl SortOrder {
         })
     }
 }
+#[cfg(all(target_os = "linux", feature = "experimental-wide-uniform-merge"))]
+fn wide_merge_handles_available() -> bool {
+    let mut limit = std::mem::MaybeUninit::<libc::rlimit>::uninit();
+    // getrlimit initializes the result on success. A failure keeps the old cap.
+    if unsafe { libc::getrlimit(libc::RLIMIT_NOFILE, limit.as_mut_ptr()) } != 0 {
+        return false;
+    }
+    // Each active run may hold both its original file and an independent reader.
+    // Leave headroom for retained levels and the rest of the process.
+    unsafe { limit.assume_init() }.rlim_cur >= 4096
+}
+
+#[cfg(all(
+    target_os = "linux",
+    feature = "experimental-probabilistic-shuffle-fusion"
+))]
+struct PreparedSpill {
+    // Drop the writer, including its admitted path, before the buffer grant.
+    writer: BufWriter<SpillFile>,
+    buffer: Reservation,
+}
+#[cfg(all(
+    target_os = "linux",
+    feature = "experimental-probabilistic-shuffle-fusion"
+))]
+impl PreparedSpill {
+    fn new(ctx: &Context) -> Result<Self> {
+        let mut buffer = Reservation::new(ctx);
+        buffer.resize(64 * 1024)?;
+        let writer = ctx.spill_writer(64 * 1024)?;
+        Ok(Self { writer, buffer })
+    }
+}
+
+// A keyed sorter routes to buckets or owns a prepared spill writer.
+// Keeping the mutually exclusive owners in one slot preserves row headroom.
+#[allow(clippy::large_enum_variant)]
+#[derive(Default)]
+enum SortSpillMode {
+    #[default]
+    Ordinary,
+    Routing(Router),
+    #[cfg(all(
+        target_os = "linux",
+        feature = "experimental-probabilistic-shuffle-fusion"
+    ))]
+    Prepared(PreparedSpill),
+}
+impl SortSpillMode {
+    fn router_mut(&mut self) -> Option<&mut Router> {
+        if let Self::Routing(router) = self {
+            Some(router)
+        } else {
+            None
+        }
+    }
+    fn take_router(&mut self) -> Option<Router> {
+        if let Self::Routing(_) = self {
+            if let Self::Routing(router) = std::mem::take(self) {
+                return Some(router);
+            }
+        }
+        None
+    }
+    #[cfg(all(
+        target_os = "linux",
+        feature = "experimental-probabilistic-shuffle-fusion"
+    ))]
+    fn take_prepared(&mut self) -> Option<PreparedSpill> {
+        if let Self::Prepared(_) = self {
+            if let Self::Prepared(owner) = std::mem::take(self) {
+                return Some(owner);
+            }
+        }
+        None
+    }
+}
+
+#[cfg(test)]
+const _: () = assert!(
+    std::mem::size_of::<SortSpillMode>() <= std::mem::size_of::<Option<Router>>(),
+    "ordinary and routed sorters must retain their existing fixed capacity",
+);
+
 pub struct Sorter {
     ctx: Context,
     order: SortOrder,
@@ -1588,8 +1674,9 @@ pub struct Sorter {
     largest_key: usize,
     reservation: Reservation,
     buffer_limit: usize,
+    defer_terminal_merges: bool,
     routing_candidate: bool,
-    router: Option<Router>,
+    spill_mode: SortSpillMode,
 }
 impl Sorter {
     pub fn new(ctx: &Context, order: SortOrder) -> Self {
@@ -1600,6 +1687,21 @@ impl Sorter {
         let buffer_limit = ctx.workspace.sort_buffer_limit(ctx.memory / 4);
         let routing_candidate =
             matches!(order, SortOrder::Key) && ctx.grouping == chopper_core::Grouping::Auto;
+        #[cfg(all(
+            target_os = "linux",
+            feature = "experimental-short-terminal-uniform-merge",
+            not(feature = "experimental-spill-blocks")
+        ))]
+        let defer_terminal_merges = ctx.direct_terminal_output
+            && !ctx.physical_enabled()
+            && matches!(order, SortOrder::Random(_))
+            && wide_merge_handles_available();
+        #[cfg(not(all(
+            target_os = "linux",
+            feature = "experimental-short-terminal-uniform-merge",
+            not(feature = "experimental-spill-blocks")
+        )))]
+        let defer_terminal_merges = false;
         Self {
             ctx: ctx.clone(),
             order,
@@ -1610,9 +1712,22 @@ impl Sorter {
             largest_key: 0,
             reservation: Reservation::new(ctx),
             buffer_limit,
+            defer_terminal_merges,
             routing_candidate,
-            router: None,
+            spill_mode: SortSpillMode::Ordinary,
         }
+    }
+    #[cfg(all(
+        target_os = "linux",
+        feature = "experimental-probabilistic-shuffle-fusion"
+    ))]
+    pub(crate) fn probabilistic_shuffle(ctx: &Context) -> Result<Self> {
+        let mut sorter = Self::new(ctx, SortOrder::GroupRandom);
+        sorter.spill_mode = SortSpillMode::Prepared(PreparedSpill::new(ctx)?);
+        sorter.buffer_limit = ctx
+            .workspace
+            .available_sort_buffer_limit(sorter.buffer_limit);
+        Ok(sorter)
     }
     /// Known count-independent membership can try routing from its first row.
     /// The same one-way fallback bounds handles and preserves sorted output.
@@ -1620,7 +1735,7 @@ impl Sorter {
         let mut sorter = Self::new(ctx, SortOrder::Key);
         if ctx.grouping == chopper_core::Grouping::Auto {
             sorter.routing_candidate = false;
-            sorter.router = Some(Router::new(ctx));
+            sorter.spill_mode = SortSpillMode::Routing(Router::new(ctx));
         }
         sorter
     }
@@ -1657,7 +1772,7 @@ impl Sorter {
             row.key.len()
         });
         if random_key.is_none() {
-            if let Some(router) = &mut self.router {
+            if let Some(router) = self.spill_mode.router_mut() {
                 if router.push_row(&row)? {
                     return Ok(row.fields);
                 }
@@ -1696,7 +1811,7 @@ impl Sorter {
         );
         self.largest_row = self.largest_row.max(decoded_size);
         self.largest_key = self.largest_key.max(row.key.len());
-        if let Some(router) = &mut self.router {
+        if let Some(router) = self.spill_mode.router_mut() {
             if router.push(&row)? {
                 return Ok(Some(row));
             }
@@ -1706,7 +1821,7 @@ impl Sorter {
         Ok(None)
     }
     fn push_packed(&mut self, mut row: PackedRow) -> Result<()> {
-        if let Some(router) = &mut self.router {
+        if let Some(router) = self.spill_mode.router_mut() {
             if router.push(&row)? {
                 return Ok(());
             }
@@ -1716,7 +1831,7 @@ impl Sorter {
                 .budget
                 .routing_fallbacks
                 .fetch_add(1, AtomicOrdering::Relaxed);
-            let router = self.router.take().unwrap();
+            let router = self.spill_mode.take_router().unwrap();
             let observation_ctx = self.ctx.clone();
             let observation = observation_ctx.physical_span_from(
                 crate::observation::physical::Kind::Fallback,
@@ -1780,7 +1895,7 @@ impl Sorter {
             std::mem::size_of::<Self>(),
         )? {
             self.flush()?;
-            if let Some(router) = &mut self.router {
+            if let Some(router) = self.spill_mode.router_mut() {
                 if router.push(&row)? {
                     return Ok(());
                 }
@@ -1845,6 +1960,9 @@ impl Sorter {
         Ok(())
     }
     fn flush(&mut self) -> Result<()> {
+        self.flush_run(true)
+    }
+    fn flush_run(&mut self, _may_spill_again: bool) -> Result<()> {
         self.ctx.pressure_boundary();
         if self.buffer.is_empty() {
             return Ok(());
@@ -1859,14 +1977,39 @@ impl Sorter {
                 self.buffer = Vec::new();
                 self.bytes = 0;
                 self.reservation.resize(0)?;
-                self.router = Some(router);
+                self.spill_mode = SortSpillMode::Routing(router);
                 return Ok(());
             }
         }
         // The spill writer overlaps the retained rows. Reserve it separately
         // from the row-storage ceiling and release it before merge allocation.
         let mut io = Reservation::new(&self.ctx);
-        io.resize(65536)?;
+        #[cfg(all(
+            target_os = "linux",
+            feature = "experimental-probabilistic-shuffle-fusion"
+        ))]
+        let prepared = self.spill_mode.take_prepared();
+        #[cfg(all(
+            target_os = "linux",
+            feature = "experimental-probabilistic-shuffle-fusion"
+        ))]
+        let renew_prepared = _may_spill_again && prepared.is_some();
+        #[cfg(all(
+            target_os = "linux",
+            feature = "experimental-probabilistic-shuffle-fusion"
+        ))]
+        let writer = prepared.map(|owner| {
+            io = owner.buffer;
+            owner.writer
+        });
+        #[cfg(not(all(
+            target_os = "linux",
+            feature = "experimental-probabilistic-shuffle-fusion"
+        )))]
+        let writer = None;
+        if writer.is_none() {
+            io.resize(64 * 1024)?;
+        }
         self.ctx
             .budget
             .sort_runs
@@ -1875,7 +2018,10 @@ impl Sorter {
         let observation = observation_ctx.physical_span(crate::observation::physical::Kind::Spill);
         let observed_rows = self.buffer.len() as u64;
         self.sort_buffer();
-        let mut writer = self.ctx.spill_writer(64 * 1024)?;
+        let mut writer = match writer {
+            Some(writer) => writer,
+            None => self.ctx.spill_writer(64 * 1024)?,
+        };
         for row in self.buffer.drain(..) {
             row.write(&mut writer)?;
         }
@@ -1893,15 +2039,68 @@ impl Sorter {
         if let Some(span) = observation {
             span.finish_counts(observed_rows, 1, None);
         }
-        self.add_run(run, 0)
+        self.add_run(run, 0)?;
+        #[cfg(all(
+            target_os = "linux",
+            feature = "experimental-probabilistic-shuffle-fusion"
+        ))]
+        if renew_prepared {
+            self.spill_mode = SortSpillMode::Prepared(PreparedSpill::new(&self.ctx)?);
+        }
+        Ok(())
     }
     fn fan_in(&self) -> usize {
+        let ceiling = 64;
+        #[cfg(all(target_os = "linux", feature = "experimental-wide-uniform-merge"))]
+        let ceiling = if self.ctx.direct_terminal_output
+            && !self.ctx.physical_enabled()
+            && matches!(self.order, SortOrder::Random(_))
+            && wide_merge_handles_available()
+        {
+            if self.defer_terminal_merges {
+                512
+            } else {
+                256
+            }
+        } else {
+            ceiling
+        };
         // Only headers are live per run. Leave headroom for the winner's
         // separately reserved decode/conversion capacity and growth overlap.
         ((self.ctx.memory / 4).saturating_sub(self.largest_row) / (self.largest_key + 65536 + 512))
-            .clamp(2, 64)
+            .clamp(2, ceiling)
     }
     fn add_run(&mut self, run: SortRun, level: usize) -> Result<()> {
+        if self.defer_terminal_merges {
+            const PENDING_LIMIT: usize = 1024;
+            debug_assert_eq!(level, 0);
+            if self.fan_in() > 256 && self.ctx.used() <= self.ctx.budget.maximum / 2 {
+                if self.levels.is_empty() {
+                    // Admit the pending slots before transferring any run.
+                    // A denied optional catalog can use ordinary merging.
+                    let reservation = Reservation::new(&self.ctx);
+                    let _ = Catalog::with_capacity(reservation, PENDING_LIMIT)
+                        .and_then(|catalog| self.levels.push(catalog));
+                }
+                if self
+                    .levels
+                    .first()
+                    .is_some_and(|pending| pending.len() < PENDING_LIMIT - 1)
+                {
+                    self.levels[0].push(run)?;
+                    return Ok(());
+                }
+            }
+            // Once the pending limit or reader budget is reached, feed the
+            // owned runs to the original bounded hierarchy exactly once.
+            self.defer_terminal_merges = false;
+            let levels = std::mem::replace(&mut self.levels, Catalog::new(&self.ctx));
+            for existing in levels {
+                for pending in existing {
+                    self.add_run(pending, 0)?;
+                }
+            }
+        }
         if self.levels.len() == level {
             self.levels.push(Catalog::new(&self.ctx))?;
         }
@@ -1982,7 +2181,7 @@ impl Sorter {
     }
     pub fn finish(mut self) -> Result<SortedRows> {
         self.ctx.pressure_boundary();
-        if let Some(router) = self.router.take() {
+        if let Some(router) = self.spill_mode.take_router() {
             self.ctx
                 .budget
                 .routed_groups
@@ -2006,14 +2205,33 @@ impl Sorter {
                 _reservation: self.reservation,
             }));
         }
-        self.flush()?;
+        self.flush_run(false)?;
+        #[cfg(all(
+            target_os = "linux",
+            feature = "experimental-probabilistic-shuffle-fusion"
+        ))]
+        drop(self.spill_mode.take_prepared());
         let fan_in = self.fan_in();
-        let mut runs = Catalog::new(&self.ctx);
-        for level in std::mem::replace(&mut self.levels, Catalog::new(&self.ctx)) {
-            for run in level {
-                runs.push(run)?;
+        let mut levels = std::mem::replace(&mut self.levels, Catalog::new(&self.ctx)).into_iter();
+        let mut runs = if self.defer_terminal_merges {
+            let mut pending = levels.next().context("missing pending terminal runs")?;
+            debug_assert_eq!(levels.len(), 0);
+            // Consolidate only the inputs needed to fit the final merge.
+            while pending.len() > fan_in {
+                let count = (pending.len() - fan_in + 1).min(fan_in);
+                let merged = self.merge(pending.take_prefix(count)?, None)?;
+                pending.push(merged)?;
             }
-        }
+            pending
+        } else {
+            let mut runs = Catalog::new(&self.ctx);
+            for level in levels {
+                for run in level {
+                    runs.push(run)?;
+                }
+            }
+            runs
+        };
         while runs.len() > fan_in {
             let mut next = Catalog::new(&self.ctx);
             let mut iter = runs.into_iter();
@@ -2427,6 +2645,68 @@ impl Iterator for MergeRows {
     fn next(&mut self) -> Option<Self::Item> {
         self.next_decoded(owned_fields_reserved)
     }
+}
+
+#[cfg(all(
+    test,
+    target_os = "linux",
+    feature = "experimental-short-terminal-uniform-merge",
+    not(feature = "experimental-spill-blocks")
+))]
+#[test]
+fn terminal_uniform_tail_merge_preserves_rows_and_bounds_pending_runs() -> Result<()> {
+    let admitted = wide_merge_handles_available();
+    for (runs, temp_bytes, keeps_pending) in [
+        (514, None, true),
+        (1024, None, false),
+        (40, Some(4096), false),
+    ] {
+        let mut ctx = Context::with_memory_pool(
+            &chopper_core::Resources {
+                temp_bytes,
+                workers: 1,
+                ..Default::default()
+            },
+            Arc::new(AtomicBool::new(false)),
+            Arc::new(|_| {}),
+            Arc::new(crate::resources::MemoryPool::new(512 * 1024 * 1024)),
+        )?;
+        ctx.direct_terminal_output = true;
+        let mut sorter = Sorter::new(&ctx, SortOrder::Random([0; 32]));
+        assert_eq!(sorter.defer_terminal_merges, admitted);
+        // A low-limit process validates the selector without opening a large
+        // batch of real files.
+        if !admitted {
+            continue;
+        }
+        for id in (0..runs).rev() {
+            sorter.push(Row {
+                id,
+                ordinal: id,
+                key: u128::from(id).to_be_bytes().to_vec(),
+                fields: vec![id.to_string()],
+            })?;
+            sorter.flush()?;
+        }
+        assert_eq!(sorter.defer_terminal_merges, keeps_pending);
+        if keeps_pending {
+            assert_eq!(sorter.levels[0].len(), runs as usize);
+            assert_eq!(ctx.budget.merge_operations.load(AtomicOrdering::Relaxed), 0);
+        }
+        let rows = sorter.finish()?.collect::<Result<Vec<_>>>()?;
+        assert_eq!(
+            rows.iter().map(|row| row.id).collect::<Vec<_>>(),
+            (0..runs).collect::<Vec<_>>()
+        );
+        if keeps_pending {
+            assert_eq!(ctx.budget.merge_operations.load(AtomicOrdering::Relaxed), 2);
+            assert_eq!(ctx.budget.merge_inputs.load(AtomicOrdering::Relaxed), 515);
+        }
+        drop(rows);
+        assert_eq!(ctx.workspace.used(), ctx.directory_reserved_bytes());
+        assert_eq!(ctx.used(), 0);
+    }
+    Ok(())
 }
 
 #[cfg(not(target_os = "wasi"))]

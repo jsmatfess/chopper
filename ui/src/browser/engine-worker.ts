@@ -47,7 +47,7 @@ scope.onmessage=async({data})=>{
       instance=(await WebAssembly.instantiateStreaming(fetch('/engine.wasm'),{wasi_snapshot_preview1:wasi.wasiImport})).instance;
       wasi.initialize(instance as WebAssembly.Instance & {exports:{memory:WebAssembly.Memory}});
       result=invoke('chopper_defaults');
-    } else if(type==='run-direct'||type==='analyze'||type==='columns'||type==='preview'||type==='sniff'||type==='profile'){
+    } else if(type==='run-direct'||type==='columns'||type==='preview'||type==='sniff'||type==='profile'){
       physicalHistory=new PhysicalHistory();stages=new StageCompletions();physicalLastSent=0;
       observations=type==='run-direct'&&data.observationCredit?new ObservationDelivery(data.observationRun,new Int32Array(data.observationCredit),message=>scope.postMessage(message)):null;
       bridge.profiling=!!data.profiling;bridge.metrics={};
@@ -58,11 +58,10 @@ scope.onmessage=async({data})=>{
       root.contents.set('observe',new MemoryFile(new Uint8Array([observations?1:0]),{readonly:true}));
       root.contents.set('job.json',new MemoryFile(encoder.encode(JSON.stringify(job)),{readonly:true}));
       if(data.resetProfile)invoke('chopper_clear_profile');
-      result=invoke(type==='profile'?'chopper_profile':type==='columns'?'chopper_columns':type==='preview'?'chopper_preview':type==='sniff'?'chopper_sniff':type==='run-direct'?'chopper_run':'chopper_analyze');
+      result=invoke(type==='profile'?'chopper_analyze':type==='columns'?'chopper_columns':type==='preview'?'chopper_preview':type==='sniff'?'chopper_sniff':'chopper_run');
     }
-    if(type==='run'||type==='run-direct'){
-      if(type==='run'){bridge.metrics={};invoke('chopper_execute');}
-      const analysis=type==='run-direct'?(result as {analysis:unknown}).analysis:undefined;
+    if(type==='run-direct'){
+      const analysis=(result as {analysis:unknown}).analysis;
       if(bridge.profiling)scope.postMessage({profile:{phase:'execute',metrics:bridge.metrics}});
       bridge.metrics={};
       observations?.update({physical:physicalHistory.snapshot(),processingComplete:true,unavailable:physicalHistory.unavailable||observations.snapshot().unavailable});
@@ -70,9 +69,9 @@ scope.onmessage=async({data})=>{
         observe:observations?observation=>observations?.update(observation):undefined,
         postMessage:message=>scope.postMessage(message),profiling:()=>bridge.profiling,accountExport,
       });
-      if(type==='run-direct')result={...(result as object),analysis};
-    } else if(!['init','analyze','columns','preview','sniff','profile'].includes(type))throw new Error('Unknown engine request');
-    if(bridge?.profiling)scope.postMessage({profile:{phase:type==='run'||type==='run-direct'?'export':type,metrics:bridge.metrics}});
+      result={...(result as object),analysis};
+    } else if(!['init','columns','preview','sniff','profile'].includes(type))throw new Error('Unknown engine request');
+    if(bridge?.profiling)scope.postMessage({profile:{phase:type==='run-direct'?'export':type,metrics:bridge.metrics}});
     collectPhysical(true);
     scope.postMessage({id,result,observationFinal:observations?.snapshot(),observationRun:data.observationRun});
     observations=null;

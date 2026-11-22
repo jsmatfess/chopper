@@ -4,7 +4,7 @@ Current contract (2026-11-15): seeded-output policy is removed. Rewrites must
 preserve requested pipeline semantics, exact allocation/group membership, full
 shuffle distributions and strict serialized caps; they need not preserve a
 particular seeded realization. Public seed input is removed; execution generates
-internal entropy and prepared confirmation retains its exact snapshot.
+internal entropy and internal snapshot execution preserves retained output bytes.
 
 Ordinary builds now fuse adjacent `auto/uniform -> partition(columns)` into one
 sort on partition tuples and random keys, avoiding the global shuffle
@@ -24,6 +24,8 @@ errors after input consumption never trigger raw-input replay.
 | `auto/uniform -> fisher_yates`: retain the final resident shuffle | Equivalent full-permutation law under independent ideal randomness | Implemented for leading prefixes and visible retained pairs. Keep the final original index/domain and resident-only failure; never elide an earlier explicit Fisher–Yates. Upstream grouping/shuffle fusion retains its existing priority. |
 | `partition -> uniform`: sort tuple plus child random key/domain | Exact v1 output | Implemented, including ingestion. Derive each child domain from its original partition lineage and shuffle index; preserve collision refinement. |
 | `uniform -> balanced`: sort once, emit exact contiguous ranges | Exact v1 output | Implemented. Preserve remainder rounding, original parent lineage and insufficient-row failure. This fuses traversal; it does not exchange the operations. |
+| `fisher_yates -> balanced`: traverse the realized resident permutation once | Exact realized output | Implemented for root and retained parents. Preserve resident-only failure, parent quotas/remainders, original indices, lineage and downstream order. Avoid the intermediate Dataset; never move Balanced across the shuffle. |
+| `partition -> balanced`: count each key, then emit exact per-key ranges | Exact membership, lineage and encounter order | Opt-in native `experimental-counted-partition-balanced` for unobserved Auto Run with plain UTF-8 input, plain output and a finite writer ceiling. Two validated passes and the existing counted-source proof precede publication. |
 | `partition -> uniform -> balanced`: sort once and emit each tuple's exact child ranges | Exact v1 output | Opt-in `experimental-partition-balanced`. A charged bounded tuple counter supplies parent sizes; preserve original last-uniform index, collision domain and per-tuple remainder rounding. High fanout/counter denial uses original materialization; typed admission failures discard tentative output and retry. [Evidence](performance.md#partition-shuffle-balanced-fusion-2026-10-18). |
 | Count-independent membership `-> partition ->` count-independent membership | Exact v1 output | Opt-in `experimental-streaming-chain`. Either endpoint may be probabilistic allocation or interleaving. Retain original scope/operation domains, source IDs, independent per-tuple encounter counters, named empty allocations and all logical stages. Bounded catalog/composite-key denial replays the original graph; exact quotas and intervening operations are excluded. [Evidence](performance.md#streaming-membership-partition-chains-2026-10-18). |
 | `uniform -> partition`: sort tuple plus original parent random key/domain | Exact v1 output | Enabled by default; the former feature retains additional audit instrumentation. Keep the original shuffle domain, source IDs and collision refinement; append partition lineage at its original index. Preserve canonical tuple order and the shuffled subsequence inside each tuple. |
@@ -32,6 +34,9 @@ errors after input consumption never trigger raw-input replay.
 | `Fisher-Yates -> partition`: replace with tuple/random-key sorting | Different pinned algorithm and seeded output | Excluded from the exact-v1 prototype. A separately recorded flexible-policy plan requires the appropriate distribution argument and acceptance checks. |
 | Move a row-count, balanced, interleaved or byte-cap split across a shuffle | Generally changes membership/chunk boundaries | Prohibited by the current rules. Shuffling children cannot repair membership selected before the shuffle. Exact-output fusion must still apply the original split to the same realized order. |
 | Move shuffle across exact/probabilistic or stratified assignment | Requires a separate joint-distribution/encounter-order proof | Excluded from the reverse-partition prototype. Existing assignment-then-shuffle fusion retains original assignment membership, quotas, draw sequence and child domains; it is not an exchange of the operations. |
+| One-chunk final writers: flush all before synchronizing original Files | Identical bytes and native commit requirements | Opt-in Linux `experimental-batched-final-sync`, unobserved plain typed catalogs only. Admit root handle queue before transfer; sync every original handle before Analysis/manifest/commit, preserve original stage/witness and terminal cleanup. No reopen, fewer-sync shortcut or other-platform/codec/multichunk eligibility. |
+| Bounded final writer with one proved chunk: retain typed metadata until canonical merge | Identical output and original publication witness | Opt-in native `experimental-single-final-catalog`; exact Group or absence of every chunk cap proves one record. Preserve serialized metadata byte limits; materialize the canonical root catalog in its original stage. Other constructors and multi-chunk groups retain disk catalogs. No writer ceiling change or Analyze dependency. |
+| Singleton retained stratified exact assignment: count strata, then interleave original quota streams into bounded final writers | Exact internal-entropy membership and output | Opt-in native `experimental-retained-exact-writers`, plain UTF-8 output and Auto grouping with configured allocation count within the writer ceiling. Preserve each stratum's original parent/step/domain, largest-remainder quotas and encounter subsequence; configured names/zeros, global output order and caps remain exact. Preparation denial retries the same immutable parent through the original writer; cancellation/cleanup faults and every emission error are terminal. No CSV retry or observed/WASI/composed eligibility. Experimental qualification is separate from this eligibility contract. |
 | `balanced(r) -> balanced(s)`: scan original nested ranges together | Exact output | Opt-in `experimental-nested-balanced` prototype, including deeper chains. Reuse one checked frame scan for intermediate shared ranges or one decode traversal for terminal emission. Keep each parent's original remainder rounding, lineage, stage counts and failures. Flattening to `balanced(r*s)` can change boundaries. [Evidence](performance.md#nested-balanced-range-fusion-2026-10-17). |
 | Redundant value partitions: group only on newly varying columns | Exact output | Opt-in `experimental-constant-partition`. Earlier requested value partitions prove constants through subsequent selection/reordering. Share intermediate files or copy terminal rows when all keys are constant; otherwise sort varying keys with full tuple lineage/domains. [Evidence](performance.md#proven-constant-partition-keys-2026-10-17). |
 | Consecutive value partitions on different columns: group once by nested tuples | Exact output | Opt-in `experimental-consecutive-partitions`. Retain selected-column order/duplicates and every logical lineage/stage; preserve encounter order and original downstream domains. Typed admission denial discards tentative output before CSV/dataset replay. Native cases improve, but large browser merging regresses. [Evidence](performance.md#consecutive-value-partition-fusion-2026-10-17). |
@@ -149,6 +154,23 @@ The ingestion-adaptive and random-quota balanced pilot implementations are not
 retained. Their measured decisions and limitations belong to the
 [swarm investigation](performance/investigations/shuffle-swarm-decisions-2026-11-15.md).
 No new size threshold, resident Auto selector or alternate runner is enabled.
+
+### Linux prepared-spill probabilistic shuffle
+
+`experimental-probabilistic-shuffle-fusion` recognizes plain Partition →
+probabilistic assignment → explicit Uniform. It replaces the intermediate
+allocation Dataset and individual child sorts with a grouped sort per retained
+partition parent. The key contains the configured allocation index and the
+original child's Uniform key and collision domain. Membership uses the original
+assignment index and stratification. The sink receives named children in the
+original order, including empty allocations.
+
+Preparation owns a real buffered spill file before accumulation. Typed memory
+denial drops its tentative owners before the retained-parent proposal tries the
+original allocation and shuffle. Cancellation and cleanup failure win at that
+boundary. After entering emission, every error is terminal. Original stage
+statistics commit once and physical facts map the operations that actually ran.
+[Linux complete-job and pressure evidence](performance/investigations/probabilistic-shuffle-fusion-at-2-gib-2026-11-21.md)
 
 ## Retained result ownership
 

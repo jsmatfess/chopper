@@ -10,6 +10,7 @@ pub use diagnostics::Diagnostics;
 mod assignment;
 mod child_metadata;
 mod column_summaries;
+mod exact_writers;
 pub use column_summaries::ColumnSummaries;
 #[cfg(feature = "experimental-consecutive-partitions")]
 mod consecutive_partitions;
@@ -39,6 +40,11 @@ mod nested_balanced;
 #[cfg(feature = "experimental-partition-balanced")]
 mod partition_balanced;
 mod preview;
+#[cfg(all(
+    target_os = "linux",
+    feature = "experimental-probabilistic-shuffle-fusion"
+))]
+mod probabilistic_shuffle;
 pub use preview::Preview;
 mod exact_plan;
 #[cfg(any(test, feature = "resource-contract-tests"))]
@@ -224,7 +230,8 @@ pub fn run(job: Job, cancel: Arc<AtomicBool>, notify: Notify) -> Result<Analysis
     run_with_memory_pool(job, cancel, notify, crate::resources::process_memory()?)
 }
 /// Run against the caller's aggregate capacity ledger. Eligibility is decided
-/// before input is opened; a consumed direct input is never retried.
+/// before CSV consumption (counted Run may peek at the container signature);
+/// a consumed direct input is never retried.
 pub fn run_with_memory_pool(
     job: Job,
     cancel: Arc<AtomicBool>,
@@ -241,10 +248,30 @@ fn run_using(
     sink: Option<crate::observation::Sink<'_>>,
 ) -> Result<output::PublishedAnalysis> {
     // Flexible execution retains its explicit prepared-snapshot replay/audit contract.
-    if job.operations.is_empty() {
+    if job.operations.is_empty()
+        || (sink.is_none()
+            && (direct::counted_eligible(&job)
+                || direct::fanout_eligible(&job)
+                || direct::chain_eligible(&job)))
+    {
         direct::run(job, cancel, notify, pool, sink, None)
     } else {
-        prepare_with_memory_pool(job, cancel, notify, pool)?.execute_published()
+        let direct_terminal = terminal_direct_eligible(&job)
+            || (sink.is_none() && native_shuffle_direct_eligible(&job));
+        process_using(
+            job,
+            cancel,
+            notify,
+            pool,
+            None,
+            direct_terminal,
+            |job, ctx, partitions, balanced, streaming| {
+                with_input(job, Reservation::new(ctx), |mut source| {
+                    ingest_options(source.as_mut(), job, ctx, partitions, balanced, streaming)
+                })
+            },
+        )?
+        .publish()
     }
 }
 /// Optional structured observations for the limits-only direct path. Other paths
@@ -318,19 +345,22 @@ pub fn run_with_observations(
     if job.operations.is_empty() {
         return run_with_memory_pool(job, cancel, notify, pool);
     }
-    prepare_using(
+    let direct_terminal = terminal_direct_eligible(&job);
+    process_using(
         job,
         cancel,
         notify,
         pool,
         Some(sink),
+        direct_terminal,
         |job, ctx, p, b, s| {
             with_input_observed(job, Reservation::new(ctx), ctx, |source, input_ctx| {
                 ingest_options(source, job, input_ctx, p, b, s)
             })
         },
     )?
-    .execute()
+    .publish()
+    .map(output::PublishedAnalysis::into_analysis)
 }
 fn prepare_using(
     job: Job,
@@ -338,12 +368,83 @@ fn prepare_using(
     notify: Notify,
     pool: Arc<crate::resources::MemoryPool>,
     physical: Option<crate::observation::physical::Sink>,
-    mut read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
+    read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
 ) -> Result<Prepared> {
+    match process_using(job, cancel, notify, pool, physical, false, read_input)? {
+        Processed::Snapshot(prepared) => Ok(prepared),
+        Processed::Direct { .. } => anyhow::bail!("explicit preparation requires a snapshot"),
+    }
+}
+
+fn native_shuffle_direct_eligible(job: &Job) -> bool {
+    cfg!(all(
+        feature = "experimental-terminal-shuffle",
+        not(target_os = "wasi")
+    )) && job.compression == chopper_core::Compression::None
+        && (matches!(job.operations.as_slice(), [Operation::Shuffle { .. }])
+            || matches!(job.operations.as_slice(), [shuffle, Operation::Partition { .. }] if uniform(shuffle)))
+}
+
+pub(crate) fn configured_writer_capacity(job: &Job) -> Option<usize> {
+    direct::writer_capacity(job)
+}
+pub(crate) fn bounded_final_partition_shape(job: &Job) -> bool {
+    direct::partition_eligible(job)
+}
+
+fn terminal_direct_eligible(job: &Job) -> bool {
+    job.compression == chopper_core::Compression::None
+        && (matches!(job.operations.as_slice(), [Operation::Balanced { .. }])
+            || (cfg!(feature = "experimental-terminal-shuffle")
+                && matches!(job.operations.as_slice(), [shuffle, Operation::Balanced { .. }] if uniform(shuffle)))
+            || (cfg!(all(
+                feature = "experimental-terminal-routing",
+                not(target_os = "wasi")
+            )) && matches!(job.operations.as_slice(), [operation] if streaming::eligible(operation) || matches!(operation, Operation::Partition { .. }) || matches!(operation, Operation::Assign { strata, .. } if !strata.is_empty()))))
+}
+
+// Keep synchronous owners inline: boxing would need a separate allocation grant.
+#[allow(clippy::large_enum_variant)]
+enum Processed {
+    Snapshot(Prepared),
+    Direct {
+        job: PreparedJob,
+        analysis: Analysis,
+        publication: output::DirectPublication,
+        ctx: Context,
+    },
+}
+impl Processed {
+    fn publish(self) -> Result<output::PublishedAnalysis> {
+        match self {
+            Self::Snapshot(prepared) => prepared.execute_published(),
+            Self::Direct {
+                job,
+                analysis,
+                publication,
+                ctx,
+            } => Ok(publication
+                .publish(&job, &analysis, &ctx)?
+                .with_analysis(analysis)),
+        }
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn process_using(
+    job: Job,
+    cancel: Arc<AtomicBool>,
+    notify: Notify,
+    pool: Arc<crate::resources::MemoryPool>,
+    physical: Option<crate::observation::physical::Sink>,
+    direct_terminal: bool,
+    mut read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
+) -> Result<Processed> {
     let started = std::time::Instant::now();
     job.validate()?;
     let mut ctx = Context::with_memory_pool(&job.resources, cancel, notify, pool)?;
     ctx.physical = physical;
+    ctx.direct_terminal_output = direct_terminal;
 
     let job = PreparedJob::admit(job, Reservation::new(&ctx))?;
     ctx.event("Reading and validating CSV", 0)?;
@@ -411,6 +512,7 @@ fn prepare_using(
         mut dataset,
         mut analysis,
         mut final_plan,
+        mut terminal_publication,
         consumed,
     } = ingested;
     let mut phase_timings = timings::Builder::new(Reservation::new(&ctx));
@@ -589,10 +691,21 @@ fn prepare_using(
             index += 1;
             continue;
         }
-        let following_shuffles = if matches!(
-            operation,
-            Operation::Partition { .. } | Operation::Assign { .. }
-        ) {
+        #[cfg(all(
+            target_os = "linux",
+            feature = "experimental-probabilistic-shuffle-fusion"
+        ))]
+        let probabilistic_after = probabilistic_shuffle::Plan::at(&job, index).is_some();
+        #[cfg(not(all(
+            target_os = "linux",
+            feature = "experimental-probabilistic-shuffle-fusion"
+        )))]
+        let probabilistic_after = false;
+        let following_shuffles = if probabilistic_after
+            || matches!(
+                operation,
+                Operation::Partition { .. } | Operation::Assign { .. }
+            ) {
             job.operations
                 .iter()
                 .skip(index + 1)
@@ -610,7 +723,7 @@ fn prepare_using(
             }
         }
         let shuffle_after = (following_shuffles > 0).then_some(index + following_shuffles);
-        let balanced_after = if uniform(operation) {
+        let balanced_after = if matches!(operation, Operation::Shuffle { .. }) {
             if let Some(Operation::Balanced { files }) = next {
                 Some((index + 1, *files))
             } else {
@@ -645,33 +758,56 @@ fn prepare_using(
         };
         let mut stats;
         if index + consumed == job.operations.len() {
-            let mut writer = output::PlanWriter::new(&job, analysis.header.as_deref(), &ctx)?;
-            apply_into(
-                &dataset,
-                operation,
-                index,
-                &job,
-                &analysis,
-                &ctx,
-                &mut writer,
-                shuffle_after,
-                balanced_after,
-            )
-            .with_context(|| format!("preparing operation {}", index + 1))?;
-            stats = StageStats {
-                operation: index + 1,
-                input_groups: before,
-                output_groups: writer.groups,
-                smallest_group: if writer.groups == 0 {
-                    0
-                } else {
-                    writer.smallest
-                },
-                largest_group: writer.largest,
-                empty_groups: writer.empty,
+            let mut writer = if direct_terminal {
+                output::PlanWriter::direct_grouped(&job, analysis.header.as_ref(), &ctx)?
+            } else {
+                output::PlanWriter::new(&job, analysis.header.as_deref(), &ctx)?
             };
-            analysis.groups = writer.groups;
-            final_plan = Some(writer.finish()?);
+            let prepared = if direct_terminal {
+                exact_writers::prepare(&dataset, &job, &analysis, &ctx)?
+            } else {
+                None
+            };
+            if let Some(prepared) = prepared {
+                // Keep the destination witness captured before tentative preparation.
+                let (seed, files, bytes) = writer.finish_direct()?;
+                ensure!(files == 0 && bytes == 0, "nonempty exact allocation setup");
+                let (publication, files, bytes, completed_stats) = prepared.emit(&dataset, seed)?;
+                analysis.groups = completed_stats.output_groups;
+                stats = completed_stats;
+                terminal_publication = Some((publication, files, bytes));
+            } else {
+                apply_into(
+                    &dataset,
+                    operation,
+                    index,
+                    &job,
+                    &analysis,
+                    &ctx,
+                    &mut writer,
+                    shuffle_after,
+                    balanced_after,
+                )
+                .with_context(|| format!("preparing operation {}", index + 1))?;
+                stats = StageStats {
+                    operation: index + 1,
+                    input_groups: before,
+                    output_groups: writer.groups,
+                    smallest_group: if writer.groups == 0 {
+                        0
+                    } else {
+                        writer.smallest
+                    },
+                    largest_group: writer.largest,
+                    empty_groups: writer.empty,
+                };
+                analysis.groups = writer.groups;
+                if direct_terminal {
+                    terminal_publication = Some(writer.finish_direct()?);
+                } else {
+                    final_plan = Some(writer.finish()?);
+                }
+            }
         } else {
             dataset = if consumed == 1 {
                 apply(&dataset, operation, index, &job, &analysis, &ctx)?
@@ -710,19 +846,31 @@ fn prepare_using(
         pipeline_started.elapsed().as_secs_f64(),
     )?;
     let output_started = std::time::Instant::now();
-    let output_plan = if let Some(plan) = final_plan {
-        plan
+    let output_plan = if terminal_publication.is_some() {
+        None
+    } else if let Some(plan) = final_plan {
+        Some(plan)
     } else {
         analysis.groups = dataset.groups;
-        output::plan(&dataset, &job, analysis.header.as_deref(), &ctx)?
+        Some(output::plan(
+            &dataset,
+            &job,
+            analysis.header.as_deref(),
+            &ctx,
+        )?)
     };
     phase_timings.insert(
         "final_serialization",
         output_started.elapsed().as_secs_f64(),
     )?;
     drop(dataset);
-    analysis.output_files = output_plan.files;
-    analysis.output_csv_bytes = output_plan.bytes;
+    let (files, bytes) = match (&terminal_publication, &output_plan) {
+        (Some((_, files, bytes)), None) => (*files, *bytes),
+        (None, Some(plan)) => (plan.files, plan.bytes),
+        _ => anyhow::bail!("ambiguous terminal output target"),
+    };
+    analysis.output_files = files;
+    analysis.output_csv_bytes = bytes;
     analysis.temp_bytes = ctx.used();
     analysis.peak_temp_bytes = ctx.peak();
     analysis.memory_budget_bytes = ctx.memory as u64;
@@ -732,13 +880,23 @@ fn prepare_using(
     analysis.warnings = warnings::build(&job, &analysis, Reservation::new(&ctx))?;
     analysis.diagnostics = Diagnostics::analysis(&ctx, &job, &analysis)?;
     ctx.physical_stage_complete(job.operations.len() + 1);
-    ctx.event("Ready for confirmation", analysis.rows)?;
-    Ok(Prepared {
-        job,
-        analysis,
-        output_plan,
-        ctx,
-    })
+    if let Some((publication, _, _)) = terminal_publication {
+        ctx.event("Finalizing direct terminal output", analysis.rows)?;
+        Ok(Processed::Direct {
+            job,
+            analysis,
+            publication,
+            ctx,
+        })
+    } else {
+        ctx.event("Finalizing output snapshot", analysis.rows)?;
+        Ok(Processed::Snapshot(Prepared {
+            job,
+            analysis,
+            output_plan: output_plan.context("missing prepared snapshot")?,
+            ctx,
+        }))
+    }
 }
 fn uniform(operation: &Operation) -> bool {
     matches!(
@@ -998,6 +1156,7 @@ struct Ingested {
     dataset: Dataset,
     analysis: Analysis,
     final_plan: Option<output::OutputPlan>,
+    terminal_publication: Option<(output::DirectPublication, u64, u64)>,
     consumed: usize,
 }
 #[cfg(test)]
@@ -1381,6 +1540,7 @@ fn ingest_records(
     }
 
     let mut final_plan = None;
+    let mut terminal_publication = None;
     let mut consumed = leading_shuffles;
     let mut group_count = 1;
     let mut partition_stats = None;
@@ -1426,7 +1586,11 @@ fn ingest_records(
         };
         consumed = 1;
         if consumed == job.operations.len() {
-            let mut plan = output::PlanWriter::new(job, header.as_deref(), ctx)?;
+            let mut plan = if ctx.direct_terminal_output {
+                output::PlanWriter::direct_grouped(job, header.as_ref(), ctx)?
+            } else {
+                output::PlanWriter::new(job, header.as_deref(), ctx)?
+            };
             routed.emit(&group, 0, &mut plan, ctx)?;
             partition_stats = Some(StageStats {
                 operation: 1,
@@ -1436,7 +1600,11 @@ fn ingest_records(
                 largest_group: plan.largest,
                 empty_groups: plan.empty,
             });
-            final_plan = Some(plan.finish()?);
+            if ctx.direct_terminal_output {
+                terminal_publication = Some(plan.finish_direct()?);
+            } else {
+                final_plan = Some(plan.finish()?);
+            }
         } else {
             routed.emit(&group, 0, &mut writer, ctx)?;
         }
@@ -1453,6 +1621,8 @@ fn ingest_records(
             })?;
         }
         let shuffled = SortedRows::Memory(resident.finish()?);
+        let balanced_step = consumed;
+        let balanced = initial_balanced(job, rows, &mut consumed, &mut group_count, &mut stages)?;
         if let Some(assignment) = initial_assignment {
             consumed += 1;
             let stats = if consumed == job.operations.len() {
@@ -1478,23 +1648,31 @@ fn ingest_records(
             group_count = stats.output_groups;
             stages.push(stats)?;
         } else if consumed == job.operations.len() {
-            let mut plan = output::PlanWriter::new(job, header.as_deref(), ctx)?;
+            let mut plan = if ctx.direct_terminal_output {
+                output::PlanWriter::direct_grouped(job, header.as_ref(), ctx)?
+            } else {
+                output::PlanWriter::new(job, header.as_deref(), ctx)?
+            };
             emit_initial_shuffle(
                 shuffled,
                 &group,
-                None,
-                1,
+                balanced,
+                balanced_step,
                 &mut plan,
                 ctx,
                 crate::observation::physical::Kind::FisherYates,
             )?;
-            final_plan = Some(plan.finish()?);
+            if ctx.direct_terminal_output {
+                terminal_publication = Some(plan.finish_direct()?);
+            } else {
+                final_plan = Some(plan.finish()?);
+            }
         } else {
             emit_initial_shuffle(
                 shuffled,
                 &group,
-                None,
-                1,
+                balanced,
+                balanced_step,
                 &mut writer,
                 ctx,
                 crate::observation::physical::Kind::FisherYates,
@@ -1605,7 +1783,11 @@ fn ingest_records(
         }
         if let Some(sorted) = sorted {
             if consumed == job.operations.len() {
-                let mut plan = output::PlanWriter::new(job, header.as_deref(), ctx)?;
+                let mut plan = if ctx.direct_terminal_output {
+                    output::PlanWriter::direct_grouped(job, header.as_ref(), ctx)?
+                } else {
+                    output::PlanWriter::new(job, header.as_deref(), ctx)?
+                };
                 emit_partition(
                     sorted,
                     &group,
@@ -1623,7 +1805,11 @@ fn ingest_records(
                     largest_group: plan.largest,
                     empty_groups: plan.empty,
                 });
-                final_plan = Some(plan.finish()?);
+                if ctx.direct_terminal_output {
+                    terminal_publication = Some(plan.finish_direct()?);
+                } else {
+                    final_plan = Some(plan.finish()?);
+                }
             } else {
                 emit_partition(
                     sorted,
@@ -1650,27 +1836,7 @@ fn ingest_records(
                 empty_groups: u64::from(rows == 0),
             })?;
         }
-        let balanced = if let Some(Operation::Balanced { files }) = job.operations.get(consumed) {
-            Some(*files)
-        } else {
-            None
-        };
-        if let Some(files) = balanced {
-            ensure!(
-                rows >= files,
-                "cannot split {rows} rows into {files} nonempty balanced groups"
-            );
-            stages.push(StageStats {
-                operation: consumed + 1,
-                input_groups: 1,
-                output_groups: files,
-                smallest_group: rows / files,
-                largest_group: rows.div_ceil(files),
-                empty_groups: 0,
-            })?;
-            group_count = files;
-            consumed += 1;
-        }
+        let balanced = initial_balanced(job, rows, &mut consumed, &mut group_count, &mut stages)?;
         let sorted = sorter.finish()?;
         if let Some(assignment) = initial_assignment {
             consumed += 1;
@@ -1697,7 +1863,11 @@ fn ingest_records(
             group_count = stats.output_groups;
             stages.push(stats)?;
         } else if consumed == job.operations.len() {
-            let mut plan = output::PlanWriter::new(job, header.as_deref(), ctx)?;
+            let mut plan = if ctx.direct_terminal_output {
+                output::PlanWriter::direct_grouped(job, header.as_ref(), ctx)?
+            } else {
+                output::PlanWriter::new(job, header.as_deref(), ctx)?
+            };
             emit_initial_shuffle(
                 sorted,
                 &group,
@@ -1707,7 +1877,11 @@ fn ingest_records(
                 ctx,
                 crate::observation::physical::Kind::ResidentSort,
             )?;
-            final_plan = Some(plan.finish()?);
+            if ctx.direct_terminal_output {
+                terminal_publication = Some(plan.finish_direct()?);
+            } else {
+                final_plan = Some(plan.finish()?);
+            }
         } else {
             emit_initial_shuffle(
                 sorted,
@@ -1739,10 +1913,36 @@ fn ingest_records(
             stages.push(stats.clone())?;
         }
     }
-    Ok(Ingested { dataset, final_plan, consumed, analysis: Analysis { algorithm_version: Analysis::algorithm_version_for(job), column_values: column_values.finish()?, seed, rows, columns: width, header, preview: preview.finish()?,
+    Ok(Ingested { dataset, final_plan, terminal_publication, consumed, analysis: Analysis { algorithm_version: Analysis::algorithm_version_for(job), column_values: column_values.finish()?, seed, rows, columns: width, header, preview: preview.finish()?,
         logical_digest: AnalysisText::copy(digest.finalize().to_hex().as_str(), Reservation::new(ctx))?, groups: group_count, output_files: 0, output_csv_bytes: 0,
         largest_record_bytes: largest, temp_bytes: 0, peak_temp_bytes: 0, memory_budget_bytes: ctx.memory as u64, workers: ctx.workers(), analysis_seconds: 0.0, timings: Default::default(), diagnostics: Default::default(), stages, warnings: Warnings::default(),
         accuracy: AnalysisText::copy("Exact row, group, file and uncompressed byte counts; complete strict validation. Compressed sizes and runtime are not guaranteed.", Reservation::new(ctx))?, execution: None } })
+}
+fn initial_balanced(
+    job: &Job,
+    rows: u64,
+    consumed: &mut usize,
+    groups: &mut u64,
+    stages: &mut Stages,
+) -> Result<Option<u64>> {
+    let Some(Operation::Balanced { files }) = job.operations.get(*consumed) else {
+        return Ok(None);
+    };
+    ensure!(
+        rows >= *files,
+        "cannot split {rows} rows into {files} nonempty balanced groups"
+    );
+    stages.push(StageStats {
+        operation: *consumed + 1,
+        input_groups: 1,
+        output_groups: *files,
+        smallest_group: rows / files,
+        largest_group: rows.div_ceil(*files),
+        empty_groups: 0,
+    })?;
+    *groups = *files;
+    *consumed += 1;
+    Ok(Some(*files))
 }
 fn sorted_physical_kind(
     rows: &SortedRows,
@@ -1765,7 +1965,7 @@ fn emit_initial_shuffle(
 ) -> Result<()> {
     output.physical_input(ctx.physical_identity(sorted_physical_kind(&rows, memory_kind)));
     if let Some(files) = balanced {
-        return emit_balanced(rows, parent, files, step, true, output, ctx);
+        return emit_balanced(rows, parent, files, step, memory_kind, output, ctx);
     }
     let mut group = output.begin(vec![], false);
     rows.try_for_each_packed(|row| {
@@ -1932,6 +2132,13 @@ fn apply_into(
         if let Some(plan) = shuffle_assignment::Plan::at(job, step) {
             return plan.apply(data, job, analysis, ctx, output);
         }
+    }
+    #[cfg(all(
+        target_os = "linux",
+        feature = "experimental-probabilistic-shuffle-fusion"
+    ))]
+    if let Some(plan) = probabilistic_shuffle::Plan::at(job, step) {
+        return plan.apply(data, job, analysis, ctx, output);
     }
     for parent in data.groups()? {
         ctx.check()?;
@@ -2104,7 +2311,19 @@ fn apply_parent(
                 output.physical_input(
                     ctx.physical_identity(crate::observation::physical::Kind::FisherYates),
                 );
-                for row in resident.finish()?.compact() {
+                let shuffled = resident.finish()?;
+                if let Some((balanced_step, files)) = balanced_after {
+                    return emit_balanced(
+                        SortedRows::Memory(shuffled),
+                        parent,
+                        files,
+                        balanced_step,
+                        crate::observation::physical::Kind::FisherYates,
+                        output,
+                        ctx,
+                    );
+                }
+                for row in shuffled.compact() {
                     ctx.check()?;
                     let mut row = row?;
                     row.ordinal = group.rows;
@@ -2125,7 +2344,15 @@ fn apply_parent(
                     crate::observation::physical::Kind::ResidentSort,
                 )));
                 if let Some((balanced_step, files)) = balanced_after {
-                    emit_balanced(sorted, parent, files, balanced_step, true, output, ctx)?;
+                    emit_balanced(
+                        sorted,
+                        parent,
+                        files,
+                        balanced_step,
+                        crate::observation::physical::Kind::ResidentSort,
+                        output,
+                        ctx,
+                    )?;
                     return Ok(());
                 }
                 sorted.try_for_each_packed(|row| {
@@ -2161,15 +2388,12 @@ fn emit_balanced(
     parent: &Group,
     files: u64,
     step: usize,
-    shuffled: bool,
+    memory_kind: crate::observation::physical::Kind,
     output: &mut impl RowSink,
     ctx: &Context,
 ) -> Result<()> {
     let mut split_ctx = ctx.physical_scope([step + 1, 0]);
-    split_ctx.physical_source = ctx.physical_identity(sorted_physical_kind(
-        &rows,
-        crate::observation::physical::Kind::ResidentSort,
-    ));
+    split_ctx.physical_source = ctx.physical_identity(sorted_physical_kind(&rows, memory_kind));
     let ctx = &split_ctx;
     let mut observation = ctx.physical_attempt(crate::observation::physical::Kind::FusedBalanced);
     output.physical_input(ctx.physical_identity(crate::observation::physical::Kind::FusedBalanced));
@@ -2198,10 +2422,8 @@ fn emit_balanced(
             for _ in 0..n {
                 ctx.check()?;
                 let row = rows.next()?.context("missing balanced row")?;
-                if shuffled {
-                    row.ordinal = ordinal;
-                    row.key = PackedKey::Bytes(Box::default());
-                }
+                row.ordinal = ordinal;
+                row.key = PackedKey::Bytes(Box::default());
                 output.packed_row_ref(group, row)?;
                 ordinal += 1;
                 observed.rows += 1;
@@ -2464,17 +2686,19 @@ fn assign(
                             observation: &mut Option<crate::observation::physical::Attempt>|
          -> Result<()> {
             scratch.reset_quota(scope.rows);
+            #[cfg(all(target_os = "linux", feature = "experimental-exact-quota-index"))]
+            let mut quota = assignment::indexed::QuotaCursor::new(
+                &mut scratch.quota,
+                assignment::indexed::enabled(),
+            );
             let mut remaining = scope.rows;
             let mut rng = Random::new(seed);
             for row in source.packed_rows(scope, ctx.max_record)? {
                 let mut row = row?;
-                let mut draw = rng.below(remaining);
-                let mut index = 0;
-                while draw >= scratch.quota[index] {
-                    draw -= scratch.quota[index];
-                    index += 1;
-                }
-                scratch.quota[index] -= 1;
+                #[cfg(all(target_os = "linux", feature = "experimental-exact-quota-index"))]
+                let index = quota.take(rng.below(remaining));
+                #[cfg(not(all(target_os = "linux", feature = "experimental-exact-quota-index")))]
+                let index = assignment::take_linear(&mut scratch.quota, rng.below(remaining));
                 remaining -= 1;
                 scratch.counts[index] += 1;
                 observed.rows += 1;
@@ -2733,6 +2957,67 @@ mod performance_tests {
         assert_eq!(report["contract"], "input-adapter-resource-contracts-v1");
         assert_eq!(report["cases"].as_array().unwrap().len(), 4);
         assert_eq!(report["fixture_directory_removed"], true);
+        Ok(())
+    }
+
+    #[test]
+    fn buffered_source_coalesces_small_reads_and_keeps_its_grant_through_eof() -> Result<()> {
+        use std::{cell::Cell, rc::Rc};
+        struct Source {
+            remaining: usize,
+            calls: Rc<Cell<usize>>,
+        }
+        impl Read for Source {
+            fn read(&mut self, out: &mut [u8]) -> std::io::Result<usize> {
+                self.calls.set(self.calls.get() + 1);
+                let size = out.len().min(self.remaining);
+                out[..size].fill(42);
+                self.remaining -= size;
+                Ok(size)
+            }
+        }
+        fn collect(mut source: impl Read) -> Result<Vec<u8>> {
+            let mut result = Vec::new();
+            let mut chunk = [0u8; 8192];
+            loop {
+                let size = source.read(&mut chunk)?;
+                if size == 0 {
+                    break;
+                }
+                result.extend_from_slice(&chunk[..size]);
+            }
+            Ok(result)
+        }
+        let calls = Rc::new(Cell::new(0));
+        let source = || Source {
+            remaining: 256 * 1024,
+            calls: calls.clone(),
+        };
+        let expected = collect(source())?;
+        assert_eq!(calls.get(), 33);
+        calls.set(0);
+        let capacity = 128 * 1024;
+        let workspace = Arc::new(Workspace::new(capacity));
+        let mut reader = InputBuffer::new(
+            source(),
+            capacity,
+            Reservation::for_workspace(workspace.clone()),
+        )?;
+        assert_eq!(collect(&mut reader)?, expected);
+        assert_eq!(calls.get(), 3);
+        assert_eq!(workspace.used(), capacity as u64);
+        drop(reader);
+        assert_eq!(workspace.used(), 0);
+        calls.set(0);
+        let denied = Arc::new(Workspace::new(capacity - 1));
+        assert!(InputBuffer::new(
+            source(),
+            capacity,
+            Reservation::for_workspace(denied.clone())
+        )
+        .is_err());
+        assert_eq!(calls.get(), 0);
+        assert_eq!(denied.used(), 0);
         Ok(())
     }
 
@@ -3035,3 +3320,6 @@ mod performance_tests {
         Ok(())
     }
 }
+
+#[cfg(all(test, not(target_os = "wasi")))]
+mod terminal_controls;

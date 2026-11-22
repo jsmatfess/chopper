@@ -1,6 +1,9 @@
 //! Exact-assignment scratch retained across strata and charged before allocation.
 use super::*;
 
+#[cfg(all(target_os = "linux", feature = "experimental-exact-quota-index"))]
+pub(super) mod indexed;
+
 pub(super) struct AssignmentScratch {
     pub weights: Vec<u64>,
     pub counts: Vec<u64>,
@@ -47,6 +50,17 @@ impl AssignmentScratch {
     pub(super) fn reset_quota(&mut self, rows: u64) {
         quotas_into(rows, &self.weights, &mut self.quota, &mut self.order);
     }
+}
+
+#[inline]
+pub(super) fn take_linear(quota: &mut [u64], mut draw: u64) -> usize {
+    let mut index = 0;
+    while draw >= quota[index] {
+        draw -= quota[index];
+        index += 1;
+    }
+    quota[index] -= 1;
+    index
 }
 
 #[cfg(test)]

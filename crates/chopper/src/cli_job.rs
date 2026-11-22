@@ -167,16 +167,16 @@ impl DecodedJob {
         drop(grant);
         result
     }
-    /// PreparedJob independently admits its retained configuration. Both grants
-    /// deliberately overlap until prepare returns, including failure/unwind.
-    pub fn prepare_analysis(
+    /// Inspect input while retaining the decoded configuration's shared grant.
+    pub fn analyze(
         self,
         cancel: Arc<AtomicBool>,
         notify: Notify,
-    ) -> Result<engine::Analysis> {
+    ) -> Result<crate::profile::InputProfile> {
         let Self { job, grant } = self;
-        let result = engine::prepare_with_memory_pool(job, cancel, notify, grant.pool.clone())
-            .map(|prepared| prepared.analysis);
+        let result = crate::profile::ProfileCache::with_memory_pool(grant.pool.clone())
+            .profile(&job, cancel, notify);
+        drop(job);
         drop(grant);
         result
     }

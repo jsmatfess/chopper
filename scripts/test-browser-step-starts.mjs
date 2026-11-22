@@ -28,7 +28,7 @@ await withHostedBrowser({port:8432},async({context,url,browserVersion})=>{
   await page.waitForFunction(()=>document.querySelector('.execution-node-title')?.textContent==='Read input');
   const titles=await page.locator('.execution-node-title').allTextContents();
   assert.equal(await page.evaluate(()=>window.startSerializationSeen),false,'serialization must not be announced before grouping supplies output');
-  assert(!titles.includes('Serialize CSV snapshot'),'writer setup must not display serialization before grouping supplies its first output row');
+  assert(!titles.includes('Serialize CSV'),'writer setup must not display serialization before grouping supplies its first output row');
  }finally{await page.evaluate(()=>{Atomics.store(new Int32Array(startControl),0,1);Atomics.notify(new Int32Array(startControl),0);});}
  await page.waitForFunction(()=>['COMPLETE','FAILED'].includes(document.getElementById('status').textContent),null,{timeout:120000});assert.equal(await page.locator('#status').textContent(),'COMPLETE',await page.locator('#error').textContent());
  assert(await page.locator('.execution-flow-strategy').filter({hasText:'external'}).count()>0,'fixture must exercise external sorting');

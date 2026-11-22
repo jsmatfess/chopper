@@ -25,6 +25,8 @@ use std::{
 ))]
 mod parallel_tests;
 mod records;
+mod writers;
+pub use writers::WriterEstimate;
 
 /// Experimental scan diagnostics, excluded from the stable profile JSON.
 #[derive(Clone, Copy, Default, Serialize)]
@@ -148,6 +150,8 @@ pub struct InputProfile {
     pub preview: Vec<Vec<String>>,
     pub column_values: Vec<ColumnProfile>,
     pub stages: Vec<StageProfile>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub writer_estimate: Option<WriterEstimate>,
     pub cache_hit: bool,
     pub seconds: f64,
     pub accuracy: String,
@@ -221,6 +225,7 @@ impl InputProfile {
             preview,
             column_values,
             stages,
+            writer_estimate: self.writer_estimate,
             cache_hit: self.cache_hit,
             seconds: self.seconds,
             accuracy,
@@ -323,6 +328,9 @@ fn selections(
 }
 fn strategy(operation: &Operation, job: &Job) -> &'static str {
     match operation {
+        Operation::Partition { .. } if engine::bounded_final_partition_shape(job) => {
+            "Bounded final writers (experimental shape; admission still required)"
+        }
         Operation::Partition { .. } if job.resources.grouping == chopper_core::Grouping::Sort => {
             "Stable grouping by sorting (forced)"
         }
@@ -481,6 +489,7 @@ impl ProfileCache {
                 distinct_exact: exact,
             });
         }
+        profile.writer_estimate = writers::estimate(job, &profile);
         profile.cache_hit = cache_hit;
         profile.seconds = started.elapsed().as_secs_f64();
         Ok(profile)
@@ -735,8 +744,8 @@ fn scan_configured(
         temp_bytes: 0,
     });
     Ok(Observations {
-        profile: InputProfile { rows, columns, header, preview, column_values, stages: vec![], cache_hit: false, seconds: 0.0,
-            accuracy: metadata_buffers.copy_string("Every input record validated; row count is exact. Distinct counts marked approximate use full-file sketches (about 3.25% relative standard error, not a bound). Input key counts are not final pipeline group counts. Exact preparation applies operations and validates output limits.")?, header_buffers, preview_buffers, metadata_buffers,
+        profile: InputProfile { rows, columns, header, preview, column_values, stages: vec![], writer_estimate: None, cache_hit: false, seconds: 0.0,
+            accuracy: metadata_buffers.copy_string("Every input record validated; row count is exact. Distinct counts marked approximate use full-file sketches (about 3.25% relative standard error, not a bound). Input key counts are not final pipeline group counts. Run applies operations and validates output limits independently.")?, header_buffers, preview_buffers, metadata_buffers,
             execution: { execution.scan_peak_reserved_bytes = workspace.peak(); execution } },
         combinations: retained_combinations, _combination_buffers: combination_buffers, key_buffers,
     })

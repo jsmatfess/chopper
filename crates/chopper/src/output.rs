@@ -8,6 +8,8 @@ use std::{
     io::{BufWriter, Read, Seek, SeekFrom, Write},
     path::Path,
 };
+#[cfg(feature = "experimental-batched-final-sync")]
+mod deferred_sync;
 mod deflate;
 mod direct;
 #[cfg(any(test, feature = "resource-contract-tests"))]
@@ -133,6 +135,14 @@ impl PublicationWriter {
             _buffer: buffer,
         })
     }
+    #[cfg(feature = "experimental-batched-final-sync")]
+    fn into_file(mut self) -> Result<File> {
+        self.writer.flush()?;
+        let Self { writer, _buffer } = self;
+        let file = writer.into_inner().map_err(|error| error.into_error())?;
+        drop(_buffer);
+        Ok(file)
+    }
     fn sync_all(&mut self) -> Result<()> {
         self.writer.flush()?;
         self.writer.get_ref().sync_all()?;
@@ -239,6 +249,7 @@ pub struct PlanWriter<'a> {
     serializer: csv::Serializer,
     chunk: Option<PlannedMetadata<Chunk>>,
     files: u64,
+    file_limit: u64,
     bytes: u64,
     processed: u64,
     observation: Option<crate::observation::physical::Span<'a>>,
@@ -276,6 +287,59 @@ impl<'a> PlanWriter<'a> {
     ) -> Result<Self> {
         let target = || Ok(EncodedTarget::Direct(DirectPublication::new(job, ctx)?));
         Self::with_target(job, header, ctx, Reservation::new(ctx), target)
+    }
+    pub(crate) fn direct_grouped(
+        job: &'a Job,
+        header: Option<&crate::engine::Header>,
+        ctx: &'a Context,
+    ) -> Result<Self> {
+        Self::with_target(
+            job,
+            header.map(|h| &h[..]),
+            ctx,
+            Reservation::new(ctx),
+            || {
+                Ok(EncodedTarget::Direct(DirectPublication::grouped(
+                    job, header, ctx,
+                )?))
+            },
+        )
+    }
+    pub(crate) fn direct_fanout(
+        job: &'a Job,
+        header: Option<&crate::engine::Header>,
+        ctx: &'a Context,
+        single_chunk: bool,
+    ) -> Result<Self> {
+        let capacity = if cfg!(feature = "experimental-small-final-catalogs") {
+            512
+        } else {
+            PLAN_CATALOG_BUFFER
+        };
+        let mut result = Self::with_target(
+            job,
+            header.map(|h| &h[..]),
+            ctx,
+            Reservation::new(ctx),
+            || {
+                Ok(EncodedTarget::Direct(
+                    if cfg!(feature = "experimental-single-final-catalog") && single_chunk {
+                        DirectPublication::grouped_single(job, header, ctx)?
+                    } else {
+                        DirectPublication::grouped_with_catalog(job, header, ctx, capacity)?
+                    },
+                ))
+            },
+        )?;
+        let EncodedTarget::Direct(target) = &mut result.target else {
+            unreachable!("direct constructor");
+        };
+        target.buffer_capacity = if cfg!(feature = "experimental-small-final-buffers") {
+            16 * 1024
+        } else {
+            PUBLICATION_BUFFER
+        };
+        Ok(result)
     }
     fn with_target(
         job: &'a Job,
@@ -332,6 +396,7 @@ impl<'a> PlanWriter<'a> {
                 serializer,
                 chunk: None,
                 files: 0,
+                file_limit: ctx.max_files,
                 bytes: 0,
                 processed: 0,
                 observation: observation.take(),
@@ -351,12 +416,31 @@ impl<'a> PlanWriter<'a> {
         result
     }
 
+    // Raw count-independent fanout delegates one monotonic stream cursor.
+    // Its selector excludes physical observations, so no per-writer span owns it.
+    pub(crate) fn continue_progress_at(&mut self, rows: u64) {
+        debug_assert!(self.observation.is_none());
+        self.processed = rows;
+    }
+    pub(crate) fn release_serialization_scratch(&mut self) -> Result<()> {
+        // Shared fanout uses its central row encoder. Drop both old buffers
+        // before returning their grant; the serialized BOM/header stays owned.
+        self.serializer = csv::Serializer::new(&self.job.output_csv)?;
+        self._serialization.resize(self.prefix.capacity())
+    }
+    pub(crate) fn files(&self) -> u64 {
+        self.files
+    }
+    pub(crate) fn allow_additional_files(&mut self, remaining: u64) -> Result<()> {
+        self.file_limit = self
+            .files
+            .checked_add(remaining)
+            .context("output count overflow")?;
+        Ok(())
+    }
     fn open(&mut self, group: &Group) -> Result<()> {
         let index = self.files.checked_add(1).context("output count overflow")?;
-        ensure!(
-            index <= self.ctx.max_files,
-            "output count exceeds max_files"
-        );
+        ensure!(index <= self.file_limit, "output count exceeds max_files");
         self.chunk = Some(PlannedMetadata::clone_lineage(
             group,
             Reservation::new(self.ctx),
@@ -421,14 +505,26 @@ impl<'a> PlanWriter<'a> {
     }
 
     pub(crate) fn finish_direct(mut self) -> Result<(DirectPublication, u64, u64)> {
-        self.close()?;
-        let EncodedTarget::Direct(mut target) = self.target else {
-            anyhow::bail!("prepared snapshot is not direct output");
-        };
-        target.seal()?;
-        Ok((target, self.files, self.bytes))
+        let observation = self.observation.take();
+        let processed = self.processed;
+        let result = (|| {
+            self.close()?;
+            let EncodedTarget::Direct(mut target) = self.target else {
+                anyhow::bail!("prepared snapshot is not direct output");
+            };
+            target.seal()?;
+            Ok((target, self.files, self.bytes))
+        })();
+        if let Some(span) = observation {
+            match &result {
+                Ok(_) => span.finish(processed),
+                Err(error) => span.finish_error(error, processed),
+            }
+        }
+        result
     }
 }
+
 impl RowSink for PlanWriter<'_> {
     fn physical_input(&mut self, source: Option<u32>) {
         if let Some(span) = &mut self.observation {
@@ -453,13 +549,18 @@ impl RowSink for PlanWriter<'_> {
         self.write_fields(group, row.fields())
     }
     fn end(&mut self, group: Group) -> Result<()> {
+        self.end_group(&group)
+    }
+}
+impl PlanWriter<'_> {
+    pub(crate) fn end_group(&mut self, group: &Group) -> Result<()> {
         let result = (|| -> Result<()> {
             self.ctx.check()?;
             if group.rows == 0 && group.lineage.iter().any(|v| v.get("allocation").is_some()) {
                 if let Some(span) = &mut self.observation {
                     span.start();
                 }
-                self.open(&group)?;
+                self.open(group)?;
             }
             self.close()?;
             self.groups += 1;
@@ -622,6 +723,18 @@ impl Write for ObservedSink {
     }
 }
 impl ObservedSink {
+    #[cfg(feature = "experimental-batched-final-sync")]
+    fn finish_deferred(self) -> Result<File> {
+        let Self { inner, observation } = self;
+        ensure!(
+            observation.is_none(),
+            "deferred sync requires unobserved output"
+        );
+        match inner {
+            Sink::Plain(writer) => writer.into_file(),
+            _ => anyhow::bail!("deferred sync requires plain output"),
+        }
+    }
     fn finish(self) -> Result<Option<DiskFile>> {
         let Self {
             inner,
@@ -649,6 +762,15 @@ fn open_sink(
     stage: &Path,
     ctx: &Context,
 ) -> Result<(ObservedSink, Option<PublicationPath>)> {
+    open_sink_buffered(name, job, stage, ctx, PUBLICATION_BUFFER)
+}
+fn open_sink_buffered(
+    name: &PublicationName,
+    job: &Job,
+    stage: &Path,
+    ctx: &Context,
+    buffer_capacity: usize,
+) -> Result<(ObservedSink, Option<PublicationPath>)> {
     let output_path = if job.compression == Compression::Zip {
         None
     } else {
@@ -669,8 +791,7 @@ fn open_sink(
         let sink = if job.compression == Compression::Zip {
             Sink::Zip(deflate::raw(ctx.file()?, Reservation::new(ctx))?)
         } else {
-            let file =
-                PublicationWriter::new(output_path.as_ref().unwrap(), PUBLICATION_BUFFER, ctx)?;
+            let file = PublicationWriter::new(output_path.as_ref().unwrap(), buffer_capacity, ctx)?;
             match job.compression {
                 Compression::None => Sink::Plain(file),
                 Compression::Gzip => Sink::Gzip(deflate::gzip(file, Reservation::new(ctx))?),
@@ -983,7 +1104,8 @@ fn commit_directory(
         std::fs::remove_dir(destination)
             .context("remove empty output folder before publication")?;
     }
-    publish_directory(stage.path(), destination).context("publish completed result directory")?;
+    publish_directory(stage.path(), destination, ctx)
+        .context("publish completed result directory")?;
     stage.published();
     #[cfg(any(test, feature = "resource-contract-tests"))]
     commit_test_hook::committed(ctx);
@@ -1008,8 +1130,63 @@ fn empty_destination(path: &Path) -> Result<bool> {
     }
 }
 
-fn publish_directory(source: &Path, destination: &Path) -> Result<()> {
-    #[cfg(any(windows, target_os = "wasi"))]
+#[cfg(windows)]
+fn windows_publication_path(path: &Path, memory: &mut Reservation) -> Result<Vec<u16>> {
+    use std::{
+        os::windows::ffi::OsStrExt,
+        path::{Component, Prefix},
+    };
+    // Both callers use std::path::absolute before staging. Its Windows normal
+    // paths use GetFullPathNameW; retain existing verbatim/device namespaces.
+    ensure!(path.is_absolute(), "publication requires absolute paths");
+    let capacity = path
+        .as_os_str()
+        .encode_wide()
+        .count()
+        .checked_add(9)
+        .context("publication wide path overflow")?;
+    let mut wide = Vec::new();
+    memory.reserve_vec(&mut wide, capacity)?;
+    let units = path.as_os_str().encode_wide();
+    match path.components().next() {
+        Some(Component::Prefix(prefix)) => match prefix.kind() {
+            Prefix::Disk(_) => {
+                wide.extend(r"\\?\".encode_utf16());
+                wide.extend(units);
+            }
+            Prefix::UNC(_, _) => {
+                wide.extend(r"\\?\UNC\".encode_utf16());
+                wide.extend(units.skip(2));
+            }
+            _ => wide.extend(units),
+        },
+        _ => anyhow::bail!("invalid absolute Windows publication path"),
+    }
+    ensure!(!wide.contains(&0), "publication path contains NUL");
+    wide.push(0);
+    Ok(wide)
+}
+
+fn publish_directory(source: &Path, destination: &Path, _ctx: &Context) -> Result<()> {
+    #[cfg(windows)]
+    {
+        let mut memory = Reservation::new(_ctx);
+        let source = windows_publication_path(source, &mut memory)?;
+        let destination = windows_publication_path(destination, &mut memory)?;
+        // No REPLACE_EXISTING or COPY_ALLOWED: same-volume atomic publication
+        // must fail even when a competing destination directory is empty.
+        if unsafe {
+            windows_sys::Win32::Storage::FileSystem::MoveFileExW(
+                source.as_ptr(),
+                destination.as_ptr(),
+                0,
+            )
+        } == 0
+        {
+            return Err(std::io::Error::last_os_error().into());
+        }
+    }
+    #[cfg(target_os = "wasi")]
     {
         std::fs::rename(source, destination)?;
     }
@@ -1263,7 +1440,7 @@ impl ZipStream {
 }
 
 impl PlanWriter<'_> {
-    fn write_fields<'a>(
+    pub(crate) fn write_fields<'a>(
         &mut self,
         group: &mut Group,
         fields: impl IntoIterator<Item = &'a str> + Clone,
@@ -1284,44 +1461,72 @@ impl PlanWriter<'_> {
                     )
                 })?
                 .len() as u64;
-            let hard = self.job.limits.bytes.unwrap_or(u64::MAX);
-            ensure!(
-                self.prefix.len() as u64 + size <= hard,
-                "one row plus header exceeds output byte limit"
-            );
-            let soft = self
-                .job
-                .limits
-                .compressed_bytes
-                .map(|v| v.saturating_sub(128).saturating_mul(100) / 105)
-                .unwrap_or(u64::MAX);
-            if let Some(chunk) = &self.chunk {
-                let chunk = &chunk.value;
-                let overflow = chunk.rows >= self.job.limits.rows.unwrap_or(u64::MAX)
-                    || chunk.bytes.saturating_add(size) > hard;
-                if chunk.rows > 0
-                    && (overflow || (!group.exact && chunk.bytes.saturating_add(size) > soft))
-                {
-                    ensure!(!group.exact, "balanced group cannot satisfy final row/byte limits without changing its exact file count");
-                    self.close()?;
-                }
-            }
-            if self.chunk.is_none() {
-                self.open(group)?;
-            }
+            self.prepare_encoded_row(group, size)?;
             self.target.write_all(self.serializer.bytes())?;
-            let chunk = &mut self.chunk.as_mut().unwrap().value;
-            chunk.rows += 1;
-            chunk.bytes += size;
-            group.rows += 1;
-            self.processed += 1;
+            self.finish_encoded_row(group, size)
+        })();
+        if let Err(error) = &result {
+            self.observe_error(error);
+        }
+        result
+    }
+    fn prepare_encoded_row(&mut self, group: &Group, size: u64) -> Result<()> {
+        let hard = self.job.limits.bytes.unwrap_or(u64::MAX);
+        ensure!(
+            self.prefix.len() as u64 + size <= hard,
+            "one row plus header exceeds output byte limit"
+        );
+        let soft = self
+            .job
+            .limits
+            .compressed_bytes
+            .map(|v| v.saturating_sub(128).saturating_mul(100) / 105)
+            .unwrap_or(u64::MAX);
+        if let Some(chunk) = &self.chunk {
+            let chunk = &chunk.value;
+            let overflow = chunk.rows >= self.job.limits.rows.unwrap_or(u64::MAX)
+                || chunk.bytes.saturating_add(size) > hard;
+            if chunk.rows > 0
+                && (overflow || (!group.exact && chunk.bytes.saturating_add(size) > soft))
+            {
+                ensure!(!group.exact, "balanced group cannot satisfy final row/byte limits without changing its exact file count");
+                self.close()?;
+            }
+        }
+        if self.chunk.is_none() {
+            self.open(group)?;
+        }
+        Ok(())
+    }
+    fn finish_encoded_row(&mut self, group: &mut Group, size: u64) -> Result<()> {
+        let chunk = &mut self.chunk.as_mut().unwrap().value;
+        chunk.rows += 1;
+        chunk.bytes += size;
+        group.rows += 1;
+        self.processed += 1;
+        if let Some(span) = &mut self.observation {
+            span.rows_processed(self.processed);
+        }
+        if self.processed.is_multiple_of(65536) {
+            self.ctx.event("Serializing output", self.processed)?;
+        }
+        Ok(())
+    }
+    pub(crate) fn write_serialized(
+        &mut self,
+        group: &mut Group,
+        serialized: &csv::Serializer,
+    ) -> Result<()> {
+        let result = (|| {
+            self.ctx.check()?;
             if let Some(span) = &mut self.observation {
-                span.rows_processed(self.processed);
+                span.start();
             }
-            if self.processed.is_multiple_of(65536) {
-                self.ctx.event("Serializing output", self.processed)?;
-            }
-            Ok(())
+            let bytes = serialized.bytes();
+            let size = bytes.len() as u64;
+            self.prepare_encoded_row(group, size)?;
+            self.target.write_all(bytes)?;
+            self.finish_encoded_row(group, size)
         })();
         if let Err(error) = &result {
             self.observe_error(error);

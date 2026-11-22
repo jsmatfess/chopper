@@ -56,10 +56,14 @@ fn fixture(workers: usize, single: bool) -> Result<(tempfile::TempDir, Job)> {
         input: dir.path().join("input.csv").to_string_lossy().into_owned(),
         output: dir.path().join("output").to_string_lossy().into_owned(),
         random_seed: Some("plain-publication-contract-v1".into()),
-        // Exercise Run's prepared path, including real seeded row ordering.
-        operations: vec![Operation::Shuffle {
-            strategy: Shuffle::Uniform,
-        }],
+        // Two adjacent shuffles keep Run on the snapshot path even in the
+        // terminal-shuffle experiment; the existing rewrite avoids duplicate work.
+        operations: vec![
+            Operation::Shuffle {
+                strategy: Shuffle::Uniform
+            };
+            2
+        ],
         limits: Limits {
             bytes: Some(if single { 16 * 1024 } else { 256 }),
             rows: if single { None } else { Some(3) },

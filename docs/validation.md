@@ -5,6 +5,41 @@ Use the [validation index](validation-index.md) and
 structured checks and individual attempts. This document owns supported claims;
 query metadata and test counts do not extend their recorded coverage.
 
+## Analyze Run and payload-pass removal (2026-11-18)
+
+The [investigation](performance/investigations/csv-data-movement-and-analyze-run-2026-11-18.md)
+and [comparison summary](benchmarks/data-movement-summary-2026-11-18.json) identify
+unmerged source overlays on `1a7742732b0a75d698bd36d917bf8dcad3488063`, the separate
+FY-only and final native binaries, exact fixtures and exclusions. They do not
+identify a new release or deployment.
+
+Linux workspace tests (default and all features), formatting and Clippy passed.
+Native Windows workspace tests passed in a new NTFS validation checkout; final
+CLI source/grant lifetime, interfaces and automatic-memory checks passed again
+after the last CLI-only teardown correction. The existing Windows checkout was
+not changed. Resource and failure controls cover exact realized FY-to-Balanced
+cuts, downstream order, strict serialized caps, final competing-owner admission,
+cancellation, destination races and private/temp cleanup, without raw-input replay.
+
+Bundled Chromium 156 passed the hosted UI and processing/graph/lifecycle sequence,
+including cleanup, persistent restart and forced-process interruption variants.
+Baseline and experimental shuffle/partition WASI resource-contract suites passed.
+After the final correction changed rebuilt WASM bytes, core processing and full
+graph acceptance passed again against the final production artifact; receipts
+record before/after asset hashes. Default production WASM and hosted assets were
+restored after test builds. This is small-fixture correctness evidence, not new
+Windows/browser throughput or large-scale acceptance.
+
+The selected performance cells contain 58 measured complete native Runs and 18
+excluded warmups across nine separate comparisons. Five pairs confirm small plain
+Balanced after a mixed three-pair result; other cells have three pairs. Their warm
+WSL2/ext4 scope reaches 1,986.26 MiB input under a 256 MiB working budget, without
+exhausting physical host RAM. Do not pool these fixtures with the earlier four-column
+DuckDB/qsv comparison or infer 40 GiB/cold-storage/native Windows/browser speed.
+Full logs, complete source/vendor identities and interrupted attempts remain in
+the local ignored provenance packet linked from the investigation. Historical
+archive hydration still blocks complete evidence-index regeneration.
+
 ## Selected native D/G scale acceptance (2026-11-15)
 
 The [sanitized acceptance record](releases/0.2.0-native-scale-acceptance.json)

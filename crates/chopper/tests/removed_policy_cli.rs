@@ -8,12 +8,12 @@ fn native_server_and_picker_commands_are_rejected() {
         .unwrap();
     assert!(help.status.success());
     let help = String::from_utf8_lossy(&help.stdout);
-    for command in ["run", "split", "analyze", "profile", "guide", "example"] {
+    for command in ["run", "split", "analyze", "guide", "example"] {
         assert!(help
             .lines()
             .any(|line| line.split_whitespace().next() == Some(command)));
     }
-    for command in ["serve", "pick-path"] {
+    for command in ["serve", "pick-path", "profile"] {
         assert!(!help
             .lines()
             .any(|line| line.split_whitespace().next() == Some(command)));

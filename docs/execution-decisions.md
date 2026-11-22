@@ -11,7 +11,7 @@ Solid diagrams below describe current behavior; the final diagram is explicitly
 a design. The [specification](specification.md), [rewrite rules](pipeline-rewrites.md)
 and [GitHub Issues](https://github.com/jsmatfess/chopper/issues) own contracts and delivery status.
 
-## 1. Current workflow: Run, profile or prepare
+## 1. Current workflow: Analyze or Run
 
 ```mermaid
 flowchart TD
@@ -20,16 +20,43 @@ flowchart TD
     Schema -->|Yes| Action{Which action?}
     Action -->|Analyze input| Profile[Full-file validation and bounded statistics]
     Profile --> Report[Return profile; no output snapshot]
-    Action -->|Prepare exact outputs| Prepare[Apply pipeline and retain immutable encoded CSV snapshot]
-    Prepare --> Confirm[Confirm and execute that prepared result]
-    Action -->|UI Run button| Ready{Current prepared snapshot?}
-    Ready -->|Yes: Confirm & split| Confirm
-    Ready -->|No: Run current settings| Eligible{Limits-only job in the ordinary build?}
-    Action -->|CLI/API Run with JSON or ordered flags| Eligible
+    Action -->|UI or CLI Run with current configuration| Counted{Native CLI counted-balanced experiment, eligible UTF-8 source and Balanced shape?}
+    Counted -->|Yes| CountPass[Strict count pass and direct write with decoded header, count and metadata checks]
+    CountPass --> ReleaseCounted[Release first-pass metadata and any Partition proof after comparison]
+    ReleaseCounted --> Publish
+    Counted -->|No| Eligible{Limits-only or single plain Balanced step?}
     Eligible -->|Yes| Direct[Validate and serialize directly to private output]
-    Eligible -->|No| Internal[Prepare internally, then execute]
-    Confirm --> Publish[Finalize and publish or export]
-    Direct --> Publish
+    Eligible -->|No| BoundedPartition{Native bounded-final-partition experiment, unobserved single plain Partition, Auto and max_files within writer capacity?}
+    BoundedPartition -->|Yes| FanoutBuffers[Select CSV/catalog capacities; admit as owners construct]
+    FanoutBuffers --> CatalogForm{Per writer: single-record experiment and exact group or no chunk caps?}
+    CatalogForm -->|Yes| TypedRecord[Retain admitted name and scalars; materialize canonical root catalog in original stage at finish]
+    CatalogForm -->|No| DiskRecords[Retain ordinary disk catalog]
+    TypedRecord --> SyncBatch{Linux batched-sync experiment and unobserved plain output?}
+    SyncBatch -->|Yes| SyncQueue[Select flush-all-then-sync finish; every original handle syncs before Analysis]
+    SyncBatch -->|No| Direct
+    SyncQueue --> Direct
+    DiskRecords --> Direct
+    BoundedPartition -->|No| Fanout{Native final-writers experiment, unobserved single plain Interleaved or probabilistic, Auto and within bounded memory/descriptor writer ceiling?}
+    Fanout -->|Yes| FanoutBuffers
+    Fanout -->|No| Chains{Native unobserved final-writer chains, 2–4 count-independent steps and leaf product within bounded memory/descriptor writer ceiling?}
+    Chains -->|Yes| FanoutBuffers
+    Chains -->|No| Experiment{Opt-in terminal-shuffle eligibility?}
+    Experiment -->|Yes| TailMerge{Opt-in Linux unobserved raw terminal Uniform with pending and reader budgets?}
+    TailMerge -->|Admitted| ShortTail[Retain bounded pending owners and consolidate only excess runs before final merge]
+    TailMerge -->|Otherwise or limit reached| Direct
+    ShortTail --> Direct
+    Experiment -->|No| Routing{Native terminal-routing experiment, single plain Partition, Interleaved, stratified exact or probabilistic assignment?}
+    Routing -->|Yes| ExactWriters{Retained-exact-writers experiment, unobserved singleton stratified exact, Auto, UTF-8 and configured writer count fits?}
+    ExactWriters -->|Yes| ExactSetup[Keep original empty writer witness; count retained tuples, quotas and RNG states; admit final writers]
+    ExactSetup --> ExactReady{Preparation admitted and no cancellation or cleanup fault?}
+    ExactReady -->|Yes| ExactEmit[Traverse same parent in source order; emit original quota streams; all later errors terminal]
+    ExactEmit --> Publish
+    ExactReady -->|Typed memory denial only| OriginalExact[Drop tentative owners; use same immutable parent and original writer]
+    OriginalExact --> Direct
+    ExactReady -->|Other error| ExactFail[Fail and clean private output]
+    ExactWriters -->|No| Direct
+    Routing -->|No| Internal[Prepare snapshot internally, then execute]
+    Direct --> Publish[Finalize and publish or export]
     Internal --> Publish
     Publish --> Native[Native: atomic destination directory commit] --> NativeReceipt[Engine publication receipt]
     Publish --> Browser[Browser: close exported files, then completion marker] --> VerifyMarker[Read back exact marker] --> BrowserReceipt[Verified destination receipt]
@@ -41,6 +68,95 @@ Job from ordered `--step` blocks, then uses the same confirmation and
 existing JSON memory/worker overrides remain supported.
 It adds no rewrite, resource-resolution or publication policy.
 
+The terminal-shuffle experiment retains root Uniform/Auto–Balanced eligibility.
+Its native unobserved extension permits a standalone full Shuffle or root
+Uniform/Auto–Partition; physical/snapshot observation and WASI keep their prior
+eligibility. Bounded final-writer chains admit all configured parent membership
+state and writer metadata, preserve original domains/counters, and retain the
+first private publication's destination witness through canonical renaming and
+commit. Prefixes/file buffers remain per writer; shared encoded row scratch has
+its own opt-in control. See [direct execution](direct-execution.md).
+
+Within native terminal Uniform execution, the Linux short-tail experiment
+admits its pending catalog and uses the existing memory-derived reader bound,
+with a ceiling of 512. Low descriptor limits and tighter catalog, reader,
+temporary-space or pending-file bounds retain or restore ordinary hierarchical
+merging. Fallback transfers the admitted run owners before another merge reads
+them, preserving ownership, cleanup and final order.
+
+The configured writer ceiling remains 16 unless the native opt-in
+`experimental-memory-final-writers` feature is enabled. That experiment uses
+`min(4096, memory_mb * 4)`, conservatively substituting 32 MiB for unresolved
+`auto`; Unix additionally limits two descriptors per writer after leaving 64
+from the soft `RLIMIT_NOFILE` ceiling. This pre-consumption selection bound grants
+no memory or handles. All owners still admit capacity; wide headers, concurrent
+pressure and opens can fail terminally. Larger fanouts retain the existing path.
+With `experimental-small-final-buffers`, configured fanout alone uses 16 KiB
+plain buffers and the ceiling becomes `min(8192, memory_mb * 8)`, retaining the
+same automatic-budget substitution and descriptor guard. Other output buffers
+keep their original sizes; both controls remain opt-in.
+The independent `experimental-small-final-catalogs` control selects 512-byte
+metadata buffers when constructing these bounded fanout writers, admitting that
+capacity before allocation. It changes neither the writer ceiling nor CSV buffers;
+default, snapshot and other direct-publication catalogs retain 8 KiB buffers.
+
+
+The independent `experimental-single-final-catalog` control replaces each
+proved-one-chunk fanout catalog with one typed record owning its existing admitted
+name; exact groups or absence of every chunk cap prove that condition. Selection
+keeps the existing writer ceiling and conservative two-descriptor guard. At
+canonical merge, the first group materializes one root catalog inside its original
+stage and destination witness; other typed records append directly. Multi-chunk
+and other constructors retain disk catalogs. Serialized metadata limits, source
+validation and terminal cleanup remain required; Analyze advice is not consumed.
+
+With the separate `experimental-single-catalog-capacity` control, jobs without
+any chunk cap use `min(16384, memory_mb * 16)` and one descriptor per writer in
+the Unix soft-limit guard, leaving the same 64-handle margin. It requires the
+single-record catalog and 16 KiB CSV-buffer controls. Auto still substitutes
+32 MiB; cap-bearing jobs keep previous ceilings and two-descriptor accounting.
+Every memory/file owner retains independent admission, with terminal cleanup.
+This is a bounded selection extension, not an unbounded writer pool.
+
+The Linux-only `experimental-batched-final-sync` control changes scheduling for
+unobserved plain typed catalogs. Each close flushes/releases its buffer and retains
+the original File. Canonical merge admits and transfers those handles to the root;
+once all writers have flushed, every handle is synchronized/drained before Analysis
+construction. Publication repeats an empty guard before the manifest and commit.
+No sync, original stage/witness or error/cancellation cleanup is removed. Windows,
+WASI, observed, codec and multi-chunk paths keep prior scheduling.
+
+The bounded-final-partition control uses the existing physical `max_files`
+ceiling as a bound on successful distinct groups. It never treats an Analyze
+estimate as proof. An admitted tuple map discovers groups and finalizes them in
+original canonical key order; a seed private publication preserves the destination
+witness, including empty output. File-limit/admission/parser errors are terminal,
+without post-emission fallback. Unsupported shapes keep existing selection before
+input consumption. Analyze's optional numeric writer advice uses existing input
+statistics and static fanouts, keeps unsupported correlated shapes unknown, and
+is recomputed after cache reuse. It is not an executable snapshot or Run lease.
+
+Counted Partition followed by Balanced has its own native experimental flag.
+It requires plain UTF-8 input, plain output, Auto grouping and a configured
+file ceiling within the writer capacity. The count pass retains bounded tuple
+counts and a logical digest. The write pass uses exact per-key remainder quotas
+and canonical publication order, and compares its digest with the first pass.
+
+Counted Balanced accepts plain UTF-8 source by default within the experiment.
+The separate `experimental-counted-zstd-input-balanced` feature admits a Zstandard
+source and uses an independently admitted decoder for each pass.
+
+Counted Balanced output is plain unless `experimental-counted-codec-balanced`
+extends it to the existing gzip/Zstandard/ZIP direct adapters. Both input paths
+validate CSV and UTF-8 on both passes. Singleton Balanced compares the decoded
+header, row count, source length and modification time before publication.
+An edit that preserves all four can go undetected. Analysis and the manifest
+use the digest of the emitted rows. Exact quotas and error cleanup still apply.
+The separate header-scratch
+release control drops unused per-writer encoder buffers
+before returning their grants; encoded prefixes remain owned. These controls do
+not change default or WASI selection.
+
 Run selects its path before consuming input. Errors after direct consumption
 starts terminate that attempt; they do not replay raw input. Failure/cancellation
 cleans owned private output and reports cleanup failures. A profile is advisory,
@@ -49,11 +165,12 @@ not an execution snapshot. See [direct execution](direct-execution.md) and
 [`direct.rs`](../crates/chopper/src/engine/direct.rs).
 
 A new execution obtains internal entropy after configuration admission. No public seed
-input or RNG replay requirement remains; prepared confirmation retains its snapshot.
+input or RNG replay requirement remains; internal snapshot execution retains its bytes.
+Analyze never retains an executable result or authorizes publication.
 
-### Native job lifecycle
+### Historical native server job lifecycle
 
-The native [job module](../crates/chopper/src/server/jobs.rs) owns the lifecycle
+The retired native server [job module](../crates/chopper/src/server/jobs.rs) owns the lifecycle
 around these engine calls. HTTP handlers decode requests and return literal
 transition acknowledgements; they do not decide job-state changes.
 
@@ -99,7 +216,7 @@ rules or browser worker/marker behavior.
 
 ```mermaid
 flowchart TD
-    Scripted[Native scripted analyze/run/profile] --> Metadata[Metadata size check then open]
+    Scripted[Native scripted Analyze/Run] --> Metadata[Metadata size check then open]
     Metadata --> Defaults{Shared defaults grant available?}
     Defaults -->|No| DecodeError[Admission error; drop partial payload before grant]
     Defaults -->|Yes| Decode[Direct typed reader; admit lexical prefix before byte delivery]
@@ -122,7 +239,6 @@ flowchart TD
     BrowserLimit --> BrowserPool[1 GiB shared tracked ledger; 2 GiB linear ceiling]
     BrowserPool --> Context[Create Context; prepared execution reuses it]
     Hosted -->|No| Context
-    Context -.-> Intake[CSV intake retains decoder, parser and records until their grants can release]
     Context --> Next[Next bounded allocation or growth]
     Context -.-> Observation[Hosted direct/prepared Run: optional bounded observation]
     Observation --> ObservationGrant{8192-byte callback grant available?}
@@ -132,7 +248,16 @@ flowchart TD
     Disable -.-> Next
     Context -.-> SortTarget[Sorters bound retained rows by job and shared ceilings]
     SortTarget -.-> Work
-    Next --> Admit{Local and shared admission allow it?}
+    Next --> Pressure{Pressure refresh due?}
+    Pressure -->|No| Admit{Local and shared admission allow it?}
+    Pressure -->|Yes| Cache{Linux cache-headroom experiment enabled?}
+    Cache -->|No| Raw[Existing platform headroom and fallback]
+    Cache -->|Yes| Usable{Complete hierarchy; usable own-cache and zero-protection data?}
+    Usable -->|No| Raw
+    Usable -->|Yes| Estimate[Estimate own clean inactive-file credit below ancestor maxima; retain raw high boundary]
+    Estimate --> Ceiling[Retain startup ceiling and half-headroom growth margin]
+    Raw --> Ceiling
+    Ceiling --> Admit
     Admit -->|Yes| Work[Perform bounded work under owned grants]
     Work -->|More work| Next
     Admit -->|No| Fallback{Supported bounded fallback available?}
@@ -167,7 +292,7 @@ not processing. This branch is distinct from host memory-pressure discovery.
 
 The [native scripted decoder](cli-job-decoding.md) uses only the existing shared
 ledger before imported resources are known. Its source grant remains through
-prompts, borrowed profile and the entire consuming Run/prepare call, intentionally
+prompts and the entire consuming Run/Analyze call, intentionally
 overlapping PreparedJob's independent grant. EOF does not require a speculative
 next-byte grant. Metadata is not an actual-read cap. Other adapters keep their
 existing construction policy; this branch does not change engine dispatch.
@@ -214,7 +339,12 @@ flowchart TD
     Last -->|Yes| Elide[Retain logical stage; emit source-free Elided fact]
     Elide --> Final[Execute final shuffle at its original index]
     Last -->|No| Pair{Full shuffle then unstratified exact assignment, with no assignment/uniform suffix overlap?}
-    Pair -->|No| Ordinary[Existing ordered dispatch and fusion priority]
+    Pair -->|No| BalancedPair{Full shuffle immediately followed by Balanced?}
+    BalancedPair -->|No| Ordinary[Existing ordered dispatch and fusion priority]
+    BalancedPair -->|Yes| BalancedProducer[Requested resident FY or random-key producer]
+    BalancedProducer --> Ranges[Traverse same realized order at exact contiguous parent quotas]
+    Ranges --> Output
+    Ranges -->|Admission, cancellation, decoding, sink or cap error| Fail
     Pair -->|Yes| Permute[Existing requested random-key or resident Fisher-Yates producer]
     Permute --> Quotas[Cut complete parent permutation at admitted largest-remainder quotas]
     Quotas --> Children[Emit named children in configured order, including zeros]
@@ -225,7 +355,7 @@ flowchart TD
     Resident --> Output
 ```
 
-Every earlier explicit Fisher–Yates executes; neither rule crosses grouping,
+Every earlier explicit Fisher–Yates executes; these rules do not cross grouping,
 assignment, positional operations or caps. Existing upstream grouping/shuffle
 fusion wins before a visible pair. Both ingestion and retained execution preserve
 original operation mappings and all logical stages. New range failures are
@@ -365,59 +495,32 @@ isolated publication entry checks cancellation before reserving a manifest path.
 All eight revised controls pass, without proving general concurrent admission or
 extending production eligibility.
 
-## 2e. Isolated probabilistic-allocation/shuffle challenger
+## 2e. Linux opt-in probabilistic assignment and Uniform fusion
 
-The [whole-plan control](performance.md#probabilistic-allocation-and-uniform-shuffle-fusion-control-2026-11-03)
-is unapplied; production probabilistic allocation still materializes before shuffle.
-
-```mermaid
-flowchart TD
-    Parent[Retained partition parent] --> Domains[Admit membership and original child shuffle domains]
-    Domains --> Sort[Composite allocation index plus child random key/domain sort]
-    Sort --> Emit[Emit original named children and normalize shuffled ordinals]
-    Emit --> Stats[Retain allocation and original shuffle logical stage statistics]
-    Stats --> Existing[Existing output snapshot and native publication]
-    Domains -->|Denial or cancellation| Error[Terminal error and owned cleanup]
-    Sort -->|Error or cancellation| Error
-    Emit -->|Error or cancellation| Error
-```
-
-No new retry or calibrated selector is established. Larger keys/per-parent sorting
-and retained domains need spill and pressure acceptance; the fitting Linux control
-does not establish Windows, browser or arbitrary shared-owner feasibility.
-The [fixed-capacity controls](performance.md#probabilistic-shuffle-fusion-fixed-capacity-and-external-sort-controls-2026-11-03)
-complete both paths at 4 MiB and observe external sorting/merge in one larger-parent
-job; the candidate adds a run and higher tracked peak despite lower logical traffic.
-This preserves the broader pressure/runtime acceptance gap and adds no retry rule.
-The [native semantic controls](performance.md#probabilistic-shuffle-fusion-native-semantic-and-failure-controls-2026-11-03)
-cover strata/repeated shuffle indices, forced-primary tie refinement through
-external sorting and public before-emission denial/cancellation on Linux/Windows.
-Browser transfer and internal/late admission still remain unproved; retry is not
-introduced by this acceptance record.
-
-The [2026-11-05 production-eligibility reconciliation](performance/investigations/probabilistic-shuffle-production-eligibility-2026-11-05.md)
-credits the later real prepared-writer owner, Linux/Windows external-wide,
-persistent-Chrome lifecycle and scoped temporary-failure controls. The earlier
-open-gap statements above describe their historical passes, not current missing
-acceptance. Production remains unchanged. The following branch is a proposed
-retained-parent seam, requiring separate authorization and fresh integration gates:
+The opt-in feature `experimental-probabilistic-shuffle-fusion` applies to plain
+Partition → probabilistic assignment → explicit Uniform. It shares the existing
+immutable snapshot publication. The sorter admits a real 64 KiB spill file and
+writer before it accumulates rows. Membership keeps the original assignment
+domain and each named child keeps its original shuffle domain.
 
 ```mermaid
 flowchart TD
-    P[Eligible seeded retained parent: proposed opt-in only] --> Prepare[Admit membership/domains and real spare; finish tentative sorting]
-    Prepare -->|Prepared| Emit[Enter emission; commit original named children and stats once]
-    Prepare -->|Typed memory denial; owners dropped; Context clean| Original[Original allocation and child shuffle for this parent once]
+    P[Eligible retained partition parent] --> Prepare[Admit membership, child domains and real spare; finish tentative sorting]
+    Prepare -->|Prepared| Emit[Emit original named children and normalize shuffled ordinals]
+    Prepare -->|Typed memory denial; owners dropped; Context clean| Original[Original assignment and child shuffle for this parent once]
     Prepare -->|Cancellation, cleanup failure or other error| Fail[Terminal error and owned cleanup]
     Emit -->|Any error after entry| Fail
     Original -->|Error| Fail
-    Emit --> Output[Existing Dataset or CSV snapshot sink]
+    Emit --> Output[Existing encoded snapshot and native publication]
     Original --> Output
 ```
 
-No production retry rule is added here. Earlier parents remain once; raw ingestion,
-direct publication, flexible policy and default promotion are excluded. Actual
-membership/sort/spill/merge/fallback facts must preserve original operation mappings
-and current observation bounds; existing hosted graph acceptance is insufficient.
+Each parent commits once. The committed result supplies original assignment and
+shuffle stage counts. Observation uses the original operation indices for
+membership, sorting, spill and traversal. Baseline Run workflows use the original
+assignment stage before the shuffle. The [matched Linux controls and timing](performance/investigations/probabilistic-shuffle-fusion-at-2-gib-2026-11-21.md)
+and [earlier prototype coverage](performance/investigations/probabilistic-shuffle-production-eligibility-2026-11-05.md)
+describe each validated scope.
 
 ### Retained combined-operation output
 
@@ -530,8 +633,14 @@ flowchart TD
     Hierarchy -->|Yes| Materialized[New run tagged with merge provenance]
     Materialized --> Merge
     Hierarchy -->|No| Traverse[Final streaming merge traversal]
-    Traverse --> CSV[Snapshot serialization then private materialization]
+    Traverse --> CSV[Snapshot or eligible direct grouped serialization]
 ```
+
+The native Linux `experimental-wide-uniform-merge` flag raises the terminal
+Uniform merge ceiling to 256 when the soft descriptor limit is at least 4,096.
+The existing per-reader memory calculation and reservation still bound the
+merge. Other ordering modes and physical-observation paths use the ordinary
+64-run ceiling.
 
 The algorithm can traverse multiple merge levels; the **displayed** graph never
 uses a cycle to represent them. Repeated levels have bounded summaries with
@@ -555,3 +664,9 @@ flowchart TD
 The browser no longer converts a quota estimate into a session-wide automatic
 cap or reserves 20% up front. OPFS enforces actual quota, including private staged
 output. Source-size estimates are advisory and do not choose execution policy.
+
+Windows directory commit uses `MoveFileExW` with neither replacement nor
+cross-volume copy enabled. Its transient UTF-16 paths are admitted through the
+call. This preserves the no-replacement branch even for a competing empty
+directory; originally empty destinations retain their explicit final-check/removal
+path. See [the ownership audit](resource-policy-research.md#windows-directory-publication-without-replacement-2026-11-19).

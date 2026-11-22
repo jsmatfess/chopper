@@ -38,9 +38,13 @@ fn scenario(
         operations: if direct {
             vec![]
         } else {
-            vec![Operation::Shuffle {
-                strategy: Shuffle::Uniform,
-            }]
+            // Keep the snapshot finalization boundary under terminal-shuffle.
+            vec![
+                Operation::Shuffle {
+                    strategy: Shuffle::Uniform
+                };
+                2
+            ]
         },
         ..Job::default()
     };
@@ -85,7 +89,7 @@ fn scenario(
                     progress.rows,
                     if direct {
                         65536
-                    } else if phase == "Ready for confirmation" {
+                    } else if phase == "Finalizing output snapshot" {
                         5000
                     } else {
                         0
@@ -228,7 +232,7 @@ fn complete_run_worker_denials() -> Result<()> {
         let mut scenarios = Vec::new();
         for phase in [
             "Reading and validating CSV",
-            "Ready for confirmation",
+            "Finalizing output snapshot",
             "Serializing output",
         ] {
             scenarios.push(scenario(workers, expected_workers, shared, phase, false)?);
@@ -237,7 +241,7 @@ fn complete_run_worker_denials() -> Result<()> {
             workers,
             expected_workers,
             shared,
-            "Ready for confirmation",
+            "Finalizing output snapshot",
             true,
         )?);
         println!(

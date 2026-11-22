@@ -590,7 +590,7 @@ impl Session {
     }
     fn review(&mut self, io: &mut impl Terminal) -> Result<()> {
         validate(&self.job)?;
-        io.say(&format!("Review: cwd {}\nInput {}\nOutput {}\nDefault UTF-8, headered comma CSV, doubled quotes, LF, no BOM. No operations; plain CSV.\nRows cap {:?}; serialized CSV bytes cap {:?}. File count, bytes and time unknown.\nAlgorithm {}; randomized output order may vary.\nInspection {}; Run validates fresh input. Use analyze for separate exact planning.\nResources: {}\nNo overwrite. Native private staging and atomic directory publication; cleanup on failure/cancellation.",
+        io.say(&format!("Review: cwd {}\nInput {}\nOutput {}\nDefault UTF-8, headered comma CSV, doubled quotes, LF, no BOM. No operations; plain CSV.\nRows cap {:?}; serialized CSV bytes cap {:?}. File count, bytes and time unknown.\nAlgorithm {}; randomized output order may vary.\nInspection {}; Run validates fresh input. Use analyze for a separate input scan and pipeline estimates.\nResources: {}\nNo overwrite. Native private staging and atomic directory publication; cleanup on failure/cancellation.",
             display(&std::env::current_dir()?.to_string_lossy()), display(&absolute(&self.job.input)?.to_string_lossy()), display(&absolute(&self.job.output)?.to_string_lossy()), self.job.limits.rows, self.job.limits.bytes,
             ALGORITHM_VERSION, if self.inspected { "completed previously; advisory only" } else { "not retained" }, resource_description(&self.job)))
     }

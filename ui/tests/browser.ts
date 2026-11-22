@@ -19,10 +19,9 @@ async function select(file:File){selected=file;await api('pick-path',{mode:'inpu
 function job(change:Partial<Job>={}):Job{return {...structuredClone(defaults),input:'fixture.csv',output:'results',...change};}
 async function run(file:File,config:Job,direct=false){
   await select(file);
-  let plan:State;
-  if(direct){await api('run-direct',config);plan=await wait('complete');}
-  else {await api('analyze',config);plan=await wait('ready');assert(plan.analysis,'prepared analysis missing');await api('run',{});}
-  const done=await wait('complete');
+  if(!direct){await api('profile',config);await wait('profiled');}
+  await api('run-direct',config);
+  const done=await wait('complete');const plan=done;
   const folder=await destination.getDirectoryHandle(done.output!.split('/').at(-1)!);
   const files:File[]=[];for await(const [,h] of (folder as any).entries())files.push(await h.getFile());
   const markerFile=files.find(f=>f.name==='CHOPPER-COMPLETE.json');
@@ -54,7 +53,7 @@ async function main(){
   Object.assign(window,{showOpenFilePicker:async()=>[{getFile:async()=>selected}],showDirectoryPicker:async()=>destination});
   defaults=await api<Job>('defaults');
   await test('removed bucket and XOF requests fail through WASI without publication',async()=>{
-    for(const action of ['profile','analyze']) {
+    for(const action of ['profile','run-direct']) {
       for(const change of [
         {full_shuffle_algorithm:'independent_buckets_v1'},
         {full_shuffle_rng:'blake3_xof_v1'},
@@ -64,7 +63,7 @@ async function main(){
         const before=[];for await(const [name] of (destination as any).entries())before.push(name);
         await api(action,job(change as Partial<Job>));
         let state=await api<State>('state');
-        while(state.status==='analyzing'||state.status==='profiling'){await pause();state=await api<State>('state');}
+        while(state.status==='running'||state.status==='profiling'){await pause();state=await api<State>('state');}
         assert(state.status==='failed','removed experiment was accepted');
         assert(/unknown variant `(independent_buckets_v1|blake3_xof_v1)`|unknown field `shuffle_rng_buffer_bytes`/.test(state.error||''),'missing schema error: '+state.error);
         let refused=false;try{await api('run',{});}catch{refused=true;}assert(refused,'invalid job authorized publication');
@@ -74,7 +73,7 @@ async function main(){
     }
   });
   await test('removed shuffle requests fail through WASI without publication',async()=>{
-    for(const action of ['profile','analyze']) {
+    for(const action of ['profile','run-direct']) {
       for(const operation of [
         {type:'shuffle',strategy:'buffer'},
         {type:'shuffle',strategy:'buffer',buffer_rows:7},
@@ -87,7 +86,7 @@ async function main(){
         const before=[];for await(const [name] of (destination as any).entries())before.push(name);
         await api(action,job({operations:[operation]}));
         let state=await api<State>('state');
-        while(state.status==='analyzing'||state.status==='profiling'){await pause();state=await api<State>('state');}
+        while(state.status==='running'||state.status==='profiling'){await pause();state=await api<State>('state');}
         assert(state.status==='failed','obsolete request was accepted');
         assert(/unknown variant `(buffer|radix|prefix_distribution)`|unknown field `buffer_rows`/.test(state.error||''),'missing schema error: '+state.error);
         let refused=false;try{await api('run',{});}catch{refused=true;}
@@ -130,14 +129,14 @@ async function main(){
   await test('input profiling cancellation cannot leave a publishable job',async()=>{
     await select(csv('id\n'+'x\n'.repeat(1000000)));
     await api('profile',job());
-    let refused=false;try{await api('analyze',job());}catch{refused=true;}
+    let refused=false;try{await api('run-direct',job());}catch{refused=true;}
     assert(refused,'preparation overlapped active profiling');
     await api('cancel',{});
     assert((await api<State>('state')).status==='cancelled','profile did not cancel');
     refused=false;try{await api('run',{});}catch{refused=true;}
     assert(refused,'cancelled profile authorized execution');
   });
-  await test('automatic memory direct and prepared runs preserve requested and effective manifest resources',async()=>{
+  await test('automatic memory Run-only and Analyze-then-Run flows preserve requested and effective manifest resources',async()=>{
     assert(defaults.resources.memory_mb===256,'default memory changed');
     for(const direct of [true,false]){
       const config=job({resources:{...defaults.resources,memory_mb:'auto',workers:0,max_record_bytes:1048576}});
@@ -155,7 +154,7 @@ async function main(){
     }
   });
   await test('hosted memory accepts 2 GiB and rejects larger budgets before publication',async()=>{
-    for(const action of ['profile','analyze','run-direct']){
+    for(const action of ['profile','run-direct']){
       await select(csv('id\n1\n2\n'));
       const before=[];for await(const [name] of (destination as any).entries())before.push(name);
       await api(action,job({resources:{...defaults.resources,memory_mb:2049}}));
@@ -173,7 +172,7 @@ async function main(){
     }
   });
   await test('automatic memory refuses an oversized explicit record limit and permits retry',async()=>{
-    for(const action of ['run-direct','analyze']){
+    for(const action of ['run-direct','profile']){
       await select(csv('id\n1\n2\n'));
       const before=[];for await(const [name] of (destination as any).entries())before.push(name);
       await api(action,job({resources:{...defaults.resources,memory_mb:'auto',max_record_bytes:512*1048576}}));
@@ -193,7 +192,7 @@ async function main(){
     const direct=await run(source,config,true);
     const prepared=await run(source,config);
     assert(direct.plan.rows===3&&direct.plan.output_files===2,'direct exact-fit byte boundary or final counts changed');
-    assert(JSON.stringify(await texts(direct.files))===JSON.stringify(await texts(prepared.files)),'direct/prepared output differs');
+    assert(JSON.stringify(await texts(direct.files))===JSON.stringify(await texts(prepared.files)),'Run-only/Analyze-then-Run output differs');
     assert(direct.files.filter(f=>f.name.endsWith('.csv')).every(f=>f.size<=21),'direct byte cap exceeded');
     let refused=false;try{await api('run',{});}catch{refused=true;}assert(refused,'completed direct run retained preparation');
   });
@@ -239,11 +238,11 @@ async function main(){
     assert(r.plan.output_csv_bytes===58,'incorrect byte accounting');
   });
   await test('balanced split rejects fewer records than files',async()=>{
-    await select(csv('id\n1\n'));await api('analyze',job({operations:[{type:'balanced',files:2}]}));
-    while((await api<State>('state')).status==='analyzing')await pause();assert((await api<State>('state')).status==='failed','expected rejection');
+    await select(csv('id\n1\n'));await api('run-direct',job({operations:[{type:'balanced',files:2}]}));
+    while((await api<State>('state')).status==='running')await pause();assert((await api<State>('state')).status==='failed','expected rejection');
   });
   await test('strict malformed CSV rejection',async()=>{
-    await select(csv('id\n"unterminated'));await api('analyze',job());while((await api<State>('state')).status==='analyzing')await pause();
+    await select(csv('id\n"unterminated'));await api('run-direct',job());while((await api<State>('state')).status==='running')await pause();
     assert((await api<State>('state')).status==='failed','malformed CSV accepted');
   });
   const input=csv('id,country,segment\n'+Array.from({length:120},(_,i)=>`${i},${i%2?'US':'GB'},${i%3}`).join('\n')+'\n');
@@ -279,8 +278,8 @@ async function main(){
   });
   await test('interleaved splitting retains nonempty and exact file-count caps',async()=>{
     for(const config of [job({operations:[{type:'interleaved',files:121}]}),job({operations:[{type:'interleaved',files:2}],limits:{rows:59,bytes:null,compressed_bytes:null}})]){
-      await select(input);await api('analyze',config);
-      while((await api<State>('state')).status==='analyzing')await pause();
+      await select(input);await api('run-direct',config);
+      while((await api<State>('state')).status==='running')await pause();
       assert((await api<State>('state')).status==='failed','expected interleaved rejection');
     }
   });
@@ -340,7 +339,7 @@ async function main(){
     assert(r.plan.output_csv_bytes===sizes.reduce((a,b)=>a+b,0),'wide UTF-8 byte accounting changed');
   });
   await test('temporary budget fails without export',async()=>{
-    await select(input);await api('analyze',job({resources:{...defaults.resources,temp_bytes:1}}));while((await api<State>('state')).status==='analyzing')await pause();assert((await api<State>('state')).status==='failed','budget ignored');
+    await select(input);await api('run-direct',job({resources:{...defaults.resources,temp_bytes:1}}));while((await api<State>('state')).status==='running')await pause();assert((await api<State>('state')).status==='failed','budget ignored');
   });
   await test('disk-backed shuffle larger than working budget',async()=>{
     const source=await destination.getFileHandle('large-source.csv',{create:true});const writer=await source.createWritable();await writer.write('id,country,payload\n');
@@ -387,7 +386,7 @@ async function main(){
   await test('cancellation cleans active workspace',async()=>{
     const workspaces=await root.getDirectoryHandle('chopper-workspaces');
     const before=new Set<string>();for await(const [name] of (workspaces as any).entries())before.add(name);
-    await select(await(await destination.getFileHandle('large-source.csv')).getFile());await api('analyze',job());await api('cancel',{});assert((await api<State>('state')).status==='cancelled','cancel failed');
+    await select(await(await destination.getFileHandle('large-source.csv')).getFile());await api('run-direct',job());await api('cancel',{});assert((await api<State>('state')).status==='cancelled','cancel failed');
     for await(const [name] of (workspaces as any).entries())assert(before.has(name),'cancellation leaked temporary workspace');
   });
   await api('cancel',{});

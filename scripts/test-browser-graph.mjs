@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import {gzipSync,gunzipSync} from 'node:zlib';
 const codecFixture=(mode,payload)=>runCodecFixture(mode,payload,smallContractPacket);
 const reports=[];
+const terminalDirect=process.argv.includes('--terminal-direct');
 await withHostedBrowser({port:8423},async({context,url,browserVersion})=>{
  const page=await context.newPage();
  await page.addInitScript(installGraphWorkerProbe);
@@ -81,7 +82,7 @@ await withHostedBrowser({port:8423},async({context,url,browserVersion})=>{
    assert.equal(await page.locator('#status').textContent(),'COMPLETE',await page.locator('#error').textContent());
    if(!disabled){
     const panel=page.locator('#execution-history');const text=await panel.locator('.execution-list button').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-label')).join(' '));assert.match(text,fixture.expected);observedGraph=text;
-    if(fixture.operations.length){assert.match(text,new RegExp(`Serialize CSV snapshot \\[operations ${fixture.operations.length+1}\\]`));assert.match(text,/Materialize private results/);assert.doesNotMatch(text,/Write CSV \[operation 1\]/);}
+    if(fixture.operations.length){assert.match(text,new RegExp(`Serialize CSV \\[operations ${fixture.operations.length+1}\\]`));if((!fixture.compression||fixture.compression==='none')&&((fixture.operations.length===1&&fixture.operations[0].type==='balanced')||(terminalDirect&&fixture.operations.length===2&&fixture.operations[0].type==='shuffle'&&['auto','uniform'].includes(fixture.operations[0].strategy??'auto')&&fixture.operations[1].type==='balanced')))assert.doesNotMatch(text,/Materialize private results/);else assert.match(text,/Materialize private results/);assert.doesNotMatch(text,/Write CSV \[operation 1\]/);}
     assert.match(text,/confirmed/);if(fixture.input)assert.match(text,new RegExp(`${fixture.input_decoded_bytes??31} decoded CSV bytes`));
     if(fixture.compression==='zip'){const archive=(await panel.locator('.execution-list li>button').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-label')))).find(text=>text.startsWith('Build and finalize ZIP archive'));assert.match(archive,/receives data from Deflate CSV members/);assert.doesNotMatch(archive,/receives data from Write CSV/);}
     if(fixture.source==='fallback'){assert.ok(await panel.locator('[data-step][data-status="handed_off"]').count()>0);assert.match(text,/Handed Off/);assert.match(text,/receives data from .*Reuse already ordered grouping files/);assert.match(text,/no re-sort/);}

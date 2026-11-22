@@ -26,7 +26,7 @@ let inputSelectionRevision=0;
 let job: Job; let status = 'idle'; let dirty = true; let editRevision = 0; let lastAnalysis = '';
 let requestEpoch=0,activeCommands=0,pollSerial=0,lastAppliedPoll=0;
 async function api<T = unknown>(path: string, data?: unknown): Promise<T> {
-  const mutation=['profile','analyze','run-direct','run','cancel'].includes(path);
+  const mutation=['profile','run-direct','cancel'].includes(path);
   if(mutation){requestEpoch++;activeCommands++;}
   try {
   return await browserApi<T>(path,data);
@@ -164,7 +164,6 @@ function markDirty() {
   const finalGrouping = job?.operations.filter(op=>op.type!=='shuffle').at(-1);
   const conflict = ['balanced','interleaved'].includes(finalGrouping?.type||'') && !!(value('max-rows')||value('max-bytes'));
   $('conflict').hidden = !conflict; $('conflict').textContent = 'Equal parts and hard limits can conflict. Processing will reject balanced groups that cannot fit without extra files.';
-  if(status==='ready') $('status').textContent='CONFIGURATION CHANGED';
   updateDraft();validation.update();
 }
 function updateDraft() {
@@ -179,10 +178,10 @@ function renderProfile(p:InputProfile,showValues=true){
   let changed=true;try{changed=profileOrigin?.configuration!==JSON.stringify(readJob());}catch{/* Keep incomplete edits editable. */}
   if(showValues){inspectionSource=profileOrigin?.source??null;hostedWorkspace?.values(p.column_values,p.header,'Full-file input analysis',p.rows);}
   const key=JSON.stringify([p,changed]);if(key===lastProfile)return;lastProfile=key;
-  $('input-profile').innerHTML=`<h3>Input analysis</h3><dl class="profile-facts"><div><dt>Records · exact</dt><dd>${format(p.rows)}</dd></div><div><dt>Columns</dt><dd>${format(p.columns)}</dd></div></dl><p class="profile-duration">Scanned in ${p.seconds.toFixed(2)} s${p.cache_hit?' · reused profile':''}</p>${changed?'<p class="profile-context">Input unchanged. Pipeline estimates reflect the earlier configuration.</p>':''}${p.stages.length?`<details><summary>Pipeline estimates${changed?' · previous settings':''}</summary><ul class="profile-stages">${p.stages.map(stage=>`<li>Step ${stage.operation}: ${escape(stage.strategy)}${stage.input_distinct_keys===null?'':` · ${stage.distinct_exact?'':'~'}${format(stage.input_distinct_keys)} distinct keys (${stage.distinct_exact?'exact':'estimated'})`}</li>`).join('')}</ul></details>`:''}<details><summary>Coverage & methodology</summary><p>${escape(p.accuracy)}</p><p>Statistics cover up to 64 selected columns. Value lists show at most 100 values per column and 256 KiB in total. Prepare exact outputs for final group counts and file sizes. Analyzing input does not create output files.</p></details>`;
+  $('input-profile').innerHTML=`<h3>Input analysis</h3><dl class="profile-facts"><div><dt>Records · exact</dt><dd>${format(p.rows)}</dd></div><div><dt>Columns</dt><dd>${format(p.columns)}</dd></div></dl><p class="profile-duration">Scanned in ${p.seconds.toFixed(2)} s${p.cache_hit?' · reused profile':''}</p>${changed?'<p class="profile-context">Input unchanged. Pipeline estimates reflect the earlier configuration.</p>':''}${p.stages.length?`<details><summary>Pipeline estimates${changed?' · previous settings':''}</summary><ul class="profile-stages">${p.stages.map(stage=>`<li>Step ${stage.operation}: ${escape(stage.strategy)}${stage.input_distinct_keys===null?'':` · ${stage.distinct_exact?'':'~'}${format(stage.input_distinct_keys)} distinct keys (${stage.distinct_exact?'exact':'estimated'})`}</li>`).join('')}</ul></details>`:''}<details><summary>Coverage & methodology</summary><p>${escape(p.accuracy)}</p><p>Statistics cover up to 64 selected columns. Value lists show at most 100 values per column and 256 KiB in total. Run reports the final exact group counts and file sizes. Analyzing input does not create output files.</p></details>`;
 }
 function renderAnalysis(a: Analysis) {
-  if(belongsToSource(analysisOrigin,sourceKey())){inspectionSource=analysisOrigin?.source??null;hostedWorkspace?.values(a.column_values||[],a.header,'Prepared output analysis',a.rows);}
+  if(belongsToSource(analysisOrigin,sourceKey())){inspectionSource=analysisOrigin?.source??null;hostedWorkspace?.values(a.column_values||[],a.header,'Completed output analysis',a.rows);}
   const key = JSON.stringify(a); if(key===lastAnalysis) return; lastAnalysis=key;
   $('empty-plan').hidden=true; $('analysis').hidden=false;
   const facts=(items:[string,string][])=>`<dl class="analysis-facts">${items.map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl>`;
@@ -210,10 +209,9 @@ async function poll() {
     if(s.origins?.profile)profileOrigin=s.origins.profile;if(s.origins?.analysis)analysisOrigin=s.origins.analysis;
     profileDirty=!belongsToSource(profileOrigin,sourceKey());
     status=s.status;
-    if(status==='ready'&&!dirty)validation.update();
     $('connection').hidden=true;
-    const busy = ['profiling','analyzing','running'].includes(status);
-    $('status').textContent=dirty&&status==='ready'?'CONFIGURATION CHANGED':status.replace('_',' ').toUpperCase();
+    const busy = ['profiling','running'].includes(status);
+    $('status').textContent=status.replace('_',' ').toUpperCase();
     const now=performance.now();
     if(busy&&(progressPhase!==s.progress.phase||progressStatus!==status||s.progress.rows<progressRows)){progressPhase=s.progress.phase;progressStarted=now;progressRows=s.progress.rows;progressStopped=null;}
     if(!busy&&progressStopped===null)progressStopped=now;
@@ -221,14 +219,14 @@ async function poll() {
     const seconds=((progressStopped??now)-progressStarted)/1000, rate=(s.progress.rows-progressRows)/Math.max(seconds,0.001);
     $('progress').hidden=!busy&&!['failed','cancelled'].includes(status);$('phase').textContent=s.progress.phase;
     $('progress-detail').textContent=`${format(s.progress.rows)} rows · ${size(s.progress.temp_bytes)} temporary · ${Math.floor(seconds)} s in phase${seconds>=1&&rate>0?` · ${format(Math.round(rate))} rows/s`:''}`;
-    updateRunControl();$<HTMLButtonElement>('profile').disabled=busy;$<HTMLButtonElement>('analyze').disabled=busy;
-    $('cancel').hidden=!['profiling','analyzing','ready','running'].includes(status);
+    updateRunControl();$<HTMLButtonElement>('profile').disabled=busy;
+    $('cancel').hidden=!['profiling','running'].includes(status);
     if(s.profile){lastProfileData=s.profile;if(!profileDirty)renderProfile(s.profile,!s.analysis||!belongsToSource(analysisOrigin,sourceKey()));else if(status==='profiled'){lastProfile='';$('input-profile').hidden=false;$('input-profile').textContent='Analysis finished for a different input or parsing configuration. Analyze input again for the current source.';}}
 
     if(s.analysis) renderAnalysis(s.analysis);
     if(s.error) error(s.error);
     $('result-path').className=status==='complete'?'hint complete':'hint';
-    $('result-path').textContent=status==='complete'?`✓ Complete. Results saved to ${s.output}`:status==='ready'?(dirty?'Settings changed. Prepare exact outputs again before confirming.':`Ready to write to ${s.output}`):status==='cancelled'?(s.error?'Cancelled. See cleanup and destination details.':'Cancelled. Job-owned temporary files cleaned up.'):'';
+    $('result-path').textContent=status==='complete'?`✓ Complete. Results saved to ${s.output}`:status==='cancelled'?(s.error?'Cancelled. See cleanup and destination details.':'Cancelled. Job-owned temporary files cleaned up.'):'';
     hostedWorkspace?.state(s,dirty);
   } catch(e) { $('connection').hidden=false;$('connection').textContent=e instanceof Error?e.message:String(e); }
 }
@@ -350,12 +348,12 @@ $('profile').onclick=async()=>{
   if(!validation.check(false))return;
   try{job=readJob();$('error').hidden=true;profileOrigin=resultOrigin(sourceKey(),job,editRevision,++resultSerial);profileDirty=false;lastProfileData=null;await api('profile',job);lastProfile='';lastAnalysis='';$('input-profile').hidden=true;$('analysis').hidden=true;await poll();}catch(e){error(e);}
 };
-async function startJob(action:'analyze'|'run-direct'){
+async function startJob(){
   if(!validation.check())return;
   try{
     job=readJob();updateDraft();$('error').hidden=true;
     const submittedRevision=editRevision;analysisOrigin=resultOrigin(sourceKey(),job,editRevision,++resultSerial);
-    await api(action,job);
+    await api('run-direct',job);
     // Acknowledgement validates only the draft revision that was submitted.
     if(submittedRevision===editRevision)dirty=false;
     lastAnalysis='';$('input-profile').hidden=true;$('analysis').hidden=true;
@@ -364,16 +362,14 @@ async function startJob(action:'analyze'|'run-direct'){
 }
 function updateRunControl() {
   const button=$<HTMLButtonElement>('run-direct');
-  button.disabled=['profiling','analyzing','running'].includes(status);
-  button.textContent=status==='ready'&&!dirty?'Confirm & split →':'Run →';
+  button.disabled=['profiling','running'].includes(status);
+  button.textContent='Run →';
 }
 $('job-form').onsubmit=async e=>{
   e.preventDefault();
   if(!validation.check())return;
-  if(status==='ready'&&!dirty){try{await api('run',{});await poll();}catch(e){error(e);}}
-  else await startJob('run-direct');
+  await startJob();
 };
-$('analyze').onclick=()=>void startJob('analyze');
 $('cancel').onclick=async()=>{try{await api('cancel',{});await poll();}catch(e){error(e);}};
 $('export').onclick=()=>{try{const blob=new Blob([JSON.stringify(readJob(),null,2)+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='chopper-job.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){error(e);}};
 $('import').onclick=()=>$<HTMLInputElement>('import-file').click();
@@ -389,7 +385,7 @@ for(const mode of ['input','output']) $('browse-'+mode).onclick=async()=>{
 };
 async function start(){try{job=await api<Job>('defaults');populate();await poll();setInterval(()=>void poll(),1000);}catch(e){$('connection').hidden=false;$('connection').textContent=`${e instanceof Error?e.message:e}. Open the browser app in desktop Chrome or Edge.`;}}
 const planLinks=configurePlanLinks();
-const validation=configureValidation(()=>job,()=>status==='ready'&&!dirty?null:columnSchema,readSizeField,()=>readMemory(memoryControls));
+const validation=configureValidation(()=>job,()=>columnSchema,readSizeField,()=>readMemory(memoryControls));
 const hostedWorkspace=configureHostedWorkspace();
 configureBrowserUI();
 void start();

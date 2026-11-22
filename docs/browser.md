@@ -56,7 +56,7 @@ npm.cmd --prefix ui run serve:hosted
 
 On Linux, run `rustup target add wasm32-wasip1`, set `WASI_SDK_PATH`, then run `node scripts/build-browser.mjs`, `npm --prefix ui ci`, `npm --prefix ui run build:hosted`, and `npm --prefix ui run serve:hosted`. `npm --prefix ui run build` is an alias for `build:hosted`. Native CLI builds do not need Node or a generated UI bundle.
 
-Open **http://127.0.0.1:8421/**. Browse for an input and an output parent folder, configure the pipeline and choose Run. Analyze input is optional; Prepare exact outputs retains a snapshot for later confirmation. Results go into a new `chopper-results-<UUID>` subdirectory. A `CHOPPER-COMPLETE.json` marker is written only after every result file has closed successfully.
+Open **http://127.0.0.1:8421/**. Browse for an input and an output parent folder, configure the pipeline and choose Run. Analyze is optional and returns input statistics and estimates; Run validates the current configuration independently. Results go into a new `chopper-results-<UUID>` subdirectory. A `CHOPPER-COMPLETE.json` marker is written only after every result file has closed successfully.
 
 For large local benchmark jobs, use a persistent browser profile. The external
 comparison harness now does so explicitly. On the recorded Chromium build,
@@ -124,13 +124,13 @@ admission policy, and avoids this browser ABI.
 See [V8's wasm32 memory explanation](https://v8.dev/blog/4gb-wasm-memory) and
 [Rust's contiguous allocation limits](https://doc.rust-lang.org/std/vec/index.html).
 
-Input profiling scans every record without producing temporary spools. Explicit
-exact preparation retains an immutable encoded output snapshot for confirmation.
-Run can process limits-only jobs directly into private output,
-without that additional complete CSV snapshot; other pipelines prepare internally.
+Analyze scans every record without producing output spools or retaining an
+executable snapshot. Run processes limits-only jobs and a single uncompressed
+Balanced step directly into private output without an additional complete CSV
+snapshot; other pipelines prepare internally.
 Both paths stage the full result in OPFS before export. Browser quota must still
 fit private output and any intermediates or metadata. Run starts from the current
-configuration; explicit preparation creates no destination export until confirmed.
+configuration and validates its input independently of earlier Analyze results.
 
 Browser APIs cannot atomically publish a directory. An interrupted export may leave incomplete files in the new results directory. Completion requires a valid `CHOPPER-COMPLETE.json` record, not just a file with that name. The v1 JSON record contains `complete: true`, `engine: "chopper-browser"`, `version: 1`, and `files` counting every exported result file including the manifest, excluding the marker itself. An empty or unparseable entry is incomplete. Cancellation or tab close after the marker commits does not roll back that completed folder, even if the client has not received the success reply. The native CLI retains its native publication behavior.
 
@@ -142,7 +142,7 @@ The shared CSV editor retains imported labels such as `cp1252` and `sjis`, inclu
 when copying input settings to output. Unknown labels remain selected for correction
 or explicit engine rejection. Alias resolution stays in the engine.
 `npm --prefix ui run test:workspace` covers both entry points with mocked responses;
-this checks import/edit/export, Run and exact prepare/confirm requests, not encoded
+this checks import/edit/export, Analyze and fresh Run requests, not encoded
 execution or publication.
 
 For independently checked tiny encoded-byte fixtures (no engine/browser startup):
@@ -159,7 +159,7 @@ hosted qualification, select the corresponding CSV and a destination parent with
 the browser file controls. Earlier instructions to import jobs into the native
 UI described the retired 0.1 interface.
 Edit an unrelated setting, export and inspect the Job, then exercise Run and a
-separate Prepare exact outputs/confirm cycle with fresh destinations. Verify each
+Analyze-then-Run cycle with fresh destinations. Verify each
 result folder (for hosted, the exported child folder):
 
 ```sh
@@ -177,9 +177,8 @@ or replace final matching native/hosted release qualification.
 ## Session ownership
 
 The [session module](../ui/src/browser/session.ts) owns hosted job lifecycle
-and replaceable browser sessions. Defaults, column inspection and profiling can
-reuse a session; exact preparation keeps its snapshot until confirmation or
-cancellation. The [client adapter](../ui/src/browser/client.ts) owns picker/UI
+and replaceable browser sessions. Defaults, column inspection and Analyze can reuse a session. Analyze caches
+bounded input statistics; it never retains output bytes for later approval. The [client adapter](../ui/src/browser/client.ts) owns picker/UI
 integration and history rendering, without coordinating worker generations.
 
 Each session owns startup, the engine/storage workers, correlated requests and
@@ -190,11 +189,11 @@ startup; a later quota/lock/init continuation cannot start replacement work.
 A queued Web Lock granted after retirement is released without creating workers.
 Cleanup replies and permission waits cannot change a newer job's state.
 Submitted settings and input/output handles are captured before startup or
-permission waits. A delayed Run grant rechecks active-job eligibility, and exact
-confirmation keeps the prepared destination even if Browse selections change.
+permission waits. A delayed Run grant rechecks active-job eligibility. Run uses
+the captured destination even if Browse selections change while permission waits.
 Post-start worker errors and request-send failures notify the lifecycle owner
 directly and reject outstanding requests. The captured failed session retires
-even when idle, profiled or ready without a pending Run, or during inspection;
+even when idle or analyzed without a pending Run, or during inspection;
 late errors cannot retire a replacement session.
 
 Retained execution history remains independent of session lifetime. Retired
@@ -285,7 +284,7 @@ checks do not launch a real browser. Run the migrated graph, lifecycle (includin
 check the real browser path. The browser CI job runs both levels.
 
 `node scripts/test-browser-graph.mjs` exercises the public Run action across
-direct and prepared grouping, shuffle, allocation and split fixtures with independent enabled/disabled
+limits-only and pipeline grouping, shuffle, allocation and split fixtures with independent enabled/disabled
 CSV, manifest and marker checks. Run it after the production hosted build; its
 server and picker/telemetry fixtures are test-only, not deployable assets.
 Codec fixtures independently decode exports using Node gzip, Python 3 ZIP and
@@ -307,7 +306,7 @@ The production interruption harness also accepts `--direct`. Run
 to check direct Run through processing, CSV export and marker-close interruption,
 same-client retry, tab close and forced-process recovery. Its `prepare` checkpoint
 label denotes pre-export input processing in this mode; the report records
-`direct_run: true`. Prepared-mode acceptance remains a separate invocation.
+`direct_run: true`. Pipeline and limits-only acceptance remain separate invocations.
 
 ```powershell
 node scripts/build-browser-tests.mjs
@@ -1198,7 +1197,7 @@ CSV settings can now be detected explicitly from a sample of at most 64 KiB of d
 
 Analysis includes expandable distinct-value lists for selected partition/stratification columns. Lists cover the whole validated input but are capped at 64 columns, 100 values per column, and 256 KiB total; incomplete lists are labeled. Progress shows phase-local rows, elapsed time, observed throughput, and temporary usage. No overall percentage is shown because multi-pass work does not provide a reliable completion total.
 
-Full-file input profiling uses the same Rust path as native `chopper profile`. It reports exact input row counts and exact or explicitly approximate distinct counts; sorted input is not truncated to a prefix. The cached profile can be reused across configuration edits in the current worker. Picking another File object clears it, and preparation, cancellation, or completion can terminate that worker and discard the cache. A new multi-column grouping/stratification combination triggers another full scan. Profiling does not enable confirmation; exact preparation remains mandatory.
+Analyze uses the same full-file input-statistics path as native `chopper analyze`. It reports exact input row counts and exact or explicitly approximate distinct counts; sorted input is not truncated to a prefix. The cached profile can be reused across configuration edits in the current worker. Picking another File object clears it, and Run, cancellation, or completion can terminate that worker and discard the cache. A new multi-column grouping/stratification combination triggers another full scan. Analyze retains no executable output. Run does not depend on an earlier analysis.
 
 The graph inspection harness exercises the real hosted page with fused/repeated
 work, default/advanced and graph/list selection, events, keyboard focus and frozen
@@ -1226,14 +1225,14 @@ input parsing/member settings, submitted configuration, draft revision and run
 identity. `result-ownership.ts` owns these comparisons. Hosted lifecycle slots
 pair result values with their origins; unrelated draft edits preserve an input
 profile, while replacement input or parser settings reject a pending profile.
-Prepared confirmation checks the captured source and draft revision before
-permission/dispatch, including edits made while preparation was running. A
-confirmation already admitted still executes its frozen snapshot and destination.
-The native editor uses the same source/revision comparisons while native prepared
-objects retain their original immutable output snapshot contract.
+Run captures its submitted configuration and source/destination handles before
+permission/dispatch. Edits made while permission is pending cannot change that
+submission; a later Run captures the new draft. Analyze retains only advisory
+input statistics, with source/configuration origins for invalidation. Internal
+engine snapshots retain their exact encoded-byte contract.
 
 State polls are ordered within a command epoch. A late response cannot overwrite
-a newer response or cross a Run/Prepare/Profile/Cancel acknowledgement. Starting
+a newer response or cross a Run/Analyze/Cancel acknowledgement. Starting
 a newer poll does not discard an older response while the newer one is pending.
 Worker generation checks independently reject messages from retired sessions.
 Completed Runs retain their submitted origin for historical results; they never
@@ -1369,7 +1368,7 @@ Pipeline steps have operation icons, short effect descriptions, dedicated drag
 handles and the existing movement arrows. Dragging previews a before/after
 insertion line; order changes only on drop. Handles also support Up/Down keys,
 restore focus after moves and announce the resulting position. In-place drops and
-cancelled drags preserve the draft and prepared confirmation. Selected-column
+cancelled drags preserve the draft and current input analysis. Selected-column
 handles show insertion markers across wrapped chips and accept drops at either
 end, preserving exact named versus numeric selectors. Column reordering remains
 scoped to its own picker, including partition and stratification selectors; Left/Right
@@ -1421,10 +1420,9 @@ captures the expanded editor in both themes at desktop and mobile widths. The ou
 actions; a separate Results & analysis card holds observations and results. Configuration stays visible at narrow widths;
 counts and CSV bytes remain unknown until processing. Input and output parsing/serialization controls remain
 independent. Source detection is explicit and bounded; Analyze input remains an
-optional full-file profile and cannot enable prepared confirmation. Prepare exact
-outputs changes the shared Run button to Confirm & split. Run submits the current draft
-without requiring either inspection step. Editing, including an edit subsequently
-reverted, invalidates prepared confirmation. A late acknowledgement cannot validate
+optional full-file profile. Run submits the current draft without requiring
+Analyze and always validates its consumed input. No output snapshot is retained
+for later user approval. Editing changes the next Run configuration. A late acknowledgement cannot validate
 a newer draft. Previous processing results are labelled when the draft changes.
 
 [`hosted-workspace.ts`](../ui/src/hosted-workspace.ts) moves the existing form
@@ -1465,9 +1463,9 @@ performance or accessibility certification.
 Selecting a source or importing a job requests a bounded sample using the current
 input encoding, dialect and ZIP member. The preview is incomplete and never
 replaces full validation. Imported browser paths still require choosing the file
-with Browse to grant access. Analyze input, Prepare exact outputs and Run appear
-in the output plan. Run becomes Confirm & split for a current prepared snapshot;
-editing the draft restores Run with the current settings.
+with Browse to grant access. Analyze and Run appear
+in the output plan. Run always submits the current settings and does not
+require an earlier Analyze.
 
 ### Pipeline operation modes
 
@@ -1530,7 +1528,7 @@ The editor size fields pair an amount with a unit selector. Byte-based limits
 accept decimal (KB/MB/GB/TB) and binary (KiB/MiB/GiB/TiB) units; working memory
 uses MiB or GiB and still resolves to whole MiB. Changing a unit re-expresses the
 same exact value, including fractional amounts, without rounding byte limits or
-invalidating a retained prepared confirmation. Editing the amount still changes
+changing the next Run configuration. Editing the amount still changes
 the draft normally.
 Defaults remain 256 MiB manual memory, an 8 MiB record working limit, and blank
 optional size caps. Imports/exports and engine requests retain the existing

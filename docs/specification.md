@@ -76,7 +76,7 @@ The explicit `assign_probabilistic` operation retains named groups and optional
 stratum columns but replaces exact quotas with independent categorical draws.
 Percentages still parse exactly and sum to 100; zero weights never receive rows.
 Empty named outputs remain present. No per-stratum nonempty or exact-count
-guarantee applies. Actual prepared counts and bytes are still reported exactly.
+guarantee applies. Completed Run counts and bytes are reported exactly.
 Membership uses the parent/step seed domain separated by
 `probabilistic-allocation-v1`, then a keyed hash of the original source row ID
 (u64 little-endian) and each selected stratum field's u64 little-endian byte
@@ -113,7 +113,7 @@ during strict decoding before input I/O; never substitute an algorithm.
 - Explicit `fisher_yates`: resident uniform shuffle, with the parent/step domain separated by `fisher-yates-v1`. Starting from encounter order, descend from index N-1 to 1 and swap with a rejection-sampled index in 0..=i using the existing RNG. This is a different seeded permutation from random-key v1. Retained rows must fit the resident workspace (one quarter of the job memory budget, including capacity accounting). Fail before publication if they do not; do not fall back to random-key sorting. There is no configurable seed or cross-plan replay promise.
 - Automatic: choose a physical implementation of the requested guarantee; never downgrade uniform to approximate to fit resources.
 - Randomized output has no cross-plan, cross-resource, cross-platform or cross-build seeded replay guarantee. User-configurable seeding is removed. Job JSON rejects `seed` (including null) and internal `random_seed`; the CLI rejects `--seed`. Execution obtains internal entropy under admission; internal test fixtures may pin randomness without adding a product option. Diagnostic entropy identifiers are not replay controls. The `full_shuffle_policy` field and `--reproducible` flag are removed and rejected. Imported JSON must omit the obsolete policy field.
-- Prepared confirmation executes the exact retained encoded CSV snapshot. This snapshot guarantee is independent of whether another run would realize the same permutation.
+- Internal snapshot execution publishes the exact retained encoded CSV bytes. This snapshot guarantee is independent of whether another run would realize the same permutation.
 - Automatic/uniform shuffle immediately followed by value partitioning may use a fused tuple/random-key sort. Distribution-equivalent changes are legal when they preserve the joint membership/order guarantees of the requested pipeline; positional splits, allocations and final caps remain semantic barriers requiring their own proof. There is no general permission to exchange arbitrary operations.
 - The alternate flexible-policy runner and its feature gates are removed. Removed policy/RNG/algorithm names continue to fail strict decoding.
 - Adjacent full shuffle followed by unstratified exact assignment may cut one parent permutation at the existing largest-remainder quotas. Preserve the joint membership and within-allocation order law, configured names/order including zero quotas, parent isolation, original logical stages and downstream semantics. Stratified assignment is excluded. The physical permutation is not a separately observable intermediate row trace; preparation still retains the exact final snapshot.
@@ -142,16 +142,18 @@ Duplicate header names are allowed but name selection must reject ambiguity and 
 - Proposed ZIP v1 methods: Stored and Deflate input, Deflate output, ZIP64 support. Unsupported compression methods, encryption, and multi-volume archives produce actionable errors.
 - Validate codec checksums/truncation errors. Read selected entries directly without extracting arbitrary archive paths. Budget archive metadata as well as payload buffering.
 
-## Analysis and confirmation
+## Analyze and Run
 
-Run validates input while processing. Limits-only jobs write directly
+Run validates input while processing. Limits-only jobs and a single uncompressed Balanced step write directly
 to private publication output; other jobs select exact preparation internally
 before consuming input. Direct parsing, codec, admission, storage and cancellation
 errors are terminal, without retrying raw input. CLI confirmation precedes
 processing and does not promise exact counts; `--yes` skips confirmation, never
 validation. Non-interactive execution without `--yes` fails rather than waiting.
-Explicit exact preparation retains the immutable output snapshot for confirmation.
-Both workflows preserve strict serialized caps and publication/cleanup contracts;
+Analyze scans input for bounded statistics and pipeline estimates without producing
+output or retaining an executable result. Run always processes the current submitted
+configuration independently. Internal snapshot paths retain exact encoded bytes
+until publication. Both execution paths preserve strict serialized caps and publication/cleanup contracts;
 see [direct execution](direct-execution.md).
 
 Original proposed analysis modes (not a list of implemented modes):
@@ -160,7 +162,7 @@ Original proposed analysis modes (not a list of implemented modes):
 2. Exact: full validation with external aggregation or pipeline simulation for exact statistics where possible. Compressed sizes and runtime remain estimates.
 3. Quick preview: bounded sample for early configuration feedback. Explicitly incomplete; cannot certify validity, exact counts, or unseen rare values. Required validation still occurs before publication.
 
-Current interfaces separate a full-file input profile from exact output preparation; see [implemented profiling and cache behavior](performance.md#full-file-input-profiling-2026-10-12). The UI also requests a bounded input sample on source selection, import and parser changes: at most eight data records are inspected, retaining at most eight rows and 32 KiB of field text with admitted field/container overhead. This sample does not validate unseen records or predict counts, cardinalities or output sizes. Full-file profiles and prepared analyses also report exact per-value input-row frequencies when a column’s bounded value list is complete (at most 100 values per column and 256 KiB of display values overall). Frequencies include empty fields, count during the existing input pass, and are discarded on truncation. These counts describe input values, not final pipeline groups; incomplete lists never imply a partial percentage distribution. A predictive resource planner remains future work.
+The Analyze action returns a full-file input profile; see [implemented profiling and cache behavior](performance.md#full-file-input-profiling-2026-10-12). The UI also requests a bounded input sample on source selection, import and parser changes: at most eight data records are inspected, retaining at most eight rows and 32 KiB of field text with admitted field/container overhead. This sample does not validate unseen records or predict counts, cardinalities or output sizes. Full-file profiles and prepared analyses also report exact per-value input-row frequencies when a column’s bounded value list is complete (at most 100 values per column and 256 KiB of display values overall). Frequencies include empty fields, count during the existing input pass, and are discarded on truncation. These counts describe input values, not final pipeline groups; incomplete lists never imply a partial percentage distribution. A predictive resource planner remains future work.
 
 HyperLogLog reduces cardinality tracking memory, not bytes read for a full-file scan. It cannot enumerate partition values or supply exact per-partition allocation counts. Estimates of cardinality alone cannot determine capped output counts because group sizes and row lengths matter. Do not extrapolate sampled unique counts as though they were full-stream HLL results.
 
@@ -168,7 +170,7 @@ Report source/member, resolved dialect, validation coverage, row counts, selecte
 
 Warn about file-count explosion and offer a configurable execution ceiling. Estimates do not authorize unlimited fanout: enforce a hard ceiling during execution and abort cleanly if exceeded. Proposed default ceiling and resource defaults will be calibrated, then documented rather than silently changing during a job.
 
-Input must remain consistent between analysis and execution. Record source identity/metadata and content digest during full scans; detect changes during execution before publication. Metadata alone is not sufficient proof. A retained canonical spool can provide a stable snapshot and avoid repeated decompression.
+Analyze is advisory and does not certify a later Run. Run validates and hashes the input it consumes before publication; it does not require equality with an earlier analysis. Metadata alone cannot prove that input bytes have not changed.
 
 ## Resources, publication, and interfaces
 
@@ -225,7 +227,7 @@ Cancellation removes job-owned staging and temp data where possible; report any 
 
 Use a streamed manifest format (proposed JSON Lines) so billions of partition entries are not collected into one in-memory object. Include schema/algorithm versions, effective configuration and internal diagnostic entropy identifier, source identity, counts, output paths or members, tuple/group lineage, sizes, and warnings.
 
-Native commands include analyze, profile, run, split and guide. Ordered jobs can use versioned JSON or the [unified Run CLI](run-cli.md), whose explicit --step boundaries preserve requested operation order and reuse Job validation. The hosted web UI provides browser file/member selection, CSV configuration and preview, operation reordering, constraints and resource settings, analysis/confirmation, execution progress/cancellation, and output summary. Both interfaces consume the same resolved plan and structured progress/error events.
+Native commands include analyze, run, split and guide. Ordered jobs can use versioned JSON or the [unified Run CLI](run-cli.md), whose explicit --step boundaries preserve requested operation order and reuse Job validation. The hosted web UI provides browser file/member selection, CSV configuration and preview, operation reordering, constraints and resource settings, optional Analyze and independent Run, execution progress/cancellation, and output summary. Both interfaces consume the same resolved plan and structured progress/error events.
 
 Progress remains `{phase: string, rows: number, temp_bytes: number}` in emission
 order. Built-in literal phases require no heap allocation. Dynamic engine phases

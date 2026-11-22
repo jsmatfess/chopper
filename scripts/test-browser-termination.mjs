@@ -68,7 +68,7 @@ w.lifecycle={
       operations:composed?[{type:'partition',columns:[1]},{type:'shuffle',strategy:'fisher_yates'}]:pauseMode==='prepare'&&!direct?[{type:'balanced',files:2},{type:'shuffle',strategy:'uniform'},{type:'partition',columns:[1]}]:[],
       limits:{rows:pauseMode==='prepare'?25000:4,bytes:null,compressed_bytes:null},
       resources:{...defaults.resources,memory_mb:32,workers:1,max_record_bytes:1024*1024,temp_dir:null}};
-    await browserApi(direct?'run-direct':'analyze',job);
+    await browserApi('run-direct',job);
   },
   jobId(){const live=records.filter(r=>r.jobId&&!r.cleaned);return live.at(-1)?.jobId;},
   async inspectSuccess(){
@@ -295,10 +295,7 @@ try{
   }
   for(const phase of ['prepare','export_write','export_closed','marker_write','marker_closed'])for(const action of ['cancel','tab_close']){
     const owner=await page();activeOwner=owner;await owner.evaluate(({phase,parentName})=>window.lifecycle.begin(phase,parentName),{phase,parentName:fixture.parentName});
-    if(phase!=='prepare'&&!direct){
-      await waitState(owner,s=>s.state.status==='ready','prepared outputs');
-      await owner.evaluate(()=>window.lifecycle.api('run',{}));
-    }
+
     await waitState(owner,s=>!!s.pause,'engine pause at '+phase);
     const paused=await owner.evaluate(async()=>({pause:window.contractPaused,id:window.lifecycle.jobId(),state:await window.lifecycle.api('state')}));
     assert.equal(paused.pause.phase,phase);assert.match(paused.id,/^[0-9a-f-]{36}$/);
@@ -327,7 +324,6 @@ try{
       // Reuse this client/module after rejecting its pending request, checking
       // that cancellation does not corrupt the next job.
       await owner.evaluate(parent=>window.lifecycle.begin('none',parent),fixture.parentName);
-      if(!direct){await waitState(owner,s=>s.state.status==='ready','fresh retry preparation');await owner.evaluate(()=>window.lifecycle.api('run',{}));}
       await waitState(owner,s=>s.state.status==='complete','fresh retry publication');
       retry=await owner.evaluate(()=>window.lifecycle.inspectSuccess());
       assert.equal(retry.marker.complete,true);assert.equal(retry.marker.files,6);assert.equal((await workspace(retry.jobId)).exists,false);
@@ -349,7 +345,6 @@ try{
       cancelled_cannot_run:action==='cancel'?true:null,same_client_fresh_retry:retry,completed_before_reply:committed,export_after_cleanup:partial,unrelated_and_exported_entries_preserved:true});
   }
   const success=await page();await success.evaluate(parent=>window.lifecycle.begin('none',parent),fixture.parentName);
-  if(!direct){await waitState(success,s=>s.state.status==='ready','success preparation');await success.evaluate(()=>window.lifecycle.api('run',{}));}
   await waitState(success,s=>s.state.status==='complete','successful publication');
   report.success_control=await success.evaluate(()=>window.lifecycle.inspectSuccess());
   const successfulFolder=(await success.evaluate(()=>window.lifecycle.api('state'))).output.split('/').at(-1);
@@ -366,7 +361,6 @@ try{
     for(const phase of phases){
       const owner=await page();activeOwner=owner;
       await owner.evaluate(({phase,parent})=>window.lifecycle.begin(phase,parent),{phase,parent:fixture.parentName});
-      if(phase!=='prepare'&&!direct){await waitState(owner,s=>s.state.status==='ready','restart preparation');await owner.evaluate(()=>window.lifecycle.api('run',{}));}
       await waitState(owner,s=>!!s.pause,'restart pause at '+phase);
       const snapshot=await owner.evaluate(async()=>({id:window.lifecycle.jobId(),state:await window.lifecycle.api('state'),pause:window.contractPaused}));
       const before=await workspace(snapshot.id);assert(before.exists&&before.locked&&before.files>0);
@@ -433,7 +427,6 @@ try{
     if(processKill){
       const recovered=await page();activeOwner=recovered;
       await recovered.evaluate(parent=>window.lifecycle.begin('none',parent),fixture.parentName);
-      if(!direct){await waitState(recovered,s=>s.state.status==='ready','post-kill preparation');await recovered.evaluate(()=>window.lifecycle.api('run',{}));}
       await waitState(recovered,s=>s.state.status==='complete','post-kill publication');
       const result=await recovered.evaluate(()=>window.lifecycle.inspectSuccess());
       if(!composed)assert.deepEqual(result.csv_sha256,report.success_control.csv_sha256);

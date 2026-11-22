@@ -14,7 +14,7 @@ describes future behavior; [GitHub Issues](https://github.com/jsmatfess/chopper/
    the admitted decode owner or appends explicit `--step` blocks to a caller-owned
    Job, without changing the fixed-order `split` interface; see its
    [reference](run-cli.md). The shared UI tracks
-   edits by revision: a successful Run/Prepare acknowledgement clears changed
+   edits by revision: a successful Run/Analyze acknowledgement clears changed
    settings only if no invalidation occurred since submission. In-place operation
    edits, imports and edits subsequently reverted still require new preparation.
    New executions obtain internal entropy; no user seed remains in the draft.
@@ -30,10 +30,11 @@ describes future behavior; [GitHub Issues](https://github.com/jsmatfess/chopper/
    [Input profiling](../crates/chopper/src/profile.rs) scans without producing
    outputs. Its advisory cache is separate from exact preparation. Windows source
    invalidation deliberately differs from Unix; see the README.
-3. [Engine](../crates/chopper/src/engine.rs) dispatches Run to limits-only
-   [direct processing](../crates/chopper/src/engine/direct.rs) or exact preparation
-   followed by execution. Explicit preparation retains an immutable encoded output
-   snapshot. Ingestion uses the shared CSV intake; original-stage execution and
+3. [Engine](../crates/chopper/src/engine.rs) dispatches limits-only Run to
+   [direct processing](../crates/chopper/src/engine/direct.rs), a single plain
+   Balanced step to grouped direct publication, and other pipelines to internal
+   exact preparation followed by execution. Internal preparation retains an
+   immutable encoded output snapshot. Analyze never creates one. Ingestion uses the shared CSV intake; original-stage execution and
    fused paths share [operation keys](../crates/chopper/src/engine/keys.rs) and
    logical domains.
    [Retained execution](../crates/chopper/src/engine/retained_execution.rs)

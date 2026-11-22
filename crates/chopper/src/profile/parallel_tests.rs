@@ -163,8 +163,15 @@ fn denied_late_batch_restarts_serially_after_releasing_partial_scan() -> Result<
     assert_eq!(result.execution.hash_workers, 0);
     let mut actual = serde_json::to_value(&result)?;
     actual["seconds"] = serde_json::json!(0.0);
-    // Public cache profiles additionally include the requested stage summary.
+    // Cache responses add job-specific planning after the equivalent raw scan.
+    if let Some(advice) = result.writer_estimate {
+        assert_eq!(
+            advice.estimated_groups,
+            result.stages[0].input_distinct_keys
+        );
+    }
     actual["stages"] = serde_json::json!([]);
+    actual.as_object_mut().unwrap().remove("writer_estimate");
     assert_eq!(actual, expected);
     let cached = cache.profile(&job, Arc::new(AtomicBool::new(false)), Arc::new(|_| {}))?;
     assert_eq!(cached.cache_hit, !cfg!(windows));

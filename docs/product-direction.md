@@ -121,7 +121,7 @@ for switching costs and preserving semantics, admission and failure cleanup.
 Seeded-output policy has been removed. Randomized results may change with the
 physical plan, resource budget, runtime or build even with the same seed. Auto
 optimizes correct completion while preserving requested distributions, exact
-allocation, caps and cleanup. Prepared confirmation executes its fixed snapshot.
+allocation, caps and cleanup. Analyze is advisory; Run validates its current input independently. Internal snapshot execution preserves its encoded bytes.
 
 ## Knowledge reuse
 
