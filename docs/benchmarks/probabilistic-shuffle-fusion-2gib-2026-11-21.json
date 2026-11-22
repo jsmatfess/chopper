@@ -1,0 +1,547 @@
+{
+  "schema_version": 1,
+  "issue": 17,
+  "source_head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+  "source_tree_has_local_changes": true,
+  "platform": "Linux/WSL2, ext4, one worker",
+  "candidate": "experimental-probabilistic-shuffle-fusion",
+  "workload": {
+    "rows": 8388608,
+    "input_bytes": 2147483674,
+    "parents": 4,
+    "probabilistic_allocation_percent": [
+      80,
+      20,
+      0
+    ],
+    "strata": [
+      "stratum"
+    ],
+    "job_limit_mib": 128,
+    "shared_ledger_mib": 256,
+    "hard_cgroup_mib": 1024,
+    "cgroup_swap_limit_bytes": 0,
+    "byte_cap": 67108864,
+    "row_cap": 1000000
+  },
+  "outcome": {
+    "qualified_pairs": 3,
+    "samples": {
+      "serial": [
+        {
+          "elapsed": 55.703269193,
+          "cpu": 25.619999999999997,
+          "rss": 45560,
+          "reserved": 34039369,
+          "read": 15628611086,
+          "write": 15627987234,
+          "files": 118,
+          "runs": 100,
+          "merges": 8
+        },
+        {
+          "elapsed": 50.098051536,
+          "cpu": 25.6,
+          "rss": 45036,
+          "reserved": 34039369,
+          "read": 15628611086,
+          "write": 15627987234,
+          "files": 118,
+          "runs": 100,
+          "merges": 8
+        },
+        {
+          "elapsed": 51.247285056,
+          "cpu": 25.4,
+          "rss": 45104,
+          "reserved": 34039369,
+          "read": 15628611086,
+          "write": 15627987234,
+          "files": 118,
+          "runs": 100,
+          "merges": 8
+        }
+      ],
+      "fused": [
+        {
+          "elapsed": 39.449888001,
+          "cpu": 23.03,
+          "rss": 44428,
+          "reserved": 34039360,
+          "read": 10595238098,
+          "write": 10594820902,
+          "files": 136,
+          "runs": 128,
+          "merges": 4
+        },
+        {
+          "elapsed": 41.819124539,
+          "cpu": 22.41,
+          "rss": 44388,
+          "reserved": 34039360,
+          "read": 10595238098,
+          "write": 10594820902,
+          "files": 136,
+          "runs": 128,
+          "merges": 4
+        },
+        {
+          "elapsed": 42.598867128,
+          "cpu": 22.65,
+          "rss": 44392,
+          "reserved": 34039360,
+          "read": 10595238098,
+          "write": 10594820902,
+          "files": 136,
+          "runs": 128,
+          "merges": 4
+        }
+      ]
+    },
+    "medians": {
+      "serial": {
+        "elapsed": 51.247285056,
+        "cpu": 25.6,
+        "rss": 45104,
+        "reserved": 34039369,
+        "read": 15628611086,
+        "write": 15627987234,
+        "files": 118,
+        "runs": 100,
+        "merges": 8
+      },
+      "fused": {
+        "elapsed": 41.819124539,
+        "cpu": 22.65,
+        "rss": 44392,
+        "reserved": 34039360,
+        "read": 10595238098,
+        "write": 10594820902,
+        "files": 136,
+        "runs": 128,
+        "merges": 4
+      }
+    },
+    "change_percent": {
+      "elapsed": -18.397385357482776,
+      "cpu": -11.52343750000001,
+      "rss": -1.578573962398011,
+      "reserved": -2.6439973077607704e-05,
+      "read": -32.20614397723966,
+      "write": -32.206107265367635,
+      "files": 15.254237288135597,
+      "runs": 28.000000000000004,
+      "merges": -50.0
+    },
+    "favorable_pairs": 3,
+    "performance_gate": true,
+    "exact_output_and_logical_analysis": true
+  },
+  "jobs": [
+    {
+      "case": "primary-00-serial",
+      "seeded_output_sha256": "5a7c6c462753b82ccbf8e0988922979f4ccb2e10f909d14d11b464dc02a5cfc6",
+      "memory_peak_bytes": 1073741824,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "65200",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0"
+      },
+      "native_file_refaults": 3348500,
+      "receipt": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-00-serial/cgroup.json",
+        "sha256": "21119d7e7f59e626ff72388ae99328a932d0b3350d760d378562a47566e322cb"
+      },
+      "report": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-00-serial/report.json",
+        "sha256": "7fae2b01c5e396fa05656ffefcfa28ade353d788437eac1f6b317d69ac8619a1"
+      },
+      "manifest": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-00-serial/manifest.jsonl",
+        "sha256": "8069306574be81dae757bc143d0b863008c6c32d0dbe01e31d9284173bfef15a"
+      },
+      "oracle": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-00-serial/oracle.txt",
+        "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+      }
+    },
+    {
+      "case": "primary-01-fused",
+      "seeded_output_sha256": "5a7c6c462753b82ccbf8e0988922979f4ccb2e10f909d14d11b464dc02a5cfc6",
+      "memory_peak_bytes": 1073741824,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "54708",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0"
+      },
+      "native_file_refaults": 2387447,
+      "receipt": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-01-fused/cgroup.json",
+        "sha256": "405ce1b3d375209e63be48369a60d7c63c31310795505eaa3273bbfe7c800f64"
+      },
+      "report": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-01-fused/report.json",
+        "sha256": "6f70ae11453bc12e13bb1bc05a523d1c7f8a1fd594a23866d543e3584f601f67"
+      },
+      "manifest": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-01-fused/manifest.jsonl",
+        "sha256": "dc94e3eff3e46e639f682f36f15c16ed586cb282425b281c4cba3eaae75d0c97"
+      },
+      "oracle": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-01-fused/oracle.txt",
+        "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+      }
+    },
+    {
+      "case": "primary-02-fused",
+      "seeded_output_sha256": "5a7c6c462753b82ccbf8e0988922979f4ccb2e10f909d14d11b464dc02a5cfc6",
+      "memory_peak_bytes": 1073741824,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "53293",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0"
+      },
+      "native_file_refaults": 2302613,
+      "receipt": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-02-fused/cgroup.json",
+        "sha256": "3373111e3750d903b4be36f70dc0dd660a18c677a93afd00d581c715628ec23e"
+      },
+      "report": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-02-fused/report.json",
+        "sha256": "5628052e2ef4a78b63763c7cd6851322cadb26c439b931c51e0cb21866fde536"
+      },
+      "manifest": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-02-fused/manifest.jsonl",
+        "sha256": "01af00d3492be1c43edc8c28c1fe7f69c95e4e4084f5f080e8235990ce297d26"
+      },
+      "oracle": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-02-fused/oracle.txt",
+        "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+      }
+    },
+    {
+      "case": "primary-03-serial",
+      "seeded_output_sha256": "5a7c6c462753b82ccbf8e0988922979f4ccb2e10f909d14d11b464dc02a5cfc6",
+      "memory_peak_bytes": 1073741824,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "64900",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0"
+      },
+      "native_file_refaults": 3349409,
+      "receipt": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-03-serial/cgroup.json",
+        "sha256": "ecff77e3cccd94c7d5f4672464b24ec593a2635df2c56c65e42e0d91c0585c8e"
+      },
+      "report": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-03-serial/report.json",
+        "sha256": "3f8e42ee4faafb5069f47d598ff64b331892e7f947d0108311fe118c5b8482cd"
+      },
+      "manifest": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-03-serial/manifest.jsonl",
+        "sha256": "0844775a34321d958fd9aeb43abdb8b455fd9267406a9d1539faefde94455ce7"
+      },
+      "oracle": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-03-serial/oracle.txt",
+        "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+      }
+    },
+    {
+      "case": "primary-04-serial",
+      "seeded_output_sha256": "5a7c6c462753b82ccbf8e0988922979f4ccb2e10f909d14d11b464dc02a5cfc6",
+      "memory_peak_bytes": 1073741824,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "68089",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0"
+      },
+      "native_file_refaults": 3235271,
+      "receipt": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-04-serial/cgroup.json",
+        "sha256": "c589899398ae8651a2cff1248ee4385460bd43a9000be1d495c8b8c8b1badd4f"
+      },
+      "report": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-04-serial/report.json",
+        "sha256": "1d1d053c19968a768f9e44968cc7f291607586eaab4c16fc2e13ae3f9a5e14ea"
+      },
+      "manifest": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-04-serial/manifest.jsonl",
+        "sha256": "24a26a0ec91c430d106498f4bf59b88ee28dad415919035b9afc93a4bd7ccc9e"
+      },
+      "oracle": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-04-serial/oracle.txt",
+        "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+      }
+    },
+    {
+      "case": "primary-05-fused",
+      "seeded_output_sha256": "5a7c6c462753b82ccbf8e0988922979f4ccb2e10f909d14d11b464dc02a5cfc6",
+      "memory_peak_bytes": 1073741824,
+      "memory_events": {
+        "low": "0",
+        "high": "0",
+        "max": "52058",
+        "oom": "0",
+        "oom_kill": "0",
+        "oom_group_kill": "0"
+      },
+      "native_file_refaults": 2383094,
+      "receipt": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-05-fused/cgroup.json",
+        "sha256": "670a5697ef0700cbb0a677304ada9922ac3b9e899f9d16c47296f33c689769d7"
+      },
+      "report": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-05-fused/report.json",
+        "sha256": "8f0a039ce2097647768b6555d230e136d25f5970f19f332be22e6807de583b67"
+      },
+      "manifest": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-05-fused/manifest.jsonl",
+        "sha256": "84ad6d8e8794b06f94f8bf1cb361525f547c34cb5d2d41d2c8b85cb6d018180f"
+      },
+      "oracle": {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-05-fused/oracle.txt",
+        "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+      }
+    }
+  ],
+  "held_peer_controls": [
+    {
+      "serial": true,
+      "held_mib": 24,
+      "outcome": "denied",
+      "retries": 0
+    },
+    {
+      "serial": false,
+      "held_mib": 24,
+      "outcome": "complete",
+      "retries": 0
+    },
+    {
+      "serial": true,
+      "held_mib": 28,
+      "outcome": "denied",
+      "retries": 0
+    },
+    {
+      "serial": false,
+      "held_mib": 28,
+      "outcome": "complete",
+      "retries": 0
+    },
+    {
+      "serial": true,
+      "held_mib": 30,
+      "outcome": "denied",
+      "retries": 0
+    },
+    {
+      "serial": false,
+      "held_mib": 30,
+      "outcome": "complete",
+      "retries": 0
+    }
+  ],
+  "targeted_tests": {
+    "passed": 3,
+    "ignored_benchmark_entrypoint": 1,
+    "retry_after_cleanup": true,
+    "emission_error_terminal": true,
+    "observed_fused_spill_operations": [
+      2,
+      3
+    ],
+    "direct_observed_membership": [
+      2,
+      0
+    ]
+  },
+  "provenance": [
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/pinned-probe",
+      "sha256": "15002ee94fd873b4aec13c91996d8f6b510bb137386a1da0b247beca52c9474e"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/input-2gib.sha256",
+      "sha256": "1ba14ff5ce7da6d46462cb22737c41c4f03c1ad74dec870f8ff99383b90d766b"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-plan-v1.json",
+      "sha256": "afd014abd7bc61dc2a59aecf50da944231b78f8812b1bbc8541e33bdc05351a6"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/primary-batch-v1/status.json",
+      "sha256": "5750e09822b9fba4b2da541bb34d7d22cb3e415484a82bf4c4beda7e74eebb0d"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/smoke-plan-v1.json",
+      "sha256": "76750d1f761843db740c75df814513eac23a29bb9ecba359316339e8000eef54"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/smoke-batch-v1/status.json",
+      "sha256": "b00de81957de13ca680ed9440105901262b230ee10ea207d528abbc69a726ec7"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/DECISION.md",
+      "sha256": "65b0cc01f04811820c8ba6398ef5ebe3c1c546c2171509b8cef4ec8e0b90ec4d"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/verify.c",
+      "sha256": "bcb032e685f730da3f4e477efdc99d3f892766e0162ae013753ada7dc0ac9374"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/fixture.c",
+      "sha256": "3562bb29fef856b567d0c4b350c3f034ba5112f7ec6d504b5eaf0c1d190258eb"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/run.py",
+      "sha256": "af0ec14349f3385368ef5f7f6175429d15798dfbcf8ba89f896365e5ce5a0bfb"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/check-pairs.py",
+      "sha256": "49c1dcd0f7393c328d640af8cc00e5706bee35f1542b29f31a19ed47dc4077d4"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-contracts-v4.log",
+      "sha256": "209ddc22e724f6f16f6cbaee206d418326167fcff3a5bc819c2f2f1794aba209"
+    }
+  ],
+  "limits": [
+    "Pinned optimized engine API through complete publication, excludes process start and correctness verification.",
+    "Matched held peer controls and timed cells are separate evidence. The OS scopes have uncontrolled backing cache.",
+    "The larger fixture separately verifies every row field, ID, partition and encoded file cap in every job, then checks exact seeded names, order, output records and content hashes within each pair. Probabilistic membership is checked against original RNG through the 70,003-row focused test."
+  ],
+  "owner_layout_transfer": {
+    "scope": "Separate 2 GiB release transfer pair on final mutually exclusive SortSpillMode layout.",
+    "all_feature_regression_caused_by_predecessor": "Four forced tiny-budget ordinary sort controls rejected with two inline owners.",
+    "new_layout_size_guard": "SortSpillMode fits within the prior Option<Router> slot.",
+    "prior_affected_controls_passed": 4,
+    "retention_transfer_passed": true,
+    "result": {
+      "qualified_pairs": 1,
+      "samples": {
+        "serial": [
+          {
+            "elapsed": 49.443675495,
+            "cpu": 25.67,
+            "rss": 44776,
+            "reserved": 34039478,
+            "read": 15628611086,
+            "write": 15627987234,
+            "files": 118,
+            "runs": 100,
+            "merges": 8
+          }
+        ],
+        "fused": [
+          {
+            "elapsed": 36.702430557,
+            "cpu": 23.14,
+            "rss": 44196,
+            "reserved": 34039469,
+            "read": 10595238098,
+            "write": 10594820902,
+            "files": 136,
+            "runs": 128,
+            "merges": 4
+          }
+        ]
+      },
+      "medians": {
+        "serial": {
+          "elapsed": 49.443675495,
+          "cpu": 25.67,
+          "rss": 44776,
+          "reserved": 34039478,
+          "read": 15628611086,
+          "write": 15627987234,
+          "files": 118,
+          "runs": 100,
+          "merges": 8
+        },
+        "fused": {
+          "elapsed": 36.702430557,
+          "cpu": 23.14,
+          "rss": 44196,
+          "reserved": 34039469,
+          "read": 10595238098,
+          "write": 10594820902,
+          "files": 136,
+          "runs": 128,
+          "merges": 4
+        }
+      },
+      "change_percent": {
+        "elapsed": -25.7692107442305,
+        "cpu": -9.855862874951304,
+        "rss": -1.2953367875647714,
+        "reserved": -2.6439888411999846e-05,
+        "read": -32.20614397723966,
+        "write": -32.206107265367635,
+        "files": 15.254237288135597,
+        "runs": 28.000000000000004,
+        "merges": -50.0
+      },
+      "favorable_pairs": 1,
+      "performance_gate": null,
+      "exact_output_and_logical_analysis": true
+    },
+    "provenance": [
+      {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/layout-transfer-plan-v1.json",
+        "sha256": "e8ed3487c28fbae4fb7107a5c376aa3d7c198f921af0db4bfcedd41f1b0fc384"
+      },
+      {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/layout-transfer-batch-v1/status.json",
+        "sha256": "74c94448a8568ca8a84a42955329e64618ee7e8a8d5be4e76a7a078d5a7b4cbd"
+      },
+      {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/layout-v2-probe",
+        "sha256": "437d0053cf4de1c4ea9456aeb1d8e985af6ed36a48494389767e0d3edf2f0afb"
+      },
+      {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/LAYOUT-TRANSFER.md",
+        "sha256": "44e4d3252321c8772aead4f091a0ba7740ea1b96dd05b57f12196fd0f9c13d03"
+      },
+      {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/layout-transfer-serial/report.json",
+        "sha256": "b3c9687c8cfafab9bc3dd32330ee8d7648f5309e0b99b414e8e2f689d42b33a5"
+      },
+      {
+        "path": "scratch/issue-avenues-36h-20261121/probabilistic-fusion-benchmark/layout-transfer-fused/report.json",
+        "sha256": "4894a61f12bb77a2d6fdc81ceb3a7e9d631146580276e5996f8abcad95060709"
+      },
+      {
+        "path": "scratch/issue-avenues-36h-20261121/linux-final-batch-v2/7-stdout.log",
+        "sha256": "5893d76b279fca53716da292967a9d74186cd15cd3b38ffd2f2ffbf774dba7b9"
+      },
+      {
+        "path": "scratch/issue-avenues-36h-20261121/layout-clippy-v1.log",
+        "sha256": "965dac93ae822fd35b8823490aae8a0d3a45d27d9e81d0da5edd5dba7f29518b"
+      },
+      {
+        "path": "scratch/issue-avenues-36h-20261121/layout-preservation-controls-v1.log",
+        "sha256": "4fb072538760fecc6f298dafeaaf4ae8f07975de1eed4424743c0146be1e69a9"
+      },
+      {
+        "path": "scratch/issue-avenues-36h-20261121/spill-layout-control-v1.log",
+        "sha256": "cec20fd5bb996cd65b249057e58ac5c539ea53ed303c61afb0a682cda64ef817"
+      }
+    ]
+  }
+}

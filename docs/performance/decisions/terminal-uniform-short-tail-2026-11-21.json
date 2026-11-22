@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "terminal-uniform-short-tail-2026-11-21",
+  "title": "Consolidate only excess terminal Uniform runs",
+  "date": "2026-11-21",
+  "subsystem": "storage",
+  "question": "Does a bounded pending catalog and shorter intermediate materialization improve complete out-of-memory native terminal Uniform?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "In 8 GiB m96 paired measurements, elapsed fell 17.24%, CPU 1.26% and both directions of managed temp traffic 37.01%. Reported RSS rose 4,564 KiB, working charge 92,378 bytes, and refaults 60.84%. Kept as an opt-in Linux experiment locally.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "8 GiB terminal Uniform then Balanced(8), one worker, 96 MiB engine and 1 GiB hard no-swap cgroup. 512 initial runs and native raw spill."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Matched full all-field/order contract, exact quotas, serialized caps, manifest and cleanup. Focused native bound, temp-space and low descriptor controls, native storage tests and compact-spill compilation."
+  },
+  "limitations": [
+    "WSL2/ext4, fixed-width single-worker fixture and uncontrolled backing caches.",
+    "The experiment combines a higher active-reader ceiling with shorter intermediate materialization. This comparison cannot attribute individual improvements to either change.",
+    "This decision covers the 8 GiB measured pairs. The separate 40 GiB transfer check has its own scope."
+  ],
+  "exclusions": [
+    "Small and full warmup pairs, oracle and fixture identity outside complete-job timing."
+  ],
+  "reopen_when": "Requalify under different initial run counts, platform resource bounds and memory settings before any default delivery decision.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#terminal-uniform-short-tail-2026-11-21",
+      "sha256": "12941423fdc68fe6285f453862a2a5bb6b65a02a5fd3db40be6b9475947bfa1b"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/terminal-uniform-short-tail-summary-2026-11-21.json",
+      "sha256": "8961946e649ef320a5b0af00efa77b923b4a1df63f15498bbcda5868b4a33d84"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/execution-decisions.md"
+  ]
+}

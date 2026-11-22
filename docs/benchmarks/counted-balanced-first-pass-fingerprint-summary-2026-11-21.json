@@ -1,0 +1,425 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "counted_balanced_first_pass_fingerprint_ablation",
+  "decision": {
+    "path": "scratch/balanced-fingerprint-resume-20261121/decision-v1.json",
+    "sha256": "ec261f586a3bd7fc191df2b0292361bc7eb410fe2dccbf145914bb3c423c1b59"
+  },
+  "runner_receipt": {
+    "path": "scratch/balanced-fingerprint-resume-20261121/pair-batch-v1/status.json",
+    "sha256": "3334142eeaa324222923b8ecd99f6070ebaba00d618a86da2cbd0ce09cf5c099"
+  },
+  "build_runner_receipt": {
+    "path": "scratch/balanced-fingerprint-resume-20261121/build-batch-v1/status.json",
+    "sha256": "593bf179b70c084193a4921a98811410e99413a8cc8a44f51cb66f37fcdad3af"
+  },
+  "user_cpu_profile": {
+    "path": "scratch/balanced-refresh-20261121/profile-summary-v1.json",
+    "sha256": "07cf20cb9de709cf2d3662318bcb04c54a9d6f73e52f0a0c40ac00bbccd1c444"
+  },
+  "versions": {
+    "control": {
+      "receipt": {
+        "path": "scratch/oom-iteration/counted-balanced-count-only-control-v1-build.json",
+        "sha256": "1e402c4336a3eafc7b74240397fb31f20324e507399eaf763ebe63d2be27bf2c"
+      },
+      "binary_sha256": "da95782646d079d2096b49d1111a89ad7bada0a45492282e646e84a838e20f26",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-final-writer-chains",
+        "experimental-memory-final-writers",
+        "experimental-small-final-buffers",
+        "experimental-release-final-header-scratch",
+        "experimental-counted-codec-balanced",
+        "experimental-bounded-final-partition",
+        "experimental-retained-exact-writers",
+        "experimental-single-final-catalog",
+        "experimental-single-catalog-capacity",
+        "experimental-batched-final-sync",
+        "experimental-counted-zstd-input-balanced",
+        "experimental-counted-partition-balanced",
+        "experimental-wide-uniform-merge"
+      ],
+      "source_archive_sha256": "62abbb4e3a9dbf97b7e07c22ca939ad1492f6f5b14aac12d3f877c04de769855"
+    },
+    "candidate": {
+      "receipt": {
+        "path": "scratch/oom-iteration/counted-balanced-count-only-candidate-v1-build.json",
+        "sha256": "a58c9301416a08c33cefa4994b7981022eda733f8c99f509ec1e4dd6056a9bb2"
+      },
+      "binary_sha256": "d3e9e0a0fa95dc78613d80c623dc279d2b5d044641161e4ec98c399746c80833",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-final-writer-chains",
+        "experimental-memory-final-writers",
+        "experimental-small-final-buffers",
+        "experimental-release-final-header-scratch",
+        "experimental-counted-codec-balanced",
+        "experimental-bounded-final-partition",
+        "experimental-retained-exact-writers",
+        "experimental-single-final-catalog",
+        "experimental-single-catalog-capacity",
+        "experimental-batched-final-sync",
+        "experimental-counted-zstd-input-balanced",
+        "experimental-counted-partition-balanced",
+        "experimental-wide-uniform-merge",
+        "experimental-counted-balanced-count-only"
+      ],
+      "source_archive_sha256": "77087bcde609748b66e328ad2ed7cc9039c10b4948acbce1524940d040648ef6"
+    }
+  },
+  "pairs": {
+    "-2": {
+      "index": {
+        "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1--2/pair.json",
+        "sha256": "2273e1949610841c86b8100afd75eabbf7e81c92f899b24e6d8570d04e3520c4"
+      },
+      "samples": {
+        "control": {
+          "receipt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1--2/control/verification.json",
+            "sha256": "449e69b894a7f14f5b664c706d41ddae9cdcac85e6f3d138fd5394c0cc786c05"
+          },
+          "rows": 16384,
+          "seconds": 0.16423367301467806,
+          "user_cpu_seconds": 0.0,
+          "system_cpu_seconds": 0.01,
+          "peak_rss_kib": 5776,
+          "accounted_workspace_bytes": 207504,
+          "temporary_read_bytes": 0,
+          "temporary_written_bytes": 1424,
+          "cgroup_peak_bytes": 15355904,
+          "output_bytes": 4227240,
+          "cpu_seconds": 0.01
+        },
+        "candidate": {
+          "receipt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1--2/candidate/verification.json",
+            "sha256": "70519e88733d0942f5459bba73bcdda624e2abe67a8b3807e2e0712e07a37c6c"
+          },
+          "rows": 16384,
+          "seconds": 0.16419749497435987,
+          "user_cpu_seconds": 0.0,
+          "system_cpu_seconds": 0.01,
+          "peak_rss_kib": 5816,
+          "accounted_workspace_bytes": 207518,
+          "temporary_read_bytes": 0,
+          "temporary_written_bytes": 1424,
+          "cgroup_peak_bytes": 14974976,
+          "output_bytes": 4227240,
+          "cpu_seconds": 0.01
+        }
+      },
+      "eligible": false
+    },
+    "-1": {
+      "index": {
+        "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1--1/pair.json",
+        "sha256": "1842a2d00f1863ed08992ae0d21f48aa29cc102f34453a5495786a43b6255901"
+      },
+      "samples": {
+        "candidate": {
+          "receipt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1--1/candidate/verification.json",
+            "sha256": "e680efe169a53fdb144e1aab174599ea59ff85cb34b13fa4f0651131cfec2db8"
+          },
+          "rows": 33554432,
+          "seconds": 36.81652477104217,
+          "user_cpu_seconds": 13.96,
+          "system_cpu_seconds": 6.45,
+          "peak_rss_kib": 5780,
+          "accounted_workspace_bytes": 207503,
+          "temporary_read_bytes": 0,
+          "temporary_written_bytes": 1512,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8657043624,
+          "cpu_seconds": 20.41
+        },
+        "control": {
+          "receipt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1--1/control/verification.json",
+            "sha256": "ff5921a79d37d8e5576d55d89907c3207ccd11e649c45cd7b42a62505a06569e"
+          },
+          "rows": 33554432,
+          "seconds": 39.01394486799836,
+          "user_cpu_seconds": 18.54,
+          "system_cpu_seconds": 6.74,
+          "peak_rss_kib": 5736,
+          "accounted_workspace_bytes": 207491,
+          "temporary_read_bytes": 0,
+          "temporary_written_bytes": 1512,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8657043624,
+          "cpu_seconds": 25.28
+        }
+      },
+      "eligible": false
+    },
+    "0": {
+      "index": {
+        "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1-0/pair.json",
+        "sha256": "9058df441dae7660fc83291379e91e2f6010326c7afc38ffdf77c85cd10b232f"
+      },
+      "samples": {
+        "control": {
+          "receipt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1-0/control/verification.json",
+            "sha256": "8081c2db21a71dd61f48464e4ca488fb25db7df2d001deb24be8ab8373cab786"
+          },
+          "rows": 33554432,
+          "seconds": 44.680344967055134,
+          "user_cpu_seconds": 19.07,
+          "system_cpu_seconds": 6.33,
+          "peak_rss_kib": 5704,
+          "accounted_workspace_bytes": 207485,
+          "temporary_read_bytes": 0,
+          "temporary_written_bytes": 1512,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8657043624,
+          "cpu_seconds": 25.4
+        },
+        "candidate": {
+          "receipt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1-0/candidate/verification.json",
+            "sha256": "4cc19d205d4b784a6ed4e7e589254e89a1bbbdad5a51ff3146f12067de197494"
+          },
+          "rows": 33554432,
+          "seconds": 39.164104711962864,
+          "user_cpu_seconds": 14.18,
+          "system_cpu_seconds": 6.35,
+          "peak_rss_kib": 5672,
+          "accounted_workspace_bytes": 207497,
+          "temporary_read_bytes": 0,
+          "temporary_written_bytes": 1512,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8657043624,
+          "cpu_seconds": 20.53
+        }
+      },
+      "eligible": true
+    },
+    "1": {
+      "index": {
+        "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1-1/pair.json",
+        "sha256": "4bcfe225d184ad09f8a7e128233371c51aecae74368676c12a36fae76a1b18a4"
+      },
+      "samples": {
+        "candidate": {
+          "receipt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1-1/candidate/verification.json",
+            "sha256": "cb81e96e6af64a0f79393eb83144775ab9edd58ff8d251a7ed9d999a4c26c25a"
+          },
+          "rows": 33554432,
+          "seconds": 38.11302956100553,
+          "user_cpu_seconds": 14.09,
+          "system_cpu_seconds": 6.35,
+          "peak_rss_kib": 5720,
+          "accounted_workspace_bytes": 207497,
+          "temporary_read_bytes": 0,
+          "temporary_written_bytes": 1512,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8657043624,
+          "cpu_seconds": 20.439999999999998
+        },
+        "control": {
+          "receipt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1-1/control/verification.json",
+            "sha256": "8ea349ea55490789798c7133048533d747b2872a947ea9e433ce73ce456a85cb"
+          },
+          "rows": 33554432,
+          "seconds": 42.27466005599126,
+          "user_cpu_seconds": 18.55,
+          "system_cpu_seconds": 6.36,
+          "peak_rss_kib": 5584,
+          "accounted_workspace_bytes": 207485,
+          "temporary_read_bytes": 0,
+          "temporary_written_bytes": 1512,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8657043624,
+          "cpu_seconds": 24.91
+        }
+      },
+      "eligible": true
+    },
+    "2": {
+      "index": {
+        "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1-2/pair.json",
+        "sha256": "34cd459ceef0fd35a2fdc39965fabc7b924461862ee8e0e70d1a77c984a6b378"
+      },
+      "samples": {
+        "control": {
+          "receipt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1-2/control/verification.json",
+            "sha256": "c2b5df9f50669ee055047164dd8cb8d7c5c052701a881411f34659df6d77635b"
+          },
+          "rows": 33554432,
+          "seconds": 44.934435775037855,
+          "user_cpu_seconds": 18.79,
+          "system_cpu_seconds": 6.37,
+          "peak_rss_kib": 5616,
+          "accounted_workspace_bytes": 207485,
+          "temporary_read_bytes": 0,
+          "temporary_written_bytes": 1512,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8657043624,
+          "cpu_seconds": 25.16
+        },
+        "candidate": {
+          "receipt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/pair-v1-2/candidate/verification.json",
+            "sha256": "c461fed15cda1be0548f70abd1ad8b10618353e6a4c866500ddeeaf13e9ac9f9"
+          },
+          "rows": 33554432,
+          "seconds": 33.557567560928874,
+          "user_cpu_seconds": 13.99,
+          "system_cpu_seconds": 6.63,
+          "peak_rss_kib": 5816,
+          "accounted_workspace_bytes": 207497,
+          "temporary_read_bytes": 0,
+          "temporary_written_bytes": 1512,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8657043624,
+          "cpu_seconds": 20.62
+        }
+      },
+      "eligible": true
+    }
+  },
+  "medians": {
+    "control": {
+      "seconds": {
+        "median": 44.680344967055134,
+        "min": 42.27466005599126,
+        "max": 44.934435775037855
+      },
+      "cpu_seconds": {
+        "median": 25.16,
+        "min": 24.91,
+        "max": 25.4
+      },
+      "user_cpu_seconds": {
+        "median": 18.79,
+        "min": 18.55,
+        "max": 19.07
+      },
+      "system_cpu_seconds": {
+        "median": 6.36,
+        "min": 6.33,
+        "max": 6.37
+      },
+      "accounted_workspace_bytes": {
+        "median": 207485,
+        "min": 207485,
+        "max": 207485
+      },
+      "peak_rss_kib": {
+        "median": 5616,
+        "min": 5584,
+        "max": 5704
+      },
+      "cgroup_peak_bytes": {
+        "median": 1073741824,
+        "min": 1073741824,
+        "max": 1073741824
+      },
+      "temporary_read_bytes": {
+        "median": 0,
+        "min": 0,
+        "max": 0
+      },
+      "temporary_written_bytes": {
+        "median": 1512,
+        "min": 1512,
+        "max": 1512
+      },
+      "output_bytes": {
+        "median": 8657043624,
+        "min": 8657043624,
+        "max": 8657043624
+      }
+    },
+    "candidate": {
+      "seconds": {
+        "median": 38.11302956100553,
+        "min": 33.557567560928874,
+        "max": 39.164104711962864
+      },
+      "cpu_seconds": {
+        "median": 20.53,
+        "min": 20.439999999999998,
+        "max": 20.62
+      },
+      "user_cpu_seconds": {
+        "median": 14.09,
+        "min": 13.99,
+        "max": 14.18
+      },
+      "system_cpu_seconds": {
+        "median": 6.35,
+        "min": 6.35,
+        "max": 6.63
+      },
+      "accounted_workspace_bytes": {
+        "median": 207497,
+        "min": 207497,
+        "max": 207497
+      },
+      "peak_rss_kib": {
+        "median": 5720,
+        "min": 5672,
+        "max": 5816
+      },
+      "cgroup_peak_bytes": {
+        "median": 1073741824,
+        "min": 1073741824,
+        "max": 1073741824
+      },
+      "temporary_read_bytes": {
+        "median": 0,
+        "min": 0,
+        "max": 0
+      },
+      "temporary_written_bytes": {
+        "median": 1512,
+        "min": 1512,
+        "max": 1512
+      },
+      "output_bytes": {
+        "median": 8657043624,
+        "min": 8657043624,
+        "max": 8657043624
+      }
+    }
+  },
+  "pair_deltas_percent": {
+    "0": -12.346010889485404,
+    "1": -9.844267202796663,
+    "2": -25.318818447096426
+  },
+  "elapsed_delta_percent": -14.698443825561291,
+  "cpu_delta_percent": -18.402225755166924,
+  "working_delta_bytes": 12,
+  "rule_checks": {
+    "speed": true,
+    "resource": true,
+    "working": true
+  },
+  "paired_cpu_deltas_percent": {
+    "0": -19.173228346456682,
+    "1": -17.944600562023293,
+    "2": -18.044515103338632
+  },
+  "retained": true,
+  "correctness_receipt": {
+    "path": "scratch/balanced-fingerprint-resume-20261121/contract-batch-v2/status.json",
+    "sha256": "9449379146da969195734a9e64fca17082adde0d52b6b0adad0f3564039331bc"
+  },
+  "scope": "8 GiB four-column plain CSV, 8 parts, 1200 MiB exact serialized cap, one worker, working setting 256 MiB, hard 1 GiB/no swap. Complete Linux WSL2/ext4 CLI job with full verification outside timing. Deltas use control as denominator. Negative elapsed delta favors candidate."
+}

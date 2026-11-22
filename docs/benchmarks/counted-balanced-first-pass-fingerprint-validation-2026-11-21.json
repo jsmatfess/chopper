@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "counted_balanced_source_proof_validation",
+  "validation": {
+    "ablation_contracts": {
+      "receipt": {
+        "path": "scratch/balanced-fingerprint-resume-20261121/contract-batch-v2/status.json",
+        "sha256": "9449379146da969195734a9e64fca17082adde0d52b6b0adad0f3564039331bc"
+      },
+      "steps": [
+        {
+          "id": "format",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/contract-batch-v2/1-stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/contract-batch-v2/1-stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "id": "direct-run-control",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/contract-batch-v2/2-stdout.log",
+            "sha256": "8e1390f9fc8ffaf5975637f28a6ffb69f888b57b2766c257559970551e3d67e1"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/contract-batch-v2/2-stderr.log",
+            "sha256": "a989b4654a00f7b5164a09b85f5b44d624bf99e9d4b71c0d9725a8276ebb5066"
+          }
+        },
+        {
+          "id": "direct-run-candidate",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/contract-batch-v2/3-stdout.log",
+            "sha256": "fe947f40267551f1d5ee36c953f206ab502a7c1206de5a4a43dacdc380c72db8"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/contract-batch-v2/3-stderr.log",
+            "sha256": "a46d83aea0d087278f021f230f67507e346f4983b538ee76d228a97e73bb3749"
+          }
+        }
+      ]
+    },
+    "final_linux": {
+      "receipt": {
+        "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/status.json",
+        "sha256": "9de20fbf4b8015814b56a5d427ddb07c50fabd4523a98cbee9f06549e41841fd"
+      },
+      "steps": [
+        {
+          "id": "fmt",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/1-stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/1-stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "id": "lint",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/2-stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/2-stderr.log",
+            "sha256": "7165646b1cd5000f660491d15f094046f393ad9a4363873750bb31e244e8a06b"
+          }
+        },
+        {
+          "id": "default-lint",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/3-stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/3-stderr.log",
+            "sha256": "bb1d2b936ed05eb0043140782b9352d78a556a76f51bbc5c7b864358212790f1"
+          }
+        },
+        {
+          "id": "workspace",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/4-stdout.log",
+            "sha256": "f466b01bd452f24d1dbfb123536e2385a8b50d201006b9016b270934bbfb7af1"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/4-stderr.log",
+            "sha256": "c07be5afc907120cf3ccd7750e82605bf1715fb5323f51c587cc3f29ad0232df"
+          }
+        },
+        {
+          "id": "default-workspace",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/5-stdout.log",
+            "sha256": "d0b4b7978c57b49a42ad31b764f9f7a87835a0649f9083b9f8fb6d5c9a7cd032"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/5-stderr.log",
+            "sha256": "52ce5218b023968533522954fc120700d9e5f3efcb10d0733f5d26bc318cd884"
+          }
+        },
+        {
+          "id": "core-wasm",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/6-stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/6-stderr.log",
+            "sha256": "8c233a54790c4800d3dd585436af679aa838da259bfdb129412e2d51cdb75cdc"
+          }
+        },
+        {
+          "id": "wasi-feature-compile",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/7-stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/7-stderr.log",
+            "sha256": "264bdd71de257003eba0d00c58e740aba2f600894c77b2bd9d11995eb437a2b6"
+          }
+        },
+        {
+          "id": "restore-default-release",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/8-stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/linux-delivery-batch-v1/8-stderr.log",
+            "sha256": "624d03029c79df5187b535cab51bd6e78084679cefcb4a7640340ad2d6f6ba47"
+          }
+        }
+      ]
+    },
+    "final_windows": {
+      "receipt": {
+        "path": "scratch/balanced-fingerprint-resume-20261121/windows-batch-v1/status.json",
+        "sha256": "89d3a9c432d058975c5adde3797d6748f5b56998c66fdd820365ec1b7d5d3402"
+      },
+      "steps": [
+        {
+          "id": "doctor",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/windows-batch-v1/1-stdout.log",
+            "sha256": "10a594c798dba8d94e4f8120c2bfaac52f12ecb531d97066012abb3a9eecffdc"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/windows-batch-v1/1-stderr.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        {
+          "id": "direct-run",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/windows-batch-v1/2-stdout.log",
+            "sha256": "fa1167fa1e4088c6e3f71e108248b266e413373baeb4572284bc79166b04ed89"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/windows-batch-v1/2-stderr.log",
+            "sha256": "f7b3a82fec20d5813dc9bfd158d219907616e6367ac9b5f7f93380b54be89771"
+          }
+        },
+        {
+          "id": "default-release",
+          "status": "passed",
+          "exit_code": 0,
+          "stdout": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/windows-batch-v1/3-stdout.log",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/windows-batch-v1/3-stderr.log",
+            "sha256": "3ee035c6445b15ff5c91f19e229ad11bcb2c43342f879956014eca20ecdba14d"
+          }
+        }
+      ]
+    }
+  },
+  "windows_source_file_count": 340,
+  "scope": "Exact integrated native singleton Balanced change. Native Windows direct-run suite and release restore; Linux default and all-feature tests, lint, formatting, portable-core WASM check, WASI feature compile and default release restore.",
+  "historical_invalid_byte_assertion": "Original ablation control rejected invalid bytes with the existing selected-encoding error. Fixed the test expectation and reran both profiles; original failed receipt preserved."
+}

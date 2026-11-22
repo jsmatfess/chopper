@@ -301,9 +301,10 @@ permissions, no pull-request trigger and no evidence-artifact upload. Configure
 only a bucket-scoped read-only private-reader credential there. Uploader keys
 remain separate. An unconfigured or unrun workflow does not establish retrieval.
 
-Hydration verifies the complete downloaded bundle, rejects duplicate/nonregular
-or unsafe member names, and verifies each selected original's size and SHA-256
-before caching it under ignored `scratch/evidence-cache`. Existing mismatches
+Hydration verifies the complete downloaded bundle and rejects nonregular or
+unsafe member names. Every copy of a repeated content-addressed member must
+match its SHA-256 address. Hydration verifies each selected original's size and
+SHA-256 before caching it under ignored `scratch/evidence-cache`. Existing mismatches
 fail rather than being replaced. Interrupted writes can leave a rejected partial
 cache entry; retain that failure and use a reviewed fresh cache/recovery procedure.
 The catalog, lossless exporter and corpus audit resolve missing aliases from

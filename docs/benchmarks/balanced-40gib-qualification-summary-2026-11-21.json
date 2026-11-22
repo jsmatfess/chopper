@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "balanced_40gib_cross_tool_qualification",
+  "scope": "Fixed generated input, 40 GiB plus header, 8 exact consecutive parts. WSL2/ext4, hard 1 GiB/no swap, one worker, Chopper and DuckDB engine memory 256 MiB. Diagnostic one full verified job per tool, excluded from repeated samples.",
+  "fixture": {
+    "receipt": {
+      "path": "scratch/balanced-40gib-resume-20261121/fixture-v1/fixture.json",
+      "sha256": "5941e2b295d356f7fe9176fa09f412300bbc508bd502063c5261c0d0f26cf5cf"
+    },
+    "rows": 167772160,
+    "bytes": 42949672981,
+    "sha256": "2d846bf77181202da68af196deb612cdd426f0922c64ee751b93686da092c601",
+    "shape": "repeated",
+    "data_row_bytes": 256,
+    "source": "generated/fsynced in named larger8192 writer extension",
+    "generation_seconds_not_benchmark": 108.48744997300673
+  },
+  "decision": {
+    "path": "scratch/balanced-40gib-resume-20261121/decision-v1.json",
+    "sha256": "1aa679f0f8d645fa8ce468963912294b94907d472bab9b4b70690289052bd5f4"
+  },
+  "qualification_exit_codes": {
+    "path": "scratch/balanced-40gib-resume-20261121/qualification-results-v1.json",
+    "sha256": "b8e18a9e18d1022804b021a5c703d6dc863032871640a120a996601d42dfec56"
+  },
+  "versions": {
+    "path": "scratch/balanced-refresh-20261121/versions-v1.json",
+    "sha256": "60904a0af4f79aa74b8092cbc5a2895aa35d27bcc749b52c822b5ba2a06e31d0"
+  },
+  "comparison_8_gib": {
+    "path": "scratch/balanced-refresh-20261121/balanced-primary-summary-v1.json",
+    "sha256": "6976799f25e91c93d04ad858889b2115f4f1bf4108ef8fc1572233de9d119565"
+  },
+  "records": {
+    "chopper": {
+      "exit_code": 0,
+      "status": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-chopper-batch-v1/status.json",
+        "sha256": "ad2e437b3ccad488a13e91f147528dc3457d4e54c1d534aaab779641e301848c"
+      },
+      "plan": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-chopper-plan-v1.json",
+        "sha256": "5369bb877b23bbbda5c3e5ba04da35fefcdef05fb49976f7d137fcad98a3aaf3"
+      },
+      "passed": true,
+      "verification": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-chopper/verification.json",
+        "sha256": "80f19366f79f4e66f3beafa665aabe05e343db1556399a0be1e1b1a3be092e28"
+      },
+      "attempt": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-chopper/attempt.json",
+        "sha256": "2a69e29cd5f042d6863afbd3ed3b03fcac2ba2181fe0cc0e16510cd6a382ff51"
+      },
+      "elapsed_seconds": 190.54622282704804,
+      "cli_user_seconds": 89.96,
+      "cli_system_seconds": 32.67,
+      "peak_process_rss_kib": 5604,
+      "peak_cgroup_bytes": 1073741824,
+      "output_csv_bytes": 43285217448,
+      "oracle": "fixed-width validated input against exact serialized blocks",
+      "cgroup_cached_file_refaults": 2060305,
+      "temporary_bytes_read": 0,
+      "temporary_bytes_written": 1520,
+      "cli_cpu_seconds": 122.63,
+      "input_gib_per_second": 0.2099228177107796
+    },
+    "qsvlite": {
+      "exit_code": 0,
+      "status": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-qsvlite-batch-v1/status.json",
+        "sha256": "6f379caaeafb22104015c36cccd37dc82b37d355ab3d1b1a98bdf2f3ac37ce4c"
+      },
+      "plan": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-qsvlite-plan-v1.json",
+        "sha256": "0d1e14a64cc61c8e96043648ac114c3540086b6d04ead0dc50ecfecae62e2c2b"
+      },
+      "passed": true,
+      "verification": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-qsvlite/verification.json",
+        "sha256": "5c54cc35d6699cfeb59622d58632bea6133a5c6e26df596289b9c7bbb559f15a"
+      },
+      "attempt": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-qsvlite/attempt.json",
+        "sha256": "4e1284cc227d5503d18806785167c494456c0adf5ba652805696f750f94555c2"
+      },
+      "elapsed_seconds": 99.52852727600839,
+      "cli_user_seconds": 46.33,
+      "cli_system_seconds": 18.04,
+      "peak_process_rss_kib": 15948,
+      "peak_cgroup_bytes": 1073741824,
+      "output_csv_bytes": 42949673128,
+      "oracle": "fixed-width validated input against exact serialized blocks",
+      "cgroup_cached_file_refaults": 10485729,
+      "temporary_bytes_read": null,
+      "temporary_bytes_written": null,
+      "cli_cpu_seconds": 64.37,
+      "input_gib_per_second": 0.40189482447654085
+    },
+    "duckdb": {
+      "exit_code": 0,
+      "status": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-duckdb-batch-v1/status.json",
+        "sha256": "7151310763129408f5fe34abe4bc11f484be8991eb8b489c754bdc6ed9a1931e"
+      },
+      "plan": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-duckdb-plan-v1.json",
+        "sha256": "b1a1426219380b0ead603ebff058f9792129536a22457feb5b544d9ed227be75"
+      },
+      "passed": true,
+      "verification": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-duckdb/verification.json",
+        "sha256": "e10c20cd90c91bc014d4809916e9b97766f142b5a6cd1f0c25707c6d724cce50"
+      },
+      "attempt": {
+        "path": "scratch/balanced-40gib-resume-20261121/qualify-duckdb/attempt.json",
+        "sha256": "0811cfaa0e85fa44e40cf59465e9a5d8fe54ac5af8b96e0f0f638ed11c46d01f"
+      },
+      "elapsed_seconds": 314.3620882910909,
+      "cli_user_seconds": 144.73,
+      "cli_system_seconds": 116.7,
+      "peak_process_rss_kib": 728156,
+      "peak_cgroup_bytes": 1073741824,
+      "output_csv_bytes": 43285217448,
+      "oracle": "fixed-width validated input against exact serialized blocks",
+      "cgroup_cached_file_refaults": 24472539,
+      "temporary_bytes_read": null,
+      "temporary_bytes_written": null,
+      "cli_cpu_seconds": 261.43,
+      "input_gib_per_second": 0.12724180647050884
+    }
+  }
+}

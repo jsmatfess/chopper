@@ -1,0 +1,288 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "streaming_external_shuffle_tools_40gib",
+  "decision": {
+    "path": "scratch/streaming-tool-compare-20261121/large-scope-decision-v1.json",
+    "sha256": "b4f6debda22b4430822d0224f4d42f3e296d26bdde91ed392be52db2160e6630"
+  },
+  "supporting_2gib": {
+    "path": "scratch/streaming-tool-compare-20261121/summary-2gib-v1.json",
+    "sha256": "db83c32f89afa3a5c8cb517549c3cd84c05dae4236b4ade5a55d31dafd1430e5"
+  },
+  "prior_40gib": {
+    "path": "scratch/uniform-cross-tool-resume-20261121/summary-v1.json",
+    "sha256": "79767980b633d0e81a63c79fc9e07a00013c6a6bad34174d58902b48dbafa3db"
+  },
+  "reference": {
+    "chopper": {
+      "batch": {
+        "path": "scratch/uniform-40gib-resume-20261121/hierarchy-batch-v1/status.json",
+        "sha256": "a94c62bbcf7dd68e9de0b9323224bf5d8acd5c0129bdf632d4cd7a784f00628f"
+      },
+      "seconds": 551.7237516629975,
+      "rows": 167772160,
+      "attempt": {
+        "path": "scratch/uniform-40gib-resume-20261121/hierarchy-v1/attempt.json",
+        "sha256": "42ba6bc35b36085c525d82677b35890c31a735af84f84d6b7cabed1f2447d76b"
+      },
+      "verification": {
+        "path": "scratch/uniform-40gib-resume-20261121/hierarchy-v1/verification.json",
+        "sha256": "59b5bc0701123c109e25f0eb89dcf9e208a8ec540017e2da5e55151715d75724"
+      },
+      "cpu_seconds": 333.90999999999997,
+      "user_cpu_seconds": 203.5,
+      "system_cpu_seconds": 130.41,
+      "peak_rss_kib": 73500,
+      "cgroup_peak_bytes": 1073741824,
+      "cgroup_memory_stat": "anon 8724480\nfile 457781248\nkernel 29442048\nkernel_stack 0\npagetables 364544\nsec_pagetables 0\npercpu 864\nsock 0\nvmalloc 0\nshmem 0\nfile_mapped 0\nfile_dirty 32768\nfile_writeback 0\nswapcached 0\nanon_thp 0\nfile_thp 0\nshmem_thp 0\ninactive_anon 8716288\nactive_anon 8192\ninactive_file 457633792\nactive_file 114688\nunevictable 0\nslab_reclaimable 28976576\nslab_unreclaimable 85064\nslab 29061640\nworkingset_refault_anon 0\nworkingset_refault_file 43740740\nworkingset_activate_anon 0\nworkingset_activate_file 4057504\nworkingset_restore_anon 0\nworkingset_restore_file 365781\nworkingset_nodereclaim 640707\npgdemote_kswapd 0\npgdemote_direct 0\npgdemote_khugepaged 0\npgdemote_proactive 0\npgscan 111135041\npgsteal 110695157\npswpin 0\npswpout 0\npgscan_kswapd 0\npgscan_direct 111135041\npgscan_khugepaged 0\npgscan_proactive 0\npgsteal_kswapd 0\npgsteal_direct 110695157\npgsteal_khugepaged 0\npgsteal_proactive 0\npgfault 28624\npgmajfault 0\npgrefill 3727507\npgactivate 413241\npgdeactivate 3727507\npglazyfree 0\npglazyfreed 0\nswpin_zero 0\nswpout_zero 0\nthp_fault_alloc 0\nthp_collapse_alloc 0\nthp_swpout 0\nthp_swpout_fallback 0\n",
+      "process_filesystem_inputs": 612405232,
+      "process_filesystem_outputs": 278380664,
+      "output_csv_bytes": 43285217448,
+      "diagnostics": {
+        "analysis_diagnostics_reserved_bytes": 75460,
+        "analysis_preview_reserved_bytes": 3048,
+        "analysis_text_reserved_bytes": 473,
+        "analysis_timings_reserved_bytes": 810,
+        "analysis_warnings_reserved_bytes": 368,
+        "column_values_reserved_bytes": 0,
+        "compact_spill_blocks": 0,
+        "compact_spill_fallbacks": 0,
+        "compact_spill_files": 0,
+        "compact_spill_rows": 0,
+        "compact_spill_source_bytes": 0,
+        "compact_spill_stored_bytes": 0,
+        "consecutive_partition_fusions": 0,
+        "consecutive_partition_retries": 0,
+        "consecutive_partition_rows": 0,
+        "directory_path_reserved_bytes": 268,
+        "fisher_yates_calls": 0,
+        "fisher_yates_rows": 0,
+        "fisher_yates_seconds": 0.0,
+        "grouping_policy": "auto",
+        "input_header_reserved_bytes": 296,
+        "merge_inputs": 987,
+        "merge_operations": 4,
+        "partition_balanced_fusions": 0,
+        "partition_balanced_retries": 0,
+        "partition_balanced_rows": 0,
+        "peak_temporary_files": 261,
+        "peak_workspace_reserved_bytes": 67444177,
+        "prepared_job_reserved_bytes": 659,
+        "process_memory": {
+          "admission_limit_bytes": 485363690,
+          "limit_bytes": 531810304,
+          "peak_reserved_bytes": 67444772,
+          "pressure_baseline_reserved_bytes": 14626794,
+          "pressure_observation": {
+            "cgroup_headroom_bytes": 941473792,
+            "complete": true,
+            "discovery": "linux proc/cgroup-v2 snapshot; experimental clean inactive-file headroom estimate",
+            "headroom_bytes": 941473792,
+            "host_available_bytes": 64932057088,
+            "observed_unix_ms": 1795289622023
+          },
+          "pressure_rechecks": 501,
+          "reserved_bytes": 90480,
+          "startup_observation": {
+            "cgroup_headroom_bytes": 1063620608,
+            "complete": true,
+            "discovery": "linux proc/cgroup-v2 snapshot; experimental clean inactive-file headroom estimate",
+            "headroom_bytes": 1063620608,
+            "host_available_bytes": 65044185088,
+            "observed_unix_ms": 1795289071026
+          }
+        },
+        "resident_sorts": 0,
+        "routed_groupings": 0,
+        "routing_fallbacks": 0,
+        "routing_reused_runs": 0,
+        "shuffle_partition_fusions": 0,
+        "shuffle_partition_retries": 0,
+        "shuffle_partition_rows": 0,
+        "sort_calls": 984,
+        "sort_rows": 167772160,
+        "sort_runs": 984,
+        "sort_seconds": 12.97583952,
+        "spill_format_candidate": false,
+        "stage_stats_reserved_bytes": 168,
+        "streaming_chain_fusions": 0,
+        "streaming_chain_retries": 0,
+        "streaming_chain_rows": 0,
+        "temporary_bytes_read": 99192633344,
+        "temporary_bytes_written": 99192634864,
+        "temporary_cleanup_failures": 0,
+        "temporary_files_created": 990,
+        "temporary_path_reserved_bytes": 143,
+        "workspace_reserved_bytes": 89885
+      },
+      "job": {
+        "path": "scratch/uniform-40gib-resume-20261121/hierarchy-v1/job.json",
+        "sha256": "a0e0f2aafc940436aa59a88fb45f0e3ce08d75051b5d7d647bfa4f4aa293a3f9"
+      }
+    },
+    "qsvlite": {
+      "batch": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/qsvlite-batch-v1/status.json",
+        "sha256": "b8c65db136573718bddd040d08d2e471a80d8ddaae86fc1637fa06d09298a81f"
+      },
+      "excluded_preflight": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/qsvlite-preflight/verification.json",
+        "sha256": "8fdfbb9ed1fd56af2b38c92be2e03b74f21d6b95601893839793851310316c2f"
+      },
+      "seconds": 806.9910833069589,
+      "rows": 167772160,
+      "attempt": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/qsvlite-full/attempt.json",
+        "sha256": "f501175e07b249a3f819fac1fb0072900bfe05f2d203b4d1b0256c091431ec87"
+      },
+      "verification": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/qsvlite-full/verification.json",
+        "sha256": "7263a82b8101f78ff06710396ba80e8efeeaa50362020b9501be660bd1370bce"
+      },
+      "cpu_seconds": 489.33000000000004,
+      "user_cpu_seconds": 327.86,
+      "system_cpu_seconds": 161.47,
+      "peak_rss_kib": 911088,
+      "cgroup_peak_bytes": 1073741824,
+      "cgroup_memory_stat": "anon 8736768\nfile 537047040\nkernel 18358272\nkernel_stack 0\npagetables 421888\nsec_pagetables 0\npercpu 1152\nsock 0\nvmalloc 0\nshmem 0\nfile_mapped 0\nfile_dirty 60833792\nfile_writeback 283115520\nswapcached 0\nanon_thp 0\nfile_thp 0\nshmem_thp 0\ninactive_anon 8728576\nactive_anon 8192\ninactive_file 503844864\nactive_file 33161216\nunevictable 0\nslab_reclaimable 17813448\nslab_unreclaimable 103688\nslab 17917136\nworkingset_refault_anon 0\nworkingset_refault_file 47106522\nworkingset_activate_anon 0\nworkingset_activate_file 0\nworkingset_restore_anon 0\nworkingset_restore_file 0\nworkingset_nodereclaim 265214\npgdemote_kswapd 0\npgdemote_direct 0\npgdemote_khugepaged 0\npgdemote_proactive 0\npgscan 162490767\npgsteal 137241394\npswpin 0\npswpout 0\npgscan_kswapd 0\npgscan_direct 162490767\npgscan_khugepaged 0\npgscan_proactive 0\npgsteal_kswapd 0\npgsteal_direct 137241394\npgsteal_khugepaged 0\npgsteal_proactive 0\npgfault 335998\npgmajfault 3\npgrefill 17117551\npgactivate 24965043\npgdeactivate 17117551\npglazyfree 0\npglazyfreed 0\nswpin_zero 0\nswpout_zero 0\nthp_fault_alloc 0\nthp_collapse_alloc 0\nthp_swpout 0\nthp_swpout_fallback 0\n",
+      "process_filesystem_inputs": 644540200,
+      "process_filesystem_outputs": 456524128,
+      "output_csv_bytes": 42949673128,
+      "oracle_sha256": "72e65f5ddd09c9d4b21e9d8d50968101d06fab1785975a8d3642e673efcd7e3b",
+      "adapter_stage_receipt": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/qsvlite-full/adapter-stages.json",
+        "sha256": "8377f282b494d57fa7c9ed771f89988905b2e673f6200b1fb38ee80330959d46"
+      },
+      "adapter_stages": {
+        "uuid_and_reorder": {
+          "seconds": 188.57961345894728,
+          "bytes": 49157242907
+        },
+        "external_line_sort": {
+          "seconds": 426.65909823810216,
+          "bytes": 49157242907
+        },
+        "drop_key": {
+          "seconds": 83.62098264705855,
+          "bytes": 42949672981
+        },
+        "split": {
+          "seconds": 108.00136980006937,
+          "bytes": 42949673128
+        }
+      }
+    }
+  },
+  "qsvlite_streamed": {
+    "complete": true,
+    "seconds": 710.5687544050161,
+    "cpu_seconds": 594.03,
+    "peak_rss_kib": 915092,
+    "filesystem_inputs": 368559704,
+    "filesystem_outputs": 180601160,
+    "refaults": 22625205,
+    "output_bytes": 42949673128,
+    "cgroup_peak_bytes": 1073741824,
+    "cgroup_oom": {
+      "low": "0",
+      "high": "0",
+      "max": "545908",
+      "oom": "0",
+      "oom_kill": "0",
+      "oom_group_kill": "0"
+    },
+    "verification": {
+      "path": "scratch/streaming-tool-compare-20261121/qsvlite-streaming-full-40gib/verification.json",
+      "sha256": "a294f453d9ad4e5d271e8d891135d85bbce46b11109e0e076cedcdc38d5144d2"
+    },
+    "adapter_stage_receipt": {
+      "path": "scratch/streaming-tool-compare-20261121/qsvlite-streaming-full-40gib/adapter-stages.json",
+      "sha256": "19b09d0ce933ca5a6abb61337f209be612168708185049f3db80ec0a6df5283d"
+    },
+    "stages": {
+      "count_seconds": 25.565696779987775,
+      "pipeline_seconds": 684.8691362319514,
+      "counted_rows": 167772160,
+      "quota": 20971520,
+      "commands": [
+        [
+          "scratch/tool-comparison/qsv/qsvlite",
+          "enum",
+          "--uuid4",
+          "scratch/balanced-40gib-resume-20261121/fixture-v1/input.csv"
+        ],
+        [
+          "scratch/tool-comparison/qsv/qsvlite",
+          "select",
+          "5,1-4"
+        ],
+        [
+          "scratch/tool-comparison/qsv/qsvlite",
+          "extsort",
+          "--memory-limit",
+          "64",
+          "--jobs",
+          "1",
+          "--tmp-dir",
+          "scratch/streaming-tool-compare-20261121/qsvlite-streaming-full-40gib/sort-temp"
+        ],
+        [
+          "scratch/tool-comparison/qsv/qsvlite",
+          "select",
+          "2-"
+        ],
+        [
+          "/usr/bin/env",
+          "QSV_SKIP_FORMAT_CHECK=1",
+          "scratch/tool-comparison/qsv/qsvlite",
+          "split",
+          "--size",
+          "20971520",
+          "-j",
+          "1",
+          "scratch/streaming-tool-compare-20261121/qsvlite-streaming-full-40gib/output",
+          "/dev/stdin"
+        ]
+      ]
+    },
+    "batch": {
+      "path": "scratch/streaming-tool-compare-20261121/qsvlite-large-batch-v1/status.json",
+      "sha256": "c2ab970b8c4528b2b8b3525706fb5e2d4e9c14a98ec0df21de60b3af1f3b5904"
+    },
+    "attempt": {
+      "path": "scratch/streaming-tool-compare-20261121/qsvlite-streaming-full-40gib/attempt.json",
+      "sha256": "dbf8c644f06155bf356f8ef62fb38f858fd787255a68b18dc434febee09031f5"
+    },
+    "excluded_preflight": {
+      "path": "scratch/streaming-tool-compare-20261121/qsvlite-streaming-preflight-40gib/verification.json",
+      "sha256": "b42812d6f9677711d61cfdc0c5da7c3fa870ecb3a292e3394aa5065de4b35f9c"
+    }
+  },
+  "duckdb_streamed_failure": {
+    "setting_mib": 256,
+    "error": "_duckdb.OutOfMemoryException: Out of Memory Error: could not allocate block of size 30.5 MiB (226.7 MiB/256.0 MiB used)",
+    "seconds_until_failure": 181.43071856501047,
+    "attempt": {
+      "path": "scratch/streaming-tool-compare-20261121/duckdb-streaming-full-40gib/attempt.json",
+      "sha256": "65deacb663d3df2a7b31a93b31b6971dde4b05db7ffe0bc70dc3fa4884c97eb8"
+    },
+    "batch": {
+      "path": "scratch/streaming-tool-compare-20261121/duckdb-large-batch-v1/status.json",
+      "sha256": "45db734cfec88ec5c72e45dd077d84c338f3b2eb3f42dbabd8260aaa04243aea"
+    },
+    "cgroup": {
+      "path": "scratch/streaming-tool-compare-20261121/duckdb-streaming-full-40gib/cgroup.json",
+      "sha256": "46fe8aa2c42535c373bf5abaa228aa0c2a10d0f08c8b4168286d0e7b3bcb1355"
+    },
+    "excluded_preflight": {
+      "path": "scratch/streaming-tool-compare-20261121/duckdb-streaming-preflight-40gib/verification.json",
+      "sha256": "0488beca679f3bf4649e6834315d175b818a5fd708779522d5e93d8f87ef9192"
+    },
+    "stderr_receipt": {
+      "path": "scratch/streaming-tool-compare-20261121/duckdb-streaming-full-40gib/stderr",
+      "sha256": "c101cfa67b0267a5b82a304e0de0eac647fffd53d008968f1068a98211a6bae2"
+    }
+  },
+  "scope": "40 GiB pinned plain fixed-width input, hard 1 GiB cgroup without swap, one requested worker per command, independent exact eight-part oracle. Full qualifications are single runs. Failed attempts do not supply complete times."
+}

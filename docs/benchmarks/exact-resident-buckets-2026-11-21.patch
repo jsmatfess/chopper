@@ -1,0 +1,826 @@
+--- a/crates/chopper/Cargo.toml
++++ b/crates/chopper/Cargo.toml
+@@ -60,6 +60,8 @@
+ experimental-shuffle-partition = []
+ # Opt-in Linux fusion of retained plain probabilistic assignment and Uniform.
+ experimental-probabilistic-shuffle-fusion = []
++# Opt-in Linux stable resident buckets for retained unstratified exact assignment.
++experimental-resident-exact-buckets = []
+ # Opt-in single traversal of nested balanced ranges.
+ experimental-nested-balanced = []
+ # Opt-in elimination of partition keys proven constant by previous partitions.
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -47,6 +47,8 @@
+ mod probabilistic_shuffle;
+ pub use preview::Preview;
+ mod exact_plan;
++#[cfg(all(target_os = "linux", feature = "experimental-resident-exact-buckets"))]
++mod exact_resident;
+ #[cfg(any(test, feature = "resource-contract-tests"))]
+ mod resource_contracts;
+ #[cfg(any(
+@@ -2367,6 +2369,32 @@
+         }
+         Operation::Assign { groups, strata } => {
+             let columns = resolve_columns(strata, analysis.header.as_deref(), analysis.columns)?;
++            #[cfg(all(target_os = "linux", feature = "experimental-resident-exact-buckets"))]
++            if exact_resident::eligible(job, step) {
++                let prepared = exact_plan::Proposal::new(groups.as_slice(), parent).prepare(
++                    ctx,
++                    |groups, parent| {
++                        exact_resident::prepare(data, parent, groups, step, &domain, ctx)
++                    },
++                    exact_resident::retryable,
++                )?;
++                match prepared {
++                    exact_plan::Attempt::Prepared(prepared) => {
++                        return prepared.emit(output, ctx);
++                    }
++                    exact_plan::Attempt::Retry(_) => {
++                        ctx.event(
++                            "Retrying exact assignment after resident denial",
++                            parent.rows,
++                        )?;
++                        if let Some(span) =
++                            ctx.physical_span(crate::observation::physical::Kind::Fallback)
++                        {
++                            span.finish(0);
++                        }
++                    }
++                }
++            }
+             assign(
+                 data,
+                 parent,
+@@ -2690,13 +2718,7 @@
+             let mut rng = Random::new(seed);
+             for row in source.packed_rows(scope, ctx.max_record)? {
+                 let mut row = row?;
+-                let mut draw = rng.below(remaining);
+-                let mut index = 0;
+-                while draw >= scratch.quota[index] {
+-                    draw -= scratch.quota[index];
+-                    index += 1;
+-                }
+-                scratch.quota[index] -= 1;
++                let index = assignment::take_linear(&mut scratch.quota, rng.below(remaining));
+                 remaining -= 1;
+                 scratch.counts[index] += 1;
+                 observed.rows += 1;
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -40,6 +40,8 @@
+ #[cfg(not(feature = "experimental-spill-blocks"))]
+ type SpillReader = DiskReader;
+ pub(crate) use adaptive::PackedKey;
++#[cfg(all(target_os = "linux", feature = "experimental-resident-exact-buckets"))]
++pub(crate) use adaptive::ResidentBuckets;
+ pub(crate) use adaptive::Workspace;
+ use adaptive::{reserve_row_capacity, ResidentRows, RoutedRows, Router};
+ pub use adaptive::{FieldViews, PackedRow};
+--- a/crates/chopper/src/storage/adaptive.rs
++++ b/crates/chopper/src/storage/adaptive.rs
+@@ -917,6 +917,91 @@
+     fn next(&mut self) -> Option<Self::Item> {
+         self.take_packed()
+             .map(|row| row.to_owned_reserved(&self._reservation))
++    }
++}
++
++/// Bounded stable buckets for an exact resident assignment. Packed rows transfer
++/// their existing decode leases into the bucket owner without copying payloads.
++#[cfg(all(target_os = "linux", feature = "experimental-resident-exact-buckets"))]
++pub(crate) struct ResidentBuckets {
++    buckets: Vec<ResidentBucket>,
++    memory: Reservation,
++    limit: usize,
++}
++#[cfg(all(target_os = "linux", feature = "experimental-resident-exact-buckets"))]
++#[derive(Default)]
++struct ResidentBucket {
++    rows: Vec<PackedRow>,
++    payload_bytes: usize,
++}
++#[cfg(all(target_os = "linux", feature = "experimental-resident-exact-buckets"))]
++impl ResidentBuckets {
++    pub(crate) fn new(quotas: &[u64], ctx: &Context) -> Result<Self> {
++        use crate::resources::MemoryAdmission;
++        let limit = ctx.workspace.sort_buffer_limit(ctx.memory / 4);
++        let descriptor_bytes = quotas.iter().try_fold(0usize, |bytes, &quota| {
++            usize::try_from(quota)
++                .ok()
++                .and_then(|rows| rows.checked_mul(std::mem::size_of::<PackedRow>()))
++                .and_then(|needed| bytes.checked_add(needed))
++                .ok_or(MemoryAdmission::Local)
++        })?;
++        let catalog_bytes = quotas
++            .len()
++            .saturating_mul(std::mem::size_of::<ResidentBucket>());
++        if descriptor_bytes.saturating_add(catalog_bytes) > limit {
++            return Err(MemoryAdmission::Local.into());
++        }
++        let mut memory = Reservation::new(ctx);
++        let mut buckets = Vec::new();
++        memory.reserve_vec(&mut buckets, quotas.len())?;
++        for &quota in quotas {
++            buckets.push(ResidentBucket::default());
++            memory.reserve_vec(
++                &mut buckets.last_mut().unwrap().rows,
++                usize::try_from(quota).map_err(|_| MemoryAdmission::Local)?,
++            )?;
++        }
++        if memory.bytes() > limit as u64 {
++            return Err(MemoryAdmission::Local.into());
++        }
++        Ok(Self {
++            buckets,
++            memory,
++            limit,
++        })
++    }
++
++    pub(crate) fn push(&mut self, index: usize, mut row: PackedRow) -> Result<()> {
++        let bucket = &mut self.buckets[index];
++        ensure!(
++            bucket.rows.len() < bucket.rows.capacity(),
++            "exact resident bucket exceeded its descriptor reservation"
++        );
++        row.key = PackedKey::Bytes(Box::default());
++        let bytes = row.heap_bytes();
++        if self.memory.bytes().saturating_add(bytes as u64) > self.limit as u64 {
++            return Err(crate::resources::MemoryAdmission::Local.into());
++        }
++        let owner = row
++            .decode_reservation
++            .as_mut()
++            .context("packed source row is missing its decode lease")?;
++        owner.resize(bytes)?;
++        self.memory.absorb(row.decode_reservation.take().unwrap());
++        bucket.payload_bytes += bytes;
++        bucket.rows.push(row);
++        Ok(())
++    }
++
++    pub(crate) fn take(&mut self, index: usize) -> ResidentRows {
++        let bucket = std::mem::take(&mut self.buckets[index]);
++        let descriptor_bytes = bucket.rows.capacity() * std::mem::size_of::<PackedRow>();
++        let reservation = self.memory.split(descriptor_bytes + bucket.payload_bytes);
++        ResidentRows {
++            rows: bucket.rows.into_iter(),
++            _reservation: reservation,
++        }
+     }
+ }
+ 
+--- a/crates/chopper/src/engine/assignment.rs
++++ b/crates/chopper/src/engine/assignment.rs
+@@ -47,6 +47,17 @@
+     pub(super) fn reset_quota(&mut self, rows: u64) {
+         quotas_into(rows, &self.weights, &mut self.quota, &mut self.order);
+     }
++}
++
++#[inline]
++pub(super) fn take_linear(quota: &mut [u64], mut draw: u64) -> usize {
++    let mut index = 0;
++    while draw >= quota[index] {
++        draw -= quota[index];
++        index += 1;
++    }
++    quota[index] -= 1;
++    index
+ }
+ 
+ #[cfg(test)]
+--- /dev/null
++++ b/crates/chopper/src/engine/exact_resident.rs
+@@ -0,0 +1,141 @@
++//! Exact retained-parent assignment without a comparison sort when its buckets fit.
++use super::*;
++use crate::{
++    observation::{
++        physical::{self, Kind},
++        Status,
++    },
++    resources::MemoryAdmission,
++    storage::ResidentBuckets,
++};
++
++struct Child {
++    lineage: Vec<serde_json::Value>,
++    _lineage_memory: Reservation,
++}
++
++pub(super) struct Prepared {
++    buckets: ResidentBuckets,
++    children: Vec<Child>,
++    _child_vector: Reservation,
++}
++
++#[cfg(test)]
++std::thread_local! {
++    static DISABLE_BUCKETS: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
++}
++
++#[cfg(test)]
++mod tests;
++
++pub(super) fn eligible(job: &Job, step: usize) -> bool {
++    #[cfg(test)]
++    if DISABLE_BUCKETS.with(std::cell::Cell::get) {
++        return false;
++    }
++    step == 1
++        && job.resources.grouping == chopper_core::Grouping::Auto
++        && job.compression == chopper_core::Compression::None
++        && matches!(
++            job.operations.as_slice(),
++            [Operation::Partition { .. }, Operation::Assign { strata, .. }]
++            if strata.is_empty()
++        )
++}
++
++pub(super) fn prepare(
++    data: &Dataset,
++    parent: &Group,
++    groups: &[Allocation],
++    step: usize,
++    domain: &[u8; 32],
++    ctx: &Context,
++) -> Result<Prepared> {
++    let mut scratch = AssignmentScratch::new(groups, false, Reservation::new(ctx))?;
++    scratch.reset_quota(parent.rows);
++    let mut buckets = ResidentBuckets::new(&scratch.quota, ctx)?;
++    let mut child_vector = Reservation::new(ctx);
++    let mut children = Vec::new();
++    child_vector.reserve_vec(&mut children, groups.len())?;
++    for allocation in groups {
++        let entry = child_metadata::Entry::allocation(step, &allocation.name);
++        let (lineage, memory) = child_metadata::build(parent, &entry, ctx, Reservation::new(ctx))?;
++        children.push(Child {
++            lineage,
++            _lineage_memory: memory,
++        });
++    }
++
++    let mut observation = ctx.physical_attempt(Kind::ExactMembership);
++    let mut observed = physical::AllocationCounts {
++        len: groups.len(),
++        ..Default::default()
++    };
++    let result = (|| -> Result<()> {
++        #[cfg(test)]
++        ctx.event("Before reserved exact parent read", parent.rows)?;
++        let mut remaining = parent.rows;
++        let mut rng = Random::new(*domain);
++        for row in data.packed_rows(parent, ctx.max_record)? {
++            ctx.check()?;
++            let row = row?;
++            let index = assignment::take_linear(&mut scratch.quota, rng.below(remaining));
++            remaining -= 1;
++            scratch.counts[index] += 1;
++            buckets.push(index, row)?;
++            observed.rows += 1;
++            if let Some(attempt) = &mut observation {
++                attempt.rows_processed(observed.rows);
++            }
++        }
++        ensure!(remaining == 0, "truncated resident assignment parent");
++        observed.groups = groups.len() as u64;
++        observed.empty_groups = scratch.counts.iter().filter(|&&count| count == 0).count() as u64;
++        Ok(())
++    })();
++    if let Some(attempt) = observation {
++        for (slot, count) in observed.memberships.iter_mut().zip(scratch.counts) {
++            *slot = count;
++        }
++        attempt.allocation(
++            result
++                .as_ref()
++                .err()
++                .map_or(Status::Completed, physical::error_status),
++            observed,
++        );
++    }
++    result?;
++    Ok(Prepared {
++        buckets,
++        children,
++        _child_vector: child_vector,
++    })
++}
++
++impl Prepared {
++    pub(super) fn emit(mut self, output: &mut impl RowSink, ctx: &Context) -> Result<()> {
++        #[cfg(test)]
++        ctx.event("Emitting resident exact assignment", 0)?;
++        output.physical_input(ctx.physical_identity(Kind::ExactMembership));
++        for (index, child) in self.children.drain(..).enumerate() {
++            ctx.check()?;
++            let Child {
++                lineage,
++                _lineage_memory,
++            } = child;
++            let mut group = output.begin(lineage, false);
++            for row in self.buckets.take(index).compact() {
++                ctx.check()?;
++                output.packed_row_ref(&mut group, &row?)?;
++            }
++            ctx.check()?;
++            output.end(group)?;
++        }
++        Ok(())
++    }
++}
++
++pub(super) fn retryable(error: &anyhow::Error) -> bool {
++    error.downcast_ref::<MemoryAdmission>().is_some()
++}
+--- /dev/null
++++ b/crates/chopper/src/engine/exact_resident/tests.rs
+@@ -0,0 +1,484 @@
++use super::*;
++use crate::{resources::MemoryPool, storage::Workspace};
++use std::{
++    io::Write,
++    path::{Path, PathBuf},
++    sync::{atomic::Ordering::Relaxed, Mutex},
++};
++
++const MEMORY: u64 = 32 * 1024 * 1024;
++const ROWS: usize = 70_003;
++const PARENTS: usize = 8;
++const SEED: &str = "exact-resident-bucket-v1";
++const BYTE_LIMIT: u64 = 65_536;
++
++fn make_fixture(dir: &Path) -> Result<(PathBuf, String)> {
++    let input = dir.join("input.csv");
++    let mut source = std::io::BufWriter::new(std::fs::File::create(&input)?);
++    writeln!(source, "id,region,payload")?;
++    let payload = "x".repeat(128);
++    for id in 0..ROWS {
++        writeln!(source, "{id},{},{payload}", id % PARENTS)?;
++    }
++    source.flush()?;
++    Ok((input, payload))
++}
++
++fn job(input: &Path, output: &Path, temp: &Path, arm: &str) -> Job {
++    Job {
++        input: input.to_string_lossy().into(),
++        output: output.to_string_lossy().into(),
++        random_seed: Some(SEED.into()),
++        operations: vec![
++            Operation::Partition {
++                columns: vec![Column::Name("region".into())],
++            },
++            Operation::Assign {
++                groups: (0..=8)
++                    .map(|n| Allocation {
++                        name: format!("a{n}"),
++                        percent: if n < 8 { "12.5".into() } else { "0".into() },
++                    })
++                    .collect(),
++                strata: vec![],
++            },
++        ],
++        limits: chopper_core::Limits {
++            rows: Some(600),
++            bytes: Some(BYTE_LIMIT),
++            ..Default::default()
++        },
++        resources: Resources {
++            memory_mb: 32.into(),
++            workers: 1,
++            grouping: if arm == "sort" {
++                Grouping::Sort
++            } else {
++                Grouping::Auto
++            },
++            max_record_bytes: 16 * 1024,
++            temp_dir: Some(temp.to_string_lossy().into()),
++            ..Default::default()
++        },
++        ..Default::default()
++    }
++}
++
++fn execute(
++    job: Job,
++    cancel: Arc<AtomicBool>,
++    notify: Notify,
++    pool: Arc<MemoryPool>,
++) -> Result<(Analysis, serde_json::Value)> {
++    let mut input_reads = 0;
++    let result = process_using(
++        job,
++        cancel,
++        notify,
++        pool,
++        None,
++        false,
++        |job, ctx, p, b, s| {
++            input_reads += 1;
++            with_input(job, Reservation::new(ctx), |mut source| {
++                ingest_options(source.as_mut(), job, ctx, p, b, s)
++            })
++        },
++    );
++    assert_eq!(input_reads, 1);
++    let result = result?;
++    let Processed::Snapshot(ref prepared) = result else {
++        panic!("expected standard encoded snapshot path");
++    };
++    let ctx = prepared.ctx.clone();
++    let analysis = result.publish()?.into_analysis();
++    let counters = ctx.diagnostics();
++    Ok((analysis, counters))
++}
++
++#[derive(Clone, Copy, Debug)]
++enum Pressure {
++    None,
++    ReaderRetry(bool),
++    FixedSelection(usize),
++    FixedEmission(usize),
++}
++
++#[test]
++fn resident_exact_buckets_preserve_output_and_admission_boundary() -> Result<()> {
++    let dir = tempfile::tempdir()?;
++    let (input, payload) = make_fixture(dir.path())?;
++    let out = dir.path().join("out");
++    let temp = dir.path().join("temp");
++    std::fs::create_dir(&temp)?;
++    let mut reference = None;
++    for pressure in [
++        Pressure::None,
++        Pressure::FixedSelection(28),
++        Pressure::FixedSelection(30),
++        Pressure::FixedEmission(30),
++        Pressure::ReaderRetry(false),
++        Pressure::ReaderRetry(true),
++    ] {
++        let arms = if matches!(pressure, Pressure::ReaderRetry(_)) {
++            &["bucket"][..]
++        } else {
++            &["auto", "sort", "bucket"][..]
++        };
++        for &arm in arms {
++            DISABLE_BUCKETS.with(|flag| flag.set(arm != "bucket"));
++            let pool = Arc::new(MemoryPool::new(MEMORY));
++            let owner = Arc::new(Mutex::new(Reservation::for_workspace(Arc::new(
++                Workspace::shared(MEMORY as usize, pool.clone()),
++            ))));
++            let counters = Arc::new([0, 1, 2, 3].map(|_| std::sync::atomic::AtomicUsize::new(0)));
++            let cancel = Arc::new(AtomicBool::new(false));
++            let notify: Notify = {
++                let (owner, pool, counters, cancel) = (
++                    owner.clone(),
++                    pool.clone(),
++                    counters.clone(),
++                    cancel.clone(),
++                );
++                Arc::new(move |progress| {
++                    if progress.phase == "Retrying exact assignment after resident denial" {
++                        counters[1].fetch_add(1, Relaxed);
++                        if matches!(pressure, Pressure::ReaderRetry(_)) {
++                            owner.lock().unwrap().resize(0).unwrap();
++                        }
++                    }
++                    if progress.phase == "Emitting resident exact assignment" {
++                        counters[2].fetch_add(1, Relaxed);
++                    }
++                    let target = match pressure {
++                        Pressure::FixedSelection(mib)
++                            if progress.phase == "Preparing operation 2 of 2" =>
++                        {
++                            Some(mib * 1024 * 1024)
++                        }
++                        Pressure::FixedEmission(mib) if progress.phase == "Serializing output" => {
++                            Some(mib * 1024 * 1024)
++                        }
++                        Pressure::ReaderRetry(_)
++                            if progress.phase == "Before reserved exact parent read" =>
++                        {
++                            Some((MEMORY - pool.usage().reserved_bytes - 32_767) as usize)
++                        }
++                        _ => None,
++                    };
++                    if let Some(target) = target {
++                        if counters[0].fetch_add(1, Relaxed) == 0 {
++                            match owner.lock().unwrap().resize(target) {
++                                Ok(()) => counters[3].fetch_add(1, Relaxed),
++                                Err(error) => {
++                                    assert!(matches!(
++                                        pressure,
++                                        Pressure::FixedSelection(_) | Pressure::FixedEmission(_)
++                                    ));
++                                    assert!(error.downcast_ref::<MemoryAdmission>().is_some());
++                                    println!("exact-peer-denied pressure={pressure:?} arm={arm} request={target}");
++                                    0
++                                }
++                            };
++                            if matches!(pressure, Pressure::ReaderRetry(true)) {
++                                cancel.store(true, Relaxed);
++                            }
++                        }
++                    }
++                })
++            };
++            let result = execute(job(&input, &out, &temp, arm), cancel, notify, pool.clone());
++            let retried = counters[1].load(Relaxed);
++            let emitted = counters[2].load(Relaxed);
++            let state = match result {
++                Ok((analysis, diagnostics)) => {
++                    let snapshot = verify(&out, analysis, &payload)?;
++                    if let Some(expected) = &reference {
++                        assert_eq!(&snapshot, expected);
++                    } else {
++                        reference = Some(snapshot);
++                    }
++                    std::fs::remove_dir_all(&out)?;
++                    if matches!(pressure, Pressure::None) {
++                        assert_eq!(retried, 0);
++                        assert_eq!(emitted, if arm == "bucket" { PARENTS } else { 0 });
++                    }
++                    if matches!(pressure, Pressure::ReaderRetry(false)) {
++                        assert_eq!(retried, 1);
++                        assert_eq!(emitted, PARENTS - 1);
++                    }
++                    println!("stats {pressure:?} {arm} {diagnostics}");
++                    "complete"
++                }
++                Err(error) => {
++                    if matches!(pressure, Pressure::ReaderRetry(true)) {
++                        assert!(format!("{error:#}").contains("job cancelled"), "{error:#}");
++                        assert_eq!(retried, 0);
++                        assert_eq!(emitted, 0);
++                        "cancelled"
++                    } else {
++                        assert!(matches!(
++                            pressure,
++                            Pressure::FixedSelection(_) | Pressure::FixedEmission(_)
++                        ));
++                        assert!(
++                            error.downcast_ref::<MemoryAdmission>().is_some(),
++                            "{error:#}"
++                        );
++                        "denied"
++                    }
++                }
++            };
++            let mut owner = owner.lock().unwrap();
++            match pressure {
++                Pressure::FixedSelection(mib) | Pressure::FixedEmission(mib) => {
++                    assert_eq!(counters[0].load(Relaxed), 1);
++                    let grant = counters[3].load(Relaxed) * mib * 1024 * 1024;
++                    assert_eq!(owner.bytes(), grant as u64);
++                }
++                _ => {}
++            }
++            println!("exact-frontier pressure={pressure:?} arm={arm} state={state} peer={} retries={retried} buckets={emitted}", owner.bytes());
++            assert_eq!(std::fs::read_dir(&temp)?.count(), 0);
++            assert!(!out.exists());
++            assert_eq!(std::fs::read_dir(dir.path())?.count(), 2);
++            assert_eq!(pool.usage().reserved_bytes, owner.bytes());
++            owner.resize(0)?;
++            assert_eq!(pool.usage().reserved_bytes, 0);
++        }
++    }
++    Ok(())
++}
++
++fn verify(
++    out: &Path,
++    analysis: Analysis,
++    payload: &str,
++) -> Result<(serde_json::Value, Vec<String>)> {
++    let mut logical = serde_json::to_value(analysis)?;
++    for key in [
++        "temp_bytes",
++        "peak_temp_bytes",
++        "analysis_seconds",
++        "timings",
++        "diagnostics",
++    ] {
++        logical.as_object_mut().unwrap().remove(key);
++    }
++    assert_eq!(logical["rows"].as_u64(), Some(ROWS as u64));
++    assert_eq!(logical["groups"].as_u64(), Some((PARENTS * 9) as u64));
++    let mut expected = vec![0; ROWS];
++    let mut quota_counts = [[0u64; 9]; PARENTS];
++    for parent in 0..PARENTS {
++        let ancestry = [serde_json::json!({"values":[parent.to_string()],"operation":0})];
++        let mut rng = Random::new(random::json_domain(SEED, 1, &ancestry)?);
++        let count = (parent..ROWS).step_by(PARENTS).len() as u64;
++        let mut quotas = [0; 9];
++        for (n, quota) in quotas[..8].iter_mut().enumerate() {
++            *quota = count / 8 + u64::from((n as u64) < count % 8);
++        }
++        quota_counts[parent] = quotas;
++        let mut remaining = count;
++        for id in (parent..ROWS).step_by(PARENTS) {
++            let mut choice = rng.below(remaining);
++            remaining -= 1;
++            for (index, quota) in quotas.iter_mut().enumerate() {
++                if choice < *quota {
++                    *quota -= 1;
++                    expected[id] = index;
++                    break;
++                }
++                choice -= *quota;
++            }
++        }
++    }
++    let manifest = std::fs::read_to_string(out.join("manifest.jsonl"))?;
++    let mut seen = vec![false; ROWS];
++    let mut order = [[None; 9]; PARENTS];
++    let mut found = [[0u64; 9]; PARENTS];
++    let mut empty = [false; PARENTS];
++    let mut hashes = Vec::new();
++    for line in manifest.lines().skip(1) {
++        let record: serde_json::Value = serde_json::from_str(line)?;
++        let lineage = record["lineage"].as_array().context("missing lineage")?;
++        assert_eq!(lineage.len(), 2);
++        assert_eq!(lineage[0]["operation"].as_u64(), Some(0));
++        assert_eq!(lineage[1]["operation"].as_u64(), Some(1));
++        let parent: usize = lineage[0]["values"][0]
++            .as_str()
++            .context("missing partition")?
++            .parse()?;
++        let group: usize = lineage[1]["allocation"]
++            .as_str()
++            .context("missing assignment")?[1..]
++            .parse()?;
++        let path = record["path"].as_str().context("missing output path")?;
++        let csv = std::fs::read(out.join(path))?;
++        assert_eq!(record["csv_bytes"].as_u64(), Some(csv.len() as u64));
++        assert!(csv.len() as u64 <= BYTE_LIMIT);
++        let mut rows = std::str::from_utf8(&csv)?.lines();
++        assert_eq!(rows.next(), Some("id,region,payload"));
++        let mut count = 0;
++        for row in rows {
++            let fields: Vec<_> = row.split(',').collect();
++            assert_eq!(fields.len(), 3);
++            let id: usize = fields[0].parse()?;
++            assert!(!std::mem::replace(&mut seen[id], true));
++            assert_eq!(fields[1].parse::<usize>()?, parent);
++            assert_eq!(id % PARENTS, parent);
++            assert_eq!(fields[2], payload);
++            assert_eq!(group, expected[id]);
++            if let Some(previous) = order[parent][group].replace(id) {
++                assert!(previous < id);
++            }
++            count += 1;
++        }
++        assert_eq!(record["rows"].as_u64(), Some(count));
++        assert!(count <= 600);
++        if group == 8 {
++            assert_eq!(count, 0);
++            assert!(!std::mem::replace(&mut empty[parent], true));
++        }
++        found[parent][group] += count;
++        hashes.push(format!("{line} {}", blake3::hash(&csv)));
++    }
++    assert_eq!(found, quota_counts);
++    assert!(empty.into_iter().all(|found| found));
++    assert!(seen.into_iter().all(|found| found));
++    assert_eq!(std::fs::read_dir(out)?.count(), hashes.len() + 1);
++    Ok((logical, hashes))
++}
++
++#[test]
++#[ignore = "requires a pinned full-job fixture"]
++fn measure_resident_exact_buckets() -> Result<()> {
++    let config = std::env::var_os("CHOPPER_EXACT_RESIDENT_CONFIG").context("missing pinned job")?;
++    let arm = std::env::var("CHOPPER_EXACT_RESIDENT_ARM")?;
++    ensure!(
++        matches!(arm.as_str(), "auto" | "sort" | "bucket"),
++        "unknown arm"
++    );
++    DISABLE_BUCKETS.with(|flag| flag.set(arm != "bucket"));
++    let mut job: Job = serde_json::from_slice(&std::fs::read(config)?)?;
++    job.random_seed = Some(SEED.into());
++    assert_eq!(
++        job.resources.grouping,
++        if arm == "sort" {
++            Grouping::Sort
++        } else {
++            Grouping::Auto
++        }
++    );
++    let pool = Arc::new(MemoryPool::new(
++        std::env::var("CHOPPER_EXACT_RESIDENT_SHARED_BYTES")?.parse()?,
++    ));
++    let counters = Arc::new([0, 1].map(|_| std::sync::atomic::AtomicUsize::new(0)));
++    let notify = {
++        let counters = counters.clone();
++        Arc::new(move |p: crate::storage::Progress| {
++            if p.phase == "Retrying exact assignment after resident denial" {
++                counters[0].fetch_add(1, Relaxed);
++            } else if p.phase == "Emitting resident exact assignment" {
++                counters[1].fetch_add(1, Relaxed);
++            }
++        })
++    };
++    let now = std::time::Instant::now();
++    let (analysis, diagnostics) =
++        execute(job, Arc::new(AtomicBool::new(false)), notify, pool.clone())?;
++    let elapsed = now.elapsed().as_secs_f64();
++    println!(
++        "MEASUREMENT {}",
++        serde_json::json!({"arm": arm, "elapsed_seconds": elapsed, "rows": analysis.rows,
++            "files": analysis.output_files, "output_csv_bytes": analysis.output_csv_bytes,
++            "retries": counters[0].load(Relaxed), "buckets": counters[1].load(Relaxed),
++            "diagnostics": diagnostics, "peak_reserved_bytes": pool.usage().peak_reserved_bytes})
++    );
++    drop(analysis);
++    assert_eq!(pool.usage().reserved_bytes, 0);
++    Ok(())
++}
++
++#[test]
++fn resident_exact_sink_denial_never_retries() -> Result<()> {
++    struct RejectSecond(usize);
++    impl RowSink for RejectSecond {
++        fn begin(&self, lineage: Vec<serde_json::Value>, exact: bool) -> Group {
++            Group {
++                offset: 0,
++                rows: 0,
++                lineage,
++                exact,
++            }
++        }
++        fn row(&mut self, group: &mut Group, _: &Row) -> Result<()> {
++            self.0 += 1;
++            if self.0 == 2 {
++                return Err(MemoryAdmission::Local.into());
++            }
++            group.rows += 1;
++            Ok(())
++        }
++        fn end(&mut self, _: Group) -> Result<()> {
++            Ok(())
++        }
++    }
++    let dir = tempfile::tempdir()?;
++    let temp = dir.path().join("temp");
++    std::fs::create_dir(&temp)?;
++    let job = job(
++        &dir.path().join("input"),
++        &dir.path().join("output"),
++        &temp,
++        "bucket",
++    );
++    let pool = Arc::new(MemoryPool::new(MEMORY));
++    let retries = Arc::new(std::sync::atomic::AtomicUsize::new(0));
++    let notify = {
++        let retries = retries.clone();
++        Arc::new(move |event: crate::storage::Progress| {
++            if event.phase == "Retrying exact assignment after resident denial" {
++                retries.fetch_add(1, Relaxed);
++            }
++        })
++    };
++    let ctx = Context::with_memory_pool(
++        &job.resources,
++        Arc::new(AtomicBool::new(false)),
++        notify,
++        pool.clone(),
++    )?;
++    let mut text = String::from("id,region,payload\n");
++    use std::fmt::Write as _;
++    for id in 0..128 {
++        writeln!(text, "{id},0,value")?;
++    }
++    let source = ingest(Box::new(text.as_bytes()), &job, &ctx)?;
++    let parent = source.dataset.groups()?.next().unwrap()?;
++    let mut sink = RejectSecond(0);
++    let error = apply_parent(
++        &source.dataset,
++        &parent,
++        &job.operations[1],
++        1,
++        &job,
++        &source.analysis,
++        &ctx,
++        &mut sink,
++        None,
++        None,
++    )
++    .expect_err("terminal sink deny");
++    assert!(matches!(
++        error.downcast_ref::<MemoryAdmission>(),
++        Some(MemoryAdmission::Local)
++    ));
++    assert_eq!(sink.0, 2);
++    assert_eq!(retries.load(Relaxed), 0);
++    drop(parent);
++    drop(source);
++    drop(ctx);
++    assert_eq!(pool.usage().reserved_bytes, 0);
++    assert_eq!(std::fs::read_dir(&temp)?.count(), 0);
++    Ok(())
++}

@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "streaming-shuffle-adapters-at-40-gib-2026-11-21",
+  "title": "Qualify streamed exact-quota shuffle adapters at 40 GiB",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Does the 2 GiB streaming adapter resource benefit transfer at 40 GiB within the same strict memory scope?",
+  "disposition": "informational",
+  "outcome": "mixed",
+  "delivery": "unchanged",
+  "summary": "qsvlite stream completes the 40 GiB job in 710.569 s, down 11.95% versus file staging with lower file counters and +21.40% process CPU. Opt-in Chopper takes 551.724 s in the prior qualification. The DuckDB stream reports engine allocation denial at m256.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "40 GiB plain fixed-width CSV, exact 8 parts, 1 GiB hard cgroup with swap disabled and one requested worker per command."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Complete exact field/ID/quotas/caps/nonidentity checks for all finished workloads. Preflights and the failed full DuckDB attempt are retained."
+  },
+  "limitations": [
+    "Only one full job per completed tool variant in WSL2/ext4. Backing caches uncontrolled.",
+    "DuckDB failure describes the exact mixed-tool pipeline and engine setting. It does not establish a general DuckDB bound. Individual RSS and cgroup cache peaks have separate scope."
+  ],
+  "exclusions": [
+    "Small preflights and failed attempts. Fixture hashing and independent oracle outside clocks."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#streaming-shuffle-adapters-at-40-gib-2026-11-21",
+      "sha256": "c4a36de4f7029edc22fe3bf1a2d1a6cea25c47c78074cf5fcf1a58e3f31608f7"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/streaming-shuffle-adapters-40gib-summary-2026-11-21.json",
+      "sha256": "a737593026022d00e079bf2e3031a7b5f6a4729e6e51c2b9eb00da4205a37d44"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md"
+  ]
+}

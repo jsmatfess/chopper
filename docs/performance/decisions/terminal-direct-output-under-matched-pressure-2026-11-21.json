@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "terminal-direct-output-under-matched-pressure-2026-11-21",
+  "title": "Retain terminal-direct under matched shared pressure",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Can a plain terminal-direct partition and probabilistic job preserve the completion and peer admission boundaries of the encoded snapshot path?",
+  "disposition": "retain-experimental",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "At publication one fixed-peer pair completed direct only. At live emission a separate fixed request admitted alongside a completed snapshot job but was rejected by the direct job. Defer delivery.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "70,003 plain rows with four partition parents, internal seeded 80/20/0 allocations, one worker, strict row/byte caps, shared and job memory at 32 MiB."
+    ],
+    "measurement": "acceptance-only"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "56 total complete-job attempts in the final primary and follow-up. Exact output and logical Analysis on success, one input visit, typed denial/cancellation, preserved late incumbent, and full owner/private staging cleanup. The primary Rust test passed and re-extraction recovered an omitted first log line."
+  },
+  "limitations": [
+    "Fixed callback-synchronized peer requests against a tracked shared ledger.",
+    "Variable pressure before or after these particular callbacks and other row widths, shapes and codec owners remain untested."
+  ],
+  "exclusions": [
+    "No new timing, RSS, physical I/O, Windows/WASI validation, dispatch or default change."
+  ],
+  "reopen_when": "Require a concrete live-writer admission remedy that preserves the matched peer completion without fallback after emission.",
+  "supersedes": [
+    "terminal-direct-2026-11-03"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#terminal-direct-output-under-matched-pressure-2026-11-21",
+      "sha256": "17c427bb4e0576401a18bacd78e11d41c27916a45337d909390aa2e4c64719f0"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/terminal-direct-matched-pressure-2026-11-21.json",
+      "sha256": "c96b721fd938a58643b463ee18869108820f7e9f4f12296e1aec636aa84f1e2c"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/pipeline-rewrites.md",
+    "docs/validation.md"
+  ]
+}

@@ -7,6 +7,12 @@
 !options-browser-2026-10-13.jsonl
 !performance-decisions-2026-10-20.json
 !strategy-corpus-review-2026-10-23.json
+
+# Compact cross-tool interpretation; raw jobs and workstation provenance stay local.
+!cross-tool-summary-2026-11-18.json
+!cross-tool-checks-summary-2026-11-18.json
+!data-movement-summary-2026-11-18.json
+!data-movement-checks-summary-2026-11-18.json
 e3-direct-r24-2026-10-26-astra-disposition.md
 e3-direct-r24-2026-10-26-repetitions-and-resources.md
 e3-direct-r24-2026-10-26-round-report.md
@@ -106,3 +112,77 @@ zero-reservation-2026-11-05.json
 # Additional workstation-bearing originals, independently read back before removal.
 packed-row-buffered-copy-2026-11-05-linux-lock.py
 reservation-entry-2026-11-05-linux-lock.py
+
+# Reviewed OOM iteration projections; original jobs and receipts remain local.
+!oom-data-movement-summary-2026-11-18.json
+!oom-data-movement-checks-summary-2026-11-18.json
+
+# Reviewed pipeline-publication projections; originals remain local and ignored.
+!pipeline-publication-summary-2026-11-18.json
+!pipeline-publication-checks-summary-2026-11-18.json
+
+# Reviewed writer capacity and publication projections.
+!memory-proportional-writers-summary-2026-11-21.json
+!memory-proportional-writers-checks-2026-11-21.json
+
+# Reviewed explicit Sort and compressed-input Balanced projection.
+!pipeline-sorting-source-codec-summary-2026-11-21.json
+
+# Reviewed count-first Partition and Balanced comparison.
+!counted-partition-balanced-summary-2026-11-21.json
+
+# Reviewed 8 GiB terminal Uniform merge comparison.
+!wide-terminal-uniform-merge-summary-2026-11-21.json
+
+# Reviewed current-build 8 GiB cross-tool Balanced comparison.
+!balanced-8gib-cross-tool-summary-2026-11-21.json
+
+# Paired native counted Balanced digest timing.
+!parallel-counted-balanced-digest-summary-2026-11-21.json
+
+# Full constrained Balanced qualification at 40 GiB.
+!balanced-40gib-qualification-summary-2026-11-21.json
+
+# Paired 8 GiB Uniform kernel read-ahead advice comparison.
+!terminal-uniform-kernel-read-ahead-summary-2026-11-21.json
+
+# Verified first 40 GiB pair stopped at the unchanged retention boundary.
+!terminal-uniform-1024-way-merge-summary-2026-11-21.json
+
+# Verified singleton counted Balanced fingerprint ablation.
+!counted-balanced-first-pass-fingerprint-summary-2026-11-21.json
+!counted-balanced-first-pass-fingerprint-validation-2026-11-21.json
+
+# Verified 8 GiB Balanced comparison after the fingerprint change.
+!balanced-integrated-8gib-cross-tool-summary-2026-11-21.json
+
+# Verified validation-only counted Balanced comparison.
+!counted-balanced-validation-only-summary-2026-11-21.json
+
+# Complete 40 GiB external shuffle comparison and DuckDB admission failures.
+!uniform-balanced-40gib-cross-tool-summary-2026-11-21.json
+
+# Paired terminal Uniform application read buffer comparison.
+!terminal-uniform-merge-read-buffers-summary-2026-11-21.json
+
+# Verified 2 GiB streaming adapter comparisons and failure receipts.
+!streaming-shuffle-adapters-2gib-summary-2026-11-21.json
+
+# Full 40 GiB streaming adapter qualification and DuckDB admission failure.
+!streaming-shuffle-adapters-40gib-summary-2026-11-21.json
+
+# Verified matched native terminal Uniform short-tail comparison.
+!terminal-uniform-short-tail-summary-2026-11-21.json
+!terminal-uniform-short-tail-40gib-summary-2026-11-21.json
+
+# Reviewed prepared spill, quota index, and terminal pressure projections.
+!indexed-exact-quota-lookup-2026-11-21.json
+!probabilistic-shuffle-fusion-2gib-2026-11-21.json
+!terminal-direct-matched-pressure-2026-11-21.json
+!exact-resident-buckets-2026-11-21.json
+
+# Reviewed routing and bounded writer projections.
+!bounded-writers-checks-2026-11-19.json
+!bounded-writers-summary-2026-11-19.json
+!partition-routing-checks-summary-2026-11-18.json
+!partition-routing-summary-2026-11-18.json

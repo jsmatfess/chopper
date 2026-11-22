@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "counted-partition-and-balanced-2026-11-21",
+  "title": "Retain counted Partition followed by Balanced",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Can a bounded per-key count pass avoid two-operation staging through native publication?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "Keep the opt-in count-first rewrite. Complete elapsed fell 41%, CLI CPU fell 32%, and managed writes fell from 7.52 GB to 14.7 KB.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2 GiB plain UTF-8 input, eight keys, 64 exact parts, 40 MiB cap, one worker, 256 MiB engine setting, 1 GiB cgroup and no swap."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "summary": "Exact source-row order and membership by key and part, full fields and logical digest, stages, canonical lineage/name ordering, strict physical serialized cap and private cleanup in every timed job; focused source mutation, quotas and empty-root parity controls. Linux default and all-feature workspace tests and lint, WASI compile, native Windows focused contracts, and native default release restoration pass. WASI coverage is compile only for this source revision."
+  },
+  "limitations": [
+    "One synthetic native Linux workload with uncontrolled WSL backing caches.",
+    "Finite bound, plain I/O, Auto grouping and unobserved native scope.",
+    "Managed traffic omits input bytes, CSV publication writes and physical I/O."
+  ],
+  "exclusions": [
+    "Warmup/preflight, initial diagnostic, unused prior builds, and harness attempts that never launched the CLI."
+  ],
+  "reopen_when": "Calibrate selection with wider keys, fanout, skew and platform transfer before proposing default activation.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#counted-partition-and-balanced-2026-11-21",
+      "sha256": "75d7b0acd55a12a3c7d6ac518933540cc35f5b41898c0aef6d19acb40345fe2c"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/counted-partition-balanced-summary-2026-11-21.json",
+      "sha256": "d53da86ed9ab08d35611ac34ef3ff1b0cd44a7207880c7e77b9447baa3e35567"
+    }
+  ],
+  "contracts": [
+    "docs/direct-execution.md",
+    "docs/pipeline-rewrites.md",
+    "docs/specification.md"
+  ]
+}

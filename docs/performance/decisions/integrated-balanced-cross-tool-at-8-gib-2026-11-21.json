@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "integrated-balanced-cross-tool-at-8-gib-2026-11-21",
+  "title": "Compare integrated counted Balanced with qsvlite and DuckDB",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "How does the integrated opt-in build with the approved fingerprint change compare on the out-of-memory 8 GiB Balanced fixture?",
+  "disposition": "informational",
+  "outcome": "diagnostic",
+  "delivery": "unchanged",
+  "summary": "Integrated Chopper median 38.87 s, qsvlite 22.53 s, ordered materialized DuckDB adapter 66.84 s. Independent paired ablation attributes about 4.6 CPU s to removed fingerprint work.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "8 GiB plain CSV, eight exact consecutive parts, hard 1 GiB cgroup without swap and one worker."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Three verified rotating measured rounds after one complete warmup per tool. Independent full CSV output, order, quotas, caps, and Chopper publication/cleanup checks."
+  },
+  "limitations": [
+    "WSL2/ext4 with uncontrolled backing cache. Input exceeds the cgroup and fits host RAM. Scope excludes native Windows.",
+    "qsvlite sequential split and DuckDB materialize-and-slice are specific adapters. The divisible fixture yields exact quotas in all three.",
+    "The opt-in Chopper build includes the approved fingerprint change. The separate 40 GiB qualification predates this change."
+  ],
+  "exclusions": [
+    "Three warmups. Fixture preparation and identity, cache eviction advice, and independent verification outside the timed commands."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#integrated-balanced-cross-tool-at-8-gib-2026-11-21",
+      "sha256": "f9a638f0b4fd64afea1ad1e44cf7ae5b2769c1cfcd3df64abf99b7e5e70386a1"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/balanced-integrated-8gib-cross-tool-summary-2026-11-21.json",
+      "sha256": "e21ee5ebe17b38d749d029d62dec1c04f0f308783d7df8b835b6cb2cd60dbbec"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md"
+  ]
+}

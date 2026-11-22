@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "balanced_8gib_cross_tool",
+  "comparison": {
+    "kind": "summary",
+    "primary": {
+      "path": "scratch/balanced-refresh-20261121/primary-batch-v1/status.json",
+      "sha256": "c11f7101d4cf9630824201770babd0fbd0cb02fdfc8ced89742217fd509899e4"
+    },
+    "qualification": {
+      "path": "scratch/balanced-refresh-20261121/qualification-result-v2.json",
+      "sha256": "b8e18a9e18d1022804b021a5c703d6dc863032871640a120a996601d42dfec56"
+    },
+    "tools": {
+      "chopper": {
+        "n": 3,
+        "samples": [
+          {
+            "rep": 0,
+            "elapsed": 37.76152928604279,
+            "cpu": 24.67,
+            "cli_rss_kib": 5792,
+            "cgroup_peak_bytes": 1073741824,
+            "output_bytes": 8657043624,
+            "attempt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/chopper-r0/attempt.json",
+              "sha256": "6b173ce1a9e6fbad238dd702e75d95f3c89d6c63bb8d78bd59a4488b32a0ee8a"
+            },
+            "receipt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/chopper-r0/verification.json",
+              "sha256": "8f48cbc94e7cf3f3f0953c0be3f18d17d476ac3d447afae6767082f174ca82d7"
+            }
+          },
+          {
+            "rep": 1,
+            "elapsed": 42.872876311070286,
+            "cpu": 25.74,
+            "cli_rss_kib": 5680,
+            "cgroup_peak_bytes": 1073741824,
+            "output_bytes": 8657043624,
+            "attempt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/chopper-r1/attempt.json",
+              "sha256": "1c20bbffc22e82d32e7474b7227fa558b662619f5dd2cb798dc328e5d3a0605b"
+            },
+            "receipt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/chopper-r1/verification.json",
+              "sha256": "2e71d7622bcbc817aa80b1980725545dafe6ac4a5a82646402d471a43d73d79f"
+            }
+          },
+          {
+            "rep": 2,
+            "elapsed": 36.405758613022044,
+            "cpu": 25.189999999999998,
+            "cli_rss_kib": 5716,
+            "cgroup_peak_bytes": 1073741824,
+            "output_bytes": 8657043624,
+            "attempt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/chopper-r2/attempt.json",
+              "sha256": "6fa909d40baaaa332f2ad58b9309dad274b1903659d0e15082d1fce02079ca3e"
+            },
+            "receipt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/chopper-r2/verification.json",
+              "sha256": "27f622263370e27fdfc7084545054a5a9a69aa05a459eaae448c959baf721506"
+            }
+          }
+        ],
+        "medians": {
+          "elapsed": 37.76152928604279,
+          "cpu": 25.189999999999998,
+          "cli_rss_kib": 5716,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8657043624
+        },
+        "elapsed_range": [
+          36.405758613022044,
+          42.872876311070286
+        ]
+      },
+      "qsvlite": {
+        "n": 3,
+        "samples": [
+          {
+            "rep": 0,
+            "elapsed": 17.961453548050486,
+            "cpu": 12.89,
+            "cli_rss_kib": 16924,
+            "cgroup_peak_bytes": 1073741824,
+            "output_bytes": 8589934760,
+            "attempt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/qsvlite-r0/attempt.json",
+              "sha256": "cb7d37c3c195641f242e09dac5c4b2524dead49fa0643f1d6d99d9397c029a40"
+            },
+            "receipt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/qsvlite-r0/verification.json",
+              "sha256": "5a06738be13eb68bfe0f98960bc23d167c9cff0e5da3d593eb0fc708a1e2e7e4"
+            }
+          },
+          {
+            "rep": 1,
+            "elapsed": 21.776989993057214,
+            "cpu": 13.02,
+            "cli_rss_kib": 16804,
+            "cgroup_peak_bytes": 1073741824,
+            "output_bytes": 8589934760,
+            "attempt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/qsvlite-r1/attempt.json",
+              "sha256": "b0f373676aad7ec1c5783204ce8961690d8b2c10242ca96c8aa22b28b2f7aba1"
+            },
+            "receipt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/qsvlite-r1/verification.json",
+              "sha256": "6baebd72257ffd50c3f5ba5ab015930cc051ad0035c3b4cca4ebd85ed9775f42"
+            }
+          },
+          {
+            "rep": 2,
+            "elapsed": 19.764798041898757,
+            "cpu": 12.63,
+            "cli_rss_kib": 17244,
+            "cgroup_peak_bytes": 1073741824,
+            "output_bytes": 8589934760,
+            "attempt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/qsvlite-r2/attempt.json",
+              "sha256": "d09ca78888d6f9597220235026960bed6e73b3e68337112d6de4a7b33c68a612"
+            },
+            "receipt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/qsvlite-r2/verification.json",
+              "sha256": "b6763f52a18bca5c43505ee4dbe758ee53848c3bd31142dca987061140e9b949"
+            }
+          }
+        ],
+        "medians": {
+          "elapsed": 19.764798041898757,
+          "cpu": 12.89,
+          "cli_rss_kib": 16924,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8589934760
+        },
+        "elapsed_range": [
+          17.961453548050486,
+          21.776989993057214
+        ]
+      },
+      "duckdb": {
+        "n": 3,
+        "samples": [
+          {
+            "rep": 0,
+            "elapsed": 62.625977830030024,
+            "cpu": 51.92,
+            "cli_rss_kib": 478156,
+            "cgroup_peak_bytes": 1073741824,
+            "output_bytes": 8657043624,
+            "attempt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/duckdb-r0/attempt.json",
+              "sha256": "3b3015c2e41d13c78a755e848ace6c0032feebc6c6bbb16a187bae06fb6a9dc2"
+            },
+            "receipt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/duckdb-r0/verification.json",
+              "sha256": "39ca1aa9f8b179989332f70203fd9135158ed0b0d945542133eceb480f4b74e9"
+            }
+          },
+          {
+            "rep": 1,
+            "elapsed": 55.408305608900264,
+            "cpu": 51.94,
+            "cli_rss_kib": 482620,
+            "cgroup_peak_bytes": 1073741824,
+            "output_bytes": 8657043624,
+            "attempt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/duckdb-r1/attempt.json",
+              "sha256": "a853c811671bce92830906fa6e8399dd20d3644744af342a53574840e1f52653"
+            },
+            "receipt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/duckdb-r1/verification.json",
+              "sha256": "eda755c430921b6a7a83aec6dd3d7435c29ccd4098eca06dd01690f5c863cfb9"
+            }
+          },
+          {
+            "rep": 2,
+            "elapsed": 64.83074831496924,
+            "cpu": 52.43,
+            "cli_rss_kib": 496564,
+            "cgroup_peak_bytes": 1073741824,
+            "output_bytes": 8657043624,
+            "attempt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/duckdb-r2/attempt.json",
+              "sha256": "26c83096d66d0013bdf1e036a71feb1fa86908b5e4cfee7ac7501b2b377634ce"
+            },
+            "receipt": {
+              "path": "scratch/balanced-refresh-20261121/primary-v1/duckdb-r2/verification.json",
+              "sha256": "f47ccc45b227ba38aefa1b2cbdae71e9943631159b57aa61d9a366465e51089d"
+            }
+          }
+        ],
+        "medians": {
+          "elapsed": 62.625977830030024,
+          "cpu": 51.94,
+          "cli_rss_kib": 482620,
+          "cgroup_peak_bytes": 1073741824,
+          "output_bytes": 8657043624
+        },
+        "elapsed_range": [
+          55.408305608900264,
+          64.83074831496924
+        ]
+      }
+    },
+    "scope": "Three complete alternating or cyclic rounds; full-size qualification excluded. GNU time CLI CPU and RSS, whole-cgroup memory peak including file cache."
+  },
+  "source": {
+    "path": "scratch/balanced-refresh-20261121/balanced-primary-summary-v1.json",
+    "sha256": "6976799f25e91c93d04ad858889b2115f4f1bf4108ef8fc1572233de9d119565"
+  },
+  "version_receipt": {
+    "path": "scratch/balanced-refresh-20261121/versions-v1.json",
+    "sha256": "60904a0af4f79aa74b8092cbc5a2895aa35d27bcc749b52c822b5ba2a06e31d0"
+  },
+  "versions": {
+    "chopper": "chopper 0.2.0",
+    "qsvlite": "qsvlite 29.0.0-jemalloc+bgthread-self_update-16-16;50.21 GiB-16.00 GiB-60.15 GiB-62.76 GiB (x86_64-unknown-linux-gnu compiled with Rust 1.100;Linux (Ubuntu 26.04)-Linux 6.18.33.1-microsoft-standard-WSL2;AMD Ryzen 7 5800X 8-Core Processor-8) prebuilt",
+    "duckdb": "2.0.0"
+  },
+  "fixture": {
+    "path": "scratch/writer-capacity-20261119/large8192-fixture/fixture.json",
+    "sha256": "710a5b2b3bb2c502caee424bd9a2d4e2eeeb9624b05c3dc3bc26819dff60b122"
+  },
+  "chopper_build": {
+    "receipt": {
+      "path": "scratch/oom-iteration/wide-uniform-merge-candidate-v1-build.json",
+      "sha256": "6e2521460bfc534fd137f4027d6098e1b79a152060a666358c6f8b4724fe2892"
+    },
+    "binary_sha256": "574ebe1a2fab9698df16155eb45c5b8f862c1200583917bf5c4954dc2cc5cb2d",
+    "features": [
+      "experimental-counted-balanced",
+      "experimental-terminal-shuffle",
+      "experimental-cgroup-cache-headroom",
+      "experimental-terminal-routing",
+      "experimental-final-writer-chains",
+      "experimental-memory-final-writers",
+      "experimental-small-final-buffers",
+      "experimental-release-final-header-scratch",
+      "experimental-counted-codec-balanced",
+      "experimental-bounded-final-partition",
+      "experimental-retained-exact-writers",
+      "experimental-single-final-catalog",
+      "experimental-single-catalog-capacity",
+      "experimental-batched-final-sync",
+      "experimental-counted-zstd-input-balanced",
+      "experimental-counted-partition-balanced",
+      "experimental-wide-uniform-merge"
+    ],
+    "source_archive_sha256": "725944512ae7817ee6e119cd15cf38237e177541d57c40a2aa451a64a0aab98a"
+  },
+  "decision": {
+    "path": "scratch/balanced-refresh-20261121/decision-v1.json",
+    "sha256": "ffe49379c865883e6fc5a674da69d826839ff7f34618c70d68544e42653f80a3"
+  },
+  "qualification": [
+    {
+      "path": "scratch/balanced-refresh-20261121/chopper-qualification-batch-v2/status.json",
+      "sha256": "9d20ded6fa3757381bdcae3874360e607f7e394a9ff370db52a69e23e9a8d043"
+    },
+    {
+      "path": "scratch/balanced-refresh-20261121/qsvlite-qualification-batch-v2/status.json",
+      "sha256": "c95790e9b2355e6eee66b9f8b215eca605d419ac459d459a44b18264b1c9f668"
+    },
+    {
+      "path": "scratch/balanced-refresh-20261121/duckdb-qualification-batch-v2/status.json",
+      "sha256": "830169c58405cbe29a92b4f1e3e7b49262601e9745570ca51b54fed4b612e7cd"
+    }
+  ],
+  "scope": "All fields, source order and eight exact quotas verified. Linux WSL2/ext4, one worker, hard 1 GiB/no swap, 256 MiB tool engine setting for Chopper and DuckDB. Prior qualification is excluded. DuckDB is the recorded materialize-and-slice adapter."
+}

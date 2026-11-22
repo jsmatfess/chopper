@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "memory-proportional-writers-and-publication-scheduling-2026-11-21",
+  "title": "Retain bounded writer expansion and final sync scheduling experiments",
+  "date": "2026-11-21",
+  "subsystem": "output",
+  "question": "Can bounded concurrent writers, smaller catalogs and scheduled final syncs improve complete jobs larger than the engine working allocation?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "Retain opt-in bounded writer paths and resource tradeoffs. The 8 GiB ceiling extension improves median elapsed 36.9%, and Linux batching improves the 8,192-file cell 49.6% with all required sync calls.",
+  "scope": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "workloads": [
+      "2 GiB Linux high-fanout publication, codec, Partition and stratified exact cells, plus an 8 GiB writer-ceiling extension and wide UTF-16 header control.",
+      "2 GiB native Windows ordered Partition and stratified exact assignment transfer."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows",
+      "wasi-chromium"
+    ],
+    "summary": "Full native output and membership oracles on each timed job. Native format, lint and workspace checks plus Chromium bounded functional and resource checks. Default production build artifacts restored."
+  },
+  "limitations": [
+    "Linux WSL2 runs use a 1 GiB cgroup with no swap and uncontrolled backing caches. Windows uses NTFS with no OS memory cap.",
+    "Higher writer capacity trades working memory and file handles for less staging. Sync scheduling is Linux-only.",
+    "Comparators have different publication contracts. Three pairs do not establish tail latency. Raw originals remain local."
+  ],
+  "exclusions": [
+    "Warmups, rejected prototypes, Windows harness failures and the interrupted Linux pair with no complete outer clock."
+  ],
+  "reopen_when": "Test candidate selectors and workload transfer with new identified cells before a default activation decision.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#memory-proportional-writers-and-publication-scheduling-2026-11-21",
+      "sha256": "efddcdb943faece054bbe19b84669ee8b103ca7a645acecb349b59027b775643"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/memory-proportional-writers-summary-2026-11-21.json",
+      "sha256": "9de59bd4230ebde5e884bc37c2f8aa62731b19d735c9279f8b4803677145692b"
+    },
+    {
+      "path": "docs/benchmarks/memory-proportional-writers-checks-2026-11-21.json",
+      "sha256": "aa6b58ee0f3c3e7b722d6b55b05490f3209fe2e3fc11b9fd8bc8383bdbccaba7"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/pipeline-rewrites.md"
+  ]
+}

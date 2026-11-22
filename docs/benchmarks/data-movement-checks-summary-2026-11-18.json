@@ -1,0 +1,259 @@
+{
+  "kind": "summary",
+  "schema_version": 1,
+  "type": "data_movement_evidence_checks",
+  "scope": "Read-only evidence-navigation checks and refresh attempts, not engine speed observations or imported CI reuse.",
+  "read_only_passed": 8,
+  "read_only_failed": 6,
+  "cause": "Missing historical archived originals prevent catalog/audit/view rebuilding; the stale catalog then omits the new source sections. Standard hydration previously rejected duplicate TAR member names in historical bundle3a9b502adc99cceb25bef6cd522f5c2d8d8301efc8a9922427e8a6284a567fb2. Archive validation was not weakened.",
+  "attempts": [
+    {
+      "phase": "refresh",
+      "command": [
+        "python3",
+        "scripts/performance-narratives.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1246488094329834,
+      "log": "00.log",
+      "log_sha256": "1601e2b30c5df81c4d312b87863172805f2ae30eb06b9eb624e86f067e40dc86",
+      "raw_log": "scratch/performance-improvements/evidence-final/00.log"
+    },
+    {
+      "phase": "refresh",
+      "command": [
+        "python3",
+        "scripts/audit-strategy-evidence.py"
+      ],
+      "exit_code": 1,
+      "seconds": 0.3991522789001465,
+      "log": "01.log",
+      "log_sha256": "ebc5cda7521e7d627641ca3ed1c8dee187f6f7060f2076f643bf0d263f7b8c2b",
+      "raw_log": "scratch/performance-improvements/evidence-final/01.log",
+      "failure_summary": "ValueError: <repo>/docs/benchmarks/accounting-batch-browser-2026-10-16.json: Archived evidence is not hydrated: docs/benchmarks/accounting-batch-browser-2026-10-16.json; run python scripts/evidence-resolver.py hydrate --wrangler PATH_TO_WRANGLER_JS"
+    },
+    {
+      "phase": "refresh",
+      "command": [
+        "python3",
+        "scripts/benchmark-catalog.py"
+      ],
+      "exit_code": 1,
+      "seconds": 0.3940293788909912,
+      "log": "02.log",
+      "log_sha256": "b87d87f6c5b3ff490a3a345e7a1864529d8eb1801b61a40adc57d9ad45be364f",
+      "raw_log": "scratch/performance-improvements/evidence-final/02.log",
+      "failure_summary": "ValueError: <repo>/docs/benchmarks/accounting-batch-browser-2026-10-16.json: Archived evidence is not hydrated: docs/benchmarks/accounting-batch-browser-2026-10-16.json; run python scripts/evidence-resolver.py hydrate --wrangler PATH_TO_WRANGLER_JS"
+    },
+    {
+      "phase": "refresh",
+      "command": [
+        "python3",
+        "scripts/performance-registry.py"
+      ],
+      "exit_code": 1,
+      "seconds": 0.14635062217712402,
+      "log": "03.log",
+      "log_sha256": "2782478dc987f4ccaffc761ea2b8f822975968788dcf8f823a23b6988db5c484",
+      "raw_log": "scratch/performance-improvements/evidence-final/03.log",
+      "failure_summary": "Performance registry: Source missing from benchmark catalog: docs/performance.md#cross-tool-csv-split-and-shuffle-comparison-2026-11-18"
+    },
+    {
+      "phase": "refresh",
+      "command": [
+        "python3",
+        "scripts/evidence-views.py",
+        "--build"
+      ],
+      "exit_code": 1,
+      "seconds": 0.09207677841186523,
+      "log": "04.log",
+      "log_sha256": "3a6b9a75163553dedeb498edd5b24437c6dbfcf850f0d9f3713e58c89c0daecc",
+      "raw_log": "scratch/performance-improvements/evidence-final/04.log",
+      "failure_summary": "Evidence views: Archived evidence is not hydrated: docs/benchmarks/windows-retained-parent-audit-unblocked-2026-10-21.jsonl; run python scripts/evidence-resolver.py hydrate --wrangler PATH_TO_WRANGLER_JS"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/test-benchmark-catalog.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.06996774673461914,
+      "log": "05.log",
+      "log_sha256": "2d014bb427120fb1a5014d7499096989061fd0fdf40acb471c2e2667de60e71e",
+      "raw_log": "scratch/performance-improvements/evidence-final/05.log"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/test-performance-registry.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.09519267082214355,
+      "log": "06.log",
+      "log_sha256": "4c5588a567331b41c167e7b0322d345caf84ccc08f92fa683139b8ea52163487",
+      "raw_log": "scratch/performance-improvements/evidence-final/06.log"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/performance-registry.py",
+        "--check"
+      ],
+      "exit_code": 1,
+      "seconds": 0.14075016975402832,
+      "log": "07.log",
+      "log_sha256": "2782478dc987f4ccaffc761ea2b8f822975968788dcf8f823a23b6988db5c484",
+      "raw_log": "scratch/performance-improvements/evidence-final/07.log",
+      "failure_summary": "Performance registry: Source missing from benchmark catalog: docs/performance.md#cross-tool-csv-split-and-shuffle-comparison-2026-11-18"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/test-performance-narratives.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.0904378890991211,
+      "log": "08.log",
+      "log_sha256": "780e1be02e283f51db370cc6a71badcafa8591f5264eb3c2c6ae2de697f50859",
+      "raw_log": "scratch/performance-improvements/evidence-final/08.log"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/performance-narratives.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.1212160587310791,
+      "log": "09.log",
+      "log_sha256": "f05d0b0e8c84d9a84c6489a99ecceac385fcbb0fa107eef58e90f8a9c4b8e555",
+      "raw_log": "scratch/performance-improvements/evidence-final/09.log"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/test-evidence-views.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.14934635162353516,
+      "log": "10.log",
+      "log_sha256": "a2cd6bbfbd2ed4c8d693190c333562fceecd49d7a295a684479367122621a9b6",
+      "raw_log": "scratch/performance-improvements/evidence-final/10.log"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/test-evidence-resolver.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.07399606704711914,
+      "log": "11.log",
+      "log_sha256": "37d8a0769d6c800296764c21f8e08feca52d770d400afabe65713604062cf749",
+      "raw_log": "scratch/performance-improvements/evidence-final/11.log"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/test-evidence-migration.py"
+      ],
+      "exit_code": 0,
+      "seconds": 0.06244802474975586,
+      "log": "12.log",
+      "log_sha256": "ecd09ed8d012e7e550f94e8f54d1099441b0dd7b24efa5b7a0c57aa10b90332d",
+      "raw_log": "scratch/performance-improvements/evidence-final/12.log"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/evidence-resolver.py",
+        "check"
+      ],
+      "exit_code": 1,
+      "seconds": 0.08615469932556152,
+      "log": "13.log",
+      "log_sha256": "ec30e1b3be1a6e40f231e97a2abf58ebf47bc786ebd74a6c8d6fdee80c142e01",
+      "raw_log": "scratch/performance-improvements/evidence-final/13.log",
+      "failure_summary": "ValueError: Archived evidence is not hydrated: docs/benchmarks/accounting-batch-browser-2026-10-16.json; run python scripts/evidence-resolver.py hydrate --wrangler PATH_TO_WRANGLER_JS"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/evidence-resolver.py",
+        "index",
+        "--check"
+      ],
+      "exit_code": 0,
+      "seconds": 0.0500178337097168,
+      "log": "14.log",
+      "log_sha256": "2591dfe37e7b5349b1c0a06f7ed00e6315a803f00b829c5fa150705a35199d6c",
+      "raw_log": "scratch/performance-improvements/evidence-final/14.log"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/benchmark-catalog.py",
+        "--check"
+      ],
+      "exit_code": 1,
+      "seconds": 0.39110732078552246,
+      "log": "15.log",
+      "log_sha256": "b87d87f6c5b3ff490a3a345e7a1864529d8eb1801b61a40adc57d9ad45be364f",
+      "raw_log": "scratch/performance-improvements/evidence-final/15.log",
+      "failure_summary": "ValueError: <repo>/docs/benchmarks/accounting-batch-browser-2026-10-16.json: Archived evidence is not hydrated: docs/benchmarks/accounting-batch-browser-2026-10-16.json; run python scripts/evidence-resolver.py hydrate --wrangler PATH_TO_WRANGLER_JS"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/summarize-performance-decisions.py",
+        "--check"
+      ],
+      "exit_code": 1,
+      "seconds": 0.08286142349243164,
+      "log": "16.log",
+      "log_sha256": "b1bc4def89371695e69714500f58bba1fbd884d0648fd8af65037e273e3b9d73",
+      "raw_log": "scratch/performance-improvements/evidence-final/16.log",
+      "failure_summary": "FileNotFoundError: [Errno 2] No such file or directory: '<repo>/docs/benchmarks/allocation-ranges-engines-2026-10-19.jsonl'"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/audit-strategy-evidence.py",
+        "--check"
+      ],
+      "exit_code": 1,
+      "seconds": 0.39825940132141113,
+      "log": "17.log",
+      "log_sha256": "ebc5cda7521e7d627641ca3ed1c8dee187f6f7060f2076f643bf0d263f7b8c2b",
+      "raw_log": "scratch/performance-improvements/evidence-final/17.log",
+      "failure_summary": "ValueError: <repo>/docs/benchmarks/accounting-batch-browser-2026-10-16.json: Archived evidence is not hydrated: docs/benchmarks/accounting-batch-browser-2026-10-16.json; run python scripts/evidence-resolver.py hydrate --wrangler PATH_TO_WRANGLER_JS"
+    },
+    {
+      "phase": "check",
+      "command": [
+        "python3",
+        "scripts/evidence-views.py",
+        "--check"
+      ],
+      "exit_code": 1,
+      "seconds": 0.08787727355957031,
+      "log": "18.log",
+      "log_sha256": "3a6b9a75163553dedeb498edd5b24437c6dbfcf850f0d9f3713e58c89c0daecc",
+      "raw_log": "scratch/performance-improvements/evidence-final/18.log",
+      "failure_summary": "Evidence views: Archived evidence is not hydrated: docs/benchmarks/windows-retained-parent-audit-unblocked-2026-10-21.jsonl; run python scripts/evidence-resolver.py hydrate --wrangler PATH_TO_WRANGLER_JS"
+    }
+  ]
+}

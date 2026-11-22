@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "exact-resident-buckets-at-2-gib-2026-11-21",
+  "title": "Archive exact assignment resident buckets after the 2 GiB screen",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Do stable resident assignment buckets improve full exact allocation beyond current Auto and explicit Sort on fitting retained parents?",
+  "disposition": "retain-experimental",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Reject source retention after the declared futility screen. Buckets save 4.1% CPU relative to Auto, take 8.2% longer than Sort and keep temporary traffic equal. One late peer-admission advantage remains in the archived patch.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2 GiB and 128 partition parents, per-parent exact unstratified buckets fit at 128 MiB engine, 1 GiB hard no-swap cgroup.",
+      "70,003 rows, eight parents, and same fixed peer tests at selection/emission; separate 65,537-row oversize case."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "All three complete screen jobs and five small/oversize jobs verify exact fields, quotas, caps, output records, seeded bytes and Analysis. Separate checks cover original retry, cancellation, fixed peer admission and terminal sink denial."
+  },
+  "limitations": [
+    "A single full triplet is a predeclared development futility screen with uncontrolled cache, not a general timing estimate.",
+    "The same request at the serializing boundary can admit in buckets and deny under Auto/Sort, with no reduction in the measured complete job peak."
+  ],
+  "exclusions": [
+    "Stratified and shuffled exact assignment and the historical probabilistic allocation route."
+  ],
+  "reopen_when": "A workload requiring the measured sink-phase headroom would need an explicit full-job benefit and pressure gate, including oversize retry costs.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#exact-resident-buckets-at-2-gib-2026-11-21",
+      "sha256": "1304e265f071c9bde780a69be6b66db5b177b4de915144919ea2636455aa8302"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/exact-resident-buckets-2026-11-21.json",
+      "sha256": "69905b90c6e66af13858e52506beb2fe756bbab3423685ecbc67fbf9eacdb5a0"
+    },
+    {
+      "path": "docs/benchmarks/exact-resident-buckets-2026-11-21.patch",
+      "sha256": "18c6b17e1b25c2f83f773b8dc2f475cfbb873e5435ed7ce6bd09fef65ca4e1de"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/resource-policy-research.md"
+  ]
+}

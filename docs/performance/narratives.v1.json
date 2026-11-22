@@ -8462,6 +8462,370 @@
           "to": "../../evidence-originals.md#sha256-5668ebd49113d1b0fc41d89a527cf2339e3a62d7b434c6e16194b608b5c7dc72"
         }
       ]
+    },
+    {
+      "id": "cross-tool-csv-split-and-shuffle-comparison-2026-11-18",
+      "title": "Cross-tool CSV split and shuffle comparison (2026-11-18)",
+      "anchor": "cross-tool-csv-split-and-shuffle-comparison-2026-11-18",
+      "path": "docs/performance/investigations/cross-tool-csv-split-and-shuffle-comparison-2026-11-18.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "cross-tool-csv-split-and-shuffle-comparison-2026-11-18"
+      ],
+      "original_section_sha256": "7930e10c67b6225eae09a013162c3a5d52d4ccb460eba543122c6befad6b3329",
+      "sha256": "46500c1ceb6d2f39e7c9550832fb9505e3424da53c43dd06f63f23ee9cafa61a",
+      "relocations": []
+    },
+    {
+      "id": "csv-data-movement-and-analyze-run-2026-11-18",
+      "title": "CSV data movement and Analyze Run (2026-11-18)",
+      "anchor": "csv-data-movement-and-analyze-run-2026-11-18",
+      "path": "docs/performance/investigations/csv-data-movement-and-analyze-run-2026-11-18.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "csv-data-movement-and-analyze-run-2026-11-18"
+      ],
+      "original_section_sha256": "e6e6286f91fdaa4b433ed53faf81366712ae37ce1198d991cba608856c7a1647",
+      "sha256": "a4ea09667a3ceaed6c97e1bbdaeabbe6ed36c7c0653ef4e4b372fd7bdbc98988",
+      "relocations": []
+    },
+    {
+      "id": "out-of-memory-data-movement-and-cache-admission-2026-11-18",
+      "title": "Out of memory data movement and cache admission (2026-11-18)",
+      "anchor": "out-of-memory-data-movement-and-cache-admission-2026-11-18",
+      "path": "docs/performance/investigations/out-of-memory-data-movement-and-cache-admission-2026-11-18.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "out-of-memory-data-movement-and-cache-admission-2026-11-18"
+      ],
+      "original_section_sha256": "4cd247a7ffaa3f1f1aa967dac4e4af0cb5bec2bffdb756f21556902df72d3715",
+      "sha256": "8895d0b8ae2746eeaf09fc33b495b58b1089a3c25e545b154d73b5f0b8aa4115",
+      "relocations": []
+    },
+    {
+      "id": "pipeline-publication-and-byte-cap-comparisons-2026-11-18",
+      "title": "Pipeline publication and byte cap comparisons (2026-11-18)",
+      "anchor": "pipeline-publication-and-byte-cap-comparisons-2026-11-18",
+      "path": "docs/performance/investigations/pipeline-publication-and-byte-cap-comparisons-2026-11-18.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "pipeline-publication-and-byte-cap-comparisons-2026-11-18"
+      ],
+      "original_section_sha256": "3022310cad0b41d597b456866d666abd251a3a3bdb1d0deef74fe437dc9343e7",
+      "sha256": "e84453774ed09e985d1bb3e71811780e46c8080a6dc9a1c5cae9c036ad5058e8",
+      "relocations": []
+    },
+    {
+      "id": "partition-routing-and-assignment-tradeoffs-2026-11-18",
+      "title": "Partition routing and assignment tradeoffs (2026-11-18)",
+      "anchor": "partition-routing-and-assignment-tradeoffs-2026-11-18",
+      "path": "docs/performance/investigations/partition-routing-and-assignment-tradeoffs-2026-11-18.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "partition-routing-and-assignment-tradeoffs-2026-11-18"
+      ],
+      "original_section_sha256": "5087bfe4e92ec0e871a3d68f73f91356e1d15e4dfde78a5b836140b3bd20b5f1",
+      "sha256": "60b418888c75c7438a76fd2e5b18c05159899d7d0bae3728875386c77f7504d5",
+      "relocations": []
+    },
+    {
+      "id": "bounded-final-writers-and-composed-pipelines-2026-11-19",
+      "title": "Bounded final writers and composed pipelines (2026-11-19)",
+      "anchor": "bounded-final-writers-and-composed-pipelines-2026-11-19",
+      "path": "docs/performance/investigations/bounded-final-writers-and-composed-pipelines-2026-11-19.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "bounded-final-writers-and-composed-pipelines-2026-11-19"
+      ],
+      "original_section_sha256": "e716328fee3e64513615f3fe326a7fe545c744c41daae4643752ffa308a165f6",
+      "sha256": "cf3e1eaeb8cef59407947bf1e8638837a2ee77e63295ea7d6132dc8489035265",
+      "relocations": []
+    },
+    {
+      "id": "memory-proportional-writers-and-publication-scheduling-2026-11-21",
+      "title": "Memory proportional writers and publication scheduling (2026-11-21)",
+      "anchor": "memory-proportional-writers-and-publication-scheduling-2026-11-21",
+      "path": "docs/performance/investigations/memory-proportional-writers-and-publication-scheduling-2026-11-21.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "memory-proportional-writers-and-publication-scheduling-2026-11-21"
+      ],
+      "original_section_sha256": "efddcdb943faece054bbe19b84669ee8b103ca7a645acecb349b59027b775643",
+      "sha256": "e76451453e80df4b28c23dfcddc1a77c946ec7d085148c50746fda82b623bde2",
+      "relocations": []
+    },
+    {
+      "id": "explicit-sort-and-zstandard-input-balanced-2026-11-21",
+      "title": "Explicit Sort and Zstandard input Balanced (2026-11-21)",
+      "anchor": "explicit-sort-and-zstandard-input-balanced-2026-11-21",
+      "path": "docs/performance/investigations/explicit-sort-and-zstandard-input-balanced-2026-11-21.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "explicit-sort-and-zstandard-input-balanced-2026-11-21"
+      ],
+      "original_section_sha256": "e6c3f9dea70119c709810123523056870a30b2c570ec00f39ff989347009d2da",
+      "sha256": "d574e03382de59b5b97090fc6b95033c4bf75bee051ab3fd53af350a4620a6fb",
+      "relocations": []
+    },
+    {
+      "id": "counted-partition-and-balanced-2026-11-21",
+      "title": "Counted Partition and Balanced (2026-11-21)",
+      "anchor": "counted-partition-and-balanced-2026-11-21",
+      "path": "docs/performance/investigations/counted-partition-and-balanced-2026-11-21.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "counted-partition-and-balanced-2026-11-21"
+      ],
+      "original_section_sha256": "75d7b0acd55a12a3c7d6ac518933540cc35f5b41898c0aef6d19acb40345fe2c",
+      "sha256": "c88a2c98bf08824bbbe0599827a2d749fc96090ed2d1dc3bf5859eb079247900",
+      "relocations": []
+    },
+    {
+      "id": "wide-terminal-uniform-merge-2026-11-21",
+      "title": "Wide terminal Uniform merge (2026-11-21)",
+      "anchor": "wide-terminal-uniform-merge-2026-11-21",
+      "path": "docs/performance/investigations/wide-terminal-uniform-merge-2026-11-21.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "wide-terminal-uniform-merge-2026-11-21"
+      ],
+      "original_section_sha256": "7cc588a0c86289836e5bcca50444f258b2d12e7ea369851abeefc7697600b081",
+      "sha256": "c98ecc92051dfacac005a2de5d1751722128934cd97fcae452c6cc397070e990",
+      "relocations": []
+    },
+    {
+      "id": "current-balanced-cross-tool-at-8-gib-2026-11-21",
+      "title": "Current Balanced cross-tool at 8 GiB (2026-11-21)",
+      "anchor": "current-balanced-cross-tool-at-8-gib-2026-11-21",
+      "path": "docs/performance/investigations/current-balanced-cross-tool-at-8-gib-2026-11-21.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "current-balanced-cross-tool-at-8-gib-2026-11-21"
+      ],
+      "original_section_sha256": "68675a09e66192c339ff524dd9c2ee55a712c7fb98949be09e235d0a87b22355",
+      "sha256": "6895bc49ccbe4d092f264bebe4dcfde9b6acf3fbc5de4c56381bf6535c1ed0b1",
+      "relocations": []
+    },
+    {
+      "id": "parallel-counted-balanced-digest-2026-11-21",
+      "title": "Parallel counted Balanced digest (2026-11-21)",
+      "anchor": "parallel-counted-balanced-digest-2026-11-21",
+      "path": "docs/performance/investigations/parallel-counted-balanced-digest-2026-11-21.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "parallel-counted-balanced-digest-2026-11-21"
+      ],
+      "original_section_sha256": "5cc378ae6148cc29dd33a598506986a98f9aa0f5ce69902e74e76afd5d4d8a3d",
+      "sha256": "7224a07542cf9c7bd54c1955dc5395ee5bb6e0d688f962c87bab5ac9bd47994c",
+      "relocations": []
+    },
+    {
+      "id": "balanced-scaling-at-40-gib-2026-11-21",
+      "title": "Balanced scaling at 40 GiB (2026-11-21)",
+      "anchor": "balanced-scaling-at-40-gib-2026-11-21",
+      "path": "docs/performance/investigations/balanced-scaling-at-40-gib-2026-11-21.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "balanced-scaling-at-40-gib-2026-11-21"
+      ],
+      "original_section_sha256": "ec167c1da70873bfa3a5faba7bc38185151ceb753b204a26bcbc5dc9df8fc81f",
+      "sha256": "3003b50989101dd075a7ef3ef8a2f55765f9eb8ad428324a20eaafccfaf9f87e",
+      "relocations": []
+    },
+    {
+      "id": "terminal-uniform-kernel-read-ahead-2026-11-21",
+      "title": "Terminal Uniform kernel read-ahead (2026-11-21)",
+      "anchor": "terminal-uniform-kernel-read-ahead-2026-11-21",
+      "path": "docs/performance/investigations/terminal-uniform-kernel-read-ahead-2026-11-21.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "terminal-uniform-kernel-read-ahead-2026-11-21"
+      ],
+      "original_section_sha256": "d6893b46db7ca85e57245718ad2a38900a10efa985034047da396549bd33b1c4",
+      "sha256": "a559f36fee971d162b614177468d08fbd7788768c3a15aa7f0f798d9bd30a2c1",
+      "relocations": []
+    },
+    {
+      "id": "terminal-uniform-1024-way-merge-2026-11-21",
+      "title": "Terminal Uniform 1024-way merge (2026-11-21)",
+      "anchor": "terminal-uniform-1024-way-merge-2026-11-21",
+      "path": "docs/performance/investigations/terminal-uniform-1024-way-merge-2026-11-21.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "terminal-uniform-1024-way-merge-2026-11-21"
+      ],
+      "original_section_sha256": "36ad108ceb9522e34b6459240f6e719b8d27dbb6dbe8e988a42f1c44f4349839",
+      "sha256": "e15be20214b57afaed451eeee77a9be3c09b0d7e00eefc2cc74e0cb0a0ed8b30",
+      "relocations": []
+    },
+    {
+      "id": "counted-balanced-first-pass-fingerprint-2026-11-21",
+      "title": "Counted Balanced first-pass fingerprint (2026-11-21)",
+      "anchor": "counted-balanced-first-pass-fingerprint-2026-11-21",
+      "path": "docs/performance/investigations/counted-balanced-first-pass-fingerprint-2026-11-21.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "counted-balanced-first-pass-fingerprint-2026-11-21"
+      ],
+      "original_section_sha256": "30976da7557fd95967613751dd9d695f22f625dea6332367bccd05be0c5dfa22",
+      "sha256": "4372e2eafc3841ba48df9bb3ae7a81f1b477e8eb1d453d8996a0129b09ba941e",
+      "relocations": []
+    },
+    {
+      "id": "integrated-balanced-cross-tool-at-8-gib-2026-11-21",
+      "title": "Integrated Balanced cross-tool at 8 GiB (2026-11-21)",
+      "anchor": "integrated-balanced-cross-tool-at-8-gib-2026-11-21",
+      "path": "docs/performance/investigations/integrated-balanced-cross-tool-at-8-gib-2026-11-21.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "integrated-balanced-cross-tool-at-8-gib-2026-11-21"
+      ],
+      "original_section_sha256": "f9a638f0b4fd64afea1ad1e44cf7ae5b2769c1cfcd3df64abf99b7e5e70386a1",
+      "sha256": "912eb28f7de80ab72fae069ba9ac72ecb287f7d1cc8137623ff7eb9d1e206b09",
+      "relocations": []
+    },
+    {
+      "id": "counted-balanced-validation-only-2026-11-21",
+      "title": "Counted Balanced validation only (2026-11-21)",
+      "anchor": "counted-balanced-validation-only-2026-11-21",
+      "path": "docs/performance/investigations/counted-balanced-validation-only-2026-11-21.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "counted-balanced-validation-only-2026-11-21"
+      ],
+      "original_section_sha256": "6bbb4160e20e5be4858172732cfd8a56606dd2f74aa210d2d6429539655ac9d1",
+      "sha256": "1515e02c8ccbc6dfc0cd748581015eb2946932a2eac327b29d0eb7612af72a1a",
+      "relocations": []
+    },
+    {
+      "id": "uniform-balanced-cross-tool-at-40-gib-2026-11-21",
+      "title": "Uniform Balanced cross-tool at 40 GiB (2026-11-21)",
+      "anchor": "uniform-balanced-cross-tool-at-40-gib-2026-11-21",
+      "path": "docs/performance/investigations/uniform-balanced-cross-tool-at-40-gib-2026-11-21.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "uniform-balanced-cross-tool-at-40-gib-2026-11-21"
+      ],
+      "original_section_sha256": "3b98e9addf6b5dad1b1435add9587e11f03a6e2dedd7469cbd3c1fd50da0f774",
+      "sha256": "660e3cbc3172b2425a1e586bde125cb98fee404c19e6637b68ea2fb5d56c2c3c",
+      "relocations": []
+    },
+    {
+      "id": "terminal-uniform-merge-read-buffers-2026-11-21",
+      "title": "Terminal Uniform merge read buffers (2026-11-21)",
+      "anchor": "terminal-uniform-merge-read-buffers-2026-11-21",
+      "path": "docs/performance/investigations/terminal-uniform-merge-read-buffers-2026-11-21.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "terminal-uniform-merge-read-buffers-2026-11-21"
+      ],
+      "original_section_sha256": "6a9f058282f2f3b63036e2207defb99a579f4d3bd9ef19dc9698a9101a8e497c",
+      "sha256": "72ffe2f8d2706aadcda9feddba07c7dd63b5bbb5b747ec1657693a886174f3ef",
+      "relocations": []
+    },
+    {
+      "id": "streaming-shuffle-adapters-at-2-gib-2026-11-21",
+      "title": "Streaming shuffle adapters at 2 GiB (2026-11-21)",
+      "anchor": "streaming-shuffle-adapters-at-2-gib-2026-11-21",
+      "path": "docs/performance/investigations/streaming-shuffle-adapters-at-2-gib-2026-11-21.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "streaming-shuffle-adapters-at-2-gib-2026-11-21"
+      ],
+      "original_section_sha256": "20bae18f0a3070b96981979987416ce6aa2245fcddc22c59dceb29156202edda",
+      "sha256": "71a5546be66d4ed1d1378019058d95f2ae745bf79141424fc68afd0b1c77a6ee",
+      "relocations": []
+    },
+    {
+      "id": "streaming-shuffle-adapters-at-40-gib-2026-11-21",
+      "title": "Streaming shuffle adapters at 40 GiB (2026-11-21)",
+      "anchor": "streaming-shuffle-adapters-at-40-gib-2026-11-21",
+      "path": "docs/performance/investigations/streaming-shuffle-adapters-at-40-gib-2026-11-21.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "streaming-shuffle-adapters-at-40-gib-2026-11-21"
+      ],
+      "original_section_sha256": "c4a36de4f7029edc22fe3bf1a2d1a6cea25c47c78074cf5fcf1a58e3f31608f7",
+      "sha256": "2d43b1782f013e167e9860dc104a222e6c2e8d65720c5dd5256a6f1e0810a229",
+      "relocations": []
+    },
+    {
+      "id": "terminal-uniform-short-tail-2026-11-21",
+      "title": "Terminal Uniform short tail (2026-11-21)",
+      "anchor": "terminal-uniform-short-tail-2026-11-21",
+      "path": "docs/performance/investigations/terminal-uniform-short-tail-2026-11-21.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "terminal-uniform-short-tail-2026-11-21"
+      ],
+      "original_section_sha256": "12941423fdc68fe6285f453862a2a5bb6b65a02a5fd3db40be6b9475947bfa1b",
+      "sha256": "0411ad0b37dbe4e03424d7a6101972feb62523a35ab9e034ff6228f49c5d57d0",
+      "relocations": []
+    },
+    {
+      "id": "terminal-uniform-short-tail-at-40-gib-2026-11-21",
+      "title": "Terminal Uniform short tail at 40 GiB (2026-11-21)",
+      "anchor": "terminal-uniform-short-tail-at-40-gib-2026-11-21",
+      "path": "docs/performance/investigations/terminal-uniform-short-tail-at-40-gib-2026-11-21.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "terminal-uniform-short-tail-at-40-gib-2026-11-21"
+      ],
+      "original_section_sha256": "f985e972ddd35a6356a99a08e08e90f0b2d9ee140e8229270b26bff8c01d276e",
+      "sha256": "5f7058b66d9f71b59ec65f2f786dd5d9d9fc63f23a47271101d25f0ab126a0be",
+      "relocations": []
+    },
+    {
+      "id": "terminal-direct-output-under-matched-pressure-2026-11-21",
+      "title": "Terminal direct output under matched pressure (2026-11-21)",
+      "anchor": "terminal-direct-output-under-matched-pressure-2026-11-21",
+      "path": "docs/performance/investigations/terminal-direct-output-under-matched-pressure-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "terminal-direct-output-under-matched-pressure-2026-11-21"
+      ],
+      "original_section_sha256": "17c427bb4e0576401a18bacd78e11d41c27916a45337d909390aa2e4c64719f0",
+      "sha256": "ac1ad3d27edaed306084e7b37c4b8ef7135e77b316712cafcffb7932065ce548",
+      "relocations": []
+    },
+    {
+      "id": "probabilistic-shuffle-fusion-at-2-gib-2026-11-21",
+      "title": "Probabilistic shuffle fusion at 2 GiB (2026-11-21)",
+      "anchor": "probabilistic-shuffle-fusion-at-2-gib-2026-11-21",
+      "path": "docs/performance/investigations/probabilistic-shuffle-fusion-at-2-gib-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "probabilistic-shuffle-fusion-at-2-gib-2026-11-21"
+      ],
+      "original_section_sha256": "dfcea56ab4ad89393d3f4ce0b8cd549e47fcd1cd5fec5f322f9939fca955bf76",
+      "sha256": "875ece80de80e8d0136c3393b6772f6b1c6245654fbc6cee36c0538168c9ba8b",
+      "relocations": []
+    },
+    {
+      "id": "exact-resident-buckets-at-2-gib-2026-11-21",
+      "title": "Exact resident buckets at 2 GiB (2026-11-21)",
+      "anchor": "exact-resident-buckets-at-2-gib-2026-11-21",
+      "path": "docs/performance/investigations/exact-resident-buckets-at-2-gib-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "exact-resident-buckets-at-2-gib-2026-11-21"
+      ],
+      "original_section_sha256": "1304e265f071c9bde780a69be6b66db5b177b4de915144919ea2636455aa8302",
+      "sha256": "f47893bde222d337a52b27afff378a43dda045691c1b05e512cf1033a1e5d2c7",
+      "relocations": []
+    },
+    {
+      "id": "indexed-exact-quota-lookup-at-2-gib-2026-11-21",
+      "title": "Indexed exact quota lookup at 2 GiB (2026-11-21)",
+      "anchor": "indexed-exact-quota-lookup-at-2-gib-2026-11-21",
+      "path": "docs/performance/investigations/indexed-exact-quota-lookup-at-2-gib-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "indexed-exact-quota-lookup-at-2-gib-2026-11-21"
+      ],
+      "original_section_sha256": "629e43693763aa4a674b2a0c2deb31a9ae1ec9ec4359b65dc9e3238572f1e049",
+      "sha256": "70a500d3a55dc057dccbc0bb881dfa3f6c9a19c515dac38fa78c763eb693bbf2",
+      "relocations": []
     }
   ],
   "migrated_count": 193

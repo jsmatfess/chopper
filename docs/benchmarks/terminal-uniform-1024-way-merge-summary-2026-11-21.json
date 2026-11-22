@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "uniform_40gib_1024_way_merge_stopped",
+  "complete_timing_pairs": 1,
+  "unattempted_pairs": 2,
+  "decision": {
+    "path": "scratch/uniform-40gib-resume-20261121/candidate-decision-v1.json",
+    "sha256": "d4dde876216de5cd043af7ea0aa53747c31f008f6ee2cdf249d8aeb4a4c54599"
+  },
+  "scope": "40 GiB fixed-width input, Uniform then 8 exact Balanced parts, worker 1, engine m256, hard 1 GiB without swap, actual byte cap 5600 MiB.",
+  "builds": {
+    "control": {
+      "record": {
+        "path": "scratch/oom-iteration/uniform-merge-1024-way-control-v1-build.json",
+        "sha256": "b7e66113d4ce29b0a26af51f3dadbac391bb22b18c11c3e3815ec7a54c794441"
+      },
+      "binary_sha256": "8873dfd46cc0be04adfd41c15067643f466670c05a9eb65beb01755d50f15fef",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-final-writer-chains",
+        "experimental-memory-final-writers",
+        "experimental-small-final-buffers",
+        "experimental-release-final-header-scratch",
+        "experimental-counted-codec-balanced",
+        "experimental-bounded-final-partition",
+        "experimental-retained-exact-writers",
+        "experimental-single-final-catalog",
+        "experimental-single-catalog-capacity",
+        "experimental-batched-final-sync",
+        "experimental-counted-zstd-input-balanced",
+        "experimental-counted-partition-balanced",
+        "experimental-wide-uniform-merge"
+      ],
+      "source_archive_sha256": "0311d4a35454d72ee8bacbd902e9ee78719fe241465ac582b9601d7fceb6912e"
+    },
+    "candidate": {
+      "record": {
+        "path": "scratch/oom-iteration/uniform-merge-1024-way-candidate-v1-build.json",
+        "sha256": "0526b71e58c96f50dc27e2c9b212a7a40e451bc7a24106001a22f0d528ad75f6"
+      },
+      "binary_sha256": "19c24c352900fc4bb96669a69688732128128e340afd2b998fca01f7275f9893",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-final-writer-chains",
+        "experimental-memory-final-writers",
+        "experimental-small-final-buffers",
+        "experimental-release-final-header-scratch",
+        "experimental-counted-codec-balanced",
+        "experimental-bounded-final-partition",
+        "experimental-retained-exact-writers",
+        "experimental-single-final-catalog",
+        "experimental-single-catalog-capacity",
+        "experimental-batched-final-sync",
+        "experimental-counted-zstd-input-balanced",
+        "experimental-counted-partition-balanced",
+        "experimental-wide-uniform-merge",
+        "experimental-1024-way-uniform-merge"
+      ],
+      "source_archive_sha256": "5996f5163fd7d54042e41c5f934213adbb3c49fde93dd02964cb09cce827fcff"
+    }
+  },
+  "status": {
+    "path": "scratch/uniform-40gib-resume-20261121/pair-batch-v1/status.json",
+    "sha256": "a8dfa6f289d71de15f55167fb8c1a15e1fbbcd3ff26ab4c7de4e1cea73e46cc8"
+  },
+  "futility": {
+    "path": "scratch/uniform-40gib-resume-20261121/futility-result-v1.json",
+    "sha256": "b52f9a15866fa0d73f7a6c21d2c00b5708bff506790960ccae87ed5550b2e472"
+  },
+  "descriptor_sample": {
+    "path": "scratch/uniform-40gib-resume-20261121/pair--1/candidate/fd-samples.jsonl",
+    "sha256": "005935f2f91674e96d8443d477c2ad20aa7037bc23ccf1ee136b4f7c15570c34"
+  },
+  "pairs": {
+    "excluded_warmup": {
+      "record": {
+        "path": "scratch/uniform-40gib-resume-20261121/pair--1/pair.json",
+        "sha256": "7374cecb2756482ddc502236e26ad688512c2f4310b2321f04dc288c42cd0928"
+      },
+      "samples": {
+        "candidate": {
+          "verification": {
+            "path": "scratch/uniform-40gib-resume-20261121/pair--1/candidate/verification.json",
+            "sha256": "66440bcce2ad631a33ba5238f52b88b41c122606fe380055293d5cb3142d0ae0"
+          },
+          "elapsed_seconds": 602.8897801180137,
+          "rows": 167772160,
+          "user_cpu_seconds": 187.99,
+          "system_cpu_seconds": 171.97,
+          "gnu_time_rss_kib": 87840,
+          "gnu_time_file_input_count": 1046992632,
+          "voluntary_context_switches": 435273,
+          "file_refaults": 106929410,
+          "direct_scans": 155019028,
+          "working_peak_bytes": 67635920,
+          "managed_peak_bytes": 55700357120,
+          "managed_writes": 55700358640,
+          "managed_reads": 55700357120,
+          "managed_temporary_file_peak": 987,
+          "sort_runs": 984,
+          "merge_operations": 1,
+          "cgroup_peak_bytes": 1073741824,
+          "cpu_seconds": 359.96000000000004
+        },
+        "control": {
+          "verification": {
+            "path": "scratch/uniform-40gib-resume-20261121/pair--1/control/verification.json",
+            "sha256": "48e3a477df4c3ec6de08047dc132c6d5ef993524aba911cd4a04fc3a1928afa4"
+          },
+          "elapsed_seconds": 552.8644204830052,
+          "rows": 167772160,
+          "user_cpu_seconds": 202.79,
+          "system_cpu_seconds": 130.53,
+          "gnu_time_rss_kib": 87956,
+          "gnu_time_file_input_count": 606604232,
+          "voluntary_context_switches": 121933,
+          "file_refaults": 43004757,
+          "direct_scans": 110498610,
+          "working_peak_bytes": 67444966,
+          "managed_peak_bytes": 57989171191,
+          "managed_writes": 99192634864,
+          "managed_reads": 99192633344,
+          "managed_temporary_file_peak": 261,
+          "sort_runs": 984,
+          "merge_operations": 4,
+          "cgroup_peak_bytes": 1073741824,
+          "cpu_seconds": 333.32
+        }
+      }
+    },
+    "eligible_pair": {
+      "record": {
+        "path": "scratch/uniform-40gib-resume-20261121/pair-0/pair.json",
+        "sha256": "22932735ccf284bce54b1ed2e4c09c4da0be32c4d27e65e38e28a6d150a337ea"
+      },
+      "samples": {
+        "control": {
+          "verification": {
+            "path": "scratch/uniform-40gib-resume-20261121/pair-0/control/verification.json",
+            "sha256": "e737f1761039e82721e55de76633eb7b72bb6436559beff842e7398f63d0d8f3"
+          },
+          "elapsed_seconds": 532.7091853750171,
+          "rows": 167772160,
+          "user_cpu_seconds": 201.84,
+          "system_cpu_seconds": 129.45,
+          "gnu_time_rss_kib": 88016,
+          "gnu_time_file_input_count": 595163336,
+          "voluntary_context_switches": 112714,
+          "file_refaults": 41572746,
+          "direct_scans": 109025177,
+          "working_peak_bytes": 67444703,
+          "managed_peak_bytes": 57989101803,
+          "managed_writes": 99192634864,
+          "managed_reads": 99192633344,
+          "managed_temporary_file_peak": 261,
+          "sort_runs": 984,
+          "merge_operations": 4,
+          "cgroup_peak_bytes": 1073741824,
+          "cpu_seconds": 331.28999999999996
+        },
+        "candidate": {
+          "verification": {
+            "path": "scratch/uniform-40gib-resume-20261121/pair-0/candidate/verification.json",
+            "sha256": "4908b207a7f73082a095c099d9a7627db3abec9a159cbe36e540f95966811cab"
+          },
+          "elapsed_seconds": 610.5308285300853,
+          "rows": 167772160,
+          "user_cpu_seconds": 192.5,
+          "system_cpu_seconds": 172.85,
+          "gnu_time_rss_kib": 89388,
+          "gnu_time_file_input_count": 1047045608,
+          "voluntary_context_switches": 435571,
+          "file_refaults": 106935205,
+          "direct_scans": 155037923,
+          "working_peak_bytes": 67634932,
+          "managed_peak_bytes": 55700357120,
+          "managed_writes": 55700358640,
+          "managed_reads": 55700357120,
+          "managed_temporary_file_peak": 987,
+          "sort_runs": 984,
+          "merge_operations": 1,
+          "cgroup_peak_bytes": 1073741824,
+          "cpu_seconds": 365.35
+        }
+      }
+    }
+  },
+  "candidate_relative_percent": {
+    "elapsed_seconds": 14.60865426983078,
+    "rows": 0.0,
+    "user_cpu_seconds": -4.6274276654776125,
+    "system_cpu_seconds": 33.5264580919274,
+    "gnu_time_rss_kib": 1.5588074895473536,
+    "gnu_time_file_input_count": 75.92575763101107,
+    "voluntary_context_switches": 286.4391291232677,
+    "file_refaults": 157.22430026633316,
+    "direct_scans": 42.20378014153556,
+    "working_peak_bytes": 0.28205180175528977,
+    "managed_peak_bytes": -3.946853135913886,
+    "managed_writes": -43.846275767985134,
+    "managed_reads": -43.84627643987312,
+    "managed_temporary_file_peak": 278.1609195402299,
+    "sort_runs": 0.0,
+    "merge_operations": -75.0,
+    "cgroup_peak_bytes": 0.0,
+    "cpu_seconds": 10.281022668960738
+  },
+  "retained": false
+}

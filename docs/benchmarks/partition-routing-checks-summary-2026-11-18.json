@@ -1,0 +1,287 @@
+{
+  "kind": "validation-receipts",
+  "schema": 1,
+  "scope": "Currentretainednative source, LinuxandfreshnativeWindowscorrectness; WAI smallgraphnativefeatureexclusion andproductionrestoration. No nativeWindows timing orfullhostedacceptance claim.",
+  "checks": [
+    {
+      "name": "linux-default",
+      "path": "scratch/oom-resume-2139/linux-default/status.json",
+      "sha256": "05380951886c49ed69325076bc04c547bf415f21358ae2029de019f1dc8c147c",
+      "summary": {
+        "passed": 3,
+        "incomplete": 0
+      },
+      "attempts": [
+        {
+          "id": "fmt",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "1da39d57cd874615d5d6d122a9c26805122a5a84a730b0325c0eb1dcc3305fc4",
+            "executable": "<toolchain>/cargo",
+            "executable_sha256": "a670e02cfa39ac2e53f77a2d911ca1fc9e2c479b0603ec956625be1daf24e3af",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        },
+        {
+          "id": "clippy-default",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "1da39d57cd874615d5d6d122a9c26805122a5a84a730b0325c0eb1dcc3305fc4",
+            "executable": "<toolchain>/cargo",
+            "executable_sha256": "a670e02cfa39ac2e53f77a2d911ca1fc9e2c479b0603ec956625be1daf24e3af",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        },
+        {
+          "id": "test-default",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "1da39d57cd874615d5d6d122a9c26805122a5a84a730b0325c0eb1dcc3305fc4",
+            "executable": "<toolchain>/cargo",
+            "executable_sha256": "a670e02cfa39ac2e53f77a2d911ca1fc9e2c479b0603ec956625be1daf24e3af",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        }
+      ]
+    },
+    {
+      "name": "linux-features",
+      "path": "scratch/oom-resume-2139/linux-features/status.json",
+      "sha256": "68d212d991ab62b395583a009674bbcb6de736d72d7def7c95ca02897af4e1bf",
+      "summary": {
+        "passed": 3,
+        "incomplete": 0
+      },
+      "attempts": [
+        {
+          "id": "clippy-features",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "86d90a6a9590e4b8915c6844d6f1674ca929108d368c0b7d1a7d177b4628f674",
+            "executable": "<toolchain>/cargo",
+            "executable_sha256": "a670e02cfa39ac2e53f77a2d911ca1fc9e2c479b0603ec956625be1daf24e3af",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        },
+        {
+          "id": "test-features",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "86d90a6a9590e4b8915c6844d6f1674ca929108d368c0b7d1a7d177b4628f674",
+            "executable": "<toolchain>/cargo",
+            "executable_sha256": "a670e02cfa39ac2e53f77a2d911ca1fc9e2c479b0603ec956625be1daf24e3af",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        },
+        {
+          "id": "core-wasm",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "86d90a6a9590e4b8915c6844d6f1674ca929108d368c0b7d1a7d177b4628f674",
+            "executable": "<toolchain>/cargo",
+            "executable_sha256": "a670e02cfa39ac2e53f77a2d911ca1fc9e2c479b0603ec956625be1daf24e3af",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        }
+      ]
+    },
+    {
+      "name": "windows-lint",
+      "path": "scratch/oom-resume-2139/windows-lint/status.json",
+      "sha256": "63fdbe1931edfb436a41cb6775cada38e3c27c5759034dc2bc08dbd572d0cb0d",
+      "summary": {
+        "passed": 2,
+        "incomplete": 0
+      },
+      "attempts": [
+        {
+          "id": "doctor",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "348765853ba98f1c1a4ee204cf6c94f7ae3964fd0a306776084484354706a2a6",
+            "executable": "/usr/bin/python3.14",
+            "executable_sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        },
+        {
+          "id": "clippy",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "348765853ba98f1c1a4ee204cf6c94f7ae3964fd0a306776084484354706a2a6",
+            "executable": "/usr/bin/python3.14",
+            "executable_sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        }
+      ]
+    },
+    {
+      "name": "windows-test",
+      "path": "scratch/oom-resume-2139/windows-test/status.json",
+      "sha256": "6cde522575c961ce7f0f15569e04c2b543b6f12a36d658dc207487fe051aad2f",
+      "summary": {
+        "passed": 1,
+        "incomplete": 0
+      },
+      "attempts": [
+        {
+          "id": "test",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "6fff11b6cacc816990fcd37a6b9260f9ffde5feb8cb082094a6b2aee3ea8ef8d",
+            "executable": "/usr/bin/python3.14",
+            "executable_sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        }
+      ]
+    },
+    {
+      "name": "wasi",
+      "path": "scratch/oom-resume-2139/wasi/status.json",
+      "sha256": "00eee5bb7be60c82d23d63d1995d0610881f63d5f399117f3e1a49dfc2a5881a",
+      "summary": {
+        "passed": 5,
+        "incomplete": 0
+      },
+      "attempts": [
+        {
+          "id": "flag-build",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "702263b1b65b8cce1d69a82d0a3191447ace056d2b3debf2b5d8e244949fb773",
+            "executable": "<toolchain>/node",
+            "executable_sha256": "94efd062ed066c1a0b332e18249859c905e920eeada5df55d24c99b919629a90",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        },
+        {
+          "id": "flag-hosted",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "702263b1b65b8cce1d69a82d0a3191447ace056d2b3debf2b5d8e244949fb773",
+            "executable": "<toolchain>/npm-cli.js",
+            "executable_sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        },
+        {
+          "id": "small-graph",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "702263b1b65b8cce1d69a82d0a3191447ace056d2b3debf2b5d8e244949fb773",
+            "executable": "<toolchain>/node",
+            "executable_sha256": "94efd062ed066c1a0b332e18249859c905e920eeada5df55d24c99b919629a90",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        },
+        {
+          "id": "restore-default",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "702263b1b65b8cce1d69a82d0a3191447ace056d2b3debf2b5d8e244949fb773",
+            "executable": "<toolchain>/node",
+            "executable_sha256": "94efd062ed066c1a0b332e18249859c905e920eeada5df55d24c99b919629a90",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        },
+        {
+          "id": "restore-hosted",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "702263b1b65b8cce1d69a82d0a3191447ace056d2b3debf2b5d8e244949fb773",
+            "executable": "<toolchain>/npm-cli.js",
+            "executable_sha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        }
+      ]
+    },
+    {
+      "name": "default-release",
+      "path": "scratch/oom-resume-2139/default-release/status.json",
+      "sha256": "d08172b7dd5f4321e192f3a09de5ea8c80ecad56e8edacf98d1399cb63439323",
+      "summary": {
+        "passed": 1,
+        "incomplete": 0
+      },
+      "attempts": [
+        {
+          "id": "default-release",
+          "status": "passed",
+          "exit_code": 0,
+          "runtime": {
+            "environment_sha256": "086a6a6079fd20033905427184a069e81d837a3cb1f38ed1ed16f18870bc4a71",
+            "executable": "/usr/bin/python3.14",
+            "executable_sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+            "runner_sha256": "7a9cae0a99b03b46250dffa96b8615423da30f6c891b899b33af47b8234988bf"
+          }
+        }
+      ]
+    }
+  ],
+  "retained_source_manifest": {
+    "path": "scratch/oom-iteration/retained-routing-build.json",
+    "sha256": "550f39f54b105473b4ad1431611bd03c1a258d50047f05b8e7b4174c6516793d",
+    "binary_sha256": "48aa1806a906c0c762acd1b4ddf75ab1b3fb2eaf6c052288dca8f31f0f72299b"
+  },
+  "default_native": {
+    "manifest_path": "scratch/oom-iteration/resume-default-build.json",
+    "manifest_sha256": "f12a4d4066fcbcce571a1d806c788fc70fa40f8782509a55101596d766d227ad",
+    "binary_sha256": "73f53e3996f09b27e17c11515677e548e048e9b7b07595711f708dd39e3aa86c",
+    "features": []
+  },
+  "windows_snapshot": {
+    "path": "scratch/oom-resume-2139/windows-checkout.json",
+    "sha256": "2735dd6e93b26d9fdfb5beca5b951fe496e0bfd6e66020fd49ca74d6712a66d2",
+    "checkout": "<native-checkout>",
+    "revision": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+    "source_identity_equal_retained": true
+  },
+  "production_assets": {
+    "ui/dist/_headers": "46b995e0cbdc5627d6fa68f94b293f929b5bd3ce90d58ab8a8837ecc7da679a0",
+    "ui/dist/app.js": "650c8d9fbd7eaa3dbe427448ae46559158f57d3fa87349c1ca6a4e19a0a808a2",
+    "ui/dist/engine-worker.js": "1bb94349dd81250293539b8bb92565e6b017c49cf5d10425e1457b414337dad6",
+    "ui/dist/engine.wasm": "0f058e5c2de6b599e5ec91875df1e3e79987986e1ec192e3f974e891727d6186",
+    "ui/dist/index.html": "e2304112b756d9aabc12022e8585ba82030f4e5d8a6dc5df49629c9bdc4238a9",
+    "ui/dist/storage-worker.js": "5e21dbce38359fb1ea972c39db41f05cc91c8d92365b9e567728ab72afca06b6",
+    "ui/dist/style.css": "766e61ac0baf1d8ecbe8faef72d6cfb94f50e771bc2ddec4abfc18d2f8275c0d"
+  },
+  "production_wasm_exports": [
+    "memory",
+    "chopper_analyze",
+    "chopper_clear_profile",
+    "chopper_columns",
+    "chopper_defaults",
+    "chopper_preview",
+    "chopper_run",
+    "chopper_sniff",
+    "rust_zstd_wasm_shim_calloc",
+    "rust_zstd_wasm_shim_free",
+    "rust_zstd_wasm_shim_malloc",
+    "rust_zstd_wasm_shim_memcmp",
+    "rust_zstd_wasm_shim_memcpy",
+    "rust_zstd_wasm_shim_memmove",
+    "rust_zstd_wasm_shim_memset",
+    "rust_zstd_wasm_shim_qsort"
+  ],
+  "notes": [
+    "Matching relevant source identities, not commit alone; prior Eager prototype is removed and not covered by finalsource claims.",
+    "Individual default/allfeature/Windows passes overlap; no aggregate test count inferred. Raw originals local/unarchived."
+  ]
+}

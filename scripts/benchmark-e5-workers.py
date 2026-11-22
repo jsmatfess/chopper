@@ -279,8 +279,8 @@ def control_records(text):
         scenarios = record.get('scenarios', [])
         require(len(scenarios) == 4, 'missing exact denial scenarios')
         for scenario, (phase, cancelled) in zip(scenarios, [
-                ('Reading and validating CSV', False), ('Ready for confirmation', False),
-                ('Serializing output', False), ('Ready for confirmation', True)]):
+                ('Reading and validating CSV', False), ('Finalizing output snapshot', False),
+                ('Serializing output', False), ('Finalizing output snapshot', True)]):
             require(all(scenario.get(k) == v for k, v in {
                 'phase': phase, 'cancelled': cancelled, 'local_limit_bytes': 128 * 1024**2,
                 'pool_limit_bytes': (64 if kind == 'shared' else 256) * 1024**2,
@@ -289,7 +289,7 @@ def control_records(text):
             require(type(scenario.get('grant_bytes')) is int and 0 < scenario['grant_bytes']
                     <= scenario['pool_limit_bytes'], 'missing exact denial grant')
             require(scenario.get('rows') == (65536 if phase == 'Serializing output' else
-                    5000 if phase == 'Ready for confirmation' else 0), 'denial emission boundary')
+                    5000 if phase == 'Finalizing output snapshot' else 0), 'denial emission boundary')
     require('test result: ok. 1 passed; 0 failed;' in text,
             'denial controls lack successful exact test result')
     return records

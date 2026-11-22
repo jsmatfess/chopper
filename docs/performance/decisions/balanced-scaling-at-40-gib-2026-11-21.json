@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "balanced-scaling-at-40-gib-2026-11-21",
+  "title": "Qualify current Balanced comparison at 40 GiB",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Does the 8 GiB constrained Balanced ranking transfer to the same fixture shape at 40 GiB?",
+  "disposition": "informational",
+  "outcome": "diagnostic",
+  "delivery": "unchanged",
+  "summary": "One verified 40 GiB run per tool reproduces the 8 GiB order and near-identical input throughput. qsvlite 99.53 s, Chopper opt-in 190.55 s, and ordered materialized DuckDB adapter 314.36 s.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "40 GiB repeated plain CSV, eight exact consecutive parts, 1 GiB hard with swap disabled and one worker."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Separate small and full qualifications, complete ordered-byte and per-file quota verification, with Chopper manifest and cleanup checks."
+  },
+  "limitations": [
+    "One full qualification per tool, no large-size repeat variability.",
+    "WSL2/ext4. Input exceeds the cgroup and fits host RAM. Scope excludes native Windows.",
+    "DuckDB is the materialize-and-slice adapter. qsvlite has no separate engine setting or Chopper-equivalent publication contract."
+  ],
+  "exclusions": [
+    "Small preflights. Generation, provenance hashing and output verification outside the timing scope."
+  ],
+  "reopen_when": "Repeat at 40 GiB if a materially different candidate or workload makes the bound or scale transfer uncertain.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#balanced-scaling-at-40-gib-2026-11-21",
+      "sha256": "ec167c1da70873bfa3a5faba7bc38185151ceb753b204a26bcbc5dc9df8fc81f"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/balanced-40gib-qualification-summary-2026-11-21.json",
+      "sha256": "34eae77aa1ce7dba5daef9138b8d6735d494efc80a368d7453af6c3fc8d885ae"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md"
+  ]
+}

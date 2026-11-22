@@ -14,6 +14,7 @@ source trees; they are not a list of current engine capabilities.
 | Local workflow gate | `python3 scripts/local-ci.py check`. Landing requires separate authorization and `local-ci.py land`. [CI policy](../docs/ci.md). |
 | Release preparation/acceptance | Use the profile's owning [preparation](../docs/validation-runner.md#actual-host-acceptance-preflight) and [qualification](../docs/hosted-tiny-qualification.md) commands. Source controls do not grant actual-host or scale acceptance. |
 | Performance work | Follow the [benchmark guide](../docs/benchmarks/README.md), current decision registry and named experiment's provenance. No harness matrix is authorized implicitly. |
+| Native tool comparison | `python scripts/benchmark-tool-comparison.py --help`; Python environment with DuckDB 2.0.0, explicit Chopper/qsv binaries and fresh work directories. Synthetic eight-file split/shuffle development cells include startup/count/materialization/output and independent field/quota checks. qsv random sort has no matched memory limit. [Evidence and interpretation](../docs/performance/investigations/cross-tool-csv-split-and-shuffle-comparison-2026-11-18.md). Verifier controls: `python3 scripts/test-benchmark-tool-comparison.py`. |
 | Hosted memory experiment | `node scripts/benchmark-hosted-memory.mjs BASELINE.wasm CANDIDATE.wasm OUTPUT MODE`; explicitly select `pilot`, `paired`, `control` or `resident`. [Measurement and verification boundary](../docs/benchmarks/README.md#bounded-random-draw-comparisons). |
 
 The [historical shuffle source archive](../docs/history/shuffle-harnesses-2026-11-16/README.md)
@@ -24,3 +25,18 @@ contains `benchmark-flexible.py`, `benchmark-allocation-ranges.py`,
 `reproduce-bucket-window.py`. Their original bytes/hashes and evidence references
 are preserved. They can emit removed schemas and require their recorded engines;
 they are not current-main benchmark entry points.
+
+`benchmark-data-movement.py` compares pinned native baseline/candidate binaries
+for one explicitly selected Fisher–Yates/Balanced or plain Balanced cell. It
+alternates complete Run jobs with an excluded warmup, records process counters,
+and independently verifies every output field, ID, quota, lineage and cap before
+removing successful payloads. Select `--case` explicitly; `--rows` is for a small
+harness smoke check. Source/build identity and admission/publication controls
+remain required separately; this harness does not qualify a build or platform.
+
+Drivers containing the removed hosted Prepare/Confirm protocol or the former
+native `profile` command are historical replay tools and require their original
+pinned build/harness identities. They are not current acceptance commands. Use
+the current Analyze/Run acceptance commands in `docs/browser.md` and the matched
+Run harness above for new experiments; changing a command name alone can compare
+different response/measurement scopes across old and new binaries.

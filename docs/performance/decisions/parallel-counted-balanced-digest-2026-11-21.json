@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "parallel-counted-balanced-digest-2026-11-21",
+  "title": "Reject synchronous parallel counted Balanced digest",
+  "date": "2026-11-21",
+  "subsystem": "input",
+  "question": "Can native counted singleton Balanced reduce digest elapsed through the existing worker pool?",
+  "disposition": "reject",
+  "outcome": "unfavorable",
+  "delivery": "unapplied",
+  "summary": "The four-worker synchronous BLAKE3 pool handoff and wider digest buffer increased median complete elapsed by 30.41% and process CPU by 119.90% at 2 GiB. Removed the prototype after all three pairs favored serial.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2 GiB UTF-8 CSV to eight exact Balanced parts, 300 MiB serialized cap, four workers, engine m256, hard 1 GiB with no swap."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Three matched complete pairs passed independent full verification of fields, order, quotas, caps, logical digest equality and cleanup."
+  },
+  "limitations": [
+    "One synthetic repeated workload in WSL2/ext4.",
+    "The implementation bundles a larger buffer and synchronous pool dispatch.",
+    "Parent cgroup peaks include file cache."
+  ],
+  "exclusions": [
+    "Small preflight, full-size warmup and one-worker perf profile."
+  ],
+  "reopen_when": "Only revisit with a distinct scheduling or data movement mechanism that removes a measured cost. Do not tune the rejected synchronous pool handoff.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#parallel-counted-balanced-digest-2026-11-21",
+      "sha256": "5cc378ae6148cc29dd33a598506986a98f9aa0f5ce69902e74e76afd5d4d8a3d"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/parallel-counted-balanced-digest-summary-2026-11-21.json",
+      "sha256": "08d2c5b539b4a1b287e51a3432b414b64940213444c0d99a4402db2c83ead2c3"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md"
+  ]
+}

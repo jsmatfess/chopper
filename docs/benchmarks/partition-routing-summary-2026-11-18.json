@@ -1,0 +1,2883 @@
+{
+  "kind": "reviewed-routing-comparisons",
+  "schema": 1,
+  "date": "2026-11-18",
+  "retention": "Raw originals local/unarchived; paths/hashes do not promise remote retrieval. Source/binary archives retained. Existing historical hydration error blocks complete generatedcatalog refresh.",
+  "native_before_after": {
+    "kind": "reviewed-native-comparisons",
+    "schema": 1,
+    "cells": [
+      {
+        "id": "partition",
+        "label": "Partition (8 keys)",
+        "decision": "retain",
+        "source": {
+          "path": "scratch/oom-resume-2139/partition-large/results.jsonl",
+          "sha256": "b45d04469296867092d1f22793882100a0e5542376c80f02d5f5cb82da2c61a0"
+        },
+        "variants": {
+          "chopper-baseline": {
+            "selector": {
+              "kind": "measurement",
+              "job": "partition",
+              "tool": "chopper-baseline",
+              "repetition": [
+                0,
+                1,
+                2
+              ]
+            },
+            "samples": [
+              {
+                "line": 5,
+                "context_line": 4,
+                "repetition": 0,
+                "seconds": 20.290424513979815,
+                "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+              },
+              {
+                "line": 9,
+                "context_line": 7,
+                "repetition": 1,
+                "seconds": 21.150833791005425,
+                "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+              },
+              {
+                "line": 11,
+                "context_line": 10,
+                "repetition": 2,
+                "seconds": 17.57240499998443,
+                "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+              }
+            ],
+            "metrics": {
+              "seconds": {
+                "n": 3,
+                "median": 20.290424513979815,
+                "min": 17.57240499998443,
+                "max": 21.150833791005425,
+                "values": [
+                  20.290424513979815,
+                  21.150833791005425,
+                  17.57240499998443
+                ]
+              },
+              "temporary_bytes_written": {
+                "n": 3,
+                "median": 4873782652,
+                "min": 4873782652,
+                "max": 4873782652,
+                "values": [
+                  4873782652,
+                  4873782652,
+                  4873782652
+                ]
+              },
+              "temporary_bytes_read": {
+                "n": 3,
+                "median": 2709520384,
+                "min": 2709520384,
+                "max": 2709520384,
+                "values": [
+                  2709520384,
+                  2709520384,
+                  2709520384
+                ]
+              },
+              "peak_workspace_reserved_bytes": {
+                "n": 3,
+                "median": 67856844,
+                "min": 67856844,
+                "max": 67856844,
+                "values": [
+                  67856844,
+                  67856844,
+                  67856844
+                ]
+              },
+              "routed_groupings": {
+                "n": 3,
+                "median": 1,
+                "min": 1,
+                "max": 1,
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "routing_fallbacks": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "sort_calls": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "sort_runs": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "peak_temp_bytes": {
+                "n": 3,
+                "median": 2980036243,
+                "min": 2980036243,
+                "max": 2980036243,
+                "values": [
+                  2980036243,
+                  2980036243,
+                  2980036243
+                ]
+              },
+              "output_csv_bytes": {
+                "n": 3,
+                "median": 2164261032,
+                "min": 2164261032,
+                "max": 2164261032,
+                "values": [
+                  2164261032,
+                  2164261032,
+                  2164261032
+                ]
+              },
+              "User time (seconds)": {
+                "n": 3,
+                "median": 5.15,
+                "min": 5.11,
+                "max": 5.16,
+                "values": [
+                  5.11,
+                  5.15,
+                  5.16
+                ]
+              },
+              "System time (seconds)": {
+                "n": 3,
+                "median": 3.73,
+                "min": 3.56,
+                "max": 3.8,
+                "values": [
+                  3.8,
+                  3.73,
+                  3.56
+                ]
+              },
+              "Maximum resident set size (kbytes)": {
+                "n": 3,
+                "median": 76052.0,
+                "min": 76012.0,
+                "max": 76128.0,
+                "values": [
+                  76128.0,
+                  76052.0,
+                  76012.0
+                ]
+              },
+              "File system inputs": {
+                "n": 3,
+                "median": 13633528.0,
+                "min": 13632888.0,
+                "max": 13634160.0,
+                "values": [
+                  13633528.0,
+                  13634160.0,
+                  13632888.0
+                ]
+              },
+              "File system outputs": {
+                "n": 3,
+                "median": 13747088.0,
+                "min": 13747056.0,
+                "max": 13749240.0,
+                "values": [
+                  13747088.0,
+                  13749240.0,
+                  13747056.0
+                ]
+              }
+            }
+          },
+          "chopper": {
+            "selector": {
+              "kind": "measurement",
+              "job": "partition",
+              "tool": "chopper",
+              "repetition": [
+                0,
+                1,
+                2
+              ]
+            },
+            "samples": [
+              {
+                "line": 6,
+                "context_line": 4,
+                "repetition": 0,
+                "seconds": 14.227818003972061,
+                "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+              },
+              {
+                "line": 8,
+                "context_line": 7,
+                "repetition": 1,
+                "seconds": 14.939878882025369,
+                "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+              },
+              {
+                "line": 12,
+                "context_line": 10,
+                "repetition": 2,
+                "seconds": 12.542165584978648,
+                "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+              }
+            ],
+            "metrics": {
+              "seconds": {
+                "n": 3,
+                "median": 14.227818003972061,
+                "min": 12.542165584978648,
+                "max": 14.939878882025369,
+                "values": [
+                  14.227818003972061,
+                  14.939878882025369,
+                  12.542165584978648
+                ]
+              },
+              "temporary_bytes_written": {
+                "n": 3,
+                "median": 2709521976,
+                "min": 2709521976,
+                "max": 2709521976,
+                "values": [
+                  2709521976,
+                  2709521976,
+                  2709521976
+                ]
+              },
+              "temporary_bytes_read": {
+                "n": 3,
+                "median": 2709520384,
+                "min": 2709520384,
+                "max": 2709520384,
+                "values": [
+                  2709520384,
+                  2709520384,
+                  2709520384
+                ]
+              },
+              "peak_workspace_reserved_bytes": {
+                "n": 3,
+                "median": 67856727,
+                "min": 67856727,
+                "max": 67856727,
+                "values": [
+                  67856727,
+                  67856727,
+                  67856727
+                ]
+              },
+              "routed_groupings": {
+                "n": 3,
+                "median": 1,
+                "min": 1,
+                "max": 1,
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "routing_fallbacks": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "sort_calls": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "sort_runs": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "peak_temp_bytes": {
+                "n": 3,
+                "median": 2709520384,
+                "min": 2709520384,
+                "max": 2709520384,
+                "values": [
+                  2709520384,
+                  2709520384,
+                  2709520384
+                ]
+              },
+              "output_csv_bytes": {
+                "n": 3,
+                "median": 2164261032,
+                "min": 2164261032,
+                "max": 2164261032,
+                "values": [
+                  2164261032,
+                  2164261032,
+                  2164261032
+                ]
+              },
+              "User time (seconds)": {
+                "n": 3,
+                "median": 5.21,
+                "min": 5.02,
+                "max": 5.22,
+                "values": [
+                  5.02,
+                  5.21,
+                  5.22
+                ]
+              },
+              "System time (seconds)": {
+                "n": 3,
+                "median": 2.81,
+                "min": 2.76,
+                "max": 2.94,
+                "values": [
+                  2.94,
+                  2.81,
+                  2.76
+                ]
+              },
+              "Maximum resident set size (kbytes)": {
+                "n": 3,
+                "median": 76200.0,
+                "min": 76176.0,
+                "max": 76236.0,
+                "values": [
+                  76236.0,
+                  76200.0,
+                  76176.0
+                ]
+              },
+              "File system inputs": {
+                "n": 3,
+                "median": 9406624.0,
+                "min": 9406440.0,
+                "max": 9407024.0,
+                "values": [
+                  9406624.0,
+                  9407024.0,
+                  9406440.0
+                ]
+              },
+              "File system outputs": {
+                "n": 3,
+                "median": 9535064.0,
+                "min": 9534960.0,
+                "max": 9539416.0,
+                "values": [
+                  9535064.0,
+                  9534960.0,
+                  9539416.0
+                ]
+              }
+            }
+          }
+        },
+        "builds": {
+          "chopper-baseline": {
+            "manifest_path": "scratch/oom-iteration/pause-candidate-build.json",
+            "manifest_sha256": "bd5f7cf811420ad4d58e477d105113be5d4e036228d1140da7b3062cc893cdca",
+            "binary_sha256": "15c4534ad522f56375a397d834c32a6f380b3cd7f15949f7771ea07479002a22",
+            "features": [
+              "experimental-counted-balanced",
+              "experimental-terminal-shuffle",
+              "experimental-cgroup-cache-headroom",
+              "experimental-terminal-routing"
+            ],
+            "source_archive": {
+              "path": "scratch/oom-iteration/pause-candidate-source.tar.gz",
+              "sha256": "f2b6d6fed661564a1cd6da6e58cb68e68d4ced4554741d8dbef449b936ec34df"
+            }
+          },
+          "chopper": {
+            "manifest_path": "scratch/oom-iteration/partition-candidate-build.json",
+            "manifest_sha256": "11c548bc45e0132cacb5c63e5cf7e219de1971f3214711add23ef6dc448e5bfd",
+            "binary_sha256": "30aabe59c87fc764935aa1923fe4929ceacedd4d065e703eee90f9d0d66b3af7",
+            "features": [
+              "experimental-counted-balanced",
+              "experimental-terminal-shuffle",
+              "experimental-cgroup-cache-headroom",
+              "experimental-terminal-routing"
+            ],
+            "source_archive": {
+              "path": "scratch/oom-iteration/partition-candidate-source.tar.gz",
+              "sha256": "ad044838d3e243d687c3098f22d47410df51f5bb3e250e6d14774d476473115f"
+            }
+          }
+        },
+        "elapsed_reduction_percent": 29.87915065961634,
+        "managed_write_reduction_percent": 44.40617956387276,
+        "paired_seconds_reductions": [
+          6.062606510007754,
+          6.210954908980057,
+          5.030239415005781
+        ]
+      },
+      {
+        "id": "assign",
+        "label": "Exact assignment",
+        "decision": "reject",
+        "source": {
+          "path": "scratch/oom-resume-2139/assignment-large-v2/results.jsonl",
+          "sha256": "490e2035a5601d4bdbe46e9dfd6fd9b1360be3906c871db60a125478c400e5b2"
+        },
+        "variants": {
+          "chopper-baseline": {
+            "selector": {
+              "kind": "measurement",
+              "job": "assign",
+              "tool": "chopper-baseline",
+              "repetition": [
+                0,
+                1,
+                2
+              ]
+            },
+            "samples": [
+              {
+                "line": 5,
+                "context_line": 4,
+                "repetition": 0,
+                "seconds": 17.00252316100523,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              },
+              {
+                "line": 9,
+                "context_line": 7,
+                "repetition": 1,
+                "seconds": 22.910088427946903,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              },
+              {
+                "line": 11,
+                "context_line": 10,
+                "repetition": 2,
+                "seconds": 17.093841185909696,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              }
+            ],
+            "metrics": {
+              "seconds": {
+                "n": 3,
+                "median": 17.093841185909696,
+                "min": 17.00252316100523,
+                "max": 22.910088427946903,
+                "values": [
+                  17.00252316100523,
+                  22.910088427946903,
+                  17.093841185909696
+                ]
+              },
+              "temporary_bytes_written": {
+                "n": 3,
+                "median": 7532970553,
+                "min": 7532970553,
+                "max": 7532970553,
+                "values": [
+                  7532970553,
+                  7532970553,
+                  7532970553
+                ]
+              },
+              "temporary_bytes_read": {
+                "n": 3,
+                "median": 5368709175,
+                "min": 5368709175,
+                "max": 5368709175,
+                "values": [
+                  5368709175,
+                  5368709175,
+                  5368709175
+                ]
+              },
+              "peak_workspace_reserved_bytes": {
+                "n": 3,
+                "median": 67453124,
+                "min": 67453124,
+                "max": 67453124,
+                "values": [
+                  67453124,
+                  67453124,
+                  67453124
+                ]
+              },
+              "routed_groupings": {
+                "n": 3,
+                "median": 1,
+                "min": 1,
+                "max": 1,
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "routing_fallbacks": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "sort_calls": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "sort_runs": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "peak_temp_bytes": {
+                "n": 3,
+                "median": 6450838875,
+                "min": 6450838875,
+                "max": 6450838875,
+                "values": [
+                  6450838875,
+                  6450838875,
+                  6450838875
+                ]
+              },
+              "output_csv_bytes": {
+                "n": 3,
+                "median": 2164260927,
+                "min": 2164260927,
+                "max": 2164260927,
+                "values": [
+                  2164260927,
+                  2164260927,
+                  2164260927
+                ]
+              },
+              "User time (seconds)": {
+                "n": 3,
+                "median": 5.86,
+                "min": 5.78,
+                "max": 5.9,
+                "values": [
+                  5.78,
+                  5.9,
+                  5.86
+                ]
+              },
+              "System time (seconds)": {
+                "n": 3,
+                "median": 5.11,
+                "min": 4.95,
+                "max": 5.11,
+                "values": [
+                  5.11,
+                  4.95,
+                  5.11
+                ]
+              },
+              "Maximum resident set size (kbytes)": {
+                "n": 3,
+                "median": 70924.0,
+                "min": 70680.0,
+                "max": 70932.0,
+                "values": [
+                  70680.0,
+                  70932.0,
+                  70924.0
+                ]
+              },
+              "File system inputs": {
+                "n": 3,
+                "median": 18907136.0,
+                "min": 18907088.0,
+                "max": 18907176.0,
+                "values": [
+                  18907176.0,
+                  18907136.0,
+                  18907088.0
+                ]
+              },
+              "File system outputs": {
+                "n": 3,
+                "median": 18944584.0,
+                "min": 18943928.0,
+                "max": 18960296.0,
+                "values": [
+                  18943928.0,
+                  18944584.0,
+                  18960296.0
+                ]
+              }
+            }
+          },
+          "chopper": {
+            "selector": {
+              "kind": "measurement",
+              "job": "assign",
+              "tool": "chopper",
+              "repetition": [
+                0,
+                1,
+                2
+              ]
+            },
+            "samples": [
+              {
+                "line": 6,
+                "context_line": 4,
+                "repetition": 0,
+                "seconds": 20.2961792179849,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              },
+              {
+                "line": 8,
+                "context_line": 7,
+                "repetition": 1,
+                "seconds": 13.981749934027903,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              },
+              {
+                "line": 12,
+                "context_line": 10,
+                "repetition": 2,
+                "seconds": 20.73549093096517,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              }
+            ],
+            "metrics": {
+              "seconds": {
+                "n": 3,
+                "median": 20.2961792179849,
+                "min": 13.981749934027903,
+                "max": 20.73549093096517,
+                "values": [
+                  20.2961792179849,
+                  13.981749934027903,
+                  20.73549093096517
+                ]
+              },
+              "temporary_bytes_written": {
+                "n": 3,
+                "median": 5368709793,
+                "min": 5368709793,
+                "max": 5368709793,
+                "values": [
+                  5368709793,
+                  5368709793,
+                  5368709793
+                ]
+              },
+              "temporary_bytes_read": {
+                "n": 3,
+                "median": 5368709175,
+                "min": 5368709175,
+                "max": 5368709175,
+                "values": [
+                  5368709175,
+                  5368709175,
+                  5368709175
+                ]
+              },
+              "peak_workspace_reserved_bytes": {
+                "n": 3,
+                "median": 67387500,
+                "min": 67387500,
+                "max": 67387500,
+                "values": [
+                  67387500,
+                  67387500,
+                  67387500
+                ]
+              },
+              "routed_groupings": {
+                "n": 3,
+                "median": 1,
+                "min": 1,
+                "max": 1,
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "routing_fallbacks": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "sort_calls": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "sort_runs": {
+                "n": 3,
+                "median": 0,
+                "min": 0,
+                "max": 0,
+                "values": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "peak_temp_bytes": {
+                "n": 3,
+                "median": 5368709175,
+                "min": 5368709175,
+                "max": 5368709175,
+                "values": [
+                  5368709175,
+                  5368709175,
+                  5368709175
+                ]
+              },
+              "output_csv_bytes": {
+                "n": 3,
+                "median": 2164260927,
+                "min": 2164260927,
+                "max": 2164260927,
+                "values": [
+                  2164260927,
+                  2164260927,
+                  2164260927
+                ]
+              },
+              "User time (seconds)": {
+                "n": 3,
+                "median": 6.03,
+                "min": 5.92,
+                "max": 6.07,
+                "values": [
+                  5.92,
+                  6.07,
+                  6.03
+                ]
+              },
+              "System time (seconds)": {
+                "n": 3,
+                "median": 4.13,
+                "min": 4.01,
+                "max": 4.24,
+                "values": [
+                  4.01,
+                  4.24,
+                  4.13
+                ]
+              },
+              "Maximum resident set size (kbytes)": {
+                "n": 3,
+                "median": 70788.0,
+                "min": 70732.0,
+                "max": 70908.0,
+                "values": [
+                  70788.0,
+                  70908.0,
+                  70732.0
+                ]
+              },
+              "File system inputs": {
+                "n": 3,
+                "median": 14680096.0,
+                "min": 14680072.0,
+                "max": 14680104.0,
+                "values": [
+                  14680096.0,
+                  14680104.0,
+                  14680072.0
+                ]
+              },
+              "File system outputs": {
+                "n": 3,
+                "median": 14714712.0,
+                "min": 14714344.0,
+                "max": 14722272.0,
+                "values": [
+                  14714344.0,
+                  14722272.0,
+                  14714712.0
+                ]
+              }
+            }
+          }
+        },
+        "builds": {
+          "chopper-baseline": {
+            "manifest_path": "scratch/oom-iteration/pause-candidate-build.json",
+            "manifest_sha256": "bd5f7cf811420ad4d58e477d105113be5d4e036228d1140da7b3062cc893cdca",
+            "binary_sha256": "15c4534ad522f56375a397d834c32a6f380b3cd7f15949f7771ea07479002a22",
+            "features": [
+              "experimental-counted-balanced",
+              "experimental-terminal-shuffle",
+              "experimental-cgroup-cache-headroom",
+              "experimental-terminal-routing"
+            ],
+            "source_archive": {
+              "path": "scratch/oom-iteration/pause-candidate-source.tar.gz",
+              "sha256": "f2b6d6fed661564a1cd6da6e58cb68e68d4ced4554741d8dbef449b936ec34df"
+            }
+          },
+          "chopper": {
+            "manifest_path": "scratch/oom-iteration/assignment-candidate-build.json",
+            "manifest_sha256": "3ee7e7f9a7fa0edad197804b0a83e6b3856c528f7a6127118c9097d228b306c4",
+            "binary_sha256": "1ede0c0c158cf67fa73a5115906af0c7d6a0dbaa191d0c179cdec783d81c15be",
+            "features": [
+              "experimental-counted-balanced",
+              "experimental-terminal-shuffle",
+              "experimental-cgroup-cache-headroom",
+              "experimental-terminal-routing"
+            ],
+            "source_archive": {
+              "path": "scratch/oom-iteration/assignment-candidate-source.tar.gz",
+              "sha256": "b7253e230571d8d94c45cc8b2a71f02d154eba88f11f3b38472306b78694f3cb"
+            }
+          }
+        },
+        "elapsed_reduction_percent": -18.733870270860265,
+        "managed_write_reduction_percent": 28.730508698697687,
+        "paired_seconds_reductions": [
+          -3.293656056979671,
+          8.928338493919,
+          -3.6416497450554743
+        ]
+      },
+      {
+        "id": "assign-strata",
+        "label": "Stratified exact assignment",
+        "decision": "retain",
+        "source": {
+          "path": "scratch/oom-resume-2139/assignment-large-v2/results.jsonl",
+          "sha256": "490e2035a5601d4bdbe46e9dfd6fd9b1360be3906c871db60a125478c400e5b2"
+        },
+        "variants": {
+          "chopper-baseline": {
+            "selector": {
+              "kind": "measurement",
+              "job": "assign-strata",
+              "tool": "chopper-baseline",
+              "repetition": [
+                0,
+                1,
+                2
+              ]
+            },
+            "samples": [
+              {
+                "line": 17,
+                "context_line": 16,
+                "repetition": 0,
+                "seconds": 33.225818125065416,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              },
+              {
+                "line": 21,
+                "context_line": 19,
+                "repetition": 1,
+                "seconds": 35.86615561589133,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              },
+              {
+                "line": 23,
+                "context_line": 22,
+                "repetition": 2,
+                "seconds": 37.29644406202715,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              }
+            ],
+            "metrics": {
+              "seconds": {
+                "n": 3,
+                "median": 35.86615561589133,
+                "min": 33.225818125065416,
+                "max": 37.29644406202715,
+                "values": [
+                  33.225818125065416,
+                  35.86615561589133,
+                  37.29644406202715
+                ]
+              },
+              "temporary_bytes_written": {
+                "n": 3,
+                "median": 12893291837,
+                "min": 12893291837,
+                "max": 12893291837,
+                "values": [
+                  12893291837,
+                  12893291837,
+                  12893291837
+                ]
+              },
+              "temporary_bytes_read": {
+                "n": 3,
+                "median": 10729030459,
+                "min": 10729030459,
+                "max": 10729030459,
+                "values": [
+                  10729030459,
+                  10729030459,
+                  10729030459
+                ]
+              },
+              "peak_workspace_reserved_bytes": {
+                "n": 3,
+                "median": 67937600,
+                "min": 67937600,
+                "max": 67937600,
+                "values": [
+                  67937600,
+                  67937600,
+                  67937600
+                ]
+              },
+              "routed_groupings": {
+                "n": 3,
+                "median": 1,
+                "min": 1,
+                "max": 1,
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "routing_fallbacks": {
+                "n": 3,
+                "median": 1,
+                "min": 1,
+                "max": 1,
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "sort_calls": {
+                "n": 3,
+                "median": 44,
+                "min": 44,
+                "max": 44,
+                "values": [
+                  44,
+                  44,
+                  44
+                ]
+              },
+              "sort_runs": {
+                "n": 3,
+                "median": 44,
+                "min": 44,
+                "max": 44,
+                "values": [
+                  44,
+                  44,
+                  44
+                ]
+              },
+              "peak_temp_bytes": {
+                "n": 3,
+                "median": 8017776675,
+                "min": 8017776675,
+                "max": 8017776675,
+                "values": [
+                  8017776675,
+                  8017776675,
+                  8017776675
+                ]
+              },
+              "output_csv_bytes": {
+                "n": 3,
+                "median": 2164260927,
+                "min": 2164260927,
+                "max": 2164260927,
+                "values": [
+                  2164260927,
+                  2164260927,
+                  2164260927
+                ]
+              },
+              "User time (seconds)": {
+                "n": 3,
+                "median": 11.53,
+                "min": 11.41,
+                "max": 11.74,
+                "values": [
+                  11.53,
+                  11.41,
+                  11.74
+                ]
+              },
+              "System time (seconds)": {
+                "n": 3,
+                "median": 8.27,
+                "min": 8.25,
+                "max": 8.37,
+                "values": [
+                  8.37,
+                  8.25,
+                  8.27
+                ]
+              },
+              "Maximum resident set size (kbytes)": {
+                "n": 3,
+                "median": 76496.0,
+                "min": 76420.0,
+                "max": 76532.0,
+                "values": [
+                  76420.0,
+                  76532.0,
+                  76496.0
+                ]
+              },
+              "File system inputs": {
+                "n": 3,
+                "median": 30448272.0,
+                "min": 30448240.0,
+                "max": 30459552.0,
+                "values": [
+                  30459552.0,
+                  30448240.0,
+                  30448272.0
+                ]
+              },
+              "File system outputs": {
+                "n": 3,
+                "median": 29418088.0,
+                "min": 29415248.0,
+                "max": 29419056.0,
+                "values": [
+                  29419056.0,
+                  29418088.0,
+                  29415248.0
+                ]
+              }
+            }
+          },
+          "chopper": {
+            "selector": {
+              "kind": "measurement",
+              "job": "assign-strata",
+              "tool": "chopper",
+              "repetition": [
+                0,
+                1,
+                2
+              ]
+            },
+            "samples": [
+              {
+                "line": 18,
+                "context_line": 16,
+                "repetition": 0,
+                "seconds": 29.52314217807725,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              },
+              {
+                "line": 20,
+                "context_line": 19,
+                "repetition": 1,
+                "seconds": 31.150149815017357,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              },
+              {
+                "line": 24,
+                "context_line": 22,
+                "repetition": 2,
+                "seconds": 32.830997308017686,
+                "verification": "all fields, IDconservation, exact largest-remainderquotas includingstrata, encounterorder,lineage/manifest/stagecounts; exactinternalmembership from snapshot parity tests"
+              }
+            ],
+            "metrics": {
+              "seconds": {
+                "n": 3,
+                "median": 31.150149815017357,
+                "min": 29.52314217807725,
+                "max": 32.830997308017686,
+                "values": [
+                  29.52314217807725,
+                  31.150149815017357,
+                  32.830997308017686
+                ]
+              },
+              "temporary_bytes_written": {
+                "n": 3,
+                "median": 10729031077,
+                "min": 10729031077,
+                "max": 10729031077,
+                "values": [
+                  10729031077,
+                  10729031077,
+                  10729031077
+                ]
+              },
+              "temporary_bytes_read": {
+                "n": 3,
+                "median": 10729030459,
+                "min": 10729030459,
+                "max": 10729030459,
+                "values": [
+                  10729030459,
+                  10729030459,
+                  10729030459
+                ]
+              },
+              "peak_workspace_reserved_bytes": {
+                "n": 3,
+                "median": 67871904,
+                "min": 67871904,
+                "max": 67871904,
+                "values": [
+                  67871904,
+                  67871904,
+                  67871904
+                ]
+              },
+              "routed_groupings": {
+                "n": 3,
+                "median": 1,
+                "min": 1,
+                "max": 1,
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "routing_fallbacks": {
+                "n": 3,
+                "median": 1,
+                "min": 1,
+                "max": 1,
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "sort_calls": {
+                "n": 3,
+                "median": 44,
+                "min": 44,
+                "max": 44,
+                "values": [
+                  44,
+                  44,
+                  44
+                ]
+              },
+              "sort_runs": {
+                "n": 3,
+                "median": 44,
+                "min": 44,
+                "max": 44,
+                "values": [
+                  44,
+                  44,
+                  44
+                ]
+              },
+              "peak_temp_bytes": {
+                "n": 3,
+                "median": 8017776675,
+                "min": 8017776675,
+                "max": 8017776675,
+                "values": [
+                  8017776675,
+                  8017776675,
+                  8017776675
+                ]
+              },
+              "output_csv_bytes": {
+                "n": 3,
+                "median": 2164260927,
+                "min": 2164260927,
+                "max": 2164260927,
+                "values": [
+                  2164260927,
+                  2164260927,
+                  2164260927
+                ]
+              },
+              "User time (seconds)": {
+                "n": 3,
+                "median": 11.44,
+                "min": 11.37,
+                "max": 11.57,
+                "values": [
+                  11.57,
+                  11.44,
+                  11.37
+                ]
+              },
+              "System time (seconds)": {
+                "n": 3,
+                "median": 7.34,
+                "min": 7.28,
+                "max": 7.53,
+                "values": [
+                  7.53,
+                  7.34,
+                  7.28
+                ]
+              },
+              "Maximum resident set size (kbytes)": {
+                "n": 3,
+                "median": 76464.0,
+                "min": 76440.0,
+                "max": 76548.0,
+                "values": [
+                  76548.0,
+                  76440.0,
+                  76464.0
+                ]
+              },
+              "File system inputs": {
+                "n": 3,
+                "median": 26216728.0,
+                "min": 26214568.0,
+                "max": 26219048.0,
+                "values": [
+                  26216728.0,
+                  26219048.0,
+                  26214568.0
+                ]
+              },
+              "File system outputs": {
+                "n": 3,
+                "median": 25195752.0,
+                "min": 25190000.0,
+                "max": 25213976.0,
+                "values": [
+                  25190000.0,
+                  25195752.0,
+                  25213976.0
+                ]
+              }
+            }
+          }
+        },
+        "builds": {
+          "chopper-baseline": {
+            "manifest_path": "scratch/oom-iteration/pause-candidate-build.json",
+            "manifest_sha256": "bd5f7cf811420ad4d58e477d105113be5d4e036228d1140da7b3062cc893cdca",
+            "binary_sha256": "15c4534ad522f56375a397d834c32a6f380b3cd7f15949f7771ea07479002a22",
+            "features": [
+              "experimental-counted-balanced",
+              "experimental-terminal-shuffle",
+              "experimental-cgroup-cache-headroom",
+              "experimental-terminal-routing"
+            ],
+            "source_archive": {
+              "path": "scratch/oom-iteration/pause-candidate-source.tar.gz",
+              "sha256": "f2b6d6fed661564a1cd6da6e58cb68e68d4ced4554741d8dbef449b936ec34df"
+            }
+          },
+          "chopper": {
+            "manifest_path": "scratch/oom-iteration/assignment-candidate-build.json",
+            "manifest_sha256": "3ee7e7f9a7fa0edad197804b0a83e6b3856c528f7a6127118c9097d228b306c4",
+            "binary_sha256": "1ede0c0c158cf67fa73a5115906af0c7d6a0dbaa191d0c179cdec783d81c15be",
+            "features": [
+              "experimental-counted-balanced",
+              "experimental-terminal-shuffle",
+              "experimental-cgroup-cache-headroom",
+              "experimental-terminal-routing"
+            ],
+            "source_archive": {
+              "path": "scratch/oom-iteration/assignment-candidate-source.tar.gz",
+              "sha256": "b7253e230571d8d94c45cc8b2a71f02d154eba88f11f3b38472306b78694f3cb"
+            }
+          }
+        },
+        "elapsed_reduction_percent": 13.148902412012164,
+        "managed_write_reduction_percent": 16.785944096830264,
+        "paired_seconds_reductions": [
+          3.7026759469881654,
+          4.7160058008739725,
+          4.465446754009463
+        ]
+      }
+    ],
+    "notes": [
+      "Separate cohorts; no pooling. n=3 measured pervariant;warmups excluded. WSL2ext4 backedcacheuncontrolled, actual1GiBcgroupnoswap,coldinput fadvise,256MiB/1worker.",
+      "Managedtemporary counters BEFOREpublication excludeprivateoutput; baselineencodedcopyreadnotincluded. Peaksnotadditive; GNU RSSlargestprocess ratherthan aggregate scope, kernelpeak includesfilecache.",
+      "Partitionperf buildprecedesstratified-only selector refinement; exactperf prototypeincludesunstratifiedpath whichisrejected. Frozenbinaries/sources owntheseobservations; finalretainedbinaryseparate."
+    ]
+  },
+  "cross_tool": {
+    "source": {
+      "path": "scratch/oom-resume-2139/partition-ordered-comparators/results.jsonl",
+      "sha256": "3fc93f63b30940c0b740542c0f4cda3af1e00399fa96b2a0144c1cf71a34f627"
+    },
+    "variants": {
+      "chopper": {
+        "selector": {
+          "kind": "measurement",
+          "tool": "chopper",
+          "repetition": [
+            0,
+            1,
+            2
+          ]
+        },
+        "samples": [
+          {
+            "line": 6,
+            "context_line": 5,
+            "repetition": 0,
+            "seconds": 13.760441106045619,
+            "cgroup_receipt_path": "scratch/oom-resume-2139/partition-ordered-comparators/partition-chopper-1/cgroup.json",
+            "cgroup_receipt_sha256": "87e7ec8238efae0856b7d8ddf7c1d1b22c45b516c41a05dd732c14e553f83fbd",
+            "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+          },
+          {
+            "line": 12,
+            "context_line": 9,
+            "repetition": 1,
+            "seconds": 13.306964986026287,
+            "cgroup_receipt_path": "scratch/oom-resume-2139/partition-ordered-comparators/partition-chopper-2/cgroup.json",
+            "cgroup_receipt_sha256": "331c0d5ab42943b69d98572ff16981afa9aeecd2001de5b3172691fec379d00b",
+            "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+          },
+          {
+            "line": 15,
+            "context_line": 13,
+            "repetition": 2,
+            "seconds": 18.445688636042178,
+            "cgroup_receipt_path": "scratch/oom-resume-2139/partition-ordered-comparators/partition-chopper-3/cgroup.json",
+            "cgroup_receipt_sha256": "a595f4bfcd7a691a3cfc03dd8bc946c846bec4ee46dbb228d1d22b60c8e07223",
+            "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+          }
+        ],
+        "metrics": {
+          "seconds": {
+            "n": 3,
+            "median": 13.760441106045619,
+            "min": 13.306964986026287,
+            "max": 18.445688636042178,
+            "values": [
+              13.760441106045619,
+              13.306964986026287,
+              18.445688636042178
+            ]
+          },
+          "kernel_memory_peak_bytes": {
+            "n": 3,
+            "median": 1073741824,
+            "min": 1073741824,
+            "max": 1073741824,
+            "values": [
+              1073741824,
+              1073741824,
+              1073741824
+            ]
+          },
+          "User time (seconds)": {
+            "n": 3,
+            "median": 5.21,
+            "min": 5.16,
+            "max": 5.45,
+            "values": [
+              5.21,
+              5.16,
+              5.45
+            ]
+          },
+          "System time (seconds)": {
+            "n": 3,
+            "median": 2.96,
+            "min": 2.87,
+            "max": 3.0,
+            "values": [
+              3.0,
+              2.96,
+              2.87
+            ]
+          },
+          "Maximum resident set size (kbytes)": {
+            "n": 3,
+            "median": 76176.0,
+            "min": 76084.0,
+            "max": 76212.0,
+            "values": [
+              76084.0,
+              76212.0,
+              76176.0
+            ]
+          },
+          "File system inputs": {
+            "n": 3,
+            "median": 9405944.0,
+            "min": 9403408.0,
+            "max": 9406816.0,
+            "values": [
+              9406816.0,
+              9403408.0,
+              9405944.0
+            ]
+          },
+          "File system outputs": {
+            "n": 3,
+            "median": 9521632.0,
+            "min": 9520584.0,
+            "max": 9522248.0,
+            "values": [
+              9522248.0,
+              9521632.0,
+              9520584.0
+            ]
+          },
+          "cpu_seconds": {
+            "n": 3,
+            "median": 8.21,
+            "min": 8.120000000000001,
+            "max": 8.32,
+            "values": [
+              8.21,
+              8.120000000000001,
+              8.32
+            ]
+          },
+          "serialized_output_bytes": {
+            "n": 3,
+            "median": 2164261032,
+            "min": 2164261032,
+            "max": 2164261032,
+            "values": [
+              2164261032,
+              2164261032,
+              2164261032
+            ]
+          },
+          "temporary_bytes_written": {
+            "n": 3,
+            "median": 2709521976,
+            "min": 2709521976,
+            "max": 2709521976,
+            "values": [
+              2709521976,
+              2709521976,
+              2709521976
+            ]
+          },
+          "temporary_bytes_read": {
+            "n": 3,
+            "median": 2709520384,
+            "min": 2709520384,
+            "max": 2709520384,
+            "values": [
+              2709520384,
+              2709520384,
+              2709520384
+            ]
+          },
+          "peak_workspace_reserved_bytes": {
+            "n": 3,
+            "median": 67856923,
+            "min": 67856923,
+            "max": 67856923,
+            "values": [
+              67856923,
+              67856923,
+              67856923
+            ]
+          },
+          "routed_groupings": {
+            "n": 3,
+            "median": 1,
+            "min": 1,
+            "max": 1,
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          "routing_fallbacks": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "values": [
+              0,
+              0,
+              0
+            ]
+          },
+          "routing_reused_runs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "values": [
+              0,
+              0,
+              0
+            ]
+          },
+          "sort_runs": {
+            "n": 3,
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "values": [
+              0,
+              0,
+              0
+            ]
+          },
+          "output_csv_bytes": {
+            "n": 3,
+            "median": 2164261032,
+            "min": 2164261032,
+            "max": 2164261032,
+            "values": [
+              2164261032,
+              2164261032,
+              2164261032
+            ]
+          },
+          "peak_temp_bytes": {
+            "n": 3,
+            "median": 2709520384,
+            "min": 2709520384,
+            "max": 2709520384,
+            "values": [
+              2709520384,
+              2709520384,
+              2709520384
+            ]
+          }
+        }
+      },
+      "duckdb-partition": {
+        "selector": {
+          "kind": "measurement",
+          "tool": "duckdb-partition",
+          "repetition": [
+            0,
+            1,
+            2
+          ]
+        },
+        "samples": [
+          {
+            "line": 8,
+            "context_line": 5,
+            "repetition": 0,
+            "seconds": 22.953399162972346,
+            "cgroup_receipt_path": "scratch/oom-resume-2139/partition-ordered-comparators/partition-duckdb-partition-1/cgroup.json",
+            "cgroup_receipt_sha256": "9822b16970de06e1129cd0eaeaa901e26edd047a0f5f23dcd0e8bff56b3465f9",
+            "verification": "all fields/exact tuple/ID/modulo membership/encounterorder; comparator has no Choppermanifest/caps/atomicpublication contract"
+          },
+          {
+            "line": 11,
+            "context_line": 9,
+            "repetition": 1,
+            "seconds": 20.287018666043878,
+            "cgroup_receipt_path": "scratch/oom-resume-2139/partition-ordered-comparators/partition-duckdb-partition-2/cgroup.json",
+            "cgroup_receipt_sha256": "bd658e78c6a76aebb81092d66f4001c8f5f57bd0801b0298fbbccd183f1bc69f",
+            "verification": "all fields/exact tuple/ID/modulo membership/encounterorder; comparator has no Choppermanifest/caps/atomicpublication contract"
+          },
+          {
+            "line": 14,
+            "context_line": 13,
+            "repetition": 2,
+            "seconds": 21.702126344898716,
+            "cgroup_receipt_path": "scratch/oom-resume-2139/partition-ordered-comparators/partition-duckdb-partition-3/cgroup.json",
+            "cgroup_receipt_sha256": "797319d12c134dc0ac182906fedb606b18d53abf8f86b4d17b5614130f1a855e",
+            "verification": "all fields/exact tuple/ID/modulo membership/encounterorder; comparator has no Choppermanifest/caps/atomicpublication contract"
+          }
+        ],
+        "metrics": {
+          "seconds": {
+            "n": 3,
+            "median": 21.702126344898716,
+            "min": 20.287018666043878,
+            "max": 22.953399162972346,
+            "values": [
+              22.953399162972346,
+              20.287018666043878,
+              21.702126344898716
+            ]
+          },
+          "kernel_memory_peak_bytes": {
+            "n": 3,
+            "median": 1073741824,
+            "min": 1073741824,
+            "max": 1073741824,
+            "values": [
+              1073741824,
+              1073741824,
+              1073741824
+            ]
+          },
+          "User time (seconds)": {
+            "n": 3,
+            "median": 10.48,
+            "min": 9.94,
+            "max": 10.48,
+            "values": [
+              9.94,
+              10.48,
+              10.48
+            ]
+          },
+          "System time (seconds)": {
+            "n": 3,
+            "median": 9.46,
+            "min": 9.21,
+            "max": 9.73,
+            "values": [
+              9.46,
+              9.21,
+              9.73
+            ]
+          },
+          "Maximum resident set size (kbytes)": {
+            "n": 3,
+            "median": 373808.0,
+            "min": 373580.0,
+            "max": 373936.0,
+            "values": [
+              373808.0,
+              373936.0,
+              373580.0
+            ]
+          },
+          "File system inputs": {
+            "n": 3,
+            "median": 15608704.0,
+            "min": 15328512.0,
+            "max": 15922616.0,
+            "values": [
+              15328512.0,
+              15922616.0,
+              15608704.0
+            ]
+          },
+          "File system outputs": {
+            "n": 3,
+            "median": 24699024.0,
+            "min": 21740944.0,
+            "max": 41966536.0,
+            "values": [
+              24699024.0,
+              41966536.0,
+              21740944.0
+            ]
+          },
+          "cpu_seconds": {
+            "n": 3,
+            "median": 19.69,
+            "min": 19.4,
+            "max": 20.21,
+            "values": [
+              19.4,
+              19.69,
+              20.21
+            ]
+          },
+          "serialized_output_bytes": {
+            "n": 3,
+            "median": 2164261032,
+            "min": 2164261032,
+            "max": 2164261032,
+            "values": [
+              2164261032,
+              2164261032,
+              2164261032
+            ]
+          }
+        }
+      },
+      "qsv-partition": {
+        "selector": {
+          "kind": "measurement",
+          "tool": "qsv-partition",
+          "repetition": [
+            0,
+            1,
+            2
+          ]
+        },
+        "samples": [
+          {
+            "line": 7,
+            "context_line": 5,
+            "repetition": 0,
+            "seconds": 3.0316928449319676,
+            "cgroup_receipt_path": "scratch/oom-resume-2139/partition-ordered-comparators/partition-qsv-partition-1/cgroup.json",
+            "cgroup_receipt_sha256": "8f8c85b1d806412bb247b0b474bda75dee2cb35598df613bcb11a6f6401d9a15",
+            "verification": "all fields/exact tuple/ID/modulo membership/encounterorder; comparator has no Choppermanifest/caps/atomicpublication contract"
+          },
+          {
+            "line": 10,
+            "context_line": 9,
+            "repetition": 1,
+            "seconds": 2.5245094320271164,
+            "cgroup_receipt_path": "scratch/oom-resume-2139/partition-ordered-comparators/partition-qsv-partition-2/cgroup.json",
+            "cgroup_receipt_sha256": "604c3e3f9dae83071a56d0b142b88cbd686f5fc8b2e425d024d09cbb9ef1205f",
+            "verification": "all fields/exact tuple/ID/modulo membership/encounterorder; comparator has no Choppermanifest/caps/atomicpublication contract"
+          },
+          {
+            "line": 16,
+            "context_line": 13,
+            "repetition": 2,
+            "seconds": 3.0638197300722823,
+            "cgroup_receipt_path": "scratch/oom-resume-2139/partition-ordered-comparators/partition-qsv-partition-3/cgroup.json",
+            "cgroup_receipt_sha256": "61909658e211512fe3510c390f38dfbf7dbbd11737d62bd9a281a56767701ab2",
+            "verification": "all fields/exact tuple/ID/modulo membership/encounterorder; comparator has no Choppermanifest/caps/atomicpublication contract"
+          }
+        ],
+        "metrics": {
+          "seconds": {
+            "n": 3,
+            "median": 3.0316928449319676,
+            "min": 2.5245094320271164,
+            "max": 3.0638197300722823,
+            "values": [
+              3.0316928449319676,
+              2.5245094320271164,
+              3.0638197300722823
+            ]
+          },
+          "kernel_memory_peak_bytes": {
+            "n": 3,
+            "median": 1073709056,
+            "min": 1073704960,
+            "max": 1073721344,
+            "values": [
+              1073709056,
+              1073721344,
+              1073704960
+            ]
+          },
+          "User time (seconds)": {
+            "n": 3,
+            "median": 1.45,
+            "min": 1.4,
+            "max": 1.47,
+            "values": [
+              1.4,
+              1.47,
+              1.45
+            ]
+          },
+          "System time (seconds)": {
+            "n": 3,
+            "median": 0.87,
+            "min": 0.85,
+            "max": 0.88,
+            "values": [
+              0.87,
+              0.88,
+              0.85
+            ]
+          },
+          "Maximum resident set size (kbytes)": {
+            "n": 3,
+            "median": 39260.0,
+            "min": 39176.0,
+            "max": 39692.0,
+            "values": [
+              39260.0,
+              39176.0,
+              39692.0
+            ]
+          },
+          "File system inputs": {
+            "n": 3,
+            "median": 4194312.0,
+            "min": 4194312.0,
+            "max": 4194312.0,
+            "values": [
+              4194312.0,
+              4194312.0,
+              4194312.0
+            ]
+          },
+          "File system outputs": {
+            "n": 3,
+            "median": 4194376.0,
+            "min": 4194376.0,
+            "max": 4194376.0,
+            "values": [
+              4194376.0,
+              4194376.0,
+              4194376.0
+            ]
+          },
+          "cpu_seconds": {
+            "n": 3,
+            "median": 2.3,
+            "min": 2.27,
+            "max": 2.35,
+            "values": [
+              2.27,
+              2.35,
+              2.3
+            ]
+          },
+          "serialized_output_bytes": {
+            "n": 3,
+            "median": 2147483816,
+            "min": 2147483816,
+            "max": 2147483816,
+            "values": [
+              2147483816,
+              2147483816,
+              2147483816
+            ]
+          }
+        }
+      }
+    },
+    "id": "partition-cross-tool",
+    "native_build": "retained-routing",
+    "competitors": "qsv29 --limit0 onepass8writers; DuckDB2 materializeCSVonce then8single-tablefilterCOPY, preserve_insertion_order=true, no redundantORDERBY. Discovery keys sorted; allworkinsideclock."
+  },
+  "eager": [
+    {
+      "source": {
+        "path": "scratch/oom-resume-2139/eager-large-8/results.jsonl",
+        "sha256": "2db63267dfb50b36f589c076c5a57ccc3b99ae2bab54e48005b10a3b2d7c9348"
+      },
+      "variants": {
+        "chopper-baseline": {
+          "selector": {
+            "kind": "measurement",
+            "tool": "chopper-baseline",
+            "repetition": [
+              0,
+              1,
+              2
+            ]
+          },
+          "samples": [
+            {
+              "line": 5,
+              "context_line": 4,
+              "repetition": 0,
+              "seconds": 15.289827479980886,
+              "cgroup_receipt_path": "scratch/oom-resume-2139/eager-large-8/partition-chopper-baseline-1/cgroup.json",
+              "cgroup_receipt_sha256": "b42293add173ead18477f6b4f42055d737787d9d978e632be9bee1989d28364e",
+              "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+            },
+            {
+              "line": 9,
+              "context_line": 7,
+              "repetition": 1,
+              "seconds": 16.613692829967476,
+              "cgroup_receipt_path": "scratch/oom-resume-2139/eager-large-8/partition-chopper-baseline-2/cgroup.json",
+              "cgroup_receipt_sha256": "49bca55b22470443a1cc6ca9f72c3de7496269e87ad144bd136eac7028973ecf",
+              "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+            },
+            {
+              "line": 11,
+              "context_line": 10,
+              "repetition": 2,
+              "seconds": 13.376324069919065,
+              "cgroup_receipt_path": "scratch/oom-resume-2139/eager-large-8/partition-chopper-baseline-3/cgroup.json",
+              "cgroup_receipt_sha256": "4bff74cd1923a7f75bc2e31c3142204bada5d97ed0d543cf3819cf0396812dc4",
+              "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+            }
+          ],
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 15.289827479980886,
+              "min": 13.376324069919065,
+              "max": 16.613692829967476,
+              "values": [
+                15.289827479980886,
+                16.613692829967476,
+                13.376324069919065
+              ]
+            },
+            "kernel_memory_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "User time (seconds)": {
+              "n": 3,
+              "median": 5.07,
+              "min": 5.07,
+              "max": 5.15,
+              "values": [
+                5.07,
+                5.07,
+                5.15
+              ]
+            },
+            "System time (seconds)": {
+              "n": 3,
+              "median": 2.88,
+              "min": 2.86,
+              "max": 3.16,
+              "values": [
+                3.16,
+                2.86,
+                2.88
+              ]
+            },
+            "Maximum resident set size (kbytes)": {
+              "n": 3,
+              "median": 76044.0,
+              "min": 75940.0,
+              "max": 76100.0,
+              "values": [
+                76044.0,
+                75940.0,
+                76100.0
+              ]
+            },
+            "File system inputs": {
+              "n": 3,
+              "median": 9406736.0,
+              "min": 9406168.0,
+              "max": 9406768.0,
+              "values": [
+                9406736.0,
+                9406768.0,
+                9406168.0
+              ]
+            },
+            "File system outputs": {
+              "n": 3,
+              "median": 9532336.0,
+              "min": 9520672.0,
+              "max": 9534400.0,
+              "values": [
+                9532336.0,
+                9520672.0,
+                9534400.0
+              ]
+            },
+            "cpu_seconds": {
+              "n": 3,
+              "median": 8.030000000000001,
+              "min": 7.93,
+              "max": 8.23,
+              "values": [
+                8.23,
+                7.93,
+                8.030000000000001
+              ]
+            },
+            "serialized_output_bytes": {
+              "n": 3,
+              "median": 2164261032,
+              "min": 2164261032,
+              "max": 2164261032,
+              "values": [
+                2164261032,
+                2164261032,
+                2164261032
+              ]
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2709521976,
+              "min": 2709521976,
+              "max": 2709521976,
+              "values": [
+                2709521976,
+                2709521976,
+                2709521976
+              ]
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 2709520384,
+              "min": 2709520384,
+              "max": 2709520384,
+              "values": [
+                2709520384,
+                2709520384,
+                2709520384
+              ]
+            },
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 67856816,
+              "min": 67856816,
+              "max": 67856816,
+              "values": [
+                67856816,
+                67856816,
+                67856816
+              ]
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1,
+              "values": [
+                1,
+                1,
+                1
+              ]
+            },
+            "routing_fallbacks": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            },
+            "routing_reused_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            },
+            "output_csv_bytes": {
+              "n": 3,
+              "median": 2164261032,
+              "min": 2164261032,
+              "max": 2164261032,
+              "values": [
+                2164261032,
+                2164261032,
+                2164261032
+              ]
+            },
+            "peak_temp_bytes": {
+              "n": 3,
+              "median": 2709520384,
+              "min": 2709520384,
+              "max": 2709520384,
+              "values": [
+                2709520384,
+                2709520384,
+                2709520384
+              ]
+            }
+          }
+        },
+        "chopper": {
+          "selector": {
+            "kind": "measurement",
+            "tool": "chopper",
+            "repetition": [
+              0,
+              1,
+              2
+            ]
+          },
+          "samples": [
+            {
+              "line": 6,
+              "context_line": 4,
+              "repetition": 0,
+              "seconds": 15.07570800499525,
+              "cgroup_receipt_path": "scratch/oom-resume-2139/eager-large-8/partition-chopper-1/cgroup.json",
+              "cgroup_receipt_sha256": "8c6dd0e8c913d62134c8cf1f892307701a7f7a346457e6fca5e1a9f914811054",
+              "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+            },
+            {
+              "line": 8,
+              "context_line": 7,
+              "repetition": 1,
+              "seconds": 16.15933485806454,
+              "cgroup_receipt_path": "scratch/oom-resume-2139/eager-large-8/partition-chopper-2/cgroup.json",
+              "cgroup_receipt_sha256": "89ba3279d1393acbce5f934bc9a5e424b6d820a0274b810aa161959b20177a12",
+              "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+            },
+            {
+              "line": 12,
+              "context_line": 10,
+              "repetition": 2,
+              "seconds": 17.986461135093123,
+              "cgroup_receipt_path": "scratch/oom-resume-2139/eager-large-8/partition-chopper-3/cgroup.json",
+              "cgroup_receipt_sha256": "01d21045e15d7455209c24690431810a9c9da091dc8e8d6df6525380f797657b",
+              "verification": "all fields, exact tuple/ID/modulo membership, canonical tuple order, encounter order, manifest/stage counts/lineage and file hashes"
+            }
+          ],
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 16.15933485806454,
+              "min": 15.07570800499525,
+              "max": 17.986461135093123,
+              "values": [
+                15.07570800499525,
+                16.15933485806454,
+                17.986461135093123
+              ]
+            },
+            "kernel_memory_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "User time (seconds)": {
+              "n": 3,
+              "median": 5.42,
+              "min": 5.41,
+              "max": 5.46,
+              "values": [
+                5.42,
+                5.46,
+                5.41
+              ]
+            },
+            "System time (seconds)": {
+              "n": 3,
+              "median": 2.8,
+              "min": 2.78,
+              "max": 2.95,
+              "values": [
+                2.78,
+                2.95,
+                2.8
+              ]
+            },
+            "Maximum resident set size (kbytes)": {
+              "n": 3,
+              "median": 16180.0,
+              "min": 16172.0,
+              "max": 16220.0,
+              "values": [
+                16172.0,
+                16180.0,
+                16220.0
+              ]
+            },
+            "File system inputs": {
+              "n": 3,
+              "median": 9387992.0,
+              "min": 9387552.0,
+              "max": 9388000.0,
+              "values": [
+                9388000.0,
+                9387992.0,
+                9387552.0
+              ]
+            },
+            "File system outputs": {
+              "n": 3,
+              "median": 9522624.0,
+              "min": 9520728.0,
+              "max": 9522768.0,
+              "values": [
+                9522768.0,
+                9522624.0,
+                9520728.0
+              ]
+            },
+            "cpu_seconds": {
+              "n": 3,
+              "median": 8.21,
+              "min": 8.2,
+              "max": 8.41,
+              "values": [
+                8.2,
+                8.41,
+                8.21
+              ]
+            },
+            "serialized_output_bytes": {
+              "n": 3,
+              "median": 2164261032,
+              "min": 2164261032,
+              "max": 2164261032,
+              "values": [
+                2164261032,
+                2164261032,
+                2164261032
+              ]
+            },
+            "temporary_bytes_written": {
+              "n": 3,
+              "median": 2709521976,
+              "min": 2709521976,
+              "max": 2709521976,
+              "values": [
+                2709521976,
+                2709521976,
+                2709521976
+              ]
+            },
+            "temporary_bytes_read": {
+              "n": 3,
+              "median": 2709520384,
+              "min": 2709520384,
+              "max": 2709520384,
+              "values": [
+                2709520384,
+                2709520384,
+                2709520384
+              ]
+            },
+            "peak_workspace_reserved_bytes": {
+              "n": 3,
+              "median": 747960,
+              "min": 747960,
+              "max": 747960,
+              "values": [
+                747960,
+                747960,
+                747960
+              ]
+            },
+            "routed_groupings": {
+              "n": 3,
+              "median": 1,
+              "min": 1,
+              "max": 1,
+              "values": [
+                1,
+                1,
+                1
+              ]
+            },
+            "routing_fallbacks": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            },
+            "routing_reused_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            },
+            "sort_runs": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            },
+            "output_csv_bytes": {
+              "n": 3,
+              "median": 2164261032,
+              "min": 2164261032,
+              "max": 2164261032,
+              "values": [
+                2164261032,
+                2164261032,
+                2164261032
+              ]
+            },
+            "peak_temp_bytes": {
+              "n": 3,
+              "median": 2709520384,
+              "min": 2709520384,
+              "max": 2709520384,
+              "values": [
+                2709520384,
+                2709520384,
+                2709520384
+              ]
+            }
+          }
+        }
+      },
+      "id": "eager-8",
+      "keys": 8,
+      "elapsed_reduction_percent": -5.686835768566434,
+      "working_peak_reduction_percent": 98.89773784847199,
+      "reported_rss_reduction_percent": 78.72284466887591
+    }
+  ],
+  "eager_passes_declared_retention_rule": false,
+  "eager_high_cardinality_large": "Not launched after lowfanout elapsedrule failed; boundedfallback correctness qualified in 26-test prototype direct_run pass with forcedSort oracle, no largehighfanout throughputclaim",
+  "builds": {
+    "pause-candidate": {
+      "manifest_path": "scratch/oom-iteration/pause-candidate-build.json",
+      "manifest_sha256": "bd5f7cf811420ad4d58e477d105113be5d4e036228d1140da7b3062cc893cdca",
+      "binary_sha256": "15c4534ad522f56375a397d834c32a6f380b3cd7f15949f7771ea07479002a22",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/pause-candidate-source.tar.gz",
+        "sha256": "f2b6d6fed661564a1cd6da6e58cb68e68d4ced4554741d8dbef449b936ec34df"
+      }
+    },
+    "partition-candidate": {
+      "manifest_path": "scratch/oom-iteration/partition-candidate-build.json",
+      "manifest_sha256": "11c548bc45e0132cacb5c63e5cf7e219de1971f3214711add23ef6dc448e5bfd",
+      "binary_sha256": "30aabe59c87fc764935aa1923fe4929ceacedd4d065e703eee90f9d0d66b3af7",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/partition-candidate-source.tar.gz",
+        "sha256": "ad044838d3e243d687c3098f22d47410df51f5bb3e250e6d14774d476473115f"
+      }
+    },
+    "assignment-candidate": {
+      "manifest_path": "scratch/oom-iteration/assignment-candidate-build.json",
+      "manifest_sha256": "3ee7e7f9a7fa0edad197804b0a83e6b3856c528f7a6127118c9097d228b306c4",
+      "binary_sha256": "1ede0c0c158cf67fa73a5115906af0c7d6a0dbaa191d0c179cdec783d81c15be",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/assignment-candidate-source.tar.gz",
+        "sha256": "b7253e230571d8d94c45cc8b2a71f02d154eba88f11f3b38472306b78694f3cb"
+      }
+    },
+    "retained-routing": {
+      "manifest_path": "scratch/oom-iteration/retained-routing-build.json",
+      "manifest_sha256": "550f39f54b105473b4ad1431611bd03c1a258d50047f05b8e7b4174c6516793d",
+      "binary_sha256": "48aa1806a906c0c762acd1b4ddf75ab1b3fb2eaf6c052288dca8f31f0f72299b",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/retained-routing-source.tar.gz",
+        "sha256": "a9e097d88953f6a111d3587ed6f8c89a377671253b5540a161a0e7a0183fe8d6"
+      }
+    },
+    "eager-control": {
+      "manifest_path": "scratch/oom-iteration/eager-control-build.json",
+      "manifest_sha256": "670c5d395bb23cee18c220731d725a52aac09db37fa1bb137f2f6708ba864518",
+      "binary_sha256": "3b1e48592821b8fecdaef6e2a14d11624c0cc68ebb80760fcbb5878efd054aa0",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/eager-control-source.tar.gz",
+        "sha256": "4d2c06386ed8e11642e34073254f671ea846aa4057c11e38d8f81afa458befc1"
+      }
+    },
+    "eager-candidate": {
+      "manifest_path": "scratch/oom-iteration/eager-candidate-build.json",
+      "manifest_sha256": "9e858254f9a2855647e20b40f4ddaca31cb0e672cd0c519fd552ce1fb52db7e9",
+      "binary_sha256": "eb84e484a2574f20b92d44421dcb7959a2dcb865d9470696609cfa4ef0f1c771",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-eager-partition-routing"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/eager-candidate-source.tar.gz",
+        "sha256": "1329ede3cb6e95303ab8e5660da5fed1ac6faaea17898a86cd61cf394a37f667"
+      }
+    }
+  },
+  "components": [
+    {
+      "path": "scratch/oom-resume-2139/results.jsonl",
+      "sha256": "5ed9b1a2e2fa8278d8137003a0890f30c37cfd57f90113f54ff46886fdc888b1",
+      "plan_path": "scratch/oom-resume-2139/plan-2.json",
+      "plan_sha256": "eadd27e5fd1f758a5ca0e666948df5e1df5ff1ad8d589e35983866b95164d2cc",
+      "runner_status_path": "scratch/oom-resume-2139/batch-2/status.json",
+      "runner_status_sha256": "2d8c012c9733ac00bd83152dcd36bc5622d69c80d9c4465da36c71f0e8a2d524",
+      "observations": [
+        {
+          "kind": "proof-cost-component",
+          "repetition": -1,
+          "two_raw_hashes": true,
+          "rows": 524288,
+          "input_bytes": 134217749,
+          "hashed_bytes": 268435498,
+          "seconds": 0.068934694
+        },
+        {
+          "kind": "proof-cost-component",
+          "repetition": -1,
+          "two_raw_hashes": false,
+          "rows": 524288,
+          "input_bytes": 134217749,
+          "hashed_bytes": 153092096,
+          "seconds": 0.065794644
+        },
+        {
+          "kind": "proof-cost-component",
+          "repetition": 0,
+          "two_raw_hashes": false,
+          "rows": 524288,
+          "input_bytes": 134217749,
+          "hashed_bytes": 153092096,
+          "seconds": 0.06617261
+        },
+        {
+          "kind": "proof-cost-component",
+          "repetition": 0,
+          "two_raw_hashes": true,
+          "rows": 524288,
+          "input_bytes": 134217749,
+          "hashed_bytes": 268435498,
+          "seconds": 0.069445827
+        },
+        {
+          "kind": "proof-cost-component",
+          "repetition": 1,
+          "two_raw_hashes": true,
+          "rows": 524288,
+          "input_bytes": 134217749,
+          "hashed_bytes": 268435498,
+          "seconds": 0.068518545
+        },
+        {
+          "kind": "proof-cost-component",
+          "repetition": 1,
+          "two_raw_hashes": false,
+          "rows": 524288,
+          "input_bytes": 134217749,
+          "hashed_bytes": 153092096,
+          "seconds": 0.066271525
+        },
+        {
+          "kind": "proof-cost-component",
+          "repetition": 2,
+          "two_raw_hashes": false,
+          "rows": 524288,
+          "input_bytes": 134217749,
+          "hashed_bytes": 153092096,
+          "seconds": 0.065661125
+        },
+        {
+          "kind": "proof-cost-component",
+          "repetition": 2,
+          "two_raw_hashes": true,
+          "rows": 524288,
+          "input_bytes": 134217749,
+          "hashed_bytes": 268435498,
+          "seconds": 0.069126341
+        }
+      ],
+      "scope": "Hotcomponent, excludedwarmup, commonsecondparser/publicdigest omitted, mockreservation excludesrealadmission; notwholejob orOOM evidence."
+    },
+    {
+      "path": "scratch/oom-resume-2139/count-cost.jsonl",
+      "sha256": "556c0b7ead7f09048959bbb06300870938774138d83a9a4cac7ad476352080f2",
+      "plan_path": "scratch/oom-resume-2139/count-cost-plan.json",
+      "plan_sha256": "d48de501f0ba8ec57401e72345b5dd157abac389da10926151786f0f4a20d667",
+      "runner_status_path": "scratch/oom-resume-2139/count-cost-batch/status.json",
+      "runner_status_sha256": "9e9e16d6d004dc9b0563b6d8d386675dd5011f6422ec42181f26862957ebf13f",
+      "observations": [
+        {
+          "kind": "strict-count-controls",
+          "cases": 1218
+        },
+        {
+          "kind": "strict-count-cost-component",
+          "repetition": -1,
+          "candidate": true,
+          "rows": 8388608,
+          "logical_input_bytes": 2147483984,
+          "seconds": 1.749732625,
+          "parser_scratch_capacity": 434,
+          "record_capacity": 0
+        },
+        {
+          "kind": "strict-count-cost-component",
+          "repetition": -1,
+          "candidate": false,
+          "rows": 8388608,
+          "logical_input_bytes": 2147483984,
+          "seconds": 1.9548687390000001,
+          "parser_scratch_capacity": 434,
+          "record_capacity": 292
+        },
+        {
+          "kind": "strict-count-cost-component",
+          "repetition": 0,
+          "candidate": false,
+          "rows": 8388608,
+          "logical_input_bytes": 2147483984,
+          "seconds": 1.9706046000000002,
+          "parser_scratch_capacity": 434,
+          "record_capacity": 292
+        },
+        {
+          "kind": "strict-count-cost-component",
+          "repetition": 0,
+          "candidate": true,
+          "rows": 8388608,
+          "logical_input_bytes": 2147483984,
+          "seconds": 1.736725847,
+          "parser_scratch_capacity": 434,
+          "record_capacity": 0
+        },
+        {
+          "kind": "strict-count-cost-component",
+          "repetition": 1,
+          "candidate": true,
+          "rows": 8388608,
+          "logical_input_bytes": 2147483984,
+          "seconds": 1.7368142899999999,
+          "parser_scratch_capacity": 434,
+          "record_capacity": 0
+        },
+        {
+          "kind": "strict-count-cost-component",
+          "repetition": 1,
+          "candidate": false,
+          "rows": 8388608,
+          "logical_input_bytes": 2147483984,
+          "seconds": 1.9464196569999999,
+          "parser_scratch_capacity": 434,
+          "record_capacity": 292
+        },
+        {
+          "kind": "strict-count-cost-component",
+          "repetition": 2,
+          "candidate": false,
+          "rows": 8388608,
+          "logical_input_bytes": 2147483984,
+          "seconds": 1.956097239,
+          "parser_scratch_capacity": 434,
+          "record_capacity": 292
+        },
+        {
+          "kind": "strict-count-cost-component",
+          "repetition": 2,
+          "candidate": true,
+          "rows": 8388608,
+          "logical_input_bytes": 2147483984,
+          "seconds": 1.73424236,
+          "parser_scratch_capacity": 434,
+          "record_capacity": 0
+        }
+      ],
+      "scope": "Hotcomponent, excludedwarmup, commonsecondparser/publicdigest omitted, mockreservation excludesrealadmission; notwholejob orOOM evidence."
+    }
+  ],
+  "scopes": [
+    "WholejobsincludeCLIstartup,inputvalidation/analysis,digest,allintermediates/outputwrites,nativefinalization/atomicpublication. Verification/deletionoutsideclock.",
+    "Perjobfadvise cleaninput evictionrequested; WSL2/ext4 backinghostcacheuncontrolled; no physicalSSD orWindows performanceclaim. Actual1GiBmemory.max/zeroswap,256MiBtoolsetting,1worker. ToolmemorysettingsarenotRSSlimits.",
+    "Managedtemporary countersreturnedbeforepublicationexcludeprivatedestinationstaging; baselineencodedcopyreadnotincluded. Not physicalI/O or totaldisk.",
+    "GNUtimeRSSlargestprocess(includinghelperfloor),notaggregate;kernelcgrouppeakincludesfilecache;workingreservationsnotRSS. Threeobservationsdonotestablishtails.",
+    "FailedDuckpartitionedCOPYqualificationandoversortedmaterializedwarmup excluded, notpooled. Allindependentcohorts keptseparate."
+  ],
+  "actual-partition-input-contracts": {
+    "path": "scratch/oom-resume-2139/partition-input-controls/results.json",
+    "sha256": "d34b551607c0a7293eb482fb10a83cac406710804fd7d9736e0f73585e524ab2",
+    "data": {
+      "kind": "contract-controls",
+      "scope": "Actual pinned partition commands, tinyinputs; no speedclaims, no claim about everyqsvcommand",
+      "native_sha256": "48aa1806a906c0c762acd1b4ddf75ab1b3fb2eaf6c052288dca8f31f0f72299b",
+      "qsv_sha256": "345b48690cbcdcd29a862b7be367fef17a06c8d3809e6b62bdae488ac60c8c49",
+      "results": [
+        {
+          "control": "invalid-utf8",
+          "input_hex": "6b65792c76616c75650a30303030302cff0a",
+          "native_exit": 1,
+          "qsv_exit": 0,
+          "qsv_output_hex": "6b65792c76616c75650a30303030302cff0a",
+          "native_private_cleanup": true
+        },
+        {
+          "control": "junk-after-quote",
+          "input_hex": "6b65792c76616c75650a30303030302c2278226a756e6b0a",
+          "native_exit": 1,
+          "qsv_exit": 0,
+          "qsv_output_hex": "6b65792c76616c75650a30303030302c786a756e6b0a",
+          "native_private_cleanup": true
+        }
+      ]
+    }
+  },
+  "instrumented-sync-diagnostic": {
+    "path": "scratch/oom-resume-2139/publication-diagnostic/sync-summary.json",
+    "sha256": "a69242aa78002e5e15aa4f896caaf24e6b6ab700b8912961ee940f904463843a",
+    "data": {
+      "kind": "diagnostic",
+      "scope": "One instrumented complete native Partition job under1GiBcgroup,noswap,256MiBworkingbudget1worker. Interposer preserves original libc fsync/fdatasync. Observed blocking-call sum, not a paired no-sync speedup; not all kernel IO. No timing pooled with othercohorts.",
+      "calls": [
+        {
+          "start_ns": 548448199877513,
+          "nanoseconds": 89012974,
+          "fd": 16,
+          "result": 0
+        },
+        {
+          "start_ns": 548448661758058,
+          "nanoseconds": 77642790,
+          "fd": 15,
+          "result": 0
+        },
+        {
+          "start_ns": 548449130846931,
+          "nanoseconds": 73999262,
+          "fd": 7,
+          "result": 0
+        },
+        {
+          "start_ns": 548449583149967,
+          "nanoseconds": 42602684,
+          "fd": 7,
+          "result": 0
+        },
+        {
+          "start_ns": 548449983476618,
+          "nanoseconds": 70437106,
+          "fd": 7,
+          "result": 0
+        },
+        {
+          "start_ns": 548450415070565,
+          "nanoseconds": 78555603,
+          "fd": 7,
+          "result": 0
+        },
+        {
+          "start_ns": 548450865567098,
+          "nanoseconds": 88314101,
+          "fd": 7,
+          "result": 0
+        },
+        {
+          "start_ns": 548451330146248,
+          "nanoseconds": 76201972,
+          "fd": 7,
+          "result": 0
+        },
+        {
+          "start_ns": 548451406636808,
+          "nanoseconds": 4583863,
+          "fd": 3,
+          "result": 0
+        }
+      ],
+      "sum_seconds": 0.601350355,
+      "job_seconds": 12.610521174967289,
+      "binary_sha256": "48aa1806a906c0c762acd1b4ddf75ab1b3fb2eaf6c052288dca8f31f0f72299b",
+      "receipts": [
+        {
+          "path": "scratch/oom-resume-2139/publication-diagnostic/receipts/1368247.json",
+          "count": 0,
+          "calls": []
+        },
+        {
+          "path": "scratch/oom-resume-2139/publication-diagnostic/receipts/1368248.json",
+          "count": 9,
+          "calls": [
+            {
+              "start_ns": 548448199877513,
+              "nanoseconds": 89012974,
+              "fd": 16,
+              "result": 0
+            },
+            {
+              "start_ns": 548448661758058,
+              "nanoseconds": 77642790,
+              "fd": 15,
+              "result": 0
+            },
+            {
+              "start_ns": 548449130846931,
+              "nanoseconds": 73999262,
+              "fd": 7,
+              "result": 0
+            },
+            {
+              "start_ns": 548449583149967,
+              "nanoseconds": 42602684,
+              "fd": 7,
+              "result": 0
+            },
+            {
+              "start_ns": 548449983476618,
+              "nanoseconds": 70437106,
+              "fd": 7,
+              "result": 0
+            },
+            {
+              "start_ns": 548450415070565,
+              "nanoseconds": 78555603,
+              "fd": 7,
+              "result": 0
+            },
+            {
+              "start_ns": 548450865567098,
+              "nanoseconds": 88314101,
+              "fd": 7,
+              "result": 0
+            },
+            {
+              "start_ns": 548451330146248,
+              "nanoseconds": 76201972,
+              "fd": 7,
+              "result": 0
+            },
+            {
+              "start_ns": 548451406636808,
+              "nanoseconds": 4583863,
+              "fd": 3,
+              "result": 0
+            }
+          ]
+        },
+        {
+          "path": "scratch/oom-resume-2139/publication-diagnostic/receipts/1368238.json",
+          "count": 0,
+          "calls": []
+        },
+        {
+          "path": "scratch/oom-resume-2139/publication-diagnostic/receipts/1368240.json",
+          "count": 0,
+          "calls": []
+        },
+        {
+          "path": "scratch/oom-resume-2139/publication-diagnostic/receipts/1368245.json",
+          "count": 0,
+          "calls": []
+        },
+        {
+          "path": "scratch/oom-resume-2139/publication-diagnostic/receipts/1368244.json",
+          "count": 0,
+          "calls": []
+        },
+        {
+          "path": "scratch/oom-resume-2139/publication-diagnostic/receipts/1368239.json",
+          "count": 0,
+          "calls": []
+        },
+        {
+          "path": "scratch/oom-resume-2139/publication-diagnostic/receipts/1368237.json",
+          "count": 0,
+          "calls": []
+        }
+      ],
+      "source_sha256": "08a2369dfd5e9e578518f4efb2d7855aaa2abf3c6103c6ae678cabb588c38c49",
+      "interposer_sha256": "7cfa196c3e6d2cf3dc98f95cd4a15b0f93ac6dfd71084571d4aad986f0f7de89"
+    }
+  }
+}

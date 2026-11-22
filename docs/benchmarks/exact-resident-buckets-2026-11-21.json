@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "issue": 18,
+  "scope": "Linux/WSL2, stable resident buckets for plain terminal unstratified exact allocation",
+  "candidate": "experimental-resident-exact-buckets, archived unapplied",
+  "outcome": {
+    "samples": {
+      "auto": [
+        {
+          "elapsed": 45.429760547,
+          "cpu": 22.21,
+          "rss": 53336,
+          "reserved": 33964680,
+          "read": 9311944425,
+          "write": 9236595928,
+          "files": 104,
+          "runs": 99,
+          "merges": 2,
+          "retries": 0,
+          "buckets": 0
+        }
+      ],
+      "sort": [
+        {
+          "elapsed": 42.523700525,
+          "cpu": 22.67,
+          "rss": 53540,
+          "reserved": 33964680,
+          "read": 9311944425,
+          "write": 9236595928,
+          "files": 104,
+          "runs": 99,
+          "merges": 2,
+          "retries": 0,
+          "buckets": 0
+        }
+      ],
+      "bucket": [
+        {
+          "elapsed": 46.007839468,
+          "cpu": 21.29,
+          "rss": 53024,
+          "reserved": 33964818,
+          "read": 9311944425,
+          "write": 9236595928,
+          "files": 104,
+          "runs": 99,
+          "merges": 2,
+          "retries": 0,
+          "buckets": 128
+        }
+      ]
+    },
+    "medians": {
+      "auto": {
+        "elapsed": 45.429760547,
+        "cpu": 22.21,
+        "rss": 53336,
+        "reserved": 33964680,
+        "read": 9311944425,
+        "write": 9236595928,
+        "files": 104,
+        "runs": 99,
+        "merges": 2,
+        "retries": 0,
+        "buckets": 0
+      },
+      "sort": {
+        "elapsed": 42.523700525,
+        "cpu": 22.67,
+        "rss": 53540,
+        "reserved": 33964680,
+        "read": 9311944425,
+        "write": 9236595928,
+        "files": 104,
+        "runs": 99,
+        "merges": 2,
+        "retries": 0,
+        "buckets": 0
+      },
+      "bucket": {
+        "elapsed": 46.007839468,
+        "cpu": 21.29,
+        "rss": 53024,
+        "reserved": 33964818,
+        "read": 9311944425,
+        "write": 9236595928,
+        "files": 104,
+        "runs": 99,
+        "merges": 2,
+        "retries": 0,
+        "buckets": 128
+      }
+    },
+    "changes_vs_lower_control_pct": {
+      "elapsed": 8.19340485419806,
+      "cpu": -4.142278253039178,
+      "rss": -0.5849707514624214,
+      "reserved": 0.0004063044315438802,
+      "read": 0.0,
+      "write": 0.0,
+      "files": 0.0,
+      "runs": 0.0,
+      "merges": 0.0
+    },
+    "equal_outputs": true,
+    "continuation_gate": false,
+    "retention_gate": null
+  },
+  "oversize": {
+    "smoke_jobs": 3,
+    "oversize_jobs": 2,
+    "equal_outputs": true,
+    "oversize_control": {
+      "elapsed": 0.473364884,
+      "cpu": 0.15000000000000002,
+      "rss": 18496,
+      "reserved": 9137407,
+      "read": 80232618,
+      "write": 79773809,
+      "files": 13,
+      "runs": 0,
+      "merges": 0,
+      "retries": 0,
+      "buckets": 0
+    },
+    "oversize_candidate": {
+      "elapsed": 0.496993857,
+      "cpu": 0.16,
+      "rss": 20100,
+      "reserved": 9137437,
+      "read": 83116202,
+      "write": 79773809,
+      "files": 13,
+      "runs": 0,
+      "merges": 0,
+      "retries": 1,
+      "buckets": 0
+    }
+  },
+  "matched_memory_controls": [
+    "exact-frontier pressure=None arm=auto state=complete peer=0 retries=0 buckets=0",
+    "exact-frontier pressure=None arm=sort state=complete peer=0 retries=0 buckets=0",
+    "exact-frontier pressure=None arm=bucket state=complete peer=0 retries=0 buckets=8",
+    "exact-frontier pressure=FixedSelection(28) arm=auto state=complete peer=29360128 retries=0 buckets=0",
+    "exact-frontier pressure=FixedSelection(28) arm=sort state=complete peer=29360128 retries=0 buckets=0",
+    "exact-frontier pressure=FixedSelection(28) arm=bucket state=complete peer=29360128 retries=0 buckets=8",
+    "exact-frontier pressure=FixedSelection(30) arm=auto state=denied peer=31457280 retries=0 buckets=0",
+    "exact-frontier pressure=FixedSelection(30) arm=sort state=denied peer=31457280 retries=0 buckets=0",
+    "exact-frontier pressure=FixedSelection(30) arm=bucket state=denied peer=31457280 retries=1 buckets=0",
+    "exact-peer-denied pressure=FixedEmission(30) arm=auto request=31457280",
+    "exact-frontier pressure=FixedEmission(30) arm=auto state=complete peer=0 retries=0 buckets=0",
+    "exact-peer-denied pressure=FixedEmission(30) arm=sort request=31457280",
+    "exact-frontier pressure=FixedEmission(30) arm=sort state=complete peer=0 retries=0 buckets=0",
+    "exact-frontier pressure=FixedEmission(30) arm=bucket state=complete peer=31457280 retries=0 buckets=8",
+    "exact-frontier pressure=ReaderRetry(false) arm=bucket state=complete peer=0 retries=1 buckets=7",
+    "exact-frontier pressure=ReaderRetry(true) arm=bucket state=cancelled peer=32557284 retries=0 buckets=0"
+  ],
+  "workload": {
+    "input_bytes": 2147483674,
+    "rows": 8388608,
+    "parent_count": 128,
+    "workers": 1,
+    "job_mib": 128,
+    "shared_mib": 256,
+    "hard_cgroup_bytes": 1073741824,
+    "swap_cap_bytes": 0
+  },
+  "validation": {
+    "focused_tests_passed": 2,
+    "ignored_explicit_measurement_entry": 1,
+    "paired_output": "exact ordered records, raw hashes and logical Analysis",
+    "independent_oracle": "every source ID, field, partition membership, exact named quota, encounter order and encoded caps",
+    "temporary_cleanup": true,
+    "decision": "stop after the full verified screen triplet. Archive the feature without applying it."
+  },
+  "provenance": [
+    {
+      "path": "docs/benchmarks/exact-resident-buckets-2026-11-21.patch",
+      "sha256": "18c6b17e1b25c2f83f773b8dc2f475cfbb873e5435ed7ce6bd09fef65ca4e1de"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/pinned-probe",
+      "sha256": "d12872968e4d986ed4677f2fa9e68a0a8b7c6aef7c112ef19d746682142be3e7"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/DECISION.md",
+      "sha256": "e448f695f83e06b38fbec1411269acd5a596ff7893485e3039b8eab9c8e1b437"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/input-2gib.sha256",
+      "sha256": "f40817192b092cbd5b5557856658696d3c7c61c2286396cbc118f3f78de982c2"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-plan-v1.json",
+      "sha256": "c66074bfcb9ebc34accd9166312d666825f4b47242ab8048a38cebdbf410bf77"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-batch-v1/status.json",
+      "sha256": "6383b341c3b8f353ee14f44ec012d27e7b4c8ed99a0c9aa03df103fe2fcc4f10"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/smoke-plan-v1.json",
+      "sha256": "a0236a43f85ffcfb9d8aedee62308effc9c8ba51c3b1e0f87ae267eeb65fa42f"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/smoke-batch-v1/status.json",
+      "sha256": "2052c1f7093154758737f1f6cabaa6160754d4c0a2165cdfb2254264030aed46"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/verify.c",
+      "sha256": "feb791c079366b4691284cb197726ccff4ef9d9fd73c993e8930e8f3f8cbd470"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/fixture.c",
+      "sha256": "d8f509c46940c4b172081d56aa834240985a96a09d277fe921ec0dd7263fb366"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-contracts-v2.log",
+      "sha256": "5e0d7c171ad31cc7b237906de32bb531d09172e6462e3507db52f72ef1c2a6fa"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-auto/report.json",
+      "sha256": "8b6fd11af4a25731e389b88cb6e0ef5effc07947d6e18bf21bbfe37622edee7a"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-auto/manifest.jsonl",
+      "sha256": "1fca3a0a30e57d4f9b8096071e8c10e40516cebf8dc5af51d86e18d528668572"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-auto/oracle.txt",
+      "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-auto/cgroup.json",
+      "sha256": "b435cb9d622beaabb0c09b9738842cfa81d6fb9589c9802d833981108e17f497"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-sort/report.json",
+      "sha256": "777eb0b17aa72e5aa32cedd859c41395fdeae488700bdb1d5dd3222109149464"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-sort/manifest.jsonl",
+      "sha256": "4fadf84adbe2fd06fb6d3de29d93cafa96d3a306145418ad5acdb81ae0e705ce"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-sort/oracle.txt",
+      "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-sort/cgroup.json",
+      "sha256": "2896d8faee98ebc42c522445cc242e06493c624b35b3a16e157f2de84045cba8"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-bucket/report.json",
+      "sha256": "0bc53833820c98ffac91ad2448df5337a93a21cf11f22893d884be5ee341600c"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-bucket/manifest.jsonl",
+      "sha256": "3c7cec448095f7f1d78ee31706ee57d6955403987f97efb19fd9d83849074071"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-bucket/oracle.txt",
+      "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+    },
+    {
+      "path": "scratch/issue-avenues-36h-20261121/exact-resident-benchmark/screen-bucket/cgroup.json",
+      "sha256": "e98bd6b9150c0d483237dd5be17c573dc031f3c314d4054899f821b1018af113"
+    }
+  ]
+}

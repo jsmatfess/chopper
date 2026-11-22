@@ -1,0 +1,130 @@
+{
+  "kind": "validation-summary",
+  "scope": "benchmark/doc tooling only; no engine implementation changes",
+  "benchmarks": {
+    "measured_jobs": 69,
+    "excluded_warmups": 23,
+    "all_outputs_verified": true,
+    "large_batch_steps_passed": 2,
+    "controls_batch_steps_passed": 5
+  },
+  "verifier_corruption_controls": "passed",
+  "evidence_checks": [
+    {
+      "command": [
+        "python3",
+        "scripts/test-benchmark-catalog.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/test-performance-registry.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/test-performance-narratives.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/test-evidence-views.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/test-evidence-resolver.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/test-evidence-migration.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/performance-registry.py",
+        "--check"
+      ],
+      "exit_code": 1
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/performance-narratives.py",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/evidence-resolver.py",
+        "check"
+      ],
+      "exit_code": 1
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/evidence-resolver.py",
+        "index",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/benchmark-catalog.py",
+        "--check"
+      ],
+      "exit_code": 1
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/summarize-performance-decisions.py",
+        "--check"
+      ],
+      "exit_code": 1
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/audit-strategy-evidence.py",
+        "--check"
+      ],
+      "exit_code": 1
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/evidence-views.py",
+        "--check"
+      ],
+      "exit_code": 1
+    }
+  ],
+  "remaining_gate": "blocked by unavailable historical originals after standard hydration rejected pre-existing duplicate-member bundle 3a9b502adc99cceb25bef6cd522f5c2d8d8301efc8a9922427e8a6284a567fb2; do not weaken duplicate rejection",
+  "targeted_narrative_hydration": "Existing resolver independently verified 34 originals from exact bundle 93c1f7e843a7ab11a1d77262e213716ef798fd1cfd86ebdaa19a2e3943a46014 in isolated registry subset; copied only SHA256/size-matched cache entries; narrative registration/check passed. Global catalog/strategy/registry/views remain pending.",
+  "not_run": [
+    "native Windows",
+    "WASI/browser benchmarks",
+    "physical RAM exhaustion/40GiB cold storage",
+    "full engine test suite (engine sources unchanged)"
+  ],
+  "raw_receipt": "docs/benchmarks/cross-tool-validation-2026-11-18.json; local ignored receipt, not uploaded"
+}

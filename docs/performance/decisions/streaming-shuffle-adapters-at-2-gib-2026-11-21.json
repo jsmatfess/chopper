@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "streaming-shuffle-adapters-at-2-gib-2026-11-21",
+  "title": "Compare streamed exact-quota external shuffle adapters",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Do one-pass output pipes improve the chosen external comparator workflows while preserving full fields and exact quotas?",
+  "disposition": "informational",
+  "outcome": "mixed",
+  "delivery": "unchanged",
+  "summary": "At 2 GiB qsvlite piping reduces elapsed 6.25% and GNU time filesystem outputs 60.44% with 20.19% more CPU. Native DuckDB COPY piped to qsvlite split reduces complete elapsed 45.27% versus the materialized DuckDB adapter.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2 GiB plain fixed-width CSV, exact 8 parts, 1 GiB hard cgroup without swap, one requested worker per command."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Two opposite-order full job pairs per workflow. Complete exact field, unique ID, quota, size and nonidentity oracle. Small preflights and prior failed alternatives preserved."
+  },
+  "limitations": [
+    "WSL2/ext4, fixed-width line-safe divisible fixture. Tool pipelines can use overlapping processes even with one worker requested per command.",
+    "The faster DuckDB workflow uses qsvlite for final split. GNU time file counters and cgroup refaults do not identify logical managed bytes or complete device traffic."
+  ],
+  "exclusions": [
+    "Small flights and unsuccessful implicit stdin, extensionless split and partitioned DuckDB COPY attempts. Verification and fixture identity outside timed command."
+  ],
+  "reopen_when": "Qualify full 40 GiB streams under the same hard cap to check viability and whether the 2 GiB traffic savings transfer.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#streaming-shuffle-adapters-at-2-gib-2026-11-21",
+      "sha256": "20bae18f0a3070b96981979987416ce6aa2245fcddc22c59dceb29156202edda"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/streaming-shuffle-adapters-2gib-summary-2026-11-21.json",
+      "sha256": "db83c32f89afa3a5c8cb517549c3cd84c05dae4236b4ade5a55d31dafd1430e5"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md"
+  ]
+}

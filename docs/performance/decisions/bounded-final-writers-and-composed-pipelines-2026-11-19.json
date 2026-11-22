@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "bounded-final-writers-and-composed-pipelines-2026-11-19",
+  "title": "Bounded final writers, shared scratch and composed grouping",
+  "date": "2026-11-19",
+  "subsystem": "execution",
+  "question": "Can bounded direct writers remove OOM row passes while preserving allocation/grouping/publication contracts?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "opt-in",
+  "summary": "Measured prototypes: shared wide-row output reduced median elapsed time by 19.02% and peak working allocation by 88.34%; two composed pipelines reduced elapsed time by 62.16% and 67.38%. Timings precede progress and Windows publication corrections. Defaults remain unchanged.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "1.5GiB768KiBrowUTF16output;2GiB8keyInterleaved/probabilisticcompositions;256MiB1worker/1GiBcgroupnoswap;3pairs+warmup;separate32MiBcompletioncontrol"
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows",
+      "wasi-chromium"
+    ],
+    "summary": "FullLinuxallfeatureworkspacepassatprogress-fixepoch;finalWindows-onlychangeLinuxfmt/allfeatureclippy/35directcontracts;freshNTFSfullallfeaturelint/testsand332-unitUnicode/longpathprobepass;WASIflagsmallgraphpassed/defaultengine+hostedrestored;finalnativeDefaultrebuilt."
+  },
+  "limitations": [
+    "n3rangesnotCIs,tailsorSSDthroughput;WSLbackingcacheuncontrolled",
+    "MeasuredELFs predatesubsequentprogress/Windows-onlycorrections;exactepochsarchived",
+    "ManagedtemporaryexcludesprivateCSVandlaterpublication;workingallocationsnotRSS",
+    "No freshqsv/DuckDBorWindowsperformancetiming",
+    "StandaloneShuffle/ShufflePartitionselectorsfunctionalbutunmeasured;preparedmatricesnotlaunched",
+    "Fullhistoricalgeneratedevidencechecksblockedbyunavailableoriginals;rawbinaries/TARslocalunarchived"
+  ],
+  "exclusions": [
+    "Warmups;prototype singletonrep1knowncompilercontaminationdeclaredbeforecompletedtimings",
+    "Failed64/128MiBwidewarmups,256rowallocationcensusandoldsourcewarmupsnotpooled",
+    "Failureoraclexicographicfilenameorderingfixedbeforeeligiblecohort;allrawlogsretained"
+  ],
+  "reopen_when": "Continueissue20:measurepreparedterminal/rootmatrices;qualifycurrent-sourceprogresscorrectiontransfer;codec/headercapacityandotherpipelinecoverage;nativeWindowsperformancebeforepromotion.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#bounded-final-writers-and-composed-pipelines-2026-11-19",
+      "sha256": "e716328fee3e64513615f3fe326a7fe545c744c41daae4643752ffa308a165f6"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/bounded-writers-summary-2026-11-19.json",
+      "sha256": "1c3080791c363f84472dff98ce699e9f90120e92a21165a62030c2e85a4d0ec4"
+    },
+    {
+      "path": "docs/benchmarks/bounded-writers-checks-2026-11-19.json",
+      "sha256": "a96343e0e73a15b8db65b0c4eab38eaf2290c9d5b9c0414b5d87ac913ac1094e"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

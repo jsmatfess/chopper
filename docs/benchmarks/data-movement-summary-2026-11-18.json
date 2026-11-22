@@ -1,0 +1,2004 @@
+{
+  "kind": "summary",
+  "schema_version": 1,
+  "type": "csv_data_movement_summary",
+  "scope": "Derived comparison only, not additional observations. Each cell has its own three matched pairs (five for the small plain-Balanced confirmation) and excluded warmups; no pooling across cells/cohorts.",
+  "timing": "Subprocess launch to CLI exit, including validation, digesting, intermediate/output writes, native publication and product cleanup; fixture generation, verification and successful payload deletion outside clock.",
+  "environment": "Warm uncontrolled WSL2/ext4, Ryzen 5800X, 62 GiB host RAM. The largest input exceeds its 256 MiB working budget, not host RAM.",
+  "cells": [
+    {
+      "id": "fy-balanced-root",
+      "family": "FY traversal",
+      "n": 3,
+      "input_rows": 524291,
+      "input_bytes": 129606241,
+      "input_sha256": "5d678be1f2096123259b56ee2d821d8dc89feb88738e19362416ad87f98e6a4a",
+      "recipe": {
+        "name": "fy-balanced-root",
+        "rows": 524291,
+        "payload_bytes": 237,
+        "wide": false,
+        "memory_mb": 4096,
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "fisher_yates"
+          },
+          {
+            "type": "balanced",
+            "files": 8
+          }
+        ]
+      },
+      "requested_workers": 1,
+      "resolved_workers": 1,
+      "memory_mib": 4096,
+      "limits": {
+        "rows": 200000,
+        "bytes": 134217728
+      },
+      "source": {
+        "path": "scratch/performance-improvements/fy-balanced-root/summary.json",
+        "sha256": "f6621c372133332c0444720ee5cd27869cb708bd1256c9f9c61a804efff88c3b"
+      },
+      "samples": {
+        "baseline": [
+          {
+            "pointer": "/0/samples/baseline/0",
+            "attempt": "scratch/performance-improvements/fy-balanced-root/fy-balanced-root/1-baseline",
+            "process_sha256": "11cbe11367b65031dc0e3ffa8810e8427ba15acf68311d94ce1741d45a83aae9",
+            "verification_sha256": "354a9902e1cd1583699fcd459d03ad565149c7af0643f152ac5c68fb4fd220a3"
+          },
+          {
+            "pointer": "/0/samples/baseline/1",
+            "attempt": "scratch/performance-improvements/fy-balanced-root/fy-balanced-root/2-baseline",
+            "process_sha256": "c2fa3c8afb90bd206786cc8ab36fbb2111c7b546b3176eb6529b9b3effa0c190",
+            "verification_sha256": "a98c6c37fed25878d00a9b31fe4ffdbdb6712fb3e2863fdb243e048032beae79"
+          },
+          {
+            "pointer": "/0/samples/baseline/2",
+            "attempt": "scratch/performance-improvements/fy-balanced-root/fy-balanced-root/3-baseline",
+            "process_sha256": "ab71134453d60b202ad000771eb1ec6d5ee868defbe9dbd7ccbd038fd967c4b0",
+            "verification_sha256": "b470f638d1c6d2bdff8e5a8d3c858c8da8cdfeeaaaaf2f7a7b525682d65b7efe"
+          }
+        ],
+        "candidate": [
+          {
+            "pointer": "/0/samples/candidate/0",
+            "attempt": "scratch/performance-improvements/fy-balanced-root/fy-balanced-root/1-candidate",
+            "process_sha256": "386affc7b2e33c8fd79ef22f820b3a180fe13730a710ccc330aed9d67a972595",
+            "verification_sha256": "0b3d324523d6137f7e9d47024bb40889ad48083b37282e58be9bc1d197f26b17"
+          },
+          {
+            "pointer": "/0/samples/candidate/1",
+            "attempt": "scratch/performance-improvements/fy-balanced-root/fy-balanced-root/2-candidate",
+            "process_sha256": "aa79afe9f3658c1dcd917c6819dd4b04e51d1c8beb87b736fa94b6e86aedfeb2",
+            "verification_sha256": "c6d18900129490e3095e2d2907cb7804795d7c5cb7f7f583f3bb3f2daf0eacbc"
+          },
+          {
+            "pointer": "/0/samples/candidate/2",
+            "attempt": "scratch/performance-improvements/fy-balanced-root/fy-balanced-root/3-candidate",
+            "process_sha256": "4c880e146b2446c5b22f8bc7c0b5957153df58b0672c42ce9932b1bf2db489eb",
+            "verification_sha256": "5e3faec267d64d250061b194f42d3e1c74fb25ef8756cba3dee0c9eb86485c42"
+          }
+        ]
+      },
+      "metrics": {
+        "baseline": {
+          "seconds": {
+            "median": 0.871371372952126,
+            "min": 0.8448892600135878,
+            "max": 0.9779006469761953,
+            "samples": [
+              0.9779006469761953,
+              0.8448892600135878,
+              0.871371372952126
+            ]
+          },
+          "max_rss_kib": {
+            "median": 206184,
+            "min": 205984,
+            "max": 206204,
+            "samples": [
+              206204,
+              206184,
+              205984
+            ]
+          },
+          "user_seconds": {
+            "median": 0.47,
+            "min": 0.45,
+            "max": 0.47,
+            "samples": [
+              0.47,
+              0.45,
+              0.47
+            ]
+          },
+          "system_seconds": {
+            "median": 0.32,
+            "min": 0.31,
+            "max": 0.42,
+            "samples": [
+              0.42,
+              0.32,
+              0.31
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 813792,
+            "min": 813792,
+            "max": 813792,
+            "samples": [
+              813792,
+              813792,
+              813792
+            ]
+          }
+        },
+        "candidate": {
+          "seconds": {
+            "median": 0.7669282910064794,
+            "min": 0.7586420180159621,
+            "max": 0.7672054590075277,
+            "samples": [
+              0.7672054590075277,
+              0.7586420180159621,
+              0.7669282910064794
+            ]
+          },
+          "max_rss_kib": {
+            "median": 206096,
+            "min": 205904,
+            "max": 206144,
+            "samples": [
+              205904,
+              206096,
+              206144
+            ]
+          },
+          "user_seconds": {
+            "median": 0.38,
+            "min": 0.38,
+            "max": 0.42,
+            "samples": [
+              0.38,
+              0.38,
+              0.42
+            ]
+          },
+          "system_seconds": {
+            "median": 0.3,
+            "min": 0.27,
+            "max": 0.31,
+            "samples": [
+              0.31,
+              0.3,
+              0.27
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 506376,
+            "min": 506376,
+            "max": 506376,
+            "samples": [
+              506376,
+              506376,
+              506376
+            ]
+          }
+        }
+      },
+      "median_elapsed_reduction_percent": 11.986058434740976,
+      "paired_elapsed_reduction_percent": [
+        21.545664032452216,
+        10.208112007038483,
+        11.986058434740976
+      ],
+      "output_csv_bytes": 129606346,
+      "output_files": 8,
+      "build_manifest": {
+        "path": "scratch/performance-improvements/fy-build.json",
+        "sha256": "c1dc85b8823468b02795fdd9ed985969fdd2550958c09971b724400b48ce759d"
+      }
+    },
+    {
+      "id": "fy-balanced-retained",
+      "family": "FY traversal",
+      "n": 3,
+      "input_rows": 524291,
+      "input_bytes": 129606241,
+      "input_sha256": "5d678be1f2096123259b56ee2d821d8dc89feb88738e19362416ad87f98e6a4a",
+      "recipe": {
+        "name": "fy-balanced-retained",
+        "rows": 524291,
+        "payload_bytes": 237,
+        "wide": false,
+        "memory_mb": 4096,
+        "operations": [
+          {
+            "type": "balanced",
+            "files": 4
+          },
+          {
+            "type": "shuffle",
+            "strategy": "fisher_yates"
+          },
+          {
+            "type": "balanced",
+            "files": 8
+          }
+        ]
+      },
+      "requested_workers": 1,
+      "resolved_workers": 1,
+      "memory_mib": 4096,
+      "limits": {
+        "rows": 200000,
+        "bytes": 134217728
+      },
+      "source": {
+        "path": "scratch/performance-improvements/fy-balanced-retained/summary.json",
+        "sha256": "ad1b5587e110d151e68730ef792d489824fbde4e1070c136a9c701126795494c"
+      },
+      "samples": {
+        "baseline": [
+          {
+            "pointer": "/0/samples/baseline/0",
+            "attempt": "scratch/performance-improvements/fy-balanced-retained/fy-balanced-retained/1-baseline",
+            "process_sha256": "bd917cffacc022e46acb86e2b071e820667eadda47372273b8c6ba4d28c88288",
+            "verification_sha256": "980141aa7dfc7e04131e0b5e278f65143dacfb9c06590b4dd73844ff813e569d"
+          },
+          {
+            "pointer": "/0/samples/baseline/1",
+            "attempt": "scratch/performance-improvements/fy-balanced-retained/fy-balanced-retained/2-baseline",
+            "process_sha256": "91985c3160300de13626fc84ae06a5ec2b8c30957039c7f65ed856acb35a7d1b",
+            "verification_sha256": "4cb91fe88aa1c857793905e8523a5b2c7a4a221db79ee6007d967a306fc4d0d7"
+          },
+          {
+            "pointer": "/0/samples/baseline/2",
+            "attempt": "scratch/performance-improvements/fy-balanced-retained/fy-balanced-retained/3-baseline",
+            "process_sha256": "4c1f1faf7cc39e67f5c5735145f37bfc96d4debfcabe7251b01afd23084401c8",
+            "verification_sha256": "c9448812fce718d088c209c5465bab3a9344e2816034e2e83986a6bee55c28db"
+          }
+        ],
+        "candidate": [
+          {
+            "pointer": "/0/samples/candidate/0",
+            "attempt": "scratch/performance-improvements/fy-balanced-retained/fy-balanced-retained/1-candidate",
+            "process_sha256": "b1b23e8f99fee29013e35ae62f374fdc8ff0ac218e0b5815028e2115b6d52276",
+            "verification_sha256": "decf8c439aa999db8bdf2ddbd5e8445f61bd170de91b30bc1c1d6c22fdabd75d"
+          },
+          {
+            "pointer": "/0/samples/candidate/1",
+            "attempt": "scratch/performance-improvements/fy-balanced-retained/fy-balanced-retained/2-candidate",
+            "process_sha256": "ff062e853493b3b045127eff5775c315c022d0236b6d5cf792a1fdc5e5d5c160",
+            "verification_sha256": "df9d4fec74abace97dfcc5c2bdd1c1f9fa2fd50a8c4b7462740e64ff396eb583"
+          },
+          {
+            "pointer": "/0/samples/candidate/2",
+            "attempt": "scratch/performance-improvements/fy-balanced-retained/fy-balanced-retained/3-candidate",
+            "process_sha256": "e9d44d784d4be3a93218e6f94d9c3f5d219f1b71f4ed34e2e355e74a47370d88",
+            "verification_sha256": "646a9862d304689c7a55cef640e60cc0eb70f9a3d7110b5054cb3fe977b0a78c"
+          }
+        ]
+      },
+      "metrics": {
+        "baseline": {
+          "seconds": {
+            "median": 1.013131448009517,
+            "min": 1.012500971031841,
+            "max": 1.0324035059893504,
+            "samples": [
+              1.0324035059893504,
+              1.013131448009517,
+              1.012500971031841
+            ]
+          },
+          "max_rss_kib": {
+            "median": 65384,
+            "min": 65352,
+            "max": 65396,
+            "samples": [
+              65384,
+              65396,
+              65352
+            ]
+          },
+          "user_seconds": {
+            "median": 0.46,
+            "min": 0.44,
+            "max": 0.48,
+            "samples": [
+              0.46,
+              0.48,
+              0.44
+            ]
+          },
+          "system_seconds": {
+            "median": 0.39,
+            "min": 0.35,
+            "max": 0.39,
+            "samples": [
+              0.39,
+              0.35,
+              0.39
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 1121304,
+            "min": 1121304,
+            "max": 1121304,
+            "samples": [
+              1121304,
+              1121304,
+              1121304
+            ]
+          }
+        },
+        "candidate": {
+          "seconds": {
+            "median": 0.9008297550026327,
+            "min": 0.9002670319750905,
+            "max": 0.9055989609914832,
+            "samples": [
+              0.9008297550026327,
+              0.9002670319750905,
+              0.9055989609914832
+            ]
+          },
+          "max_rss_kib": {
+            "median": 65252,
+            "min": 65236,
+            "max": 65276,
+            "samples": [
+              65276,
+              65236,
+              65252
+            ]
+          },
+          "user_seconds": {
+            "median": 0.45,
+            "min": 0.44,
+            "max": 0.46,
+            "samples": [
+              0.45,
+              0.46,
+              0.44
+            ]
+          },
+          "system_seconds": {
+            "median": 0.27,
+            "min": 0.26,
+            "max": 0.28,
+            "samples": [
+              0.27,
+              0.26,
+              0.28
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 813888,
+            "min": 813888,
+            "max": 813888,
+            "samples": [
+              813888,
+              813888,
+              813888
+            ]
+          }
+        }
+      },
+      "median_elapsed_reduction_percent": 11.084612290687613,
+      "paired_elapsed_reduction_percent": [
+        12.744411484793517,
+        11.140155234167237,
+        10.558213088073753
+      ],
+      "output_csv_bytes": 129606706,
+      "output_files": 32,
+      "build_manifest": {
+        "path": "scratch/performance-improvements/fy-build.json",
+        "sha256": "c1dc85b8823468b02795fdd9ed985969fdd2550958c09971b724400b48ce759d"
+      }
+    },
+    {
+      "id": "fy-balanced-wide",
+      "family": "FY traversal",
+      "n": 3,
+      "input_rows": 240003,
+      "input_bytes": 70214068,
+      "input_sha256": "5ab7411599d622098a3748a4b46ebc1c1298e7cbfbc4a2cf57d1f7207d45279a",
+      "recipe": {
+        "name": "fy-balanced-wide",
+        "rows": 240003,
+        "payload_bytes": 192,
+        "wide": true,
+        "memory_mb": 4096,
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "fisher_yates"
+          },
+          {
+            "type": "balanced",
+            "files": 8
+          }
+        ]
+      },
+      "requested_workers": 1,
+      "resolved_workers": 1,
+      "memory_mib": 4096,
+      "limits": {
+        "rows": 200000,
+        "bytes": 134217728
+      },
+      "source": {
+        "path": "scratch/performance-improvements/fy-balanced-wide/summary.json",
+        "sha256": "8e9fa4d615275d5de9ed6d0e2408651f5728e39aa204feb28d62b1ef1be9f773"
+      },
+      "samples": {
+        "baseline": [
+          {
+            "pointer": "/0/samples/baseline/0",
+            "attempt": "scratch/performance-improvements/fy-balanced-wide/fy-balanced-wide/1-baseline",
+            "process_sha256": "e26008aab6f35e937ea8cedbac1efafd1db715cfbf6798f15b72e5b416326da2",
+            "verification_sha256": "61cb4c677663523deb77f5196d56759bf5fc6f02d44902bf15f34e0cdf362237"
+          },
+          {
+            "pointer": "/0/samples/baseline/1",
+            "attempt": "scratch/performance-improvements/fy-balanced-wide/fy-balanced-wide/2-baseline",
+            "process_sha256": "4530ff356aa42ef75f9e9556795954af031020156078c71d64d47b76b0b535f3",
+            "verification_sha256": "727d2f9e79b5f6803287a2613cf90aa6ad70dbde9a0d6d285d870d87da6aba87"
+          },
+          {
+            "pointer": "/0/samples/baseline/2",
+            "attempt": "scratch/performance-improvements/fy-balanced-wide/fy-balanced-wide/3-baseline",
+            "process_sha256": "e1c9dcae8a3680bf6d1468e0753b25708c16c421667bc96793c220288a31a37a",
+            "verification_sha256": "9b689fe95070717033805a7a6ff767dc0fecfaa052bfc292ac694cb3bd5eab89"
+          }
+        ],
+        "candidate": [
+          {
+            "pointer": "/0/samples/candidate/0",
+            "attempt": "scratch/performance-improvements/fy-balanced-wide/fy-balanced-wide/1-candidate",
+            "process_sha256": "fdcfc25385800463d2c2f8964547ba3aadc5f2edbb4aca91097cc98a0836aae6",
+            "verification_sha256": "a9fac32d27b9309fa60924e8116cf4323fec9ab3c9131ae5fe25b6fe3a650f4e"
+          },
+          {
+            "pointer": "/0/samples/candidate/1",
+            "attempt": "scratch/performance-improvements/fy-balanced-wide/fy-balanced-wide/2-candidate",
+            "process_sha256": "f32689e8f22ab31278376c46ffcab3fbb8bb37476858ebea3013ba2481aeb5b0",
+            "verification_sha256": "3e37aef1310d6c27cb3e3e67153e1b39bb58299cf773621f98f1c77a44409862"
+          },
+          {
+            "pointer": "/0/samples/candidate/2",
+            "attempt": "scratch/performance-improvements/fy-balanced-wide/fy-balanced-wide/3-candidate",
+            "process_sha256": "cf9e5cd8125b5ae2f88b4f1be240a892e66f484b4dd19c16e229a151ddeb2f27",
+            "verification_sha256": "bea7d928f1fbf2a8e8cbcae06763fc27ebc302982c92711a2f92e3ed80381453"
+          }
+        ]
+      },
+      "metrics": {
+        "baseline": {
+          "seconds": {
+            "median": 0.8525016730418429,
+            "min": 0.8486090340302326,
+            "max": 0.8754350999952294,
+            "samples": [
+              0.8754350999952294,
+              0.8525016730418429,
+              0.8486090340302326
+            ]
+          },
+          "max_rss_kib": {
+            "median": 207916,
+            "min": 207844,
+            "max": 207968,
+            "samples": [
+              207844,
+              207968,
+              207916
+            ]
+          },
+          "user_seconds": {
+            "median": 0.53,
+            "min": 0.53,
+            "max": 0.56,
+            "samples": [
+              0.56,
+              0.53,
+              0.53
+            ]
+          },
+          "system_seconds": {
+            "median": 0.25,
+            "min": 0.25,
+            "max": 0.25,
+            "samples": [
+              0.25,
+              0.25,
+              0.25
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 534800,
+            "min": 534792,
+            "max": 534808,
+            "samples": [
+              534808,
+              534792,
+              534800
+            ]
+          }
+        },
+        "candidate": {
+          "seconds": {
+            "median": 0.6734771649935283,
+            "min": 0.6678426430444233,
+            "max": 0.6847003779839724,
+            "samples": [
+              0.6678426430444233,
+              0.6847003779839724,
+              0.6734771649935283
+            ]
+          },
+          "max_rss_kib": {
+            "median": 208000,
+            "min": 207860,
+            "max": 208004,
+            "samples": [
+              208004,
+              208000,
+              207860
+            ]
+          },
+          "user_seconds": {
+            "median": 0.43,
+            "min": 0.42,
+            "max": 0.46,
+            "samples": [
+              0.43,
+              0.46,
+              0.42
+            ]
+          },
+          "system_seconds": {
+            "median": 0.18,
+            "min": 0.16,
+            "max": 0.18,
+            "samples": [
+              0.18,
+              0.16,
+              0.18
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 274360,
+            "min": 274360,
+            "max": 274360,
+            "samples": [
+              274360,
+              274360,
+              274360
+            ]
+          }
+        }
+      },
+      "median_elapsed_reduction_percent": 20.999901080490623,
+      "paired_elapsed_reduction_percent": [
+        23.713060734249446,
+        19.683397741512042,
+        20.63752116860743
+      ],
+      "output_csv_bytes": 70214943,
+      "output_files": 8,
+      "build_manifest": {
+        "path": "scratch/performance-improvements/fy-build.json",
+        "sha256": "c1dc85b8823468b02795fdd9ed985969fdd2550958c09971b724400b48ce759d"
+      }
+    },
+    {
+      "id": "uniform-balanced-control",
+      "family": "FY traversal",
+      "n": 3,
+      "input_rows": 524291,
+      "input_bytes": 129606241,
+      "input_sha256": "5d678be1f2096123259b56ee2d821d8dc89feb88738e19362416ad87f98e6a4a",
+      "recipe": {
+        "name": "uniform-balanced-control",
+        "rows": 524291,
+        "payload_bytes": 237,
+        "wide": false,
+        "memory_mb": 4096,
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "uniform"
+          },
+          {
+            "type": "balanced",
+            "files": 8
+          }
+        ]
+      },
+      "requested_workers": 1,
+      "resolved_workers": 1,
+      "memory_mib": 4096,
+      "limits": {
+        "rows": 200000,
+        "bytes": 134217728
+      },
+      "source": {
+        "path": "scratch/performance-improvements/uniform-balanced-control/summary.json",
+        "sha256": "b3cdb5a575d72e25ce847f1a1367e799eed52f54d628eb680875bac16e2a6961"
+      },
+      "samples": {
+        "baseline": [
+          {
+            "pointer": "/0/samples/baseline/0",
+            "attempt": "scratch/performance-improvements/uniform-balanced-control/uniform-balanced-control/1-baseline",
+            "process_sha256": "96584ca6bcd3415e42a2214855d3841cbe780d4a60b016361c46b4804d146dc3",
+            "verification_sha256": "7510489ee85e7560707d0ae29f34abc3caa2db7820806d5ccd8dff65425f5a80"
+          },
+          {
+            "pointer": "/0/samples/baseline/1",
+            "attempt": "scratch/performance-improvements/uniform-balanced-control/uniform-balanced-control/2-baseline",
+            "process_sha256": "00a127be0da6ed5eb0844eb283884a015b054fd829d52b600ed93ac38fc19bed",
+            "verification_sha256": "b782c817a498a80ad1103ab6cf489dfdd77e0cc00804e0e7080c3a81d112edeb"
+          },
+          {
+            "pointer": "/0/samples/baseline/2",
+            "attempt": "scratch/performance-improvements/uniform-balanced-control/uniform-balanced-control/3-baseline",
+            "process_sha256": "002cd9ed99abd40f5d66f7741f0d2f652c0e8f7bfb96630475943c2776e8cde3",
+            "verification_sha256": "84418cadb521fe496ddfb0dd1d2ba4ef70ff83971e850bf007e4d36841315880"
+          }
+        ],
+        "candidate": [
+          {
+            "pointer": "/0/samples/candidate/0",
+            "attempt": "scratch/performance-improvements/uniform-balanced-control/uniform-balanced-control/1-candidate",
+            "process_sha256": "93d197e85effc96cbdf220a9dc88197704541330848af60c646e82d619b2cca1",
+            "verification_sha256": "2f452706cb8e49bcbcf326a1c28db8a3b031389c913d7f39ba2908b3dbbfc011"
+          },
+          {
+            "pointer": "/0/samples/candidate/1",
+            "attempt": "scratch/performance-improvements/uniform-balanced-control/uniform-balanced-control/2-candidate",
+            "process_sha256": "ab34d75f24841dbb4fdc0a3b57e11bfd6f9e88b46f7ccfa97192b8813bb1dae6",
+            "verification_sha256": "29bece59b0b663931e8b9ca4a94e9fd3c657c5044e47cab9594c5e46d456ac0f"
+          },
+          {
+            "pointer": "/0/samples/candidate/2",
+            "attempt": "scratch/performance-improvements/uniform-balanced-control/uniform-balanced-control/3-candidate",
+            "process_sha256": "97905cd4f11897e391d1c0711467581d85c9db60d71f106cf74b56518d78f678",
+            "verification_sha256": "3276232bd8beaf88164a05d122aa1de56ede8fada0256c37584a07e386e93398"
+          }
+        ]
+      },
+      "metrics": {
+        "baseline": {
+          "seconds": {
+            "median": 0.8111121469992213,
+            "min": 0.8018405890325084,
+            "max": 0.8113870979868807,
+            "samples": [
+              0.8018405890325084,
+              0.8113870979868807,
+              0.8111121469992213
+            ]
+          },
+          "max_rss_kib": {
+            "median": 206060,
+            "min": 205936,
+            "max": 206120,
+            "samples": [
+              206120,
+              206060,
+              205936
+            ]
+          },
+          "user_seconds": {
+            "median": 0.45,
+            "min": 0.44,
+            "max": 0.46,
+            "samples": [
+              0.45,
+              0.44,
+              0.46
+            ]
+          },
+          "system_seconds": {
+            "median": 0.28,
+            "min": 0.27,
+            "max": 0.29,
+            "samples": [
+              0.27,
+              0.29,
+              0.28
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 506376,
+            "min": 506376,
+            "max": 506376,
+            "samples": [
+              506376,
+              506376,
+              506376
+            ]
+          }
+        },
+        "candidate": {
+          "seconds": {
+            "median": 0.7960853810072877,
+            "min": 0.7951529310084879,
+            "max": 0.809721790952608,
+            "samples": [
+              0.7951529310084879,
+              0.809721790952608,
+              0.7960853810072877
+            ]
+          },
+          "max_rss_kib": {
+            "median": 206068,
+            "min": 205820,
+            "max": 206092,
+            "samples": [
+              206068,
+              206092,
+              205820
+            ]
+          },
+          "user_seconds": {
+            "median": 0.45,
+            "min": 0.41,
+            "max": 0.45,
+            "samples": [
+              0.45,
+              0.45,
+              0.41
+            ]
+          },
+          "system_seconds": {
+            "median": 0.28,
+            "min": 0.27,
+            "max": 0.31,
+            "samples": [
+              0.27,
+              0.28,
+              0.31
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 506376,
+            "min": 506376,
+            "max": 506376,
+            "samples": [
+              506376,
+              506376,
+              506376
+            ]
+          }
+        }
+      },
+      "median_elapsed_reduction_percent": 1.8526126192939474,
+      "paired_elapsed_reduction_percent": [
+        0.834038350701316,
+        0.2052419909565284,
+        1.8526126192939474
+      ],
+      "output_csv_bytes": 129606346,
+      "output_files": 8,
+      "build_manifest": {
+        "path": "scratch/performance-improvements/fy-build.json",
+        "sha256": "c1dc85b8823468b02795fdd9ed985969fdd2550958c09971b724400b48ce759d"
+      }
+    },
+    {
+      "id": "plain-balanced-small",
+      "family": "terminal direct",
+      "n": 5,
+      "input_rows": 524291,
+      "input_bytes": 129606241,
+      "input_sha256": "5d678be1f2096123259b56ee2d821d8dc89feb88738e19362416ad87f98e6a4a",
+      "recipe": {
+        "name": "plain-balanced-small",
+        "rows": 524291,
+        "payload_bytes": 237,
+        "wide": false,
+        "memory_mb": 4096,
+        "operations": [
+          {
+            "type": "balanced",
+            "files": 8
+          }
+        ]
+      },
+      "requested_workers": 1,
+      "resolved_workers": 1,
+      "memory_mib": 4096,
+      "limits": {
+        "rows": 2000000,
+        "bytes": 536870912
+      },
+      "source": {
+        "path": "scratch/performance-improvements/terminal4-plain-balanced-small/summary.json",
+        "sha256": "e26defdea2fa8a452cabdfbba3790afc384c2603dca5326745a2fa1c4a00ef20"
+      },
+      "samples": {
+        "baseline": [
+          {
+            "pointer": "/0/samples/baseline/0",
+            "attempt": "scratch/performance-improvements/terminal4-plain-balanced-small/plain-balanced-small/1-baseline",
+            "process_sha256": "b5f9bebf7f31288af4283fcb27a2565343bd2c0fb0a7b54c394b1283b485de54",
+            "verification_sha256": "bba23217db1f06a07845938634f51c1b635b915592b5930b054900cb57b33fce"
+          },
+          {
+            "pointer": "/0/samples/baseline/1",
+            "attempt": "scratch/performance-improvements/terminal4-plain-balanced-small/plain-balanced-small/2-baseline",
+            "process_sha256": "bd1f745eadcea9c7b12ebe87d400bab73d1d714590d464bfe45eb49a6dbae7ac",
+            "verification_sha256": "b82093a4cea3fbd11e7afeb7215a6dc57ff6e50de930b86fd74f7adec2bcb5ed"
+          },
+          {
+            "pointer": "/0/samples/baseline/2",
+            "attempt": "scratch/performance-improvements/terminal4-plain-balanced-small/plain-balanced-small/3-baseline",
+            "process_sha256": "c3b3a1391e04f2673882cd7cf1691b444409bede29282462d036d1a28f5adda5",
+            "verification_sha256": "29472714a9d72f8df471f25f86b3923f37764e1c2cf2ada527e11c20f5f5cc24"
+          },
+          {
+            "pointer": "/0/samples/baseline/3",
+            "attempt": "scratch/performance-improvements/terminal4-plain-balanced-small/plain-balanced-small/4-baseline",
+            "process_sha256": "43b5185e0df206efa489f1509446b6c5b96b2f2fe003112719388ab497f0887c",
+            "verification_sha256": "f23a13e82340de077dbbe532af69b275d0c7720b0555da8b971b05e5c7f3030f"
+          },
+          {
+            "pointer": "/0/samples/baseline/4",
+            "attempt": "scratch/performance-improvements/terminal4-plain-balanced-small/plain-balanced-small/5-baseline",
+            "process_sha256": "9c6757abcbbe1a777ce4e845141dd930e80538fdeac2225682e5941885d6a3c5",
+            "verification_sha256": "947e4ca6a3d83c6ae5012e833a1e794ca573001fadfad055f36fcc77ecc17182"
+          }
+        ],
+        "candidate": [
+          {
+            "pointer": "/0/samples/candidate/0",
+            "attempt": "scratch/performance-improvements/terminal4-plain-balanced-small/plain-balanced-small/1-candidate",
+            "process_sha256": "8186fe6301fcd8270d972f9205bc4c87b75eea1f5daa62e2af6c3ded41153997",
+            "verification_sha256": "837a84f29151ceb89fe286551a59b5965b45ae786130d42fb3a020ffcefee3f1"
+          },
+          {
+            "pointer": "/0/samples/candidate/1",
+            "attempt": "scratch/performance-improvements/terminal4-plain-balanced-small/plain-balanced-small/2-candidate",
+            "process_sha256": "a1a0d6a30ef81166efea30985aaf5e4d66d3084fa0f4fba228f9681522a3f629",
+            "verification_sha256": "991c6630b55f0c06980393eef60831cb6f5f0fe0d1613e34bb9610c9ded07e5c"
+          },
+          {
+            "pointer": "/0/samples/candidate/2",
+            "attempt": "scratch/performance-improvements/terminal4-plain-balanced-small/plain-balanced-small/3-candidate",
+            "process_sha256": "fa24197b88af7b3490e6baa7c10b5edb6ca7e27f10925b1d2fff2db5956878e2",
+            "verification_sha256": "67b605b19c17590a22a79edf3399530c400710c5c7b6af8177a47579140eef66"
+          },
+          {
+            "pointer": "/0/samples/candidate/3",
+            "attempt": "scratch/performance-improvements/terminal4-plain-balanced-small/plain-balanced-small/4-candidate",
+            "process_sha256": "43910ecd0de1921af44c78e97079cfb595a3885b653879a616abb8e419680a71",
+            "verification_sha256": "3edb76374fa9fd58eb3ba6a4e3e6625598a2e5547cda8634d616543765879f24"
+          },
+          {
+            "pointer": "/0/samples/candidate/4",
+            "attempt": "scratch/performance-improvements/terminal4-plain-balanced-small/plain-balanced-small/5-candidate",
+            "process_sha256": "55232f10fda51aa785bb3448c997da533788d0b7cce91acded13b6602d59d7a8",
+            "verification_sha256": "42535c6fedf7e1c81fe4032ca0e4c7446d0e49a1e88fd0b0970d9b57c3954404"
+          }
+        ]
+      },
+      "metrics": {
+        "baseline": {
+          "seconds": {
+            "median": 0.4951039190054871,
+            "min": 0.49136540095787495,
+            "max": 0.5027965150075033,
+            "samples": [
+              0.5027965150075033,
+              0.4951039190054871,
+              0.4938020589761436,
+              0.49136540095787495,
+              0.49774511996656656
+            ]
+          },
+          "max_rss_kib": {
+            "median": 5944,
+            "min": 5832,
+            "max": 6128,
+            "samples": [
+              5968,
+              5900,
+              5832,
+              5944,
+              6128
+            ]
+          },
+          "user_seconds": {
+            "median": 0.21,
+            "min": 0.19,
+            "max": 0.23,
+            "samples": [
+              0.21,
+              0.23,
+              0.22,
+              0.19,
+              0.19
+            ]
+          },
+          "system_seconds": {
+            "median": 0.21,
+            "min": 0.19,
+            "max": 0.23,
+            "samples": [
+              0.21,
+              0.19,
+              0.2,
+              0.22,
+              0.23
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 813768,
+            "min": 813768,
+            "max": 813768,
+            "samples": [
+              813768,
+              813768,
+              813768,
+              813768,
+              813768
+            ]
+          }
+        },
+        "candidate": {
+          "seconds": {
+            "median": 0.44802244601305574,
+            "min": 0.4378061620518565,
+            "max": 0.46426324697677046,
+            "samples": [
+              0.46426324697677046,
+              0.44802244601305574,
+              0.4400809059734456,
+              0.4506873660138808,
+              0.4378061620518565
+            ]
+          },
+          "max_rss_kib": {
+            "median": 5852,
+            "min": 5732,
+            "max": 5936,
+            "samples": [
+              5936,
+              5808,
+              5732,
+              5932,
+              5852
+            ]
+          },
+          "user_seconds": {
+            "median": 0.24,
+            "min": 0.21,
+            "max": 0.26,
+            "samples": [
+              0.25,
+              0.24,
+              0.21,
+              0.26,
+              0.23
+            ]
+          },
+          "system_seconds": {
+            "median": 0.13,
+            "min": 0.12,
+            "max": 0.15,
+            "samples": [
+              0.14,
+              0.13,
+              0.15,
+              0.12,
+              0.13
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 560624,
+            "min": 560624,
+            "max": 560624,
+            "samples": [
+              560624,
+              560624,
+              560624,
+              560624,
+              560624
+            ]
+          }
+        }
+      },
+      "median_elapsed_reduction_percent": 9.509412304189336,
+      "paired_elapsed_reduction_percent": [
+        7.663789799767773,
+        9.509412304189336,
+        10.879086473248856,
+        8.278571276018987,
+        12.04209855814079
+      ],
+      "output_csv_bytes": 129606346,
+      "output_files": 8,
+      "build_manifest": {
+        "path": "scratch/performance-improvements/terminal-build-v2.json",
+        "sha256": "0fc8ba8be9bc407d2d53188041f6958eb7d522dbdc3a90997e8af1a856c4b70f"
+      }
+    },
+    {
+      "id": "plain-balanced-large",
+      "family": "terminal direct",
+      "n": 3,
+      "input_rows": 8388611,
+      "input_bytes": 2082743806,
+      "input_sha256": "8f9dbf8a9b1ff4a41c7ad922ed10662520c7ad267813cba39372bfba273b7b05",
+      "recipe": {
+        "name": "plain-balanced-large",
+        "rows": 8388611,
+        "payload_bytes": 237,
+        "wide": false,
+        "memory_mb": 256,
+        "operations": [
+          {
+            "type": "balanced",
+            "files": 8
+          }
+        ]
+      },
+      "requested_workers": 1,
+      "resolved_workers": 1,
+      "memory_mib": 256,
+      "limits": {
+        "rows": 2000000,
+        "bytes": 536870912
+      },
+      "source": {
+        "path": "scratch/performance-improvements/terminal3-plain-balanced-large/summary.json",
+        "sha256": "8ca984f40ee980158a42f76f3243f46174a636f770bf7aec4733e070a88372a1"
+      },
+      "samples": {
+        "baseline": [
+          {
+            "pointer": "/0/samples/baseline/0",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-large/plain-balanced-large/1-baseline",
+            "process_sha256": "416d158f246ad86d40dada010d6e1b5d660085a442ca333ef1feed58b26154ac",
+            "verification_sha256": "4401c69994e2678828d04fcb8c64df7ac71769fcf9872e28c86f862c2b631fb5"
+          },
+          {
+            "pointer": "/0/samples/baseline/1",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-large/plain-balanced-large/2-baseline",
+            "process_sha256": "a03b9b46fa0041e9806ae69ac6c03549565d884a95e489f99193ef3b712eb68f",
+            "verification_sha256": "ed56b410382d789c201af01fcaf60d46eab58db7d7094bf940a8812b087c6ff7"
+          },
+          {
+            "pointer": "/0/samples/baseline/2",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-large/plain-balanced-large/3-baseline",
+            "process_sha256": "6270d3c5267f13291324cf5703d64b3997007193755efd2d6584c3d6100d2bf1",
+            "verification_sha256": "8e9b925f51e27537b8c49d7d6b124d177a13cf313bf0d46dfb982aa3a72495f7"
+          }
+        ],
+        "candidate": [
+          {
+            "pointer": "/0/samples/candidate/0",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-large/plain-balanced-large/1-candidate",
+            "process_sha256": "b24f9708fbca14d21c5e949b2a8b032eb3641060b441ffb2f6e280ab7f26507a",
+            "verification_sha256": "324c2f6d9caf4ddf6a3ee8260148b564fd21a1e0ad6a22d05515365e07faa584"
+          },
+          {
+            "pointer": "/0/samples/candidate/1",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-large/plain-balanced-large/2-candidate",
+            "process_sha256": "0fbd21a76be900d624c68157df272531eb687ec19d0295f79d51133274d66723",
+            "verification_sha256": "c15409471e059358f7c64bd39b0d8bd86bcdad60e84574f8d398ff3fb3691f7e"
+          },
+          {
+            "pointer": "/0/samples/candidate/2",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-large/plain-balanced-large/3-candidate",
+            "process_sha256": "7f0e8fad46de5d780ab00023d278de990a4774151cfb0fa782aee7af109e6ec6",
+            "verification_sha256": "1e59d821594a318af14f3aa0df5ecdd1d623c3142ac4666dd6e185530bc63034"
+          }
+        ]
+      },
+      "metrics": {
+        "baseline": {
+          "seconds": {
+            "median": 9.218482766998932,
+            "min": 9.135249226004817,
+            "max": 9.334370716009289,
+            "samples": [
+              9.334370716009289,
+              9.135249226004817,
+              9.218482766998932
+            ]
+          },
+          "max_rss_kib": {
+            "median": 5892,
+            "min": 5784,
+            "max": 5992,
+            "samples": [
+              5784,
+              5892,
+              5992
+            ]
+          },
+          "user_seconds": {
+            "median": 3.64,
+            "min": 3.6,
+            "max": 3.72,
+            "samples": [
+              3.72,
+              3.64,
+              3.6
+            ]
+          },
+          "system_seconds": {
+            "median": 5.15,
+            "min": 5.04,
+            "max": 5.17,
+            "samples": [
+              5.15,
+              5.04,
+              5.17
+            ]
+          },
+          "fs_inputs": {
+            "median": 8,
+            "min": 8,
+            "max": 8,
+            "samples": [
+              8,
+              8,
+              8
+            ]
+          },
+          "fs_outputs": {
+            "median": 13072016,
+            "min": 13072016,
+            "max": 13072016,
+            "samples": [
+              13072016,
+              13072016,
+              13072016
+            ]
+          }
+        },
+        "candidate": {
+          "seconds": {
+            "median": 7.9362384239793755,
+            "min": 7.690332843048964,
+            "max": 8.048877616005484,
+            "samples": [
+              7.690332843048964,
+              8.048877616005484,
+              7.9362384239793755
+            ]
+          },
+          "max_rss_kib": {
+            "median": 5864,
+            "min": 5800,
+            "max": 5876,
+            "samples": [
+              5864,
+              5800,
+              5876
+            ]
+          },
+          "user_seconds": {
+            "median": 3.84,
+            "min": 3.83,
+            "max": 4.08,
+            "samples": [
+              3.84,
+              3.83,
+              4.08
+            ]
+          },
+          "system_seconds": {
+            "median": 3.43,
+            "min": 3.42,
+            "max": 3.77,
+            "samples": [
+              3.42,
+              3.77,
+              3.43
+            ]
+          },
+          "fs_inputs": {
+            "median": 8,
+            "min": 0,
+            "max": 24,
+            "samples": [
+              0,
+              8,
+              24
+            ]
+          },
+          "fs_outputs": {
+            "median": 9004152,
+            "min": 9004152,
+            "max": 9004152,
+            "samples": [
+              9004152,
+              9004152,
+              9004152
+            ]
+          }
+        }
+      },
+      "median_elapsed_reduction_percent": 13.909494386753508,
+      "paired_elapsed_reduction_percent": [
+        17.612733873325304,
+        11.892085077512915,
+        13.909494386753508
+      ],
+      "output_csv_bytes": 2082743911,
+      "output_files": 8,
+      "build_manifest": {
+        "path": "scratch/performance-improvements/terminal-build-v2.json",
+        "sha256": "0fc8ba8be9bc407d2d53188041f6958eb7d522dbdc3a90997e8af1a856c4b70f"
+      }
+    },
+    {
+      "id": "plain-balanced-wide",
+      "family": "terminal direct",
+      "n": 3,
+      "input_rows": 240003,
+      "input_bytes": 70214068,
+      "input_sha256": "5ab7411599d622098a3748a4b46ebc1c1298e7cbfbc4a2cf57d1f7207d45279a",
+      "recipe": {
+        "name": "plain-balanced-wide",
+        "rows": 240003,
+        "payload_bytes": 192,
+        "wide": true,
+        "memory_mb": 4096,
+        "operations": [
+          {
+            "type": "balanced",
+            "files": 8
+          }
+        ]
+      },
+      "requested_workers": 1,
+      "resolved_workers": 1,
+      "memory_mib": 4096,
+      "limits": {
+        "rows": 2000000,
+        "bytes": 536870912
+      },
+      "source": {
+        "path": "scratch/performance-improvements/terminal3-plain-balanced-wide/summary.json",
+        "sha256": "3b072173acbce2996e6d7e5c5cc52c6aac2df8b336801e37147317612855d5f2"
+      },
+      "samples": {
+        "baseline": [
+          {
+            "pointer": "/0/samples/baseline/0",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-wide/plain-balanced-wide/1-baseline",
+            "process_sha256": "b9e72a2abe603fa94cc2b1339bab90c4006580d8d828e88be721389e30d73fa7",
+            "verification_sha256": "f0d3def6c75b654b97e01678b69f1fd5c85fd2133291a0f13f8e9d124b85453f"
+          },
+          {
+            "pointer": "/0/samples/baseline/1",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-wide/plain-balanced-wide/2-baseline",
+            "process_sha256": "e6e80f450715b471751e91f7da1f891c093d2c727684953d6a7fa09ed90ea7c3",
+            "verification_sha256": "3067886b6df4601355d07aaad2349b29e6b883000e87cfc904e1a3dde52f619a"
+          },
+          {
+            "pointer": "/0/samples/baseline/2",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-wide/plain-balanced-wide/3-baseline",
+            "process_sha256": "361383b4e699301af4ae516457f376bd216eb2032912386836c1c3edf895955d",
+            "verification_sha256": "a99efc7300ae70e09aac1afe204bd1e2aeb1b12798243e2b881c999fb9ba7a42"
+          }
+        ],
+        "candidate": [
+          {
+            "pointer": "/0/samples/candidate/0",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-wide/plain-balanced-wide/1-candidate",
+            "process_sha256": "7f44a32c2acbee43941d5fe3fccbdc47b7b85db35a0c5c15262dae8b6b830291",
+            "verification_sha256": "f60e41de3612d75eb2284e2c617e0f13b63b79059eee9bacff9137ebd8d100ea"
+          },
+          {
+            "pointer": "/0/samples/candidate/1",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-wide/plain-balanced-wide/2-candidate",
+            "process_sha256": "db686b93410aaf8b386ba0933b9d5ace70c21f508a204c6d515b7a788ad40614",
+            "verification_sha256": "0d01c373919b315ce04c57f59af61524bdcc80ad15110adf18f4043fed252930"
+          },
+          {
+            "pointer": "/0/samples/candidate/2",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-wide/plain-balanced-wide/3-candidate",
+            "process_sha256": "dc89d84013e7b8e4590389ce594fd211b9ffbbcfa720c12620fbc3c5fd6f3661",
+            "verification_sha256": "78d84b2ef0e83a4e5b78c1521648cab8feec8704cfc1ebbd95bbffc15739789a"
+          }
+        ]
+      },
+      "metrics": {
+        "baseline": {
+          "seconds": {
+            "median": 0.6005643870448694,
+            "min": 0.5997461680090055,
+            "max": 0.6023293470498174,
+            "samples": [
+              0.6005643870448694,
+              0.6023293470498174,
+              0.5997461680090055
+            ]
+          },
+          "max_rss_kib": {
+            "median": 7968,
+            "min": 7792,
+            "max": 7976,
+            "samples": [
+              7976,
+              7792,
+              7968
+            ]
+          },
+          "user_seconds": {
+            "median": 0.39,
+            "min": 0.39,
+            "max": 0.41,
+            "samples": [
+              0.41,
+              0.39,
+              0.39
+            ]
+          },
+          "system_seconds": {
+            "median": 0.14,
+            "min": 0.12,
+            "max": 0.15,
+            "samples": [
+              0.12,
+              0.15,
+              0.14
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 534816,
+            "min": 534816,
+            "max": 534816,
+            "samples": [
+              534816,
+              534816,
+              534816
+            ]
+          }
+        },
+        "candidate": {
+          "seconds": {
+            "median": 0.5886492050485685,
+            "min": 0.5880386549979448,
+            "max": 0.5890578680555336,
+            "samples": [
+              0.5886492050485685,
+              0.5890578680555336,
+              0.5880386549979448
+            ]
+          },
+          "max_rss_kib": {
+            "median": 7940,
+            "min": 7864,
+            "max": 7996,
+            "samples": [
+              7940,
+              7864,
+              7996
+            ]
+          },
+          "user_seconds": {
+            "median": 0.4,
+            "min": 0.39,
+            "max": 0.41,
+            "samples": [
+              0.39,
+              0.4,
+              0.41
+            ]
+          },
+          "system_seconds": {
+            "median": 0.12,
+            "min": 0.11,
+            "max": 0.13,
+            "samples": [
+              0.13,
+              0.12,
+              0.11
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 397672,
+            "min": 397672,
+            "max": 397672,
+            "samples": [
+              397672,
+              397672,
+              397672
+            ]
+          }
+        }
+      },
+      "median_elapsed_reduction_percent": 1.9839974286405049,
+      "paired_elapsed_reduction_percent": [
+        1.9839974286405049,
+        2.2033591853504952,
+        1.9520780015863104
+      ],
+      "output_csv_bytes": 70214943,
+      "output_files": 8,
+      "build_manifest": {
+        "path": "scratch/performance-improvements/terminal-build-v2.json",
+        "sha256": "0fc8ba8be9bc407d2d53188041f6958eb7d522dbdc3a90997e8af1a856c4b70f"
+      }
+    },
+    {
+      "id": "plain-balanced-auto-small",
+      "family": "terminal direct",
+      "n": 3,
+      "input_rows": 524291,
+      "input_bytes": 129606241,
+      "input_sha256": "5d678be1f2096123259b56ee2d821d8dc89feb88738e19362416ad87f98e6a4a",
+      "recipe": {
+        "name": "plain-balanced-auto-small",
+        "rows": 524291,
+        "payload_bytes": 237,
+        "wide": false,
+        "memory_mb": 4096,
+        "operations": [
+          {
+            "type": "balanced",
+            "files": 8
+          }
+        ]
+      },
+      "requested_workers": 0,
+      "resolved_workers": 4,
+      "memory_mib": 4096,
+      "limits": {
+        "rows": 2000000,
+        "bytes": 536870912
+      },
+      "source": {
+        "path": "scratch/performance-improvements/terminal3-plain-balanced-auto-small/summary.json",
+        "sha256": "1a43c489c63bf9d81417ad1c536c99305d66b77c475a2b453d61ad903e0b9ad7"
+      },
+      "samples": {
+        "baseline": [
+          {
+            "pointer": "/0/samples/baseline/0",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-auto-small/plain-balanced-auto-small/1-baseline",
+            "process_sha256": "4eb0739239788a2e731216600af4df9b6ddd10c4c0fb691a26aa2fe3043a2c14",
+            "verification_sha256": "43f9bdd0b8c005b3f9ec7eb9250d5b6d9bdb95c6231ac51ce5c78b679de75f76"
+          },
+          {
+            "pointer": "/0/samples/baseline/1",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-auto-small/plain-balanced-auto-small/2-baseline",
+            "process_sha256": "7d06f10c67ca3259abdf3fcb9e92baa3c355981813895d9270044480fccbe70f",
+            "verification_sha256": "91164390172412deb99980c10df6c49baf38d864688f4786bf104eef206d3ac1"
+          },
+          {
+            "pointer": "/0/samples/baseline/2",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-auto-small/plain-balanced-auto-small/3-baseline",
+            "process_sha256": "4e2bf647922c729910dc5c25e45eb3c2ebf990ee9196f6c7c057792298d62d64",
+            "verification_sha256": "d53122ce41a66c5dbbdaf1d97af5aa4b78316c5afda28770632aa0e988cd632f"
+          }
+        ],
+        "candidate": [
+          {
+            "pointer": "/0/samples/candidate/0",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-auto-small/plain-balanced-auto-small/1-candidate",
+            "process_sha256": "d61bad57c99397c4b0644d771bf312394ee5e96bf9645cdcf87de133caebe094",
+            "verification_sha256": "74a70508fecd316031823de4aa218af4388f31d620be4edff1952183a43f480e"
+          },
+          {
+            "pointer": "/0/samples/candidate/1",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-auto-small/plain-balanced-auto-small/2-candidate",
+            "process_sha256": "5fe9b4d39f5a3a81e4cbc3c7b51a1cb0211b98ae9a6cd59aed63de81e2fde0ba",
+            "verification_sha256": "496073ac90129336d4b68580d74402ea5750f256493eff16753345ff4f3b395d"
+          },
+          {
+            "pointer": "/0/samples/candidate/2",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-auto-small/plain-balanced-auto-small/3-candidate",
+            "process_sha256": "2a73a38fa548b9f0a0e8709bfa9ac18fae4fafaf24c15c5c62c459611e5d3303",
+            "verification_sha256": "3e0b9aac5dfcdff409f1fb19910391996b183e7cf716fb0d4a2db529332359f5"
+          }
+        ]
+      },
+      "metrics": {
+        "baseline": {
+          "seconds": {
+            "median": 0.5010473370202817,
+            "min": 0.45644087402615696,
+            "max": 0.5065846180077642,
+            "samples": [
+              0.5065846180077642,
+              0.5010473370202817,
+              0.45644087402615696
+            ]
+          },
+          "max_rss_kib": {
+            "median": 6096,
+            "min": 5744,
+            "max": 6188,
+            "samples": [
+              5744,
+              6096,
+              6188
+            ]
+          },
+          "user_seconds": {
+            "median": 0.22,
+            "min": 0.21,
+            "max": 0.22,
+            "samples": [
+              0.22,
+              0.22,
+              0.21
+            ]
+          },
+          "system_seconds": {
+            "median": 0.2,
+            "min": 0.17,
+            "max": 0.2,
+            "samples": [
+              0.2,
+              0.2,
+              0.17
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 813768,
+            "min": 813768,
+            "max": 813768,
+            "samples": [
+              813768,
+              813768,
+              813768
+            ]
+          }
+        },
+        "candidate": {
+          "seconds": {
+            "median": 0.4657598899793811,
+            "min": 0.4399191489792429,
+            "max": 0.4988094519940205,
+            "samples": [
+              0.4399191489792429,
+              0.4988094519940205,
+              0.4657598899793811
+            ]
+          },
+          "max_rss_kib": {
+            "median": 5672,
+            "min": 5664,
+            "max": 5740,
+            "samples": [
+              5672,
+              5740,
+              5664
+            ]
+          },
+          "user_seconds": {
+            "median": 0.24,
+            "min": 0.23,
+            "max": 0.25,
+            "samples": [
+              0.23,
+              0.25,
+              0.24
+            ]
+          },
+          "system_seconds": {
+            "median": 0.15,
+            "min": 0.13,
+            "max": 0.17,
+            "samples": [
+              0.13,
+              0.17,
+              0.15
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "samples": [
+              0,
+              0,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 560624,
+            "min": 560624,
+            "max": 560624,
+            "samples": [
+              560624,
+              560624,
+              560624
+            ]
+          }
+        }
+      },
+      "median_elapsed_reduction_percent": 7.042737169456748,
+      "paired_elapsed_reduction_percent": [
+        13.159789432749724,
+        0.4466414370286609,
+        -2.0416699037102637
+      ],
+      "output_csv_bytes": 129606346,
+      "output_files": 8,
+      "build_manifest": {
+        "path": "scratch/performance-improvements/terminal-build-v2.json",
+        "sha256": "0fc8ba8be9bc407d2d53188041f6958eb7d522dbdc3a90997e8af1a856c4b70f"
+      }
+    },
+    {
+      "id": "plain-balanced-eight-large",
+      "family": "terminal direct",
+      "n": 3,
+      "input_rows": 8388611,
+      "input_bytes": 2082743806,
+      "input_sha256": "8f9dbf8a9b1ff4a41c7ad922ed10662520c7ad267813cba39372bfba273b7b05",
+      "recipe": {
+        "name": "plain-balanced-eight-large",
+        "rows": 8388611,
+        "payload_bytes": 237,
+        "wide": false,
+        "memory_mb": 256,
+        "operations": [
+          {
+            "type": "balanced",
+            "files": 8
+          }
+        ]
+      },
+      "requested_workers": 8,
+      "resolved_workers": 8,
+      "memory_mib": 256,
+      "limits": {
+        "rows": 2000000,
+        "bytes": 536870912
+      },
+      "source": {
+        "path": "scratch/performance-improvements/terminal3-plain-balanced-eight-large/summary.json",
+        "sha256": "d05cfa96fc005d9a964bad2af5b123a9ad272f2851e6ca7bb1ed95f9b1b7e0ca"
+      },
+      "samples": {
+        "baseline": [
+          {
+            "pointer": "/0/samples/baseline/0",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-eight-large/plain-balanced-eight-large/1-baseline",
+            "process_sha256": "6cdc60da4244722ed8a2e0be5ca168790801f56a3191d4d1fab7f7751dfb2817",
+            "verification_sha256": "61ac0d52a54ed3d5f3b34d81946de0ea8e46f0685244e3a1bade6d95130f522d"
+          },
+          {
+            "pointer": "/0/samples/baseline/1",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-eight-large/plain-balanced-eight-large/2-baseline",
+            "process_sha256": "1f9e65ac68126d14929ac8314288ada38ed095f8099bf418d3b0505516148b2e",
+            "verification_sha256": "60d2ac7059d0daa1eca4c059dae5fdedf459414c699bb96ebbcf849c6c5c02c3"
+          },
+          {
+            "pointer": "/0/samples/baseline/2",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-eight-large/plain-balanced-eight-large/3-baseline",
+            "process_sha256": "44da5315cceec7eae7ad84c59db9be771892465b021bdb6951543988522d44cd",
+            "verification_sha256": "68b7c6f9c9e5b409dba932e54ed00c89ed9040c3d88f4868537fd23595fe9286"
+          }
+        ],
+        "candidate": [
+          {
+            "pointer": "/0/samples/candidate/0",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-eight-large/plain-balanced-eight-large/1-candidate",
+            "process_sha256": "dda2738df7dd7dd0790715b436883b6abbea4972db98e41f0409ffcaba12d9f7",
+            "verification_sha256": "430395de4eb4caced1eb9aede6bcd301cc1301d5c7daa8986b7a6be772a72acf"
+          },
+          {
+            "pointer": "/0/samples/candidate/1",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-eight-large/plain-balanced-eight-large/2-candidate",
+            "process_sha256": "6a1392a2e9999c3ac1924795851d59769c4f0547b14af750d59558c94ae94871",
+            "verification_sha256": "e6ba5a5b42d8690f83edc0ad4121867e4f956627e04ebc3a7ce55ee02a3f2fbf"
+          },
+          {
+            "pointer": "/0/samples/candidate/2",
+            "attempt": "scratch/performance-improvements/terminal3-plain-balanced-eight-large/plain-balanced-eight-large/3-candidate",
+            "process_sha256": "4c7b3eaa5459a8104e840bf8e445a078a289783d9061c89146eb608c58952075",
+            "verification_sha256": "9fb8532814a1ba96c4f32dccabefb3a4f0efb2847b2415054ffb7a3bab862607"
+          }
+        ]
+      },
+      "metrics": {
+        "baseline": {
+          "seconds": {
+            "median": 9.461941865971312,
+            "min": 8.195333643991034,
+            "max": 9.554244322003797,
+            "samples": [
+              8.195333643991034,
+              9.554244322003797,
+              9.461941865971312
+            ]
+          },
+          "max_rss_kib": {
+            "median": 5864,
+            "min": 5744,
+            "max": 6128,
+            "samples": [
+              5744,
+              6128,
+              5864
+            ]
+          },
+          "user_seconds": {
+            "median": 3.61,
+            "min": 3.44,
+            "max": 3.76,
+            "samples": [
+              3.44,
+              3.76,
+              3.61
+            ]
+          },
+          "system_seconds": {
+            "median": 5.26,
+            "min": 4.26,
+            "max": 5.39,
+            "samples": [
+              4.26,
+              5.26,
+              5.39
+            ]
+          },
+          "fs_inputs": {
+            "median": 0,
+            "min": 0,
+            "max": 24,
+            "samples": [
+              0,
+              24,
+              0
+            ]
+          },
+          "fs_outputs": {
+            "median": 13072016,
+            "min": 13072016,
+            "max": 13072016,
+            "samples": [
+              13072016,
+              13072016,
+              13072016
+            ]
+          }
+        },
+        "candidate": {
+          "seconds": {
+            "median": 8.124034571985248,
+            "min": 8.071855916001368,
+            "max": 8.1932612080127,
+            "samples": [
+              8.071855916001368,
+              8.1932612080127,
+              8.124034571985248
+            ]
+          },
+          "max_rss_kib": {
+            "median": 5808,
+            "min": 5632,
+            "max": 5988,
+            "samples": [
+              5808,
+              5988,
+              5632
+            ]
+          },
+          "user_seconds": {
+            "median": 3.92,
+            "min": 3.9,
+            "max": 4.03,
+            "samples": [
+              3.92,
+              4.03,
+              3.9
+            ]
+          },
+          "system_seconds": {
+            "median": 3.74,
+            "min": 3.71,
+            "max": 3.79,
+            "samples": [
+              3.71,
+              3.74,
+              3.79
+            ]
+          },
+          "fs_inputs": {
+            "median": 8,
+            "min": 0,
+            "max": 32,
+            "samples": [
+              32,
+              0,
+              8
+            ]
+          },
+          "fs_outputs": {
+            "median": 9004152,
+            "min": 9004152,
+            "max": 9004152,
+            "samples": [
+              9004152,
+              9004152,
+              9004152
+            ]
+          }
+        }
+      },
+      "median_elapsed_reduction_percent": 14.13988072361424,
+      "paired_elapsed_reduction_percent": [
+        1.5066833560852255,
+        14.244801243534244,
+        14.13988072361424
+      ],
+      "output_csv_bytes": 2082743911,
+      "output_files": 8,
+      "build_manifest": {
+        "path": "scratch/performance-improvements/terminal-build-v2.json",
+        "sha256": "0fc8ba8be9bc407d2d53188041f6958eb7d522dbdc3a90997e8af1a856c4b70f"
+      }
+    }
+  ],
+  "excluded": [
+    "All warmups and harness smoke/negative controls",
+    "Initial terminal-batch after manual interruption of verifier-bound large cell; completed small screen not pooled",
+    "Unsealed terminal-batch-v2 large cell after parent SIGTERM143; raw verified observations retained but excluded",
+    "Mixed three-pair terminal-batch-v2 small cell retained as diagnostic evidence, not pooled with the five-pair confirmation",
+    "Unused planned steps and all earlier failed compile/test/setup attempts are not successes"
+  ],
+  "units": {
+    "seconds": "elapsed/user/system seconds, separate scopes",
+    "max_rss_kib": "GNU-time process peak RSS KiB; not a working-allocation cap",
+    "fs_inputs": "GNU-time %I kernel filesystem counters; not physical-device read traffic",
+    "fs_outputs": "GNU-time %O kernel filesystem counters; not physical-device write traffic"
+  },
+  "replay": "Baseline and FY/terminal binaries, complete source/vendor hashes, patches, exact harness snapshots, fixtures, per-attempt receipts, runner attempts and final validation logs are retained in the local ignored provenance packet. No public seeded cross-plan replay guarantee.",
+  "validation_checks": "docs/benchmarks/data-movement-checks-summary-2026-11-18.json",
+  "raw_provenance": "docs/benchmarks/data-movement-provenance-2026-11-18.json"
+}

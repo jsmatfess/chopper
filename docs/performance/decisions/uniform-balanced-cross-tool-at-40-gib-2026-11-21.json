@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "uniform-balanced-cross-tool-at-40-gib-2026-11-21",
+  "title": "Qualify 40 GiB external shuffle comparators",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "How do the selected large-file external shuffle workflows fare at 40 GiB inside the same hard memory cap?",
+  "disposition": "informational",
+  "outcome": "mixed",
+  "delivery": "unchanged",
+  "summary": "One 40 GiB qualification completed in 551.724 s for opt-in Chopper and 806.991 s for qsvlite. The original DuckDB adapter denied memory during sort materialization at 256 and 512 MiB engine settings.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "40 GiB exact Uniform then Balanced equivalent shape, plain fixed-width CSV, eight exact groups, 1 GiB hard cgroup with no swap."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Independent full all-field, unique ID, quota, cap and nonidentity oracle for both completed jobs. Chopper manifest and cleanup also checked. Both failed DuckDB settings passed the small preflight."
+  },
+  "limitations": [
+    "WSL2/ext4 with uncontrolled backing cache. Each full completion is one sample.",
+    "qsvlite uses a fixture-specific external line sort with one requested worker per command. UUID generation and reorder can overlap.",
+    "DuckDB failures cover one chosen materialized adapter. Full output timings exclude both failures."
+  ],
+  "exclusions": [
+    "Fixture hashing and output verification are outside timing. Small qualifications and unsuccessful attempts excluded from complete elapsed comparisons."
+  ],
+  "reopen_when": "Qualify a streaming DuckDB writer adapter or a different exact external algorithm under the same hard cap before generalizing.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#uniform-balanced-cross-tool-at-40-gib-2026-11-21",
+      "sha256": "3b98e9addf6b5dad1b1435add9587e11f03a6e2dedd7469cbd3c1fd50da0f774"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/uniform-balanced-40gib-cross-tool-summary-2026-11-21.json",
+      "sha256": "79767980b633d0e81a63c79fc9e07a00013c6a6bad34174d58902b48dbafa3db"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md"
+  ]
+}

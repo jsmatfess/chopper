@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "pipeline-publication-and-byte-cap-comparisons-2026-11-18",
+  "title": "Retain terminal routing pass elimination and reject costly buffer/serializer variants",
+  "date": "2026-11-18",
+  "subsystem": "execution",
+  "question": "Do pipeline publication and source-grounded serialization changes improve memory-constrained jobs?",
+  "disposition": "retain-experimental",
+  "outcome": "mixed",
+  "delivery": "opt-in",
+  "summary": "Unmerged native terminal-routing opt-in: Interleaved24.08% lower elapsed; probabilistic3.89% lower with~44% fewer managed temporary writes. Chopper bytecap median6.237s vs tunedqsv9.485s with overlapping ranges. Larger genericbuffer and ownedserializerfit rejected; byteproof source-only prototype deferred. First countedheader drops aftercomparison for finalizationheadroom.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2GiB fourcolumn CSV versus1GiB cgroup/no swap,256MiB/oneworker native; Interleaved8,probabilistic0/50/50,8MiB bytecaps. Separate128MiB tuning calibration and hotASCII decoder component."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows",
+      "wasi-chromium"
+    ],
+    "summary": "Current retainedsource Linux fmt/default+allfeatures lint/tests/coreWASM passed; fresh nativeWindows allfeatures lint/tests passed; routing-flagWASI smallgraph proves nativeexclusion and productiondefaultWASM/hosted restored. Native release candidate/default rebuilt from retainedsource. Not full hosted acceptance."
+  },
+  "limitations": [
+    "Opt-in unmerged code, no deployment/release claim.",
+    "Three runs pervariant, no pooling or tailclaim; qsv wins one bytecap pair.",
+    "Managedtemporary counters exclude privateoutput, not physicalIO/totaldisk/RSS.",
+    "Performance binaries predate separate headerrelease refinement; finalcorrectness receipts and rebuilt artifacts are distinct.",
+    "Raw originals remain local/unarchived; historical archive blocks complete generatedregistry refresh."
+  ],
+  "exclusions": [
+    "Warmups and128MiB tuning calibration not pooled with large comparisons.",
+    "Decoder component is not isolatedUTF8 cost or wholejob speedup.",
+    "Unmeasured byteproof source prototype not an implemented performancewin."
+  ],
+  "reopen_when": "Next benchmark the deferred counted-byte-proof prototype before claiming benefit; consider quote-aware counting only after BOM/blankline/CRLF/escape and full validation proof. Continue allremaining operation/mode coverage in issue20 after owner resumes.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#pipeline-publication-and-byte-cap-comparisons-2026-11-18",
+      "sha256": "3022310cad0b41d597b456866d666abd251a3a3bdb1d0deef74fe437dc9343e7"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/pipeline-publication-summary-2026-11-18.json",
+      "sha256": "244d2e891dd899bc65e643a20b08346e727496e030a4f56088faea8196e46742"
+    },
+    {
+      "path": "docs/benchmarks/pipeline-publication-checks-summary-2026-11-18.json",
+      "sha256": "9e480a15c73b73bc9206fdd15d3cd079851356bf86f05547f80a9fe76a98e6b0"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

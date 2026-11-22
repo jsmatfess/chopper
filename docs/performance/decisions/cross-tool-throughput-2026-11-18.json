@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "cross-tool-throughput-2026-11-18",
+  "title": "Prioritize complete-job data movement and useful parallelism after cross-tool comparison",
+  "date": "2026-11-18",
+  "subsystem": "execution",
+  "question": "Where does current Chopper leave split/shuffle throughput on the table against DuckDB and qsv?",
+  "disposition": "informational",
+  "outcome": "mixed",
+  "delivery": "unchanged",
+  "summary": "qsv and qsvlite lead balanced splitting; DuckDB leads the measured external shuffle; Chopper beats naive DuckDB balanced output. Investigate admitted batching and avoidable Run payload passes before changing sorting kernels.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "128 MiB repeated and varied four-text-column CSVs; 2 GiB repeated input; eight consecutive balanced outputs and full shuffle followed by balanced output."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "69 measured complete jobs and 23 excluded warmups across six cohorts independently verify fields, unique IDs, quotas and balanced order; separate smoke, failed DuckDB256MiB OOM, nondivisible quota and component/profile diagnostics remain distinct."
+  },
+  "limitations": [
+    "Warm WSL2/ext4 with 62 GiB host RAM; forced engine spill does not reproduce physical-RAM exhaustion, 40 GiB cold storage, native Windows or hosted behavior.",
+    "Three observations per cell; small varied-shuffle ranges overlap. No general ranking or tail claim.",
+    "qsv random sort is resident and unconstrained. Memory settings are not RSS caps; qsv count uses a separate Polars pool.",
+    "DuckDB adapter uses fixture-specific absent NULL sentinel and materializes/counts/exports LIMIT-OFFSET ranges; not an optimal or general text backend.",
+    "Component probes are not causal whole-job ablations; returned Chopper temporary counters precede publication."
+  ],
+  "exclusions": [
+    "All warmups, smoke runs, failed/setup attempts and instrumented component/CTAS diagnostics are excluded from complete-job medians.",
+    "Different fixtures, builds, cohorts and prior historical/user-supplied percentages are not pooled."
+  ],
+  "reopen_when": "A narrowly scoped candidate eliminates a demonstrated pass or row-handling cost, preserves contracts and passes a frozen complete-job decision rule; do not restore rejected radix, buckets, copied parser or adaptive FY unchanged.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#cross-tool-csv-split-and-shuffle-comparison-2026-11-18",
+      "sha256": "7930e10c67b6225eae09a013162c3a5d52d4ccb460eba543122c6befad6b3329"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/cross-tool-summary-2026-11-18.json",
+      "sha256": "e58fc1c689525bbc6ce32f8b035470614e86776d0a14cb36d731a0411e865ad6"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

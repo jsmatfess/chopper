@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "4ce7419bc21b192620055eb80c004c927408e797c406f2360345dbc4f8b01ded",
+  "analysis_script_sha256": "6f86197c2475f37726d1e7621c75d8a165efaa777b3fe6a717ce5b469b82d76e",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "9c381147e846b1a8482ba6b053a706da555c5f01135822616711efece33ff0ed"
+    "sha256": "1d6153df56023860535e30d12e335c20d8217365abf00ee0b6592c57d04961ba"
   },
   "families": [
     "adaptive-routing",
@@ -3940,6 +3940,414 @@
         "topic": "ownership-and-lifecycle"
       },
       "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Cross-tool CSV split and shuffle comparison (2026-11-18)",
+      "evidence": "docs/performance.md#cross-tool-csv-split-and-shuffle-comparison-2026-11-18",
+      "artifacts": [
+        "docs/benchmarks/cross-tool-summary-2026-11-18.json"
+      ],
+      "scripts": [
+        "scripts/benchmark-tool-comparison.py",
+        "scripts/test-benchmark-tool-comparison.py"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/cross-tool-csv-split-and-shuffle-comparison-2026-11-18.md",
+        "sha256": "46500c1ceb6d2f39e7c9550832fb9505e3424da53c43dd06f63f23ee9cafa61a",
+        "topic": "profiling"
+      },
+      "family": "profiling"
+    },
+    {
+      "title": "CSV data movement and Analyze Run (2026-11-18)",
+      "evidence": "docs/performance.md#csv-data-movement-and-analyze-run-2026-11-18",
+      "artifacts": [
+        "docs/benchmarks/data-movement-summary-2026-11-18.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/csv-data-movement-and-analyze-run-2026-11-18.md",
+        "sha256": "a4ea09667a3ceaed6c97e1bbdaeabbe6ed36c7c0653ef4e4b372fd7bdbc98988",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Out of memory data movement and cache admission (2026-11-18)",
+      "evidence": "docs/performance.md#out-of-memory-data-movement-and-cache-admission-2026-11-18",
+      "artifacts": [
+        "docs/benchmarks/data-movement-checks-summary-2026-11-18.json",
+        "docs/benchmarks/data-movement-summary-2026-11-18.json",
+        "docs/benchmarks/oom-comparison-2026-11-18.png",
+        "docs/benchmarks/oom-data-movement-checks-summary-2026-11-18.json",
+        "docs/benchmarks/oom-data-movement-summary-2026-11-18.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/out-of-memory-data-movement-and-cache-admission-2026-11-18.md",
+        "sha256": "8895d0b8ae2746eeaf09fc33b495b58b1089a3c25e545b154d73b5f0b8aa4115",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Pipeline publication and byte cap comparisons (2026-11-18)",
+      "evidence": "docs/performance.md#pipeline-publication-and-byte-cap-comparisons-2026-11-18",
+      "artifacts": [
+        "docs/benchmarks/pipeline-publication-2026-11-18.png",
+        "docs/benchmarks/pipeline-publication-checks-summary-2026-11-18.json",
+        "docs/benchmarks/pipeline-publication-summary-2026-11-18.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/pipeline-publication-and-byte-cap-comparisons-2026-11-18.md",
+        "sha256": "e84453774ed09e985d1bb3e71811780e46c8080a6dc9a1c5cae9c036ad5058e8",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Partition routing and assignment tradeoffs (2026-11-18)",
+      "evidence": "docs/performance.md#partition-routing-and-assignment-tradeoffs-2026-11-18",
+      "artifacts": [
+        "docs/benchmarks/partition-routing-2026-11-18.png",
+        "docs/benchmarks/partition-routing-checks-summary-2026-11-18.json",
+        "docs/benchmarks/partition-routing-summary-2026-11-18.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/partition-routing-and-assignment-tradeoffs-2026-11-18.md",
+        "sha256": "60b418888c75c7438a76fd2e5b18c05159899d7d0bae3728875386c77f7504d5",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Bounded final writers and composed pipelines (2026-11-19)",
+      "evidence": "docs/performance.md#bounded-final-writers-and-composed-pipelines-2026-11-19",
+      "artifacts": [
+        "docs/benchmarks/bounded-writers-2026-11-19.png",
+        "docs/benchmarks/bounded-writers-checks-2026-11-19.json",
+        "docs/benchmarks/bounded-writers-summary-2026-11-19.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/bounded-final-writers-and-composed-pipelines-2026-11-19.md",
+        "sha256": "cf3e1eaeb8cef59407947bf1e8638837a2ee77e63295ea7d6132dc8489035265",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Memory proportional writers and publication scheduling (2026-11-21)",
+      "evidence": "docs/performance.md#memory-proportional-writers-and-publication-scheduling-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/memory-proportional-writers-checks-2026-11-21.json",
+        "docs/benchmarks/memory-proportional-writers-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/memory-proportional-writers-and-publication-scheduling-2026-11-21.md",
+        "sha256": "e76451453e80df4b28c23dfcddc1a77c946ec7d085148c50746fda82b623bde2",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Explicit Sort and Zstandard input Balanced (2026-11-21)",
+      "evidence": "docs/performance.md#explicit-sort-and-zstandard-input-balanced-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/pipeline-sorting-source-codec-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/explicit-sort-and-zstandard-input-balanced-2026-11-21.md",
+        "sha256": "d574e03382de59b5b97090fc6b95033c4bf75bee051ab3fd53af350a4620a6fb",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Counted Partition and Balanced (2026-11-21)",
+      "evidence": "docs/performance.md#counted-partition-and-balanced-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/counted-partition-balanced-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/counted-partition-and-balanced-2026-11-21.md",
+        "sha256": "c88a2c98bf08824bbbe0599827a2d749fc96090ed2d1dc3bf5859eb079247900",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Wide terminal Uniform merge (2026-11-21)",
+      "evidence": "docs/performance.md#wide-terminal-uniform-merge-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/wide-terminal-uniform-merge-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/wide-terminal-uniform-merge-2026-11-21.md",
+        "sha256": "c98ecc92051dfacac005a2de5d1751722128934cd97fcae452c6cc397070e990",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Current Balanced cross-tool at 8 GiB (2026-11-21)",
+      "evidence": "docs/performance.md#current-balanced-cross-tool-at-8-gib-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/balanced-8gib-cross-tool-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/current-balanced-cross-tool-at-8-gib-2026-11-21.md",
+        "sha256": "6895bc49ccbe4d092f264bebe4dcfde9b6acf3fbc5de4c56381bf6535c1ed0b1",
+        "topic": "profiling"
+      },
+      "family": "profiling"
+    },
+    {
+      "title": "Parallel counted Balanced digest (2026-11-21)",
+      "evidence": "docs/performance.md#parallel-counted-balanced-digest-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/parallel-counted-balanced-digest-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/parallel-counted-balanced-digest-2026-11-21.md",
+        "sha256": "7224a07542cf9c7bd54c1955dc5395ee5bb6e0d688f962c87bab5ac9bd47994c",
+        "topic": "profiling"
+      },
+      "family": "profiling"
+    },
+    {
+      "title": "Balanced scaling at 40 GiB (2026-11-21)",
+      "evidence": "docs/performance.md#balanced-scaling-at-40-gib-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/balanced-40gib-qualification-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/balanced-scaling-at-40-gib-2026-11-21.md",
+        "sha256": "3003b50989101dd075a7ef3ef8a2f55765f9eb8ad428324a20eaafccfaf9f87e",
+        "topic": "profiling"
+      },
+      "family": "profiling"
+    },
+    {
+      "title": "Terminal Uniform kernel read-ahead (2026-11-21)",
+      "evidence": "docs/performance.md#terminal-uniform-kernel-read-ahead-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/terminal-uniform-kernel-read-ahead-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/terminal-uniform-kernel-read-ahead-2026-11-21.md",
+        "sha256": "a559f36fee971d162b614177468d08fbd7788768c3a15aa7f0f798d9bd30a2c1",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Terminal Uniform 1024-way merge (2026-11-21)",
+      "evidence": "docs/performance.md#terminal-uniform-1024-way-merge-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/terminal-uniform-1024-way-merge-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/terminal-uniform-1024-way-merge-2026-11-21.md",
+        "sha256": "e15be20214b57afaed451eeee77a9be3c09b0d7e00eefc2cc74e0cb0a0ed8b30",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Counted Balanced first-pass fingerprint (2026-11-21)",
+      "evidence": "docs/performance.md#counted-balanced-first-pass-fingerprint-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/counted-balanced-first-pass-fingerprint-summary-2026-11-21.json",
+        "docs/benchmarks/counted-balanced-first-pass-fingerprint-validation-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/counted-balanced-first-pass-fingerprint-2026-11-21.md",
+        "sha256": "4372e2eafc3841ba48df9bb3ae7a81f1b477e8eb1d453d8996a0129b09ba941e",
+        "topic": "profiling"
+      },
+      "family": "profiling"
+    },
+    {
+      "title": "Integrated Balanced cross-tool at 8 GiB (2026-11-21)",
+      "evidence": "docs/performance.md#integrated-balanced-cross-tool-at-8-gib-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/balanced-integrated-8gib-cross-tool-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/integrated-balanced-cross-tool-at-8-gib-2026-11-21.md",
+        "sha256": "912eb28f7de80ab72fae069ba9ac72ecb287f7d1cc8137623ff7eb9d1e206b09",
+        "topic": "profiling"
+      },
+      "family": "profiling"
+    },
+    {
+      "title": "Counted Balanced validation only (2026-11-21)",
+      "evidence": "docs/performance.md#counted-balanced-validation-only-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/counted-balanced-validation-only-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/counted-balanced-validation-only-2026-11-21.md",
+        "sha256": "1515e02c8ccbc6dfc0cd748581015eb2946932a2eac327b29d0eb7612af72a1a",
+        "topic": "profiling"
+      },
+      "family": "profiling"
+    },
+    {
+      "title": "Uniform Balanced cross-tool at 40 GiB (2026-11-21)",
+      "evidence": "docs/performance.md#uniform-balanced-cross-tool-at-40-gib-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/uniform-balanced-40gib-cross-tool-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/uniform-balanced-cross-tool-at-40-gib-2026-11-21.md",
+        "sha256": "660e3cbc3172b2425a1e586bde125cb98fee404c19e6637b68ea2fb5d56c2c3c",
+        "topic": "profiling"
+      },
+      "family": "profiling"
+    },
+    {
+      "title": "Terminal Uniform merge read buffers (2026-11-21)",
+      "evidence": "docs/performance.md#terminal-uniform-merge-read-buffers-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/terminal-uniform-merge-read-buffers-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/terminal-uniform-merge-read-buffers-2026-11-21.md",
+        "sha256": "72ffe2f8d2706aadcda9feddba07c7dd63b5bbb5b747ec1657693a886174f3ef",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Streaming shuffle adapters at 2 GiB (2026-11-21)",
+      "evidence": "docs/performance.md#streaming-shuffle-adapters-at-2-gib-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/streaming-shuffle-adapters-2gib-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/streaming-shuffle-adapters-at-2-gib-2026-11-21.md",
+        "sha256": "71a5546be66d4ed1d1378019058d95f2ae745bf79141424fc68afd0b1c77a6ee",
+        "topic": "profiling"
+      },
+      "family": "profiling"
+    },
+    {
+      "title": "Streaming shuffle adapters at 40 GiB (2026-11-21)",
+      "evidence": "docs/performance.md#streaming-shuffle-adapters-at-40-gib-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/streaming-shuffle-adapters-40gib-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/streaming-shuffle-adapters-at-40-gib-2026-11-21.md",
+        "sha256": "2d43b1782f013e167e9860dc104a222e6c2e8d65720c5dd5256a6f1e0810a229",
+        "topic": "profiling"
+      },
+      "family": "profiling"
+    },
+    {
+      "title": "Terminal Uniform short tail (2026-11-21)",
+      "evidence": "docs/performance.md#terminal-uniform-short-tail-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/terminal-uniform-short-tail-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/terminal-uniform-short-tail-2026-11-21.md",
+        "sha256": "0411ad0b37dbe4e03424d7a6101972feb62523a35ab9e034ff6228f49c5d57d0",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Terminal Uniform short tail at 40 GiB (2026-11-21)",
+      "evidence": "docs/performance.md#terminal-uniform-short-tail-at-40-gib-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/terminal-uniform-short-tail-40gib-summary-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/terminal-uniform-short-tail-at-40-gib-2026-11-21.md",
+        "sha256": "5f7058b66d9f71b59ec65f2f786dd5d9d9fc63f23a47271101d25f0ab126a0be",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Terminal direct output under matched pressure (2026-11-21)",
+      "evidence": "docs/performance.md#terminal-direct-output-under-matched-pressure-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/terminal-direct-matched-pressure-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/terminal-direct-output-under-matched-pressure-2026-11-21.md",
+        "sha256": "ac1ad3d27edaed306084e7b37c4b8ef7135e77b316712cafcffb7932065ce548",
+        "topic": "adaptive-routing"
+      },
+      "family": "adaptive-routing"
+    },
+    {
+      "title": "Probabilistic shuffle fusion at 2 GiB (2026-11-21)",
+      "evidence": "docs/performance.md#probabilistic-shuffle-fusion-at-2-gib-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/probabilistic-shuffle-fusion-2gib-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/probabilistic-shuffle-fusion-at-2-gib-2026-11-21.md",
+        "sha256": "875ece80de80e8d0136c3393b6772f6b1c6245654fbc6cee36c0538168c9ba8b",
+        "topic": "adaptive-routing"
+      },
+      "family": "adaptive-routing"
+    },
+    {
+      "title": "Exact resident buckets at 2 GiB (2026-11-21)",
+      "evidence": "docs/performance.md#exact-resident-buckets-at-2-gib-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/exact-resident-buckets-2026-11-21.json",
+        "docs/benchmarks/exact-resident-buckets-2026-11-21.patch"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/exact-resident-buckets-at-2-gib-2026-11-21.md",
+        "sha256": "f47893bde222d337a52b27afff378a43dda045691c1b05e512cf1033a1e5d2c7",
+        "topic": "adaptive-routing"
+      },
+      "family": "adaptive-routing"
+    },
+    {
+      "title": "Indexed exact quota lookup at 2 GiB (2026-11-21)",
+      "evidence": "docs/performance.md#indexed-exact-quota-lookup-at-2-gib-2026-11-21",
+      "artifacts": [
+        "docs/benchmarks/indexed-exact-quota-lookup-2026-11-21.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/indexed-exact-quota-lookup-at-2-gib-2026-11-21.md",
+        "sha256": "70a500d3a55dc057dccbc0bb881dfa3f6c9a19c515dac38fa78c763eb693bbf2",
+        "topic": "adaptive-routing"
+      },
+      "family": "adaptive-routing"
     }
   ],
   "sources": [
@@ -7614,6 +8022,125 @@
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
+      "path": "docs/benchmarks/balanced-40gib-qualification-summary-2026-11-21.json",
+      "sha256": "34eae77aa1ce7dba5daef9138b8d6735d494efc80a368d7453af6c3fc8d885ae",
+      "bytes": 5789,
+      "format": "json",
+      "record_counts": {
+        "balanced_40gib_cross_tool_qualification": 1
+      },
+      "fields": [
+        "comparison_8_gib",
+        "decision",
+        "fixture",
+        "kind",
+        "qualification_exit_codes",
+        "records",
+        "schema_version",
+        "scope",
+        "type",
+        "versions"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#balanced-scaling-at-40-gib-2026-11-21"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "balanced_40gib_cross_tool_qualification": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/balanced-8gib-cross-tool-summary-2026-11-21.json",
+      "sha256": "bc81842bf61e65d7b0cd6d3576247ae5855a022d3ee52d66864d36680786a164",
+      "bytes": 11126,
+      "format": "json",
+      "record_counts": {
+        "balanced_8gib_cross_tool": 1
+      },
+      "fields": [
+        "chopper_build",
+        "comparison",
+        "decision",
+        "fixture",
+        "kind",
+        "qualification",
+        "schema_version",
+        "scope",
+        "source",
+        "type",
+        "version_receipt",
+        "versions"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#current-balanced-cross-tool-at-8-gib-2026-11-21"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "balanced_8gib_cross_tool": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/balanced-integrated-8gib-cross-tool-summary-2026-11-21.json",
+      "sha256": "e21ee5ebe17b38d749d029d62dec1c04f0f308783d7df8b835b6cb2cd60dbbec",
+      "bytes": 14511,
+      "format": "json",
+      "record_counts": {
+        "counted_balanced_integrated_cross_tool": 1
+      },
+      "fields": [
+        "base_current_design",
+        "batch",
+        "integrated_chopper_build",
+        "kind",
+        "paired_ablation",
+        "schema_version",
+        "scope",
+        "tools",
+        "type",
+        "versions"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#integrated-balanced-cross-tool-at-8-gib-2026-11-21"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "counted_balanced_integrated_cross_tool": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
       "path": "docs/benchmarks/benchmark-windows-device-io-measured-2026-10-20.py",
       "sha256": "6aac47e6d3e99d2e351a50ea3f956e7f7eba93dc595982c239e01ad0e4354f4f",
       "bytes": 11002,
@@ -7957,6 +8484,117 @@
       ],
       "record_bounds_by_kind": {
         "provenance": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/bounded-writers-2026-11-19.png",
+      "sha256": "74c2fbb8197721b619a5ab2c8a3991ba9ce72e17f641b9a0917eda67fa46c702",
+      "bytes": 107976,
+      "format": "png",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#bounded-final-writers-and-composed-pipelines-2026-11-19"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/bounded-writers-2026-11-19.svg",
+      "sha256": "fd7b6affea306b86dec0454b888b8b38288b155959677b2af237325ada333439",
+      "bytes": 61380,
+      "format": "svg",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/bounded-writers-checks-2026-11-19.json",
+      "sha256": "a96343e0e73a15b8db65b0c4eab38eaf2290c9d5b9c0414b5d87ac913ac1094e",
+      "bytes": 50554,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "current_default_binary_sha256",
+        "current_default_build",
+        "final_direct_contracts",
+        "final_linux_all_feature_clippy",
+        "limitations",
+        "path_probe",
+        "runs",
+        "schema_version",
+        "source_epochs",
+        "source_sha256",
+        "windows_snapshot"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#bounded-final-writers-and-composed-pipelines-2026-11-19"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/bounded-writers-summary-2026-11-19.json",
+      "sha256": "1c3080791c363f84472dff98ce699e9f90120e92a21165a62030c2e85a4d0ec4",
+      "bytes": 252944,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "builds",
+        "capacity",
+        "cells",
+        "date",
+        "incomplete_cells",
+        "limitations",
+        "schema_version",
+        "scope",
+        "source_epoch_note",
+        "tracked_raw_copies"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#bounded-final-writers-and-composed-pipelines-2026-11-19"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
           "first": {
             "pointer": ""
           },
@@ -12634,6 +13272,246 @@
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
+      "path": "docs/benchmarks/counted-balanced-first-pass-fingerprint-summary-2026-11-21.json",
+      "sha256": "b6fa578a72ee0ab30e46cd54c1972a8544bd6a5cf2bbae7e730feb7ba17e743d",
+      "bytes": 14745,
+      "format": "json",
+      "record_counts": {
+        "counted_balanced_first_pass_fingerprint_ablation": 1
+      },
+      "fields": [
+        "build_runner_receipt",
+        "correctness_receipt",
+        "cpu_delta_percent",
+        "decision",
+        "elapsed_delta_percent",
+        "kind",
+        "medians",
+        "pair_deltas_percent",
+        "paired_cpu_deltas_percent",
+        "pairs",
+        "retained",
+        "rule_checks",
+        "runner_receipt",
+        "schema_version",
+        "scope",
+        "type",
+        "user_cpu_profile",
+        "versions",
+        "working_delta_bytes"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#counted-balanced-first-pass-fingerprint-2026-11-21"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "counted_balanced_first_pass_fingerprint_ablation": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/counted-balanced-first-pass-fingerprint-validation-2026-11-21.json",
+      "sha256": "d3fd0f14c9a85a96625ed0b6c8695cde5b9601b98d28d80f31ab927d23305955",
+      "bytes": 9270,
+      "format": "json",
+      "record_counts": {
+        "counted_balanced_source_proof_validation": 1
+      },
+      "fields": [
+        "historical_invalid_byte_assertion",
+        "kind",
+        "schema_version",
+        "scope",
+        "type",
+        "validation",
+        "windows_source_file_count"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#counted-balanced-first-pass-fingerprint-2026-11-21"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "counted_balanced_source_proof_validation": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/counted-balanced-validation-only-summary-2026-11-21.json",
+      "sha256": "0d2120574bcf7e5b25150c7984625385bee9319c3ff8fa4af8c52aa739375c77",
+      "bytes": 14703,
+      "format": "json",
+      "record_counts": {
+        "counted_balanced_first_pass_validation_only": 1
+      },
+      "fields": [
+        "build_runner_receipt",
+        "correctness_receipt",
+        "cpu_delta_percent",
+        "decision",
+        "elapsed_delta_percent",
+        "kind",
+        "medians",
+        "pair_deltas_percent",
+        "paired_cpu_deltas_percent",
+        "paired_fingerprint_ablation",
+        "pairs",
+        "retained",
+        "rule_checks",
+        "runner_receipt",
+        "schema_version",
+        "scope",
+        "type",
+        "versions",
+        "working_delta_bytes"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#counted-balanced-validation-only-2026-11-21"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "counted_balanced_first_pass_validation_only": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/counted-partition-balanced-summary-2026-11-21.json",
+      "sha256": "d53da86ed9ab08d35611ac34ef3ff1b0cd44a7207880c7e77b9447baa3e35567",
+      "bytes": 7798,
+      "format": "json",
+      "record_counts": {
+        "counted_partition_balanced": 1
+      },
+      "fields": [
+        "builds",
+        "comparison",
+        "decision",
+        "fixture",
+        "kind",
+        "reviewed_selection",
+        "schema_version",
+        "scope",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#counted-partition-and-balanced-2026-11-21"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "counted_partition_balanced": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/cross-tool-checks-summary-2026-11-18.json",
+      "sha256": "ad017fe46ef03159202ea93e7fc030fca2a58b4198191d51aafadf2e4c8da7fb",
+      "bytes": 3141,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "benchmarks",
+        "evidence_checks",
+        "kind",
+        "not_run",
+        "raw_receipt",
+        "remaining_gate",
+        "scope",
+        "targeted_narrative_hydration",
+        "verifier_corruption_controls"
+      ],
+      "context_records": [],
+      "evidence": [],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/cross-tool-summary-2026-11-18.json",
+      "sha256": "e58fc1c689525bbc6ce32f8b035470614e86776d0a14cb36d731a0411e865ad6",
+      "bytes": 46842,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "cells",
+        "kind",
+        "schema",
+        "scope",
+        "sources"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#cross-tool-csv-split-and-shuffle-comparison-2026-11-18"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
       "path": "docs/benchmarks/csv-marker-cache-2026-11-05-attest.py",
       "sha256": "2bfc69006e35faae008d8b2596fe8e6337a2820e72f4f756d132382077755964",
       "bytes": 3481,
@@ -13153,6 +14031,85 @@
       ],
       "record_bounds_by_kind": {
         "validation": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/data-movement-checks-summary-2026-11-18.json",
+      "sha256": "f42f966d43364d4869f1e393e18a325416c0d93511d003e4127de0522551ec7e",
+      "bytes": 10137,
+      "format": "json",
+      "record_counts": {
+        "data_movement_evidence_checks": 1
+      },
+      "fields": [
+        "attempts",
+        "cause",
+        "kind",
+        "read_only_failed",
+        "read_only_passed",
+        "schema_version",
+        "scope",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#out-of-memory-data-movement-and-cache-admission-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "data_movement_evidence_checks": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/data-movement-summary-2026-11-18.json",
+      "sha256": "6533874d5e2935e5ddda7c003e17ecd444a3d9bd37050055376811537e486109",
+      "bytes": 64444,
+      "format": "json",
+      "record_counts": {
+        "csv_data_movement_summary": 1
+      },
+      "fields": [
+        "cells",
+        "environment",
+        "excluded",
+        "kind",
+        "raw_provenance",
+        "replay",
+        "schema_version",
+        "scope",
+        "timing",
+        "type",
+        "units",
+        "validation_checks"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#csv-data-movement-and-analyze-run-2026-11-18",
+        "docs/performance.md#out-of-memory-data-movement-and-cache-admission-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "csv_data_movement_summary": {
           "first": {
             "pointer": ""
           },
@@ -16396,6 +17353,62 @@
           }
         }
       },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/exact-resident-buckets-2026-11-21.json",
+      "sha256": "69905b90c6e66af13858e52506beb2fe756bbab3423685ecbc67fbf9eacdb5a0",
+      "bytes": 9953,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "candidate",
+        "issue",
+        "matched_memory_controls",
+        "outcome",
+        "oversize",
+        "provenance",
+        "schema_version",
+        "scope",
+        "validation",
+        "workload"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#exact-resident-buckets-at-2-gib-2026-11-21"
+      ],
+      "families": [
+        "adaptive-routing"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/exact-resident-buckets-2026-11-21.patch",
+      "sha256": "18c6b17e1b25c2f83f773b8dc2f475cfbb873e5435ed7ce6bd09fef65ca4e1de",
+      "bytes": 31213,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#exact-resident-buckets-at-2-gib-2026-11-21"
+      ],
+      "families": [
+        "adaptive-routing"
+      ],
+      "record_bounds_by_kind": {},
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
@@ -20547,6 +21560,48 @@
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
+      "path": "docs/benchmarks/indexed-exact-quota-lookup-2026-11-21.json",
+      "sha256": "92ecad81a8a08443aadf17e91d66e06fc8a332c17708f18dc4de2c2bc5a522c1",
+      "bytes": 15406,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "candidate",
+        "jobs",
+        "methods",
+        "platform",
+        "postmeasurement_lint_correction",
+        "primary",
+        "provenance",
+        "qualification",
+        "schema_version",
+        "source_head",
+        "source_tree_has_local_changes",
+        "validation",
+        "workload"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#indexed-exact-quota-lookup-at-2-gib-2026-11-21"
+      ],
+      "families": [
+        "adaptive-routing"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
       "path": "docs/benchmarks/inline-keys-native-2026-10-12.jsonl",
       "sha256": "8e689423e6431b3d2c169267c6dd901a9d70629eef41f25e57590e449d73ec3a",
       "bytes": 99904,
@@ -21405,6 +22460,75 @@
           },
           "last": {
             "line": 9
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/memory-proportional-writers-checks-2026-11-21.json",
+      "sha256": "aa6b58ee0f3c3e7b722d6b55b05490f3209fe2e3fc11b9fd8bc8383bdbccaba7",
+      "bytes": 256939,
+      "format": "json",
+      "record_counts": {
+        "memory_proportional_writer_checks": 1
+      },
+      "fields": [
+        "batches",
+        "diagnoses",
+        "kind",
+        "schema_version",
+        "scope",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#memory-proportional-writers-and-publication-scheduling-2026-11-21"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "memory_proportional_writer_checks": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/memory-proportional-writers-summary-2026-11-21.json",
+      "sha256": "9de59bd4230ebde5e884bc37c2f8aa62731b19d735c9279f8b4803677145692b",
+      "bytes": 188973,
+      "format": "json",
+      "record_counts": {
+        "memory_proportional_writer_summary": 1
+      },
+      "fields": [
+        "comparisons",
+        "kind",
+        "schema_version",
+        "scope",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#memory-proportional-writers-and-publication-scheduling-2026-11-21"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "memory_proportional_writer_summary": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
           }
         }
       },
@@ -24016,6 +25140,119 @@
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
+      "path": "docs/benchmarks/oom-comparison-2026-11-18.png",
+      "sha256": "e92bee9df0caac824b0b6ad1cdcce20f6c2886c2d9947dd5b558751968b7319c",
+      "bytes": 159104,
+      "format": "png",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#out-of-memory-data-movement-and-cache-admission-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/oom-comparison-2026-11-18.svg",
+      "sha256": "367f05be1e8852306c09ec915e5d4779889a24fa307943eec44262134b7bde90",
+      "bytes": 97690,
+      "format": "svg",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/oom-data-movement-checks-summary-2026-11-18.json",
+      "sha256": "5b638a80fa75540e4eb8c026186175ea3464ae096d9539213ab63a98f8443d8a",
+      "bytes": 48392,
+      "format": "json",
+      "record_counts": {
+        "oom_data_movement_checks_summary": 1
+      },
+      "fields": [
+        "browser",
+        "browser_test_source",
+        "evidence_readonly",
+        "evidence_refresh",
+        "inputs",
+        "kind",
+        "native",
+        "schema_version",
+        "scope",
+        "sync_diagnostic",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#out-of-memory-data-movement-and-cache-admission-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "oom_data_movement_checks_summary": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/oom-data-movement-summary-2026-11-18.json",
+      "sha256": "8b5612664a0d53616844ce0456e271871506a6b11644b1aa00c3c9a90bc3fb1d",
+      "bytes": 529376,
+      "format": "json",
+      "record_counts": {
+        "oom_data_movement_summary": 1
+      },
+      "fields": [
+        "builds",
+        "caveats",
+        "cells",
+        "decision",
+        "derived_path_policy",
+        "failures",
+        "kind",
+        "publication_sync_diagnostic",
+        "schema_version",
+        "scope",
+        "sources",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#out-of-memory-data-movement-and-cache-admission-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "oom_data_movement_summary": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
       "path": "docs/benchmarks/operation-key-browser-2026-10-16.json",
       "sha256": "9f10e47f4cc40f81a2e1878c12418f80deb82708c7439c2fa67c63bafca9f575",
       "bytes": 2827,
@@ -25548,6 +26785,52 @@
         "ownership-and-lifecycle"
       ],
       "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/parallel-counted-balanced-digest-summary-2026-11-21.json",
+      "sha256": "08d2c5b539b4a1b287e51a3432b414b64940213444c0d99a4402db2c83ead2c3",
+      "bytes": 14270,
+      "format": "json",
+      "record_counts": {
+        "parallel_counted_balanced_digest": 1
+      },
+      "fields": [
+        "build_runner_receipt",
+        "cpu_delta_percent",
+        "decision",
+        "elapsed_delta_percent",
+        "kind",
+        "medians",
+        "pair_deltas_percent",
+        "pairs",
+        "retained",
+        "rule_checks",
+        "runner_receipt",
+        "schema_version",
+        "scope",
+        "type",
+        "user_cpu_profile",
+        "versions",
+        "working_delta_bytes"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#parallel-counted-balanced-digest-2026-11-21"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "parallel_counted_balanced_digest": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
@@ -29799,6 +31082,120 @@
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
+      "path": "docs/benchmarks/partition-routing-2026-11-18.png",
+      "sha256": "5ab6f0701b3ab20de9f577180313f45cb18f40514d62c9fd6e57344b591be1d2",
+      "bytes": 113981,
+      "format": "png",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#partition-routing-and-assignment-tradeoffs-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/partition-routing-2026-11-18.svg",
+      "sha256": "93a3376379c90ace57b9c49f870d8f4a644600087660df10265c6977b7d0415a",
+      "bytes": 76624,
+      "format": "svg",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/partition-routing-checks-summary-2026-11-18.json",
+      "sha256": "b2db8381e39584e0fab6bd65ba6d70303b0d2e852ec64ca5af27c6b6d4c4b61b",
+      "bytes": 11701,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "checks",
+        "default_native",
+        "kind",
+        "notes",
+        "production_assets",
+        "production_wasm_exports",
+        "retained_source_manifest",
+        "schema",
+        "scope",
+        "windows_snapshot"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#partition-routing-and-assignment-tradeoffs-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/partition-routing-summary-2026-11-18.json",
+      "sha256": "3d38b488a702af3f8675345706a75e64a5c7f9ef8b2ed358c1e89aeb15ee7f84",
+      "bytes": 91449,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "actual-partition-input-contracts",
+        "builds",
+        "components",
+        "cross_tool",
+        "date",
+        "eager",
+        "eager_high_cardinality_large",
+        "eager_passes_declared_retention_rule",
+        "instrumented-sync-diagnostic",
+        "kind",
+        "native_before_after",
+        "retention",
+        "schema",
+        "scopes"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#partition-routing-and-assignment-tradeoffs-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
       "path": "docs/benchmarks/path-budget-browser-2026-10-15.json",
       "sha256": "042424c7a28defa07945c41ba170d7f8b80430b63486aa5923e4dd840536e1cb",
       "bytes": 2694,
@@ -30723,6 +32120,152 @@
       ],
       "record_bounds_by_kind": {
         "validation": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/pipeline-publication-2026-11-18.png",
+      "sha256": "6f182f8454603e37bbf0f94ced9f1b261e0f6f11371a047da2e2e030cdeda179",
+      "bytes": 115754,
+      "format": "png",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#pipeline-publication-and-byte-cap-comparisons-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/pipeline-publication-2026-11-18.svg",
+      "sha256": "97473eabb09ea4fc943caf72b2fc40b8a590f58b05257e326071820300b8773c",
+      "bytes": 84666,
+      "format": "svg",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/pipeline-publication-checks-summary-2026-11-18.json",
+      "sha256": "9e480a15c73b73bc9206fdd15d3cd079851356bf86f05547f80a9fe76a98e6b0",
+      "bytes": 44381,
+      "format": "json",
+      "record_counts": {
+        "pipeline_publication_checks_summary": 1
+      },
+      "fields": [
+        "browser",
+        "kind",
+        "limitations",
+        "native",
+        "restored_native_builds",
+        "schema_version",
+        "scope",
+        "source_sha256",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#pipeline-publication-and-byte-cap-comparisons-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "pipeline_publication_checks_summary": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/pipeline-publication-summary-2026-11-18.json",
+      "sha256": "244d2e891dd899bc65e643a20b08346e727496e030a4f56088faea8196e46742",
+      "bytes": 70908,
+      "format": "json",
+      "record_counts": {
+        "pipeline_publication_summary": 1
+      },
+      "fields": [
+        "builds",
+        "caveats",
+        "cells",
+        "contract_differences",
+        "decisions",
+        "decoder_component",
+        "decoder_retention",
+        "kind",
+        "qsv_calibration",
+        "schema_version",
+        "scope",
+        "sources",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#pipeline-publication-and-byte-cap-comparisons-2026-11-18"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "pipeline_publication_summary": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/pipeline-sorting-source-codec-summary-2026-11-21.json",
+      "sha256": "486ac1486a9aa0c5d5527ff3c3cb37bdbc939464794358a481528276d9bf2178",
+      "bytes": 16410,
+      "format": "json",
+      "record_counts": {
+        "pipeline-sorting-and-source-codec": 1
+      },
+      "fields": [
+        "comparisons",
+        "kind",
+        "schema_version",
+        "scope",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#explicit-sort-and-zstandard-input-balanced-2026-11-21"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "pipeline-sorting-and-source-codec": {
           "first": {
             "pointer": ""
           },
@@ -31909,6 +33452,49 @@
         "adaptive-routing"
       ],
       "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/probabilistic-shuffle-fusion-2gib-2026-11-21.json",
+      "sha256": "dde5c51ad0ad57ae40afe2ae21c1e34c72a472e03ed9defce3af09b5538871f1",
+      "bytes": 19310,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "candidate",
+        "held_peer_controls",
+        "issue",
+        "jobs",
+        "limits",
+        "outcome",
+        "owner_layout_transfer",
+        "platform",
+        "provenance",
+        "schema_version",
+        "source_head",
+        "source_tree_has_local_changes",
+        "targeted_tests",
+        "workload"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#probabilistic-shuffle-fusion-at-2-gib-2026-11-21"
+      ],
+      "families": [
+        "adaptive-routing"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
@@ -45023,6 +46609,84 @@
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
+      "path": "docs/benchmarks/streaming-shuffle-adapters-2gib-summary-2026-11-21.json",
+      "sha256": "db83c32f89afa3a5c8cb517549c3cd84c05dae4236b4ade5a55d31dafd1430e5",
+      "bytes": 13429,
+      "format": "json",
+      "record_counts": {
+        "streaming_external_shuffle_tools_2gib": 1
+      },
+      "fields": [
+        "decision",
+        "duckdb_semantic_controls",
+        "excluded_failures",
+        "fixture",
+        "kind",
+        "large_followup_separate",
+        "schema_version",
+        "scope",
+        "tools",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#streaming-shuffle-adapters-at-2-gib-2026-11-21"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "streaming_external_shuffle_tools_2gib": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/streaming-shuffle-adapters-40gib-summary-2026-11-21.json",
+      "sha256": "a737593026022d00e079bf2e3031a7b5f6a4729e6e51c2b9eb00da4205a37d44",
+      "bytes": 13593,
+      "format": "json",
+      "record_counts": {
+        "streaming_external_shuffle_tools_40gib": 1
+      },
+      "fields": [
+        "decision",
+        "duckdb_streamed_failure",
+        "kind",
+        "prior_40gib",
+        "qsvlite_streamed",
+        "reference",
+        "schema_version",
+        "scope",
+        "supporting_2gib",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#streaming-shuffle-adapters-at-40-gib-2026-11-21"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "streaming_external_shuffle_tools_40gib": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
       "path": "docs/benchmarks/streaming-state-browser-2026-10-16.json",
       "sha256": "308b5f2573b72290045d7c8a831eaf6c3bd38eeaa583af11c1cf55a85850947e",
       "bytes": 2835,
@@ -45815,6 +47479,47 @@
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
+      "path": "docs/benchmarks/terminal-direct-matched-pressure-2026-11-21.json",
+      "sha256": "c96b721fd938a58643b463ee18869108820f7e9f4f12296e1aec636aa84f1e2c",
+      "bytes": 32748,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "emission_edge",
+        "issue",
+        "limitations",
+        "measurement",
+        "platform",
+        "primary",
+        "provenance",
+        "schema_version",
+        "source_head",
+        "source_tree_has_local_changes",
+        "verified",
+        "workload"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#terminal-direct-output-under-matched-pressure-2026-11-21"
+      ],
+      "families": [
+        "adaptive-routing"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
       "path": "docs/benchmarks/terminal-direct-native-2026-11-03.json",
       "sha256": "83df964f8ee42773a8699d65945f207b21309b292a81993362811f138c046bcd",
       "bytes": 30144,
@@ -45979,6 +47684,272 @@
         "adaptive-routing"
       ],
       "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/terminal-uniform-1024-way-merge-summary-2026-11-21.json",
+      "sha256": "6fdf3ca4f0d0896e6257181f14bd4bae2070ae743365b900921f5542cd897345",
+      "bytes": 8758,
+      "format": "json",
+      "record_counts": {
+        "uniform_40gib_1024_way_merge_stopped": 1
+      },
+      "fields": [
+        "builds",
+        "candidate_relative_percent",
+        "complete_timing_pairs",
+        "decision",
+        "descriptor_sample",
+        "futility",
+        "kind",
+        "pairs",
+        "retained",
+        "schema_version",
+        "scope",
+        "status",
+        "type",
+        "unattempted_pairs"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#terminal-uniform-1024-way-merge-2026-11-21"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "uniform_40gib_1024_way_merge_stopped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/terminal-uniform-kernel-read-ahead-summary-2026-11-21.json",
+      "sha256": "225c9676645ae471c00689d18a839acdb72cc507a8d4e1304921d7af8da77fb0",
+      "bytes": 17116,
+      "format": "json",
+      "record_counts": {
+        "wide_external_merge_linux_readahead": 1
+      },
+      "fields": [
+        "aggregates",
+        "builds",
+        "candidate_relative_percent",
+        "cpu_pairs_percent",
+        "cpu_resource_rule_pass",
+        "decision",
+        "elapsed_pairs_percent",
+        "kind",
+        "pairs",
+        "qualification",
+        "retained",
+        "schema_version",
+        "scope",
+        "speed_rule_pass",
+        "status",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#terminal-uniform-kernel-read-ahead-2026-11-21"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "wide_external_merge_linux_readahead": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/terminal-uniform-merge-read-buffers-summary-2026-11-21.json",
+      "sha256": "4f54367b9c578fb11a94aaa0493a00126dc64de3d93ccc3c9615b8d9e2448c68",
+      "bytes": 18841,
+      "format": "json",
+      "record_counts": {
+        "terminal_uniform_application_read_buffers": 1
+      },
+      "fields": [
+        "aggregates",
+        "build_batch",
+        "builds",
+        "candidate_relative_percent",
+        "contract_batch",
+        "cpu_pairs_percent",
+        "cpu_resource_rule_pass",
+        "decision",
+        "elapsed_pairs_percent",
+        "kind",
+        "pairs",
+        "qualification",
+        "retained",
+        "rss_delta_kib",
+        "schema_version",
+        "scope",
+        "speed_rule_pass",
+        "status",
+        "type",
+        "working_delta_bytes"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#terminal-uniform-merge-read-buffers-2026-11-21"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "terminal_uniform_application_read_buffers": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/terminal-uniform-short-tail-40gib-summary-2026-11-21.json",
+      "sha256": "67aa5c7445274e694b1480f32485a747cd639ff6aec758f99a02873388a91b63",
+      "bytes": 4139,
+      "format": "json",
+      "record_counts": {
+        "terminal_uniform_short_tail_holdout_40gib": 1
+      },
+      "fields": [
+        "batch",
+        "decision",
+        "kind",
+        "pair",
+        "relative_percent",
+        "samples",
+        "schema_version",
+        "scope",
+        "scoped_primary_8gib",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#terminal-uniform-short-tail-at-40-gib-2026-11-21"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "terminal_uniform_short_tail_holdout_40gib": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/terminal-uniform-short-tail-summary-2026-11-21.json",
+      "sha256": "8961946e649ef320a5b0af00efa77b923b4a1df63f15498bbcda5868b4a33d84",
+      "bytes": 17910,
+      "format": "json",
+      "record_counts": {
+        "terminal_uniform_short_tail": 1
+      },
+      "fields": [
+        "aggregates",
+        "build_batch",
+        "builds",
+        "candidate_relative_percent",
+        "contract_batch",
+        "cpu_pairs_percent",
+        "decision",
+        "elapsed_pairs_percent",
+        "kind",
+        "pairs",
+        "qualification",
+        "retained",
+        "rss_delta_kib",
+        "schema_version",
+        "scope",
+        "speed_rule_pass",
+        "status",
+        "traffic_pairs_percent",
+        "traffic_resource_rule_pass",
+        "type",
+        "working_delta_bytes"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#terminal-uniform-short-tail-2026-11-21"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "terminal_uniform_short_tail": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/uniform-balanced-40gib-cross-tool-summary-2026-11-21.json",
+      "sha256": "79767980b633d0e81a63c79fc9e07a00013c6a6bad34174d58902b48dbafa3db",
+      "bytes": 12810,
+      "format": "json",
+      "record_counts": {
+        "uniform_balanced_cross_tool_40gib": 1
+      },
+      "fields": [
+        "decision",
+        "duckdb_failed_attempts",
+        "duckdb_retry_decision",
+        "fixture",
+        "kind",
+        "oracle_controls",
+        "schema_version",
+        "scope",
+        "tools",
+        "type",
+        "versions"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#uniform-balanced-cross-tool-at-40-gib-2026-11-21"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "uniform_balanced_cross_tool_40gib": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
@@ -46336,6 +48307,46 @@
         "profiling"
       ],
       "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/wide-terminal-uniform-merge-summary-2026-11-21.json",
+      "sha256": "d68e927710e9cb61a563f8072d97bf3346afcdbcd1769701524b54832e55b15a",
+      "bytes": 10187,
+      "format": "json",
+      "record_counts": {
+        "wide_terminal_uniform_merge": 1
+      },
+      "fields": [
+        "builds",
+        "comparison",
+        "decision",
+        "diagnostic_batch",
+        "fixture",
+        "kind",
+        "pair_batch",
+        "reviewed_selection",
+        "schema_version",
+        "scope",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#wide-terminal-uniform-merge-2026-11-21"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "wide_terminal_uniform_merge": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {

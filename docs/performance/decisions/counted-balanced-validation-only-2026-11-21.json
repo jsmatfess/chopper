@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "counted-balanced-validation-only-2026-11-21",
+  "title": "Screen a validation-only count pass for counted Balanced",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Does avoiding first-pass packed rows materially improve complete native counted singleton Balanced under a hard memory limit?",
+  "disposition": "reject",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "Median job time fell 3.41% and CPU fell 5.65%, below the predeclared 5% elapsed and 10% CPU rules. All pairs improved and memory and managed spill costs were effectively unchanged.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "8 GiB plain four-column CSV, eight exact parts, hard 1 GiB cgroup without swap, 256 MiB engine memory and one worker."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Three exact-output pairs, focused parser parity and intake admission/terminal tests, 35 native direct-run tests in each arm, and portable-core WASM compile."
+  },
+  "limitations": [
+    "WSL2/ext4, uncontrolled backing cache, single fixture and one worker.",
+    "The parser validation cost is shared; the candidate removed packed field copies only. The earlier hot raw-proof component is a separate experiment."
+  ],
+  "exclusions": [
+    "Excluded small preflight pair and full warmup pair. Fixture hashing and independent oracle run outside timer."
+  ],
+  "reopen_when": "Revisit for a job where first-pass record construction produces material CPU or working memory cost, supported by profiling or a relevant contract change.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#counted-balanced-validation-only-2026-11-21",
+      "sha256": "6bbb4160e20e5be4858172732cfd8a56606dd2f74aa210d2d6429539655ac9d1"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/counted-balanced-validation-only-summary-2026-11-21.json",
+      "sha256": "0d2120574bcf7e5b25150c7984625385bee9319c3ff8fa4af8c52aa739375c77"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md"
+  ]
+}

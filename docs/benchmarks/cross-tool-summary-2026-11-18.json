@@ -1,0 +1,2224 @@
+{
+  "kind": "summary",
+  "schema": 1,
+  "scope": "derived only, not additional observations",
+  "cells": [
+    {
+      "cohort": "small",
+      "job": "balanced",
+      "tool": "chopper",
+      "n": 3,
+      "source_lines": [
+        8,
+        16,
+        21
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.5119655319722369,
+        "min": 0.511864788015373,
+        "max": 0.5571798899909481,
+        "samples": [
+          0.5571798899909481,
+          0.5119655319722369,
+          0.511864788015373
+        ]
+      },
+      "rss_mib": {
+        "median": 5.82421875,
+        "min": 5.77734375,
+        "max": 5.89453125,
+        "samples": [
+          5.77734375,
+          5.82421875,
+          5.89453125
+        ]
+      },
+      "user_seconds": {
+        "median": 0.23,
+        "min": 0.23,
+        "max": 0.25,
+        "samples": [
+          0.23,
+          0.25,
+          0.23
+        ]
+      },
+      "system_seconds": {
+        "median": 0.21,
+        "min": 0.19,
+        "max": 0.23,
+        "samples": [
+          0.23,
+          0.19,
+          0.21
+        ]
+      },
+      "analysis_seconds": {
+        "median": 0.375991341,
+        "min": 0.367651775,
+        "max": 0.395729028,
+        "samples": [
+          0.395729028,
+          0.375991341,
+          0.367651775
+        ]
+      },
+      "post_analysis_tail_seconds": {
+        "median": 0.14421301301537304,
+        "min": 0.13597419097223695,
+        "max": 0.16145086199094816,
+        "samples": [
+          0.16145086199094816,
+          0.13597419097223695,
+          0.14421301301537304
+        ]
+      },
+      "diagnostics": {
+        "sort_seconds": {
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "samples": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "sort_runs": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "resident_sorts": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "merge_operations": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_read": {
+          "median": 165675062,
+          "min": 165675062,
+          "max": 165675062,
+          "samples": [
+            165675062,
+            165675062,
+            165675062
+          ]
+        },
+        "temporary_bytes_written": {
+          "median": 300942649,
+          "min": 300942649,
+          "max": 300942649,
+          "samples": [
+            300942649,
+            300942649,
+            300942649
+          ]
+        },
+        "peak_workspace_reserved_bytes": {
+          "median": 214876,
+          "min": 214876,
+          "max": 214876,
+          "samples": [
+            214876,
+            214876,
+            214876
+          ]
+        }
+      }
+    },
+    {
+      "cohort": "small",
+      "job": "balanced",
+      "tool": "duckdb",
+      "n": 3,
+      "source_lines": [
+        9,
+        14,
+        22
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.8018580579664558,
+        "min": 0.7704536230303347,
+        "max": 0.8021751689957455,
+        "samples": [
+          0.8018580579664558,
+          0.8021751689957455,
+          0.7704536230303347
+        ]
+      },
+      "rss_mib": {
+        "median": 750.609375,
+        "min": 747.43359375,
+        "max": 780.5234375,
+        "samples": [
+          750.609375,
+          747.43359375,
+          780.5234375
+        ]
+      },
+      "user_seconds": {
+        "median": 0.53,
+        "min": 0.51,
+        "max": 0.55,
+        "samples": [
+          0.55,
+          0.51,
+          0.53
+        ]
+      },
+      "system_seconds": {
+        "median": 0.6,
+        "min": 0.57,
+        "max": 0.61,
+        "samples": [
+          0.57,
+          0.61,
+          0.6
+        ]
+      }
+    },
+    {
+      "cohort": "small",
+      "job": "balanced",
+      "tool": "qsv",
+      "n": 3,
+      "source_lines": [
+        10,
+        15,
+        20
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": null,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.2410745460074395,
+        "min": 0.2392775909975171,
+        "max": 0.25223565398482606,
+        "samples": [
+          0.2410745460074395,
+          0.2392775909975171,
+          0.25223565398482606
+        ]
+      },
+      "rss_mib": {
+        "median": 318.25,
+        "min": 318.23046875,
+        "max": 318.50390625,
+        "samples": [
+          318.25,
+          318.23046875,
+          318.50390625
+        ]
+      },
+      "user_seconds": {
+        "median": 0.47,
+        "min": 0.47,
+        "max": 0.47,
+        "samples": [
+          0.47,
+          0.47,
+          0.47
+        ]
+      },
+      "system_seconds": {
+        "median": 0.14,
+        "min": 0.12,
+        "max": 0.18,
+        "samples": [
+          0.12,
+          0.14,
+          0.18
+        ]
+      }
+    },
+    {
+      "cohort": "small",
+      "job": "shuffle",
+      "tool": "chopper",
+      "n": 3,
+      "source_lines": [
+        11,
+        19,
+        24
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.7538447150145657,
+        "min": 0.75244815798942,
+        "max": 0.7699254599865526,
+        "samples": [
+          0.75244815798942,
+          0.7699254599865526,
+          0.7538447150145657
+        ]
+      },
+      "rss_mib": {
+        "median": 201.2421875,
+        "min": 201.203125,
+        "max": 201.2890625,
+        "samples": [
+          201.2890625,
+          201.203125,
+          201.2421875
+        ]
+      },
+      "user_seconds": {
+        "median": 0.5,
+        "min": 0.49,
+        "max": 0.51,
+        "samples": [
+          0.49,
+          0.5,
+          0.51
+        ]
+      },
+      "system_seconds": {
+        "median": 0.23,
+        "min": 0.22,
+        "max": 0.24,
+        "samples": [
+          0.23,
+          0.24,
+          0.22
+        ]
+      },
+      "analysis_seconds": {
+        "median": 0.591497889,
+        "min": 0.577547673,
+        "max": 0.60009535,
+        "samples": [
+          0.60009535,
+          0.577547673,
+          0.591497889
+        ]
+      },
+      "post_analysis_tail_seconds": {
+        "median": 0.16234682601456574,
+        "min": 0.15235280798941997,
+        "max": 0.1923777869865526,
+        "samples": [
+          0.15235280798941997,
+          0.1923777869865526,
+          0.16234682601456574
+        ]
+      },
+      "diagnostics": {
+        "sort_seconds": {
+          "median": 0.013263945,
+          "min": 0.013215528,
+          "max": 0.01346966,
+          "samples": [
+            0.013263945,
+            0.013215528,
+            0.01346966
+          ]
+        },
+        "sort_runs": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "resident_sorts": {
+          "median": 1,
+          "min": 1,
+          "max": 1,
+          "samples": [
+            1,
+            1,
+            1
+          ]
+        },
+        "merge_operations": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_read": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_written": {
+          "median": 135267587,
+          "min": 135267587,
+          "max": 135267587,
+          "samples": [
+            135267587,
+            135267587,
+            135267587
+          ]
+        },
+        "peak_workspace_reserved_bytes": {
+          "median": 199434272,
+          "min": 199434272,
+          "max": 199434272,
+          "samples": [
+            199434272,
+            199434272,
+            199434272
+          ]
+        }
+      }
+    },
+    {
+      "cohort": "small",
+      "job": "shuffle",
+      "tool": "duckdb",
+      "n": 3,
+      "source_lines": [
+        12,
+        17,
+        25
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.6896081980085,
+        "min": 0.6752324319677427,
+        "max": 0.6990491679753177,
+        "samples": [
+          0.6752324319677427,
+          0.6896081980085,
+          0.6990491679753177
+        ]
+      },
+      "rss_mib": {
+        "median": 764.38671875,
+        "min": 757.21484375,
+        "max": 783.80078125,
+        "samples": [
+          783.80078125,
+          764.38671875,
+          757.21484375
+        ]
+      },
+      "user_seconds": {
+        "median": 0.59,
+        "min": 0.59,
+        "max": 0.61,
+        "samples": [
+          0.59,
+          0.61,
+          0.59
+        ]
+      },
+      "system_seconds": {
+        "median": 0.58,
+        "min": 0.57,
+        "max": 0.61,
+        "samples": [
+          0.57,
+          0.58,
+          0.61
+        ]
+      }
+    },
+    {
+      "cohort": "small",
+      "job": "shuffle",
+      "tool": "qsv",
+      "n": 3,
+      "source_lines": [
+        13,
+        18,
+        23
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": null,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.7472674829768948,
+        "min": 0.7281528359744698,
+        "max": 0.7820998409879394,
+        "samples": [
+          0.7820998409879394,
+          0.7281528359744698,
+          0.7472674829768948
+        ]
+      },
+      "rss_mib": {
+        "median": 318.4296875,
+        "min": 318.0703125,
+        "max": 319.0546875,
+        "samples": [
+          318.4296875,
+          319.0546875,
+          318.0703125
+        ]
+      },
+      "user_seconds": {
+        "median": 0.76,
+        "min": 0.74,
+        "max": 0.77,
+        "samples": [
+          0.77,
+          0.76,
+          0.74
+        ]
+      },
+      "system_seconds": {
+        "median": 0.36,
+        "min": 0.34,
+        "max": 0.38,
+        "samples": [
+          0.38,
+          0.34,
+          0.36
+        ]
+      }
+    },
+    {
+      "cohort": "large3",
+      "job": "balanced",
+      "tool": "chopper",
+      "n": 3,
+      "source_lines": [
+        8,
+        16,
+        21
+      ],
+      "rows": 8388608,
+      "input_bytes": 2147483669,
+      "memory_setting_mib": 1024,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 8.619275616016239,
+        "min": 8.192972975957673,
+        "max": 9.313015632040333,
+        "samples": [
+          9.313015632040333,
+          8.619275616016239,
+          8.192972975957673
+        ]
+      },
+      "rss_mib": {
+        "median": 5.5234375,
+        "min": 5.515625,
+        "max": 5.56640625,
+        "samples": [
+          5.5234375,
+          5.56640625,
+          5.515625
+        ]
+      },
+      "user_seconds": {
+        "median": 3.93,
+        "min": 3.77,
+        "max": 3.95,
+        "samples": [
+          3.93,
+          3.95,
+          3.77
+        ]
+      },
+      "system_seconds": {
+        "median": 4.21,
+        "min": 3.98,
+        "max": 4.92,
+        "samples": [
+          4.92,
+          4.21,
+          3.98
+        ]
+      },
+      "analysis_seconds": {
+        "median": 7.31599314,
+        "min": 6.90346612,
+        "max": 7.540877858,
+        "samples": [
+          7.540877858,
+          7.31599314,
+          6.90346612
+        ]
+      },
+      "post_analysis_tail_seconds": {
+        "median": 1.3032824760162391,
+        "min": 1.289506855957673,
+        "max": 1.772137774040333,
+        "samples": [
+          1.772137774040333,
+          1.3032824760162391,
+          1.289506855957673
+        ]
+      },
+      "diagnostics": {
+        "sort_seconds": {
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "samples": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "sort_runs": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "resident_sorts": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "merge_operations": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_read": {
+          "median": 2650800183,
+          "min": 2650800183,
+          "max": 2650800183,
+          "samples": [
+            2650800183,
+            2650800183,
+            2650800183
+          ]
+        },
+        "temporary_bytes_written": {
+          "median": 4815062363,
+          "min": 4815062363,
+          "max": 4815062363,
+          "samples": [
+            4815062363,
+            4815062363,
+            4815062363
+          ]
+        },
+        "peak_workspace_reserved_bytes": {
+          "median": 214885,
+          "min": 214885,
+          "max": 214885,
+          "samples": [
+            214885,
+            214885,
+            214885
+          ]
+        }
+      }
+    },
+    {
+      "cohort": "large3",
+      "job": "balanced",
+      "tool": "duckdb",
+      "n": 3,
+      "source_lines": [
+        9,
+        14,
+        22
+      ],
+      "rows": 8388608,
+      "input_bytes": 2147483669,
+      "memory_setting_mib": 1024,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 9.437103045987897,
+        "min": 9.126396677980665,
+        "max": 9.54860000294866,
+        "samples": [
+          9.437103045987897,
+          9.126396677980665,
+          9.54860000294866
+        ]
+      },
+      "rss_mib": {
+        "median": 1240.4140625,
+        "min": 1239.21875,
+        "max": 1260.07421875,
+        "samples": [
+          1260.07421875,
+          1239.21875,
+          1240.4140625
+        ]
+      },
+      "user_seconds": {
+        "median": 7.87,
+        "min": 7.87,
+        "max": 8.01,
+        "samples": [
+          8.01,
+          7.87,
+          7.87
+        ]
+      },
+      "system_seconds": {
+        "median": 7.94,
+        "min": 7.78,
+        "max": 8.12,
+        "samples": [
+          7.78,
+          8.12,
+          7.94
+        ]
+      }
+    },
+    {
+      "cohort": "large3",
+      "job": "balanced",
+      "tool": "qsv",
+      "n": 3,
+      "source_lines": [
+        10,
+        15,
+        20
+      ],
+      "rows": 8388608,
+      "input_bytes": 2147483669,
+      "memory_setting_mib": null,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 3.0955398440128192,
+        "min": 2.9318144810386,
+        "max": 3.1337128480081446,
+        "samples": [
+          3.0955398440128192,
+          3.1337128480081446,
+          2.9318144810386
+        ]
+      },
+      "rss_mib": {
+        "median": 3169.74609375,
+        "min": 3169.5,
+        "max": 3233.28515625,
+        "samples": [
+          3233.28515625,
+          3169.5,
+          3169.74609375
+        ]
+      },
+      "user_seconds": {
+        "median": 6.7,
+        "min": 6.49,
+        "max": 6.71,
+        "samples": [
+          6.49,
+          6.7,
+          6.71
+        ]
+      },
+      "system_seconds": {
+        "median": 2.45,
+        "min": 2.29,
+        "max": 2.5,
+        "samples": [
+          2.45,
+          2.5,
+          2.29
+        ]
+      }
+    },
+    {
+      "cohort": "large3",
+      "job": "shuffle",
+      "tool": "chopper",
+      "n": 3,
+      "source_lines": [
+        11,
+        19,
+        24
+      ],
+      "rows": 8388608,
+      "input_bytes": 2147483669,
+      "memory_setting_mib": 1024,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 13.93141476798337,
+        "min": 13.635908361990005,
+        "max": 13.936999491008464,
+        "samples": [
+          13.936999491008464,
+          13.635908361990005,
+          13.93141476798337
+        ]
+      },
+      "rss_mib": {
+        "median": 260.21484375,
+        "min": 260.19921875,
+        "max": 260.3671875,
+        "samples": [
+          260.19921875,
+          260.3671875,
+          260.21484375
+        ]
+      },
+      "user_seconds": {
+        "median": 8.92,
+        "min": 8.75,
+        "max": 8.95,
+        "samples": [
+          8.92,
+          8.95,
+          8.75
+        ]
+      },
+      "system_seconds": {
+        "median": 5.38,
+        "min": 5.04,
+        "max": 5.54,
+        "samples": [
+          5.38,
+          5.04,
+          5.54
+        ]
+      },
+      "analysis_seconds": {
+        "median": 12.625086226,
+        "min": 12.393812316,
+        "max": 12.671310797,
+        "samples": [
+          12.625086226,
+          12.393812316,
+          12.671310797
+        ]
+      },
+      "post_analysis_tail_seconds": {
+        "median": 1.2601039709833692,
+        "min": 1.2420960459900048,
+        "max": 1.3119132650084637,
+        "samples": [
+          1.3119132650084637,
+          1.2420960459900048,
+          1.2601039709833692
+        ]
+      },
+      "diagnostics": {
+        "sort_seconds": {
+          "median": 0.207246066,
+          "min": 0.206674848,
+          "max": 0.211032581,
+          "samples": [
+            0.207246066,
+            0.211032581,
+            0.206674848
+          ]
+        },
+        "sort_runs": {
+          "median": 13,
+          "min": 13,
+          "max": 13,
+          "samples": [
+            13,
+            13,
+            13
+          ]
+        },
+        "resident_sorts": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "merge_operations": {
+          "median": 1,
+          "min": 1,
+          "max": 1,
+          "samples": [
+            1,
+            1,
+            1
+          ]
+        },
+        "temporary_bytes_read": {
+          "median": 2785017856,
+          "min": 2785017856,
+          "max": 2785017856,
+          "samples": [
+            2785017856,
+            2785017856,
+            2785017856
+          ]
+        },
+        "temporary_bytes_written": {
+          "median": 4949280036,
+          "min": 4949280036,
+          "max": 4949280036,
+          "samples": [
+            4949280036,
+            4949280036,
+            4949280036
+          ]
+        },
+        "peak_workspace_reserved_bytes": {
+          "median": 268708006,
+          "min": 268708006,
+          "max": 268708006,
+          "samples": [
+            268708006,
+            268708006,
+            268708006
+          ]
+        }
+      }
+    },
+    {
+      "cohort": "large3",
+      "job": "shuffle",
+      "tool": "duckdb",
+      "n": 3,
+      "source_lines": [
+        12,
+        17,
+        25
+      ],
+      "rows": 8388608,
+      "input_bytes": 2147483669,
+      "memory_setting_mib": 1024,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 9.814361418946646,
+        "min": 9.67544204799924,
+        "max": 10.734244143008254,
+        "samples": [
+          9.814361418946646,
+          10.734244143008254,
+          9.67544204799924
+        ]
+      },
+      "rss_mib": {
+        "median": 1238.27734375,
+        "min": 1238.03125,
+        "max": 1247.734375,
+        "samples": [
+          1238.03125,
+          1238.27734375,
+          1247.734375
+        ]
+      },
+      "user_seconds": {
+        "median": 11.88,
+        "min": 11.61,
+        "max": 12.37,
+        "samples": [
+          11.61,
+          12.37,
+          11.88
+        ]
+      },
+      "system_seconds": {
+        "median": 10.81,
+        "min": 10.34,
+        "max": 11.31,
+        "samples": [
+          10.81,
+          11.31,
+          10.34
+        ]
+      }
+    },
+    {
+      "cohort": "large3",
+      "job": "shuffle",
+      "tool": "qsv",
+      "n": 3,
+      "source_lines": [
+        13,
+        18,
+        23
+      ],
+      "rows": 8388608,
+      "input_bytes": 2147483669,
+      "memory_setting_mib": null,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 14.434083227999508,
+        "min": 14.083344924962148,
+        "max": 14.796115042001475,
+        "samples": [
+          14.083344924962148,
+          14.796115042001475,
+          14.434083227999508
+        ]
+      },
+      "rss_mib": {
+        "median": 3320.7578125,
+        "min": 3318.4609375,
+        "max": 3320.96875,
+        "samples": [
+          3320.7578125,
+          3318.4609375,
+          3320.96875
+        ]
+      },
+      "user_seconds": {
+        "median": 14.26,
+        "min": 14.24,
+        "max": 14.82,
+        "samples": [
+          14.24,
+          14.26,
+          14.82
+        ]
+      },
+      "system_seconds": {
+        "median": 5.89,
+        "min": 5.7,
+        "max": 6.36,
+        "samples": [
+          5.89,
+          6.36,
+          5.7
+        ]
+      }
+    },
+    {
+      "cohort": "direct-control",
+      "job": "balanced",
+      "tool": "chopper",
+      "n": 3,
+      "source_lines": [
+        4,
+        7,
+        8
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.4903503489913419,
+        "min": 0.48777604702627286,
+        "max": 0.5051431870087981,
+        "samples": [
+          0.5051431870087981,
+          0.48777604702627286,
+          0.4903503489913419
+        ]
+      },
+      "rss_mib": {
+        "median": 5.7421875,
+        "min": 5.52734375,
+        "max": 5.83203125,
+        "samples": [
+          5.52734375,
+          5.7421875,
+          5.83203125
+        ]
+      },
+      "user_seconds": {
+        "median": 0.23,
+        "min": 0.23,
+        "max": 0.24,
+        "samples": [
+          0.23,
+          0.24,
+          0.23
+        ]
+      },
+      "system_seconds": {
+        "median": 0.19,
+        "min": 0.17,
+        "max": 0.19,
+        "samples": [
+          0.19,
+          0.17,
+          0.19
+        ]
+      },
+      "analysis_seconds": {
+        "median": 0.365683555,
+        "min": 0.361027426,
+        "max": 0.371318347,
+        "samples": [
+          0.371318347,
+          0.361027426,
+          0.365683555
+        ]
+      },
+      "post_analysis_tail_seconds": {
+        "median": 0.12674862102627288,
+        "min": 0.1246667939913419,
+        "max": 0.13382484000879813,
+        "samples": [
+          0.13382484000879813,
+          0.12674862102627288,
+          0.1246667939913419
+        ]
+      },
+      "diagnostics": {
+        "sort_seconds": {
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "samples": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "sort_runs": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "resident_sorts": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "merge_operations": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_read": {
+          "median": 165675062,
+          "min": 165675062,
+          "max": 165675062,
+          "samples": [
+            165675062,
+            165675062,
+            165675062
+          ]
+        },
+        "temporary_bytes_written": {
+          "median": 300942649,
+          "min": 300942649,
+          "max": 300942649,
+          "samples": [
+            300942649,
+            300942649,
+            300942649
+          ]
+        },
+        "peak_workspace_reserved_bytes": {
+          "median": 214948,
+          "min": 214948,
+          "max": 214948,
+          "samples": [
+            214948,
+            214948,
+            214948
+          ]
+        }
+      }
+    },
+    {
+      "cohort": "direct-control",
+      "job": "balanced",
+      "tool": "chopper-direct",
+      "n": 3,
+      "source_lines": [
+        5,
+        6,
+        9
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.31014534598216414,
+        "min": 0.3088191509596072,
+        "max": 0.31421576003776863,
+        "samples": [
+          0.31014534598216414,
+          0.31421576003776863,
+          0.3088191509596072
+        ]
+      },
+      "rss_mib": {
+        "median": 5.3515625,
+        "min": 5.32421875,
+        "max": 5.5078125,
+        "samples": [
+          5.32421875,
+          5.3515625,
+          5.5078125
+        ]
+      },
+      "user_seconds": {
+        "median": 0.16,
+        "min": 0.14,
+        "max": 0.17,
+        "samples": [
+          0.14,
+          0.16,
+          0.17
+        ]
+      },
+      "system_seconds": {
+        "median": 0.07,
+        "min": 0.06,
+        "max": 0.09,
+        "samples": [
+          0.09,
+          0.07,
+          0.06
+        ]
+      },
+      "analysis_seconds": {
+        "median": 0.301860058,
+        "min": 0.300363787,
+        "max": 0.305622578,
+        "samples": [
+          0.301860058,
+          0.305622578,
+          0.300363787
+        ]
+      },
+      "post_analysis_tail_seconds": {
+        "median": 0.00845536395960722,
+        "min": 0.008285287982164158,
+        "max": 0.008593182037768654,
+        "samples": [
+          0.008285287982164158,
+          0.008593182037768654,
+          0.00845536395960722
+        ]
+      },
+      "diagnostics": {
+        "sort_seconds": {
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "samples": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "sort_runs": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "resident_sorts": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "merge_operations": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_read": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_written": {
+          "median": 1208,
+          "min": 1208,
+          "max": 1208,
+          "samples": [
+            1208,
+            1208,
+            1208
+          ]
+        },
+        "peak_workspace_reserved_bytes": {
+          "median": 204744,
+          "min": 204744,
+          "max": 204744,
+          "samples": [
+            204744,
+            204744,
+            204744
+          ]
+        }
+      }
+    },
+    {
+      "cohort": "fisher-control",
+      "job": "shuffle",
+      "tool": "chopper",
+      "n": 3,
+      "source_lines": [
+        4,
+        7,
+        8
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.712746592995245,
+        "min": 0.6961368049960583,
+        "max": 0.7156169720110483,
+        "samples": [
+          0.7156169720110483,
+          0.6961368049960583,
+          0.712746592995245
+        ]
+      },
+      "rss_mib": {
+        "median": 201.3046875,
+        "min": 201.26171875,
+        "max": 201.33203125,
+        "samples": [
+          201.3046875,
+          201.33203125,
+          201.26171875
+        ]
+      },
+      "user_seconds": {
+        "median": 0.48,
+        "min": 0.46,
+        "max": 0.48,
+        "samples": [
+          0.48,
+          0.46,
+          0.48
+        ]
+      },
+      "system_seconds": {
+        "median": 0.21,
+        "min": 0.21,
+        "max": 0.21,
+        "samples": [
+          0.21,
+          0.21,
+          0.21
+        ]
+      },
+      "analysis_seconds": {
+        "median": 0.56512933,
+        "min": 0.559568427,
+        "max": 0.569787956,
+        "samples": [
+          0.569787956,
+          0.559568427,
+          0.56512933
+        ]
+      },
+      "post_analysis_tail_seconds": {
+        "median": 0.14582901601104836,
+        "min": 0.13656837799605837,
+        "max": 0.14761726299524502,
+        "samples": [
+          0.14582901601104836,
+          0.13656837799605837,
+          0.14761726299524502
+        ]
+      },
+      "diagnostics": {
+        "sort_seconds": {
+          "median": 0.012989586,
+          "min": 0.012223005,
+          "max": 0.013180241,
+          "samples": [
+            0.012989586,
+            0.012223005,
+            0.013180241
+          ]
+        },
+        "sort_runs": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "resident_sorts": {
+          "median": 1,
+          "min": 1,
+          "max": 1,
+          "samples": [
+            1,
+            1,
+            1
+          ]
+        },
+        "merge_operations": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_read": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_written": {
+          "median": 135267587,
+          "min": 135267587,
+          "max": 135267587,
+          "samples": [
+            135267587,
+            135267587,
+            135267587
+          ]
+        },
+        "peak_workspace_reserved_bytes": {
+          "median": 199434326,
+          "min": 199434326,
+          "max": 199434326,
+          "samples": [
+            199434326,
+            199434326,
+            199434326
+          ]
+        }
+      }
+    },
+    {
+      "cohort": "fisher-control",
+      "job": "shuffle",
+      "tool": "chopper-fisher",
+      "n": 3,
+      "source_lines": [
+        5,
+        6,
+        9
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.8047843520180322,
+        "min": 0.804606378020253,
+        "max": 0.8633479179698043,
+        "samples": [
+          0.8633479179698043,
+          0.8047843520180322,
+          0.804606378020253
+        ]
+      },
+      "rss_mib": {
+        "median": 201.19921875,
+        "min": 201.10546875,
+        "max": 201.19921875,
+        "samples": [
+          201.19921875,
+          201.10546875,
+          201.19921875
+        ]
+      },
+      "user_seconds": {
+        "median": 0.44,
+        "min": 0.44,
+        "max": 0.48,
+        "samples": [
+          0.48,
+          0.44,
+          0.44
+        ]
+      },
+      "system_seconds": {
+        "median": 0.29,
+        "min": 0.28,
+        "max": 0.3,
+        "samples": [
+          0.3,
+          0.28,
+          0.29
+        ]
+      },
+      "analysis_seconds": {
+        "median": 0.663363288,
+        "min": 0.661040486,
+        "max": 0.710096692,
+        "samples": [
+          0.710096692,
+          0.661040486,
+          0.663363288
+        ]
+      },
+      "post_analysis_tail_seconds": {
+        "median": 0.14374386601803224,
+        "min": 0.14124309002025304,
+        "max": 0.15325122596980423,
+        "samples": [
+          0.15325122596980423,
+          0.14374386601803224,
+          0.14124309002025304
+        ]
+      },
+      "diagnostics": {
+        "sort_seconds": {
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "samples": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "sort_runs": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "resident_sorts": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "merge_operations": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_read": {
+          "median": 165675062,
+          "min": 165675062,
+          "max": 165675062,
+          "samples": [
+            165675062,
+            165675062,
+            165675062
+          ]
+        },
+        "temporary_bytes_written": {
+          "median": 300942649,
+          "min": 300942649,
+          "max": 300942649,
+          "samples": [
+            300942649,
+            300942649,
+            300942649
+          ]
+        },
+        "peak_workspace_reserved_bytes": {
+          "median": 199433801,
+          "min": 199433801,
+          "max": 199433801,
+          "samples": [
+            199433801,
+            199433801,
+            199433801
+          ]
+        }
+      }
+    },
+    {
+      "cohort": "varied",
+      "job": "balanced",
+      "tool": "chopper",
+      "n": 3,
+      "source_lines": [
+        8,
+        16,
+        21
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.5206137310015038,
+        "min": 0.5124445490073413,
+        "max": 0.5367201649933122,
+        "samples": [
+          0.5206137310015038,
+          0.5367201649933122,
+          0.5124445490073413
+        ]
+      },
+      "rss_mib": {
+        "median": 5.71875,
+        "min": 5.6953125,
+        "max": 5.91015625,
+        "samples": [
+          5.71875,
+          5.6953125,
+          5.91015625
+        ]
+      },
+      "user_seconds": {
+        "median": 0.23,
+        "min": 0.23,
+        "max": 0.26,
+        "samples": [
+          0.23,
+          0.26,
+          0.23
+        ]
+      },
+      "system_seconds": {
+        "median": 0.21,
+        "min": 0.2,
+        "max": 0.22,
+        "samples": [
+          0.22,
+          0.21,
+          0.2
+        ]
+      },
+      "analysis_seconds": {
+        "median": 0.36929818,
+        "min": 0.360401139,
+        "max": 0.37478809,
+        "samples": [
+          0.360401139,
+          0.36929818,
+          0.37478809
+        ]
+      },
+      "post_analysis_tail_seconds": {
+        "median": 0.16021259200150378,
+        "min": 0.13765645900734125,
+        "max": 0.16742198499331223,
+        "samples": [
+          0.16021259200150378,
+          0.16742198499331223,
+          0.13765645900734125
+        ]
+      },
+      "diagnostics": {
+        "sort_seconds": {
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "samples": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "sort_runs": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "resident_sorts": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "merge_operations": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_read": {
+          "median": 165675062,
+          "min": 165675062,
+          "max": 165675062,
+          "samples": [
+            165675062,
+            165675062,
+            165675062
+          ]
+        },
+        "temporary_bytes_written": {
+          "median": 300942649,
+          "min": 300942649,
+          "max": 300942649,
+          "samples": [
+            300942649,
+            300942649,
+            300942649
+          ]
+        },
+        "peak_workspace_reserved_bytes": {
+          "median": 214884,
+          "min": 214884,
+          "max": 214884,
+          "samples": [
+            214884,
+            214884,
+            214884
+          ]
+        }
+      }
+    },
+    {
+      "cohort": "varied",
+      "job": "balanced",
+      "tool": "duckdb",
+      "n": 3,
+      "source_lines": [
+        9,
+        14,
+        22
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.7415373449912295,
+        "min": 0.6979967699735425,
+        "max": 0.7686846560100093,
+        "samples": [
+          0.6979967699735425,
+          0.7686846560100093,
+          0.7415373449912295
+        ]
+      },
+      "rss_mib": {
+        "median": 707.39453125,
+        "min": 691.921875,
+        "max": 763.7734375,
+        "samples": [
+          691.921875,
+          707.39453125,
+          763.7734375
+        ]
+      },
+      "user_seconds": {
+        "median": 0.5,
+        "min": 0.49,
+        "max": 0.56,
+        "samples": [
+          0.5,
+          0.56,
+          0.49
+        ]
+      },
+      "system_seconds": {
+        "median": 0.52,
+        "min": 0.52,
+        "max": 0.61,
+        "samples": [
+          0.52,
+          0.52,
+          0.61
+        ]
+      }
+    },
+    {
+      "cohort": "varied",
+      "job": "balanced",
+      "tool": "qsv",
+      "n": 3,
+      "source_lines": [
+        10,
+        15,
+        20
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": null,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.24639576801564544,
+        "min": 0.24251906399149448,
+        "max": 0.28248518001055345,
+        "samples": [
+          0.28248518001055345,
+          0.24251906399149448,
+          0.24639576801564544
+        ]
+      },
+      "rss_mib": {
+        "median": 317.41015625,
+        "min": 317.35546875,
+        "max": 317.6015625,
+        "samples": [
+          317.35546875,
+          317.6015625,
+          317.41015625
+        ]
+      },
+      "user_seconds": {
+        "median": 0.45,
+        "min": 0.44,
+        "max": 0.48,
+        "samples": [
+          0.45,
+          0.44,
+          0.48
+        ]
+      },
+      "system_seconds": {
+        "median": 0.14,
+        "min": 0.13,
+        "max": 0.18,
+        "samples": [
+          0.18,
+          0.13,
+          0.14
+        ]
+      }
+    },
+    {
+      "cohort": "varied",
+      "job": "shuffle",
+      "tool": "chopper",
+      "n": 3,
+      "source_lines": [
+        11,
+        19,
+        24
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.7404481410048902,
+        "min": 0.7179785710177384,
+        "max": 0.7674173490377143,
+        "samples": [
+          0.7674173490377143,
+          0.7404481410048902,
+          0.7179785710177384
+        ]
+      },
+      "rss_mib": {
+        "median": 201.11328125,
+        "min": 201.10546875,
+        "max": 201.21484375,
+        "samples": [
+          201.21484375,
+          201.10546875,
+          201.11328125
+        ]
+      },
+      "user_seconds": {
+        "median": 0.44,
+        "min": 0.43,
+        "max": 0.47,
+        "samples": [
+          0.47,
+          0.44,
+          0.43
+        ]
+      },
+      "system_seconds": {
+        "median": 0.27,
+        "min": 0.26,
+        "max": 0.28,
+        "samples": [
+          0.27,
+          0.28,
+          0.26
+        ]
+      },
+      "analysis_seconds": {
+        "median": 0.573291926,
+        "min": 0.565773556,
+        "max": 0.573374669,
+        "samples": [
+          0.573291926,
+          0.565773556,
+          0.573374669
+        ]
+      },
+      "post_analysis_tail_seconds": {
+        "median": 0.1746745850048902,
+        "min": 0.14460390201773843,
+        "max": 0.1941254230377143,
+        "samples": [
+          0.1941254230377143,
+          0.1746745850048902,
+          0.14460390201773843
+        ]
+      },
+      "diagnostics": {
+        "sort_seconds": {
+          "median": 0.013492403,
+          "min": 0.013194137,
+          "max": 0.013696552,
+          "samples": [
+            0.013492403,
+            0.013194137,
+            0.013696552
+          ]
+        },
+        "sort_runs": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "resident_sorts": {
+          "median": 1,
+          "min": 1,
+          "max": 1,
+          "samples": [
+            1,
+            1,
+            1
+          ]
+        },
+        "merge_operations": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_read": {
+          "median": 0,
+          "min": 0,
+          "max": 0,
+          "samples": [
+            0,
+            0,
+            0
+          ]
+        },
+        "temporary_bytes_written": {
+          "median": 135267587,
+          "min": 135267587,
+          "max": 135267587,
+          "samples": [
+            135267587,
+            135267587,
+            135267587
+          ]
+        },
+        "peak_workspace_reserved_bytes": {
+          "median": 199434278,
+          "min": 199434278,
+          "max": 199434278,
+          "samples": [
+            199434278,
+            199434278,
+            199434278
+          ]
+        }
+      }
+    },
+    {
+      "cohort": "varied",
+      "job": "shuffle",
+      "tool": "duckdb",
+      "n": 3,
+      "source_lines": [
+        12,
+        17,
+        25
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": 4096,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.7145031479885802,
+        "min": 0.6461087010102347,
+        "max": 0.7184885940514505,
+        "samples": [
+          0.7145031479885802,
+          0.7184885940514505,
+          0.6461087010102347
+        ]
+      },
+      "rss_mib": {
+        "median": 774.87109375,
+        "min": 691.5703125,
+        "max": 793.06640625,
+        "samples": [
+          774.87109375,
+          793.06640625,
+          691.5703125
+        ]
+      },
+      "user_seconds": {
+        "median": 0.58,
+        "min": 0.53,
+        "max": 0.6,
+        "samples": [
+          0.58,
+          0.53,
+          0.6
+        ]
+      },
+      "system_seconds": {
+        "median": 0.64,
+        "min": 0.58,
+        "max": 0.69,
+        "samples": [
+          0.64,
+          0.69,
+          0.58
+        ]
+      }
+    },
+    {
+      "cohort": "varied",
+      "job": "shuffle",
+      "tool": "qsv",
+      "n": 3,
+      "source_lines": [
+        13,
+        18,
+        23
+      ],
+      "rows": 524288,
+      "input_bytes": 134217749,
+      "memory_setting_mib": null,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 0.7926784789888188,
+        "min": 0.7867407430312596,
+        "max": 0.8267133809858933,
+        "samples": [
+          0.7867407430312596,
+          0.7926784789888188,
+          0.8267133809858933
+        ]
+      },
+      "rss_mib": {
+        "median": 317.5859375,
+        "min": 317.58203125,
+        "max": 317.90234375,
+        "samples": [
+          317.90234375,
+          317.58203125,
+          317.5859375
+        ]
+      },
+      "user_seconds": {
+        "median": 0.76,
+        "min": 0.75,
+        "max": 0.78,
+        "samples": [
+          0.75,
+          0.78,
+          0.76
+        ]
+      },
+      "system_seconds": {
+        "median": 0.39,
+        "min": 0.34,
+        "max": 0.42,
+        "samples": [
+          0.39,
+          0.34,
+          0.42
+        ]
+      }
+    },
+    {
+      "cohort": "qsvlite",
+      "job": "balanced",
+      "tool": "qsv",
+      "n": 3,
+      "source_lines": [
+        3,
+        4,
+        5
+      ],
+      "rows": 8388608,
+      "input_bytes": 2147483669,
+      "memory_setting_mib": null,
+      "requested_workers": 8,
+      "seconds": {
+        "median": 3.385440581012517,
+        "min": 3.369642979989294,
+        "max": 3.4192293970263563,
+        "samples": [
+          3.385440581012517,
+          3.4192293970263563,
+          3.369642979989294
+        ]
+      },
+      "rss_mib": {
+        "median": 21.1640625,
+        "min": 21.14453125,
+        "max": 21.203125,
+        "samples": [
+          21.1640625,
+          21.203125,
+          21.14453125
+        ]
+      },
+      "user_seconds": {
+        "median": 2.43,
+        "min": 2.33,
+        "max": 2.46,
+        "samples": [
+          2.43,
+          2.33,
+          2.46
+        ]
+      },
+      "system_seconds": {
+        "median": 0.94,
+        "min": 0.89,
+        "max": 1.07,
+        "samples": [
+          0.94,
+          1.07,
+          0.89
+        ]
+      }
+    }
+  ],
+  "sources": [
+    {
+      "path": "docs/benchmarks/cross-tool-small-2026-11-18.jsonl",
+      "sha256": "ce1d0e7d10faedf2bc5b8f973807e7893a8be5553719a6a59d0aba1a1781d53f",
+      "original_path": "scratch/tool-comparison/small/results.jsonl"
+    },
+    {
+      "path": "docs/benchmarks/cross-tool-large3-2026-11-18.jsonl",
+      "sha256": "3af05251abf9df34eb3663cf6b8db8fd240d13bed9557268da2d3b6050f29cbf",
+      "original_path": "scratch/tool-comparison/large3/results.jsonl"
+    },
+    {
+      "path": "docs/benchmarks/cross-tool-direct-control-2026-11-18.jsonl",
+      "sha256": "9aac415786253274e67d845c2f58313dfdebce1dd31a9ab186eace9efbcff4c0",
+      "original_path": "scratch/tool-comparison/direct-control/results.jsonl"
+    },
+    {
+      "path": "docs/benchmarks/cross-tool-fisher-control-2026-11-18.jsonl",
+      "sha256": "4374288d2e3ef66523097695980f4c3bc9489c2b9f586959729c6988efc74a82",
+      "original_path": "scratch/tool-comparison/fisher-control/results.jsonl"
+    },
+    {
+      "path": "docs/benchmarks/cross-tool-varied-2026-11-18.jsonl",
+      "sha256": "1efb6c3f29b69f37c3a489704567a9654f9f04a4d9c717d13de2391e05173a1f",
+      "original_path": "scratch/tool-comparison/varied/results.jsonl"
+    },
+    {
+      "path": "docs/benchmarks/cross-tool-qsvlite-2026-11-18.jsonl",
+      "sha256": "7f5a9a846f2208d9b28aecb33fd5fd5c3c663b1b92f9711d59e7d8c7f62c9c50",
+      "original_path": "scratch/tool-comparison/qsvlite/results.jsonl"
+    }
+  ]
+}

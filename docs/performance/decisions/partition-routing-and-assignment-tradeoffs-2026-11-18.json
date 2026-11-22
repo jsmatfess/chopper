@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "partition-routing-and-assignment-tradeoffs-2026-11-18",
+  "title": "Retain Partition/stratified exact publication and reject regressing resource prototypes",
+  "date": "2026-11-18",
+  "subsystem": "execution",
+  "question": "Which native final-publication and routing changes improve OOM pipeline functions without unacceptable regressions?",
+  "disposition": "retain-experimental",
+  "outcome": "mixed",
+  "delivery": "opt-in",
+  "summary": "Unmerged opt-in Partition29.88% and stratifiedexact13.15% lowerelapsed; managedwrites44.41%/16.79%lower. Unstratifiedexact18.73%slower rejected. Immediate routing lowersworkingpeak98.90%/reportedRSS78.72% but5.69%slowermedianfailsdeclaredrule; removed. Separatecross-toolPartitionnative13.760s/Duck21.702s/qsv3.032s. Countproofscreens belowthresholds; no coreAPI integrated.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2GiB/1GiBcgroupnoswap/256MiBtoolsetting1worker;8keyPartition, exact0/50/50with/without8strata. Separate component and input-contract/syncdiagnostics."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows",
+      "wasi-chromium"
+    ],
+    "summary": "RetainedsourceLinuxfmt/default+allfeatureslint/tests/coreWASM passed; freshNTFSnativeWindows allfeatureslint/tests passed; WASIroutingflag smallhostedgraph passed,defaultWASI/hosted restored; defaultnative release rebuilt. Prototypeeager26-testpass distinct from finalsource checks."
+  },
+  "limitations": [
+    "Opt-in unmerged code, no default promotion/deployment/release claim.",
+    "Independentcohorts and n3samples, rangesnotconfidenceintervals; no pooling or tailclaim.",
+    "Managedtemporary beforepublication excludesprivateoutputandlaterencodedcopyread; notphysicalIO,totaldiskorRSS.",
+    "GNUtimeRSSlargestprocess/helperfloor; kernelpeakincludesfilecache; reservationsworkingallocations.",
+    "Localraworiginals unarchived; historicalhydrationfailureblockscompletecatalog/registry/viewsrefresh."
+  ],
+  "exclusions": [
+    "Warmups, supersededoversortedDuckwarmup and3failedtiny partitionedCOPY adapters excluded.",
+    "Hotcomponent countproof/digest screens notwholejob orOOM speedups.",
+    "Highcardinalitylargeeagermatrix notlaunchedafterlowfanoutacceptancerulefailed; prototypefallbackcorrectnessonly."
+  ],
+  "reopen_when": "Measure boundedfinalwriters forknownfanout withcaps/metadata/atomiccommit andhighfanoutcleanup; profilepackedrouting/perrecordcost beforebatching. Reopen immediate-routing only for a concrete sharedcapacity/completion workload and declaredtradeoffs, notanunchangedthresholdsweep. Continueotheroperation/mode coverage inissue20.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#partition-routing-and-assignment-tradeoffs-2026-11-18",
+      "sha256": "5087bfe4e92ec0e871a3d68f73f91356e1d15e4dfde78a5b836140b3bd20b5f1"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/partition-routing-summary-2026-11-18.json",
+      "sha256": "3d38b488a702af3f8675345706a75e64a5c7f9ef8b2ed358c1e89aeb15ee7f84"
+    },
+    {
+      "path": "docs/benchmarks/partition-routing-checks-summary-2026-11-18.json",
+      "sha256": "b2db8381e39584e0fab6bd65ba6d70303b0d2e852ec64ca5af27c6b6d4c4b61b"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

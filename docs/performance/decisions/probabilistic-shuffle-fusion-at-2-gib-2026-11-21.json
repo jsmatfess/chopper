@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "probabilistic-shuffle-fusion-at-2-gib-2026-11-21",
+  "title": "Retain prepared-spill probabilistic shuffle fusion at 2 GiB",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Can the integrated actual-spill-owner fusion justify opt-in eligibility against the original stages when output and competitor requests are matched?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "opt-in",
+  "summary": "Linux native opt-in for the proven plain retained shape. All three pairs improved; elapsed fell 18.4%, CPU 11.5% and managed temporary traffic 32.2%. The held-peer control improves completion at three fixed points.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2 GiB, four partition parents, stratified 80/20/0 probabilistic assignment followed by explicit Uniform, one worker, 128 MiB job and 1 GiB no-swap cgroup.",
+      "70,003 plain rows, a 32 MiB tracked shared pool, three fixed peer requests and separate fault injection."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Three complete pairs with exact seeded outputs and independent fields/ID/cap verification, three held-peer pairs, cancellation and pre-emission typed retry, terminal sink error and original observation indices. Feature workspace Clippy passed. One final-layout 2 GiB transfer pair preserves exactness and benefit, and all four previously affected tiny-budget controls pass."
+  },
+  "limitations": [
+    "Uncontrolled WSL2 backing cache, one worker and one timed workload.",
+    "Fixed peer requests and tested callback positions do not establish arbitrary admission-domain inclusion.",
+    "More initial runs and temporary files offset part of the traffic benefit."
+  ],
+  "exclusions": [
+    "Native Windows and browser acceptance of the integrated revision and automatic/default selection."
+  ],
+  "reopen_when": "Any expansion needs a workload-specific benefit and native Windows or browser acceptance of the actual integration, including observation and retained owner lifetime.",
+  "supersedes": [
+    "fusion-prepared-spill-2026-11-05"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#probabilistic-shuffle-fusion-at-2-gib-2026-11-21",
+      "sha256": "dfcea56ab4ad89393d3f4ce0b8cd549e47fcd1cd5fec5f322f9939fca955bf76"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/probabilistic-shuffle-fusion-2gib-2026-11-21.json",
+      "sha256": "dde5c51ad0ad57ae40afe2ae21c1e34c72a472e03ed9defce3af09b5538871f1"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/execution-decisions.md",
+    "docs/validation.md"
+  ]
+}

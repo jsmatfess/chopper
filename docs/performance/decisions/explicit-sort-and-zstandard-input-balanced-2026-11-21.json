@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "explicit-sort-and-zstandard-input-balanced-2026-11-21",
+  "title": "Retain counted Balanced for Zstandard input",
+  "date": "2026-11-21",
+  "subsystem": "input",
+  "question": "Can a second checked input decode avoid the decoded Dataset spool for native Balanced?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "Retain the opt-in native Zstandard input path. The measured Balanced job is 24.4% faster while CLI CPU rises 19.9%. Remove the independently rejected one-worker serial Sort guard.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2 GiB decoded, varied checksummed Zstandard input, eight plain Balanced outputs, 1 GiB cgroup without swap, 256 MiB engine setting and one worker."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "summary": "Exact fields, quotas, encounter order, digest, lineage, CSV byte caps and cleanup validated per job. Focused truncation, checksum rejection and prepared output comparison pass. Linux default and all-feature workspace tests and lint, WASI compile, native Windows focused contracts, and native default release restoration pass. WASI coverage is compile only for this source revision."
+  },
+  "limitations": [
+    "One synthetic varied input and three alternating pairs. WSL backing caches are uncontrolled.",
+    "Managed spool counters exclude physical I/O, input reads and final output bytes.",
+    "Recorded timings use the original selector expression. The later lint revision preserves its boolean behavior."
+  ],
+  "exclusions": [
+    "Preflight, warmup, profiler run and initial fixture errors."
+  ],
+  "reopen_when": "Require representative compressed inputs and platform transfer before considering broader activation.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#explicit-sort-and-zstandard-input-balanced-2026-11-21",
+      "sha256": "e6c3f9dea70119c709810123523056870a30b2c570ec00f39ff989347009d2da"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/pipeline-sorting-source-codec-summary-2026-11-21.json",
+      "sha256": "486ac1486a9aa0c5d5527ff3c3cb37bdbc939464794358a481528276d9bf2178"
+    }
+  ],
+  "contracts": [
+    "docs/direct-execution.md",
+    "docs/specification.md"
+  ]
+}

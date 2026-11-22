@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "terminal-uniform-short-tail-at-40-gib-2026-11-21",
+  "title": "Qualify short-tail Uniform merging at 40 GiB",
+  "date": "2026-11-21",
+  "subsystem": "storage",
+  "question": "Does the 8 GiB opt-in retention decision transfer structurally and in complete-job time to a 40 GiB run with a 256 MiB engine setting?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "One matched 40 GiB pair reduced elapsed 5.83%, CPU 1.09%, and temporary reads/writes 16.84%. Cache refaults rose 38.94%. The original 8 GiB retention remains Linux raw opt-in.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "40 GiB fixed-width CSV, terminal Uniform and eight exact parts, 256 MiB engine, one worker, hard 1 GiB cgroup without swap."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "summary": "Exact independent 40 GiB oracle and native manifest cleanup. Linux default, all-feature, and raw-feature full lint/tests pass, portable WASM and WASI compilation pass. Separate Windows ordinary storage/direct checks with Linux route inactive. Default native binaries restored."
+  },
+  "limitations": [
+    "Single full matched pair with control first and uncontrolled WSL2 backing cache.",
+    "Windows validates fallback compilation and ordinary behavior. The performance path is raw native Linux only.",
+    "Descriptor observation is a point, not a maximum."
+  ],
+  "exclusions": [
+    "Large elapsed and CPU comparison excludes fixture identity and verification. Filesystem counters and file-cache refaults are distinct from managed logical traffic."
+  ],
+  "reopen_when": "Require new platform, workload and resource eligibility evidence before considering automatic selection or default delivery.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#terminal-uniform-short-tail-at-40-gib-2026-11-21",
+      "sha256": "f985e972ddd35a6356a99a08e08e90f0b2d9ee140e8229270b26bff8c01d276e"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/terminal-uniform-short-tail-40gib-summary-2026-11-21.json",
+      "sha256": "67aa5c7445274e694b1480f32485a747cd639ff6aec758f99a02873388a91b63"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/execution-decisions.md"
+  ]
+}

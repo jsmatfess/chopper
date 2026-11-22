@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "counted-balanced-first-pass-fingerprint-2026-11-21",
+  "title": "Retain removal of singleton Balanced first-pass fingerprint",
+  "date": "2026-11-21",
+  "subsystem": "input",
+  "question": "Does omitting the count-pass digest reduce cost when both native singleton passes retain strict validation and independent row, header and metadata checks?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "The user-authorized source contract change reduced median elapsed 14.70% and median process CPU 18.40% across three verified 8 GiB pairs. Integrated within existing opt-in counted singleton Balanced and removed the temporary ablation flag.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "8 GiB repeated plain UTF-8, 8 equal consecutive parts, 1200 MiB actual cap, one worker, m256, hard 1 GiB/no swap."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "summary": "Matched ablation controls and all output oracles passed. Final Linux formatting, default/all-feature lint/tests, WASM and WASI compile and release restore passed. Native Windows focused direct-run suite and default release passed."
+  },
+  "limitations": [
+    "Timed speed is for one repeated plain workload on WSL2/ext4.",
+    "An edit preserving decoded header, row count, byte length and mtime may go undetected.",
+    "Timing does not cover different codecs or native Windows."
+  ],
+  "exclusions": [
+    "Small preflights, full warmup pair and first failed test assertion about the existing UTF-8 decoder wording."
+  ],
+  "reopen_when": "Require platform/shape calibration before broader counted dispatch or further change to the source proof.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#counted-balanced-first-pass-fingerprint-2026-11-21",
+      "sha256": "30976da7557fd95967613751dd9d695f22f625dea6332367bccd05be0c5dfa22"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/counted-balanced-first-pass-fingerprint-summary-2026-11-21.json",
+      "sha256": "b6fa578a72ee0ab30e46cd54c1972a8544bd6a5cf2bbae7e730feb7ba17e743d"
+    },
+    {
+      "path": "docs/benchmarks/counted-balanced-first-pass-fingerprint-validation-2026-11-21.json",
+      "sha256": "d3fd0f14c9a85a96625ed0b6c8695cde5b9601b98d28d80f31ab927d23305955"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/execution-decisions.md"
+  ]
+}

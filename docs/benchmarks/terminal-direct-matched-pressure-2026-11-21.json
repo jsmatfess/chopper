@@ -1,0 +1,1544 @@
+{
+  "schema_version": 1,
+  "issue": 19,
+  "source_head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+  "source_tree_has_local_changes": true,
+  "platform": "Native Linux/WSL2, Rust 1.99.1",
+  "measurement": "Paired complete in-process correctness and tracked-admission observations",
+  "workload": {
+    "rows": 70003,
+    "parents": 4,
+    "probabilistic_percent": [
+      80,
+      20,
+      0
+    ],
+    "internal_seed": "terminal-direct-shared-frontier-v1",
+    "workers": 1,
+    "job_mib": 32,
+    "shared_mib": 32,
+    "row_limit": 4000,
+    "csv_byte_limit": 65536
+  },
+  "primary": {
+    "returncode": 0,
+    "scenarios": [
+      {
+        "boundary": "selection",
+        "request": 0,
+        "cancel": false
+      },
+      {
+        "boundary": "selection",
+        "request": 33488896,
+        "cancel": false
+      },
+      {
+        "boundary": "selection",
+        "request": 33456128,
+        "cancel": false
+      },
+      {
+        "boundary": "selection",
+        "request": 33423360,
+        "cancel": false
+      },
+      {
+        "boundary": "selection",
+        "request": 33292288,
+        "cancel": false
+      },
+      {
+        "boundary": "selection",
+        "request": 33030144,
+        "cancel": false
+      },
+      {
+        "boundary": "selection",
+        "request": 32505856,
+        "cancel": false
+      },
+      {
+        "boundary": "selection",
+        "request": 29360128,
+        "cancel": false
+      },
+      {
+        "boundary": "emission",
+        "request": 33275904,
+        "cancel": false
+      },
+      {
+        "boundary": "emission",
+        "request": 33264640,
+        "cancel": false
+      },
+      {
+        "boundary": "emission",
+        "request": 33247232,
+        "cancel": false
+      },
+      {
+        "boundary": "emission",
+        "request": 33161216,
+        "cancel": false
+      },
+      {
+        "boundary": "emission",
+        "request": 33030144,
+        "cancel": false
+      },
+      {
+        "boundary": "emission",
+        "request": 32505856,
+        "cancel": false
+      },
+      {
+        "boundary": "publication",
+        "request": 33476608,
+        "cancel": false
+      },
+      {
+        "boundary": "publication",
+        "request": 33464320,
+        "cancel": false
+      },
+      {
+        "boundary": "publication",
+        "request": 33456128,
+        "cancel": false
+      },
+      {
+        "boundary": "publication",
+        "request": 33423360,
+        "cancel": false
+      },
+      {
+        "boundary": "publication",
+        "request": 33357824,
+        "cancel": false
+      },
+      {
+        "boundary": "publication",
+        "request": 33292288,
+        "cancel": false
+      },
+      {
+        "boundary": "publication",
+        "request": 33161216,
+        "cancel": false
+      },
+      {
+        "boundary": "publication",
+        "request": 33030144,
+        "cancel": false
+      },
+      {
+        "boundary": "publication",
+        "request": 32505856,
+        "cancel": false
+      },
+      {
+        "boundary": "emission",
+        "request": 33247232,
+        "cancel": true
+      },
+      {
+        "boundary": "publication",
+        "request": 33464320,
+        "cancel": true
+      },
+      {
+        "boundary": "publication",
+        "request": 33030144,
+        "cancel": false,
+        "race": true
+      }
+    ],
+    "observations": [
+      {
+        "case": 0,
+        "direct": false,
+        "request_bytes": 0,
+        "grant_bytes": 0,
+        "state": "published",
+        "peak_bytes": 8594248,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 0,
+        "direct": true,
+        "request_bytes": 0,
+        "grant_bytes": 0,
+        "state": "published",
+        "peak_bytes": 8594248,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 1,
+        "direct": false,
+        "request_bytes": 33488896,
+        "grant_bytes": 33488896,
+        "state": "admission-denied",
+        "peak_bytes": 33496398,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 1,
+        "direct": true,
+        "request_bytes": 33488896,
+        "grant_bytes": 33488896,
+        "state": "admission-denied",
+        "peak_bytes": 33504617,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 2,
+        "direct": false,
+        "request_bytes": 33456128,
+        "grant_bytes": 33456128,
+        "state": "admission-denied",
+        "peak_bytes": 33537392,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 2,
+        "direct": true,
+        "request_bytes": 33456128,
+        "grant_bytes": 33456128,
+        "state": "admission-denied",
+        "peak_bytes": 33544161,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 3,
+        "direct": false,
+        "request_bytes": 33423360,
+        "grant_bytes": 33423360,
+        "state": "admission-denied",
+        "peak_bytes": 33504624,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 3,
+        "direct": true,
+        "request_bytes": 33423360,
+        "grant_bytes": 33423360,
+        "state": "admission-denied",
+        "peak_bytes": 33511393,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 4,
+        "direct": false,
+        "request_bytes": 33292288,
+        "grant_bytes": 33292288,
+        "state": "admission-denied",
+        "peak_bytes": 33507154,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 4,
+        "direct": true,
+        "request_bytes": 33292288,
+        "grant_bytes": 33292288,
+        "state": "admission-denied",
+        "peak_bytes": 33508233,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 5,
+        "direct": false,
+        "request_bytes": 33030144,
+        "grant_bytes": 33030144,
+        "state": "published",
+        "peak_bytes": 33378460,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            33319340,
+            33378460
+          ],
+          [
+            "publication",
+            33101728,
+            33378460
+          ]
+        ]
+      },
+      {
+        "case": 5,
+        "direct": true,
+        "request_bytes": 33030144,
+        "grant_bytes": 33030144,
+        "state": "published",
+        "peak_bytes": 33319635,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            33319635,
+            33319635
+          ],
+          [
+            "publication",
+            33109913,
+            33319635
+          ]
+        ]
+      },
+      {
+        "case": 6,
+        "direct": false,
+        "request_bytes": 32505856,
+        "grant_bytes": 32505856,
+        "state": "published",
+        "peak_bytes": 32854172,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            32795052,
+            32854172
+          ],
+          [
+            "publication",
+            32577440,
+            32854172
+          ]
+        ]
+      },
+      {
+        "case": 6,
+        "direct": true,
+        "request_bytes": 32505856,
+        "grant_bytes": 32505856,
+        "state": "published",
+        "peak_bytes": 32795347,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            32795347,
+            32795347
+          ],
+          [
+            "publication",
+            32585625,
+            32795347
+          ]
+        ]
+      },
+      {
+        "case": 7,
+        "direct": false,
+        "request_bytes": 29360128,
+        "grant_bytes": 29360128,
+        "state": "published",
+        "peak_bytes": 29708444,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            29649324,
+            29708444
+          ],
+          [
+            "publication",
+            29431712,
+            29708444
+          ]
+        ]
+      },
+      {
+        "case": 7,
+        "direct": true,
+        "request_bytes": 29360128,
+        "grant_bytes": 29360128,
+        "state": "published",
+        "peak_bytes": 29649619,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            29649619,
+            29649619
+          ],
+          [
+            "publication",
+            29439897,
+            29649619
+          ]
+        ]
+      },
+      {
+        "case": 8,
+        "direct": false,
+        "request_bytes": 33275904,
+        "grant_bytes": 0,
+        "state": "published",
+        "peak_bytes": 8594248,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 8,
+        "direct": true,
+        "request_bytes": 33275904,
+        "grant_bytes": 0,
+        "state": "published",
+        "peak_bytes": 8594248,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 9,
+        "direct": false,
+        "request_bytes": 33264640,
+        "grant_bytes": 33264640,
+        "state": "published",
+        "peak_bytes": 33553836,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            33336224,
+            33553836
+          ]
+        ]
+      },
+      {
+        "case": 9,
+        "direct": true,
+        "request_bytes": 33264640,
+        "grant_bytes": 33264640,
+        "state": "published",
+        "peak_bytes": 33554131,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            33344409,
+            33554131
+          ]
+        ]
+      },
+      {
+        "case": 10,
+        "direct": false,
+        "request_bytes": 33247232,
+        "grant_bytes": 33247232,
+        "state": "published",
+        "peak_bytes": 33536428,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            33318816,
+            33536428
+          ]
+        ]
+      },
+      {
+        "case": 10,
+        "direct": true,
+        "request_bytes": 33247232,
+        "grant_bytes": 33247232,
+        "state": "published",
+        "peak_bytes": 33536723,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            33327001,
+            33536723
+          ]
+        ]
+      },
+      {
+        "case": 11,
+        "direct": false,
+        "request_bytes": 33161216,
+        "grant_bytes": 33161216,
+        "state": "published",
+        "peak_bytes": 33450412,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            33232800,
+            33450412
+          ]
+        ]
+      },
+      {
+        "case": 11,
+        "direct": true,
+        "request_bytes": 33161216,
+        "grant_bytes": 33161216,
+        "state": "published",
+        "peak_bytes": 33450707,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            33240985,
+            33450707
+          ]
+        ]
+      },
+      {
+        "case": 12,
+        "direct": false,
+        "request_bytes": 33030144,
+        "grant_bytes": 33030144,
+        "state": "published",
+        "peak_bytes": 33319340,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            33101728,
+            33319340
+          ]
+        ]
+      },
+      {
+        "case": 12,
+        "direct": true,
+        "request_bytes": 33030144,
+        "grant_bytes": 33030144,
+        "state": "published",
+        "peak_bytes": 33319635,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            33109913,
+            33319635
+          ]
+        ]
+      },
+      {
+        "case": 13,
+        "direct": false,
+        "request_bytes": 32505856,
+        "grant_bytes": 32505856,
+        "state": "published",
+        "peak_bytes": 32795052,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            32577440,
+            32795052
+          ]
+        ]
+      },
+      {
+        "case": 13,
+        "direct": true,
+        "request_bytes": 32505856,
+        "grant_bytes": 32505856,
+        "state": "published",
+        "peak_bytes": 32795347,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            32585625,
+            32795347
+          ]
+        ]
+      },
+      {
+        "case": 14,
+        "direct": false,
+        "request_bytes": 33476608,
+        "grant_bytes": 33476608,
+        "state": "admission-denied",
+        "peak_bytes": 33548301,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 14,
+        "direct": true,
+        "request_bytes": 33476608,
+        "grant_bytes": 0,
+        "state": "published",
+        "peak_bytes": 8594248,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 15,
+        "direct": false,
+        "request_bytes": 33464320,
+        "grant_bytes": 33464320,
+        "state": "admission-denied",
+        "peak_bytes": 33544205,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 15,
+        "direct": true,
+        "request_bytes": 33464320,
+        "grant_bytes": 33464320,
+        "state": "admission-denied",
+        "peak_bytes": 33552343,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 16,
+        "direct": false,
+        "request_bytes": 33456128,
+        "grant_bytes": 33456128,
+        "state": "admission-denied",
+        "peak_bytes": 33536013,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 16,
+        "direct": true,
+        "request_bytes": 33456128,
+        "grant_bytes": 33456128,
+        "state": "admission-denied",
+        "peak_bytes": 33544151,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 17,
+        "direct": false,
+        "request_bytes": 33423360,
+        "grant_bytes": 33423360,
+        "state": "admission-denied",
+        "peak_bytes": 33503245,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 17,
+        "direct": true,
+        "request_bytes": 33423360,
+        "grant_bytes": 33423360,
+        "state": "admission-denied",
+        "peak_bytes": 33511383,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 18,
+        "direct": false,
+        "request_bytes": 33357824,
+        "grant_bytes": 33357824,
+        "state": "admission-denied",
+        "peak_bytes": 33437709,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 18,
+        "direct": true,
+        "request_bytes": 33357824,
+        "grant_bytes": 33357824,
+        "state": "admission-denied",
+        "peak_bytes": 33445847,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 19,
+        "direct": false,
+        "request_bytes": 33292288,
+        "grant_bytes": 33292288,
+        "state": "admission-denied",
+        "peak_bytes": 33541888,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 19,
+        "direct": true,
+        "request_bytes": 33292288,
+        "grant_bytes": 33292288,
+        "state": "published",
+        "peak_bytes": 33550026,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 20,
+        "direct": false,
+        "request_bytes": 33161216,
+        "grant_bytes": 33161216,
+        "state": "published",
+        "peak_bytes": 33442963,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 20,
+        "direct": true,
+        "request_bytes": 33161216,
+        "grant_bytes": 33161216,
+        "state": "published",
+        "peak_bytes": 33418954,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 21,
+        "direct": false,
+        "request_bytes": 33030144,
+        "grant_bytes": 33030144,
+        "state": "published",
+        "peak_bytes": 33311891,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 21,
+        "direct": true,
+        "request_bytes": 33030144,
+        "grant_bytes": 33030144,
+        "state": "published",
+        "peak_bytes": 33287882,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 22,
+        "direct": false,
+        "request_bytes": 32505856,
+        "grant_bytes": 32505856,
+        "state": "published",
+        "peak_bytes": 32787603,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 22,
+        "direct": true,
+        "request_bytes": 32505856,
+        "grant_bytes": 32505856,
+        "state": "published",
+        "peak_bytes": 32763594,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 23,
+        "direct": false,
+        "request_bytes": 33247232,
+        "grant_bytes": 33247232,
+        "state": "cancelled",
+        "peak_bytes": 33536428,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 23,
+        "direct": true,
+        "request_bytes": 33247232,
+        "grant_bytes": 33247232,
+        "state": "cancelled",
+        "peak_bytes": 33536723,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 24,
+        "direct": false,
+        "request_bytes": 33464320,
+        "grant_bytes": 33464320,
+        "state": "cancelled",
+        "peak_bytes": 33535904,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 24,
+        "direct": true,
+        "request_bytes": 33464320,
+        "grant_bytes": 33464320,
+        "state": "cancelled",
+        "peak_bytes": 33544089,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 25,
+        "direct": false,
+        "request_bytes": 33030144,
+        "grant_bytes": 33030144,
+        "state": "destination-rejected",
+        "peak_bytes": 33101728,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 25,
+        "direct": true,
+        "request_bytes": 33030144,
+        "grant_bytes": 33030144,
+        "state": "destination-rejected",
+        "peak_bytes": 33287882,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      }
+    ],
+    "recovered_log_sha256": "ce5ac82c468740e091a22af6eea7d4afe8e83b4a4ec048ab71e74cf7ee2cd907"
+  },
+  "emission_edge": {
+    "returncode": 0,
+    "scenarios": [
+      {
+        "boundary": "selection",
+        "request": 0,
+        "cancel": false
+      },
+      {
+        "boundary": "emission",
+        "request": 33265088,
+        "cancel": false
+      }
+    ],
+    "observations": [
+      {
+        "case": 0,
+        "direct": false,
+        "request_bytes": 0,
+        "grant_bytes": 0,
+        "state": "published",
+        "peak_bytes": 8594248,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            71584,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 0,
+        "direct": true,
+        "request_bytes": 0,
+        "grant_bytes": 0,
+        "state": "published",
+        "peak_bytes": 8594248,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      },
+      {
+        "case": 1,
+        "direct": false,
+        "request_bytes": 33265088,
+        "grant_bytes": 33265088,
+        "state": "published",
+        "peak_bytes": 33554284,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289196,
+            8594248
+          ],
+          [
+            "publication",
+            33336672,
+            33554284
+          ]
+        ]
+      },
+      {
+        "case": 1,
+        "direct": true,
+        "request_bytes": 33265088,
+        "grant_bytes": 0,
+        "state": "published",
+        "peak_bytes": 8594248,
+        "boundaries": [
+          [
+            "selection",
+            7502,
+            8594248
+          ],
+          [
+            "emission",
+            289491,
+            8594248
+          ],
+          [
+            "publication",
+            79769,
+            8594248
+          ]
+        ]
+      }
+    ]
+  },
+  "verified": {
+    "raw_input_visits_per_job": 1,
+    "successful_seeded_bytes_and_order": true,
+    "logical_analysis_parity": true,
+    "cancelled_prepublication": true,
+    "late_incumbent_preserved": true,
+    "all_private_storage_and_grants_released": true
+  },
+  "provenance": {
+    "direct-pressure-plan-v1.json": {
+      "path": "scratch/issue-avenues-36h-20261121/direct-pressure-plan-v1.json",
+      "sha256": "f4f045c7e25467d44db0c4f3073bd683ecba1f8e45a3ede2a1abc7e22d4fec53"
+    },
+    "direct-pressure-batch-v1/status.json": {
+      "path": "scratch/issue-avenues-36h-20261121/direct-pressure-batch-v1/status.json",
+      "sha256": "aac40cdca0a5253fa912f7ae64a9ba4ffab3857a7916284fa2ad2d3baa1767be"
+    },
+    "direct-pressure-batch-v1/2-stdout.log": {
+      "path": "scratch/issue-avenues-36h-20261121/direct-pressure-batch-v1/2-stdout.log",
+      "sha256": "ce5ac82c468740e091a22af6eea7d4afe8e83b4a4ec048ab71e74cf7ee2cd907"
+    },
+    "direct-pressure-batch-v1/2-stderr.log": {
+      "path": "scratch/issue-avenues-36h-20261121/direct-pressure-batch-v1/2-stderr.log",
+      "sha256": "7baade803f81b815b52057105b67d4d51ae5727feaf11c8e70bf7215452115d5"
+    },
+    "direct-pressure-evidence-plan-v1.json": {
+      "path": "scratch/issue-avenues-36h-20261121/direct-pressure-evidence-plan-v1.json",
+      "sha256": "d91ab384af0496b47949454cb780ea1243e41d4fd9532a931a491b8c971f55a7"
+    },
+    "direct-pressure-evidence-batch-v1/status.json": {
+      "path": "scratch/issue-avenues-36h-20261121/direct-pressure-evidence-batch-v1/status.json",
+      "sha256": "05a6edbe1f44c24467fa2be312148e82498f27ee1906b246583226f368df59e6"
+    },
+    "direct-pressure-evidence-batch-v1/2-stdout.log": {
+      "path": "scratch/issue-avenues-36h-20261121/direct-pressure-evidence-batch-v1/2-stdout.log",
+      "sha256": "48cdb214523c17cf1aabb1f15e863a1ffd9c438d3c9b318eb8ce84d7b4258c49"
+    },
+    "direct-pressure-v5-probe": {
+      "path": "scratch/issue-avenues-36h-20261121/direct-pressure-v5-probe",
+      "sha256": "6e1758ca47aa1ad274ffddc0f4c27a53610c5bc58dc085c142006cd467ec1697"
+    },
+    "direct-pressure-probe-v5.rs": {
+      "path": "scratch/issue-avenues-36h-20261121/direct-pressure-probe-v5.rs",
+      "sha256": "78bf6339ad227dd0634bc955cfec0e6e3998b87294cf4330dc9e8ffdc9ab1bb2"
+    },
+    "direct-pressure-injection.txt": {
+      "path": "scratch/issue-avenues-36h-20261121/direct-pressure-injection.txt",
+      "sha256": "e1ae2a70136e56bd8792ea5c68c67d6ed4760ad00d9e444fafc14dd8eac3b227"
+    }
+  },
+  "limitations": [
+    "Two serialized callback arms in one runtime. The peer has a separate workspace in the same ledger.",
+    "The probe does not simulate arbitrary interleavings or establish an RSS or elapsed comparison.",
+    "The first wrapper missed one libtest-prefixed log line. The complete Rust probe passed. The raw log recovery passed without replaying the primary jobs."
+  ]
+}

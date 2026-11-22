@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "terminal-uniform-kernel-read-ahead-2026-11-21",
+  "title": "Reject suppressed kernel read-ahead on wide Uniform spill readers",
+  "date": "2026-11-21",
+  "subsystem": "storage",
+  "question": "Can per-descriptor advice reduce constrained time or process CPU during the wide single terminal merge?",
+  "disposition": "reject",
+  "outcome": "unfavorable",
+  "delivery": "unapplied",
+  "summary": "Median elapsed rose 57.29% and process CPU rose 6.34%. File-cache refault events fell 92.74% with unchanged managed spill traffic. Removed the opt-in candidate.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "8 GiB Uniform Shuffle to eight exact Balanced parts. 197 runs, one merge, one worker, m256, 1 GiB hard without swap."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Three alternating fully verified pairs. Separate 2 GiB instrumented run verified all 197 successful advisory calls on controlled spill descriptors."
+  },
+  "limitations": [
+    "WSL2/ext4 and one synthetic workload.",
+    "Kernel event and GNU time file input counters have distinct scopes from managed data movement and physical I/O."
+  ],
+  "exclusions": [
+    "Warmup pair, small preflight, separate 2 GiB advice-call qualification and separate 8 GiB CPU profile."
+  ],
+  "reopen_when": "Keep this advice disabled for the measured path. Test different application-level read batching separately if budget and traffic support it.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#terminal-uniform-kernel-read-ahead-2026-11-21",
+      "sha256": "d6893b46db7ca85e57245718ad2a38900a10efa985034047da396549bd33b1c4"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/terminal-uniform-kernel-read-ahead-summary-2026-11-21.json",
+      "sha256": "225c9676645ae471c00689d18a839acdb72cc507a8d4e1304921d7af8da77fb0"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/execution-decisions.md"
+  ]
+}

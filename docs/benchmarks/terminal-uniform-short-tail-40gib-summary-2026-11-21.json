@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "terminal_uniform_short_tail_holdout_40gib",
+  "scoped_primary_8gib": {
+    "path": "scratch/uniform-tail-merge-resume-20261121/summary-v1.json",
+    "sha256": "8961946e649ef320a5b0af00efa77b923b4a1df63f15498bbcda5868b4a33d84"
+  },
+  "decision": {
+    "path": "scratch/uniform-tail-merge-resume-20261121/holdout-decision-v1.json",
+    "sha256": "b4c68f25d695c918be86b5ae2502ebb5b5bbd988b5e955cfd7345cbb285a79a8"
+  },
+  "batch": {
+    "path": "scratch/uniform-tail-merge-resume-20261121/holdout-batch-v1/status.json",
+    "sha256": "ac98a96bdc92dd381269b85e264d895f257ebe503b18687877ce13649bd79716"
+  },
+  "pair": {
+    "path": "scratch/uniform-tail-merge-resume-20261121/holdout-40gib-v1/pair.json",
+    "sha256": "85d3c99325727e55d410908103adb95d2acc1c3f3429a3714df08c29023b4e13"
+  },
+  "samples": {
+    "control": {
+      "elapsed_seconds": 575.9762560019735,
+      "cpu_seconds": 351.08000000000004,
+      "user_cpu_seconds": 211.72,
+      "system_cpu_seconds": 139.36,
+      "peak_rss_kib": 87960,
+      "filesystem_inputs": 623408640,
+      "filesystem_outputs": 278363640,
+      "working_peak_bytes": 67448648,
+      "managed_writes": 99192634864,
+      "managed_reads": 99192633344,
+      "merges": 4,
+      "merge_inputs": 987,
+      "sort_runs": 984,
+      "refaults": 45127662,
+      "direct_page_scans": 112994224,
+      "cgroup_peak_bytes": 1073741824,
+      "verification": {
+        "path": "scratch/uniform-tail-merge-resume-20261121/holdout-40gib-v1/control/verification.json",
+        "sha256": "eca2274ef454bb0387d4b02543df18dcd8c262bd16bd08e5ee8e609f18621b47"
+      },
+      "attempt": {
+        "path": "scratch/uniform-tail-merge-resume-20261121/holdout-40gib-v1/control/attempt.json",
+        "sha256": "a8035c8fe488e8e993efbea586fdbcfbd62400cf3f9056f7e4f4fe3627b30f0c"
+      },
+      "job": {
+        "path": "scratch/uniform-tail-merge-resume-20261121/holdout-40gib-v1/control/job.json",
+        "sha256": "e464d398382d55538e91ed989d9776adbdac796c92ebc0275b4557171681094c"
+      }
+    },
+    "candidate": {
+      "elapsed_seconds": 542.3880447290139,
+      "cpu_seconds": 347.26,
+      "user_cpu_seconds": 200.91,
+      "system_cpu_seconds": 146.35,
+      "peak_rss_kib": 86740,
+      "filesystem_inputs": 746567080,
+      "filesystem_outputs": 245685184,
+      "working_peak_bytes": 67649752,
+      "managed_writes": 82486617304,
+      "managed_reads": 82486615784,
+      "merges": 2,
+      "merge_inputs": 985,
+      "sort_runs": 984,
+      "refaults": 62698208,
+      "direct_page_scans": 124082548,
+      "cgroup_peak_bytes": 1073741824,
+      "verification": {
+        "path": "scratch/uniform-tail-merge-resume-20261121/holdout-40gib-v1/candidate/verification.json",
+        "sha256": "5a2749958a75d77b3af31a0e43ed2764dec56c9aef73a0a79f29d88e43c018e5"
+      },
+      "attempt": {
+        "path": "scratch/uniform-tail-merge-resume-20261121/holdout-40gib-v1/candidate/attempt.json",
+        "sha256": "cafd86cc169181c38f946e3ff47375590676c845f6ea138a9e1ff61030ee6aab"
+      },
+      "job": {
+        "path": "scratch/uniform-tail-merge-resume-20261121/holdout-40gib-v1/candidate/job.json",
+        "sha256": "6150a487ac4d760b990d22e75876181f8d0a4ef658c911d768081e2fdfbee232"
+      }
+    }
+  },
+  "relative_percent": {
+    "elapsed_seconds": -5.831527067817966,
+    "cpu_seconds": -1.0880710949071615,
+    "user_cpu_seconds": -5.105800113357262,
+    "system_cpu_seconds": 5.01578645235361,
+    "peak_rss_kib": -1.3869940882219156,
+    "filesystem_inputs": 19.755651766391935,
+    "filesystem_outputs": -11.739484366564545,
+    "working_peak_bytes": 0.29815868214289054,
+    "managed_writes": -16.84199394733804,
+    "managed_reads": -16.841994205420008,
+    "merges": -50.0,
+    "merge_inputs": -0.20263424518743856,
+    "sort_runs": 0.0,
+    "refaults": 38.935201207631806,
+    "direct_page_scans": 9.813177707207398,
+    "cgroup_peak_bytes": 0.0
+  },
+  "scope": "Single 40 GiB full pair. Same fixed-width CSV and exact eight parts, hard 1 GiB no swap, one worker, 256 MiB engine setting. Full independent oracle and publication checks outside clock."
+}

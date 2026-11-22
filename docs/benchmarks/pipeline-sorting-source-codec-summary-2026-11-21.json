@@ -1,0 +1,369 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "pipeline-sorting-and-source-codec",
+  "scope": "Two independent Linux WSL2/ext4 cgroup cohorts, 1 GiB no swap, 256 MiB engine setting, one worker. Excludes preflight, warmup and instrumented jobs. Logical managed traffic is distinct from final CSV and physical I/O.",
+  "comparisons": [
+    {
+      "cell": "explicit-key-sort",
+      "selection": {
+        "path": "scratch/sort-resume-20261121/serial-sort-summary-v1.json",
+        "sha256": "2fec5557ef02153cd37d72c86c815e25351555eb3371a2f5d969d528740ad288"
+      },
+      "builds": {
+        "control": {
+          "binary_sha256": "f61e97f30d8f5d9a8dfcf97ecc19b8f2e0d83d91efe49587341c518d5e01c045",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-retained-exact-writers",
+            "experimental-single-final-catalog",
+            "experimental-single-catalog-capacity",
+            "experimental-batched-final-sync"
+          ],
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "profile": "workspace default release, --locked",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "receipt": {
+            "path": "scratch/oom-iteration/serial-key-sort-control-v1-build.json",
+            "sha256": "f45fa2011ce14bdb2d304bd29f385d4af1fbd7ca6b2aa5ecc821f586dca644de"
+          },
+          "source_archive_sha256": "ca61d01060272c7d0f66833d8ae0aba09f2dfd2565d103541c59607a0d9d8d8e"
+        },
+        "candidate": {
+          "binary_sha256": "12403d94f87d7d8b37aa1e091ae9b2070c3d9096c1c4787231cc129f4d9057f0",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-retained-exact-writers",
+            "experimental-single-final-catalog",
+            "experimental-single-catalog-capacity",
+            "experimental-batched-final-sync",
+            "experimental-serial-key-sort"
+          ],
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "profile": "workspace default release, --locked",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "receipt": {
+            "path": "scratch/oom-iteration/serial-key-sort-candidate-v1-build.json",
+            "sha256": "e5ae8931c686c9638ff6328fc10e2bd66221e3c504b314220dfa3af2da0fb58a"
+          },
+          "source_archive_sha256": "f2c8b148ac238f6d166c2ecff560c1c59f0bc15d999eb7e6f2a59d8788740c42"
+        }
+      },
+      "observations": {
+        "kind": "summary",
+        "repetitions": 3,
+        "samples": [
+          {
+            "control": {
+              "receipt": "scratch/sort-resume-20261121/pair-0/control/verification.json",
+              "receipt_sha256": "46f72958d4e863bfb2a90494a0a394c3ff50eeda9696f24ae025769299239efc",
+              "elapsed": 23.072192084044218,
+              "cpu": 12.39,
+              "cli_rss_kib": 91740,
+              "working_bytes": 67401278,
+              "sort_seconds": 1.914031156,
+              "runs": 50,
+              "merge_operations": 1,
+              "temporary_bytes_written": 2709521976,
+              "temporary_bytes_read": 2709520384
+            },
+            "candidate": {
+              "receipt": "scratch/sort-resume-20261121/pair-0/candidate/verification.json",
+              "receipt_sha256": "fb5e9d4e23bd155bd9e2f1ddc8c66351c5437b2a3ffbc30808a76c401877eda3",
+              "elapsed": 21.3677028210368,
+              "cpu": 12.469999999999999,
+              "cli_rss_kib": 91916,
+              "working_bytes": 67401386,
+              "sort_seconds": 2.089959722,
+              "runs": 50,
+              "merge_operations": 1,
+              "temporary_bytes_written": 2709521976,
+              "temporary_bytes_read": 2709520384
+            }
+          },
+          {
+            "candidate": {
+              "receipt": "scratch/sort-resume-20261121/pair-1/candidate/verification.json",
+              "receipt_sha256": "fd1c394f81da0c77a04e9facd1fcbd8921add321581494da65dc99e0315eff2c",
+              "elapsed": 22.470498551032506,
+              "cpu": 12.42,
+              "cli_rss_kib": 91692,
+              "working_bytes": 67401386,
+              "sort_seconds": 2.099411051,
+              "runs": 50,
+              "merge_operations": 1,
+              "temporary_bytes_written": 2709521976,
+              "temporary_bytes_read": 2709520384
+            },
+            "control": {
+              "receipt": "scratch/sort-resume-20261121/pair-1/control/verification.json",
+              "receipt_sha256": "d755459f593ca98042cf720070dacf38cff8ae194f5e8621c98dbc0279d36984",
+              "elapsed": 21.16752137907315,
+              "cpu": 12.45,
+              "cli_rss_kib": 92012,
+              "working_bytes": 67401278,
+              "sort_seconds": 1.936744674,
+              "runs": 50,
+              "merge_operations": 1,
+              "temporary_bytes_written": 2709521976,
+              "temporary_bytes_read": 2709520384
+            }
+          },
+          {
+            "control": {
+              "receipt": "scratch/sort-resume-20261121/pair-2/control/verification.json",
+              "receipt_sha256": "0cbe046daf9211af5b6d4a7fcb5636d437cd8f326b35a2ae75933dd0c21091c3",
+              "elapsed": 21.417971857008524,
+              "cpu": 12.559999999999999,
+              "cli_rss_kib": 91868,
+              "working_bytes": 67401278,
+              "sort_seconds": 1.916792318,
+              "runs": 50,
+              "merge_operations": 1,
+              "temporary_bytes_written": 2709521976,
+              "temporary_bytes_read": 2709520384
+            },
+            "candidate": {
+              "receipt": "scratch/sort-resume-20261121/pair-2/candidate/verification.json",
+              "receipt_sha256": "f72b0e46bc44a42cd2656e7ac33f2b0d8ed3e43a422a58e5b664485755fdc97d",
+              "elapsed": 22.36921794596128,
+              "cpu": 12.35,
+              "cli_rss_kib": 77324,
+              "working_bytes": 67401386,
+              "sort_seconds": 2.035873917,
+              "runs": 50,
+              "merge_operations": 1,
+              "temporary_bytes_written": 2709521976,
+              "temporary_bytes_read": 2709520384
+            }
+          }
+        ],
+        "medians": {
+          "control": {
+            "elapsed": 21.417971857008524,
+            "cpu": 12.45,
+            "cli_rss_kib": 91868,
+            "working_bytes": 67401278,
+            "sort_seconds": 1.916792318,
+            "runs": 50,
+            "merge_operations": 1,
+            "temporary_bytes_written": 2709521976,
+            "temporary_bytes_read": 2709520384
+          },
+          "candidate": {
+            "elapsed": 22.36921794596128,
+            "cpu": 12.42,
+            "cli_rss_kib": 91692,
+            "working_bytes": 67401386,
+            "sort_seconds": 2.089959722,
+            "runs": 50,
+            "merge_operations": 1,
+            "temporary_bytes_written": 2709521976,
+            "temporary_bytes_read": 2709520384
+          }
+        },
+        "reductions_percent": {
+          "elapsed": -4.441345311794698,
+          "cpu": 0.24096385542168308,
+          "cli_rss_kib": 0.19157922236252567,
+          "working_bytes": -0.00016023435045475765,
+          "sort_seconds": -9.034228819358203,
+          "runs": 0.0,
+          "merge_operations": 0.0,
+          "temporary_bytes_written": 0.0,
+          "temporary_bytes_read": 0.0
+        },
+        "all_elapsed_pairs_favorable": false,
+        "speed_rule": false,
+        "cpu_threshold": false
+      }
+    },
+    {
+      "cell": "counted-zstd-input",
+      "selection": {
+        "path": "scratch/counted-zstd-resume-20261121/counted-zstd-input-summary-v1.json",
+        "sha256": "e0055f1d532f70512f19d518c5456a4263230b2def5e1d96c70d8f4f016492e7"
+      },
+      "builds": {
+        "control": {
+          "binary_sha256": "89f640c1f7eac32f2b93d31aa700b1995a7416bf9ece2d0f7725880e9840f247",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-retained-exact-writers",
+            "experimental-single-final-catalog",
+            "experimental-single-catalog-capacity",
+            "experimental-batched-final-sync"
+          ],
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "profile": "workspace default release, --locked",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "receipt": {
+            "path": "scratch/oom-iteration/counted-zstd-input-control-v1-build.json",
+            "sha256": "fec986dcf47f7c914a13ab11459625188f6b6f1b2790abf9fca34dc1b97d5888"
+          },
+          "source_archive_sha256": "c99ad08349d4e4960a9da7ae4ea6dafc48928a1d33dbd01ac3b5f426bb583a14"
+        },
+        "candidate": {
+          "binary_sha256": "b718e5af7b9f35ec0ce2d33d4f026cb94344417e1f9a1d63c7db817f24dfd257",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-retained-exact-writers",
+            "experimental-single-final-catalog",
+            "experimental-single-catalog-capacity",
+            "experimental-batched-final-sync",
+            "experimental-counted-zstd-input-balanced"
+          ],
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "profile": "workspace default release, --locked",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "receipt": {
+            "path": "scratch/oom-iteration/counted-zstd-input-candidate-v1-build.json",
+            "sha256": "e0ebc307b574570ba15accfaec7b7508bf57218878b74898d2db9ded75759390"
+          },
+          "source_archive_sha256": "783fca14ad8e17306c47b3cfac062df27dd659788a7a9fd41e2b2389a5b12f2d"
+        }
+      },
+      "observations": {
+        "kind": "summary",
+        "repetitions": 3,
+        "samples": [
+          {
+            "control": {
+              "receipt": "scratch/counted-zstd-resume-20261121/pair-0/control/verification.json",
+              "receipt_sha256": "b7798b69e5a7a6ecf09a0fd1ee793006af7fcc994077208a157c07bd24973cfa",
+              "elapsed": 16.0541672850959,
+              "cpu": 8.23,
+              "cli_rss_kib": 8636,
+              "working_bytes": 2921908,
+              "temporary_bytes_written": 2650801679,
+              "temporary_bytes_read": 2650800183
+            },
+            "candidate": {
+              "receipt": "scratch/counted-zstd-resume-20261121/pair-0/candidate/verification.json",
+              "receipt_sha256": "7df3b0b2ec95ab1db9e427348ad7265a688e7db39ce2994463f606d29db33726",
+              "elapsed": 11.491569912061095,
+              "cpu": 9.72,
+              "cli_rss_kib": 8640,
+              "working_bytes": 2925113,
+              "temporary_bytes_written": 1496,
+              "temporary_bytes_read": 0
+            }
+          },
+          {
+            "candidate": {
+              "receipt": "scratch/counted-zstd-resume-20261121/pair-1/candidate/verification.json",
+              "receipt_sha256": "45f61c91b6f188813b8add832cdcb72d6645ef4884ceb2037dae7de9afd84c65",
+              "elapsed": 11.141960323904641,
+              "cpu": 9.71,
+              "cli_rss_kib": 8564,
+              "working_bytes": 2925113,
+              "temporary_bytes_written": 1496,
+              "temporary_bytes_read": 0
+            },
+            "control": {
+              "receipt": "scratch/counted-zstd-resume-20261121/pair-1/control/verification.json",
+              "receipt_sha256": "4d22ca7fa8d182567ed941db42ff5d8fd9ff3216b287ed14b3cbab30d0fd46ac",
+              "elapsed": 15.20119639497716,
+              "cpu": 8.08,
+              "cli_rss_kib": 8676,
+              "working_bytes": 2921908,
+              "temporary_bytes_written": 2650801679,
+              "temporary_bytes_read": 2650800183
+            }
+          },
+          {
+            "control": {
+              "receipt": "scratch/counted-zstd-resume-20261121/pair-2/control/verification.json",
+              "receipt_sha256": "4ce5bc40b7f58503fb4d77b04192159975a64496f82c9383809d8b4d651fe087",
+              "elapsed": 14.099026240059175,
+              "cpu": 8.100000000000001,
+              "cli_rss_kib": 8672,
+              "working_bytes": 2921908,
+              "temporary_bytes_written": 2650801679,
+              "temporary_bytes_read": 2650800183
+            },
+            "candidate": {
+              "receipt": "scratch/counted-zstd-resume-20261121/pair-2/candidate/verification.json",
+              "receipt_sha256": "3e56703577517b1dae606d6fc84080fe6d79d5f7f302cc3bbcc9160aebb7b2d0",
+              "elapsed": 12.394057161989622,
+              "cpu": 9.71,
+              "cli_rss_kib": 8652,
+              "working_bytes": 2925113,
+              "temporary_bytes_written": 1496,
+              "temporary_bytes_read": 0
+            }
+          }
+        ],
+        "medians": {
+          "control": {
+            "elapsed": 15.20119639497716,
+            "cpu": 8.100000000000001,
+            "cli_rss_kib": 8672,
+            "working_bytes": 2921908,
+            "temporary_bytes_written": 2650801679,
+            "temporary_bytes_read": 2650800183
+          },
+          "candidate": {
+            "elapsed": 11.491569912061095,
+            "cpu": 9.71,
+            "cli_rss_kib": 8640,
+            "working_bytes": 2925113,
+            "temporary_bytes_written": 1496,
+            "temporary_bytes_read": 0
+          }
+        },
+        "reductions_percent": {
+          "elapsed": 24.4035165820357,
+          "cpu": -19.87654320987653,
+          "cli_rss_kib": 0.36900369003689537,
+          "working_bytes": -0.10968860073623521,
+          "temporary_bytes_written": 99.99994356424278,
+          "temporary_bytes_read": 100.0
+        },
+        "all_elapsed_pairs_favorable": true,
+        "speed_rule": true,
+        "resource_rule": false
+      }
+    }
+  ]
+}

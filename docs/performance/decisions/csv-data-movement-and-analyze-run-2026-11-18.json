@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "csv-data-movement-and-analyze-run-2026-11-18",
+  "title": "Remove validated payload passes and replace prepared approval with Analyze and Run",
+  "date": "2026-11-18",
+  "subsystem": "execution",
+  "question": "Can Chopper remove demonstrably redundant materialization while preserving exact membership, admitted ownership and native/browser publication?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Enabled in this unmerged worktree default build: Analyze returns advisory input statistics, Run is independent, FY-to-Balanced avoids an intermediate Dataset, and a single plain Balanced Run avoids the output snapshot roundtrip. FY cells improve 11\u201321%; plain Balanced primary small/large cells improve 9.5%/13.9%, with eight-worker large 14.1%; wide plain Balanced is near neutral at 2%.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "Warm WSL2/ext4: 123.60 MiB narrow and 66.96 MiB 33-column inputs, plus 1986.26 MiB under a 256 MiB working budget; exact nondivisible Balanced8, root/retained FY spans, one/automatic/eight workers."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows",
+      "wasi-chromium"
+    ],
+    "summary": "Linux default/all-feature workspace checks, final all-feature Clippy/terminal owner controls, native Windows workspace plus final CLI ownership/interface controls, hosted UI tests, bundled Chromium processing/graph/lifecycle/interruption and WASI resource-contract suites. Final default WASM core and full graph acceptance rerun with identical before/after asset hashes; production artifacts restored."
+  },
+  "limitations": [
+    "Unmerged worktree code, not a release, merge or hosted deployment.",
+    "Warm WSL2 performance only; no physical-RAM exhaustion, 40 GiB, cold storage, device bandwidth, Windows/browser throughput or cross-tool reranking claim.",
+    "Each cell has 3 pairs except 5 for the small confirmation. Earlier mixed small data remain reported; automatic-worker small ranges overlap. No tail or confidence-interval claim.",
+    "Single plain Balanced only; input Dataset remains. Private output may overlap it earlier, so lower total peak filesystem usage and complete RSS caps are not established.",
+    "Complete generated evidence navigation remains blocked by invalid duplicate-member historical archive hydration."
+  ],
+  "exclusions": [
+    "Warmups, smoke/negative controls, rejected digest-only probe and all failed/interrupted/setup attempts are not complete-Run speed observations.",
+    "Initial small screens, mixed three-pair small cohort and unsealed large cohort are retained separately, not pooled with confirmatory cells.",
+    "Different row shapes, runtimes and original cross-tool fixtures/percentages are not pooled."
+  ],
+  "reopen_when": "Revisit if matched complete jobs or correctness/admission/publication controls regress. Broader pipelines/codecs and admitted row batching require separate frozen experiments; rejected radix/bucket/copied-parser/adaptive-FY work is not reopened unchanged.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#csv-data-movement-and-analyze-run-2026-11-18",
+      "sha256": "e6e6286f91fdaa4b433ed53faf81366712ae37ce1198d991cba608856c7a1647"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/data-movement-summary-2026-11-18.json",
+      "sha256": "6533874d5e2935e5ddda7c003e17ecd444a3d9bd37050055376811537e486109"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

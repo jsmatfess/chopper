@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "terminal-uniform-merge-read-buffers-2026-11-21",
+  "title": "Screen larger final merge application buffers",
+  "date": "2026-11-21",
+  "subsystem": "storage",
+  "question": "Does 256 KiB per final run improve a hard-capped terminal Uniform merge using the same file policy and fan-in?",
+  "disposition": "reject",
+  "outcome": "unfavorable",
+  "delivery": "unapplied",
+  "summary": "256 KiB buffers increased complete-job elapsed 4.81% and CPU 4.69%. All three pairs regressed on both measures. Managed spill bytes and merge count matched. File-cache refaults rose 11.58%.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "Exact 8 GiB terminal Uniform then Balanced(8), 197 initial runs and one last merge, m256, one worker, 1 GiB cgroup no swap."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Matched full field/ID/quotas/caps/cleanup verification in all pairs. Linux storage and admission controls, compact spill compile, instrumented 512 MiB coverage of both larger reads and 64 KiB fallback."
+  },
+  "limitations": [
+    "WSL2/ext4, one fixture and one worker. Cgroup page counters are scope observations with uncontrolled backing caches.",
+    "Test holds kernel read-ahead, 197-run merge order, and the raw spill format steady. It does not establish a universal optimal buffer size."
+  ],
+  "exclusions": [
+    "Small/full warmups and read syscall probe jobs excluded. Fixture hashing and independent full output oracle outside clock."
+  ],
+  "reopen_when": "Investigate a changed locality or file layout with measured per-reader refill cost or substantially different active run structure.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#terminal-uniform-merge-read-buffers-2026-11-21",
+      "sha256": "6a9f058282f2f3b63036e2207defb99a579f4d3bd9ef19dc9698a9101a8e497c"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/terminal-uniform-merge-read-buffers-summary-2026-11-21.json",
+      "sha256": "4f54367b9c578fb11a94aaa0493a00126dc64de3d93ccc3c9615b8d9e2448c68"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md"
+  ]
+}

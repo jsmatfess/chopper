@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "out-of-memory-data-movement-and-cache-admission-2026-11-18",
+  "title": "Retain measured OOM pass elimination and qualify cache headroom experimentally",
+  "date": "2026-11-18",
+  "subsystem": "execution",
+  "question": "Can fewer payload passes and conservative cache-aware admission improve complete jobs under real memory pressure?",
+  "disposition": "retain-experimental",
+  "outcome": "mixed",
+  "delivery": "opt-in",
+  "summary": "Unmerged opt-in implementation: count-first plain UTF8 Balanced improves 12.09% at2GiB warm; terminal Uniform\u2192Balanced improves3.13% with~44% fewer managed temporary writes. Under a dedicated1GiB/no-swap scope Chopper beats the measured naive DuckDB and composed qsv adapters. Cache credit remains an estimate, decoder throughput is unproven and compact second-pass emitter was rejected.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2GiB four-column line-free CSV,8,388,608 rows; warm8-worker native pairs, and cold-input dedicated1GiB cgroup/no-swap,256MiB/one-worker constrained comparisons. Separate497MiB three-column and67MiB33-column screens."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows",
+      "wasi-chromium"
+    ],
+    "summary": "Linux default/all-feature lint/tests, formatting and portable-core all-feature WASM passed; native Windows all-feature lint/tests passed on fresh NTFS snapshot; browser prototype core/full graph/bridge/cleanup and restored default small graph passed. Not entire hosted acceptance suite."
+  },
+  "limitations": [
+    "Experimental opt-in unmerged changes, not released defaults. Cache credit cannot guarantee reclaimability; reservations are not RSS caps.",
+    "Three runs per variant, independent cohorts not pooled; qsv composition qualified only for line-free divisible fixture and includes two concurrent pipe commands. DuckDB adapter is not best-known general SQL.",
+    "Managed temporary counters exclude private output staging; not physical I/O or total disk peaks. WSL backing cache uncontrolled; no Windows/browser throughput claims.",
+    "Original benchmark binaries predate minor error/eligibility refinements; refined correctness receipts are separate. Raw artifacts/runner logs remain local unarchived; derived projection removes checkout-root prefixes.",
+    "Historical archive hydration blocks complete generated catalog/registry/views refresh."
+  ],
+  "exclusions": [
+    "Warmups, screening/calibration cohorts and failed attempts excluded from confirmation timing populations.",
+    "DuckDB256MiB single-COPY variants failed internal OOM and are not throughput observations.",
+    "Sync diagnostic and hot digest/random-key components do not establish removable whole-job speedups."
+  ],
+  "reopen_when": "Test isolated native plain512KiB publication buffer and checked serializer fit path with bounded paired complete jobs and admission/publication controls; then expand to all supported operation families in issue20. No automatic promotion.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#out-of-memory-data-movement-and-cache-admission-2026-11-18",
+      "sha256": "4cd247a7ffaa3f1f1aa967dac4e4af0cb5bec2bffdb756f21556902df72d3715"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/oom-data-movement-summary-2026-11-18.json",
+      "sha256": "8b5612664a0d53616844ce0456e271871506a6b11644b1aa00c3c9a90bc3fb1d"
+    },
+    {
+      "path": "docs/benchmarks/oom-data-movement-checks-summary-2026-11-18.json",
+      "sha256": "5b638a80fa75540e4eb8c026186175ea3464ae096d9539213ab63a98f8443d8a"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

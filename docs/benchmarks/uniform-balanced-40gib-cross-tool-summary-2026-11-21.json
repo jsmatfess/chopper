@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "uniform_balanced_cross_tool_40gib",
+  "scope": "40 GiB plain four-field fixed-width CSV, 1 GiB hard no swap, one requested worker per tool command, exact eight parts. Complete-job timing through process exit, exact full output verified outside timing. One completed full qualification each of Chopper and qsvlite. DuckDB failed engine admission at 256 and 512 MiB and supplies no complete timing.",
+  "decision": {
+    "path": "scratch/uniform-40gib-resume-20261121/comparator-decision-v1.json",
+    "sha256": "9023578a0465542dc1a5dca4a5b4bf75002fcb3c221cbed122b28c0638c9acd7"
+  },
+  "duckdb_retry_decision": {
+    "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-retry-decision-v2.json",
+    "sha256": "7cbde2c8b26ec57f1bdf10d0ff26cc6cf5fb5e9bf85fe95f05527d809e24a64c"
+  },
+  "oracle_controls": {
+    "path": "scratch/uniform-cross-tool-resume-20261121/oracle-gates.json",
+    "sha256": "c3124431f6c701fc9adb4b228ccbe00d4b695a208c73c570c4bf7ccfad8a7994"
+  },
+  "versions": {
+    "path": "scratch/balanced-refresh-20261121/versions-v1.json",
+    "sha256": "60904a0af4f79aa74b8092cbc5a2895aa35d27bcc749b52c822b5ba2a06e31d0"
+  },
+  "fixture": {
+    "path": "scratch/balanced-40gib-resume-20261121/fixture-v1/fixture.json",
+    "sha256": "5941e2b295d356f7fe9176fa09f412300bbc508bd502063c5261c0d0f26cf5cf"
+  },
+  "tools": {
+    "chopper": {
+      "batch": {
+        "path": "scratch/uniform-40gib-resume-20261121/hierarchy-batch-v1/status.json",
+        "sha256": "a94c62bbcf7dd68e9de0b9323224bf5d8acd5c0129bdf632d4cd7a784f00628f"
+      },
+      "seconds": 551.7237516629975,
+      "rows": 167772160,
+      "attempt": {
+        "path": "scratch/uniform-40gib-resume-20261121/hierarchy-v1/attempt.json",
+        "sha256": "42ba6bc35b36085c525d82677b35890c31a735af84f84d6b7cabed1f2447d76b"
+      },
+      "verification": {
+        "path": "scratch/uniform-40gib-resume-20261121/hierarchy-v1/verification.json",
+        "sha256": "59b5bc0701123c109e25f0eb89dcf9e208a8ec540017e2da5e55151715d75724"
+      },
+      "cpu_seconds": 333.90999999999997,
+      "user_cpu_seconds": 203.5,
+      "system_cpu_seconds": 130.41,
+      "peak_rss_kib": 73500,
+      "cgroup_peak_bytes": 1073741824,
+      "cgroup_memory_stat": "anon 8724480\nfile 457781248\nkernel 29442048\nkernel_stack 0\npagetables 364544\nsec_pagetables 0\npercpu 864\nsock 0\nvmalloc 0\nshmem 0\nfile_mapped 0\nfile_dirty 32768\nfile_writeback 0\nswapcached 0\nanon_thp 0\nfile_thp 0\nshmem_thp 0\ninactive_anon 8716288\nactive_anon 8192\ninactive_file 457633792\nactive_file 114688\nunevictable 0\nslab_reclaimable 28976576\nslab_unreclaimable 85064\nslab 29061640\nworkingset_refault_anon 0\nworkingset_refault_file 43740740\nworkingset_activate_anon 0\nworkingset_activate_file 4057504\nworkingset_restore_anon 0\nworkingset_restore_file 365781\nworkingset_nodereclaim 640707\npgdemote_kswapd 0\npgdemote_direct 0\npgdemote_khugepaged 0\npgdemote_proactive 0\npgscan 111135041\npgsteal 110695157\npswpin 0\npswpout 0\npgscan_kswapd 0\npgscan_direct 111135041\npgscan_khugepaged 0\npgscan_proactive 0\npgsteal_kswapd 0\npgsteal_direct 110695157\npgsteal_khugepaged 0\npgsteal_proactive 0\npgfault 28624\npgmajfault 0\npgrefill 3727507\npgactivate 413241\npgdeactivate 3727507\npglazyfree 0\npglazyfreed 0\nswpin_zero 0\nswpout_zero 0\nthp_fault_alloc 0\nthp_collapse_alloc 0\nthp_swpout 0\nthp_swpout_fallback 0\n",
+      "process_filesystem_inputs": 612405232,
+      "process_filesystem_outputs": 278380664,
+      "output_csv_bytes": 43285217448,
+      "diagnostics": {
+        "analysis_diagnostics_reserved_bytes": 75460,
+        "analysis_preview_reserved_bytes": 3048,
+        "analysis_text_reserved_bytes": 473,
+        "analysis_timings_reserved_bytes": 810,
+        "analysis_warnings_reserved_bytes": 368,
+        "column_values_reserved_bytes": 0,
+        "compact_spill_blocks": 0,
+        "compact_spill_fallbacks": 0,
+        "compact_spill_files": 0,
+        "compact_spill_rows": 0,
+        "compact_spill_source_bytes": 0,
+        "compact_spill_stored_bytes": 0,
+        "consecutive_partition_fusions": 0,
+        "consecutive_partition_retries": 0,
+        "consecutive_partition_rows": 0,
+        "directory_path_reserved_bytes": 268,
+        "fisher_yates_calls": 0,
+        "fisher_yates_rows": 0,
+        "fisher_yates_seconds": 0.0,
+        "grouping_policy": "auto",
+        "input_header_reserved_bytes": 296,
+        "merge_inputs": 987,
+        "merge_operations": 4,
+        "partition_balanced_fusions": 0,
+        "partition_balanced_retries": 0,
+        "partition_balanced_rows": 0,
+        "peak_temporary_files": 261,
+        "peak_workspace_reserved_bytes": 67444177,
+        "prepared_job_reserved_bytes": 659,
+        "process_memory": {
+          "admission_limit_bytes": 485363690,
+          "limit_bytes": 531810304,
+          "peak_reserved_bytes": 67444772,
+          "pressure_baseline_reserved_bytes": 14626794,
+          "pressure_observation": {
+            "cgroup_headroom_bytes": 941473792,
+            "complete": true,
+            "discovery": "linux proc/cgroup-v2 snapshot; experimental clean inactive-file headroom estimate",
+            "headroom_bytes": 941473792,
+            "host_available_bytes": 64932057088,
+            "observed_unix_ms": 1795289622023
+          },
+          "pressure_rechecks": 501,
+          "reserved_bytes": 90480,
+          "startup_observation": {
+            "cgroup_headroom_bytes": 1063620608,
+            "complete": true,
+            "discovery": "linux proc/cgroup-v2 snapshot; experimental clean inactive-file headroom estimate",
+            "headroom_bytes": 1063620608,
+            "host_available_bytes": 65044185088,
+            "observed_unix_ms": 1795289071026
+          }
+        },
+        "resident_sorts": 0,
+        "routed_groupings": 0,
+        "routing_fallbacks": 0,
+        "routing_reused_runs": 0,
+        "shuffle_partition_fusions": 0,
+        "shuffle_partition_retries": 0,
+        "shuffle_partition_rows": 0,
+        "sort_calls": 984,
+        "sort_rows": 167772160,
+        "sort_runs": 984,
+        "sort_seconds": 12.97583952,
+        "spill_format_candidate": false,
+        "stage_stats_reserved_bytes": 168,
+        "streaming_chain_fusions": 0,
+        "streaming_chain_retries": 0,
+        "streaming_chain_rows": 0,
+        "temporary_bytes_read": 99192633344,
+        "temporary_bytes_written": 99192634864,
+        "temporary_cleanup_failures": 0,
+        "temporary_files_created": 990,
+        "temporary_path_reserved_bytes": 143,
+        "workspace_reserved_bytes": 89885
+      },
+      "job": {
+        "path": "scratch/uniform-40gib-resume-20261121/hierarchy-v1/job.json",
+        "sha256": "a0e0f2aafc940436aa59a88fb45f0e3ce08d75051b5d7d647bfa4f4aa293a3f9"
+      }
+    },
+    "qsvlite": {
+      "batch": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/qsvlite-batch-v1/status.json",
+        "sha256": "b8c65db136573718bddd040d08d2e471a80d8ddaae86fc1637fa06d09298a81f"
+      },
+      "excluded_preflight": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/qsvlite-preflight/verification.json",
+        "sha256": "8fdfbb9ed1fd56af2b38c92be2e03b74f21d6b95601893839793851310316c2f"
+      },
+      "seconds": 806.9910833069589,
+      "rows": 167772160,
+      "attempt": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/qsvlite-full/attempt.json",
+        "sha256": "f501175e07b249a3f819fac1fb0072900bfe05f2d203b4d1b0256c091431ec87"
+      },
+      "verification": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/qsvlite-full/verification.json",
+        "sha256": "7263a82b8101f78ff06710396ba80e8efeeaa50362020b9501be660bd1370bce"
+      },
+      "cpu_seconds": 489.33000000000004,
+      "user_cpu_seconds": 327.86,
+      "system_cpu_seconds": 161.47,
+      "peak_rss_kib": 911088,
+      "cgroup_peak_bytes": 1073741824,
+      "cgroup_memory_stat": "anon 8736768\nfile 537047040\nkernel 18358272\nkernel_stack 0\npagetables 421888\nsec_pagetables 0\npercpu 1152\nsock 0\nvmalloc 0\nshmem 0\nfile_mapped 0\nfile_dirty 60833792\nfile_writeback 283115520\nswapcached 0\nanon_thp 0\nfile_thp 0\nshmem_thp 0\ninactive_anon 8728576\nactive_anon 8192\ninactive_file 503844864\nactive_file 33161216\nunevictable 0\nslab_reclaimable 17813448\nslab_unreclaimable 103688\nslab 17917136\nworkingset_refault_anon 0\nworkingset_refault_file 47106522\nworkingset_activate_anon 0\nworkingset_activate_file 0\nworkingset_restore_anon 0\nworkingset_restore_file 0\nworkingset_nodereclaim 265214\npgdemote_kswapd 0\npgdemote_direct 0\npgdemote_khugepaged 0\npgdemote_proactive 0\npgscan 162490767\npgsteal 137241394\npswpin 0\npswpout 0\npgscan_kswapd 0\npgscan_direct 162490767\npgscan_khugepaged 0\npgscan_proactive 0\npgsteal_kswapd 0\npgsteal_direct 137241394\npgsteal_khugepaged 0\npgsteal_proactive 0\npgfault 335998\npgmajfault 3\npgrefill 17117551\npgactivate 24965043\npgdeactivate 17117551\npglazyfree 0\npglazyfreed 0\nswpin_zero 0\nswpout_zero 0\nthp_fault_alloc 0\nthp_collapse_alloc 0\nthp_swpout 0\nthp_swpout_fallback 0\n",
+      "process_filesystem_inputs": 644540200,
+      "process_filesystem_outputs": 456524128,
+      "output_csv_bytes": 42949673128,
+      "oracle_sha256": "72e65f5ddd09c9d4b21e9d8d50968101d06fab1785975a8d3642e673efcd7e3b",
+      "adapter_stage_receipt": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/qsvlite-full/adapter-stages.json",
+        "sha256": "8377f282b494d57fa7c9ed771f89988905b2e673f6200b1fb38ee80330959d46"
+      },
+      "adapter_stages": {
+        "uuid_and_reorder": {
+          "seconds": 188.57961345894728,
+          "bytes": 49157242907
+        },
+        "external_line_sort": {
+          "seconds": 426.65909823810216,
+          "bytes": 49157242907
+        },
+        "drop_key": {
+          "seconds": 83.62098264705855,
+          "bytes": 42949672981
+        },
+        "split": {
+          "seconds": 108.00136980006937,
+          "bytes": 42949673128
+        }
+      }
+    }
+  },
+  "duckdb_failed_attempts": [
+    {
+      "engine_limit_mib": 256,
+      "seconds_until_failure": 147.60322881606407,
+      "exit_code": 1,
+      "error": "_duckdb.OutOfMemoryException: Out of Memory Error: could not allocate block of size 30.5 MiB (226.7 MiB/256.0 MiB used)",
+      "peak_rss_kib": 595004,
+      "cgroup_peak_bytes": 1073741824,
+      "oom_killed": false,
+      "run": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-full/attempt.json",
+        "sha256": "23b31e1ded4674d3beba66c7b1431fe6e99f867002a25565f3b25c536c11156d"
+      },
+      "stderr": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-full/stderr",
+        "sha256": "78c867c1ca6c7f71854bbe86f70c138dcee0db9ae152fb8f973856ffa2cc2374"
+      },
+      "cgroup": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-full/cgroup.json",
+        "sha256": "a904b7115cc79e2857905aa4a3e90b9ee733acfdf810f81c4fa022854b5ab307"
+      },
+      "status": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-batch-v1/status.json",
+        "sha256": "7efe205a8b7dcd97bebc6cad61b5009f3faa4b91754a179e471022e4090a5466"
+      },
+      "excluded_preflight": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-preflight/verification.json",
+        "sha256": "1096d21c263e98ed81577b8396735b5125f3a4bce0f7e7cf0cd6ec91ab222355"
+      }
+    },
+    {
+      "engine_limit_mib": 512,
+      "seconds_until_failure": 148.75522998801898,
+      "exit_code": 1,
+      "error": "_duckdb.OutOfMemoryException: Out of Memory Error: failed to pin block of size 256.0 KiB (511.9 MiB/512.0 MiB used)",
+      "peak_rss_kib": 820052,
+      "cgroup_peak_bytes": 1073741824,
+      "oom_killed": false,
+      "run": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-full-v2/attempt.json",
+        "sha256": "2b5930eaa8b2659cd4ef490e2341acc65b9d95a770548df2ba599155aa328361"
+      },
+      "stderr": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-full-v2/stderr",
+        "sha256": "9ee559ffbc0ca6a40ed9ab3f14f91518ba223120026a34bbf1e683a635469d12"
+      },
+      "cgroup": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-full-v2/cgroup.json",
+        "sha256": "9c591a650604bee81f5462869aaee442f697b9fe95bfcc7986fc95baa8c7b759"
+      },
+      "status": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-batch-v2/status.json",
+        "sha256": "7bdb8f7d0256fa9b6ec192568bd1da92c213c03c1fb2f0ab49a627a93dc47fac"
+      },
+      "excluded_preflight": {
+        "path": "scratch/uniform-cross-tool-resume-20261121/duckdb-preflight-v2/verification.json",
+        "sha256": "07cd6aa13b6c2977247572234368ab4b7d40fa19745f8250fe28e06d9376cbef"
+      }
+    }
+  ]
+}

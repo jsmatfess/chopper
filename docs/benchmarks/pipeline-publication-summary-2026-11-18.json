@@ -1,0 +1,2108 @@
+{
+  "kind": "summary",
+  "schema_version": 1,
+  "type": "pipeline_publication_summary",
+  "scope": "Reviewed independent whole-job cells, not new observations; 2GiB inputs versus1GiB cgroup/no swap,cold-input fadvise,256MiB/one-worker native. WSL2/ext4 backing cache uncontrolled. Warmups excluded;3 measured pervariant. No pooling across cells or calibrations.",
+  "cells": [
+    {
+      "id": "buffer-balanced",
+      "source_path": "scratch/oom-iteration/buffer-screen/results.jsonl",
+      "source_sha256": "bca585b065ddb69431c571ba18634c8652b6f1bf52971c223f97d6b348209a93",
+      "variants": {
+        "chopper": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 8.3073898749426,
+              "min": 6.356352787930518,
+              "max": 9.928515993058681,
+              "values": [
+                6.356352787930518,
+                9.928515993058681,
+                8.3073898749426
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 4.56,
+              "min": 4.44,
+              "max": 4.69,
+              "values": [
+                4.56,
+                4.69,
+                4.44
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 1.39,
+              "min": 1.24,
+              "max": 1.44,
+              "values": [
+                1.24,
+                1.44,
+                1.39
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 16152.0,
+              "min": 16084.0,
+              "max": 16184.0,
+              "values": [
+                16084.0,
+                16152.0,
+                16184.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 8388624.0,
+              "min": 8388616.0,
+              "max": 8388632.0,
+              "values": [
+                8388616.0,
+                8388624.0,
+                8388632.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 4227576.0,
+              "min": 4227568.0,
+              "max": 4229728.0,
+              "values": [
+                4227568.0,
+                4229728.0,
+                4227576.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "managed_temp_written_bytes": {
+              "n": 3,
+              "median": 1496,
+              "min": 1496,
+              "max": 1496,
+              "values": [
+                1496,
+                1496,
+                1496
+              ]
+            },
+            "managed_temp_read_bytes": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            },
+            "workspace_peak_reserved_bytes": {
+              "n": 3,
+              "median": 666174,
+              "min": 666174,
+              "max": 666174,
+              "values": [
+                666174,
+                666174,
+                666174
+              ]
+            },
+            "managed_temp_peak_bytes": {
+              "n": 3,
+              "median": 1496,
+              "min": 1496,
+              "max": 1496,
+              "values": [
+                1496,
+                1496,
+                1496
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 8,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/buffer-screen/balanced-chopper-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "6a9ab3c9b2924f8de33cec1b18ff7623b52648eb8894d563dfa836d0db03629f",
+              "stdout_sha256": "6536d42570c8651e01a0c8a1dc5f25dbf9749b05c1d5629abda2519970e0bd0d"
+            },
+            {
+              "line": 12,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/buffer-screen/balanced-chopper-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "f1ced3e947ca213dd80559cb7ee37f867c3b6dc34240dcd216a7b714e903a918",
+              "stdout_sha256": "3aa1e5c4acdf05a85c7751495a9b4b4df089a27d65b32d9fb0ec62b472ca007c"
+            },
+            {
+              "line": 18,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/buffer-screen/balanced-chopper-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "f658e1698f08a6814b79dbe1dbb326bd860816c289c1f555c79817d7e6a2636c",
+              "stdout_sha256": "45413ff30b82a4bf841dbc88123f5ffb5d43f6d3597bd8b0ffd3786ca13cb418"
+            }
+          ]
+        },
+        "chopper-baseline": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 9.690138346981257,
+              "min": 7.5412810270208865,
+              "max": 11.291726117022336,
+              "values": [
+                11.291726117022336,
+                7.5412810270208865,
+                9.690138346981257
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 4.55,
+              "min": 4.51,
+              "max": 4.59,
+              "values": [
+                4.59,
+                4.51,
+                4.55
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 1.77,
+              "min": 1.67,
+              "max": 1.8,
+              "values": [
+                1.8,
+                1.67,
+                1.77
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 16168.0,
+              "min": 16156.0,
+              "max": 16224.0,
+              "values": [
+                16156.0,
+                16224.0,
+                16168.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 8388624.0,
+              "min": 8388616.0,
+              "max": 8388632.0,
+              "values": [
+                8388632.0,
+                8388616.0,
+                8388624.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 4227952.0,
+              "min": 4227344.0,
+              "max": 4228776.0,
+              "values": [
+                4227952.0,
+                4227344.0,
+                4228776.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "managed_temp_written_bytes": {
+              "n": 3,
+              "median": 1496,
+              "min": 1496,
+              "max": 1496,
+              "values": [
+                1496,
+                1496,
+                1496
+              ]
+            },
+            "managed_temp_read_bytes": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            },
+            "workspace_peak_reserved_bytes": {
+              "n": 3,
+              "median": 207476,
+              "min": 207476,
+              "max": 207476,
+              "values": [
+                207476,
+                207476,
+                207476
+              ]
+            },
+            "managed_temp_peak_bytes": {
+              "n": 3,
+              "median": 1496,
+              "min": 1496,
+              "max": 1496,
+              "values": [
+                1496,
+                1496,
+                1496
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 7,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/buffer-screen/balanced-chopper-baseline-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "c7e83a7893a4ae1d4e0d630e9a976d1c192db4b2b575683333524e5feb2a29bf",
+              "stdout_sha256": "8066aefea677ea9638438db8543c2e515bf84d8ebfe34e4323b8df8e50db198f"
+            },
+            {
+              "line": 13,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/buffer-screen/balanced-chopper-baseline-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "91eaf3f769748d6737a36e39df39c8e83cb4989b5abac0b77537d596583a07fc",
+              "stdout_sha256": "2858511112e636ad55780f0bd423f97c5e87cbac8ef75c8fbec22df570b0469b"
+            },
+            {
+              "line": 17,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/buffer-screen/balanced-chopper-baseline-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "b4d0fdb053febdf4c1a0ba12083f3966ba618c7dd012c866e6e211fdf05f8c8f",
+              "stdout_sha256": "aae1d0af746839a2ffc9b49738dc7cf50e9541533f765f0a9cb311700bdb5b0d"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "buffer-shuffle",
+      "source_path": "scratch/oom-iteration/buffer-screen/results.jsonl",
+      "source_sha256": "bca585b065ddb69431c571ba18634c8652b6f1bf52971c223f97d6b348209a93",
+      "variants": {
+        "chopper": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 20.2517950409092,
+              "min": 19.889890331076458,
+              "max": 21.729126959922723,
+              "values": [
+                20.2517950409092,
+                21.729126959922723,
+                19.889890331076458
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 7.8,
+              "min": 7.7,
+              "max": 7.82,
+              "values": [
+                7.82,
+                7.8,
+                7.7
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 3.33,
+              "min": 3.32,
+              "max": 3.47,
+              "values": [
+                3.32,
+                3.33,
+                3.47
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 87756.0,
+              "min": 73212.0,
+              "max": 87760.0,
+              "values": [
+                73212.0,
+                87760.0,
+                87756.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 11586320.0,
+              "min": 11381112.0,
+              "max": 11782952.0,
+              "values": [
+                11381112.0,
+                11586320.0,
+                11782952.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 9669632.0,
+              "min": 9667864.0,
+              "max": 9669904.0,
+              "values": [
+                9667864.0,
+                9669632.0,
+                9669904.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "managed_temp_written_bytes": {
+              "n": 3,
+              "median": 2785019352,
+              "min": 2785019352,
+              "max": 2785019352,
+              "values": [
+                2785019352,
+                2785019352,
+                2785019352
+              ]
+            },
+            "managed_temp_read_bytes": {
+              "n": 3,
+              "median": 2785017856,
+              "min": 2785017856,
+              "max": 2785017856,
+              "values": [
+                2785017856,
+                2785017856,
+                2785017856
+              ]
+            },
+            "workspace_peak_reserved_bytes": {
+              "n": 3,
+              "median": 67391710,
+              "min": 67391710,
+              "max": 67391710,
+              "values": [
+                67391710,
+                67391710,
+                67391710
+              ]
+            },
+            "managed_temp_peak_bytes": {
+              "n": 3,
+              "median": 2785017856,
+              "min": 2785017856,
+              "max": 2785017856,
+              "values": [
+                2785017856,
+                2785017856,
+                2785017856
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 10,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/buffer-screen/shuffle-chopper-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "b2db6faf349b29833e33408b2041a83e57bdc3ee8d21b5db46a5ba1c577e90d8",
+              "stdout_sha256": "4a61928ef85268ddda8e3542cd3b4a1400e769a45b0ab1c9d40781e75e9927de"
+            },
+            {
+              "line": 14,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/buffer-screen/shuffle-chopper-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "b25c07d891b897167a93a0bba65569c49f70004ed15eec79f35f74d644653fe1",
+              "stdout_sha256": "41c6ae3256153cb5e5ea06f8e99034a5208e2ad4832c20b3e515ca6476ef78a3"
+            },
+            {
+              "line": 20,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/buffer-screen/shuffle-chopper-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "37dbdba764e0ba25c4f5463df8a0afa114c1cf74a86aea8384a27c6ada048177",
+              "stdout_sha256": "1c3b52383041701512ff1566c82344d995adc2a4158f8b69fc6f301f6a343304"
+            }
+          ]
+        },
+        "chopper-baseline": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 18.519723242963664,
+              "min": 18.01993723399937,
+              "max": 19.704210776020773,
+              "values": [
+                19.704210776020773,
+                18.01993723399937,
+                18.519723242963664
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 8.13,
+              "min": 7.74,
+              "max": 8.21,
+              "values": [
+                8.13,
+                8.21,
+                7.74
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 3.44,
+              "min": 3.41,
+              "max": 3.73,
+              "values": [
+                3.41,
+                3.73,
+                3.44
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 87760.0,
+              "min": 73348.0,
+              "max": 87924.0,
+              "values": [
+                87924.0,
+                87760.0,
+                73348.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 11866480.0,
+              "min": 11481432.0,
+              "max": 11937240.0,
+              "values": [
+                11937240.0,
+                11866480.0,
+                11481432.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 9670808.0,
+              "min": 9670024.0,
+              "max": 9671952.0,
+              "values": [
+                9670808.0,
+                9670024.0,
+                9671952.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "managed_temp_written_bytes": {
+              "n": 3,
+              "median": 2785019352,
+              "min": 2785019352,
+              "max": 2785019352,
+              "values": [
+                2785019352,
+                2785019352,
+                2785019352
+              ]
+            },
+            "managed_temp_read_bytes": {
+              "n": 3,
+              "median": 2785017856,
+              "min": 2785017856,
+              "max": 2785017856,
+              "values": [
+                2785017856,
+                2785017856,
+                2785017856
+              ]
+            },
+            "workspace_peak_reserved_bytes": {
+              "n": 3,
+              "median": 67392196,
+              "min": 67392196,
+              "max": 67392196,
+              "values": [
+                67392196,
+                67392196,
+                67392196
+              ]
+            },
+            "managed_temp_peak_bytes": {
+              "n": 3,
+              "median": 2785017856,
+              "min": 2785017856,
+              "max": 2785017856,
+              "values": [
+                2785017856,
+                2785017856,
+                2785017856
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 9,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/buffer-screen/shuffle-chopper-baseline-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "c41b30a5b42e1aa8673bfc1468aed19f0ec137a2fa1939d0ecfe3f914827cb49",
+              "stdout_sha256": "bbc36ba2f1f0637467a27227ef6cf16cdf51f0c9e3f5fce7b2cbce11c8b74662"
+            },
+            {
+              "line": 15,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/buffer-screen/shuffle-chopper-baseline-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "988d914d374fb834b72cdff6c761489bfeb8f765e58fb62fe136edd933a5d02b",
+              "stdout_sha256": "e5e447b54d5464debd25ea7a9fab1c6f0c9cacda09e6a2a8e27aafcbe8d91781"
+            },
+            {
+              "line": 19,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/buffer-screen/shuffle-chopper-baseline-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "687b3ce05eb04acdd59bdab5411d27c82718c6ff26153ee118b13d0f94740fef",
+              "stdout_sha256": "7198b8748faa08b559a7ae618cdbe5a1810619e1f4ff8c69111366832c401446"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "routing-interleaved",
+      "source_path": "scratch/oom-iteration/routing-screen/results.jsonl",
+      "source_sha256": "e9f98942a162a5bc781b7e4b20f6606308a805056017e25ab396f76e3db471ea",
+      "variants": {
+        "chopper": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 10.73776511696633,
+              "min": 10.139994669007137,
+              "max": 11.70071514195297,
+              "values": [
+                10.139994669007137,
+                10.73776511696633,
+                11.70071514195297
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 4.28,
+              "min": 4.25,
+              "max": 4.35,
+              "values": [
+                4.25,
+                4.28,
+                4.35
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 2.75,
+              "min": 2.72,
+              "max": 2.81,
+              "values": [
+                2.72,
+                2.81,
+                2.75
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 16212.0,
+              "min": 16184.0,
+              "max": 16252.0,
+              "values": [
+                16184.0,
+                16212.0,
+                16252.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 9405080.0,
+              "min": 9400368.0,
+              "max": 9405096.0,
+              "values": [
+                9400368.0,
+                9405096.0,
+                9405080.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 9544928.0,
+              "min": 9538824.0,
+              "max": 9560680.0,
+              "values": [
+                9560680.0,
+                9544928.0,
+                9538824.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "managed_temp_written_bytes": {
+              "n": 3,
+              "median": 2717910488,
+              "min": 2717910488,
+              "max": 2717910488,
+              "values": [
+                2717910488,
+                2717910488,
+                2717910488
+              ]
+            },
+            "managed_temp_read_bytes": {
+              "n": 3,
+              "median": 2717908992,
+              "min": 2717908992,
+              "max": 2717908992,
+              "values": [
+                2717908992,
+                2717908992,
+                2717908992
+              ]
+            },
+            "workspace_peak_reserved_bytes": {
+              "n": 3,
+              "median": 738063,
+              "min": 738063,
+              "max": 738063,
+              "values": [
+                738063,
+                738063,
+                738063
+              ]
+            },
+            "managed_temp_peak_bytes": {
+              "n": 3,
+              "median": 2717908992,
+              "min": 2717908992,
+              "max": 2717908992,
+              "values": [
+                2717908992,
+                2717908992,
+                2717908992
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 8,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/routing-screen/interleaved-chopper-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "cfc93e8fed520844ccf0a33a8b95fa74909d37951eac38a6fd7a574a458244c7",
+              "stdout_sha256": "d24328bf589963140451016c84b6179ae8ab0e1d8d6ce2652f8b7df9cfe29ca5"
+            },
+            {
+              "line": 12,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/routing-screen/interleaved-chopper-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "c0e8057fa3121e6e24961055ecfb82681dcd48678e351b1f0f402864c96d1913",
+              "stdout_sha256": "c8b97938b5c7fd59f5472054f2595a5864ddf7f5660af06b9e7467792d450d1c"
+            },
+            {
+              "line": 18,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/routing-screen/interleaved-chopper-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "6c57ee52576f2250e32f0d9b02f0149a7a7b881b3e983854cea01201fc6fd1b5",
+              "stdout_sha256": "fb0eb416c6ce107b0c6011fcdd510dce7477c726375a1748eeefcac10799fc40"
+            }
+          ]
+        },
+        "chopper-baseline": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 14.144234686973505,
+              "min": 13.198545244056731,
+              "max": 15.423132090945728,
+              "values": [
+                14.144234686973505,
+                13.198545244056731,
+                15.423132090945728
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 4.21,
+              "min": 4.16,
+              "max": 4.25,
+              "values": [
+                4.21,
+                4.25,
+                4.16
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 3.68,
+              "min": 3.59,
+              "max": 3.82,
+              "values": [
+                3.68,
+                3.59,
+                3.82
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 16180.0,
+              "min": 16116.0,
+              "max": 16216.0,
+              "values": [
+                16116.0,
+                16180.0,
+                16216.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 13630384.0,
+              "min": 13615328.0,
+              "max": 13632088.0,
+              "values": [
+                13630384.0,
+                13632088.0,
+                13615328.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 13791712.0,
+              "min": 13763552.0,
+              "max": 13810008.0,
+              "values": [
+                13791712.0,
+                13810008.0,
+                13763552.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "managed_temp_written_bytes": {
+              "n": 3,
+              "median": 4882171172,
+              "min": 4882171172,
+              "max": 4882171172,
+              "values": [
+                4882171172,
+                4882171172,
+                4882171172
+              ]
+            },
+            "managed_temp_read_bytes": {
+              "n": 3,
+              "median": 2717908992,
+              "min": 2717908992,
+              "max": 2717908992,
+              "values": [
+                2717908992,
+                2717908992,
+                2717908992
+              ]
+            },
+            "workspace_peak_reserved_bytes": {
+              "n": 3,
+              "median": 738180,
+              "min": 738180,
+              "max": 738180,
+              "values": [
+                738180,
+                738180,
+                738180
+              ]
+            },
+            "managed_temp_peak_bytes": {
+              "n": 3,
+              "median": 2988424851,
+              "min": 2988424851,
+              "max": 2988424851,
+              "values": [
+                2988424851,
+                2988424851,
+                2988424851
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 7,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/routing-screen/interleaved-chopper-baseline-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "f97072565c585fc8a8a6532a60be7c199efeab12dfcbccef9a1321ac62eb17a6",
+              "stdout_sha256": "f7b697a69a499dc4f6f1abba82321a52a20505f33fb9eb97b85afa332721b8c2"
+            },
+            {
+              "line": 13,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/routing-screen/interleaved-chopper-baseline-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "3a4a4974e8f309f98aa58c5a9807e6e3fc5c5bd8a4b852aad346e2c5ddd1532c",
+              "stdout_sha256": "95bfd74925f6852387a69b833c7fdb19e6e5ad84edebc665add0b9df1d36eb4b"
+            },
+            {
+              "line": 17,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/routing-screen/interleaved-chopper-baseline-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "6ca4841d9fac271fa7e219fa39e4cbb0e7bcb964d942fd153fc60ccd03c8620a",
+              "stdout_sha256": "c75300d507fface389d597a8cb886008cf7aa7a9e155a8a62a18629373ffadd3"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "routing-probabilistic",
+      "source_path": "scratch/oom-iteration/routing-screen/results.jsonl",
+      "source_sha256": "e9f98942a162a5bc781b7e4b20f6606308a805056017e25ab396f76e3db471ea",
+      "variants": {
+        "chopper": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 15.829077684087679,
+              "min": 12.27771939302329,
+              "max": 16.249142910004593,
+              "values": [
+                16.249142910004593,
+                12.27771939302329,
+                15.829077684087679
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 5.42,
+              "min": 5.38,
+              "max": 5.43,
+              "values": [
+                5.42,
+                5.43,
+                5.38
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 2.82,
+              "min": 2.74,
+              "max": 2.84,
+              "values": [
+                2.74,
+                2.84,
+                2.82
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 16180.0,
+              "min": 16176.0,
+              "max": 16200.0,
+              "values": [
+                16180.0,
+                16200.0,
+                16176.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 9502744.0,
+              "min": 9502720.0,
+              "max": 9502760.0,
+              "values": [
+                9502720.0,
+                9502744.0,
+                9502760.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 9539184.0,
+              "min": 9536720.0,
+              "max": 9540112.0,
+              "values": [
+                9536720.0,
+                9539184.0,
+                9540112.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "managed_temp_written_bytes": {
+              "n": 3,
+              "median": 2717909610,
+              "min": 2717909610,
+              "max": 2717909610,
+              "values": [
+                2717909610,
+                2717909610,
+                2717909610
+              ]
+            },
+            "managed_temp_read_bytes": {
+              "n": 3,
+              "median": 2717908992,
+              "min": 2717908992,
+              "max": 2717908992,
+              "values": [
+                2717908992,
+                2717908992,
+                2717908992
+              ]
+            },
+            "workspace_peak_reserved_bytes": {
+              "n": 3,
+              "median": 337916,
+              "min": 337916,
+              "max": 337916,
+              "values": [
+                337916,
+                337916,
+                337916
+              ]
+            },
+            "managed_temp_peak_bytes": {
+              "n": 3,
+              "median": 2717908992,
+              "min": 2717908992,
+              "max": 2717908992,
+              "values": [
+                2717908992,
+                2717908992,
+                2717908992
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 10,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/routing-screen/probabilistic-chopper-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "aa447802329b3865422cd8643ba5a10263712b049e94895d8db236f238aa0260",
+              "stdout_sha256": "d0cde8c1f4c391d1e9a9baa7eb13b93118c5e86ef18fb55ae2a00f08e2070fad"
+            },
+            {
+              "line": 14,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/routing-screen/probabilistic-chopper-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "5cc1f1275b72cfac53d2838f3fb044da678e59cd0e5a78b26ca6d900b1b15369",
+              "stdout_sha256": "05eda2bdfcb08506d26b9385f7e8d234ade05e49bcb9afbf3328f85c994cc688"
+            },
+            {
+              "line": 20,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/routing-screen/probabilistic-chopper-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "5611df23b137466cef62732b8fb0c87fbc11b204f6c5f7b192a7b29d4dc0ec97",
+              "stdout_sha256": "64c6161e0a5eb9e798928c516b76c42bed03f3347766a5573b8dee15ce058a1e"
+            }
+          ]
+        },
+        "chopper-baseline": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 16.468998293043114,
+              "min": 16.273584252921864,
+              "max": 22.54305923904758,
+              "values": [
+                16.468998293043114,
+                22.54305923904758,
+                16.273584252921864
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 5.18,
+              "min": 5.1,
+              "max": 5.32,
+              "values": [
+                5.1,
+                5.18,
+                5.32
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 3.81,
+              "min": 3.72,
+              "max": 3.85,
+              "values": [
+                3.72,
+                3.85,
+                3.81
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 16220.0,
+              "min": 16172.0,
+              "max": 16244.0,
+              "values": [
+                16220.0,
+                16244.0,
+                16172.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 13729832.0,
+              "min": 13729824.0,
+              "max": 13729832.0,
+              "values": [
+                13729832.0,
+                13729832.0,
+                13729824.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 13763960.0,
+              "min": 13763600.0,
+              "max": 13766016.0,
+              "values": [
+                13763600.0,
+                13763960.0,
+                13766016.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "managed_temp_written_bytes": {
+              "n": 3,
+              "median": 4882170370,
+              "min": 4882170370,
+              "max": 4882170370,
+              "values": [
+                4882170370,
+                4882170370,
+                4882170370
+              ]
+            },
+            "managed_temp_read_bytes": {
+              "n": 3,
+              "median": 2717908992,
+              "min": 2717908992,
+              "max": 2717908992,
+              "values": [
+                2717908992,
+                2717908992,
+                2717908992
+              ]
+            },
+            "workspace_peak_reserved_bytes": {
+              "n": 3,
+              "median": 337979,
+              "min": 337979,
+              "max": 337979,
+              "values": [
+                337979,
+                337979,
+                337979
+              ]
+            },
+            "managed_temp_peak_bytes": {
+              "n": 3,
+              "median": 3800628480,
+              "min": 3800300820,
+              "max": 3800759544,
+              "values": [
+                3800300820,
+                3800759544,
+                3800628480
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 9,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/routing-screen/probabilistic-chopper-baseline-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "4704cb5e73c7261d685566b111967673fbf7ecb451eb533f635b67d3aa8b1eac",
+              "stdout_sha256": "c349d7b090e830f35a42f7f38fe899777a23492202402e7cdcc04562f1516d26"
+            },
+            {
+              "line": 15,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/routing-screen/probabilistic-chopper-baseline-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "40ba7f00f655cbc3341edf861909944ff5f5931c0c62631205f09ba3837ddd90",
+              "stdout_sha256": "63c3efe779d550f3910770a577bb4670a652fe00b703af4ba0f4277a9b10b508"
+            },
+            {
+              "line": 19,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/routing-screen/probabilistic-chopper-baseline-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "3b20c6f5fd294e7805ce8a85646d5c49b7a81d1a8fcc6d8fec57847aca6bede5",
+              "stdout_sha256": "0c1d2c28eb2044238970d52662ea0beed3b4e416f1027fbd8402e3fdaab715b2"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "bytecap-byte-cap",
+      "source_path": "scratch/oom-iteration/bytecap-large/results.jsonl",
+      "source_sha256": "653b66898a0b482350cbd2e6766cd3dbb805b44802d7b2027f760586ecaa5619",
+      "variants": {
+        "chopper": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 6.278671870939434,
+              "min": 6.2786564730340615,
+              "max": 6.379408280015923,
+              "values": [
+                6.2786564730340615,
+                6.278671870939434,
+                6.379408280015923
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 2.8,
+              "min": 2.64,
+              "max": 2.8,
+              "values": [
+                2.8,
+                2.64,
+                2.8
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 1.47,
+              "min": 1.41,
+              "max": 1.55,
+              "values": [
+                1.41,
+                1.55,
+                1.47
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 16144.0,
+              "min": 16124.0,
+              "max": 16160.0,
+              "values": [
+                16124.0,
+                16160.0,
+                16144.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 4194336.0,
+              "min": 4194320.0,
+              "max": 4194352.0,
+              "values": [
+                4194352.0,
+                4194320.0,
+                4194336.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 4194648.0,
+              "min": 4194648.0,
+              "max": 4194648.0,
+              "values": [
+                4194648.0,
+                4194648.0,
+                4194648.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "managed_temp_written_bytes": {
+              "n": 3,
+              "median": 38287,
+              "min": 38287,
+              "max": 38287,
+              "values": [
+                38287,
+                38287,
+                38287
+              ]
+            },
+            "managed_temp_read_bytes": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            },
+            "workspace_peak_reserved_bytes": {
+              "n": 3,
+              "median": 204890,
+              "min": 204890,
+              "max": 204890,
+              "values": [
+                204890,
+                204890,
+                204890
+              ]
+            },
+            "managed_temp_peak_bytes": {
+              "n": 3,
+              "median": 38287,
+              "min": 38287,
+              "max": 38287,
+              "values": [
+                38287,
+                38287,
+                38287
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 11,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/bytecap-large/chopper-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "d5ac10d94bd1404cf9f97916fc46da995a8835f0da810970db9592cd55d72b89",
+              "stdout_sha256": "b61c71f864645d1b972ead5b38e83fe1047743e0e3f51996aa1c76021711d17f"
+            },
+            {
+              "line": 16,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/bytecap-large/chopper-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "207cc02a99b5424aed1796b3545f5cac1f474f5accefb841ee7108e47db319de",
+              "stdout_sha256": "9b14799392e2a70ccc69159a4cdf69b033ee8ca346b0d2b9237f795fd666dee9"
+            },
+            {
+              "line": 27,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/bytecap-large/chopper-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "07199741b6166f456aae0a316821844629a47418d6d9e438ff6f14b8e24778a8",
+              "stdout_sha256": "5d553f40cc24dff88e291324abea888b9b081855101e4499b769673e35dbaac6"
+            }
+          ]
+        },
+        "chopper-baseline": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 6.236505756969564,
+              "min": 6.232488997047767,
+              "max": 6.236635279026814,
+              "values": [
+                6.232488997047767,
+                6.236505756969564,
+                6.236635279026814
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 2.67,
+              "min": 2.61,
+              "max": 2.77,
+              "values": [
+                2.77,
+                2.61,
+                2.67
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 1.39,
+              "min": 1.38,
+              "max": 1.44,
+              "values": [
+                1.39,
+                1.44,
+                1.38
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 16128.0,
+              "min": 16116.0,
+              "max": 16180.0,
+              "values": [
+                16180.0,
+                16116.0,
+                16128.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 4194336.0,
+              "min": 4194320.0,
+              "max": 4194344.0,
+              "values": [
+                4194336.0,
+                4194344.0,
+                4194320.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 4194648.0,
+              "min": 4194648.0,
+              "max": 4194648.0,
+              "values": [
+                4194648.0,
+                4194648.0,
+                4194648.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            },
+            "managed_temp_written_bytes": {
+              "n": 3,
+              "median": 38287,
+              "min": 38287,
+              "max": 38287,
+              "values": [
+                38287,
+                38287,
+                38287
+              ]
+            },
+            "managed_temp_read_bytes": {
+              "n": 3,
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "values": [
+                0,
+                0,
+                0
+              ]
+            },
+            "workspace_peak_reserved_bytes": {
+              "n": 3,
+              "median": 204683,
+              "min": 204683,
+              "max": 204683,
+              "values": [
+                204683,
+                204683,
+                204683
+              ]
+            },
+            "managed_temp_peak_bytes": {
+              "n": 3,
+              "median": 38287,
+              "min": 38287,
+              "max": 38287,
+              "values": [
+                38287,
+                38287,
+                38287
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 9,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/bytecap-large/chopper-baseline-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "aff7ca8cca6d65bfa90163cfaa055a9f5fca926b26660a44053abd9db73ed92f",
+              "stdout_sha256": "f2768d034708e9d49bd3e1f97112c7f1f9ccc8cdc0a4c7f32113006d984a5e7e"
+            },
+            {
+              "line": 20,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/bytecap-large/chopper-baseline-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "ed0de7d0bf64d8971e523676092e82530e1a546c6ab68af8b40eedeb33c480a4",
+              "stdout_sha256": "aaac4dc857f25e7b8d8e3ed12cf162647a90950b6b3a99db61da32169ddc9b80"
+            },
+            {
+              "line": 25,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/bytecap-large/chopper-baseline-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "3f76288c92bb6f8176b50a8e98bec7d6712bbd0a9af2e3b7673a7e4797bd25cf",
+              "stdout_sha256": "1589e598ef96e09c7504e804c984379b2f9813a7337011445b38a5cf201909df"
+            }
+          ]
+        },
+        "qsv-8k": {
+          "metrics": {
+            "seconds": {
+              "n": 3,
+              "median": 9.485333214979619,
+              "min": 5.627360561979003,
+              "max": 11.389422593056224,
+              "values": [
+                5.627360561979003,
+                11.389422593056224,
+                9.485333214979619
+              ]
+            },
+            "user_seconds": {
+              "n": 3,
+              "median": 3.72,
+              "min": 3.66,
+              "max": 3.8,
+              "values": [
+                3.8,
+                3.72,
+                3.66
+              ]
+            },
+            "system_seconds": {
+              "n": 3,
+              "median": 1.48,
+              "min": 1.44,
+              "max": 1.52,
+              "values": [
+                1.48,
+                1.44,
+                1.52
+              ]
+            },
+            "max_rss_kib": {
+              "n": 3,
+              "median": 17912.0,
+              "min": 17424.0,
+              "max": 17928.0,
+              "values": [
+                17912.0,
+                17424.0,
+                17928.0
+              ]
+            },
+            "kernel_fs_inputs": {
+              "n": 3,
+              "median": 4194312.0,
+              "min": 4194312.0,
+              "max": 4194312.0,
+              "values": [
+                4194312.0,
+                4194312.0,
+                4194312.0
+              ]
+            },
+            "kernel_fs_outputs": {
+              "n": 3,
+              "median": 4194456.0,
+              "min": 4194456.0,
+              "max": 4194456.0,
+              "values": [
+                4194456.0,
+                4194456.0,
+                4194456.0
+              ]
+            },
+            "cgroup_peak_bytes": {
+              "n": 3,
+              "median": 1073741824,
+              "min": 1073741824,
+              "max": 1073741824,
+              "values": [
+                1073741824,
+                1073741824,
+                1073741824
+              ]
+            }
+          },
+          "samples": [
+            {
+              "line": 13,
+              "repetition": 0,
+              "attempt": "scratch/oom-iteration/bytecap-large/qsv-8k-1",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "52831aa12083ce3010313f655f014f17e6ea6a4af1091993a6672c3d2df0aba8",
+              "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "line": 18,
+              "repetition": 1,
+              "attempt": "scratch/oom-iteration/bytecap-large/qsv-8k-2",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "0702496e602538eed7cb323ebbeb39b87894ed27ff119e20852fe289fa7dc541",
+              "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "line": 23,
+              "repetition": 2,
+              "attempt": "scratch/oom-iteration/bytecap-large/qsv-8k-3",
+              "verified_rows": 8388608,
+              "scope_receipt_sha256": "11dafc2fc89763866ef746f6e9180475b9a5e8865a3e7482fae14d322397fa46",
+              "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "sources": [
+    {
+      "path": "scratch/oom-iteration/buffer-screen/results.jsonl",
+      "sha256": "bca585b065ddb69431c571ba18634c8652b6f1bf52971c223f97d6b348209a93"
+    },
+    {
+      "path": "scratch/oom-iteration/routing-screen/results.jsonl",
+      "sha256": "e9f98942a162a5bc781b7e4b20f6606308a805056017e25ab396f76e3db471ea"
+    },
+    {
+      "path": "scratch/oom-iteration/bytecap-large/results.jsonl",
+      "sha256": "653b66898a0b482350cbd2e6766cd3dbb805b44802d7b2027f760586ecaa5619"
+    }
+  ],
+  "builds": {
+    "buffer-control": {
+      "manifest_path": "scratch/oom-iteration/buffer-control-build.json",
+      "manifest_sha256": "f187227e8e3cde51e4f4e2010005d199d7d52d4f10251e2f565d7e555dc8c464",
+      "binary_sha256": "104587752a66c95b0a10359501ea8251e324e3731a0af53bc451aa19735e75fb",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/buffer-control-source.tar.gz",
+        "sha256": "9be935a3568636398ac5f3384e1e70a01447928a82d4c2f074578e175337a8fd"
+      },
+      "source_map_sha256": "6bd8496c62eb4240da155307c29a41e4926028e34c36d87152f131e371a6cc77",
+      "head": "1a7742732b0a75d698bd36d917bf8dcad3488063"
+    },
+    "buffer-512": {
+      "manifest_path": "scratch/oom-iteration/buffer-512-build.json",
+      "manifest_sha256": "14cd22fcfbcbcafaa2fdd5e52743329924c451e24ae235b448b6bfd2ccaac7a8",
+      "binary_sha256": "2d19986e1c6577c7899dfdb475d6449deb235a43e155b9d43da78c451052ae70",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-plain-output-buffer"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/buffer-512-source.tar.gz",
+        "sha256": "2a09298762892da676f9db9559d1f88a5679f092cd0385b111ad998bdd635ca7"
+      },
+      "source_map_sha256": "6bd8496c62eb4240da155307c29a41e4926028e34c36d87152f131e371a6cc77",
+      "head": "1a7742732b0a75d698bd36d917bf8dcad3488063"
+    },
+    "routing-control": {
+      "manifest_path": "scratch/oom-iteration/routing-control-build.json",
+      "manifest_sha256": "b45e61535347d3e58ed8a74c73452ad6b74cb56cf0c9617a82e4ced51c1ba39f",
+      "binary_sha256": "15492d26be0d22e1782f622193ad3708d20e7a2b1c1f138206bd139d6a6b1548",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/routing-control-source.tar.gz",
+        "sha256": "d9195ce7409cf979112308e784c690210b2e3322c2987ddef99fa897f86d904f"
+      },
+      "source_map_sha256": "c0f8b412dfee4ebfb9d10008f7af3e933df9dcafa4f809c73dd2bc97df326bfa",
+      "head": "1a7742732b0a75d698bd36d917bf8dcad3488063"
+    },
+    "routing-candidate": {
+      "manifest_path": "scratch/oom-iteration/routing-candidate-build.json",
+      "manifest_sha256": "53d0342fcc1eed45554f0ba890d8f50d1079c7a2d95462cd336dd55663fca071",
+      "binary_sha256": "38c90818f09c1fca566b0d39b512e0d9992710c93c0aa65d5b57780ba4e32ac1",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/routing-candidate-source.tar.gz",
+        "sha256": "184cb8b7149d15d0dea7af35f888cd5885fcc47f38bb451c92e293bda5f49120"
+      },
+      "source_map_sha256": "c0f8b412dfee4ebfb9d10008f7af3e933df9dcafa4f809c73dd2bc97df326bfa",
+      "head": "1a7742732b0a75d698bd36d917bf8dcad3488063"
+    },
+    "fit-control": {
+      "manifest_path": "scratch/oom-iteration/fit-control-build.json",
+      "manifest_sha256": "a7372a58bed05c9a054ae2dab9a1b7df777a3a935ff43f2089ed87433ee4bb85",
+      "binary_sha256": "ff6295a89ca580746219d85c5e8d91c41ed2a48e448a98cb3acf635192c94a1b",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/fit-control-source.tar.gz",
+        "sha256": "751261f0c64c533b355615e98d9e8a6ce00cdd9eff9d2719ce0d5320d3d23f00"
+      },
+      "source_map_sha256": "e59c91bb9af0bba53670805fccb38dcf56c0dd7b3a95a86ee49eed0f8ae743d9",
+      "head": "1a7742732b0a75d698bd36d917bf8dcad3488063"
+    },
+    "fit-candidate": {
+      "manifest_path": "scratch/oom-iteration/fit-candidate-build.json",
+      "manifest_sha256": "f3605179d364cd1d811a030251193d7cd13366c335b4e2ad0807a0aac32a466a",
+      "binary_sha256": "a10b3fd7998debac48cbe52433f29e0b3e561eee62357cf30178abf015f7db87",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-owned-serialization-fit"
+      ],
+      "source_archive": {
+        "path": "scratch/oom-iteration/fit-candidate-source.tar.gz",
+        "sha256": "524e958692b316ed5c837f1565c910c5664f63f189a7553b3cdfc03136df8498"
+      },
+      "source_map_sha256": "e59c91bb9af0bba53670805fccb38dcf56c0dd7b3a95a86ee49eed0f8ae743d9",
+      "head": "1a7742732b0a75d698bd36d917bf8dcad3488063"
+    }
+  },
+  "decisions": {
+    "buffer512": "Rejected:9.35% slower Shuffle allpairs, extra448KiB/writer; mixed Balanced.",
+    "terminal_routing": "Retain opt-in:Interleaved24.08%lowerelapsed;prob3.89%lower with~44% fewer managedtemporarywrites.",
+    "owned_fit": "Rejected:slower all3pairs, additional retainedscratch; safe API/bound prototype archived only.",
+    "byte_proof": "Deferred source-only prototype; focused tests passed, no release/performance evidence.",
+    "early_header_release": "Retain: first counted-pass header drops aftercomparison beforepublication;512KiBheadercontrol preserves returnedAnalysis owner; no lower wholejob peak/RSS claim."
+  },
+  "caveats": [
+    "Managed temporary counters exclude private destination output.",
+    "Reservations are working allocations, not RSS limits; kernelpeak includes cache.",
+    "GNUtime filesystem counters are not physical-device bytes.",
+    "qsv bytecap comparison uses8KiB writer override chosen fromseparate128MiBcalibration; default calibration notpooled.",
+    "All primarybytecaprecords fit8MiB, noemptyfields, byteidenticalserialization/boundaries; qsv permitsoversizedrow generally and is not a strict-cap substitute.",
+    "Raw originals/source archives/runnerlogs retained locally unarchived; derived projection strips checkoutroot prefixes.",
+    "Bytecap Chopper control is frozen fit-control with the fit feature off but shared prototype API plumbing present; final retained source removes that plumbing. Measurements identify frozen binaries, not a timed final rebuild."
+  ],
+  "qsv_calibration": {
+    "path": "scratch/oom-iteration/bytecap-calibration/results.jsonl",
+    "sha256": "9fa88916b3461a294fc4bfb764df4a04c955f9217466d5e7530bdf9b27378d9b",
+    "data": [
+      {
+        "clock": "launch through CLIexit: allnative validation/digest/output/sync/publication; no equivalent qsv atomicpublication claim",
+        "fixture": {
+          "bytes": 134217749,
+          "rows": 524288,
+          "sha256": "fb19b1fd98b4c7949d3108cf9baad7808e67400a9577f4968891ad85d44c6da2",
+          "shape": "fourcolumns,noemptyfields,ASCIInostructuralpayload,256serializedbytes/row"
+        },
+        "harness_sha256": "b007ffff77a522cc9b9935350a93c437696ee9a92d1823b050be0775e21dc41e",
+        "kind": "context",
+        "native_build_sha256": "b45e61535347d3e58ed8a74c73452ad6b74cb56cf0c9617a82e4ced51c1ba39f",
+        "native_sha256": "15492d26be0d22e1782f622193ad3708d20e7a2b1c1f138206bd139d6a6b1548",
+        "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+        "qsv_sha256": "d794c990c24a9101e7c4c16a3dab1dc7f6ab6b4a287c00d2a29d46e52d031f1b",
+        "rep": 0,
+        "scope": "Inputbytes fromfixture vs1GiB totalmemory/no swap;256MiB/1worker native; qsv oneworker, no countprepass; perjobinputfadvise,WSLbackingcacheuncontrolled"
+      },
+      {
+        "attempt": "scratch/oom-iteration/bytecap-calibration/chopper-1",
+        "command": [
+          "scratch/oom-iteration/routing-control-chopper",
+          "run",
+          "--config",
+          "scratch/oom-iteration/bytecap-calibration/chopper-1/job.json",
+          "--yes"
+        ],
+        "excluded_warmup": false,
+        "exit_code": 0,
+        "gnu_time": "\tCommand being timed: \"/usr/bin/systemd-run --unit chopper-bytecap-15bcdf2df1f74ae0869f5f6ae8070ba9.scope --user --scope --quiet -p MemoryMax=1073741824 -p MemorySwapMax=0 scratch/tool-comparison/venv/bin/python-frozen scratch/oom-iteration/cgroup-worker-v3.py --receipt scratch/oom-iteration/bytecap-calibration/chopper-1/cgroup.json -- scratch/oom-iteration/routing-control-chopper run --config scratch/oom-iteration/bytecap-calibration/chopper-1/job.json --yes\"\n\tUser time (seconds): 0.24\n\tSystem time (seconds): 0.10\n\tPercent of CPU this job got: 68%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:00.50\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 16180\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 2965\n\tVoluntary context switches: 678\n\tInvoluntary context switches: 0\n\tSwaps: 0\n\tFile system inputs: 262152\n\tFile system outputs: 262224\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+        "job": "byte-cap",
+        "kind": "measurement",
+        "qsv_writer_buffer_bytes": null,
+        "repetition": 0,
+        "seconds": 0.5154667510651052,
+        "tool": "chopper"
+      },
+      {
+        "attempt": "scratch/oom-iteration/bytecap-calibration/chopper-1",
+        "kind": "verification",
+        "repetition": 0,
+        "tool": "chopper",
+        "verified": {
+          "counts": [
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            16
+          ],
+          "csv_bytes": 134218085,
+          "files": 17,
+          "rows": 524288,
+          "verification": "Allfields/globalencounterorder/strictcaps/exactsameboundaries and serializedsizes; native manifest checked"
+        }
+      },
+      {
+        "attempt": "scratch/oom-iteration/bytecap-calibration/qsv-default-1",
+        "command": [
+          "scratch/tool-comparison/qsv/qsvlite",
+          "split",
+          "--kb-size",
+          "8192",
+          "-j",
+          "1",
+          "scratch/oom-iteration/bytecap-calibration/qsv-default-1/output",
+          "scratch/oom-iteration/bytecap-calibration/input.csv"
+        ],
+        "excluded_warmup": false,
+        "exit_code": 0,
+        "gnu_time": "\tCommand being timed: \"/usr/bin/systemd-run --unit chopper-bytecap-5fbacdb26f1c4eac81240e630b16cf16.scope --user --scope --quiet -p MemoryMax=1073741824 -p MemorySwapMax=0 scratch/tool-comparison/venv/bin/python-frozen scratch/oom-iteration/cgroup-worker-v3.py --receipt scratch/oom-iteration/bytecap-calibration/qsv-default-1/cgroup.json -- scratch/tool-comparison/qsv/qsvlite split --kb-size 8192 -j 1 scratch/oom-iteration/bytecap-calibration/qsv-default-1/output scratch/oom-iteration/bytecap-calibration/input.csv\"\n\tUser time (seconds): 2.99\n\tSystem time (seconds): 0.10\n\tPercent of CPU this job got: 99%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:03.12\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 18564\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 4111\n\tVoluntary context switches: 23\n\tInvoluntary context switches: 11\n\tSwaps: 0\n\tFile system inputs: 262152\n\tFile system outputs: 262176\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+        "job": "byte-cap",
+        "kind": "measurement",
+        "qsv_writer_buffer_bytes": 524288,
+        "repetition": 0,
+        "seconds": 3.1709588140947744,
+        "tool": "qsv-default"
+      },
+      {
+        "attempt": "scratch/oom-iteration/bytecap-calibration/qsv-default-1",
+        "kind": "verification",
+        "repetition": 0,
+        "tool": "qsv-default",
+        "verified": {
+          "counts": [
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            16
+          ],
+          "csv_bytes": 134218085,
+          "files": 17,
+          "rows": 524288,
+          "verification": "Allfields/globalencounterorder/strictcaps/exactsameboundaries and serializedsizes; native manifest checked"
+        }
+      },
+      {
+        "attempt": "scratch/oom-iteration/bytecap-calibration/qsv-8k-1",
+        "command": [
+          "scratch/tool-comparison/qsv/qsvlite",
+          "split",
+          "--kb-size",
+          "8192",
+          "-j",
+          "1",
+          "scratch/oom-iteration/bytecap-calibration/qsv-8k-1/output",
+          "scratch/oom-iteration/bytecap-calibration/input.csv"
+        ],
+        "excluded_warmup": false,
+        "exit_code": 0,
+        "gnu_time": "\tCommand being timed: \"/usr/bin/systemd-run --unit chopper-bytecap-23c3294950e7421c93e544de2e6467a4.scope --user --scope --quiet -p MemoryMax=1073741824 -p MemorySwapMax=0 scratch/tool-comparison/venv/bin/python-frozen scratch/oom-iteration/cgroup-worker-v3.py --receipt scratch/oom-iteration/bytecap-calibration/qsv-8k-1/cgroup.json -- scratch/tool-comparison/qsv/qsvlite split --kb-size 8192 -j 1 scratch/oom-iteration/bytecap-calibration/qsv-8k-1/output scratch/oom-iteration/bytecap-calibration/input.csv\"\n\tUser time (seconds): 0.25\n\tSystem time (seconds): 0.09\n\tPercent of CPU this job got: 92%\n\tElapsed (wall clock) time (h:mm:ss or m:ss): 0:00.37\n\tAverage shared text size (kbytes): 0\n\tAverage unshared data size (kbytes): 0\n\tAverage stack size (kbytes): 0\n\tAverage total size (kbytes): 0\n\tMaximum resident set size (kbytes): 18300\n\tAverage resident set size (kbytes): 0\n\tMajor (requiring I/O) page faults: 0\n\tMinor (reclaiming a frame) page faults: 3866\n\tVoluntary context switches: 18\n\tInvoluntary context switches: 1\n\tSwaps: 0\n\tFile system inputs: 262152\n\tFile system outputs: 262176\n\tSocket messages sent: 0\n\tSocket messages received: 0\n\tSignals delivered: 0\n\tPage size (bytes): 4096\n\tExit status: 0\n",
+        "job": "byte-cap",
+        "kind": "measurement",
+        "qsv_writer_buffer_bytes": 8192,
+        "repetition": 0,
+        "seconds": 0.41480356897227466,
+        "tool": "qsv-8k"
+      },
+      {
+        "attempt": "scratch/oom-iteration/bytecap-calibration/qsv-8k-1",
+        "kind": "verification",
+        "repetition": 0,
+        "tool": "qsv-8k",
+        "verified": {
+          "counts": [
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            32767,
+            16
+          ],
+          "csv_bytes": 134218085,
+          "files": 17,
+          "rows": 524288,
+          "verification": "Allfields/globalencounterorder/strictcaps/exactsameboundaries and serializedsizes; native manifest checked"
+        }
+      }
+    ]
+  },
+  "contract_differences": {
+    "path": "scratch/oom-iteration/bytecap-contract-differences-v3.json",
+    "sha256": "b5e8d6a41a513d882edfe2513394b8ab6484d93081a604f4215cd7cb4d118dff",
+    "data": {
+      "scope": "Tiny behavior controls, no timing claims; Chopper strict UTF8/CSV/bytecaps vs these qsv invocations only",
+      "receipts": [
+        {
+          "case": "invalid-utf8",
+          "tool": "chopper",
+          "exit_code": 1,
+          "stderr": "Reading and writing CSV | 0 rows | 0 MiB temporary\nchopper: CSV record 1: invalid byte sequence in selected input encoding\n",
+          "output_bytes": [],
+          "contains_invalid_utf8": false
+        },
+        {
+          "case": "invalid-utf8",
+          "tool": "qsv",
+          "exit_code": 0,
+          "stderr": "Wrote 1 chunk/s to 'scratch/oom-iteration/tmptyjcty_x/invalid-utf8-qsv'. Rows/chunk: 1 Num records: 1\n",
+          "output_bytes": [
+            12
+          ],
+          "contains_invalid_utf8": true
+        },
+        {
+          "case": "quote-after-close",
+          "tool": "chopper",
+          "exit_code": 1,
+          "stderr": "Reading and writing CSV | 0 rows | 0 MiB temporary\nchopper: CSV record 2: unexpected text after closing quote\n",
+          "output_bytes": [],
+          "contains_invalid_utf8": false
+        },
+        {
+          "case": "quote-after-close",
+          "tool": "qsv",
+          "exit_code": 0,
+          "stderr": "Wrote 1 chunk/s to 'scratch/oom-iteration/tmptyjcty_x/quote-after-close-qsv'. Rows/chunk: 1 Num records: 1\n",
+          "output_bytes": [
+            21
+          ],
+          "contains_invalid_utf8": false
+        },
+        {
+          "case": "oversize-row",
+          "tool": "chopper",
+          "exit_code": 1,
+          "stderr": "Reading and writing CSV | 0 rows | 0 MiB temporary\nchopper: one row plus header exceeds output byte limit\n",
+          "output_bytes": [],
+          "contains_invalid_utf8": false
+        },
+        {
+          "case": "oversize-row",
+          "tool": "qsv",
+          "exit_code": 0,
+          "stderr": "Wrote 1 chunk/s to 'scratch/oom-iteration/tmptyjcty_x/oversize-row-qsv'. Size/chunk: <= 1KB; Num records: 1\n",
+          "output_bytes": [
+            2059
+          ],
+          "contains_invalid_utf8": false
+        }
+      ]
+    }
+  },
+  "decoder_component": {
+    "path": "scratch/oom-iteration/decode-component-results.jsonl",
+    "sha256": "73197f0f60211e59e8240d468facea37aefff2878e7614dcb15488280e70789b",
+    "data": [
+      {
+        "kind": "component",
+        "repetition": -1,
+        "decoder": true,
+        "seconds": 0.138233304,
+        "bytes": 2147483648
+      },
+      {
+        "kind": "component",
+        "repetition": -1,
+        "decoder": false,
+        "seconds": 0.069110261,
+        "bytes": 2147483648
+      },
+      {
+        "kind": "component",
+        "repetition": 0,
+        "decoder": false,
+        "seconds": 0.069389101,
+        "bytes": 2147483648
+      },
+      {
+        "kind": "component",
+        "repetition": 0,
+        "decoder": true,
+        "seconds": 0.137363362,
+        "bytes": 2147483648
+      },
+      {
+        "kind": "component",
+        "repetition": 1,
+        "decoder": true,
+        "seconds": 0.137895804,
+        "bytes": 2147483648
+      },
+      {
+        "kind": "component",
+        "repetition": 1,
+        "decoder": false,
+        "seconds": 0.069814986,
+        "bytes": 2147483648
+      },
+      {
+        "kind": "component",
+        "repetition": 2,
+        "decoder": false,
+        "seconds": 0.069196412,
+        "bytes": 2147483648
+      },
+      {
+        "kind": "component",
+        "repetition": 2,
+        "decoder": true,
+        "seconds": 0.138731923,
+        "bytes": 2147483648
+      }
+    ]
+  },
+  "decoder_retention": {
+    "path": "scratch/oom-iteration/decode-component-retention.json",
+    "sha256": "4c3c660d451e1e13eb7cb1952c8792e6e974081bcecfa05a69326ccce4012a36",
+    "data": {
+      "original": "target/release/deps/libchopper_core-c165cb7be16f5e70.rlib",
+      "retained": "scratch/oom-iteration/decode-component-input.rlib",
+      "sha256": "3a468a63c79bc8dcbc83b620249e5448c40c7ab2c12d6b8f98e6059f7791a15d",
+      "binary_sha256": "bbe37182e259bd224d7dadf69b4f90a2aea58db4ff836e741da4f4e889ebae4e",
+      "core_source_snapshot": "scratch/oom-iteration/routing-control-source.tar.gz"
+    }
+  }
+}

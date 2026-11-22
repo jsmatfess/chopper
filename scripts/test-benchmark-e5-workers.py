@@ -141,9 +141,9 @@ class Gate(unittest.TestCase):
             record['scenarios'] = [dict(phase=phase,cancelled=cancelled,local_limit_bytes=128*1024**2,
                 pool_limit_bytes=(64 if record['kind']=='shared' else 256)*1024**2,
                 remaining_bytes=0,cleanup_verified=True,error='cancelled' if cancelled else record['kind'],
-                grant_bytes=1024, rows=65536 if phase=='Serializing output' else 5000 if phase=='Ready for confirmation' else 0)
-                for phase,cancelled in [('Reading and validating CSV',False),('Ready for confirmation',False),
-                                       ('Serializing output',False),('Ready for confirmation',True)]]
+                grant_bytes=1024, rows=65536 if phase=='Serializing output' else 5000 if phase=='Finalizing output snapshot' else 0)
+                for phase,cancelled in [('Reading and validating CSV',False),('Finalizing output snapshot',False),
+                                       ('Serializing output',False),('Finalizing output snapshot',True)]]
         stdout, stderr = self.root / 'controls.log', self.root / 'controls.err'
         stdout.write_text(''.join(w.CONTROL_PREFIX + json.dumps(r) + '\n' for r in records)
                           + 'test result: ok. 1 passed; 0 failed; 0 ignored;\n')

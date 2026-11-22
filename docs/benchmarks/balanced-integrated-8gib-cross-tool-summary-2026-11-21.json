@@ -1,0 +1,362 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "counted_balanced_integrated_cross_tool",
+  "tools": {
+    "chopper": {
+      "samples": [
+        {
+          "rep": -1,
+          "eligible": false,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-chopper-r-1/verification.json",
+            "sha256": "80cf44073c0b07417b73e10d9500dcfa623acf07c9314b752ba62a7f345ace60"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-chopper-r-1/attempt.json",
+            "sha256": "604dbc3a7591375a50674075ee965204331d422983c120d6581300a91abb16b2"
+          },
+          "tool_identity": {
+            "binary_sha256": "53ed7b47f1e6c1b6325f4afb6acb0613cd37a556e0d02e00248f41ec55feba82"
+          },
+          "elapsed_seconds": 37.55944430001546,
+          "cpu_seconds": 20.68,
+          "rss_kib": 5820,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8657043624
+        },
+        {
+          "rep": 0,
+          "eligible": true,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-chopper-r0/verification.json",
+            "sha256": "461d23659af5b71744d2fd0153ea6be711bb33568467baa02b61f877f155dee3"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-chopper-r0/attempt.json",
+            "sha256": "a1270788d7f89552c3db01c008564d3f54848216613ab2123ad6e345abcc3906"
+          },
+          "tool_identity": {
+            "binary_sha256": "53ed7b47f1e6c1b6325f4afb6acb0613cd37a556e0d02e00248f41ec55feba82"
+          },
+          "elapsed_seconds": 39.516963417991064,
+          "cpu_seconds": 20.65,
+          "rss_kib": 5696,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8657043624
+        },
+        {
+          "rep": 1,
+          "eligible": true,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-chopper-r1/verification.json",
+            "sha256": "1210fb0b1f60dbe7595a7823588a1440abf0ce7eaf21628bffce48a87bdd3593"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-chopper-r1/attempt.json",
+            "sha256": "d03aa77d2cdc1944f3e5fe927152622882a70d6711817063f227f97e5cde5425"
+          },
+          "tool_identity": {
+            "binary_sha256": "53ed7b47f1e6c1b6325f4afb6acb0613cd37a556e0d02e00248f41ec55feba82"
+          },
+          "elapsed_seconds": 37.164765115012415,
+          "cpu_seconds": 20.71,
+          "rss_kib": 5716,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8657043624
+        },
+        {
+          "rep": 2,
+          "eligible": true,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-chopper-r2/verification.json",
+            "sha256": "dab0ac540da977b5ea4bccb9fe21d96c6a9380cb62da5be2cc79ac6ad2430cb1"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-chopper-r2/attempt.json",
+            "sha256": "fb8ef0fd45afecc7f9cc73dd8cc4dbd7c7009e55b7aaa7a346b9fcd011171b25"
+          },
+          "tool_identity": {
+            "binary_sha256": "53ed7b47f1e6c1b6325f4afb6acb0613cd37a556e0d02e00248f41ec55feba82"
+          },
+          "elapsed_seconds": 38.86514776409604,
+          "cpu_seconds": 20.72,
+          "rss_kib": 5696,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8657043624
+        }
+      ],
+      "summary": {
+        "elapsed_seconds": {
+          "median": 38.86514776409604,
+          "min": 37.164765115012415,
+          "max": 39.516963417991064
+        },
+        "cpu_seconds": {
+          "median": 20.71,
+          "min": 20.65,
+          "max": 20.72
+        },
+        "rss_kib": {
+          "median": 5696,
+          "min": 5696,
+          "max": 5716
+        },
+        "cgroup_peak_bytes": {
+          "median": 1073741824,
+          "min": 1073741824,
+          "max": 1073741824
+        },
+        "output_csv_bytes": {
+          "median": 8657043624,
+          "min": 8657043624,
+          "max": 8657043624
+        }
+      }
+    },
+    "qsvlite": {
+      "samples": [
+        {
+          "rep": -1,
+          "eligible": false,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-qsvlite-r-1/verification.json",
+            "sha256": "c2d5b2c7601ba5a5fa0afc105d926ec595114cb331106db35cdd3007d359103d"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-qsvlite-r-1/attempt.json",
+            "sha256": "3fc5ad23efca711c4e0738c4e645aadc4cd3ecaead34bd374e5554f5fad8ca7a"
+          },
+          "tool_identity": {
+            "binary_sha256": "d794c990c24a9101e7c4c16a3dab1dc7f6ab6b4a287c00d2a29d46e52d031f1b"
+          },
+          "elapsed_seconds": 22.478149801958352,
+          "cpu_seconds": 12.67,
+          "rss_kib": 16064,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8589934760
+        },
+        {
+          "rep": 0,
+          "eligible": true,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-qsvlite-r0/verification.json",
+            "sha256": "cd7f64165be3354b070effae1374375e3a070e8570f5b3e242090ed1df46a5c5"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-qsvlite-r0/attempt.json",
+            "sha256": "e7943297a5938e52c81f84683caad2ece0a40ff4d2b5cda4e99dd2728d9a96a8"
+          },
+          "tool_identity": {
+            "binary_sha256": "d794c990c24a9101e7c4c16a3dab1dc7f6ab6b4a287c00d2a29d46e52d031f1b"
+          },
+          "elapsed_seconds": 22.577420008950867,
+          "cpu_seconds": 12.62,
+          "rss_kib": 15904,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8589934760
+        },
+        {
+          "rep": 1,
+          "eligible": true,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-qsvlite-r1/verification.json",
+            "sha256": "6f40e61f4df77bf514fabdeba111c6563c976b7dd1bce1fd13708439b319cf69"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-qsvlite-r1/attempt.json",
+            "sha256": "8b07b2130f9f8123d61c89eb6958b76eed314ebfc1710623d6020836046b5126"
+          },
+          "tool_identity": {
+            "binary_sha256": "d794c990c24a9101e7c4c16a3dab1dc7f6ab6b4a287c00d2a29d46e52d031f1b"
+          },
+          "elapsed_seconds": 21.018635060056113,
+          "cpu_seconds": 12.83,
+          "rss_kib": 15716,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8589934760
+        },
+        {
+          "rep": 2,
+          "eligible": true,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-qsvlite-r2/verification.json",
+            "sha256": "89afa7b8cd53d88d2736d2055d38b1a55b2f939f7d7adee69efd11f8b8a301c7"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-qsvlite-r2/attempt.json",
+            "sha256": "ff29d9f0bead3be3f593135826562f6074f68f42d9dbb7729fcf488f855b73f3"
+          },
+          "tool_identity": {
+            "binary_sha256": "d794c990c24a9101e7c4c16a3dab1dc7f6ab6b4a287c00d2a29d46e52d031f1b"
+          },
+          "elapsed_seconds": 22.53047700494062,
+          "cpu_seconds": 12.6,
+          "rss_kib": 15472,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8589934760
+        }
+      ],
+      "summary": {
+        "elapsed_seconds": {
+          "median": 22.53047700494062,
+          "min": 21.018635060056113,
+          "max": 22.577420008950867
+        },
+        "cpu_seconds": {
+          "median": 12.62,
+          "min": 12.6,
+          "max": 12.83
+        },
+        "rss_kib": {
+          "median": 15716,
+          "min": 15472,
+          "max": 15904
+        },
+        "cgroup_peak_bytes": {
+          "median": 1073741824,
+          "min": 1073741824,
+          "max": 1073741824
+        },
+        "output_csv_bytes": {
+          "median": 8589934760,
+          "min": 8589934760,
+          "max": 8589934760
+        }
+      }
+    },
+    "duckdb": {
+      "samples": [
+        {
+          "rep": -1,
+          "eligible": false,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-duckdb-r-1/verification.json",
+            "sha256": "b7c2d3e21ffd4c9fe420ea5da57b397c4ca8bec5dd06f283539d25ff8684ba68"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-duckdb-r-1/attempt.json",
+            "sha256": "854b90c2f3809ecf8467ea8d22b52da09a5fb1d4b0471e352d9c3279dbf6b077"
+          },
+          "tool_identity": {
+            "python_sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+            "adapter_sha256": "c0071fb75a9997807063e88f7f75406a9dee426ab20f46f7b6d66471bdb50bcf"
+          },
+          "elapsed_seconds": 66.78781636792701,
+          "cpu_seconds": 52.03,
+          "rss_kib": 486640,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8657043624
+        },
+        {
+          "rep": 0,
+          "eligible": true,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-duckdb-r0/verification.json",
+            "sha256": "0246228d3b08f2e2d84c6a98e893492e78f310096990c2293090ee8ae43e2e96"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-duckdb-r0/attempt.json",
+            "sha256": "c4db7fe95e167bd725cfa31f82cd3ddb1ef4ebf7edd34274fa23c82fa0b892ab"
+          },
+          "tool_identity": {
+            "python_sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+            "adapter_sha256": "c0071fb75a9997807063e88f7f75406a9dee426ab20f46f7b6d66471bdb50bcf"
+          },
+          "elapsed_seconds": 71.24750381091144,
+          "cpu_seconds": 52.05,
+          "rss_kib": 476100,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8657043624
+        },
+        {
+          "rep": 1,
+          "eligible": true,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-duckdb-r1/verification.json",
+            "sha256": "ac35450cdd054a366260e67a2f0f3c16f434c824305373a7fa6f1615fbc0bb37"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-duckdb-r1/attempt.json",
+            "sha256": "c66bd512dd12c049118a15e83b8ef24c24ebf3a34c03649f2b0aff7f9781f4dd"
+          },
+          "tool_identity": {
+            "python_sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+            "adapter_sha256": "c0071fb75a9997807063e88f7f75406a9dee426ab20f46f7b6d66471bdb50bcf"
+          },
+          "elapsed_seconds": 66.83408424607478,
+          "cpu_seconds": 53.3,
+          "rss_kib": 483292,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8657043624
+        },
+        {
+          "rep": 2,
+          "eligible": true,
+          "verification": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-duckdb-r2/verification.json",
+            "sha256": "00ef95eb3110cab933f181e0008d6f29ae3df8229a5960bba36105a8be4477d0"
+          },
+          "attempt": {
+            "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-v1/cross-tool-duckdb-r2/attempt.json",
+            "sha256": "ff293935f062919361e9e8a1ed9629329634687dcfa63f468b581bebfe5b3fb7"
+          },
+          "tool_identity": {
+            "python_sha256": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+            "adapter_sha256": "c0071fb75a9997807063e88f7f75406a9dee426ab20f46f7b6d66471bdb50bcf"
+          },
+          "elapsed_seconds": 66.84319389692973,
+          "cpu_seconds": 52.370000000000005,
+          "rss_kib": 475764,
+          "cgroup_peak_bytes": 1073741824,
+          "output_csv_bytes": 8657043624
+        }
+      ],
+      "summary": {
+        "elapsed_seconds": {
+          "median": 66.84319389692973,
+          "min": 66.83408424607478,
+          "max": 71.24750381091144
+        },
+        "cpu_seconds": {
+          "median": 52.370000000000005,
+          "min": 52.05,
+          "max": 53.3
+        },
+        "rss_kib": {
+          "median": 476100,
+          "min": 475764,
+          "max": 483292
+        },
+        "cgroup_peak_bytes": {
+          "median": 1073741824,
+          "min": 1073741824,
+          "max": 1073741824
+        },
+        "output_csv_bytes": {
+          "median": 8657043624,
+          "min": 8657043624,
+          "max": 8657043624
+        }
+      }
+    }
+  },
+  "scope": "8 GiB and exact eight consecutive parts. Hard 1 GiB Linux WSL2/ext4 cgroup, swap disabled, one worker, m256 Chopper/DuckDB. Full independent output equality checks. Three warmups excluded and three rotating measured rounds.",
+  "batch": {
+    "path": "scratch/balanced-fingerprint-resume-20261121/cross-tool-batch-v1/status.json",
+    "sha256": "0508de2e0e3bc271e179160d606e5fce6ae4b0bad708a6d9eeea159fedf17b06"
+  },
+  "paired_ablation": {
+    "path": "scratch/balanced-fingerprint-resume-20261121/summary-v1.json",
+    "sha256": "b6fa578a72ee0ab30e46cd54c1972a8544bd6a5cf2bbae7e730feb7ba17e743d"
+  },
+  "versions": {
+    "path": "scratch/balanced-refresh-20261121/versions-v1.json",
+    "sha256": "60904a0af4f79aa74b8092cbc5a2895aa35d27bcc749b52c822b5ba2a06e31d0"
+  },
+  "integrated_chopper_build": {
+    "path": "scratch/oom-iteration/counted-balanced-final-comparison-v1-build.json",
+    "sha256": "311ee78881a390e3105aa056c39e78d72f37137016c2fa42299f7c9fb2f142dd"
+  },
+  "base_current_design": "Counted singleton Balanced removes first-pass fingerprint after the approved contract change; second-pass output proof remains."
+}

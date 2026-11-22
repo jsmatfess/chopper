@@ -33,6 +33,7 @@ These routes index all existing validation sections without converting prose int
 
 | Narrative | Recorded status |
 | --- | --- |
+| [Analyze Run and payload-pass removal (2026-11-18)](validation.md#analyze-run-and-payload-pass-removal-2026-11-18) | Not inferred from prose |
 | [Selected native D/G scale acceptance (2026-11-15)](validation.md#selected-native-dg-scale-acceptance-2026-11-15) | Not inferred from prose |
 | [Selected hosted scale and final-package smoke (2026-11-15)](validation.md#selected-hosted-scale-and-final-package-smoke-2026-11-15) | Not inferred from prose |
 | [Native experimental plain publication (2026-11-05)](validation.md#native-experimental-plain-publication-2026-11-05) | Not inferred from prose |

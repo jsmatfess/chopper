@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "counted_partition_balanced",
+  "builds": {
+    "control": {
+      "binary_sha256": "f3d594c2c83bd4485b52be5402e962edb89e948ac92c238af28ad86ee0bbc873",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-final-writer-chains",
+        "experimental-memory-final-writers",
+        "experimental-small-final-buffers",
+        "experimental-release-final-header-scratch",
+        "experimental-counted-codec-balanced",
+        "experimental-bounded-final-partition",
+        "experimental-retained-exact-writers",
+        "experimental-single-final-catalog",
+        "experimental-single-catalog-capacity",
+        "experimental-batched-final-sync",
+        "experimental-counted-zstd-input-balanced"
+      ],
+      "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+      "profile": "workspace default release, --locked",
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+      "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+      "receipt": {
+        "path": "scratch/oom-iteration/counted-partition-balanced-control-v2-build.json",
+        "sha256": "0567cf9bf03f98c6531d1a4bc70a9919ac98a0f628abde6473a91aadd2c6444f"
+      },
+      "source_archive_sha256": "8f0abe14215c18c57f37c3517858bf92c98256b2a5844372c59ed07c7bd19b83"
+    },
+    "candidate": {
+      "binary_sha256": "0e46a633801f5d90194bbcf7ad04ec20cec53534653bf556007bc8a36ea9025a",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-final-writer-chains",
+        "experimental-memory-final-writers",
+        "experimental-small-final-buffers",
+        "experimental-release-final-header-scratch",
+        "experimental-counted-codec-balanced",
+        "experimental-bounded-final-partition",
+        "experimental-retained-exact-writers",
+        "experimental-single-final-catalog",
+        "experimental-single-catalog-capacity",
+        "experimental-batched-final-sync",
+        "experimental-counted-zstd-input-balanced",
+        "experimental-counted-partition-balanced"
+      ],
+      "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+      "profile": "workspace default release, --locked",
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+      "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+      "receipt": {
+        "path": "scratch/oom-iteration/counted-partition-balanced-candidate-v2-build.json",
+        "sha256": "43c82612d624f832b0ea491b4dee1e55da647b2cb17a7173f5f0ce65cf543472"
+      },
+      "source_archive_sha256": "4637460fd6ad9089db49ad991f1a1293a2829f65700161fae828b18c5e5a3b54"
+    }
+  },
+  "comparison": {
+    "kind": "summary",
+    "repetitions": 3,
+    "samples": [
+      {
+        "control": {
+          "receipt": "scratch/partition-balanced-resume-20261121/pair-v4-0/control/verification.json",
+          "receipt_sha256": "a069d1d509b5a800b18ffcf1b064aaef4f21d028ac0097aa9bd391d610cb1517",
+          "elapsed": 24.224366732989438,
+          "cpu": 11.440000000000001,
+          "cli_rss_kib": 76104,
+          "working_bytes": 67856787,
+          "temporary_bytes_written": 7524594899,
+          "temporary_bytes_read": 5360322056
+        },
+        "candidate": {
+          "receipt": "scratch/partition-balanced-resume-20261121/pair-v4-0/candidate/verification.json",
+          "receipt_sha256": "789aa5431ad7bced47cd6ea07911f88faae83764099644e0b482fa22fa755b9e",
+          "elapsed": 15.251600379007868,
+          "cpu": 7.92,
+          "cli_rss_kib": 6672,
+          "working_bytes": 1926900,
+          "temporary_bytes_written": 14656,
+          "temporary_bytes_read": 0
+        }
+      },
+      {
+        "candidate": {
+          "receipt": "scratch/partition-balanced-resume-20261121/pair-v4-1/candidate/verification.json",
+          "receipt_sha256": "eb715054abf6140301a7912fc3390556260620b5a88980124c61e64f05541c90",
+          "elapsed": 11.54274534189608,
+          "cpu": 7.82,
+          "cli_rss_kib": 6836,
+          "working_bytes": 1926900,
+          "temporary_bytes_written": 14656,
+          "temporary_bytes_read": 0
+        },
+        "control": {
+          "receipt": "scratch/partition-balanced-resume-20261121/pair-v4-1/control/verification.json",
+          "receipt_sha256": "a50805bb2062d706ba6ce1bb938ad29d53ea0dcd374be2138aba99bb2041e0b2",
+          "elapsed": 23.62314639694523,
+          "cpu": 11.33,
+          "cli_rss_kib": 76216,
+          "working_bytes": 67856787,
+          "temporary_bytes_written": 7524594899,
+          "temporary_bytes_read": 5360322056
+        }
+      },
+      {
+        "control": {
+          "receipt": "scratch/partition-balanced-resume-20261121/pair-v4-2/control/verification.json",
+          "receipt_sha256": "4abecfa93e67079bac7e59c689af3ee759161a82a2df51df071125a9ad77491f",
+          "elapsed": 24.326943452935666,
+          "cpu": 11.43,
+          "cli_rss_kib": 76212,
+          "working_bytes": 67856787,
+          "temporary_bytes_written": 7524594899,
+          "temporary_bytes_read": 5360322056
+        },
+        "candidate": {
+          "receipt": "scratch/partition-balanced-resume-20261121/pair-v4-2/candidate/verification.json",
+          "receipt_sha256": "778c1a28323ce3978e19ff8d11cd14645df30efb76c434fefcaa2bfb660c6417",
+          "elapsed": 14.300553102977574,
+          "cpu": 7.77,
+          "cli_rss_kib": 6900,
+          "working_bytes": 1926900,
+          "temporary_bytes_written": 14656,
+          "temporary_bytes_read": 0
+        }
+      }
+    ],
+    "medians": {
+      "control": {
+        "elapsed": 24.224366732989438,
+        "cpu": 11.43,
+        "cli_rss_kib": 76212,
+        "working_bytes": 67856787,
+        "temporary_bytes_written": 7524594899,
+        "temporary_bytes_read": 5360322056
+      },
+      "candidate": {
+        "elapsed": 14.300553102977574,
+        "cpu": 7.82,
+        "cli_rss_kib": 6836,
+        "working_bytes": 1926900,
+        "temporary_bytes_written": 14656,
+        "temporary_bytes_read": 0
+      }
+    },
+    "reductions_percent": {
+      "elapsed": 40.966245844096015,
+      "cpu": 31.583552055992993,
+      "cli_rss_kib": 91.0302839447856,
+      "working_bytes": 97.16034300297773,
+      "temporary_bytes_written": 99.9998052253949,
+      "temporary_bytes_read": 100.0
+    },
+    "all_elapsed_pairs_favorable": true,
+    "speed_rule": true,
+    "resource_rule": true
+  },
+  "reviewed_selection": {
+    "path": "scratch/partition-balanced-resume-20261121/counted-partition-balanced-summary-v1.json",
+    "sha256": "c064b26aa28d2de4500b0237f42240fe04bb08d1b6af25bfaf380bdaefaf2ce1"
+  },
+  "decision": {
+    "path": "scratch/partition-balanced-resume-20261121/candidate-decision-v1.json",
+    "sha256": "184245165f299b7581c0fdfc5a857d3f03df93901e2d63018ae6c5ea2d8a5ea4"
+  },
+  "fixture": {
+    "path": "scratch/oom-final-writers/terminal-large/fixture.json",
+    "sha256": "fb8ca4e8988fb552fe1226827c30bd8fa12b0f94081d3f358bee47ff8e7e62f1"
+  },
+  "scope": "Three alternating complete native Linux WSL2/ext4 pairs, 2 GiB plain UTF-8 input, 8 keys and 64 exact parts, 40 MiB byte cap, 256 MiB engine setting, one worker, 1 GiB cgroup without swap. Preflight and warmup excluded. Managed counters exclude input, final CSV and physical-device I/O."
+}

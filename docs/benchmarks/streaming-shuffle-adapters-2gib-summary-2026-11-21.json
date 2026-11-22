@@ -1,0 +1,317 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "streaming_external_shuffle_tools_2gib",
+  "decision": {
+    "path": "scratch/streaming-tool-compare-20261121/decision-v1.json",
+    "sha256": "218475cd5dba9c87b5c8aaa10e65fa829ec7eed84fc22374698ef3fa42add214"
+  },
+  "large_followup_separate": {
+    "path": "scratch/streaming-tool-compare-20261121/large-scope-decision-v1.json",
+    "sha256": "b4f6debda22b4430822d0224f4d42f3e296d26bdde91ed392be52db2160e6630"
+  },
+  "fixture": {
+    "path": "scratch/streaming-tool-compare-20261121/fixture-2gib-v1/fixture.json",
+    "sha256": "9957c331e9fbfe55114da331d971ef73f2b6e18777d63c2bf8140f4325b7a49c"
+  },
+  "tools": {
+    "qsvlite": {
+      "samples": {
+        "staged": [
+          {
+            "seconds": 40.76760947704315,
+            "cpu_seconds": 22.59,
+            "peak_rss_kib": 137472.0,
+            "filesystem_inputs": 29410552.0,
+            "filesystem_outputs": 22824248.0,
+            "file_cache_refaults": 3152030,
+            "output_bytes": 2147483816,
+            "cgroup_peak_bytes": 1073741824,
+            "receipt": {
+              "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-0-staged-v3/verification.json",
+              "sha256": "c99c14307629a8130dcc8a50b3f8035ca176ad7cea4f967e253c58290de0df8f"
+            },
+            "attempt": {
+              "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-0-staged-v3/attempt.json",
+              "sha256": "14e819d40a913f6c51c823036d36d6c3c637b9c962380f38e178bd582b52d111"
+            }
+          },
+          {
+            "seconds": 37.910960483015515,
+            "cpu_seconds": 22.97,
+            "peak_rss_kib": 138576.0,
+            "filesystem_inputs": 30083760.0,
+            "filesystem_outputs": 22823864.0,
+            "file_cache_refaults": 3236181,
+            "output_bytes": 2147483816,
+            "cgroup_peak_bytes": 1073741824,
+            "receipt": {
+              "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-1-staged-v3/verification.json",
+              "sha256": "9da86e9b4a010b1733680e318727cc8543f59ec3ed066e94acb0753eb997e678"
+            },
+            "attempt": {
+              "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-1-staged-v3/attempt.json",
+              "sha256": "ffafb342b2f85a81fe6e9744e9ddb3a44ae3eba4b6697740a4ef79016b0395a9"
+            }
+          }
+        ],
+        "streaming": [
+          {
+            "seconds": 37.00632842804771,
+            "cpu_seconds": 27.25,
+            "peak_rss_kib": 134116.0,
+            "filesystem_inputs": 15028720.0,
+            "filesystem_outputs": 9028688.0,
+            "file_cache_refaults": 1354301,
+            "output_bytes": 2147483816,
+            "cgroup_peak_bytes": 1073741824,
+            "receipt": {
+              "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-0-streaming-v3/verification.json",
+              "sha256": "1eeeeb33f06446ee15b5a07f67ba1f039f526c7fdbccfeb6ca39a11fef7fe2ce"
+            },
+            "attempt": {
+              "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-0-streaming-v3/attempt.json",
+              "sha256": "cf7ff4cdc84ec779289544eae097d5d1c255ea60008d74056d8b4f2798f0cc8b"
+            }
+          },
+          {
+            "seconds": 36.75619026494678,
+            "cpu_seconds": 27.509999999999998,
+            "peak_rss_kib": 155492.0,
+            "filesystem_inputs": 15356336.0,
+            "filesystem_outputs": 9028664.0,
+            "file_cache_refaults": 1395253,
+            "output_bytes": 2147483816,
+            "cgroup_peak_bytes": 1073741824,
+            "receipt": {
+              "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-1-streaming-v3/verification.json",
+              "sha256": "8d0e776d91213ecb98962f2049ecc2c98f1780797cde0315a2b80e255eae7a77"
+            },
+            "attempt": {
+              "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-1-streaming-v3/attempt.json",
+              "sha256": "8335507fc9ed90b30b40aa4032693ade3c3f8f98a78b79c698a70f445588975d"
+            }
+          }
+        ]
+      },
+      "medians": {
+        "staged": {
+          "seconds": 39.33928498002933,
+          "cpu_seconds": 22.78,
+          "peak_rss_kib": 138024.0,
+          "filesystem_inputs": 29747156.0,
+          "filesystem_outputs": 22824056.0,
+          "file_cache_refaults": 3194105.5,
+          "output_bytes": 2147483816.0,
+          "cgroup_peak_bytes": 1073741824.0
+        },
+        "streaming": {
+          "seconds": 36.881259346497245,
+          "cpu_seconds": 27.38,
+          "peak_rss_kib": 144804.0,
+          "filesystem_inputs": 15192528.0,
+          "filesystem_outputs": 9028676.0,
+          "file_cache_refaults": 1374777.0,
+          "output_bytes": 2147483816.0,
+          "cgroup_peak_bytes": 1073741824.0
+        }
+      },
+      "relative_percent": {
+        "seconds": -6.248272267225774,
+        "cpu_seconds": 20.19315188762072,
+        "peak_rss_kib": 4.912189184489657,
+        "filesystem_inputs": -48.927796660628665,
+        "filesystem_outputs": -60.44228072346125,
+        "file_cache_refaults": -56.95893576464521,
+        "output_bytes": 0.0,
+        "cgroup_peak_bytes": 0.0
+      },
+      "elapsed_pairs_percent": [
+        -9.226150606435423,
+        -3.04600622974478
+      ],
+      "elapsed_advance": false,
+      "batch": {
+        "path": "scratch/streaming-tool-compare-20261121/qsvlite-primary-batch-v3/status.json",
+        "sha256": "4909d61653c9462e6f274d97deb466c3b9c0e9e292cc68eef5884a488a1024e6"
+      },
+      "excluded_preflights": {
+        "path": "scratch/streaming-tool-compare-20261121/qsvlite-preflight-batch-v3/status.json",
+        "sha256": "ece920304f1612213a9207175fcd17ae0268d8af4fdb7e299281b925de606b60"
+      }
+    },
+    "duckdb": {
+      "samples": {
+        "staged": [
+          {
+            "seconds": 23.674813813064247,
+            "cpu_seconds": 19.41,
+            "peak_rss_kib": 394896.0,
+            "filesystem_inputs": 18533176.0,
+            "filesystem_outputs": 22125968.0,
+            "file_cache_refaults": 1791990,
+            "output_bytes": 2164261032,
+            "cgroup_peak_bytes": 1073741824,
+            "receipt": {
+              "path": "scratch/streaming-tool-compare-20261121/duckdb-medium-0-staged-v2/verification.json",
+              "sha256": "6f2ed3134f6aedad92f33e78fa8b5058a172c090aeea56493a2546a74581c707"
+            },
+            "attempt": {
+              "path": "scratch/streaming-tool-compare-20261121/duckdb-medium-0-staged-v2/attempt.json",
+              "sha256": "dcce8c809b6d93680f0d98363d0ac48f4b1d65241b87cb1dfb35b99e84e24085"
+            }
+          },
+          {
+            "seconds": 29.042600858025253,
+            "cpu_seconds": 19.96,
+            "peak_rss_kib": 399164.0,
+            "filesystem_inputs": 17870000.0,
+            "filesystem_outputs": 20028344.0,
+            "file_cache_refaults": 1709133,
+            "output_bytes": 2164261032,
+            "cgroup_peak_bytes": 1073741824,
+            "receipt": {
+              "path": "scratch/streaming-tool-compare-20261121/duckdb-medium-1-staged-v2/verification.json",
+              "sha256": "0e58c753567d956a2e43efcb64f2a83793307f64b6c7bd5cd2d053816484cb24"
+            },
+            "attempt": {
+              "path": "scratch/streaming-tool-compare-20261121/duckdb-medium-1-staged-v2/attempt.json",
+              "sha256": "40056d36ef09c63d8c43102ff59e458ca8bd1065282c3f8bfa7bd3fbe4fa3f84"
+            }
+          }
+        ],
+        "streaming": [
+          {
+            "seconds": 13.498576531070285,
+            "cpu_seconds": 17.950000000000003,
+            "peak_rss_kib": 395652.0,
+            "filesystem_inputs": 14063504.0,
+            "filesystem_outputs": 6744584.0,
+            "file_cache_refaults": 1233647,
+            "output_bytes": 2147483816,
+            "cgroup_peak_bytes": 1073741824,
+            "receipt": {
+              "path": "scratch/streaming-tool-compare-20261121/duckdb-medium-0-streaming-v2/verification.json",
+              "sha256": "12de3b86bd4426ef4e95d6400f04d5ab007c73c07f6c47ffb3927e9781752aab"
+            },
+            "attempt": {
+              "path": "scratch/streaming-tool-compare-20261121/duckdb-medium-0-streaming-v2/attempt.json",
+              "sha256": "afcc42023e901dacfb7f08da047eb4e2986a4eec7b149b9580139553173ecbc0"
+            }
+          },
+          {
+            "seconds": 15.353021024959162,
+            "cpu_seconds": 19.58,
+            "peak_rss_kib": 393828.0,
+            "filesystem_inputs": 14302208.0,
+            "filesystem_outputs": 6838088.0,
+            "file_cache_refaults": 1263480,
+            "output_bytes": 2147483816,
+            "cgroup_peak_bytes": 1073741824,
+            "receipt": {
+              "path": "scratch/streaming-tool-compare-20261121/duckdb-medium-1-streaming-v2/verification.json",
+              "sha256": "b3c00412c598293ca98e98eddf011d8b2c662b1d10ede99eefcfc72823ae4c16"
+            },
+            "attempt": {
+              "path": "scratch/streaming-tool-compare-20261121/duckdb-medium-1-streaming-v2/attempt.json",
+              "sha256": "46eb609eb891bd515dc85fa1ffeec198abbb4637ca486eb95bf427211d7f7015"
+            }
+          }
+        ]
+      },
+      "medians": {
+        "staged": {
+          "seconds": 26.35870733554475,
+          "cpu_seconds": 19.685000000000002,
+          "peak_rss_kib": 397030.0,
+          "filesystem_inputs": 18201588.0,
+          "filesystem_outputs": 21077156.0,
+          "file_cache_refaults": 1750561.5,
+          "output_bytes": 2164261032.0,
+          "cgroup_peak_bytes": 1073741824.0
+        },
+        "streaming": {
+          "seconds": 14.425798778014723,
+          "cpu_seconds": 18.765,
+          "peak_rss_kib": 394740.0,
+          "filesystem_inputs": 14182856.0,
+          "filesystem_outputs": 6791336.0,
+          "file_cache_refaults": 1248563.5,
+          "output_bytes": 2147483816.0,
+          "cgroup_peak_bytes": 1073741824.0
+        }
+      },
+      "relative_percent": {
+        "seconds": -45.27122064684289,
+        "cpu_seconds": -4.673609347218699,
+        "peak_rss_kib": -0.5767826108858287,
+        "filesystem_inputs": -22.079018599915567,
+        "filesystem_outputs": -67.77868892748148,
+        "file_cache_refaults": -28.676398972558236,
+        "output_bytes": -0.7751937382754703,
+        "cgroup_peak_bytes": 0.0
+      },
+      "elapsed_pairs_percent": [
+        -42.98338885511534,
+        -47.136204846072836
+      ],
+      "elapsed_advance": true,
+      "batch": {
+        "path": "scratch/streaming-tool-compare-20261121/duckdb-primary-batch-v2/status.json",
+        "sha256": "98829e2db28a7d35a224609ca71c7c38cd4d408d7c5d2061a45007fcadf30591"
+      },
+      "excluded_preflights": {
+        "path": "scratch/streaming-tool-compare-20261121/duckdb-preflight-batch-v2/status.json",
+        "sha256": "8c65d5cf531edf4029ec8d2cc536884ddd797607c84f0195b78f23f17e391863"
+      }
+    }
+  },
+  "excluded_failures": [
+    {
+      "kind": "live scope OOM due to implicit split stdin spool",
+      "attempt": {
+        "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-0-streaming/attempt.json",
+        "sha256": "9b2537d1dd2cfd4ede7291fc5588705c16db9d475dae3d9348a49bc6ffdb7edc"
+      },
+      "kernel": {
+        "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-0-streaming/oom-matching-journal.txt",
+        "sha256": "92216493cadc2cd3339d8c07adfd23ffb2ef8d6142f41ad515cb5a3794b3a5f7"
+      },
+      "tmp_mount": {
+        "path": "scratch/streaming-tool-compare-20261121/qsvlite-medium-0-streaming/tmp-mount.txt",
+        "sha256": "43c0994c3be263f45088fedaa75d8986b4448ecb945835f0e36651dc92fa0823"
+      }
+    },
+    {
+      "kind": "extensionless explicit path rejected by qsv format classification",
+      "attempt": {
+        "path": "scratch/streaming-tool-compare-20261121/qsvlite-preflight-0-streaming-v2/attempt.json",
+        "sha256": "173eed0583c07625d414786f23c029bf8925211904a3d7b418b77e5d76129de7"
+      },
+      "stderr": {
+        "path": "scratch/streaming-tool-compare-20261121/qsvlite-preflight-0-streaming-v2/stderr",
+        "sha256": "787a08022152876af714422dc4837a3cb2dba5e3a12cc0cdbb0c107b8a37c41c"
+      }
+    },
+    {
+      "kind": "DuckDB partitioned COPY engine memory denial at 2 GiB",
+      "attempt": {
+        "path": "scratch/streaming-tool-compare-20261121/duckdb-medium-0-streaming/attempt.json",
+        "sha256": "be40bf888627edf383e34810195a98fcbf0357a9cbdcaccf5ef62276cfa65041"
+      },
+      "stderr": {
+        "path": "scratch/streaming-tool-compare-20261121/duckdb-medium-0-streaming/stderr",
+        "sha256": "e05c59b40b234003b1b378c96c913562f2ae8b702b517032f816e8032c0aef6b"
+      },
+      "runner": {
+        "path": "scratch/streaming-tool-compare-20261121/duckdb-primary-batch-v1/status.json",
+        "sha256": "b2a3a53c5e80dd34d475fbb4832fca553a375603af589a190a36dd949c66432b"
+      }
+    }
+  ],
+  "duckdb_semantic_controls": {
+    "path": "scratch/duckdb-streaming-comparator-20261121/smoke-v1/verified.json",
+    "sha256": "69de30f8c704bdd1297b376486c61a2b8ba0e0a5288a0dda5b9916f0f488fabb"
+  },
+  "scope": "Two opposite-order paired 2 GiB 8-way Shuffle+Balanced adapter screens, hard 1 GiB Linux WSL2/ext4 and swap disabled. Complete job through output closure. All fields, unique IDs, exact quotas and actual caps checked outside timing."
+}

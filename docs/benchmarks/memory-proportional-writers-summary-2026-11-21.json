@@ -1,0 +1,4350 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "memory_proportional_writer_summary",
+  "scope": "Derived reviewed comparisons, not extra observations. Independent source/feature/runtime strata, n3 plus excluded warmup. Full raw jobs/source archives local and unarchived. Linux WSL/ext4 hard1GiB/noSwap and Windows MSVC/NTFS NO OSRAMcap are separate. Reservations, CLI RSS or Windows peakWS/privatecommit, logical managed traffic, CPU and physical I/O are distinct. Codec working snapshots have DIFFERENT publication phases and cannot establish whole-job memory regressions. No default promotion.",
+  "comparisons": [
+    {
+      "schema_version": 1,
+      "cells": [
+        {
+          "operation": "interleaved",
+          "groups": 64,
+          "memory_mib": 32,
+          "n": 3,
+          "source": "scratch/writer-capacity-20261119/oom-interleaved-64-m32/results.jsonl",
+          "source_sha256": "bbb8b4db066b8c61654eaa52459072680810701ac2daf8db90d6054b313248cc",
+          "variants": {
+            "baseline": {
+              "runs": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 7,
+                  "verification_line": 8,
+                  "seconds": 23.972121080034412,
+                  "working_peak_bytes": 8689845,
+                  "managed_written_bytes": 5363830914,
+                  "managed_read_bytes": 5363819028,
+                  "sort_runs": 394,
+                  "outer_max_process_rss_kib": 16184,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 14,
+                  "verification_line": 15,
+                  "seconds": 22.217376113985665,
+                  "working_peak_bytes": 8689845,
+                  "managed_written_bytes": 5363830914,
+                  "managed_read_bytes": 5363819028,
+                  "sort_runs": 394,
+                  "outer_max_process_rss_kib": 16020,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 17,
+                  "verification_line": 18,
+                  "seconds": 23.42103340208996,
+                  "working_peak_bytes": 8689845,
+                  "managed_written_bytes": 5363830914,
+                  "managed_read_bytes": 5363819028,
+                  "sort_runs": 394,
+                  "outer_max_process_rss_kib": 16176,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                }
+              ],
+              "medians": {
+                "seconds": 23.42103340208996,
+                "working_peak_bytes": 8689845,
+                "managed_written_bytes": 5363830914,
+                "managed_read_bytes": 5363819028,
+                "outer_max_process_rss_kib": 16176,
+                "cgroup_memory_peak_bytes": 1073741824
+              },
+              "range_seconds": [
+                22.217376113985665,
+                23.972121080034412
+              ]
+            },
+            "candidate": {
+              "runs": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 9,
+                  "verification_line": 10,
+                  "seconds": 8.785820945049636,
+                  "working_peak_bytes": 5314052,
+                  "managed_written_bytes": 23588,
+                  "managed_read_bytes": 11702,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 16192,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 12,
+                  "verification_line": 13,
+                  "seconds": 7.632283917977475,
+                  "working_peak_bytes": 5314052,
+                  "managed_written_bytes": 23588,
+                  "managed_read_bytes": 11702,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 16216,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 19,
+                  "verification_line": 20,
+                  "seconds": 7.632715906947851,
+                  "working_peak_bytes": 5314052,
+                  "managed_written_bytes": 23588,
+                  "managed_read_bytes": 11702,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 16144,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                }
+              ],
+              "medians": {
+                "seconds": 7.632715906947851,
+                "working_peak_bytes": 5314052,
+                "managed_written_bytes": 23588,
+                "managed_read_bytes": 11702,
+                "outer_max_process_rss_kib": 16192,
+                "cgroup_memory_peak_bytes": 1073741824
+              },
+              "range_seconds": [
+                7.632283917977475,
+                8.785820945049636
+              ]
+            }
+          },
+          "elapsed_reduction_percent": 67.41084914610663,
+          "working_peak_reduction_percent": 38.84756287367611,
+          "managed_write_reduction_percent": 99.99956023967984,
+          "all_pairs_favorable": true
+        },
+        {
+          "operation": "chain",
+          "groups": 256,
+          "memory_mib": 64,
+          "n": 3,
+          "source": "scratch/writer-capacity-20261119/oom-chain-256-m64/results.jsonl",
+          "source_sha256": "e2d8db16e12b0ff0fbec720cd8b2afad0e920fa94aeddd019f9af7679debcdb6",
+          "variants": {
+            "baseline": {
+              "runs": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 7,
+                  "verification_line": 8,
+                  "seconds": 29.3352142641088,
+                  "working_peak_bytes": 1282073,
+                  "managed_written_bytes": 10250928705,
+                  "managed_read_bytes": 8086620848,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 16124,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 14,
+                  "verification_line": 15,
+                  "seconds": 30.49025362508837,
+                  "working_peak_bytes": 1282073,
+                  "managed_written_bytes": 10250928705,
+                  "managed_read_bytes": 8086620848,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 16204,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 17,
+                  "verification_line": 18,
+                  "seconds": 28.583969829021953,
+                  "working_peak_bytes": 1282073,
+                  "managed_written_bytes": 10250928705,
+                  "managed_read_bytes": 8086620848,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 16168,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                }
+              ],
+              "medians": {
+                "seconds": 29.3352142641088,
+                "working_peak_bytes": 1282073,
+                "managed_written_bytes": 10250928705,
+                "managed_read_bytes": 8086620848,
+                "outer_max_process_rss_kib": 16168,
+                "cgroup_memory_peak_bytes": 1073741824
+              },
+              "range_seconds": [
+                28.583969829021953,
+                30.49025362508837
+              ]
+            },
+            "candidate": {
+              "runs": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 9,
+                  "verification_line": 10,
+                  "seconds": 10.089438797906041,
+                  "working_peak_bytes": 21937270,
+                  "managed_written_bytes": 110250,
+                  "managed_read_bytes": 55018,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 24564,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 12,
+                  "verification_line": 13,
+                  "seconds": 10.890240052016452,
+                  "working_peak_bytes": 21937270,
+                  "managed_written_bytes": 110250,
+                  "managed_read_bytes": 55018,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 24364,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 19,
+                  "verification_line": 20,
+                  "seconds": 8.835628817090765,
+                  "working_peak_bytes": 21937270,
+                  "managed_written_bytes": 110250,
+                  "managed_read_bytes": 55018,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 24540,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                }
+              ],
+              "medians": {
+                "seconds": 10.089438797906041,
+                "working_peak_bytes": 21937270,
+                "managed_written_bytes": 110250,
+                "managed_read_bytes": 55018,
+                "outer_max_process_rss_kib": 24540,
+                "cgroup_memory_peak_bytes": 1073741824
+              },
+              "range_seconds": [
+                8.835628817090765,
+                10.890240052016452
+              ]
+            }
+          },
+          "elapsed_reduction_percent": 65.60639132521926,
+          "working_peak_reduction_percent": -1611.0780743374207,
+          "managed_write_reduction_percent": 99.99892448769108,
+          "all_pairs_favorable": true
+        },
+        {
+          "operation": "interleaved",
+          "groups": 1024,
+          "memory_mib": 256,
+          "n": 3,
+          "source": "scratch/writer-capacity-20261119/oom-interleaved-1024-m256/results.jsonl",
+          "source_sha256": "6e770996cb86b6ee447bff62fa8a35fdb2de1830772b8f7ac0bee0313a035a93",
+          "variants": {
+            "baseline": {
+              "runs": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 7,
+                  "verification_line": 8,
+                  "seconds": 23.16966934001539,
+                  "working_peak_bytes": 67415303,
+                  "managed_written_bytes": 2718097242,
+                  "managed_read_bytes": 2717908992,
+                  "sort_runs": 50,
+                  "outer_max_process_rss_kib": 87928,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 14,
+                  "verification_line": 15,
+                  "seconds": 24.923758147051558,
+                  "working_peak_bytes": 67415303,
+                  "managed_written_bytes": 2718097242,
+                  "managed_read_bytes": 2717908992,
+                  "sort_runs": 50,
+                  "outer_max_process_rss_kib": 87696,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 17,
+                  "verification_line": 18,
+                  "seconds": 24.372154509997927,
+                  "working_peak_bytes": 67415303,
+                  "managed_written_bytes": 2718097242,
+                  "managed_read_bytes": 2717908992,
+                  "sort_runs": 50,
+                  "outer_max_process_rss_kib": 79004,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                }
+              ],
+              "medians": {
+                "seconds": 24.372154509997927,
+                "working_peak_bytes": 67415303,
+                "managed_written_bytes": 2718097242,
+                "managed_read_bytes": 2717908992,
+                "outer_max_process_rss_kib": 87696,
+                "cgroup_memory_peak_bytes": 1073741824
+              },
+              "range_seconds": [
+                23.16966934001539,
+                24.923758147051558
+              ]
+            },
+            "candidate": {
+              "runs": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 9,
+                  "verification_line": 10,
+                  "seconds": 16.80371598491911,
+                  "working_peak_bytes": 83078467,
+                  "managed_written_bytes": 376320,
+                  "managed_read_bytes": 188070,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 80148,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 12,
+                  "verification_line": 13,
+                  "seconds": 16.654543379088864,
+                  "working_peak_bytes": 83078467,
+                  "managed_written_bytes": 376320,
+                  "managed_read_bytes": 188070,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 80008,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 19,
+                  "verification_line": 20,
+                  "seconds": 17.45529934100341,
+                  "working_peak_bytes": 83078467,
+                  "managed_written_bytes": 376320,
+                  "managed_read_bytes": 188070,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 79952,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                }
+              ],
+              "medians": {
+                "seconds": 16.80371598491911,
+                "working_peak_bytes": 83078467,
+                "managed_written_bytes": 376320,
+                "managed_read_bytes": 188070,
+                "outer_max_process_rss_kib": 80008,
+                "cgroup_memory_peak_bytes": 1073741824
+              },
+              "range_seconds": [
+                16.654543379088864,
+                17.45529934100341
+              ]
+            }
+          },
+          "elapsed_reduction_percent": 31.053629345629254,
+          "working_peak_reduction_percent": -23.23384054210955,
+          "managed_write_reduction_percent": 99.98615502071871,
+          "all_pairs_favorable": true
+        },
+        {
+          "operation": "interleaved",
+          "groups": 4096,
+          "memory_mib": 1024,
+          "n": 3,
+          "source": "scratch/writer-capacity-20261119/oom-interleaved-4096-m1024/results.jsonl",
+          "source_sha256": "8d40a836b88ab4296d66fd9ac64fe242f967fa1892b685e12591022012c4e59c",
+          "variants": {
+            "baseline": {
+              "runs": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 7,
+                  "verification_line": 8,
+                  "seconds": 52.23583552800119,
+                  "working_peak_bytes": 266400485,
+                  "managed_written_bytes": 2718660442,
+                  "managed_read_bytes": 2717908992,
+                  "sort_runs": 13,
+                  "outer_max_process_rss_kib": 266780,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 14,
+                  "verification_line": 15,
+                  "seconds": 53.94639138900675,
+                  "working_peak_bytes": 266466045,
+                  "managed_written_bytes": 2718660442,
+                  "managed_read_bytes": 2717908992,
+                  "sort_runs": 13,
+                  "outer_max_process_rss_kib": 266744,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 17,
+                  "verification_line": 18,
+                  "seconds": 52.44047606503591,
+                  "working_peak_bytes": 266401541,
+                  "managed_written_bytes": 2718660442,
+                  "managed_read_bytes": 2717908992,
+                  "sort_runs": 13,
+                  "outer_max_process_rss_kib": 266664,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                }
+              ],
+              "medians": {
+                "seconds": 52.44047606503591,
+                "working_peak_bytes": 266401541,
+                "managed_written_bytes": 2718660442,
+                "managed_read_bytes": 2717908992,
+                "outer_max_process_rss_kib": 266744,
+                "cgroup_memory_peak_bytes": 1073741824
+              },
+              "range_seconds": [
+                52.23583552800119,
+                53.94639138900675
+              ]
+            },
+            "candidate": {
+              "runs": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 9,
+                  "verification_line": 10,
+                  "seconds": 37.50264999305364,
+                  "working_peak_bytes": 331938118,
+                  "managed_written_bytes": 1502722,
+                  "managed_read_bytes": 751272,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 303796,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 12,
+                  "verification_line": 13,
+                  "seconds": 40.75918683002237,
+                  "working_peak_bytes": 331938118,
+                  "managed_written_bytes": 1502722,
+                  "managed_read_bytes": 751272,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 304148,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 19,
+                  "verification_line": 20,
+                  "seconds": 41.762215916998684,
+                  "working_peak_bytes": 331938118,
+                  "managed_written_bytes": 1502722,
+                  "managed_read_bytes": 751272,
+                  "sort_runs": 0,
+                  "outer_max_process_rss_kib": 304236,
+                  "cgroup_memory_peak_bytes": 1073741824,
+                  "io_stat": null
+                }
+              ],
+              "medians": {
+                "seconds": 40.75918683002237,
+                "working_peak_bytes": 331938118,
+                "managed_written_bytes": 1502722,
+                "managed_read_bytes": 751272,
+                "outer_max_process_rss_kib": 304148,
+                "cgroup_memory_peak_bytes": 1073741824
+              },
+              "range_seconds": [
+                37.50264999305364,
+                41.762215916998684
+              ]
+            }
+          },
+          "elapsed_reduction_percent": 22.27533026307117,
+          "working_peak_reduction_percent": -24.600674888738716,
+          "managed_write_reduction_percent": 99.94472564588116,
+          "all_pairs_favorable": true
+        }
+      ],
+      "builds": {
+        "control": {
+          "binary_sha256": "faef21c8e58bc909e01fa7a81f83b67ea63cb7803b3e87b976cdf697170cf1b1",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/capacity-control-v1-source.tar.gz",
+            "sha256": "f0f46d014accbf1ac5ca33f48d697729ad3f3ff4583dc11db7ec10835cfeeed5"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "d2f6311a61d514e712d7716496ed6d0ced4266afaa6382c1e410fdc170e4803d",
+          "source_file_count": 335
+        },
+        "candidate": {
+          "binary_sha256": "bf3948ce064c9b686617f20655c551679515ceec177eb10146b2679711799cc3",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/capacity-candidate-v1-source.tar.gz",
+            "sha256": "1b47034c3376fa3328129cdb0986caa721d078b6c347ae5ed15d7e425e7ab01a"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "d2f6311a61d514e712d7716496ed6d0ced4266afaa6382c1e410fdc170e4803d",
+          "source_file_count": 335
+        }
+      },
+      "eligibility": "Three complete paired repetitions0/1/2 per named cell, warmup-1 excluded. All CLI exits, independent full field/ID/membership/metadata and cgroup controls pass. Fixed reviewed selector; no pooled estimate.",
+      "scope": "CLI startup through final publication/exit under1GiB cgroup/no swap, WSL2 ext4, cleaninput fadvise; host cache uncontrolled. Managed traffic excludes private/final CSVs; working reservations not RSS. Outer GNU time reports largest process including ~16MiB Python wrapper floor; cgroup peak includes cache. Frozen capacity-v1 source predates later header/compact/codec/smallbuffer prototypes. No fresh comparator timings.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/capacity-summary.json",
+        "sha256": "20eb92b717357965cface3ff557156195566163199faf0c05fa31b86bcaa639b"
+      }
+    },
+    {
+      "cell": "small-buffer-oom-4096",
+      "n": 3,
+      "rows": 8388608,
+      "groups": 4096,
+      "source": "scratch/writer-capacity-20261119/small-buffer-oom-4096/results.jsonl",
+      "source_sha256": "63ea2d6471a90f71a981fe6b7ef2ea32560bd49bd1dba06df45f3deaea2c40df",
+      "builds": {
+        "baseline": {
+          "binary_sha256": "8482b91e59af127954c258a23ace582a0fcb5fc529789cd91823824eaca8ca53",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/lifetime-control-v1-source.tar.gz",
+            "sha256": "d3f60d3b2c111ec6d1a4fdbddcd572506da5b6373b8eb16f03162b6d22237ec4"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "34b0ae874f95f34ef267a0438269f44eecf6b431e815654b9857c6bf87226d9f",
+          "source_file_count": 335
+        },
+        "candidate": {
+          "binary_sha256": "0cefafbcc556162c538f3d30ca95b9edaa1e85803b1cc67d4357ea60087de3c2",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/small-buffer-candidate-v1-source.tar.gz",
+            "sha256": "48229c8e1914510d37399517c35dbf01b22225700d5c79837b420d2db882b1d2"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "34b0ae874f95f34ef267a0438269f44eecf6b431e815654b9857c6bf87226d9f",
+          "source_file_count": 335
+        }
+      },
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 41.86324803298339,
+              "cli_peak_rss_kib": 303768,
+              "working_peak_bytes": 331897140,
+              "managed_writes": 1502722,
+              "managed_reads": 751272,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 35.45235800696537,
+              "cli_peak_rss_kib": 303996,
+              "working_peak_bytes": 331897140,
+              "managed_writes": 1502722,
+              "managed_reads": 751272,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 42.6675602189498,
+              "cli_peak_rss_kib": 304104,
+              "working_peak_bytes": 331897140,
+              "managed_writes": 1502722,
+              "managed_reads": 751272,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            }
+          ],
+          "medians": {
+            "seconds": 41.86324803298339,
+            "cli_peak_rss_kib": 303996,
+            "working_peak_bytes": 331897140,
+            "managed_writes": 1502722,
+            "managed_reads": 751272,
+            "cgroup_peak_bytes": 1073741824
+          },
+          "range_seconds": [
+            35.45235800696537,
+            42.6675602189498
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 35.64893468399532,
+              "cli_peak_rss_kib": 107808,
+              "working_peak_bytes": 130600062,
+              "managed_writes": 1502722,
+              "managed_reads": 751272,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 36.29986768704839,
+              "cli_peak_rss_kib": 107780,
+              "working_peak_bytes": 130600062,
+              "managed_writes": 1502722,
+              "managed_reads": 751272,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 35.75000514893327,
+              "cli_peak_rss_kib": 107688,
+              "working_peak_bytes": 130600062,
+              "managed_writes": 1502722,
+              "managed_reads": 751272,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            }
+          ],
+          "medians": {
+            "seconds": 35.75000514893327,
+            "cli_peak_rss_kib": 107780,
+            "working_peak_bytes": 130600062,
+            "managed_writes": 1502722,
+            "managed_reads": 751272,
+            "cgroup_peak_bytes": 1073741824
+          },
+          "range_seconds": [
+            35.64893468399532,
+            36.29986768704839
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 14.602887189339908,
+        "cli_peak_rss_kib": 64.54558612613323,
+        "working_peak_bytes": 60.650440675686454,
+        "managed_writes": 0.0,
+        "managed_reads": 0.0,
+        "cgroup_peak_bytes": 0.0
+      },
+      "all_elapsed_pairs_favorable": false,
+      "eligibility": "Named matched complete jobs repetitions0/1/2 only, excludedwarmup-1, n3pervariant. Fullfield/order/membership/lineage/stage/manifest/cgroup/cleanupcontrols. Source337 and335epochs stayseparate; no historical pooling.",
+      "scope": "WSL2ext4 perjob fadvise cleaninput with hostcacheuncontrolled;1GiBcgroup/no swap. CLI startup through nativeprivateatomicpublication andexit; verifierexcluded. Workingreservations, CLI-only GNU maxRSS, managedtemporarytraffic andcgroupcacheinclusivepeak distinct; no physicaldiskthroughput/nativeWindowsclaim.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/small-buffer-oom-4096-summary.json",
+        "sha256": "d9c858997c1a8664689276496dece64d9fa649b9d0b114be80bbcfd587ec2c2e"
+      }
+    },
+    {
+      "cell": "bounded-oom-8",
+      "n": 3,
+      "rows": 8388608,
+      "groups": 8,
+      "source": "scratch/writer-capacity-20261119/bounded-oom-8/results.jsonl",
+      "source_sha256": "dd3dc7c19741cfc34d4488155f9f9dbbe68590d85ade6f88606b22c1b341f84f",
+      "builds": {
+        "baseline": {
+          "binary_sha256": "f07ccec720a3689a19b6940306d53e598f61a5e621e17321b06cb42ee30708f8",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/bounded-control-v1-source.tar.gz",
+            "sha256": "29689759bc6449dabc28d7ec8c52b4a178b08c9427d0448900e93c3d15340ce5"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "3c77d8c5f7b06ccd23357f68bc64d2a4695d510f145435b4d9929620960b6e29",
+          "source_file_count": 337
+        },
+        "candidate": {
+          "binary_sha256": "48dfe6de0e90404157b7ab6853d78106432cff69932c36c7b038ce6482583842",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/bounded-candidate-v1-source.tar.gz",
+            "sha256": "20d0d5331fa8174344721ad029ee9e82d9b6d74ae44d1cdc2f0cf02a74a26574"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "3c77d8c5f7b06ccd23357f68bc64d2a4695d510f145435b4d9929620960b6e29",
+          "source_file_count": 337
+        }
+      },
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 16.553531317971647,
+              "cli_peak_rss_kib": 76060,
+              "working_peak_bytes": 67856713,
+              "managed_writes": 2709521976,
+              "managed_reads": 2709520384,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 14.098463919945061,
+              "cli_peak_rss_kib": 76116,
+              "working_peak_bytes": 67856713,
+              "managed_writes": 2709521976,
+              "managed_reads": 2709520384,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 16.3038227079669,
+              "cli_peak_rss_kib": 76084,
+              "working_peak_bytes": 67856713,
+              "managed_writes": 2709521976,
+              "managed_reads": 2709520384,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            }
+          ],
+          "medians": {
+            "seconds": 16.3038227079669,
+            "cli_peak_rss_kib": 76084,
+            "working_peak_bytes": 67856713,
+            "managed_writes": 2709521976,
+            "managed_reads": 2709520384,
+            "cgroup_peak_bytes": 1073741824
+          },
+          "range_seconds": [
+            14.098463919945061,
+            16.553531317971647
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 10.539203352062032,
+              "cli_peak_rss_kib": 5812,
+              "working_peak_bytes": 577960,
+              "managed_writes": 3184,
+              "managed_reads": 1592,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 10.138319917023182,
+              "cli_peak_rss_kib": 5840,
+              "working_peak_bytes": 577960,
+              "managed_writes": 3184,
+              "managed_reads": 1592,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 9.387074516969733,
+              "cli_peak_rss_kib": 5784,
+              "working_peak_bytes": 577960,
+              "managed_writes": 3184,
+              "managed_reads": 1592,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            }
+          ],
+          "medians": {
+            "seconds": 10.138319917023182,
+            "cli_peak_rss_kib": 5812,
+            "working_peak_bytes": 577960,
+            "managed_writes": 3184,
+            "managed_reads": 1592,
+            "cgroup_peak_bytes": 1073741824
+          },
+          "range_seconds": [
+            9.387074516969733,
+            10.539203352062032
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 37.816301743338585,
+        "cli_peak_rss_kib": 92.36107460175596,
+        "working_peak_bytes": 99.14826407816129,
+        "managed_writes": 99.99988248849692,
+        "managed_reads": 99.99994124421394,
+        "cgroup_peak_bytes": 0.0
+      },
+      "all_elapsed_pairs_favorable": true,
+      "eligibility": "Named matched complete jobs repetitions0/1/2 only, excludedwarmup-1, n3pervariant. Fullfield/order/membership/lineage/stage/manifest/cgroup/cleanupcontrols. Source337 and335epochs stayseparate; no historical pooling.",
+      "scope": "WSL2ext4 perjob fadvise cleaninput with hostcacheuncontrolled;1GiBcgroup/no swap. CLI startup through nativeprivateatomicpublication andexit; verifierexcluded. Workingreservations, CLI-only GNU maxRSS, managedtemporarytraffic andcgroupcacheinclusivepeak distinct; no physicaldiskthroughput/nativeWindowsclaim.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/bounded-oom-8-summary.json",
+        "sha256": "4a5591d391b7fd79911e0ae80b7300c7c702cbcb2df80b57072e64ae07daf15a"
+      }
+    },
+    {
+      "cell": "large-writer-oom-8192",
+      "n": 3,
+      "rows": 33554432,
+      "groups": 8192,
+      "source": "scratch/writer-capacity-20261119/large-writer-oom-8192/results.jsonl",
+      "source_sha256": "72dbb963f73a9e773fb59da72f3715df5f49fa7b85a23995a30dc87c60f4c193",
+      "builds": {
+        "baseline": {
+          "binary_sha256": "4062b029945031f485bcd1516d72cd50a29386d9caf8550a7b87ad2b959bf6b2",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/large-writer-control-v1-source.tar.gz",
+            "sha256": "6da9e04dbb96e9e3bd85312e7109ec84ee0acbc7cd4b9f060e1e02be752314a5"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "3c77d8c5f7b06ccd23357f68bc64d2a4695d510f145435b4d9929620960b6e29",
+          "source_file_count": 337
+        },
+        "candidate": {
+          "binary_sha256": "f07ccec720a3689a19b6940306d53e598f61a5e621e17321b06cb42ee30708f8",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/bounded-control-v1-source.tar.gz",
+            "sha256": "29689759bc6449dabc28d7ec8c52b4a178b08c9427d0448900e93c3d15340ce5"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "3c77d8c5f7b06ccd23357f68bc64d2a4695d510f145435b4d9929620960b6e29",
+          "source_file_count": 337
+        }
+      },
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 174.8414429689292,
+              "cli_peak_rss_kib": 266776,
+              "working_peak_bytes": 266336935,
+              "managed_writes": 10873157466,
+              "managed_reads": 10871635968,
+              "sort_calls": 50,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 179.74663111800328,
+              "cli_peak_rss_kib": 266772,
+              "working_peak_bytes": 266272431,
+              "managed_writes": 10873157466,
+              "managed_reads": 10871635968,
+              "sort_calls": 50,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 176.08923259703442,
+              "cli_peak_rss_kib": 266748,
+              "working_peak_bytes": 266336935,
+              "managed_writes": 10873157466,
+              "managed_reads": 10871635968,
+              "sort_calls": 50,
+              "cgroup_peak_bytes": 1073741824
+            }
+          ],
+          "medians": {
+            "seconds": 176.08923259703442,
+            "cli_peak_rss_kib": 266772,
+            "working_peak_bytes": 266336935,
+            "managed_writes": 10873157466,
+            "managed_reads": 10871635968,
+            "cgroup_peak_bytes": 1073741824
+          },
+          "range_seconds": [
+            174.8414429689292,
+            179.74663111800328
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 162.85503152001183,
+              "cli_peak_rss_kib": 210100,
+              "working_peak_bytes": 260881590,
+              "managed_writes": 3042816,
+              "managed_reads": 1521318,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 163.10205333691556,
+              "cli_peak_rss_kib": 209956,
+              "working_peak_bytes": 260881590,
+              "managed_writes": 3042816,
+              "managed_reads": 1521318,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 166.86924550205003,
+              "cli_peak_rss_kib": 209620,
+              "working_peak_bytes": 260881590,
+              "managed_writes": 3042816,
+              "managed_reads": 1521318,
+              "sort_calls": 0,
+              "cgroup_peak_bytes": 1073741824
+            }
+          ],
+          "medians": {
+            "seconds": 163.10205333691556,
+            "cli_peak_rss_kib": 209956,
+            "working_peak_bytes": 260881590,
+            "managed_writes": 3042816,
+            "managed_reads": 1521318,
+            "cgroup_peak_bytes": 1073741824
+          },
+          "range_seconds": [
+            162.85503152001183,
+            166.86924550205003
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 7.375339802768599,
+        "cli_peak_rss_kib": 21.29758745295608,
+        "working_peak_bytes": 2.048287069159216,
+        "managed_writes": 99.9720153413623,
+        "managed_reads": 99.9860065402808,
+        "cgroup_peak_bytes": 0.0
+      },
+      "all_elapsed_pairs_favorable": true,
+      "eligibility": "Named matched complete jobs repetitions0/1/2 only, excludedwarmup-1, n3pervariant. Fullfield/order/membership/lineage/stage/manifest/cgroup/cleanupcontrols. Source337 and335epochs stayseparate; no historical pooling.",
+      "scope": "WSL2ext4 perjob fadvise cleaninput with hostcacheuncontrolled;1GiBcgroup/no swap. CLI startup through nativeprivateatomicpublication andexit; verifierexcluded. Workingreservations, CLI-only GNU maxRSS, managedtemporarytraffic andcgroupcacheinclusivepeak distinct; no physicaldiskthroughput/nativeWindowsclaim.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/large-writer-oom-8192-summary.json",
+        "sha256": "9b1790949cce1b6308119b2ecb8ed98c3f1d235c9b7d368b00672de2d20abdc7"
+      }
+    },
+    {
+      "cell": "catalog-oom-4096",
+      "n": 3,
+      "source": "scratch/writer-capacity-20261119/catalog-oom-4096/results.jsonl",
+      "source_sha256": "3d0ef7180668c32a2b7c2f54281aedda07e277727f3cceb366c2fb73fd1820b0",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 34.64889097795822,
+              "cli_user_seconds": 3.48,
+              "cli_system_seconds": 6.11,
+              "cli_total_cpu_seconds": 9.59,
+              "cli_peak_rss_kib": 107400.0,
+              "working_peak_bytes": 130440342,
+              "managed_writes": 1502722,
+              "managed_reads": 751272
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 33.995357270003296,
+              "cli_user_seconds": 3.45,
+              "cli_system_seconds": 6.08,
+              "cli_total_cpu_seconds": 9.530000000000001,
+              "cli_peak_rss_kib": 107144.0,
+              "working_peak_bytes": 130440342,
+              "managed_writes": 1502722,
+              "managed_reads": 751272
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 35.25016806705389,
+              "cli_user_seconds": 3.35,
+              "cli_system_seconds": 6.12,
+              "cli_total_cpu_seconds": 9.47,
+              "cli_peak_rss_kib": 107280.0,
+              "working_peak_bytes": 130440342,
+              "managed_writes": 1502722,
+              "managed_reads": 751272
+            }
+          ],
+          "medians": {
+            "seconds": 34.64889097795822,
+            "cli_user_seconds": 3.45,
+            "cli_system_seconds": 6.11,
+            "cli_total_cpu_seconds": 9.530000000000001,
+            "cli_peak_rss_kib": 107280.0,
+            "working_peak_bytes": 130440342,
+            "managed_writes": 1502722,
+            "managed_reads": 751272
+          },
+          "range_seconds": [
+            33.995357270003296,
+            35.25016806705389
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 36.301377698080614,
+              "cli_user_seconds": 3.54,
+              "cli_system_seconds": 6.21,
+              "cli_total_cpu_seconds": 9.75,
+              "cli_peak_rss_kib": 92552.0,
+              "working_peak_bytes": 98995353,
+              "managed_writes": 1502722,
+              "managed_reads": 751272
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 36.100398967042565,
+              "cli_user_seconds": 3.61,
+              "cli_system_seconds": 6.03,
+              "cli_total_cpu_seconds": 9.64,
+              "cli_peak_rss_kib": 92704.0,
+              "working_peak_bytes": 98995353,
+              "managed_writes": 1502722,
+              "managed_reads": 751272
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 35.30037804006133,
+              "cli_user_seconds": 3.67,
+              "cli_system_seconds": 4.53,
+              "cli_total_cpu_seconds": 8.2,
+              "cli_peak_rss_kib": 92556.0,
+              "working_peak_bytes": 98995353,
+              "managed_writes": 1502722,
+              "managed_reads": 751272
+            }
+          ],
+          "medians": {
+            "seconds": 36.100398967042565,
+            "cli_user_seconds": 3.61,
+            "cli_system_seconds": 6.03,
+            "cli_total_cpu_seconds": 9.64,
+            "cli_peak_rss_kib": 92556.0,
+            "working_peak_bytes": 98995353,
+            "managed_writes": 1502722,
+            "managed_reads": 751272
+          },
+          "range_seconds": [
+            35.30037804006133,
+            36.301377698080614
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": -4.189190326489012,
+        "cli_user_seconds": -4.6376811594202705,
+        "cli_system_seconds": 1.3093289689034338,
+        "cli_total_cpu_seconds": -1.1542497376705096,
+        "cli_peak_rss_kib": 13.724832214765105,
+        "working_peak_bytes": 24.106797420080362,
+        "managed_writes": 0.0,
+        "managed_reads": 0.0
+      },
+      "all_elapsed_pairs_favorable": false,
+      "passes_declared_speed_rule": false,
+      "passes_declared_resource_rule": true,
+      "retain_under_declared_rule": true,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "486ea59c9b84b886fc074ec61d4af4d0bb9c1a361ae9f25ef461d8072da38984",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/catalog-control-v1-source.tar.gz",
+            "sha256": "96d29cc81830f0a10065421de0399b26ee1c861c74e9cc515bef11874fefffa6"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "a5936383fcd7bcc70f4d9b072e33b95777cebac75c319c46c6cbd7e0401084ad",
+          "source_file_count": 337
+        },
+        "candidate": {
+          "binary_sha256": "debb9abcc2408f6f4e29684f102b26112189c388971852d2fccc2db54874f143",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-small-final-catalogs"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/catalog-candidate-v1-source.tar.gz",
+            "sha256": "df42acfaff4dab65c7333e070cf4d9444a283b9ac4e678338a99fb03a0320aee"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "a5936383fcd7bcc70f4d9b072e33b95777cebac75c319c46c6cbd7e0401084ad",
+          "source_file_count": 337
+        }
+      },
+      "scope": "Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/catalog-oom-4096-summary-v1.json",
+        "sha256": "81d45b61993cf8e9e4f32db902b982efab2f082c062bff0c6d7ebe6c46e41ad4"
+      }
+    },
+    {
+      "cell": "buffered-input-oom-partition8",
+      "n": 3,
+      "source": "scratch/writer-capacity-20261119/buffered-input-oom-partition8/results.jsonl",
+      "source_sha256": "d614ab89558e6641e7034d583d2167bbfc7d5911d868fa8347e438a9e471f809",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 7.735520281014033,
+              "cli_user_seconds": 3.51,
+              "cli_system_seconds": 1.78,
+              "cli_total_cpu_seconds": 5.29,
+              "cli_peak_rss_kib": 5616.0,
+              "working_peak_bytes": 578410,
+              "managed_writes": 3184,
+              "managed_reads": 1592
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 10.289421434048563,
+              "cli_user_seconds": 3.66,
+              "cli_system_seconds": 1.63,
+              "cli_total_cpu_seconds": 5.29,
+              "cli_peak_rss_kib": 5716.0,
+              "working_peak_bytes": 578410,
+              "managed_writes": 3184,
+              "managed_reads": 1592
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 11.993612401071005,
+              "cli_user_seconds": 3.57,
+              "cli_system_seconds": 1.71,
+              "cli_total_cpu_seconds": 5.279999999999999,
+              "cli_peak_rss_kib": 5880.0,
+              "working_peak_bytes": 578410,
+              "managed_writes": 3184,
+              "managed_reads": 1592
+            }
+          ],
+          "medians": {
+            "seconds": 10.289421434048563,
+            "cli_user_seconds": 3.57,
+            "cli_system_seconds": 1.71,
+            "cli_total_cpu_seconds": 5.29,
+            "cli_peak_rss_kib": 5716.0,
+            "working_peak_bytes": 578410,
+            "managed_writes": 3184,
+            "managed_reads": 1592
+          },
+          "range_seconds": [
+            7.735520281014033,
+            11.993612401071005
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 8.68545071000699,
+              "cli_user_seconds": 3.35,
+              "cli_system_seconds": 1.7,
+              "cli_total_cpu_seconds": 5.05,
+              "cli_peak_rss_kib": 5924.0,
+              "working_peak_bytes": 709512,
+              "managed_writes": 3184,
+              "managed_reads": 1592
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 9.03610495000612,
+              "cli_user_seconds": 3.08,
+              "cli_system_seconds": 1.73,
+              "cli_total_cpu_seconds": 4.8100000000000005,
+              "cli_peak_rss_kib": 5672.0,
+              "working_peak_bytes": 709512,
+              "managed_writes": 3184,
+              "managed_reads": 1592
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 9.036206779070199,
+              "cli_user_seconds": 3.21,
+              "cli_system_seconds": 1.65,
+              "cli_total_cpu_seconds": 4.859999999999999,
+              "cli_peak_rss_kib": 5916.0,
+              "working_peak_bytes": 709512,
+              "managed_writes": 3184,
+              "managed_reads": 1592
+            }
+          ],
+          "medians": {
+            "seconds": 9.03610495000612,
+            "cli_user_seconds": 3.21,
+            "cli_system_seconds": 1.7,
+            "cli_total_cpu_seconds": 4.859999999999999,
+            "cli_peak_rss_kib": 5916.0,
+            "working_peak_bytes": 709512,
+            "managed_writes": 3184,
+            "managed_reads": 1592
+          },
+          "range_seconds": [
+            8.68545071000699,
+            9.036206779070199
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 12.180631263630758,
+        "cli_user_seconds": 10.084033613445376,
+        "cli_system_seconds": 0.5847953216374324,
+        "cli_total_cpu_seconds": 8.128544423440465,
+        "cli_peak_rss_kib": -3.4989503149055246,
+        "working_peak_bytes": -22.665929012292317,
+        "managed_writes": 0.0,
+        "managed_reads": 0.0
+      },
+      "all_elapsed_pairs_favorable": false,
+      "passes_declared_speed_rule": false,
+      "passes_declared_resource_rule": false,
+      "retain_under_declared_rule": false,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "486ea59c9b84b886fc074ec61d4af4d0bb9c1a361ae9f25ef461d8072da38984",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/catalog-control-v1-source.tar.gz",
+            "sha256": "96d29cc81830f0a10065421de0399b26ee1c861c74e9cc515bef11874fefffa6"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "a5936383fcd7bcc70f4d9b072e33b95777cebac75c319c46c6cbd7e0401084ad",
+          "source_file_count": 337
+        },
+        "candidate": {
+          "binary_sha256": "986c97a10104ee210ba0f123d6d902b1f097c70b5a2c1be489589a254d5508d9",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-buffered-plain-input"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/buffered-input-candidate-v1-source.tar.gz",
+            "sha256": "9b3ff72c0b28d5476000b08e66759d015cac75c9666ba36981926fd97bdf9acd"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "a5936383fcd7bcc70f4d9b072e33b95777cebac75c319c46c6cbd7e0401084ad",
+          "source_file_count": 337
+        }
+      },
+      "scope": "Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/buffered-input-oom-partition8-summary-v1.json",
+        "sha256": "e350cd48f1fc350408c0bd55241e4ce26686a7405b68aed9cec96487389f53a5"
+      }
+    },
+    {
+      "cell": "adaptive-oom-interleaved8",
+      "n": 3,
+      "source": "scratch/writer-capacity-20261119/adaptive-oom-interleaved8/results.jsonl",
+      "source_sha256": "0d9a794f249f0ebcb19c40c7e79e15e383d641d38a469c5a73e08d3e8c2e4ba6",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 8.585251623997465,
+              "cli_user_seconds": 2.74,
+              "cli_system_seconds": 1.79,
+              "cli_total_cpu_seconds": 4.53,
+              "cli_peak_rss_kib": 5844.0,
+              "working_peak_bytes": 402397,
+              "managed_writes": 2805,
+              "managed_reads": 1309
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 9.9884271370247,
+              "cli_user_seconds": 3.1,
+              "cli_system_seconds": 1.61,
+              "cli_total_cpu_seconds": 4.71,
+              "cli_peak_rss_kib": 5860.0,
+              "working_peak_bytes": 402397,
+              "managed_writes": 2805,
+              "managed_reads": 1309
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 8.935541116981767,
+              "cli_user_seconds": 2.74,
+              "cli_system_seconds": 1.81,
+              "cli_total_cpu_seconds": 4.550000000000001,
+              "cli_peak_rss_kib": 5956.0,
+              "working_peak_bytes": 402397,
+              "managed_writes": 2805,
+              "managed_reads": 1309
+            }
+          ],
+          "medians": {
+            "seconds": 8.935541116981767,
+            "cli_user_seconds": 2.74,
+            "cli_system_seconds": 1.79,
+            "cli_total_cpu_seconds": 4.550000000000001,
+            "cli_peak_rss_kib": 5860.0,
+            "working_peak_bytes": 402397,
+            "managed_writes": 2805,
+            "managed_reads": 1309
+          },
+          "range_seconds": [
+            8.585251623997465,
+            9.9884271370247
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 7.181775426026434,
+              "cli_user_seconds": 2.75,
+              "cli_system_seconds": 0.99,
+              "cli_total_cpu_seconds": 3.74,
+              "cli_peak_rss_kib": 7556.0,
+              "working_peak_bytes": 2351447,
+              "managed_writes": 2805,
+              "managed_reads": 1309
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 6.5800276580266654,
+              "cli_user_seconds": 2.77,
+              "cli_system_seconds": 0.96,
+              "cli_total_cpu_seconds": 3.73,
+              "cli_peak_rss_kib": 7620.0,
+              "working_peak_bytes": 2351447,
+              "managed_writes": 2805,
+              "managed_reads": 1309
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 10.444569819024764,
+              "cli_user_seconds": 2.73,
+              "cli_system_seconds": 1.09,
+              "cli_total_cpu_seconds": 3.8200000000000003,
+              "cli_peak_rss_kib": 7588.0,
+              "working_peak_bytes": 2351447,
+              "managed_writes": 2805,
+              "managed_reads": 1309
+            }
+          ],
+          "medians": {
+            "seconds": 7.181775426026434,
+            "cli_user_seconds": 2.75,
+            "cli_system_seconds": 0.99,
+            "cli_total_cpu_seconds": 3.74,
+            "cli_peak_rss_kib": 7588.0,
+            "working_peak_bytes": 2351447,
+            "managed_writes": 2805,
+            "managed_reads": 1309
+          },
+          "range_seconds": [
+            6.5800276580266654,
+            10.444569819024764
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 19.62685491561722,
+        "cli_user_seconds": -0.36496350364962904,
+        "cli_system_seconds": 44.6927374301676,
+        "cli_total_cpu_seconds": 17.802197802197806,
+        "cli_peak_rss_kib": -29.48805460750854,
+        "working_peak_bytes": -484.35997286262074,
+        "managed_writes": 0.0,
+        "managed_reads": 0.0
+      },
+      "all_elapsed_pairs_favorable": false,
+      "passes_declared_speed_rule": false,
+      "passes_declared_resource_rule": false,
+      "retain_under_declared_rule": false,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "54354ec1058eee86d67b8c24592a5039ca70fa7d2d81d52ff896fba2f1eebf86",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/adaptive-control-v1-source.tar.gz",
+            "sha256": "d7c423457644981e6a84994ab9c445c984f382176ee61e1ec9313f7b32ceebf8"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "cc634b2e41e0551687f41d2f03c30808dfb72089e755b0c0dee6cbfe02af18f5",
+          "source_file_count": 337
+        },
+        "candidate": {
+          "binary_sha256": "2134f354de072d051450880b2a8c92984e09ded2e624b5a3c65382c4febbeffa",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-adaptive-final-buffers"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/adaptive-candidate-v1-source.tar.gz",
+            "sha256": "1378c798728937320e96840a171a2024ad4387e1a03f41671e0187c9249e8b80"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "cc634b2e41e0551687f41d2f03c30808dfb72089e755b0c0dee6cbfe02af18f5",
+          "source_file_count": 337
+        }
+      },
+      "scope": "Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/adaptive-oom-interleaved8-summary-v1.json",
+        "sha256": "d5954db54eccbd909a3078c703722f87365d3ef5a804e412f5e453d140a3ef22"
+      }
+    },
+    {
+      "source": "scratch/writer-capacity-20261119/header-large/results.jsonl",
+      "source_sha256": "6e3fc318d6bc7a3e8bf41e9784bafadd5311fee0132e39c2e4dd30a7790b7f0b",
+      "n": 3,
+      "variants": {
+        "control": {
+          "samples": [
+            {
+              "repetition": 0,
+              "line": 5,
+              "seconds": 14.372114351019263,
+              "working_peak_bytes": 80348949,
+              "cli_peak_rss_kib": 72724.0,
+              "cli_user_seconds": 4.67,
+              "cli_system_seconds": 1.31
+            },
+            {
+              "repetition": 1,
+              "line": 9,
+              "seconds": 13.159844057983719,
+              "working_peak_bytes": 80348949,
+              "cli_peak_rss_kib": 72584.0,
+              "cli_user_seconds": 4.71,
+              "cli_system_seconds": 1.51
+            },
+            {
+              "repetition": 2,
+              "line": 11,
+              "seconds": 11.624271398060955,
+              "working_peak_bytes": 80348949,
+              "cli_peak_rss_kib": 72676.0,
+              "cli_user_seconds": 4.67,
+              "cli_system_seconds": 1.29
+            }
+          ],
+          "medians": {
+            "seconds": 13.159844057983719,
+            "working_peak_bytes": 80348949,
+            "cli_peak_rss_kib": 72676.0,
+            "cli_user_seconds": 4.67,
+            "cli_system_seconds": 1.31
+          },
+          "range_seconds": [
+            11.624271398060955,
+            14.372114351019263
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "line": 6,
+              "seconds": 10.777989024994895,
+              "working_peak_bytes": 42599451,
+              "cli_peak_rss_kib": 37196.0,
+              "cli_user_seconds": 4.68,
+              "cli_system_seconds": 1.45
+            },
+            {
+              "repetition": 1,
+              "line": 8,
+              "seconds": 13.41983498306945,
+              "working_peak_bytes": 42599451,
+              "cli_peak_rss_kib": 37196.0,
+              "cli_user_seconds": 4.68,
+              "cli_system_seconds": 1.41
+            },
+            {
+              "repetition": 2,
+              "line": 12,
+              "seconds": 11.048539108945988,
+              "working_peak_bytes": 42599451,
+              "cli_peak_rss_kib": 37148.0,
+              "cli_user_seconds": 4.71,
+              "cli_system_seconds": 1.33
+            }
+          ],
+          "medians": {
+            "seconds": 11.048539108945988,
+            "working_peak_bytes": 42599451,
+            "cli_peak_rss_kib": 37196.0,
+            "cli_user_seconds": 4.68,
+            "cli_system_seconds": 1.41
+          },
+          "range_seconds": [
+            10.777989024994895,
+            13.41983498306945
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 16.043540787680232,
+        "working_peak_bytes": 46.98194372150406,
+        "cli_peak_rss_kib": 48.81941768947108,
+        "cli_user_seconds": -0.21413276231263545,
+        "cli_system_seconds": -7.6335877862595325
+      },
+      "retain_under_declared_rule": true,
+      "scope": "Frozen335-sourcelifetime/headerpair,complete128writerUTF16LE+BOMjobs,1.5GiBwideinput/96KiBheader/m256/1GiBcgroup/noSwap; allfields/quotas/manifest/capsverified. Threealternatingpairs,warmup-1excluded;WSL2ext4/inputfadvise/hostcacheuncontrolled. CLI-onlyRSS distinctfromworking; no default/Windowsclaim.",
+      "builds": {
+        "candidate": {
+          "binary_sha256": "a8e72e86d5bdde397ff0c2c03b0a91e4a422bedc415e73d23d7b6b4262d0a4cf",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-release-final-header-scratch"
+          ],
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "source_archive": {
+            "path": "scratch/oom-iteration/header-candidate-v1-source.tar.gz",
+            "sha256": "7e8e0014f5398649effae13e538cce1695841686f031ab9d9931fa5015883c20"
+          },
+          "source_map_sha256": "34b0ae874f95f34ef267a0438269f44eecf6b431e815654b9857c6bf87226d9f",
+          "source_file_count": 335
+        },
+        "control": {
+          "binary_sha256": "8482b91e59af127954c258a23ace582a0fcb5fc529789cd91823824eaca8ca53",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers"
+          ],
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "source_archive": {
+            "path": "scratch/oom-iteration/lifetime-control-v1-source.tar.gz",
+            "sha256": "d3f60d3b2c111ec6d1a4fdbddcd572506da5b6373b8eb16f03162b6d22237ec4"
+          },
+          "source_map_sha256": "34b0ae874f95f34ef267a0438269f44eecf6b431e815654b9857c6bf87226d9f",
+          "source_file_count": 335
+        }
+      },
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/header-large-summary-v1.json",
+        "sha256": "10ed3a7b5ddce410657934c910e5efcdd5bff4583cf31291e9f2d265af01cc5e"
+      }
+    },
+    {
+      "cell": "codec-oom-gzip",
+      "n": 3,
+      "source": "scratch/writer-capacity-20261119/codec-oom-gzip/results.jsonl",
+      "source_sha256": "8beeddeb59387f4a568fa4d735df13b31801df75b747f940b2dc01d061143fc1",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 17.807320283027366,
+              "cli_user_seconds": 8.36,
+              "cli_system_seconds": 3.0,
+              "cli_total_cpu_seconds": 11.36,
+              "cli_peak_rss_kib": 6032.0,
+              "working_peak_bytes": 214963,
+              "managed_writes": 4815062363,
+              "managed_reads": 2650800183
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 17.95792999607511,
+              "cli_user_seconds": 8.31,
+              "cli_system_seconds": 3.13,
+              "cli_total_cpu_seconds": 11.440000000000001,
+              "cli_peak_rss_kib": 6048.0,
+              "working_peak_bytes": 214963,
+              "managed_writes": 4815062363,
+              "managed_reads": 2650800183
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 17.40659869206138,
+              "cli_user_seconds": 8.2,
+              "cli_system_seconds": 3.11,
+              "cli_total_cpu_seconds": 11.309999999999999,
+              "cli_peak_rss_kib": 6268.0,
+              "working_peak_bytes": 214963,
+              "managed_writes": 4815062363,
+              "managed_reads": 2650800183
+            }
+          ],
+          "medians": {
+            "seconds": 17.807320283027366,
+            "cli_user_seconds": 8.31,
+            "cli_system_seconds": 3.11,
+            "cli_total_cpu_seconds": 11.36,
+            "cli_peak_rss_kib": 6048.0,
+            "working_peak_bytes": 214963,
+            "managed_writes": 4815062363,
+            "managed_reads": 2650800183
+          },
+          "range_seconds": [
+            17.40659869206138,
+            17.95792999607511
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 13.296387918060645,
+              "cli_user_seconds": 11.94,
+              "cli_system_seconds": 1.04,
+              "cli_total_cpu_seconds": 12.98,
+              "cli_peak_rss_kib": 5588.0,
+              "working_peak_bytes": 559574,
+              "managed_writes": 1504,
+              "managed_reads": 0
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 13.045650444924831,
+              "cli_user_seconds": 12.03,
+              "cli_system_seconds": 0.68,
+              "cli_total_cpu_seconds": 12.709999999999999,
+              "cli_peak_rss_kib": 5760.0,
+              "working_peak_bytes": 559574,
+              "managed_writes": 1504,
+              "managed_reads": 0
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 13.345713707967661,
+              "cli_user_seconds": 11.87,
+              "cli_system_seconds": 1.15,
+              "cli_total_cpu_seconds": 13.02,
+              "cli_peak_rss_kib": 5624.0,
+              "working_peak_bytes": 559574,
+              "managed_writes": 1504,
+              "managed_reads": 0
+            }
+          ],
+          "medians": {
+            "seconds": 13.296387918060645,
+            "cli_user_seconds": 11.94,
+            "cli_system_seconds": 1.04,
+            "cli_total_cpu_seconds": 12.98,
+            "cli_peak_rss_kib": 5624.0,
+            "working_peak_bytes": 559574,
+            "managed_writes": 1504,
+            "managed_reads": 0
+          },
+          "range_seconds": [
+            13.045650444924831,
+            13.345713707967661
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 25.331898866704893,
+        "cli_user_seconds": -43.682310469314054,
+        "cli_system_seconds": 66.55948553054662,
+        "cli_total_cpu_seconds": -14.260563380281699,
+        "cli_peak_rss_kib": 7.010582010582011,
+        "working_peak_bytes": -160.31177458446336,
+        "managed_writes": 99.99996876468286,
+        "managed_reads": 100.0
+      },
+      "all_elapsed_pairs_favorable": true,
+      "passes_declared_speed_rule": true,
+      "passes_declared_resource_rule": true,
+      "retain_under_declared_rule": true,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "8482b91e59af127954c258a23ace582a0fcb5fc529789cd91823824eaca8ca53",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/lifetime-control-v1-source.tar.gz",
+            "sha256": "d3f60d3b2c111ec6d1a4fdbddcd572506da5b6373b8eb16f03162b6d22237ec4"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "34b0ae874f95f34ef267a0438269f44eecf6b431e815654b9857c6bf87226d9f",
+          "source_file_count": 335
+        },
+        "candidate": {
+          "binary_sha256": "67d9315b8d5e65ddb7580a671ea350cbf415202e00d1a0aaa6d408467f20bbd7",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-counted-codec-balanced"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/codec-candidate-v1-source.tar.gz",
+            "sha256": "d0030cb437a9b77f75a6b3dae398948da07c13bf42b1340e46a010163ab2a588"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "34b0ae874f95f34ef267a0438269f44eecf6b431e815654b9857c6bf87226d9f",
+          "source_file_count": 335
+        }
+      },
+      "scope": "Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/codec-oom-gzip-summary-v1.json",
+        "sha256": "3f70993e738b36bd5d8f334df6980f01dd38d452fa8c3763342dab2f5e7675ae"
+      }
+    },
+    {
+      "cell": "codec-oom-zstd",
+      "n": 3,
+      "source": "scratch/writer-capacity-20261119/codec-oom-zstd/results.jsonl",
+      "source_sha256": "5bd1dd23956d696697f16da468d9df9c982aefe19126c391d3495318e149cecc",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 12.895860792021267,
+              "cli_user_seconds": 4.25,
+              "cli_system_seconds": 2.98,
+              "cli_total_cpu_seconds": 7.23,
+              "cli_peak_rss_kib": 9320.0,
+              "working_peak_bytes": 214963,
+              "managed_writes": 4815062363,
+              "managed_reads": 2650800183
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 15.903363927965984,
+              "cli_user_seconds": 4.11,
+              "cli_system_seconds": 3.17,
+              "cli_total_cpu_seconds": 7.28,
+              "cli_peak_rss_kib": 9244.0,
+              "working_peak_bytes": 214963,
+              "managed_writes": 4815062363,
+              "managed_reads": 2650800183
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 13.296888570999727,
+              "cli_user_seconds": 4.28,
+              "cli_system_seconds": 2.9,
+              "cli_total_cpu_seconds": 7.18,
+              "cli_peak_rss_kib": 9264.0,
+              "working_peak_bytes": 214963,
+              "managed_writes": 4815062363,
+              "managed_reads": 2650800183
+            }
+          ],
+          "medians": {
+            "seconds": 13.296888570999727,
+            "cli_user_seconds": 4.25,
+            "cli_system_seconds": 2.98,
+            "cli_total_cpu_seconds": 7.23,
+            "cli_peak_rss_kib": 9264.0,
+            "working_peak_bytes": 214963,
+            "managed_writes": 4815062363,
+            "managed_reads": 2650800183
+          },
+          "range_seconds": [
+            12.895860792021267,
+            15.903363927965984
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 6.630323390010744,
+              "cli_user_seconds": 5.25,
+              "cli_system_seconds": 1.1,
+              "cli_total_cpu_seconds": 6.35,
+              "cli_peak_rss_kib": 8756.0,
+              "working_peak_bytes": 3903618,
+              "managed_writes": 1512,
+              "managed_reads": 0
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 6.179148114984855,
+              "cli_user_seconds": 5.29,
+              "cli_system_seconds": 0.63,
+              "cli_total_cpu_seconds": 5.92,
+              "cli_peak_rss_kib": 8928.0,
+              "working_peak_bytes": 3903618,
+              "managed_writes": 1512,
+              "managed_reads": 0
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 6.580137770040892,
+              "cli_user_seconds": 5.26,
+              "cli_system_seconds": 0.99,
+              "cli_total_cpu_seconds": 6.25,
+              "cli_peak_rss_kib": 8972.0,
+              "working_peak_bytes": 3903618,
+              "managed_writes": 1512,
+              "managed_reads": 0
+            }
+          ],
+          "medians": {
+            "seconds": 6.580137770040892,
+            "cli_user_seconds": 5.26,
+            "cli_system_seconds": 0.99,
+            "cli_total_cpu_seconds": 6.25,
+            "cli_peak_rss_kib": 8928.0,
+            "working_peak_bytes": 3903618,
+            "managed_writes": 1512,
+            "managed_reads": 0
+          },
+          "range_seconds": [
+            6.179148114984855,
+            6.630323390010744
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 50.5137029997224,
+        "cli_user_seconds": -23.76470588235293,
+        "cli_system_seconds": 66.77852348993288,
+        "cli_total_cpu_seconds": 13.554633471645927,
+        "cli_peak_rss_kib": 3.626943005181349,
+        "working_peak_bytes": -1715.9487911873207,
+        "managed_writes": 99.99996859853755,
+        "managed_reads": 100.0
+      },
+      "all_elapsed_pairs_favorable": true,
+      "passes_declared_speed_rule": true,
+      "passes_declared_resource_rule": true,
+      "retain_under_declared_rule": true,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "8482b91e59af127954c258a23ace582a0fcb5fc529789cd91823824eaca8ca53",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/lifetime-control-v1-source.tar.gz",
+            "sha256": "d3f60d3b2c111ec6d1a4fdbddcd572506da5b6373b8eb16f03162b6d22237ec4"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "34b0ae874f95f34ef267a0438269f44eecf6b431e815654b9857c6bf87226d9f",
+          "source_file_count": 335
+        },
+        "candidate": {
+          "binary_sha256": "67d9315b8d5e65ddb7580a671ea350cbf415202e00d1a0aaa6d408467f20bbd7",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-counted-codec-balanced"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/codec-candidate-v1-source.tar.gz",
+            "sha256": "d0030cb437a9b77f75a6b3dae398948da07c13bf42b1340e46a010163ab2a588"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "34b0ae874f95f34ef267a0438269f44eecf6b431e815654b9857c6bf87226d9f",
+          "source_file_count": 335
+        }
+      },
+      "scope": "Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/codec-oom-zstd-summary-v1.json",
+        "sha256": "73f0711735f479fd064c430bb150b31975a3c7b6a6b4e36fd243c5e78f5877de"
+      }
+    },
+    {
+      "cell": "varied-gzip-oom",
+      "n": 3,
+      "source": "scratch/writer-capacity-20261119/varied-gzip-oom/results.jsonl",
+      "source_sha256": "06adc6373e4fe9c468fbfd1a5125b6cb70472765fbc6afb82556592b0ffea730",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 67.47734049207065,
+              "cli_user_seconds": 57.16,
+              "cli_system_seconds": 4.27,
+              "cli_total_cpu_seconds": 61.42999999999999,
+              "cli_peak_rss_kib": 6164.0,
+              "working_peak_bytes": 214985,
+              "managed_writes": 4815062363,
+              "managed_reads": 2650800183,
+              "actual_compressed_stored_bytes": 1560519777
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 72.34020000207238,
+              "cli_user_seconds": 57.33,
+              "cli_system_seconds": 4.32,
+              "cli_total_cpu_seconds": 61.65,
+              "cli_peak_rss_kib": 5880.0,
+              "working_peak_bytes": 214985,
+              "managed_writes": 4815062363,
+              "managed_reads": 2650800183,
+              "actual_compressed_stored_bytes": 1560519777
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 70.48531305301003,
+              "cli_user_seconds": 57.58,
+              "cli_system_seconds": 4.16,
+              "cli_total_cpu_seconds": 61.739999999999995,
+              "cli_peak_rss_kib": 5888.0,
+              "working_peak_bytes": 214985,
+              "managed_writes": 4815062363,
+              "managed_reads": 2650800183,
+              "actual_compressed_stored_bytes": 1560519777
+            }
+          ],
+          "medians": {
+            "seconds": 70.48531305301003,
+            "cli_user_seconds": 57.33,
+            "cli_system_seconds": 4.27,
+            "cli_total_cpu_seconds": 61.65,
+            "cli_peak_rss_kib": 5888.0,
+            "working_peak_bytes": 214985,
+            "managed_writes": 4815062363,
+            "managed_reads": 2650800183,
+            "actual_compressed_stored_bytes": 1560519777
+          },
+          "range_seconds": [
+            67.47734049207065,
+            72.34020000207238
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 63.66768020798918,
+              "cli_user_seconds": 61.26,
+              "cli_system_seconds": 1.88,
+              "cli_total_cpu_seconds": 63.14,
+              "cli_peak_rss_kib": 5656.0,
+              "working_peak_bytes": 559595,
+              "managed_writes": 1520,
+              "managed_reads": 0,
+              "actual_compressed_stored_bytes": 1560519777
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 63.884670253959484,
+              "cli_user_seconds": 61.5,
+              "cli_system_seconds": 1.82,
+              "cli_total_cpu_seconds": 63.32,
+              "cli_peak_rss_kib": 5848.0,
+              "working_peak_bytes": 559595,
+              "managed_writes": 1520,
+              "managed_reads": 0,
+              "actual_compressed_stored_bytes": 1560519777
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 63.618041516048834,
+              "cli_user_seconds": 61.3,
+              "cli_system_seconds": 1.74,
+              "cli_total_cpu_seconds": 63.04,
+              "cli_peak_rss_kib": 5512.0,
+              "working_peak_bytes": 559595,
+              "managed_writes": 1520,
+              "managed_reads": 0,
+              "actual_compressed_stored_bytes": 1560519777
+            }
+          ],
+          "medians": {
+            "seconds": 63.66768020798918,
+            "cli_user_seconds": 61.3,
+            "cli_system_seconds": 1.82,
+            "cli_total_cpu_seconds": 63.14,
+            "cli_peak_rss_kib": 5656.0,
+            "working_peak_bytes": 559595,
+            "managed_writes": 1520,
+            "managed_reads": 0,
+            "actual_compressed_stored_bytes": 1560519777
+          },
+          "range_seconds": [
+            63.618041516048834,
+            63.884670253959484
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 9.672416209449908,
+        "cli_user_seconds": -6.924821210535503,
+        "cli_system_seconds": 57.377049180327866,
+        "cli_total_cpu_seconds": -2.4168694241686994,
+        "cli_peak_rss_kib": 3.940217391304346,
+        "working_peak_bytes": -160.2949042956485,
+        "managed_writes": 99.99996843239224,
+        "managed_reads": 100.0,
+        "actual_compressed_stored_bytes": 0.0
+      },
+      "all_elapsed_pairs_favorable": true,
+      "passes_declared_speed_rule": true,
+      "passes_declared_resource_rule": true,
+      "retain_under_declared_rule": true,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "8482b91e59af127954c258a23ace582a0fcb5fc529789cd91823824eaca8ca53",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/lifetime-control-v1-source.tar.gz",
+            "sha256": "d3f60d3b2c111ec6d1a4fdbddcd572506da5b6373b8eb16f03162b6d22237ec4"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "34b0ae874f95f34ef267a0438269f44eecf6b431e815654b9857c6bf87226d9f",
+          "source_file_count": 335
+        },
+        "candidate": {
+          "binary_sha256": "67d9315b8d5e65ddb7580a671ea350cbf415202e00d1a0aaa6d408467f20bbd7",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-counted-codec-balanced"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/codec-candidate-v1-source.tar.gz",
+            "sha256": "d0030cb437a9b77f75a6b3dae398948da07c13bf42b1340e46a010163ab2a588"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "34b0ae874f95f34ef267a0438269f44eecf6b431e815654b9857c6bf87226d9f",
+          "source_file_count": 335
+        }
+      },
+      "scope": "Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/varied-gzip-oom-summary-v1.json",
+        "sha256": "e19a467688e6157db993e6d8c5d0ab67f751d0960950f7e0f2a92649a8ab8343"
+      }
+    },
+    {
+      "cell": "retained-exact-oom-strata8",
+      "n": 3,
+      "source": "scratch/writer-capacity-20261119/retained-exact-oom-strata8/results.jsonl",
+      "source_sha256": "c8196b7cec6b0d0c1d56ae0f2ad22a3d7e584226fc1663f72dfb10e0ac8b55c6",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 41.819148480077274,
+              "cli_user_seconds": 11.94,
+              "cli_system_seconds": 8.12,
+              "cli_total_cpu_seconds": 20.06,
+              "cli_peak_rss_kib": 76368.0,
+              "working_peak_bytes": 67872414,
+              "managed_writes": 10729032123,
+              "managed_reads": 10729030459,
+              "sort_calls": 44,
+              "sort_runs": 44,
+              "managed_peak_temp_bytes": 8017776675
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 32.79186635289807,
+              "cli_user_seconds": 12.22,
+              "cli_system_seconds": 8.03,
+              "cli_total_cpu_seconds": 20.25,
+              "cli_peak_rss_kib": 76104.0,
+              "working_peak_bytes": 67872414,
+              "managed_writes": 10729032123,
+              "managed_reads": 10729030459,
+              "sort_calls": 44,
+              "sort_runs": 44,
+              "managed_peak_temp_bytes": 8017776675
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 35.34825149201788,
+              "cli_user_seconds": 12.88,
+              "cli_system_seconds": 7.44,
+              "cli_total_cpu_seconds": 20.32,
+              "cli_peak_rss_kib": 76496.0,
+              "working_peak_bytes": 67872414,
+              "managed_writes": 10729032123,
+              "managed_reads": 10729030459,
+              "sort_calls": 44,
+              "sort_runs": 44,
+              "managed_peak_temp_bytes": 8017776675
+            }
+          ],
+          "medians": {
+            "seconds": 35.34825149201788,
+            "cli_user_seconds": 12.22,
+            "cli_system_seconds": 8.03,
+            "cli_total_cpu_seconds": 20.25,
+            "cli_peak_rss_kib": 76368.0,
+            "working_peak_bytes": 67872414,
+            "managed_writes": 10729032123,
+            "managed_reads": 10729030459,
+            "sort_calls": 44,
+            "sort_runs": 44,
+            "managed_peak_temp_bytes": 8017776675
+          },
+          "range_seconds": [
+            32.79186635289807,
+            41.819148480077274
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 16.854246433940716,
+              "cli_user_seconds": 7.44,
+              "cli_system_seconds": 3.39,
+              "cli_total_cpu_seconds": 10.83,
+              "cli_peak_rss_kib": 5724.0,
+              "working_peak_bytes": 365444,
+              "managed_writes": 2650803511,
+              "managed_reads": 5301602030,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 2650801847
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 16.454302424914204,
+              "cli_user_seconds": 7.46,
+              "cli_system_seconds": 3.33,
+              "cli_total_cpu_seconds": 10.79,
+              "cli_peak_rss_kib": 5860.0,
+              "working_peak_bytes": 365444,
+              "managed_writes": 2650803511,
+              "managed_reads": 5301602030,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 2650801847
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 16.95489837997593,
+              "cli_user_seconds": 7.43,
+              "cli_system_seconds": 3.33,
+              "cli_total_cpu_seconds": 10.76,
+              "cli_peak_rss_kib": 5832.0,
+              "working_peak_bytes": 365444,
+              "managed_writes": 2650803511,
+              "managed_reads": 5301602030,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 2650801847
+            }
+          ],
+          "medians": {
+            "seconds": 16.854246433940716,
+            "cli_user_seconds": 7.44,
+            "cli_system_seconds": 3.33,
+            "cli_total_cpu_seconds": 10.79,
+            "cli_peak_rss_kib": 5832.0,
+            "working_peak_bytes": 365444,
+            "managed_writes": 2650803511,
+            "managed_reads": 5301602030,
+            "sort_calls": 0,
+            "sort_runs": 0,
+            "managed_peak_temp_bytes": 2650801847
+          },
+          "range_seconds": [
+            16.454302424914204,
+            16.95489837997593
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 52.31943385446763,
+        "cli_user_seconds": 39.116202945990175,
+        "cli_system_seconds": 58.530510585305095,
+        "cli_total_cpu_seconds": 46.71604938271605,
+        "cli_peak_rss_kib": 92.36329352608422,
+        "working_peak_bytes": 99.46157211971273,
+        "managed_writes": 75.29317201579228,
+        "managed_reads": 50.586382895830305,
+        "sort_calls": 100.0,
+        "sort_runs": 100.0,
+        "managed_peak_temp_bytes": 66.93844248287198
+      },
+      "all_elapsed_pairs_favorable": true,
+      "passes_declared_speed_rule": true,
+      "passes_declared_resource_rule": true,
+      "retain_under_declared_rule": true,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "a4d0b86877577ba60218041798fc96878de2c6f2d75379a81f8f88ab25cac437",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/retained-exact-control-v1-source.tar.gz",
+            "sha256": "2e00f0223b457d266093de703211ebf24a2ba9931579dbff0bd31fe953ee4ac0"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "eccdc21bd4e7a1abc1fbdb9e35f857feb14c425217258a8e601bc86434da5a41",
+          "source_file_count": 338
+        },
+        "candidate": {
+          "binary_sha256": "6403614e47e9e4dedda78c696ddd6b5bba91e0e9382be4de1e34aff1e82cdac3",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-retained-exact-writers"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/retained-exact-candidate-v1-source.tar.gz",
+            "sha256": "46763e557a5416f6b31edcd86749e323c036da9d6b1414dc2508efb8b6523af5"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "eccdc21bd4e7a1abc1fbdb9e35f857feb14c425217258a8e601bc86434da5a41",
+          "source_file_count": 338
+        }
+      },
+      "scope": "Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/retained-exact-oom-strata8-summary-v1.json",
+        "sha256": "c5c197fdabb9e65a35f3772d82e835014766e2016af0390dfd98aa28c55410fa"
+      }
+    },
+    {
+      "cell": "hashed-oom-partition512",
+      "n": 3,
+      "source": "scratch/writer-capacity-20261119/hashed-oom-partition512/results.jsonl",
+      "source_sha256": "f52ccff07368e75d0e99f725d804c2eca6da9d59800d3833a99fd13c96190855",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 13.998412689077668,
+              "cli_user_seconds": 3.87,
+              "cli_system_seconds": 2.64,
+              "cli_total_cpu_seconds": 6.51,
+              "cli_peak_rss_kib": 18212.0,
+              "working_peak_bytes": 16980483,
+              "managed_writes": 197632,
+              "managed_reads": 98816
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 15.553247344912961,
+              "cli_user_seconds": 3.75,
+              "cli_system_seconds": 2.56,
+              "cli_total_cpu_seconds": 6.3100000000000005,
+              "cli_peak_rss_kib": 18272.0,
+              "working_peak_bytes": 16980483,
+              "managed_writes": 197632,
+              "managed_reads": 98816
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 16.404099922976457,
+              "cli_user_seconds": 3.81,
+              "cli_system_seconds": 2.54,
+              "cli_total_cpu_seconds": 6.35,
+              "cli_peak_rss_kib": 18212.0,
+              "working_peak_bytes": 16980483,
+              "managed_writes": 197632,
+              "managed_reads": 98816
+            }
+          ],
+          "medians": {
+            "seconds": 15.553247344912961,
+            "cli_user_seconds": 3.81,
+            "cli_system_seconds": 2.56,
+            "cli_total_cpu_seconds": 6.35,
+            "cli_peak_rss_kib": 18212.0,
+            "working_peak_bytes": 16980483,
+            "managed_writes": 197632,
+            "managed_reads": 98816
+          },
+          "range_seconds": [
+            13.998412689077668,
+            16.404099922976457
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 15.251206097076647,
+              "cli_user_seconds": 3.65,
+              "cli_system_seconds": 2.64,
+              "cli_total_cpu_seconds": 6.29,
+              "cli_peak_rss_kib": 18472.0,
+              "working_peak_bytes": 16674825,
+              "managed_writes": 197632,
+              "managed_reads": 98816
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 16.05413759604562,
+              "cli_user_seconds": 3.8,
+              "cli_system_seconds": 2.55,
+              "cli_total_cpu_seconds": 6.35,
+              "cli_peak_rss_kib": 18376.0,
+              "working_peak_bytes": 16674825,
+              "managed_writes": 197632,
+              "managed_reads": 98816
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 14.549402046948671,
+              "cli_user_seconds": 3.72,
+              "cli_system_seconds": 2.58,
+              "cli_total_cpu_seconds": 6.300000000000001,
+              "cli_peak_rss_kib": 18412.0,
+              "working_peak_bytes": 16674825,
+              "managed_writes": 197632,
+              "managed_reads": 98816
+            }
+          ],
+          "medians": {
+            "seconds": 15.251206097076647,
+            "cli_user_seconds": 3.72,
+            "cli_system_seconds": 2.58,
+            "cli_total_cpu_seconds": 6.300000000000001,
+            "cli_peak_rss_kib": 18412.0,
+            "working_peak_bytes": 16674825,
+            "managed_writes": 197632,
+            "managed_reads": 98816
+          },
+          "range_seconds": [
+            14.549402046948671,
+            16.05413759604562
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 1.9419818970158875,
+        "cli_user_seconds": 2.3622047244094446,
+        "cli_system_seconds": -0.78125,
+        "cli_total_cpu_seconds": 0.7874015748031371,
+        "cli_peak_rss_kib": -1.0981770261366153,
+        "working_peak_bytes": 1.8000548040947972,
+        "managed_writes": 0.0,
+        "managed_reads": 0.0
+      },
+      "all_elapsed_pairs_favorable": false,
+      "passes_declared_speed_rule": false,
+      "passes_declared_resource_rule": false,
+      "retain_under_declared_rule": false,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "54f9c2bea64c3a59214297977f5980835324429c234aabecd4d6f9d4a1dc3807",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/hashed-control-v1-source.tar.gz",
+            "sha256": "5254459490d18c875208b8224af9e9a2e1141de93d753273bf14d0d2876138fa"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "de3403b9df36ea270ad563b348365b01518f4b1aca630f65442ae388295c67bb",
+          "source_file_count": 338
+        },
+        "candidate": {
+          "binary_sha256": "ec8c5b4acc9d2e523fa4410784c9d14e7a77bc3e16aca1c2e625fac95af61023",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-hashed-final-partition"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/hashed-candidate-v1-source.tar.gz",
+            "sha256": "26ead1294562c476d77f90711c9cf00269bc8f823685ab6d05edb805a8489c8c"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "de3403b9df36ea270ad563b348365b01518f4b1aca630f65442ae388295c67bb",
+          "source_file_count": 338
+        }
+      },
+      "scope": "Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/hashed-oom-partition512-summary-v1.json",
+        "sha256": "3cc33aeb2c84cd19f9792ef74654153208c0c29deb356aa4173cd7f1ef83cb28"
+      }
+    },
+    {
+      "cell": "csv-body-oom-balanced8",
+      "n": 3,
+      "source": "scratch/writer-capacity-20261119/csv-body-oom-balanced8/results.jsonl",
+      "source_sha256": "4573ccea03860e2c21a5a20f7e3cf48307576b45bc870b2217f34cca5b6ebd1b",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 9.488401948940009,
+              "cli_user_seconds": 4.65,
+              "cli_system_seconds": 1.65,
+              "cli_total_cpu_seconds": 6.300000000000001,
+              "cli_peak_rss_kib": 5720.0,
+              "working_peak_bytes": 207503,
+              "managed_writes": 1496,
+              "managed_reads": 0,
+              "managed_peak_temp_bytes": 1496,
+              "final_serialized_csv_bytes": 2164261032
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 7.733363804989494,
+              "cli_user_seconds": 4.58,
+              "cli_system_seconds": 1.7,
+              "cli_total_cpu_seconds": 6.28,
+              "cli_peak_rss_kib": 5828.0,
+              "working_peak_bytes": 207503,
+              "managed_writes": 1496,
+              "managed_reads": 0,
+              "managed_peak_temp_bytes": 1496,
+              "final_serialized_csv_bytes": 2164261032
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 8.886296637007035,
+              "cli_user_seconds": 4.71,
+              "cli_system_seconds": 1.64,
+              "cli_total_cpu_seconds": 6.35,
+              "cli_peak_rss_kib": 5700.0,
+              "working_peak_bytes": 207503,
+              "managed_writes": 1496,
+              "managed_reads": 0,
+              "managed_peak_temp_bytes": 1496,
+              "final_serialized_csv_bytes": 2164261032
+            }
+          ],
+          "medians": {
+            "seconds": 8.886296637007035,
+            "cli_user_seconds": 4.65,
+            "cli_system_seconds": 1.65,
+            "cli_total_cpu_seconds": 6.300000000000001,
+            "cli_peak_rss_kib": 5720.0,
+            "working_peak_bytes": 207503,
+            "managed_writes": 1496,
+            "managed_reads": 0,
+            "managed_peak_temp_bytes": 1496,
+            "final_serialized_csv_bytes": 2164261032
+          },
+          "range_seconds": [
+            7.733363804989494,
+            9.488401948940009
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 9.93900330294855,
+              "cli_user_seconds": 2.7,
+              "cli_system_seconds": 2.41,
+              "cli_total_cpu_seconds": 5.11,
+              "cli_peak_rss_kib": 5488.0,
+              "working_peak_bytes": 387420,
+              "managed_writes": 2231371224,
+              "managed_reads": 2164260928,
+              "managed_peak_temp_bytes": 2231371224,
+              "final_serialized_csv_bytes": 2164261032
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 6.781046906020492,
+              "cli_user_seconds": 2.71,
+              "cli_system_seconds": 2.42,
+              "cli_total_cpu_seconds": 5.13,
+              "cli_peak_rss_kib": 5520.0,
+              "working_peak_bytes": 387420,
+              "managed_writes": 2231371224,
+              "managed_reads": 2164260928,
+              "managed_peak_temp_bytes": 2231371224,
+              "final_serialized_csv_bytes": 2164261032
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 9.938624706002884,
+              "cli_user_seconds": 2.62,
+              "cli_system_seconds": 2.48,
+              "cli_total_cpu_seconds": 5.1,
+              "cli_peak_rss_kib": 5296.0,
+              "working_peak_bytes": 387420,
+              "managed_writes": 2231371224,
+              "managed_reads": 2164260928,
+              "managed_peak_temp_bytes": 2231371224,
+              "final_serialized_csv_bytes": 2164261032
+            }
+          ],
+          "medians": {
+            "seconds": 9.938624706002884,
+            "cli_user_seconds": 2.7,
+            "cli_system_seconds": 2.42,
+            "cli_total_cpu_seconds": 5.11,
+            "cli_peak_rss_kib": 5488.0,
+            "working_peak_bytes": 387420,
+            "managed_writes": 2231371224,
+            "managed_reads": 2164260928,
+            "managed_peak_temp_bytes": 2231371224,
+            "final_serialized_csv_bytes": 2164261032
+          },
+          "range_seconds": [
+            6.781046906020492,
+            9.93900330294855
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": -11.842144281043044,
+        "cli_user_seconds": 41.93548387096774,
+        "cli_system_seconds": -46.66666666666668,
+        "cli_total_cpu_seconds": 18.88888888888889,
+        "cli_peak_rss_kib": 4.05594405594406,
+        "working_peak_bytes": -86.7057343749247,
+        "managed_writes": -149155730.48128343,
+        "managed_reads": null,
+        "managed_peak_temp_bytes": -149155730.48128343,
+        "final_serialized_csv_bytes": 0.0
+      },
+      "all_elapsed_pairs_favorable": false,
+      "passes_declared_speed_rule": false,
+      "passes_declared_resource_rule": false,
+      "retain_under_declared_rule": false,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "2878f4061efe0dccbc2e92ea852af5629b4fb2b0abc28c6663bbd4686594c8f5",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/csv-body-control-v1-source.tar.gz",
+            "sha256": "841966e770121c512bd0410e1e4bad75e360054cc53e09677a329d2bee584049"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "531e89285ded044de94827453e1e8e4c093e56f6b92aa5098a6e2348242c5e6d",
+          "source_file_count": 338
+        },
+        "candidate": {
+          "binary_sha256": "362402ff9bb746b6b2aed9056a04b961c8d8ee1308f42d3d1fab28c670f4e8f5",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-csv-body-balanced"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/csv-body-candidate-v1-source.tar.gz",
+            "sha256": "8b2d566e1ff8ebbca1822da5ed67e77965861d564746ffaa44750f7dd54c5bd3"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "531e89285ded044de94827453e1e8e4c093e56f6b92aa5098a6e2348242c5e6d",
+          "source_file_count": 338
+        }
+      },
+      "scope": "Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/csv-body-oom-balanced8-summary-v1.json",
+        "sha256": "2a100c07cca7cec030eddd50e326fba67106148cd44bf0b0e012ac788dd9b36d"
+      }
+    },
+    {
+      "cell": "single-catalog-oom-8192",
+      "n": 3,
+      "descriptor_control": {
+        "source": "scratch/writer-capacity-20261119/single-catalog-gates-batch-v2/2-stdout.log",
+        "sha256": "3a029e0f312266b83bc9b8e7ab6960128e98b97af8df6df986e27bb5d98e402a",
+        "metadata_fds_control": 64,
+        "metadata_fds_candidate": 0,
+        "csv_fds_both": 64,
+        "scope": "Private isolated owner census, not timed whole-job peak"
+      },
+      "source": "scratch/writer-capacity-20261119/single-catalog-oom-8192/results.jsonl",
+      "source_sha256": "eb02bc48cee662e0442465380ab11ffea38bf39dcd86485ae258998af5fed2f1",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 79.30517219298054,
+              "cli_user_seconds": 3.81,
+              "cli_system_seconds": 10.81,
+              "cli_total_cpu_seconds": 14.620000000000001,
+              "cli_peak_rss_kib": 209712.0,
+              "working_peak_bytes": 260906155,
+              "managed_writes": 3010050,
+              "managed_reads": 1504936,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 1505114
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 71.23370239790529,
+              "cli_user_seconds": 3.89,
+              "cli_system_seconds": 10.62,
+              "cli_total_cpu_seconds": 14.51,
+              "cli_peak_rss_kib": 210064.0,
+              "working_peak_bytes": 260906155,
+              "managed_writes": 3010050,
+              "managed_reads": 1504936,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 1505114
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 59.908472924958915,
+              "cli_user_seconds": 3.98,
+              "cli_system_seconds": 10.47,
+              "cli_total_cpu_seconds": 14.450000000000001,
+              "cli_peak_rss_kib": 209776.0,
+              "working_peak_bytes": 260906155,
+              "managed_writes": 3010050,
+              "managed_reads": 1504936,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 1505114
+            }
+          ],
+          "medians": {
+            "seconds": 71.23370239790529,
+            "cli_user_seconds": 3.89,
+            "cli_system_seconds": 10.62,
+            "cli_total_cpu_seconds": 14.51,
+            "cli_peak_rss_kib": 209776.0,
+            "working_peak_bytes": 260906155,
+            "managed_writes": 3010050,
+            "managed_reads": 1504936,
+            "sort_calls": 0,
+            "sort_runs": 0,
+            "managed_peak_temp_bytes": 1505114
+          },
+          "range_seconds": [
+            59.908472924958915,
+            79.30517219298054
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 66.02505869604647,
+              "cli_user_seconds": 4.04,
+              "cli_system_seconds": 10.24,
+              "cli_total_cpu_seconds": 14.280000000000001,
+              "cli_peak_rss_kib": 174420.0,
+              "working_peak_bytes": 192477501,
+              "managed_writes": 1505114,
+              "managed_reads": 0,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 1505114
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 64.16954172204714,
+              "cli_user_seconds": 3.98,
+              "cli_system_seconds": 10.27,
+              "cli_total_cpu_seconds": 14.25,
+              "cli_peak_rss_kib": 174512.0,
+              "working_peak_bytes": 192477501,
+              "managed_writes": 1505114,
+              "managed_reads": 0,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 1505114
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 67.12406557891518,
+              "cli_user_seconds": 4.11,
+              "cli_system_seconds": 7.02,
+              "cli_total_cpu_seconds": 11.129999999999999,
+              "cli_peak_rss_kib": 174604.0,
+              "working_peak_bytes": 192477501,
+              "managed_writes": 1505114,
+              "managed_reads": 0,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 1505114
+            }
+          ],
+          "medians": {
+            "seconds": 66.02505869604647,
+            "cli_user_seconds": 4.04,
+            "cli_system_seconds": 10.24,
+            "cli_total_cpu_seconds": 14.25,
+            "cli_peak_rss_kib": 174512.0,
+            "working_peak_bytes": 192477501,
+            "managed_writes": 1505114,
+            "managed_reads": 0,
+            "sort_calls": 0,
+            "sort_runs": 0,
+            "managed_peak_temp_bytes": 1505114
+          },
+          "range_seconds": [
+            64.16954172204714,
+            67.12406557891518
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 7.312049671044452,
+        "cli_user_seconds": -3.8560411311054033,
+        "cli_system_seconds": 3.5781544256120457,
+        "cli_total_cpu_seconds": 1.791867677463821,
+        "cli_peak_rss_kib": 16.810311951796198,
+        "working_peak_bytes": 26.227305369626098,
+        "managed_writes": 49.99704323848441,
+        "managed_reads": 100.0,
+        "sort_calls": null,
+        "sort_runs": null,
+        "managed_peak_temp_bytes": 0.0
+      },
+      "all_elapsed_pairs_favorable": false,
+      "passes_declared_speed_rule": false,
+      "passes_declared_resource_rule": true,
+      "retain_under_declared_rule": true,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "83782165aefffdc2aee08861f2ffd096ca18e8d5db72759fa54f07dd51537abd",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/single-catalog-control-v2-source.tar.gz",
+            "sha256": "2db6d18986a1d803fe3880dc56ec100e639d36ce8f4ca1554988109e834f756e"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "72db37ee419a0bd014a6e2352b3890d0f6d5de9767c1a91a1b13fd7fdce9be59",
+          "source_file_count": 338
+        },
+        "candidate": {
+          "binary_sha256": "f0ef9cc020e62b7f5737f9c4b3659f61357bd31c0a3d375ddd6c2cbbec5f1877",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-single-final-catalog"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/single-catalog-candidate-v2-source.tar.gz",
+            "sha256": "d315b4a710abf67c56c6b438c288506407d9241721a295b9921ce370c0873368"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "72db37ee419a0bd014a6e2352b3890d0f6d5de9767c1a91a1b13fd7fdce9be59",
+          "source_file_count": 338
+        }
+      },
+      "scope": "Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/single-catalog-oom-8192-summary-v2.json",
+        "sha256": "2649b5abf74304c55356717c8914e39ffc9b7cc9fae8113fffb0f39d84b02dd9"
+      }
+    },
+    {
+      "cell": "single-capacity-oom-16384",
+      "n": 3,
+      "source": "scratch/writer-capacity-20261119/single-capacity-oom-16384/results.jsonl",
+      "source_sha256": "ef0b8e98d0582ba5efb84a6c28ec607dfd3fc44965c5e7aecd857d5c3b0bc3ba",
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 7,
+              "verification_line": 8,
+              "seconds": 290.3717878200114,
+              "cli_user_seconds": 31.07,
+              "cli_system_seconds": 23.56,
+              "cli_total_cpu_seconds": 54.629999999999995,
+              "cli_peak_rss_kib": 266940.0,
+              "working_peak_bytes": 266334303,
+              "managed_writes": 10874661180,
+              "managed_reads": 10871635968,
+              "sort_calls": 50,
+              "sort_runs": 50,
+              "managed_peak_temp_bytes": 10874636048
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 14,
+              "verification_line": 15,
+              "seconds": 237.93248840700835,
+              "cli_user_seconds": 30.92,
+              "cli_system_seconds": 23.66,
+              "cli_total_cpu_seconds": 54.58,
+              "cli_peak_rss_kib": 266976.0,
+              "working_peak_bytes": 266334303,
+              "managed_writes": 10874661180,
+              "managed_reads": 10871635968,
+              "sort_calls": 50,
+              "sort_runs": 50,
+              "managed_peak_temp_bytes": 10874636048
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 17,
+              "verification_line": 18,
+              "seconds": 266.97130823496263,
+              "cli_user_seconds": 31.5,
+              "cli_system_seconds": 23.97,
+              "cli_total_cpu_seconds": 55.47,
+              "cli_peak_rss_kib": 266836.0,
+              "working_peak_bytes": 266335359,
+              "managed_writes": 10874661180,
+              "managed_reads": 10871635968,
+              "sort_calls": 50,
+              "sort_runs": 50,
+              "managed_peak_temp_bytes": 10874636048
+            }
+          ],
+          "medians": {
+            "seconds": 266.97130823496263,
+            "cli_user_seconds": 31.07,
+            "cli_system_seconds": 23.66,
+            "cli_total_cpu_seconds": 54.629999999999995,
+            "cli_peak_rss_kib": 266940.0,
+            "working_peak_bytes": 266334303,
+            "managed_writes": 10874661180,
+            "managed_reads": 10871635968,
+            "sort_calls": 50,
+            "sort_runs": 50,
+            "managed_peak_temp_bytes": 10874636048
+          },
+          "range_seconds": [
+            237.93248840700835,
+            290.3717878200114
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 202.01231046800967,
+              "cli_user_seconds": 17.63,
+              "cli_system_seconds": 20.74,
+              "cli_total_cpu_seconds": 38.37,
+              "cli_peak_rss_kib": 343784.0,
+              "working_peak_bytes": 384897600,
+              "managed_writes": 3025212,
+              "managed_reads": 0,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 3025212
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 12,
+              "verification_line": 13,
+              "seconds": 146.56453089404386,
+              "cli_user_seconds": 17.53,
+              "cli_system_seconds": 19.86,
+              "cli_total_cpu_seconds": 37.39,
+              "cli_peak_rss_kib": 343628.0,
+              "working_peak_bytes": 384897600,
+              "managed_writes": 3025212,
+              "managed_reads": 0,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 3025212
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 19,
+              "verification_line": 20,
+              "seconds": 168.57889429398347,
+              "cli_user_seconds": 17.85,
+              "cli_system_seconds": 20.43,
+              "cli_total_cpu_seconds": 38.28,
+              "cli_peak_rss_kib": 343640.0,
+              "working_peak_bytes": 384897600,
+              "managed_writes": 3025212,
+              "managed_reads": 0,
+              "sort_calls": 0,
+              "sort_runs": 0,
+              "managed_peak_temp_bytes": 3025212
+            }
+          ],
+          "medians": {
+            "seconds": 168.57889429398347,
+            "cli_user_seconds": 17.63,
+            "cli_system_seconds": 20.43,
+            "cli_total_cpu_seconds": 38.28,
+            "cli_peak_rss_kib": 343640.0,
+            "working_peak_bytes": 384897600,
+            "managed_writes": 3025212,
+            "managed_reads": 0,
+            "sort_calls": 0,
+            "sort_runs": 0,
+            "managed_peak_temp_bytes": 3025212
+          },
+          "range_seconds": [
+            146.56453089404386,
+            202.01231046800967
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 36.85505179994233,
+        "cli_user_seconds": 43.257161248793054,
+        "cli_system_seconds": 13.65173288250211,
+        "cli_total_cpu_seconds": 29.928610653487087,
+        "cli_peak_rss_kib": -28.73304862515922,
+        "working_peak_bytes": -44.516720401577416,
+        "managed_writes": 99.97218109189862,
+        "managed_reads": 100.0,
+        "sort_calls": 100.0,
+        "sort_runs": 100.0,
+        "managed_peak_temp_bytes": 99.97218102760729
+      },
+      "all_elapsed_pairs_favorable": true,
+      "passes_declared_speed_rule": true,
+      "passes_declared_resource_rule": true,
+      "retain_under_declared_rule": true,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "670e01ca3c2d01877c8bd482ecc2e341eb4b9abac4a79a8b05086f0bb84013b7",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-retained-exact-writers",
+            "experimental-single-final-catalog"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/single-capacity-control-v1-source.tar.gz",
+            "sha256": "e46b77c16efd292f1ae5e2d13d7a2790b57682e2566909b712702c5128f9dcb5"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "2d92829abe7d03d9b296a757bda89473d97120a7aad5037be58b608489d4ce9c",
+          "source_file_count": 338
+        },
+        "candidate": {
+          "binary_sha256": "2e08e84ee0e4d6880bb72b301ee47a476155005ee080e91da8b54cffd9c73752",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-retained-exact-writers",
+            "experimental-single-final-catalog",
+            "experimental-single-catalog-capacity"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/single-capacity-candidate-v1-source.tar.gz",
+            "sha256": "e4dfacb721e43796dbfc075cb2179527cab3ec71e61d93488e735a1c90254ce7"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "2d92829abe7d03d9b296a757bda89473d97120a7aad5037be58b608489d4ce9c",
+          "source_file_count": 338
+        }
+      },
+      "scope": "Whole-planselector extension: controlSort/sequential64KiBCSV/diskcatalog versus candidateconcurrent16KiBCSV/typedcatalog. Bothenablecommonbuffer/catalogflags, butactualpaths differ; notbufferablation. Readsingle-capacity-scope-clarification-v1.json. Threecompletepairedrepetitions0/1/2,warmup-1excluded;1GiBcgroup/noswap/1worker,WSL2ext4 perjobfadvise/hostcacheuncontrolled. CLI-onlyGNUCPU/RSS, managedworkingreserves/logicaltemptraffic distinct. NotphysicalI/O/nativeWindowsclaim;no defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/single-capacity-oom-16384-summary-v1.json",
+        "sha256": "0e0d379038c9e2e0ef1ea76b4d61aeb5ec01f6a0136887d1d216dfef0c335d34"
+      }
+    },
+    {
+      "source": "scratch/writer-capacity-20261119/partition-tools-oom-v2/results.jsonl",
+      "source_sha256": "49784b1190fae9fe8de26b0156db644a3a9671473a5b97410ca04b0c23bfc368",
+      "n": 3,
+      "tools": {
+        "chopper": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 9,
+              "verification_line": 10,
+              "seconds": 10.540317522012629,
+              "core_user_seconds": 3.37,
+              "core_system_seconds": 1.88,
+              "core_peak_rss_kib": 5748.0
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 20,
+              "verification_line": 21,
+              "seconds": 8.284114254987799,
+              "core_user_seconds": 3.5,
+              "core_system_seconds": 1.81,
+              "core_peak_rss_kib": 5828.0
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 23,
+              "verification_line": 24,
+              "seconds": 12.59443341998849,
+              "core_user_seconds": 3.64,
+              "core_system_seconds": 1.68,
+              "core_peak_rss_kib": 5572.0
+            }
+          ],
+          "medians": {
+            "seconds": 10.540317522012629,
+            "core_user_seconds": 3.5,
+            "core_system_seconds": 1.81,
+            "core_peak_rss_kib": 5748.0
+          },
+          "range_seconds": [
+            8.284114254987799,
+            12.59443341998849
+          ]
+        },
+        "qsv": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 11,
+              "verification_line": 12,
+              "seconds": 4.675629077013582,
+              "core_user_seconds": 1.41,
+              "core_system_seconds": 0.83,
+              "core_peak_rss_kib": 40536.0,
+              "adapter_core_seconds": 4.391215034993365,
+              "sync_seconds": 0.14451244100928307,
+              "publication_seconds": 0.00407463195733726
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 18,
+              "verification_line": 19,
+              "seconds": 2.4702178239822388,
+              "core_user_seconds": 1.52,
+              "core_system_seconds": 0.61,
+              "core_peak_rss_kib": 40316.0,
+              "adapter_core_seconds": 2.305885495035909,
+              "sync_seconds": 0.025298311025835574,
+              "publication_seconds": 0.004393415991216898
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 25,
+              "verification_line": 26,
+              "seconds": 5.377452653949149,
+              "core_user_seconds": 1.4,
+              "core_system_seconds": 0.83,
+              "core_peak_rss_kib": 39704.0,
+              "adapter_core_seconds": 5.119415603927337,
+              "sync_seconds": 0.154576150001958,
+              "publication_seconds": 0.004002406960353255
+            }
+          ],
+          "medians": {
+            "seconds": 4.675629077013582,
+            "core_user_seconds": 1.41,
+            "core_system_seconds": 0.83,
+            "core_peak_rss_kib": 40316.0,
+            "adapter_core_seconds": 4.391215034993365,
+            "sync_seconds": 0.14451244100928307,
+            "publication_seconds": 0.00407463195733726
+          },
+          "range_seconds": [
+            2.4702178239822388,
+            5.377452653949149
+          ]
+        },
+        "duckdb-materialized": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_line": 13,
+              "verification_line": 14,
+              "seconds": 25.683339300914668,
+              "core_user_seconds": 10.31,
+              "core_system_seconds": 8.7,
+              "core_peak_rss_kib": 372480.0,
+              "adapter_core_seconds": 25.51847856398672,
+              "sync_seconds": 0.01638372801244259,
+              "publication_seconds": 0.004101362079381943
+            },
+            {
+              "repetition": 1,
+              "measurement_line": 16,
+              "verification_line": 17,
+              "seconds": 18.761998233036138,
+              "core_user_seconds": 9.92,
+              "core_system_seconds": 8.68,
+              "core_peak_rss_kib": 370492.0,
+              "adapter_core_seconds": 18.58602881198749,
+              "sync_seconds": 0.017662212951108813,
+              "publication_seconds": 0.0041944950353354216
+            },
+            {
+              "repetition": 2,
+              "measurement_line": 27,
+              "verification_line": 28,
+              "seconds": 21.317587265977636,
+              "core_user_seconds": 10.09,
+              "core_system_seconds": 8.96,
+              "core_peak_rss_kib": 370132.0,
+              "adapter_core_seconds": 21.19236844300758,
+              "sync_seconds": 0.01217173901386559,
+              "publication_seconds": 0.004091343027539551
+            }
+          ],
+          "medians": {
+            "seconds": 21.317587265977636,
+            "core_user_seconds": 10.09,
+            "core_system_seconds": 8.7,
+            "core_peak_rss_kib": 370492.0,
+            "adapter_core_seconds": 21.19236844300758,
+            "sync_seconds": 0.01638372801244259,
+            "publication_seconds": 0.004101362079381943
+          },
+          "range_seconds": [
+            18.761998233036138,
+            25.683339300914668
+          ]
+        }
+      },
+      "scope": "Fixedthree-toolorderedPartition,threealternatingcompletejobs/tool,warmup-1excluded;fullfields/IDs/order/membership/filecount/cgroupverified. WSL2ext4/hostcacheuncontrolled/inputfadvise;256MiBengine/1GiBcgroup/noSwap/1thread. qsvhasnocustomenginebudget. CoreRSSisnottotalcgroupusage;DuckmaterializedadapterincludesCTAS/discovery/eightorderedCOPY. Wrappersync/renameincluded;notdestination-race/manifest/capcontractequivalence. NooptimalDuck/nativeWindows/physicalIO/defaultpromotionclaim.",
+      "supplementary_duck_identity": {
+        "path": "scratch/writer-capacity-20261119/duck-extension-inherited-identity-v1.json",
+        "sha256": "1b3fdd1c37584f1e8f2c4c540b4539f850e0860c5212740cebdbb9fffbe0644a",
+        "scope": "PriorfrozenextensionreceiptmatchedcurrentSHAandallfilemetadata/ctime;newownplansomittedextensionandpackagewrappernotseparatelypinned; no oldrunnerreceiptrewritten"
+      },
+      "projection_source": {
+        "path": "scratch/writer-capacity-20261119/partition-tools-summary-v2.json",
+        "sha256": "7d35ba7086d06dd3f145d10bc268862ce976eb8005eff6a12615a6e4453aeba9"
+      }
+    },
+    {
+      "cell": "batched-sync-oom-8192",
+      "n": 3,
+      "sources": [
+        {
+          "path": "scratch/writer-capacity-20261119/batched-sync-oom-8192/results.jsonl",
+          "sha256": "5b00b845534646b41f756a9ba48b9c632d0250f65b5ca12af2cdf7810fcda93f"
+        },
+        {
+          "path": "scratch/writer-capacity-20261119/batched-sync-r2-recovery/results.jsonl",
+          "sha256": "21dba897289f55b8a66f84fd22bdad35f1ff22627b420dd23e049ba1fcd96108"
+        }
+      ],
+      "variants": {
+        "baseline": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-oom-8192/results.jsonl",
+                "sha256": "5b00b845534646b41f756a9ba48b9c632d0250f65b5ca12af2cdf7810fcda93f",
+                "line": 7
+              },
+              "verification_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-oom-8192/results.jsonl",
+                "sha256": "5b00b845534646b41f756a9ba48b9c632d0250f65b5ca12af2cdf7810fcda93f",
+                "line": 8
+              },
+              "seconds": 90.8450171489967,
+              "cli_user_seconds": 3.88,
+              "cli_system_seconds": 11.72,
+              "cli_total_cpu_seconds": 15.600000000000001,
+              "cli_peak_rss_kib": 174368.0,
+              "working_peak_bytes": 192428340,
+              "managed_writes": 1505114,
+              "managed_reads": 0
+            },
+            {
+              "repetition": 1,
+              "measurement_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-oom-8192/results.jsonl",
+                "sha256": "5b00b845534646b41f756a9ba48b9c632d0250f65b5ca12af2cdf7810fcda93f",
+                "line": 14
+              },
+              "verification_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-oom-8192/results.jsonl",
+                "sha256": "5b00b845534646b41f756a9ba48b9c632d0250f65b5ca12af2cdf7810fcda93f",
+                "line": 15
+              },
+              "seconds": 81.31738420005422,
+              "cli_user_seconds": 3.9,
+              "cli_system_seconds": 9.21,
+              "cli_total_cpu_seconds": 13.110000000000001,
+              "cli_peak_rss_kib": 174216.0,
+              "working_peak_bytes": 192428340,
+              "managed_writes": 1505114,
+              "managed_reads": 0
+            },
+            {
+              "repetition": 2,
+              "measurement_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-r2-recovery/results.jsonl",
+                "sha256": "21dba897289f55b8a66f84fd22bdad35f1ff22627b420dd23e049ba1fcd96108",
+                "line": 2
+              },
+              "verification_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-r2-recovery/results.jsonl",
+                "sha256": "21dba897289f55b8a66f84fd22bdad35f1ff22627b420dd23e049ba1fcd96108",
+                "line": 3
+              },
+              "seconds": 63.91965249297209,
+              "cli_user_seconds": 4.02,
+              "cli_system_seconds": 8.68,
+              "cli_total_cpu_seconds": 12.7,
+              "cli_peak_rss_kib": 174500.0,
+              "working_peak_bytes": 192477501,
+              "managed_writes": 1505114,
+              "managed_reads": 0
+            }
+          ],
+          "medians": {
+            "seconds": 81.31738420005422,
+            "cli_user_seconds": 3.9,
+            "cli_system_seconds": 9.21,
+            "cli_total_cpu_seconds": 13.110000000000001,
+            "cli_peak_rss_kib": 174368.0,
+            "working_peak_bytes": 192428340,
+            "managed_writes": 1505114,
+            "managed_reads": 0
+          },
+          "range_seconds": [
+            63.91965249297209,
+            90.8450171489967
+          ]
+        },
+        "candidate": {
+          "samples": [
+            {
+              "repetition": 0,
+              "measurement_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-oom-8192/results.jsonl",
+                "sha256": "5b00b845534646b41f756a9ba48b9c632d0250f65b5ca12af2cdf7810fcda93f",
+                "line": 9
+              },
+              "verification_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-oom-8192/results.jsonl",
+                "sha256": "5b00b845534646b41f756a9ba48b9c632d0250f65b5ca12af2cdf7810fcda93f",
+                "line": 10
+              },
+              "seconds": 58.75903506297618,
+              "cli_user_seconds": 3.63,
+              "cli_system_seconds": 7.82,
+              "cli_total_cpu_seconds": 11.45,
+              "cli_peak_rss_kib": 174840.0,
+              "working_peak_bytes": 192772407,
+              "managed_writes": 1505114,
+              "managed_reads": 0
+            },
+            {
+              "repetition": 1,
+              "measurement_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-oom-8192/results.jsonl",
+                "sha256": "5b00b845534646b41f756a9ba48b9c632d0250f65b5ca12af2cdf7810fcda93f",
+                "line": 12
+              },
+              "verification_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-oom-8192/results.jsonl",
+                "sha256": "5b00b845534646b41f756a9ba48b9c632d0250f65b5ca12af2cdf7810fcda93f",
+                "line": 13
+              },
+              "seconds": 32.09354709205218,
+              "cli_user_seconds": 3.7,
+              "cli_system_seconds": 6.25,
+              "cli_total_cpu_seconds": 9.95,
+              "cli_peak_rss_kib": 174828.0,
+              "working_peak_bytes": 192772407,
+              "managed_writes": 1505114,
+              "managed_reads": 0
+            },
+            {
+              "repetition": 2,
+              "measurement_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-r2-recovery/results.jsonl",
+                "sha256": "21dba897289f55b8a66f84fd22bdad35f1ff22627b420dd23e049ba1fcd96108",
+                "line": 4
+              },
+              "verification_location": {
+                "source": "scratch/writer-capacity-20261119/batched-sync-r2-recovery/results.jsonl",
+                "sha256": "21dba897289f55b8a66f84fd22bdad35f1ff22627b420dd23e049ba1fcd96108",
+                "line": 5
+              },
+              "seconds": 40.96225738199428,
+              "cli_user_seconds": 3.91,
+              "cli_system_seconds": 7.14,
+              "cli_total_cpu_seconds": 11.05,
+              "cli_peak_rss_kib": 175116.0,
+              "working_peak_bytes": 192821568,
+              "managed_writes": 1505114,
+              "managed_reads": 0
+            }
+          ],
+          "medians": {
+            "seconds": 40.96225738199428,
+            "cli_user_seconds": 3.7,
+            "cli_system_seconds": 7.14,
+            "cli_total_cpu_seconds": 11.05,
+            "cli_peak_rss_kib": 174840.0,
+            "working_peak_bytes": 192772407,
+            "managed_writes": 1505114,
+            "managed_reads": 0
+          },
+          "range_seconds": [
+            32.09354709205218,
+            58.75903506297618
+          ]
+        }
+      },
+      "reduction_percent": {
+        "seconds": 49.626690793176095,
+        "cli_user_seconds": 5.128205128205121,
+        "cli_system_seconds": 22.4755700325733,
+        "cli_total_cpu_seconds": 15.713196033562172,
+        "cli_peak_rss_kib": -0.2706918700678962,
+        "working_peak_bytes": -0.17880266492971142,
+        "managed_writes": 0.0,
+        "managed_reads": null
+      },
+      "all_elapsed_pairs_favorable": true,
+      "passes_declared_speed_rule": true,
+      "retain_under_declared_rule": true,
+      "builds": {
+        "baseline": {
+          "binary_sha256": "81ea876866354f74cb76fb33877dce665b57da7753af11ca4aa557702929fbd1",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-retained-exact-writers",
+            "experimental-single-final-catalog",
+            "experimental-single-catalog-capacity"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/batched-sync-control-v1-source.tar.gz",
+            "sha256": "f9030927bc167985ed65576596a2db23c08eb17abc1e764282b8b695d0b3e2d9"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "3b6c6d14b8bb00bbc67a26e58947f7ac312a7df6a61507a1100007b25653ce49",
+          "source_file_count": 339
+        },
+        "candidate": {
+          "binary_sha256": "f50cd9f4a52ac2dc5af6267ad2b59cee1cfdc77bd146bf2f21915eb6d29eff07",
+          "features": [
+            "experimental-counted-balanced",
+            "experimental-terminal-shuffle",
+            "experimental-cgroup-cache-headroom",
+            "experimental-terminal-routing",
+            "experimental-final-writer-chains",
+            "experimental-memory-final-writers",
+            "experimental-small-final-buffers",
+            "experimental-release-final-header-scratch",
+            "experimental-counted-codec-balanced",
+            "experimental-bounded-final-partition",
+            "experimental-retained-exact-writers",
+            "experimental-single-final-catalog",
+            "experimental-single-catalog-capacity",
+            "experimental-batched-final-sync"
+          ],
+          "source_archive": {
+            "path": "scratch/oom-iteration/batched-sync-candidate-v1-source.tar.gz",
+            "sha256": "e8e4b26523a47573ea41480b4c01f26cf20a9c8a81ba57aaec917fa15593fe67"
+          },
+          "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+          "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+          "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+          "platform": "Linux-6.18.33.1-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+          "profile": "workspace default release, --locked",
+          "source_map_sha256": "3b6c6d14b8bb00bbc67a26e58947f7ac312a7df6a61507a1100007b25653ce49",
+          "source_file_count": 339
+        }
+      },
+      "exclusion": "Original repetition2 baseline and orphan candidate are incomplete-pair/diagnostic only after externally interrupted supervisor. Fresh complete repetition2 selected before timing interpretation; warmup excluded. See N/batched-r2-interruption-v1.json and orphan-r2-verification-v1.json.",
+      "scope": "2GiB/8192Interleaved/m1024/oneworker/1GiBcgroup/noSwap, WSL2ext4, inputfadvise/hostcacheuncontrolled. Bothactual16KiB/typed concurrent paths, ONLY synchronization schedule differs. No default promotion or nativeWindows claim. CPU/RSS/working/logical traffic separate; no physicalIO inference.",
+      "projection_source": {
+        "path": "scratch/oom-resume-20261121/batched-sync-summary-v2.json",
+        "sha256": "ace5bf6394afef20a21385e827d8eb92dd4ef2e2cb77764fee428b81c1a40265"
+      }
+    },
+    {
+      "kind": "summary",
+      "schema_version": 1,
+      "cases": [
+        {
+          "operation": "partition",
+          "n": 3,
+          "source": "<native-checkouts>/writer-headroom-floatfix-20261121-175ca243/scratch/writer-headroom-transfer/partition-large-v3/results.jsonl",
+          "source_sha256": "96ec19f2ae9ea881902ef4ef1e40d292f1c7131f1b3e718c6e6cd96855809317",
+          "variants": {
+            "baseline": {
+              "samples": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 7,
+                  "verification_line": 8,
+                  "seconds": 9.516086499905214,
+                  "cli_user_seconds": 6.265625,
+                  "cli_system_seconds": 2.65625,
+                  "cli_total_cpu_seconds": 8.921875,
+                  "working_peak_bytes": 67857332,
+                  "managed_writes": 2709521976,
+                  "managed_reads": 2709520384,
+                  "cli_peak_private_commit_bytes": 74158080,
+                  "cli_peak_working_set_bytes": 76382208
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 14,
+                  "verification_line": 15,
+                  "seconds": 9.71193910005968,
+                  "cli_user_seconds": 6.203125,
+                  "cli_system_seconds": 2.84375,
+                  "cli_total_cpu_seconds": 9.046875,
+                  "working_peak_bytes": 67857332,
+                  "managed_writes": 2709521976,
+                  "managed_reads": 2709520384,
+                  "cli_peak_private_commit_bytes": 74149888,
+                  "cli_peak_working_set_bytes": 76357632
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 17,
+                  "verification_line": 18,
+                  "seconds": 9.507252199924551,
+                  "cli_user_seconds": 5.59375,
+                  "cli_system_seconds": 3.34375,
+                  "cli_total_cpu_seconds": 8.9375,
+                  "working_peak_bytes": 67857332,
+                  "managed_writes": 2709521976,
+                  "managed_reads": 2709520384,
+                  "cli_peak_private_commit_bytes": 74145792,
+                  "cli_peak_working_set_bytes": 76316672
+                }
+              ],
+              "medians": {
+                "seconds": 9.516086499905214,
+                "cli_user_seconds": 6.203125,
+                "cli_system_seconds": 2.84375,
+                "cli_total_cpu_seconds": 8.9375,
+                "working_peak_bytes": 67857332,
+                "managed_writes": 2709521976,
+                "managed_reads": 2709520384,
+                "cli_peak_private_commit_bytes": 74149888,
+                "cli_peak_working_set_bytes": 76357632
+              },
+              "range_seconds": [
+                9.507252199924551,
+                9.71193910005968
+              ]
+            },
+            "candidate": {
+              "samples": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 9,
+                  "verification_line": 10,
+                  "seconds": 5.904938100022264,
+                  "cli_user_seconds": 3.65625,
+                  "cli_system_seconds": 1.9375,
+                  "cli_total_cpu_seconds": 5.59375,
+                  "working_peak_bytes": 478649,
+                  "managed_writes": 1592,
+                  "managed_reads": 0,
+                  "cli_peak_private_commit_bytes": 1527808,
+                  "cli_peak_working_set_bytes": 6955008
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 12,
+                  "verification_line": 13,
+                  "seconds": 5.875472200103104,
+                  "cli_user_seconds": 3.28125,
+                  "cli_system_seconds": 2.109375,
+                  "cli_total_cpu_seconds": 5.390625,
+                  "working_peak_bytes": 478649,
+                  "managed_writes": 1592,
+                  "managed_reads": 0,
+                  "cli_peak_private_commit_bytes": 1527808,
+                  "cli_peak_working_set_bytes": 6963200
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 19,
+                  "verification_line": 20,
+                  "seconds": 5.937585200066678,
+                  "cli_user_seconds": 3.46875,
+                  "cli_system_seconds": 2.109375,
+                  "cli_total_cpu_seconds": 5.578125,
+                  "working_peak_bytes": 478649,
+                  "managed_writes": 1592,
+                  "managed_reads": 0,
+                  "cli_peak_private_commit_bytes": 1536000,
+                  "cli_peak_working_set_bytes": 6983680
+                }
+              ],
+              "medians": {
+                "seconds": 5.904938100022264,
+                "cli_user_seconds": 3.46875,
+                "cli_system_seconds": 2.109375,
+                "cli_total_cpu_seconds": 5.578125,
+                "working_peak_bytes": 478649,
+                "managed_writes": 1592,
+                "managed_reads": 0,
+                "cli_peak_private_commit_bytes": 1527808,
+                "cli_peak_working_set_bytes": 6963200
+              },
+              "range_seconds": [
+                5.875472200103104,
+                5.937585200066678
+              ]
+            }
+          },
+          "reduction_percent": {
+            "seconds": 37.94783075919832,
+            "cli_user_seconds": 44.08060453400504,
+            "cli_system_seconds": 25.82417582417582,
+            "cli_total_cpu_seconds": 37.58741258741259,
+            "working_peak_bytes": 99.2946244924572,
+            "managed_writes": 99.99994124424848,
+            "managed_reads": 100.0,
+            "cli_peak_private_commit_bytes": 97.93956802739878,
+            "cli_peak_working_set_bytes": 90.88080678038837
+          },
+          "all_elapsed_pairs_favorable": true,
+          "passes_speed_rule": true,
+          "passes_resource_rule": true,
+          "supports_windows_transfer": true,
+          "builds": {
+            "baseline": {
+              "binary": "<native-checkouts>\\writer-headroom-floatfix-20261121-175ca243\\scratch\\writer-headroom-transfer\\pins\\partition-control-v2\\chopper.exe",
+              "binary_sha256": "4ec9afdf9f883789bfe636dc5360ca70bf9612c7879c8c1218d91090262920a1",
+              "features": [
+                "experimental-counted-balanced",
+                "experimental-terminal-shuffle",
+                "experimental-cgroup-cache-headroom",
+                "experimental-terminal-routing",
+                "experimental-final-writer-chains",
+                "experimental-memory-final-writers",
+                "experimental-small-final-buffers",
+                "experimental-release-final-header-scratch",
+                "experimental-counted-codec-balanced",
+                "experimental-single-final-catalog",
+                "experimental-single-catalog-capacity",
+                "experimental-batched-final-sync"
+              ],
+              "source_archive": {
+                "path": "<native-checkouts>\\writer-headroom-floatfix-20261121-175ca243\\scratch\\writer-headroom-transfer\\pins\\partition-control-v2\\source.tar.gz",
+                "sha256": "960f5f4ecbe8652232a0b2e17224e0eb4f37dee162268623ae5789c4e1165bd3"
+              },
+              "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+              "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+              "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+              "platform": "Windows-11-10.0.26300-SP0",
+              "profile": "workspace default native MSVC release --locked",
+              "source_map_sha256": "d016fffb5e973c8f6f31b860df81323c94e27c7f8736d7414671b2ba91d39787",
+              "source_file_count": 339
+            },
+            "candidate": {
+              "binary": "<native-checkouts>\\writer-headroom-floatfix-20261121-175ca243\\scratch\\writer-headroom-transfer\\pins\\candidate\\chopper.exe",
+              "binary_sha256": "ba21fcc71e219a827bf57883dfe23a7fba0f703a7a07ae9ce19c4ccd67a53a8a",
+              "features": [
+                "experimental-counted-balanced",
+                "experimental-terminal-shuffle",
+                "experimental-cgroup-cache-headroom",
+                "experimental-terminal-routing",
+                "experimental-final-writer-chains",
+                "experimental-memory-final-writers",
+                "experimental-small-final-buffers",
+                "experimental-release-final-header-scratch",
+                "experimental-counted-codec-balanced",
+                "experimental-bounded-final-partition",
+                "experimental-retained-exact-writers",
+                "experimental-single-final-catalog",
+                "experimental-single-catalog-capacity",
+                "experimental-batched-final-sync"
+              ],
+              "source_archive": {
+                "path": "<native-checkouts>\\writer-headroom-floatfix-20261121-175ca243\\scratch\\writer-headroom-transfer\\pins\\candidate\\source.tar.gz",
+                "sha256": "6e62f346be05e34cc24225c1b558153b3ac057b6bee19267bec70e973c8c8414"
+              },
+              "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+              "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+              "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+              "platform": "Windows-11-10.0.26300-SP0",
+              "profile": "workspace default native MSVC release --locked",
+              "source_map_sha256": "d016fffb5e973c8f6f31b860df81323c94e27c7f8736d7414671b2ba91d39787",
+              "source_file_count": 339
+            }
+          }
+        },
+        {
+          "operation": "exact",
+          "n": 3,
+          "source": "<native-checkouts>/writer-headroom-floatfix-20261121-175ca243/scratch/writer-headroom-transfer/exact-large-v3/results.jsonl",
+          "source_sha256": "c2cf344e9f1720ef1b785f76e2bfa4ae0d9af2c59e1289dd4f2e30b15c0e4f77",
+          "variants": {
+            "baseline": {
+              "samples": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 7,
+                  "verification_line": 8,
+                  "seconds": 22.560805899905972,
+                  "cli_user_seconds": 14.234375,
+                  "cli_system_seconds": 7.515625,
+                  "cli_total_cpu_seconds": 21.75,
+                  "working_peak_bytes": 67872920,
+                  "managed_writes": 10729032123,
+                  "managed_reads": 10729030459,
+                  "cli_peak_private_commit_bytes": 78704640,
+                  "cli_peak_working_set_bytes": 76619776
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 14,
+                  "verification_line": 15,
+                  "seconds": 22.547965199919418,
+                  "cli_user_seconds": 13.515625,
+                  "cli_system_seconds": 8.203125,
+                  "cli_total_cpu_seconds": 21.71875,
+                  "working_peak_bytes": 67872920,
+                  "managed_writes": 10729032123,
+                  "managed_reads": 10729030459,
+                  "cli_peak_private_commit_bytes": 78819328,
+                  "cli_peak_working_set_bytes": 76607488
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 17,
+                  "verification_line": 18,
+                  "seconds": 22.590316600049846,
+                  "cli_user_seconds": 13.296875,
+                  "cli_system_seconds": 8.453125,
+                  "cli_total_cpu_seconds": 21.75,
+                  "working_peak_bytes": 67872920,
+                  "managed_writes": 10729032123,
+                  "managed_reads": 10729030459,
+                  "cli_peak_private_commit_bytes": 78557184,
+                  "cli_peak_working_set_bytes": 76644352
+                }
+              ],
+              "medians": {
+                "seconds": 22.560805899905972,
+                "cli_user_seconds": 13.515625,
+                "cli_system_seconds": 8.203125,
+                "cli_total_cpu_seconds": 21.75,
+                "working_peak_bytes": 67872920,
+                "managed_writes": 10729032123,
+                "managed_reads": 10729030459,
+                "cli_peak_private_commit_bytes": 78704640,
+                "cli_peak_working_set_bytes": 76619776
+              },
+              "range_seconds": [
+                22.547965199919418,
+                22.590316600049846
+              ]
+            },
+            "candidate": {
+              "samples": [
+                {
+                  "repetition": 0,
+                  "measurement_line": 9,
+                  "verification_line": 10,
+                  "seconds": 12.886509999982081,
+                  "cli_user_seconds": 8.703125,
+                  "cli_system_seconds": 3.703125,
+                  "cli_total_cpu_seconds": 12.40625,
+                  "working_peak_bytes": 366904,
+                  "managed_writes": 2650803511,
+                  "managed_reads": 5301602030,
+                  "cli_peak_private_commit_bytes": 1495040,
+                  "cli_peak_working_set_bytes": 7102464
+                },
+                {
+                  "repetition": 1,
+                  "measurement_line": 12,
+                  "verification_line": 13,
+                  "seconds": 12.784926300053485,
+                  "cli_user_seconds": 7.84375,
+                  "cli_system_seconds": 4.421875,
+                  "cli_total_cpu_seconds": 12.265625,
+                  "working_peak_bytes": 366904,
+                  "managed_writes": 2650803511,
+                  "managed_reads": 5301602030,
+                  "cli_peak_private_commit_bytes": 1499136,
+                  "cli_peak_working_set_bytes": 7102464
+                },
+                {
+                  "repetition": 2,
+                  "measurement_line": 19,
+                  "verification_line": 20,
+                  "seconds": 12.724120200029574,
+                  "cli_user_seconds": 8.734375,
+                  "cli_system_seconds": 3.5625,
+                  "cli_total_cpu_seconds": 12.296875,
+                  "working_peak_bytes": 366904,
+                  "managed_writes": 2650803511,
+                  "managed_reads": 5301602030,
+                  "cli_peak_private_commit_bytes": 1507328,
+                  "cli_peak_working_set_bytes": 7102464
+                }
+              ],
+              "medians": {
+                "seconds": 12.784926300053485,
+                "cli_user_seconds": 8.703125,
+                "cli_system_seconds": 3.703125,
+                "cli_total_cpu_seconds": 12.296875,
+                "working_peak_bytes": 366904,
+                "managed_writes": 2650803511,
+                "managed_reads": 5301602030,
+                "cli_peak_private_commit_bytes": 1499136,
+                "cli_peak_working_set_bytes": 7102464
+              },
+              "range_seconds": [
+                12.724120200029574,
+                12.886509999982081
+              ]
+            }
+          },
+          "reduction_percent": {
+            "seconds": 43.33125174350811,
+            "cli_user_seconds": 35.60693641618498,
+            "cli_system_seconds": 54.85714285714286,
+            "cli_total_cpu_seconds": 43.462643678160916,
+            "working_peak_bytes": 99.45942505494091,
+            "managed_writes": 75.29317201579228,
+            "managed_reads": 50.586382895830305,
+            "cli_peak_private_commit_bytes": 98.09523809523809,
+            "cli_peak_working_set_bytes": 90.73024697957874
+          },
+          "all_elapsed_pairs_favorable": true,
+          "passes_speed_rule": true,
+          "passes_resource_rule": true,
+          "supports_windows_transfer": true,
+          "builds": {
+            "baseline": {
+              "binary": "<native-checkouts>\\writer-headroom-floatfix-20261121-175ca243\\scratch\\writer-headroom-transfer\\pins\\exact-control\\chopper.exe",
+              "binary_sha256": "6b47d6388fa8962c687c4005bde8f07ea14aa6c90d2fb03a2a8e777d418fe75c",
+              "features": [
+                "experimental-counted-balanced",
+                "experimental-terminal-shuffle",
+                "experimental-cgroup-cache-headroom",
+                "experimental-terminal-routing",
+                "experimental-final-writer-chains",
+                "experimental-memory-final-writers",
+                "experimental-small-final-buffers",
+                "experimental-release-final-header-scratch",
+                "experimental-counted-codec-balanced",
+                "experimental-bounded-final-partition",
+                "experimental-single-final-catalog",
+                "experimental-single-catalog-capacity",
+                "experimental-batched-final-sync"
+              ],
+              "source_archive": {
+                "path": "<native-checkouts>\\writer-headroom-floatfix-20261121-175ca243\\scratch\\writer-headroom-transfer\\pins\\exact-control\\source.tar.gz",
+                "sha256": "998b547047d4a2954c68fcb2c15aa1859aa594ba6eae57ae3dfe853ceebc307c"
+              },
+              "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+              "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+              "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+              "platform": "Windows-11-10.0.26300-SP0",
+              "profile": "workspace default native MSVC release --locked",
+              "source_map_sha256": "d016fffb5e973c8f6f31b860df81323c94e27c7f8736d7414671b2ba91d39787",
+              "source_file_count": 339
+            },
+            "candidate": {
+              "binary": "<native-checkouts>\\writer-headroom-floatfix-20261121-175ca243\\scratch\\writer-headroom-transfer\\pins\\candidate\\chopper.exe",
+              "binary_sha256": "ba21fcc71e219a827bf57883dfe23a7fba0f703a7a07ae9ce19c4ccd67a53a8a",
+              "features": [
+                "experimental-counted-balanced",
+                "experimental-terminal-shuffle",
+                "experimental-cgroup-cache-headroom",
+                "experimental-terminal-routing",
+                "experimental-final-writer-chains",
+                "experimental-memory-final-writers",
+                "experimental-small-final-buffers",
+                "experimental-release-final-header-scratch",
+                "experimental-counted-codec-balanced",
+                "experimental-bounded-final-partition",
+                "experimental-retained-exact-writers",
+                "experimental-single-final-catalog",
+                "experimental-single-catalog-capacity",
+                "experimental-batched-final-sync"
+              ],
+              "source_archive": {
+                "path": "<native-checkouts>\\writer-headroom-floatfix-20261121-175ca243\\scratch\\writer-headroom-transfer\\pins\\candidate\\source.tar.gz",
+                "sha256": "6e62f346be05e34cc24225c1b558153b3ac057b6bee19267bec70e973c8c8414"
+              },
+              "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+              "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+              "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+              "platform": "Windows-11-10.0.26300-SP0",
+              "profile": "workspace default native MSVC release --locked",
+              "source_map_sha256": "d016fffb5e973c8f6f31b860df81323c94e27c7f8736d7414671b2ba91d39787",
+              "source_file_count": 339
+            }
+          }
+        }
+      ],
+      "scope": "Native Windows MSVC/NTFS,2GiB/8keys/8outputs,m256/oneworker/maxfiles64. Three alternating complete pairs plus excluded warmup per operation. Native Popen\u2192exit clock excludes WSL transport/inputhash/oracle/deletion. Cache uncontrolled; NOOSRAMcap or swapcontrol. Input exceeds engine working allocation, not necessarily hostRAM. Do not pool Linuxcgroup times. Windows peak working set/private commit/working reservations/CPU/logical temptraffic distinct. Batching is Linux-only and inactive here.",
+      "exclusions": "Originalpreflight/warmup failures preserved separately: wirefloat test normalization; transitive-feature control correction; statusmetadata race; erroneous sort-only Auto assertion. No failedwarmup or derivedsummary is extra observation. Partition control disables BoundPartition AND transitive RetainedExact (unused in Partitionshape); exact control disables onlyRetainedExact. Fullfields/IDs/order/64exactquotas/manifest/caps/cleanup verified. No defaultpromotion.",
+      "projection_source": {
+        "path": "scratch/oom-resume-20261121/windows-transfer-summary-v1.json",
+        "sha256": "d6f0cc29ce4be33cead0894d8ac3390abba2d0ada1d99a8a8b80b816637b5bcf"
+      }
+    }
+  ]
+}

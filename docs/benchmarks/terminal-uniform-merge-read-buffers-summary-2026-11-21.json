@@ -1,0 +1,555 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "terminal_uniform_application_read_buffers",
+  "pairs": [
+    {
+      "rep": -1,
+      "index": {
+        "path": "scratch/uniform-buffer-resume-20261121/pair--1/pair.json",
+        "sha256": "ebd02a93cad411266b79d8f8166ba1520ecbf4efab303f5ecc6ef11e529ea39c"
+      },
+      "eligible": false,
+      "samples": {
+        "candidate": {
+          "receipt": {
+            "path": "scratch/uniform-buffer-resume-20261121/pair--1/candidate/verification.json",
+            "sha256": "0e1918b3316fe8f861308eef1fc49983ddaf3c39fd4bea34b68ca0203ff8d8a5"
+          },
+          "elapsed_seconds": 85.93422150192782,
+          "cpu_seconds": 56.349999999999994,
+          "user_cpu_seconds": 34.48,
+          "system_cpu_seconds": 21.87,
+          "gnu_time_filesystem_inputs": 115958408,
+          "gnu_time_filesystem_outputs": 38680448,
+          "voluntary_context_switches": 12923,
+          "gnu_time_rss_peak_kib": 73112,
+          "workspace_peak_bytes": 67432414,
+          "managed_writes": 11140072936,
+          "managed_reads": 11140071424,
+          "cgroup_peak_bytes": 1073741824,
+          "file_cache_refaults": 10477397,
+          "direct_page_scans": 19224150,
+          "sort_runs": 197,
+          "sort_seconds": 2.602641385,
+          "merge_operations": 1
+        },
+        "control": {
+          "receipt": {
+            "path": "scratch/uniform-buffer-resume-20261121/pair--1/control/verification.json",
+            "sha256": "f980a567a363f9996c2c49c6f33d1f59312dd73b002ecc256ce1825e7eea82ac"
+          },
+          "elapsed_seconds": 82.77682295395061,
+          "cpu_seconds": 54.550000000000004,
+          "user_cpu_seconds": 36.13,
+          "system_cpu_seconds": 18.42,
+          "gnu_time_filesystem_inputs": 108945696,
+          "gnu_time_filesystem_outputs": 38679912,
+          "voluntary_context_switches": 13293,
+          "gnu_time_rss_peak_kib": 87772,
+          "workspace_peak_bytes": 67432012,
+          "managed_writes": 11140072936,
+          "managed_reads": 11140071424,
+          "cgroup_peak_bytes": 1073741824,
+          "file_cache_refaults": 9654381,
+          "direct_page_scans": 18353446,
+          "sort_runs": 197,
+          "sort_seconds": 2.601278807,
+          "merge_operations": 1
+        }
+      }
+    },
+    {
+      "rep": 0,
+      "index": {
+        "path": "scratch/uniform-buffer-resume-20261121/pair-0/pair.json",
+        "sha256": "d2e424b35933634d65514c6301d00e0008942fc67800498b03ad102d4f33a029"
+      },
+      "eligible": true,
+      "samples": {
+        "control": {
+          "receipt": {
+            "path": "scratch/uniform-buffer-resume-20261121/pair-0/control/verification.json",
+            "sha256": "4afe956b7242ebda05813e9578fb4a326818d950a6970fddfd818d266f3f8dd0"
+          },
+          "elapsed_seconds": 83.62995431304444,
+          "cpu_seconds": 53.52,
+          "user_cpu_seconds": 35.17,
+          "system_cpu_seconds": 18.35,
+          "gnu_time_filesystem_inputs": 102645888,
+          "gnu_time_filesystem_outputs": 38679504,
+          "voluntary_context_switches": 13557,
+          "gnu_time_rss_peak_kib": 73332,
+          "workspace_peak_bytes": 67431811,
+          "managed_writes": 11140072936,
+          "managed_reads": 11140071424,
+          "cgroup_peak_bytes": 1073741824,
+          "file_cache_refaults": 8865740,
+          "direct_page_scans": 17583991,
+          "sort_runs": 197,
+          "sort_seconds": 2.617573954,
+          "merge_operations": 1
+        },
+        "candidate": {
+          "receipt": {
+            "path": "scratch/uniform-buffer-resume-20261121/pair-0/candidate/verification.json",
+            "sha256": "3099cc181ee5ad9d8496484f8603bd3b84695d61f8c436622b87c11a77125d38"
+          },
+          "elapsed_seconds": 88.29189585195854,
+          "cpu_seconds": 55.77,
+          "user_cpu_seconds": 34.56,
+          "system_cpu_seconds": 21.21,
+          "gnu_time_filesystem_inputs": 102932168,
+          "gnu_time_filesystem_outputs": 38675360,
+          "voluntary_context_switches": 13175,
+          "gnu_time_rss_peak_kib": 87896,
+          "workspace_peak_bytes": 67432213,
+          "managed_writes": 11140072936,
+          "managed_reads": 11140071424,
+          "cgroup_peak_bytes": 1073741824,
+          "file_cache_refaults": 8846307,
+          "direct_page_scans": 17699286,
+          "sort_runs": 197,
+          "sort_seconds": 2.636833714,
+          "merge_operations": 1
+        }
+      }
+    },
+    {
+      "rep": 1,
+      "index": {
+        "path": "scratch/uniform-buffer-resume-20261121/pair-1/pair.json",
+        "sha256": "abd01626e95d2a9013ffe1aa62bc6b657d3378bbfbb724ad4d8bdb194450df4a"
+      },
+      "eligible": true,
+      "samples": {
+        "candidate": {
+          "receipt": {
+            "path": "scratch/uniform-buffer-resume-20261121/pair-1/candidate/verification.json",
+            "sha256": "b19a4c769014980eff251363fcc8e6e3103df07bf989c092347315450ccc069d"
+          },
+          "elapsed_seconds": 88.28999682702124,
+          "cpu_seconds": 56.510000000000005,
+          "user_cpu_seconds": 34.56,
+          "system_cpu_seconds": 21.95,
+          "gnu_time_filesystem_inputs": 116016464,
+          "gnu_time_filesystem_outputs": 38672696,
+          "voluntary_context_switches": 14523,
+          "gnu_time_rss_peak_kib": 73264,
+          "workspace_peak_bytes": 67432213,
+          "managed_writes": 11140072936,
+          "managed_reads": 11140071424,
+          "cgroup_peak_bytes": 1073741824,
+          "file_cache_refaults": 10485755,
+          "direct_page_scans": 19214084,
+          "sort_runs": 197,
+          "sort_seconds": 2.636037185,
+          "merge_operations": 1
+        },
+        "control": {
+          "receipt": {
+            "path": "scratch/uniform-buffer-resume-20261121/pair-1/control/verification.json",
+            "sha256": "f6c6a95e055084d5a15986063cb11bf8681956d42b19545cf09c17e1291ca359"
+          },
+          "elapsed_seconds": 85.78272278397344,
+          "cpu_seconds": 54.1,
+          "user_cpu_seconds": 35.56,
+          "system_cpu_seconds": 18.54,
+          "gnu_time_filesystem_inputs": 105631424,
+          "gnu_time_filesystem_outputs": 38681152,
+          "voluntary_context_switches": 13691,
+          "gnu_time_rss_peak_kib": 87904,
+          "workspace_peak_bytes": 67431811,
+          "managed_writes": 11140072936,
+          "managed_reads": 11140071424,
+          "cgroup_peak_bytes": 1073741824,
+          "file_cache_refaults": 9236254,
+          "direct_page_scans": 18023886,
+          "sort_runs": 197,
+          "sort_seconds": 2.592444256,
+          "merge_operations": 1
+        }
+      }
+    },
+    {
+      "rep": 2,
+      "index": {
+        "path": "scratch/uniform-buffer-resume-20261121/pair-2/pair.json",
+        "sha256": "cc73e18150d9a927a1e796e7b6e721db4679bada0210936c119774225ae049c6"
+      },
+      "eligible": true,
+      "samples": {
+        "control": {
+          "receipt": {
+            "path": "scratch/uniform-buffer-resume-20261121/pair-2/control/verification.json",
+            "sha256": "e70c0e1bc40fdcf6b9347cab7848e7bc3e0a11b8b469d6f9d5ad28ef584690c1"
+          },
+          "elapsed_seconds": 84.23704080202151,
+          "cpu_seconds": 53.45,
+          "user_cpu_seconds": 34.95,
+          "system_cpu_seconds": 18.5,
+          "gnu_time_filesystem_inputs": 109173008,
+          "gnu_time_filesystem_outputs": 38674792,
+          "voluntary_context_switches": 12708,
+          "gnu_time_rss_peak_kib": 87740,
+          "workspace_peak_bytes": 67431811,
+          "managed_writes": 11140072936,
+          "managed_reads": 11140071424,
+          "cgroup_peak_bytes": 1073741824,
+          "file_cache_refaults": 9684653,
+          "direct_page_scans": 18487501,
+          "sort_runs": 197,
+          "sort_seconds": 2.587842397,
+          "merge_operations": 1
+        },
+        "candidate": {
+          "receipt": {
+            "path": "scratch/uniform-buffer-resume-20261121/pair-2/candidate/verification.json",
+            "sha256": "e5781571044ff4b8047d75516ab789708c9f401d4d68f9cfccaa34a08bd3fcaa"
+          },
+          "elapsed_seconds": 87.94150792900473,
+          "cpu_seconds": 56.03,
+          "user_cpu_seconds": 34.22,
+          "system_cpu_seconds": 21.81,
+          "gnu_time_filesystem_inputs": 114607416,
+          "gnu_time_filesystem_outputs": 38673600,
+          "voluntary_context_switches": 13600,
+          "gnu_time_rss_peak_kib": 87944,
+          "workspace_peak_bytes": 67432213,
+          "managed_writes": 11140072936,
+          "managed_reads": 11140071424,
+          "cgroup_peak_bytes": 1073741824,
+          "file_cache_refaults": 10305716,
+          "direct_page_scans": 19029495,
+          "sort_runs": 197,
+          "sort_seconds": 2.607944701,
+          "merge_operations": 1
+        }
+      }
+    }
+  ],
+  "decision": {
+    "path": "scratch/uniform-buffer-resume-20261121/decision-v1.json",
+    "sha256": "79362f9774b0286d6bb2f56cfbaa33b06b582893929de44e65bd1f05910937e9"
+  },
+  "builds": {
+    "control": {
+      "receipt": {
+        "path": "scratch/oom-iteration/terminal-merge-read-buffers-control-v1-build.json",
+        "sha256": "e81a051039b164ea3293fb000e7f5cb3136b708297cd8b5caa204015618d0483"
+      },
+      "binary": "b22141686899374ac995eec06df336a653c95fbf5e92b6796a099f619b3b9e2a",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-final-writer-chains",
+        "experimental-memory-final-writers",
+        "experimental-small-final-buffers",
+        "experimental-release-final-header-scratch",
+        "experimental-counted-codec-balanced",
+        "experimental-bounded-final-partition",
+        "experimental-retained-exact-writers",
+        "experimental-single-final-catalog",
+        "experimental-single-catalog-capacity",
+        "experimental-batched-final-sync",
+        "experimental-counted-zstd-input-balanced",
+        "experimental-counted-partition-balanced",
+        "experimental-wide-uniform-merge"
+      ],
+      "archive": "47872142699ef48da319a06327ff23d060222199d76a09507973aa77e8be16e3"
+    },
+    "candidate": {
+      "receipt": {
+        "path": "scratch/oom-iteration/terminal-merge-read-buffers-candidate-v1-build.json",
+        "sha256": "565c0aa770a05d6a10faa1d93d3ce8309fea527e87da57b3892a8c641b57a694"
+      },
+      "binary": "75a7b49f685affb1d197d8ae7d575dc9709194f477d8ac902475c97ae6246279",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-final-writer-chains",
+        "experimental-memory-final-writers",
+        "experimental-small-final-buffers",
+        "experimental-release-final-header-scratch",
+        "experimental-counted-codec-balanced",
+        "experimental-bounded-final-partition",
+        "experimental-retained-exact-writers",
+        "experimental-single-final-catalog",
+        "experimental-single-catalog-capacity",
+        "experimental-batched-final-sync",
+        "experimental-counted-zstd-input-balanced",
+        "experimental-counted-partition-balanced",
+        "experimental-wide-uniform-merge",
+        "experimental-terminal-merge-read-buffers"
+      ],
+      "archive": "ef7fb30366cbb557107c44b4eaa43a5a0a934e41a09615ea37e659841346d532"
+    }
+  },
+  "status": {
+    "path": "scratch/uniform-buffer-resume-20261121/pair-batch-v1/status.json",
+    "sha256": "580d7708bb8035c96c220cf0cd58f3f294cef0535934e85b6b6e865484d85a17"
+  },
+  "qualification": {
+    "batch": {
+      "path": "scratch/uniform-buffer-resume-20261121/qualification-batch-v1/status.json",
+      "sha256": "55234bccacdf78c9e08bbf85e4bf4d2b081ef065a79b4d4a56ec23fbceef0980"
+    },
+    "probe_binary": {
+      "path": "scratch/uniform-buffer-resume-20261121/read-probe-v1.so",
+      "sha256": "7725452fb0e1a7e3163c70d57859e3533d4440d9e87cecfe4d2b47089c9fe694"
+    },
+    "reads": {
+      "64": {
+        "receipt": {
+          "path": "scratch/uniform-buffer-resume-20261121/read-probe-64k/read-probe.json",
+          "sha256": "26f50d6a54edc2d31b07d087cfee0a6ca4ecd12d6053dc08a6121214d6d8bdcd"
+        },
+        "counts": {
+          "temp_read_64k_calls": 10822,
+          "temp_read_256k_calls": 0
+        },
+        "output": {
+          "path": "scratch/uniform-buffer-resume-20261121/read-probe-64k/verification.json",
+          "sha256": "065e41f88016a4b40394c9f145e7a2625c84d6164c43c9166f70c799768f78e8"
+        }
+      },
+      "256": {
+        "receipt": {
+          "path": "scratch/uniform-buffer-resume-20261121/read-probe-256k/read-probe.json",
+          "sha256": "35930ca9178e4c7d266cde59f807595873eac4e0b0e0a4015567ddece4d67d33"
+        },
+        "counts": {
+          "temp_read_64k_calls": 2,
+          "temp_read_256k_calls": 2681
+        },
+        "output": {
+          "path": "scratch/uniform-buffer-resume-20261121/read-probe-256k/verification.json",
+          "sha256": "6ebaec11f4d09463fd975c4c039c1811d57fd0dd97e6ce34542a87d57a66932a"
+        }
+      }
+    }
+  },
+  "contract_batch": {
+    "path": "scratch/uniform-buffer-resume-20261121/contract-batch-v1/status.json",
+    "sha256": "a9a80226443a9c0c73c4d2d448befe8836d4f9acaaf185962c1ac4487dcfdcbe"
+  },
+  "build_batch": {
+    "path": "scratch/uniform-buffer-resume-20261121/build-batch-v1/status.json",
+    "sha256": "c6aa41a513c76091572d89dbc323723a0b12f3281d19eb4eb1a4f272951c5efc"
+  },
+  "working_delta_bytes": 402,
+  "rss_delta_kib": 156,
+  "scope": "Three matched 8 GiB Uniform Balanced pairs, hard 1 GiB/no swap WSL2/ext4, one worker, working setting 256 MiB, equal actual wide single merge and logical traffic. Excluded instrumented qualification and warmup.",
+  "aggregates": {
+    "control": {
+      "elapsed_seconds": {
+        "median": 84.23704080202151,
+        "min": 83.62995431304444,
+        "max": 85.78272278397344
+      },
+      "cpu_seconds": {
+        "median": 53.52,
+        "min": 53.45,
+        "max": 54.1
+      },
+      "user_cpu_seconds": {
+        "median": 35.17,
+        "min": 34.95,
+        "max": 35.56
+      },
+      "system_cpu_seconds": {
+        "median": 18.5,
+        "min": 18.35,
+        "max": 18.54
+      },
+      "gnu_time_filesystem_inputs": {
+        "median": 105631424,
+        "min": 102645888,
+        "max": 109173008
+      },
+      "gnu_time_filesystem_outputs": {
+        "median": 38679504,
+        "min": 38674792,
+        "max": 38681152
+      },
+      "voluntary_context_switches": {
+        "median": 13557,
+        "min": 12708,
+        "max": 13691
+      },
+      "gnu_time_rss_peak_kib": {
+        "median": 87740,
+        "min": 73332,
+        "max": 87904
+      },
+      "workspace_peak_bytes": {
+        "median": 67431811,
+        "min": 67431811,
+        "max": 67431811
+      },
+      "managed_writes": {
+        "median": 11140072936,
+        "min": 11140072936,
+        "max": 11140072936
+      },
+      "managed_reads": {
+        "median": 11140071424,
+        "min": 11140071424,
+        "max": 11140071424
+      },
+      "cgroup_peak_bytes": {
+        "median": 1073741824,
+        "min": 1073741824,
+        "max": 1073741824
+      },
+      "file_cache_refaults": {
+        "median": 9236254,
+        "min": 8865740,
+        "max": 9684653
+      },
+      "direct_page_scans": {
+        "median": 18023886,
+        "min": 17583991,
+        "max": 18487501
+      },
+      "sort_runs": {
+        "median": 197,
+        "min": 197,
+        "max": 197
+      },
+      "sort_seconds": {
+        "median": 2.592444256,
+        "min": 2.587842397,
+        "max": 2.617573954
+      },
+      "merge_operations": {
+        "median": 1,
+        "min": 1,
+        "max": 1
+      }
+    },
+    "candidate": {
+      "elapsed_seconds": {
+        "median": 88.28999682702124,
+        "min": 87.94150792900473,
+        "max": 88.29189585195854
+      },
+      "cpu_seconds": {
+        "median": 56.03,
+        "min": 55.77,
+        "max": 56.510000000000005
+      },
+      "user_cpu_seconds": {
+        "median": 34.56,
+        "min": 34.22,
+        "max": 34.56
+      },
+      "system_cpu_seconds": {
+        "median": 21.81,
+        "min": 21.21,
+        "max": 21.95
+      },
+      "gnu_time_filesystem_inputs": {
+        "median": 114607416,
+        "min": 102932168,
+        "max": 116016464
+      },
+      "gnu_time_filesystem_outputs": {
+        "median": 38673600,
+        "min": 38672696,
+        "max": 38675360
+      },
+      "voluntary_context_switches": {
+        "median": 13600,
+        "min": 13175,
+        "max": 14523
+      },
+      "gnu_time_rss_peak_kib": {
+        "median": 87896,
+        "min": 73264,
+        "max": 87944
+      },
+      "workspace_peak_bytes": {
+        "median": 67432213,
+        "min": 67432213,
+        "max": 67432213
+      },
+      "managed_writes": {
+        "median": 11140072936,
+        "min": 11140072936,
+        "max": 11140072936
+      },
+      "managed_reads": {
+        "median": 11140071424,
+        "min": 11140071424,
+        "max": 11140071424
+      },
+      "cgroup_peak_bytes": {
+        "median": 1073741824,
+        "min": 1073741824,
+        "max": 1073741824
+      },
+      "file_cache_refaults": {
+        "median": 10305716,
+        "min": 8846307,
+        "max": 10485755
+      },
+      "direct_page_scans": {
+        "median": 19029495,
+        "min": 17699286,
+        "max": 19214084
+      },
+      "sort_runs": {
+        "median": 197,
+        "min": 197,
+        "max": 197
+      },
+      "sort_seconds": {
+        "median": 2.636037185,
+        "min": 2.607944701,
+        "max": 2.636833714
+      },
+      "merge_operations": {
+        "median": 1,
+        "min": 1,
+        "max": 1
+      }
+    }
+  },
+  "candidate_relative_percent": {
+    "elapsed_seconds": 4.811370373901447,
+    "cpu_seconds": 4.68983557548579,
+    "user_cpu_seconds": -1.7344327551890748,
+    "system_cpu_seconds": 17.891891891891888,
+    "gnu_time_filesystem_inputs": 8.497463785019121,
+    "gnu_time_filesystem_outputs": -0.015263897903139423,
+    "voluntary_context_switches": 0.31717931695802726,
+    "gnu_time_rss_peak_kib": 0.17779803966264662,
+    "workspace_peak_bytes": 0.0005961577985713618,
+    "managed_writes": 0.0,
+    "managed_reads": 0.0,
+    "cgroup_peak_bytes": 0.0,
+    "file_cache_refaults": 11.57895830928859,
+    "direct_page_scans": 5.579312918423929,
+    "sort_runs": 0.0,
+    "sort_seconds": 1.6815377572384937,
+    "merge_operations": 0.0
+  },
+  "elapsed_pairs_percent": [
+    5.574487726566835,
+    2.922819376300123,
+    4.397670064989168
+  ],
+  "cpu_pairs_percent": [
+    4.204035874439471,
+    4.454713493530504,
+    4.826941066417212
+  ],
+  "speed_rule_pass": false,
+  "cpu_resource_rule_pass": false,
+  "retained": false
+}

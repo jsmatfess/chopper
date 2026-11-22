@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "terminal-uniform-1024-way-merge-2026-11-21",
+  "title": "Reject a 1024-run ceiling for the measured terminal Uniform case",
+  "date": "2026-11-21",
+  "subsystem": "storage",
+  "question": "Can broad Linux descriptor headroom and existing memory admission remove substantial spill without slowing the 40 GiB complete job?",
+  "disposition": "reject",
+  "outcome": "unfavorable",
+  "delivery": "unapplied",
+  "summary": "One eligible fully verified pair regressed 14.61% elapsed with 43.85% fewer managed spill bytes. This exceeded the individual threshold for both rules. Stopped before the remaining timed pairs and removed the candidate.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "40 GiB Uniform followed by eight exact Balanced parts. 984 initial runs, m256, one worker, hard 1 GiB without swap."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Both selector-boundary suites, source pins, small output preflights, full paired warmup and one eligible complete pair passed independent scope checks."
+  },
+  "limitations": [
+    "One eligible pair and one synthetic WSL2/ext4 workload.",
+    "Managed byte volume and pushed kernel counters have separate scopes. Sampled descriptors are a lower bound on peak."
+  ],
+  "exclusions": [
+    "Separate structural control, both warmups and two unattempted timing pairs."
+  ],
+  "reopen_when": "Test a distinct schedule that bounds active readers independently of catalog size, or test admitted application-buffer sizing.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#terminal-uniform-1024-way-merge-2026-11-21",
+      "sha256": "36ad108ceb9522e34b6459240f6e719b8d27dbb6dbe8e988a42f1c44f4349839"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/terminal-uniform-1024-way-merge-summary-2026-11-21.json",
+      "sha256": "6fdf3ca4f0d0896e6257181f14bd4bae2070ae743365b900921f5542cd897345"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/execution-decisions.md"
+  ]
+}

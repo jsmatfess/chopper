@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "indexed-exact-quota-lookup-at-2-gib-2026-11-21",
+  "title": "Retain indexed exact assignment quota lookup",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Can an in-place index improve high-fanout whole-job exact assignment while preserving every original quota and draw?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "opt-in",
+  "summary": "Keep the Linux opt-in. Two of three paired jobs are faster, with median elapsed down 7.16%, CPU down 5.19%, exact output and equal managed temporary traffic.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2 GiB standalone unstratified exact assignment, 1,000 equal named quotas, one worker, 128 MiB job and hard 1 GiB no-swap scope.",
+      "Complete small comparisons at eight, 1,000 and stratified 1,000 groups."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Three differential tests and six complete matched pairs. Independent IDs, fields, encounter order, quotas and caps, exact output bytes and recorded Analysis. All owner and temporary cleanup checks pass."
+  },
+  "limitations": [
+    "One high-fanout timed point with uncontrolled backing cache; group crossover remains uncalibrated.",
+    "Small correct-output pairs supply no speed estimate."
+  ],
+  "exclusions": [
+    "Automatic selection and active Windows or WASI routes."
+  ],
+  "reopen_when": "Any expansion beyond this opt-in requires a scoped benefit and active runtime validation.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#indexed-exact-quota-lookup-at-2-gib-2026-11-21",
+      "sha256": "629e43693763aa4a674b2a0c2deb31a9ae1ec9ec4359b65dc9e3238572f1e049"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/indexed-exact-quota-lookup-2026-11-21.json",
+      "sha256": "92ecad81a8a08443aadf17e91d66e06fc8a332c17708f18dc4de2c2bc5a522c1"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/validation.md",
+    "docs/resource-policy-research.md"
+  ]
+}

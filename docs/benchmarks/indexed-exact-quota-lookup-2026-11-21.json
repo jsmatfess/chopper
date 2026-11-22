@@ -1,0 +1,453 @@
+{
+  "schema_version": 1,
+  "candidate": "experimental-exact-quota-index",
+  "source_head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+  "platform": "Native Linux/WSL2",
+  "source_tree_has_local_changes": true,
+  "workload": {
+    "rows": 8388608,
+    "source_bytes": 2147483674,
+    "groups": 1000,
+    "percent_per_group": "0.1",
+    "groups_with_8389": 608,
+    "groups_with_8388": 392,
+    "workers": 1,
+    "job_mib": 128,
+    "shared_mib": 256,
+    "hard_cgroup_bytes": 1073741824,
+    "swap_bytes": 0
+  },
+  "qualification": {
+    "exact_parity": true,
+    "pairs": [
+      {
+        "linear": {
+          "elapsed": 0.053966596,
+          "cpu": 0.01,
+          "rss": 10952,
+          "reserved": 2489740,
+          "read": 2803861,
+          "write": 2346059,
+          "files": 4,
+          "runs": 0,
+          "merges": 0
+        },
+        "indexed": {
+          "elapsed": 0.055321775,
+          "cpu": 0.01,
+          "rss": 11148,
+          "reserved": 2489747,
+          "read": 2803861,
+          "write": 2346059,
+          "files": 4,
+          "runs": 0,
+          "merges": 0
+        },
+        "rows": 4099,
+        "groups": 8,
+        "strata": 1
+      },
+      {
+        "linear": {
+          "elapsed": 4.258842919,
+          "cpu": 0.21,
+          "rss": 11340,
+          "reserved": 2577049,
+          "read": 64963630,
+          "write": 2515556,
+          "files": 4,
+          "runs": 0,
+          "merges": 0
+        },
+        "indexed": {
+          "elapsed": 4.296528498,
+          "cpu": 0.22,
+          "rss": 11208,
+          "reserved": 2577056,
+          "read": 64963630,
+          "write": 2515556,
+          "files": 4,
+          "runs": 0,
+          "merges": 0
+        },
+        "rows": 4099,
+        "groups": 1000,
+        "strata": 1
+      },
+      {
+        "linear": {
+          "elapsed": 4.274732599,
+          "cpu": 0.23,
+          "rss": 11584,
+          "reserved": 2672082,
+          "read": 42621687,
+          "write": 3811011,
+          "files": 6,
+          "runs": 0,
+          "merges": 0
+        },
+        "indexed": {
+          "elapsed": 4.275823642,
+          "cpu": 0.22,
+          "rss": 11848,
+          "reserved": 2672091,
+          "read": 42621687,
+          "write": 3811011,
+          "files": 6,
+          "runs": 0,
+          "merges": 0
+        },
+        "rows": 4099,
+        "groups": 1000,
+        "strata": 7
+      }
+    ]
+  },
+  "primary": {
+    "exact_parity": true,
+    "pairs": [
+      {
+        "linear": {
+          "elapsed": 44.762424063,
+          "cpu": 19.509999999999998,
+          "rss": 50480,
+          "reserved": 33935509,
+          "read": 9300047442,
+          "write": 9284884424,
+          "files": 104,
+          "runs": 99,
+          "merges": 2
+        },
+        "indexed": {
+          "elapsed": 41.555490052,
+          "cpu": 18.59,
+          "rss": 50828,
+          "reserved": 33935580,
+          "read": 9300047442,
+          "write": 9284884424,
+          "files": 104,
+          "runs": 99,
+          "merges": 2
+        },
+        "rows": 8388608,
+        "groups": 1000,
+        "strata": 1
+      },
+      {
+        "indexed": {
+          "elapsed": 38.421133231,
+          "cpu": 18.73,
+          "rss": 50436,
+          "reserved": 33935580,
+          "read": 9300047442,
+          "write": 9284884424,
+          "files": 104,
+          "runs": 99,
+          "merges": 2
+        },
+        "linear": {
+          "elapsed": 50.95024191,
+          "cpu": 19.75,
+          "rss": 50040,
+          "reserved": 33935509,
+          "read": 9300047442,
+          "write": 9284884424,
+          "files": 104,
+          "runs": 99,
+          "merges": 2
+        },
+        "rows": 8388608,
+        "groups": 1000,
+        "strata": 1
+      },
+      {
+        "linear": {
+          "elapsed": 42.163148331,
+          "cpu": 19.66,
+          "rss": 50704,
+          "reserved": 33935509,
+          "read": 9300047442,
+          "write": 9284884424,
+          "files": 104,
+          "runs": 99,
+          "merges": 2
+        },
+        "indexed": {
+          "elapsed": 48.779388634,
+          "cpu": 18.64,
+          "rss": 50444,
+          "reserved": 33935580,
+          "read": 9300047442,
+          "write": 9284884424,
+          "files": 104,
+          "runs": 99,
+          "merges": 2
+        },
+        "rows": 8388608,
+        "groups": 1000,
+        "strata": 1
+      }
+    ],
+    "medians": {
+      "linear": {
+        "elapsed": 44.762424063,
+        "cpu": 19.66,
+        "rss": 50480,
+        "reserved": 33935509,
+        "read": 9300047442,
+        "write": 9284884424,
+        "files": 104,
+        "runs": 99,
+        "merges": 2
+      },
+      "indexed": {
+        "elapsed": 41.555490052,
+        "cpu": 18.64,
+        "rss": 50444,
+        "reserved": 33935580,
+        "read": 9300047442,
+        "write": 9284884424,
+        "files": 104,
+        "runs": 99,
+        "merges": 2
+      }
+    },
+    "changes_pct": {
+      "elapsed": -7.164343929378036,
+      "cpu": -5.1881993896236045,
+      "rss": -0.07131537242471842,
+      "reserved": 0.00020922037740067623,
+      "read": 0.0,
+      "write": 0.0,
+      "files": 0.0,
+      "runs": 0.0,
+      "merges": 0.0
+    },
+    "faster_pairs": 2,
+    "retention_gate": true
+  },
+  "jobs": [
+    {
+      "case": "primary-00-linear",
+      "hash": "a28eea72b4ab11f1aca151267c560bb8bd188214d3387e4cb7e5ae79fee9e69b",
+      "receipts": [
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-00-linear/report.json",
+          "sha256": "38f008cd9562ead2f2a39150de4c6e0c6a8fcdbd14f12496b2df02b7dbf69fbb"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-00-linear/cgroup.json",
+          "sha256": "afa8781f41f353062e1a1c5fb11e07f74c1931d153fec580317aa608f3ab79e7"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-00-linear/oracle.txt",
+          "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-00-linear/manifest.jsonl",
+          "sha256": "a89f74ab23311ef2565b9575c7165e373ddc7bfaf3db1b871ae2e5fb39d08464"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-00-linear/time.txt",
+          "sha256": "a9c004d87ce03c1679bfc2a46d27826f4e1b796890b02111185d018af3445286"
+        }
+      ]
+    },
+    {
+      "case": "primary-01-indexed",
+      "hash": "a28eea72b4ab11f1aca151267c560bb8bd188214d3387e4cb7e5ae79fee9e69b",
+      "receipts": [
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-01-indexed/report.json",
+          "sha256": "bd4f23a820baf5da7d4600445e2d67864d6776f36a5a42c154e5c54ffa6cf530"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-01-indexed/cgroup.json",
+          "sha256": "ed3734f43f8e97a4e650a63c814b2d82b7e7c7357eb64b8d685f4f27fe1686d3"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-01-indexed/oracle.txt",
+          "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-01-indexed/manifest.jsonl",
+          "sha256": "94a7ec5442ca5e362c1b9dbc3068d5f96c0c2d7d959753e9c1b494eabafe94db"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-01-indexed/time.txt",
+          "sha256": "ff3f019f8b1f28302c48d6185a01924ef733ba429a2709f15026a5f43149c292"
+        }
+      ]
+    },
+    {
+      "case": "primary-02-indexed",
+      "hash": "a28eea72b4ab11f1aca151267c560bb8bd188214d3387e4cb7e5ae79fee9e69b",
+      "receipts": [
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-02-indexed/report.json",
+          "sha256": "9506865fecaf245dc49c0bef8cff4e118260b29176d5c50a5c638c902bb9d927"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-02-indexed/cgroup.json",
+          "sha256": "8f60a2abe112f2ba300908f2f3bd42ca4f1a63facc038414d8bd819f1aec590b"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-02-indexed/oracle.txt",
+          "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-02-indexed/manifest.jsonl",
+          "sha256": "3fe35de02ddad1ba27be3aec6f28a37310007b505b1c15ed577c94fe7ef2ed32"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-02-indexed/time.txt",
+          "sha256": "38835e22208e8e96211764d8d9b5efa9654b2a67f7298b0c73559f0b04b3c797"
+        }
+      ]
+    },
+    {
+      "case": "primary-03-linear",
+      "hash": "a28eea72b4ab11f1aca151267c560bb8bd188214d3387e4cb7e5ae79fee9e69b",
+      "receipts": [
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-03-linear/report.json",
+          "sha256": "4be49d684282f9f413a23c7873ee5c1a18114ea466bfa6758a27a25b27d3ef4e"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-03-linear/cgroup.json",
+          "sha256": "4905ea301b2671bedfec9c508782c0653f36d3035e03cd1c2e5b08e8f854f5d7"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-03-linear/oracle.txt",
+          "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-03-linear/manifest.jsonl",
+          "sha256": "fad44bbeb9654bfa4f6b0cf3b5740b4347f771cae677ae67292f590ba5b4f4f9"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-03-linear/time.txt",
+          "sha256": "f0f9eea0fe6186cf69e6e96ccdcdd103150d41d7abb918494daae3b87cee0116"
+        }
+      ]
+    },
+    {
+      "case": "primary-04-linear",
+      "hash": "a28eea72b4ab11f1aca151267c560bb8bd188214d3387e4cb7e5ae79fee9e69b",
+      "receipts": [
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-04-linear/report.json",
+          "sha256": "a3bcc73f00fa7d8d1076b832123b7d9ea447117d064b623e632284cbe1eafc03"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-04-linear/cgroup.json",
+          "sha256": "2276db89ee4d5c680c61fd5de2ef45d7bd5c689ea0f6d1aa7a62f95201952833"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-04-linear/oracle.txt",
+          "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-04-linear/manifest.jsonl",
+          "sha256": "67c999f1b0294b75ad41c2a4a42e60cc193ba8901976d18d7ac1b1fac1859a24"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-04-linear/time.txt",
+          "sha256": "2a0adec87c8b571a1f3e4a58a479f317c74918b86d922be165bb976f617064a6"
+        }
+      ]
+    },
+    {
+      "case": "primary-05-indexed",
+      "hash": "a28eea72b4ab11f1aca151267c560bb8bd188214d3387e4cb7e5ae79fee9e69b",
+      "receipts": [
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-05-indexed/report.json",
+          "sha256": "c0dd8fe4d73ed554411080ab1f381062343a446e22d34a401fa3c175092fbd69"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-05-indexed/cgroup.json",
+          "sha256": "b39380c4f7db1fbbe4e7f3a9813e58ee5a683be781210e0c87bb3c4de3355a67"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-05-indexed/oracle.txt",
+          "sha256": "9d86f28f8effb74a09b5d06a14a05572241d271f44ff3a8141f6d558d61bd09f"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-05-indexed/manifest.jsonl",
+          "sha256": "cc2f5a03e6fe7ae309e689c46ce9bacf330c6b1f2a3b10277ee38551583cf0db"
+        },
+        {
+          "path": "scratch/exact-assignment-quota-lookup-20261121/primary-05-indexed/time.txt",
+          "sha256": "68768c4a7e977d2304d87c9e6ba60b65bd2a86302e78c3d045f9e926320b5d72"
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "differential_tests": 3,
+    "whole_job_smoke_pairs": 3,
+    "whole_job_primary_pairs": 3,
+    "independent_id_field_quota_cap_and_order": true,
+    "exact_seeded_byte_hashes": true,
+    "all_temporary_storage_and_ledger_release": true
+  },
+  "methods": [
+    "Same optimized native executable with a test-only algorithm control and fixed internal seed.",
+    "Complete Run API through publication; verification and process startup are outside elapsed.",
+    "Full-file backing cache state is uncontrolled. This workload measures the 1000-group point, not the crossover."
+  ],
+  "provenance": [
+    {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/pinned-probe",
+      "sha256": "7d3b2c649056ab62109d9793c389ad463e52f4c9c710eb7e50c4815c14d773a1"
+    },
+    {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/quota-tests-v2.log",
+      "sha256": "d8b2eb17a3f1a0d7db7309d62abb26ba2c00dc2027aa7f797e85733384009439"
+    },
+    {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/DECISION.md",
+      "sha256": "67cd91b03b242a03acac54ee7a72afa2dab33d0ff5a696ff7bfc51f17cf6583f"
+    },
+    {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/primary-plan-v1.json",
+      "sha256": "9503b0e83774263b0f9226400cef07923170c320d940bf6a9c83c791aa2500fa"
+    },
+    {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/primary-batch-v1/status.json",
+      "sha256": "b362f9a4c8db4d5d32cf776e18f5962e068a8024766adb9408a0368cc6a322b2"
+    },
+    {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/smoke-plan-v1.json",
+      "sha256": "2c738ee6af908349a43fbf02150b34a68a5a42cd9d6ae0e4e4894b35cc8b55c7"
+    },
+    {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/smoke-batch-v1/status.json",
+      "sha256": "b9ffc89372ea8d5172ce158f4376bf2e2e74c9a07f38fc37670bcc7adae0ba04"
+    },
+    {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/verify.c",
+      "sha256": "9a45cdc95c90f124245e771c749f84e38b47e682bd3b413797e1509905a14690"
+    },
+    {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/run.py",
+      "sha256": "a5cd8ad5fecfa58c648d7550819fdd9ee2fd441659a9f2feab9cc1580aaa43d3"
+    },
+    {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/check.py",
+      "sha256": "b1682c3d632d1c908963a0dc6a2f73c2785b4177d0ed2df0aa6040905766d576"
+    }
+  ],
+  "postmeasurement_lint_correction": {
+    "summary": "Use usize::isolate_lowest_one in the kept source. A release-equivalent minimal compilation aliases the two implementations under the same Rust version.",
+    "assembly": {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/lowest-bit-equivalence.s",
+      "sha256": "cbbc1a3c34fb990e7d49b33fce14c9432df85776786d99c6a80b52d62e76ea48"
+    },
+    "measured_source": {
+      "path": "scratch/exact-assignment-quota-lookup-20261121/indexed-measured.rs",
+      "sha256": "527b8b66cc93bba8e6f76a6df6ea25195e41c450ced8fb2ee801b245da8b48ec"
+    }
+  }
+}

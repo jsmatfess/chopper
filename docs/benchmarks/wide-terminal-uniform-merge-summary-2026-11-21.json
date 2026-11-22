@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "kind": "summary",
+  "type": "wide_terminal_uniform_merge",
+  "builds": {
+    "control": {
+      "binary_sha256": "f25cc2946acac0f42b8abf0e833265354dc34561d15cada5d2b84d3d9a7dc714",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-final-writer-chains",
+        "experimental-memory-final-writers",
+        "experimental-small-final-buffers",
+        "experimental-release-final-header-scratch",
+        "experimental-counted-codec-balanced",
+        "experimental-bounded-final-partition",
+        "experimental-retained-exact-writers",
+        "experimental-single-final-catalog",
+        "experimental-single-catalog-capacity",
+        "experimental-batched-final-sync",
+        "experimental-counted-zstd-input-balanced",
+        "experimental-counted-partition-balanced"
+      ],
+      "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+      "profile": "workspace default release, --locked",
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+      "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+      "receipt": {
+        "path": "scratch/oom-iteration/wide-uniform-merge-control-v1-build.json",
+        "sha256": "5612d4aee306a52ec6693929036b9d9d19ac235234327e929c2d4323d83d1c47"
+      },
+      "source_archive_sha256": "219795fc728cf7662dd8de1d7ba8893a21ff937789b739fc6d8c372a0cb0fa98"
+    },
+    "candidate": {
+      "binary_sha256": "574ebe1a2fab9698df16155eb45c5b8f862c1200583917bf5c4954dc2cc5cb2d",
+      "features": [
+        "experimental-counted-balanced",
+        "experimental-terminal-shuffle",
+        "experimental-cgroup-cache-headroom",
+        "experimental-terminal-routing",
+        "experimental-final-writer-chains",
+        "experimental-memory-final-writers",
+        "experimental-small-final-buffers",
+        "experimental-release-final-header-scratch",
+        "experimental-counted-codec-balanced",
+        "experimental-bounded-final-partition",
+        "experimental-retained-exact-writers",
+        "experimental-single-final-catalog",
+        "experimental-single-catalog-capacity",
+        "experimental-batched-final-sync",
+        "experimental-counted-zstd-input-balanced",
+        "experimental-counted-partition-balanced",
+        "experimental-wide-uniform-merge"
+      ],
+      "head": "1a7742732b0a75d698bd36d917bf8dcad3488063",
+      "profile": "workspace default release, --locked",
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+      "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)\n",
+      "receipt": {
+        "path": "scratch/oom-iteration/wide-uniform-merge-candidate-v1-build.json",
+        "sha256": "6e2521460bfc534fd137f4027d6098e1b79a152060a666358c6f8b4724fe2892"
+      },
+      "source_archive_sha256": "725944512ae7817ee6e119cd15cf38237e177541d57c40a2aa451a64a0aab98a"
+    }
+  },
+  "comparison": {
+    "kind": "summary",
+    "resource_scope": {
+      "peak_temporary_files": "Engine-managed temporary files, not open process handles",
+      "cgroup_peak_bytes": "Entire timed cgroup, including file cache",
+      "cli_rss_kib": "Peak CLI process RSS from GNU time",
+      "working_bytes": "Engine-accounted peak working reservations"
+    },
+    "repetitions": 3,
+    "samples": [
+      {
+        "control": {
+          "receipt": "scratch/shuffle-merge-resume-20261121/pair-0/control/verification.json",
+          "receipt_sha256": "e75910de432518a1d7d5307a261604f17772548e4cbc68b9e177a34f1e5a4491",
+          "elapsed": 104.92899592302274,
+          "cpu": 60.29,
+          "cli_rss_kib": 87932,
+          "working_bytes": 67395360,
+          "cgroup_peak_bytes": 1073741824,
+          "peak_temporary_files": 69,
+          "sort_seconds": 2.563714045,
+          "runs": 197,
+          "merge_operations": 4,
+          "temporary_bytes_written": 22013141992,
+          "temporary_bytes_read": 22013140480
+        },
+        "candidate": {
+          "receipt": "scratch/shuffle-merge-resume-20261121/pair-0/candidate/verification.json",
+          "receipt_sha256": "257c6d8036c07152ad7578a8af2c3c1a334ad0d7a8114aec9f9589d607c022e4",
+          "elapsed": 80.77050232398324,
+          "cpu": 53.379999999999995,
+          "cli_rss_kib": 87552,
+          "working_bytes": 67432012,
+          "cgroup_peak_bytes": 1073741824,
+          "peak_temporary_files": 200,
+          "sort_seconds": 2.622842808,
+          "runs": 197,
+          "merge_operations": 1,
+          "temporary_bytes_written": 11140072936,
+          "temporary_bytes_read": 11140071424
+        }
+      },
+      {
+        "candidate": {
+          "receipt": "scratch/shuffle-merge-resume-20261121/pair-1/candidate/verification.json",
+          "receipt_sha256": "f2f708c751536aa2771f792d89110b749bf844cc0c4444b7a69a11b14ecfff87",
+          "elapsed": 86.43468263209797,
+          "cpu": 54.120000000000005,
+          "cli_rss_kib": 88068,
+          "working_bytes": 67432012,
+          "cgroup_peak_bytes": 1073741824,
+          "peak_temporary_files": 200,
+          "sort_seconds": 2.622512244,
+          "runs": 197,
+          "merge_operations": 1,
+          "temporary_bytes_written": 11140072936,
+          "temporary_bytes_read": 11140071424
+        },
+        "control": {
+          "receipt": "scratch/shuffle-merge-resume-20261121/pair-1/control/verification.json",
+          "receipt_sha256": "d86c3ced67cddb55ab3f3d64d0589321a492df64047b2bbf2be4485435dcaaf8",
+          "elapsed": 97.16135452501476,
+          "cpu": 60.56,
+          "cli_rss_kib": 73368,
+          "working_bytes": 67395360,
+          "cgroup_peak_bytes": 1073741824,
+          "peak_temporary_files": 69,
+          "sort_seconds": 2.62560419,
+          "runs": 197,
+          "merge_operations": 4,
+          "temporary_bytes_written": 22013141992,
+          "temporary_bytes_read": 22013140480
+        }
+      },
+      {
+        "control": {
+          "receipt": "scratch/shuffle-merge-resume-20261121/pair-2/control/verification.json",
+          "receipt_sha256": "15c9b6ac85b1c4ab17edbe29c49dc969666ab2ea33e9d99545740d688d200076",
+          "elapsed": 107.54464500490576,
+          "cpu": 59.72,
+          "cli_rss_kib": 73348,
+          "working_bytes": 67395360,
+          "cgroup_peak_bytes": 1073741824,
+          "peak_temporary_files": 69,
+          "sort_seconds": 2.628438081,
+          "runs": 197,
+          "merge_operations": 4,
+          "temporary_bytes_written": 22013141992,
+          "temporary_bytes_read": 22013140480
+        },
+        "candidate": {
+          "receipt": "scratch/shuffle-merge-resume-20261121/pair-2/candidate/verification.json",
+          "receipt_sha256": "d6614599f36c949dbe9c489193bf714bd508b64493fb386b302423e8eca9d49b",
+          "elapsed": 83.32325206603855,
+          "cpu": 52.599999999999994,
+          "cli_rss_kib": 73356,
+          "working_bytes": 67432012,
+          "cgroup_peak_bytes": 1073741824,
+          "peak_temporary_files": 200,
+          "sort_seconds": 2.613688713,
+          "runs": 197,
+          "merge_operations": 1,
+          "temporary_bytes_written": 11140072936,
+          "temporary_bytes_read": 11140071424
+        }
+      }
+    ],
+    "medians": {
+      "control": {
+        "elapsed": 104.92899592302274,
+        "cpu": 60.29,
+        "cli_rss_kib": 73368,
+        "working_bytes": 67395360,
+        "cgroup_peak_bytes": 1073741824,
+        "peak_temporary_files": 69,
+        "sort_seconds": 2.62560419,
+        "runs": 197,
+        "merge_operations": 4,
+        "temporary_bytes_written": 22013141992,
+        "temporary_bytes_read": 22013140480
+      },
+      "candidate": {
+        "elapsed": 83.32325206603855,
+        "cpu": 53.379999999999995,
+        "cli_rss_kib": 87552,
+        "working_bytes": 67432012,
+        "cgroup_peak_bytes": 1073741824,
+        "peak_temporary_files": 200,
+        "sort_seconds": 2.622512244,
+        "runs": 197,
+        "merge_operations": 1,
+        "temporary_bytes_written": 11140072936,
+        "temporary_bytes_read": 11140071424
+      }
+    },
+    "reductions_percent": {
+      "elapsed": 20.59082302935067,
+      "cpu": 11.461270525792012,
+      "cli_rss_kib": -19.33267909715408,
+      "working_bytes": -0.05438356587159632,
+      "cgroup_peak_bytes": 0.0,
+      "peak_temporary_files": -189.85507246376812,
+      "sort_seconds": 0.11776131420629943,
+      "runs": 0.0,
+      "merge_operations": 75.0,
+      "temporary_bytes_written": 49.393535279750076,
+      "temporary_bytes_read": 49.393538672406635
+    },
+    "all_elapsed_pairs_favorable": true,
+    "speed_rule": true,
+    "resource_rule": true
+  },
+  "reviewed_selection": {
+    "path": "scratch/shuffle-merge-resume-20261121/wide-uniform-merge-summary-v2.json",
+    "sha256": "7f97b8edf21dfba4409826fa9c027b87f242155f4cc56baf88d127e174a23b68"
+  },
+  "decision": {
+    "path": "scratch/shuffle-merge-resume-20261121/candidate-decision-v1.json",
+    "sha256": "d3f3d3e8bdd71d9d2b258fae15c93ddd9a70f882ac531611f2dcc8b1845b597f"
+  },
+  "pair_batch": {
+    "path": "scratch/shuffle-merge-resume-20261121/pair-batch-v1/status.json",
+    "sha256": "194a1f6639922126630fb1d7c73bd4efd7c94b816a4db3fd677c91ef1ab0aa84"
+  },
+  "diagnostic_batch": {
+    "path": "scratch/shuffle-merge-resume-20261121/candidate-batch-v1/status.json",
+    "sha256": "92dba073c393a8781a2b689804c95ccead928f1395e99e6d614f6de484ed482d"
+  },
+  "fixture": {
+    "path": "scratch/writer-capacity-20261119/large8192-fixture/fixture.json",
+    "sha256": "710a5b2b3bb2c502caee424bd9a2d4e2eeeb9624b05c3dc3bc26819dff60b122"
+  },
+  "scope": "Three matched 8 GiB complete native Linux pairs, 256 MiB engine setting, one worker, 1 GiB cgroup without swap. Excluded warmup and structural checks. Logical temporary traffic, engine workspace, CLI RSS and cgroup peak describe different resources."
+}

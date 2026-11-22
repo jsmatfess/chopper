@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "wide-terminal-uniform-merge-2026-11-21",
+  "title": "Retain wider terminal Uniform merge experiment",
+  "date": "2026-11-21",
+  "subsystem": "storage",
+  "question": "Can a larger bounded fan-in avoid a full intermediate merge on a constrained terminal Uniform job?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "Keep the opt-in Linux merge ceiling. Median elapsed fell 20.59% and managed temporary writes fell 49.39% at 8 GiB; managed temporary files and CLI RSS increased.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "8 GiB Uniform Shuffle to eight exact Balanced parts, 197 runs, 256 MiB engine setting, one worker, 1 GiB cgroup without swap."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Three matched complete pairs with field, ID conservation, exact quota, serialized cap, metadata and cleanup checks. Separate 256-descriptor low-limit fallback and full diagnostic verified. Retained source passed formatting, default and all-feature Clippy and workspace tests, portable-core WASM check, WASI feature compile, and default native release build on the Linux host."
+  },
+  "limitations": [
+    "One synthetic WSL2/ext4 input shape with uncontrolled host backing cache.",
+    "Descriptor threshold is not global admission. Managed temporary-file count is not a process descriptor census.",
+    "Working reservations, CLI RSS, and cgroup memory describe different resource bounds."
+  ],
+  "exclusions": [
+    "Small preflight, low-descriptor fallback control, structural diagnostic and excluded warmup."
+  ],
+  "reopen_when": "Require varied data, scale transfer and native workload calibration before proposing wider activation.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#wide-terminal-uniform-merge-2026-11-21",
+      "sha256": "7cc588a0c86289836e5bcca50444f258b2d12e7ea369851abeefc7697600b081"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/wide-terminal-uniform-merge-summary-2026-11-21.json",
+      "sha256": "d68e927710e9cb61a563f8072d97bf3346afcdbcd1769701524b54832e55b15a"
+    }
+  ],
+  "contracts": [
+    "docs/execution-decisions.md",
+    "docs/specification.md",
+    "docs/direct-execution.md"
+  ]
+}
