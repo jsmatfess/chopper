@@ -180,6 +180,7 @@ fn global_position_does_not_change_stage_options_and_defaults_match_json() {
     let expected = Job {
         input: "input.csv".into(),
         output: "results".into(),
+        resources: Resources::automatic(),
         ..Job::default()
     };
     assert_eq!(

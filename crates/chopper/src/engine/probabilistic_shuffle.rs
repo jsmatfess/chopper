@@ -24,7 +24,11 @@ std::thread_local! {
     static SERIAL_CONTROL: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
 }
 
-#[cfg(test)]
+#[cfg(all(
+    test,
+    target_os = "linux",
+    feature = "experimental-probabilistic-shuffle-fusion"
+))]
 mod tests;
 
 impl Plan {
@@ -33,13 +37,12 @@ impl Plan {
         if SERIAL_CONTROL.with(std::cell::Cell::get) {
             return None;
         }
-        let [Operation::Partition { .. }, Operation::AssignProbabilistic { .. }, Operation::Shuffle {
-            strategy: Shuffle::Uniform,
-        }] = job.operations.as_slice()
+        let [Operation::Partition { .. }, Operation::AssignProbabilistic { .. }, shuffle] =
+            job.operations.as_slice()
         else {
             return None;
         };
-        if step == 1 && job.compression == chopper_core::Compression::None {
+        if step == 1 && uniform(shuffle) && job.compression == chopper_core::Compression::None {
             Some(Self {
                 assignment: 1,
                 shuffle: 2,
@@ -47,6 +50,36 @@ impl Plan {
         } else {
             None
         }
+    }
+
+    pub(super) fn selected(
+        job: &Job,
+        step: usize,
+        analysis: &Analysis,
+        ctx: &Context,
+    ) -> Option<Self> {
+        let plan = Self::at(job, step)?;
+        if cfg!(all(
+            target_os = "linux",
+            feature = "experimental-probabilistic-shuffle-fusion"
+        )) {
+            return Some(plan);
+        }
+        if !ctx.auto_run || job.resources.grouping != chopper_core::Grouping::Auto {
+            return None;
+        }
+        let partition = analysis
+            .stages
+            .first()
+            .filter(|stage| stage.operation == 1)?;
+        auto::fuse_probabilistic(
+            ctx.memory as u64,
+            ctx.workers(),
+            analysis.rows,
+            ctx.validated_payload_bytes(),
+            partition,
+        )
+        .then_some(plan)
     }
 
     fn prepare<'a>(
@@ -90,7 +123,7 @@ impl Plan {
             ..Default::default()
         };
         let result = (|| -> Result<SortedRows> {
-            #[cfg(test)]
+            #[cfg(any(test, feature = "resource-contract-tests"))]
             ctx.event("Before prepared probabilistic spill", parent.rows)?;
             let mut sorter = Sorter::probabilistic_shuffle(&order_ctx)?;
             for row in data.packed_rows(parent, ctx.max_record)? {
@@ -189,6 +222,7 @@ impl Plan {
     ) -> Result<()> {
         for parent in data.groups()? {
             let parent = parent?;
+            ctx.probabilistic_shuffle_attempt();
             let prepared = exact_plan::Proposal::new(self, &parent).prepare(
                 ctx,
                 |plan, parent| plan.prepare(data, parent, job, analysis, ctx),
@@ -199,6 +233,7 @@ impl Plan {
                     self.emit(prepared, &parent, ctx, output)?
                 }
                 exact_plan::Attempt::Retry(_) => {
+                    ctx.probabilistic_shuffle_retry();
                     ctx.event("Retrying probabilistic assignment and shuffle", parent.rows)?;
                     let span = ctx.physical_span(Kind::Fallback);
                     if let Some(span) = span {

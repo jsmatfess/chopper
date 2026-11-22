@@ -1,0 +1,239 @@
+diff --git a/crates/chopper/src/engine.rs b/crates/chopper/src/engine.rs
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -1,4 +1,5 @@
+ pub(crate) mod auto;
++mod digest_overlap;
+ pub use auto::{AutoObservations, AutoPlan, PreviewObservations};
+ mod analysis_text;
+ pub use analysis_text::AnalysisText;
+diff --git a/crates/chopper/src/engine/direct.rs b/crates/chopper/src/engine/direct.rs
+--- a/crates/chopper/src/engine/direct.rs
++++ b/crates/chopper/src/engine/direct.rs
+@@ -326,7 +326,10 @@
+         lineage: lineage(part),
+         exact: balanced_rows.is_some(),
+     };
+-    let mut digest = crate::digest::LogicalDigest::reserved(Reservation::new(ctx))?;
++    let mut digest = super::digest_overlap::EmitDigest::new(
++        Reservation::new(ctx),
++        balanced_rows.is_some() && counted_partition.is_none() && ctx.workers() >= 2,
++    )?;
+     let mut preview = preview::Builder::new(Reservation::new(ctx));
+     let mut column_values = column_summaries::Builder::new(Reservation::new(ctx));
+     let mut largest = 0;
+@@ -364,7 +367,7 @@
+         let size = views.clone().map(str::len).sum();
+         largest = largest.max(size as u64);
+         preview.consider(views.clone(), size)?;
+-        digest.record(input.owned());
++        digest.record(input.owned())?;
+         if let Some(partition) = &mut counted_partition {
+             partition.row(rows, views)?;
+             group.rows += 1;
+@@ -413,7 +416,7 @@
+             observe(observer, true, Status::Active, rows, false);
+         }
+     }
+-    let digest = digest.finalize();
++    let digest = digest.finalize()?;
+     if let Some(counted) = counted {
+         if let Some(expected) = counted.digest {
+             ensure!(
+diff --git a/crates/chopper/src/engine/digest_overlap.rs b/crates/chopper/src/engine/digest_overlap.rs
+new file mode 100644
+--- /dev/null
++++ b/crates/chopper/src/engine/digest_overlap.rs
+@@ -0,0 +1,192 @@
++// Temporary benchmark candidate. Keep the v1 frame encoding and one pending chunk.
++use crate::digest::LogicalDigest;
++use crate::storage::Reservation;
++use anyhow::{Context, Result};
++use std::sync::mpsc::{sync_channel, Receiver, SyncSender};
++use std::thread::JoinHandle;
++
++const CAP: usize = 256 * 1024;
++
++pub(super) enum EmitDigest {
++    Original(LogicalDigest),
++    Buffered(BufferedDigest),
++}
++
++impl EmitDigest {
++    pub(super) fn new(reservation: Reservation, eligible: bool) -> Result<Self> {
++        let mode = std::env::var("CHOPPER_EXPERIMENT_DIGEST").ok();
++        if eligible && matches!(mode.as_deref(), Some("serial-buffer" | "overlap")) {
++            Ok(Self::Buffered(BufferedDigest::new(
++                reservation,
++                mode.as_deref() == Some("overlap"),
++            )?))
++        } else {
++            Ok(Self::Original(LogicalDigest::reserved(reservation)?))
++        }
++    }
++    pub(super) fn record(&mut self, row: &[String]) -> Result<()> {
++        match self {
++            Self::Original(digest) => digest.record(row),
++            Self::Buffered(digest) => {
++                digest.update(&(row.len() as u64).to_le_bytes())?;
++                for field in row {
++                    digest.update(&(field.len() as u64).to_le_bytes())?;
++                    digest.update(field.as_bytes())?;
++                }
++            }
++        }
++        Ok(())
++    }
++    pub(super) fn finalize(self) -> Result<blake3::Hash> {
++        match self {
++            Self::Original(digest) => Ok(digest.finalize()),
++            Self::Buffered(digest) => digest.finalize(),
++        }
++    }
++}
++
++pub(super) struct BufferedDigest {
++    data: Vec<u8>,
++    hasher: blake3::Hasher,
++    worker: Option<Worker>,
++    _admission: Reservation,
++}
++
++impl BufferedDigest {
++    fn new(mut admission: Reservation, overlap: bool) -> Result<Self> {
++        admission.resize(std::mem::size_of::<Self>())?;
++        let mut data = Vec::new();
++        admission.reserve_vec(&mut data, CAP)?;
++        let worker = overlap
++            .then(|| Worker::new(admission.sibling()))
++            .transpose()?;
++        Ok(Self {
++            data,
++            hasher: blake3::Hasher::new(),
++            worker,
++            _admission: admission,
++        })
++    }
++    fn flush(&mut self) -> Result<()> {
++        if self.data.is_empty() {
++            return Ok(());
++        }
++        if let Some(worker) = &mut self.worker {
++            let spare = match worker.spare.take() {
++                Some(buffer) => buffer,
++                None => worker.returned.recv().context("receive digest buffer")?,
++            };
++            let ready = std::mem::replace(&mut self.data, spare);
++            worker
++                .send
++                .as_ref()
++                .unwrap()
++                .send(ready)
++                .context("send digest buffer")?;
++        } else {
++            self.hasher.update(&self.data);
++            self.data.clear();
++        }
++        Ok(())
++    }
++    fn update(&mut self, mut bytes: &[u8]) -> Result<()> {
++        while !bytes.is_empty() {
++            let count = (CAP - self.data.len()).min(bytes.len());
++            self.data.extend_from_slice(&bytes[..count]);
++            bytes = &bytes[count..];
++            if self.data.len() == CAP {
++                self.flush()?;
++            }
++        }
++        Ok(())
++    }
++    fn finalize(mut self) -> Result<blake3::Hash> {
++        self.flush()?;
++        match self.worker.take() {
++            Some(mut worker) => worker.finish(),
++            None => Ok(self.hasher.finalize()),
++        }
++    }
++}
++
++struct Worker {
++    send: Option<SyncSender<Vec<u8>>>,
++    returned: Receiver<Vec<u8>>,
++    spare: Option<Vec<u8>>,
++    thread: Option<JoinHandle<blake3::Hash>>,
++    _admission: Reservation,
++}
++impl Worker {
++    fn new(mut admission: Reservation) -> Result<Self> {
++        // Include fixed protocol storage in the prototype's working estimate.
++        admission
++            .resize(std::mem::size_of::<Self>() + std::mem::size_of::<blake3::Hasher>() + 4096)?;
++        let mut spare = Vec::new();
++        admission.reserve_vec(&mut spare, CAP)?;
++        let (send, read) = sync_channel::<Vec<u8>>(1);
++        let (send_back, returned) = sync_channel(1);
++        let worker = std::thread::Builder::new()
++            .name("digest-overlap".into())
++            .spawn(move || {
++                let mut hasher = blake3::Hasher::new();
++                while let Ok(mut data) = read.recv() {
++                    hasher.update(&data);
++                    data.clear();
++                    if send_back.send(data).is_err() {
++                        break;
++                    }
++                }
++                hasher.finalize()
++            })?;
++        Ok(Self {
++            send: Some(send),
++            returned,
++            spare: Some(spare),
++            thread: Some(worker),
++            _admission: admission,
++        })
++    }
++    fn finish(&mut self) -> Result<blake3::Hash> {
++        self.send.take();
++        self.thread
++            .take()
++            .unwrap()
++            .join()
++            .map_err(|_| anyhow::anyhow!("digest worker failed"))
++    }
++}
++impl Drop for Worker {
++    fn drop(&mut self) {
++        if self.thread.is_some() {
++            let _ = self.finish();
++        }
++    }
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++    use crate::storage::Workspace;
++    use std::sync::Arc;
++
++    #[test]
++    fn digest_overlap_keeps_order_and_joins_when_abandoned() -> Result<()> {
++        let workspace = Arc::new(Workspace::new(CAP * 4));
++        let start = || Reservation::for_workspace(workspace.clone());
++        let data: Vec<u8> = (0..(CAP * 2 + 7)).map(|i| (i % 251) as u8).collect();
++        let mut completed = BufferedDigest::new(start(), true)?;
++        completed.update(&data[..CAP / 2])?;
++        completed.update(&data[CAP / 2..])?;
++        assert_eq!(completed.finalize()?, blake3::hash(&data));
++        assert_eq!(workspace.used(), 0);
++        let mut abandoned = BufferedDigest::new(start(), true)?;
++        abandoned.update(&data[..CAP])?;
++        drop(abandoned);
++        assert_eq!(workspace.used(), 0);
++
++        let small = Arc::new(Workspace::new(CAP + 8192));
++        assert!(BufferedDigest::new(Reservation::for_workspace(small.clone()), true).is_err());
++        assert_eq!(small.used(), 0);
++        Ok(())
++    }
++}

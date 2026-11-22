@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "id": "browser-source-prefetch-2026-11-22",
+  "date": "2026-11-22",
+  "title": "Retain one-window browser source prefetch",
+  "subsystem": "input",
+  "question": "Can the browser refill the next source window while the engine consumes the current one?",
+  "disposition": "retain-experimental",
+  "delivery": "unapplied",
+  "outcome": "favorable",
+  "summary": "One 256 KiB outstanding source read removed 1.34 to 3.40 seconds from three measured jobs, with effectively flat browser CPU. Retain as a benchmark candidate.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "File-backed Chromium streaming and partition to OPFS on WSL."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "Twelve timed comparisons verified records, output caps and cleanup. A separate injected rejection successfully fell back to synchronous reading."
+  },
+  "limitations": [
+    "One WSL host, Chromium and OPFS. The prototype JS slot is outside WASI working reservations."
+  ],
+  "exclusions": [
+    "Production buffer ownership, in-flight cancellation qualifications and default selection."
+  ],
+  "reopen_when": "Integrate a browser buffer limit and qualify cancellation with one source read outstanding.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#input-prefetch-native-publication-and-digest-overlap-2026-11-22",
+      "sha256": "4fee88c77d308d299822d4b3981f8b7f8ca692e636fd7a7fea83796ceea976f0"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-browser-prefetch.jsonl",
+      "sha256": "a6c6dcb093168ea79a0091b3eb8301a1dd930c0713b65445644c77af3bd63954"
+    },
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-browser-controls.jsonl",
+      "sha256": "7e49cd632b5fbb26b35a48bb4d509f1277736e93e97d8b0f8bfaa21a002914d4"
+    },
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-attempt-notes.json",
+      "sha256": "db942ddb2ab77d8ee6bd9251be45cb8d1965786fb269b8f912af75cb98b356b3"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/browser.md"
+  ]
+}

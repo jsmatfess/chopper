@@ -1,14 +1,14 @@
 //! Bounded configured fanout with original count-independent membership.
 use super::*;
 pub(super) mod chains;
-#[cfg(feature = "experimental-bounded-final-partition")]
+#[cfg(not(target_os = "wasi"))]
 mod partition;
 mod writers;
 pub(in crate::engine) use writers::Writers;
 
 fn writer_limit(job: &Job) -> usize {
     if !cfg!(feature = "experimental-memory-final-writers") {
-        return 16;
+        return crate::engine::auto::descriptor_writer_ceiling(2).min(16);
     }
     // Selection precedes automatic memory resolution. Its minimum valid budget
     // keeps this advisory cap conservative; every allocation still needs a grant.
@@ -25,29 +25,11 @@ fn writer_limit(job: &Job) -> usize {
         (4, 4096)
     };
     let limit = memory_mb.saturating_mul(per_mib).min(maximum) as usize;
-    native_writer_limit(limit, if one_descriptor { 1 } else { 2 })
-}
-
-fn native_writer_limit(limit: usize, descriptors: usize) -> usize {
     #[cfg(all(unix, not(target_os = "wasi")))]
-    {
-        let mut handles = std::mem::MaybeUninit::<libc::rlimit>::uninit();
-        // getrlimit initializes both fields on success and retains no pointer.
-        if unsafe { libc::getrlimit(libc::RLIMIT_NOFILE, handles.as_mut_ptr()) } != 0 {
-            return limit.min(16);
-        }
-        let handles = unsafe { handles.assume_init() };
-        // Uncapped single-record writers retain only their CSV descriptor.
-        // Others conservatively allow a catalog and CSV. Leave headroom for
-        // intake, publication and runtime descriptors; this is not a reservation.
-        let available = handles.rlim_cur.saturating_sub(64) / descriptors as libc::rlim_t;
-        limit.min(available.min(usize::MAX as _) as usize)
-    }
-    #[cfg(any(not(unix), target_os = "wasi"))]
-    {
-        let _ = descriptors;
-        limit
-    }
+    let limit = limit.min(crate::engine::auto::descriptor_writer_ceiling(
+        if one_descriptor { 1 } else { 2 },
+    ));
+    limit
 }
 
 pub(super) fn writer_capacity(job: &Job) -> Option<usize> {
@@ -83,7 +65,7 @@ pub(super) fn eligible(job: &Job) -> bool {
 #[allow(clippy::large_enum_variant)]
 enum Selection<'a> {
     Configured(streaming::Membership<'a>),
-    #[cfg(feature = "experimental-bounded-final-partition")]
+    #[cfg(not(target_os = "wasi"))]
     Partition(partition::Partition<'a>),
 }
 
@@ -98,7 +80,7 @@ impl<'a> Fanout<'a> {
         width: usize,
         ctx: &'a Context,
     ) -> Result<Self> {
-        #[cfg(feature = "experimental-bounded-final-partition")]
+        #[cfg(not(target_os = "wasi"))]
         if matches!(job.operations.as_slice(), [Operation::Partition { .. }]) {
             // Run already selected the bounded shape. A later descriptor-limit
             // change may fail an open, but must not select another membership.
@@ -148,7 +130,7 @@ impl<'a> Fanout<'a> {
                 let index = membership.index(id, fields.clone());
                 self.writers.row(index, id, fields)
             }
-            #[cfg(feature = "experimental-bounded-final-partition")]
+            #[cfg(not(target_os = "wasi"))]
             Selection::Partition(partition) => partition.row(&mut self.writers, id, fields),
         }
     }
@@ -167,7 +149,7 @@ impl<'a> Fanout<'a> {
                 let (publication, files, bytes) = self.writers.finish()?;
                 Ok((publication, files, bytes, stats))
             }
-            #[cfg(feature = "experimental-bounded-final-partition")]
+            #[cfg(not(target_os = "wasi"))]
             Selection::Partition(partition) => partition.finish(self.writers),
         }
     }

@@ -157,10 +157,10 @@ mod tests {
     fn defaults_and_deferred_validation() {
         for wire in ["{}", r#"{"resources":{}}"#] {
             let job: Job = serde_json::from_str(wire).unwrap();
-            assert_eq!(job.resources.memory_mb, MemoryBudget::MiB(256));
+            assert_eq!(job.resources.memory_mb, MemoryBudget::Auto);
             assert_eq!(
                 serde_json::to_value(&job).unwrap()["resources"]["memory_mb"],
-                256
+                "auto"
             );
         }
         let mut job = Job {

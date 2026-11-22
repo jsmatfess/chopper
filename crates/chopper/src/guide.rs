@@ -440,6 +440,7 @@ struct Session {
     dirty: bool,
     step: usize,
     cache: ProfileCache,
+    auto_observations: Option<engine::AutoObservations>,
     inspected: bool,
 }
 impl Session {
@@ -449,6 +450,7 @@ impl Session {
             dirty: false,
             step: 0,
             cache: ProfileCache::default(),
+            auto_observations: None,
             inspected: false,
         }
     }
@@ -640,7 +642,7 @@ impl Session {
                             }
                         }
                     }
-                    "94" => io.say("Slice A: typed local default UTF-8 headered CSV, no operations, strict row/serialized-byte caps. Data prompts accept literal command words. Inspection is optional. Memory defaults to 256 MiB; workers 0 automatic. Auto memory resolves at task start from shared admission; working allocations are not an RSS cap. Workers do not parallelize every phase. Existing engine validation remains authoritative. Ctrl+C/EOF abort without saving.")?,
+                    "94" => io.say("Slice A: typed local default UTF-8 headered CSV, no operations, strict row/serialized-byte caps. Data prompts accept literal command words. Inspection is optional. Memory and workers default to automatic. Auto memory resolves at task start from shared admission; working allocations are not an RSS cap. Workers do not parallelize every phase. Existing engine validation remains authoritative. Ctrl+C/EOF abort without saving.")?,
                     "95" => {
                         if self.dirty && self.confirm(io, &cancel, "Save dirty draft before cancelling?")? && !self.save(io, &cancel)? { return Ok(None); }
                         return Ok(Some(false));
@@ -665,6 +667,7 @@ impl Session {
                                 io.say(&format!("Completed full scan: {} exact rows; {} columns; cache hit {}. Bounded preview (first 8 columns only):", profile.rows, profile.columns, profile.cache_hit))?;
                                 if let Some(header) = &profile.header { for (i, field) in header.iter().take(8).enumerate() { io.say(&format!("column {i}: {}", display(field)))?; } }
                                 for row in profile.preview.iter().take(8) { io.say(&row.iter().take(8).map(|v| display(v)).collect::<Vec<_>>().join(" | "))?; }
+                                self.auto_observations = profile.auto_observations;
                                 self.inspected = true;
                             }
                         }
@@ -685,7 +688,12 @@ impl Session {
                 Ok(Some(false)) => return Ok(None),
                 Ok(Some(true)) => {
                     self.cache.clear();
-                    match engine::run(self.job.clone(), cancel.clone(), notify.clone()) {
+                    match engine::run_advised(
+                        self.job.clone(),
+                        cancel.clone(),
+                        notify.clone(),
+                        self.auto_observations,
+                    ) {
                         Ok(analysis) => return Ok(Some(analysis)),
                         Err(error) => {
                             io.say(&format!("Run failed after owners stopped: {}. No successful result published; draft retained.", display(&format!("{error:#}"))))?;
@@ -722,7 +730,14 @@ fn run_inner(config: Option<PathBuf>) -> Result<()> {
             eprintln!("guide test interrupt received");
         }
     })?;
-    let job = config.as_deref().map(load).transpose()?.unwrap_or_default();
+    let job = config
+        .as_deref()
+        .map(load)
+        .transpose()?
+        .unwrap_or_else(|| Job {
+            resources: Resources::automatic(),
+            ..Job::default()
+        });
     let mut session = Session::new(job);
     let mut console = Console;
     if let Err(error) = supported(&session.job) {

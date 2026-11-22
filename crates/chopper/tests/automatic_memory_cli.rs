@@ -84,3 +84,100 @@ fn automatic_cli_overrides_work_without_seed_input() {
         }
     }
 }
+
+#[test]
+fn omitted_resources_and_explicit_advanced_values_are_effective() -> anyhow::Result<()> {
+    let directory = tempfile::tempdir()?;
+    let source = directory.path().join("input.csv");
+    fs::write(&source, "id\n1\n2\n3\n4\n")?;
+    for (name, overrides) in [
+        ("default", &[][..]),
+        ("advanced", &["--memory-mb", "128", "--workers", "2"][..]),
+    ] {
+        let output = directory.path().join(name);
+        let run = Command::new(env!("CARGO_BIN_EXE_chopper"))
+            .env("CHOPPER_MEMORY_LIMIT_MB", "256")
+            .args(["run", "--input"])
+            .arg(&source)
+            .arg("--output")
+            .arg(&output)
+            .args(["--rows", "1", "--yes"])
+            .args(overrides)
+            .output()?;
+        assert!(
+            run.status.success(),
+            "{}",
+            String::from_utf8_lossy(&run.stderr)
+        );
+        let report: Value = serde_json::from_slice(&run.stdout)?;
+        assert_eq!(report["rows"], 4);
+        assert_eq!(report["auto_plan"]["version"], 2);
+        assert_eq!(
+            report["auto_plan"]["effective_workers"],
+            if name == "default" { 1 } else { 2 }
+        );
+        assert_eq!(
+            report["auto_plan"]["effective_memory_bytes"],
+            if name == "default" { 256 } else { 128 } * 1024 * 1024
+        );
+        assert_eq!(report["auto_plan"]["measurements"]["peak_writer_slots"], 1);
+    }
+    Ok(())
+}
+
+#[test]
+fn prepared_publication_uses_bounded_writers_and_matching_analysis_can_limit_workers(
+) -> anyhow::Result<()> {
+    let directory = tempfile::tempdir()?;
+    let source = directory.path().join("input.csv");
+    let config = directory.path().join("job.json");
+    let profile = directory.path().join("profile.json");
+    fs::write(&source, "id\n1\n2\n3\n4\n")?;
+    let run = |action: &str, extras: &[&str]| -> anyhow::Result<Value> {
+        let result = Command::new(env!("CARGO_BIN_EXE_chopper"))
+            .env("CHOPPER_MEMORY_LIMIT_MB", "256")
+            .arg(action)
+            .arg("--config")
+            .arg(&config)
+            .args(extras)
+            .output()?;
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        Ok(serde_json::from_slice(&result.stdout)?)
+    };
+    for (name, workers) in [("explicit", 2), ("auto", 0)] {
+        if workers == 0 && cfg!(windows) {
+            continue;
+        }
+        fs::write(
+            &config,
+            json!({
+                "input": source, "output": directory.path().join(name),
+                "operations": [{"type": "shuffle", "strategy": "uniform"}],
+                "compression": "gzip", "limits": {"rows": 1},
+                "resources": {"memory_mb": 256, "workers": workers}
+            })
+            .to_string(),
+        )?;
+        let result = if workers == 0 {
+            fs::write(&profile, run("analyze", &[])?.to_string())?;
+            run("run", &["--analysis", profile.to_str().unwrap(), "--yes"])?
+        } else {
+            run("run", &["--yes"])?
+        };
+        assert_eq!(result["output_files"], 4);
+        let plan = &result["auto_plan"];
+        if workers == 0 {
+            assert_eq!(plan["worker_limit_from_analyze"], true);
+            assert_eq!(plan["effective_workers"], 1);
+            assert_eq!(plan["measurements"]["peak_writer_slots"], 1);
+        } else {
+            assert_eq!(plan["effective_workers"], 2);
+            assert_eq!(plan["measurements"]["peak_writer_slots"], 2);
+        }
+    }
+    Ok(())
+}

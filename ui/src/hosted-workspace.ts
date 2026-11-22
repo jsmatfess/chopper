@@ -41,11 +41,18 @@ export function configureHostedWorkspace() {
   nav.className = 'workspace-nav'; nav.setAttribute('aria-label','Workspace steps');
   nav.innerHTML = '<a href="#source">Source</a><a href="#output-settings">Output</a><a href="#pipeline">Pipeline</a><a href="#review">Resources</a>';
   const toolbar=document.createElement('div');toolbar.className='workspace-toolbar';
+  const dock=document.createElement('div');dock.id='run-dock';
+  dock.setAttribute('role','region');dock.setAttribute('aria-label','Run controls');
+  const setup=document.createElement('div');setup.className='processing-inner';
+  setup.innerHTML='<div class="setup-status"><span id="run-readiness" role="status"></span><button type="button" id="run-next-step" class="text-button" hidden></button></div>';
+  const run=get('run-direct');run.classList.remove('full');setup.append(run);
   const processing=document.createElement('div');processing.id='processing-strip';processing.hidden=true;
   processing.setAttribute('role','region');processing.setAttribute('aria-label','Processing status');
-  processing.innerHTML='<div class="processing-inner"><div class="processing-copy"><span class="processing-dot" aria-hidden="true"></span><span id="processing-activity"></span><span id="processing-elapsed"></span></div><div class="processing-actions"><button type="button" class="secondary" id="processing-view">View execution</button><button type="button" class="secondary" id="processing-cancel">Cancel</button></div></div>';
-  toolbar.append(nav);document.querySelector('header')!.after(toolbar);document.body.append(processing);
-  get('processing-cancel').onclick=()=>get('cancel').click();
+  processing.innerHTML='<div class="processing-inner"><div class="processing-copy"><span class="processing-dot" aria-hidden="true"></span><span id="processing-activity" role="status"></span><span id="processing-elapsed"></span></div><div class="processing-actions"><button type="button" class="secondary" id="processing-view">View execution</button><span class="processing-cancel"></span></div></div>';
+  const cancel=get('cancel');cancel.textContent='Cancel';cancel.classList.remove('full');
+  processing.querySelector('.processing-cancel')!.replaceWith(cancel);
+  dock.append(setup,processing);document.body.append(dock);
+  toolbar.append(nav);document.querySelector('header')!.after(toolbar);
   get('processing-view').onclick=()=>{
     showView('execution',false);
     const graph=document.querySelector<HTMLDetailsElement>('#execution-history');
@@ -69,7 +76,7 @@ export function configureHostedWorkspace() {
   document.addEventListener('scroll',scheduleNavigation,{passive:true});document.addEventListener('scrollend',syncNavigation);
   const updateNavigationSize=()=>{document.documentElement.style.setProperty('--workspace-rail-height',`${(document.querySelector('.rail') as HTMLElement).offsetHeight}px`);document.documentElement.style.setProperty('--workspace-toolbar-height',`${wideNavigation.matches?16:toolbar.offsetHeight+24}px`);scheduleNavigation();};
   const toolbarSize=new ResizeObserver(updateNavigationSize);toolbarSize.observe(toolbar);toolbarSize.observe(document.querySelector('.rail')!);wideNavigation.addEventListener('change',updateNavigationSize);
-  const processingSize=new ResizeObserver(()=>document.documentElement.style.setProperty('--processing-strip-height',`${processing.hidden?0:processing.offsetHeight}px`));processingSize.observe(processing);
+  const processingSize=new ResizeObserver(()=>document.documentElement.style.setProperty('--processing-strip-height',`${dock.offsetHeight}px`));processingSize.observe(dock);
   const sectionObserver=new IntersectionObserver(scheduleNavigation,{threshold:[0,1]});
 
   function title(card: HTMLElement, id: string, number: string, heading: string) {
@@ -113,12 +120,27 @@ export function configureHostedWorkspace() {
   pipeline.querySelector('.hint')!.textContent = 'Steps run in order, within the preceding groups.';
   pipeline.querySelector<HTMLElement>('.tag')!.id = 'pipeline-count';
   title(limits,'review','04','Resources');
-  for(const [card,key] of [[source,'source'],[output,'output'],[pipeline,'pipeline'],[limits,'resources']] as const)decorate(card,key);
+  for(const [card,key] of [[source,'source'],[pipeline,'pipeline'],[output,'output'],[limits,'resources']] as const)decorate(card,key);
   const reviewBody = limits.querySelector('.section-body')!;
   const resources = limits.querySelector('details')!;
   resources.id = 'resource-settings';
   resources.querySelector('summary')!.textContent = 'Resource budget';
-  reviewBody.replaceChildren(resources);
+  const autoSettings=document.createElement('div');
+  autoSettings.id='auto-processing';autoSettings.hidden=true;
+  autoSettings.innerHTML='<p id="auto-summary"></p><details><summary>View Auto decisions</summary><p id="auto-reason" class="hint"></p><dl class="analysis-facts"><div><dt>Working memory</dt><dd id="auto-memory"></dd></div><div><dt>Processing workers</dt><dd id="auto-workers"></dd></div><div><dt>Grouping strategy</dt><dd>Automatic</dd></div><div><dt>Writer concurrency</dt><dd id="auto-writers"></dd></div></dl></details>';
+  function showAutoSettings(plan?:NonNullable<State['analysis']>['auto_plan']){
+    const mib=(bytes:number)=>(bytes/(2**20)).toLocaleString(undefined,{maximumFractionDigits:1})+' MiB';
+    get('auto-summary').textContent=plan?`Auto · ${mib(plan.effective_memory_bytes)} · ${plan.effective_workers} worker${plan.effective_workers===1?'':'s'} · automatic grouping`:'Auto · Memory and writers sized at Run · 1 browser worker';
+    const memory=plan?.memory_plan;
+    get('auto-reason').textContent=plan
+      ?memory?.from_analyze?'Analyze informed the starting memory target.':memory?.preview_tier_mb?'The input preview informed the starting memory target.':'The engine sized execution using the job and available working capacity.'
+      :'Auto uses the input and pipeline to size working memory and writers. Safety limits apply in both modes.';
+    get('auto-memory').textContent=plan?`${mib(plan.effective_memory_bytes)} budget for this Run`:'Chosen at Run · usually up to 256 MiB';
+    get('auto-workers').textContent=plan?plan.effective_workers.toLocaleString():'1 in the browser';
+    get('auto-writers').textContent=plan?`${plan.measurements.peak_writer_slots.toLocaleString()} peak slots used`:'Sized during Run';
+  }
+  reviewBody.replaceChildren(label('execution-mode'),get('execution-mode-help'),autoSettings,resources);
+  showAutoSettings();
   const resourceGrid=resources.querySelector('.grid2')!;
   function resourceGroup(heading:string,ids:string[]){
     const group=document.createElement('fieldset');group.className='config-group';
@@ -128,15 +150,16 @@ export function configureHostedWorkspace() {
     return group;
   }
   const processingFields=resourceGroup('Processing',['memory-mode','memory','workers','grouping']);
+  processingFields.id='advanced-processing';
   processingFields.append(get('memory-help'));
-  const safety=resourceGroup('Safety limits',['max-files','max-record','temp-bytes']);
+  const safety=resourceGroup('Safety limits · independent of Auto',['max-files','max-record','temp-bytes']);
   // Browser storage has no configurable directory; retain the disabled field for import/export.
   const temporary=label('temp-dir');temporary.setAttribute('hidden','');
   resources.append(processingFields,safety,temporary);resourceGrid.remove();
   const workerLabel=label('workers');workerLabel.firstChild!.textContent='Processing workers';
   const workerHelp=document.createElement('small');workerHelp.textContent='0 = automatic. The hosted engine uses one worker.';workerLabel.append(workerHelp);
   get('workers').setAttribute('aria-describedby','workers-help');workerHelp.id='workers-help';
-  get('memory-help').textContent='Automatic chooses a working budget at job start, up to 256 MiB. Manual uses 1 MiB increments. This budget covers working allocations, not total browser memory.';
+  get('memory-help').textContent='Automatic normally uses up to 256 MiB and can choose a larger budget for eligible shuffles. Manual uses 1 MiB increments. This budget covers working allocations, not total browser memory.';
   for(const id of ['zip-member']){const input=get(id) as HTMLInputElement;input.spellcheck=false;input.setAttribute('autocapitalize','none');}
 
   for(const card of [source,output,pipeline,limits]){
@@ -155,7 +178,12 @@ export function configureHostedWorkspace() {
   const previewCard=get('preview-card');previewCard.classList.remove('card');previewCard.querySelector('.section-title')!.remove();preview.append(previewCard);facts.after(preview);
   const values=document.createElement('section');values.id='input-values';values.hidden=true;
   values.innerHTML='<div class="input-values-heading"><h3>Column values</h3><span id="input-values-count"></span></div><p class="hint" id="input-values-origin"></p><label class="input-values-filter">Find a column<input type="search" data-inspection-search placeholder="Column name" autocomplete="off"></label><div class="input-values-list"></div><p class="hint input-values-empty" hidden>No matching columns.</p>';
-  preview.after(values);
+  const analyze=document.createElement('div');analyze.className='source-analysis-action';
+  analyze.innerHTML='<p id="analyze-advice" class="hint"></p>';
+  const profile=get('profile');profile.textContent='Analyze input';profile.setAttribute('aria-describedby','analyze-advice');
+  const oldAnalyzeActions=profile.parentElement!;
+  analyze.prepend(profile);oldAnalyzeActions.remove();
+  preview.after(analyze,get('input-profile'),values);
   const valuesSearch=values.querySelector<HTMLInputElement>('input')!,valuesList=values.querySelector<HTMLElement>('.input-values-list')!;
   function filterValues(){const query=valuesSearch.value.trim().toLocaleLowerCase();let matches=0;for(const row of valuesList.querySelectorAll<HTMLElement>('details')){row.hidden=!row.dataset.search!.includes(query);if(!row.hidden)matches++;}values.querySelector<HTMLElement>('.input-values-empty')!.hidden=matches>0;}
   valuesSearch.addEventListener('input',filterValues);
@@ -167,7 +195,7 @@ export function configureHostedWorkspace() {
   const results = document.querySelector('.results')!;
   const workspace=document.querySelector('.workspace')!,shell=document.createElement('div');shell.className='configuration-shell';workspace.before(shell);shell.append(toolbar,workspace);
   const execution=document.createElement('section');execution.className='execution-pane';execution.setAttribute('aria-label','Execution graph');
-  execution.innerHTML='<div class="execution-empty card"><h2>Execution will appear here</h2><p>Run your pipeline to follow its execution.</p></div>';
+  execution.innerHTML='<div class="execution-live" id="execution-live" hidden><strong id="execution-phase"></strong><span id="execution-counters"></span><button type="button" id="execution-results-link" class="text-button" hidden>View results</button></div><div class="execution-empty card"><h2>Execution will appear here</h2><p>Run your pipeline to follow its execution.</p></div>';
   workspace.prepend(execution);
   const viewControls=document.createElement('div');viewControls.className='workspace-view-controls';viewControls.setAttribute('role','group');viewControls.setAttribute('aria-label','Workspace view');
   viewControls.innerHTML='<button type="button" data-workspace-view="configuration" aria-pressed="true">Configure</button><button type="button" data-workspace-view="execution" aria-pressed="false">Execution</button>';
@@ -184,6 +212,7 @@ export function configureHostedWorkspace() {
       for(const button of viewControls.querySelectorAll('button'))button.setAttribute('aria-pressed',String(button.dataset.workspaceView===next));
       heading.textContent=next==='execution'?'Execution':'CSV workbench';intro.textContent=next==='execution'?'Follow your pipeline and its output plan.':'Split, group, shuffle. All on your device.';
       const graph=document.querySelector<HTMLDetailsElement>('#execution-history');if(next==='execution'&&graph)graph.open=true;
+      get('processing-view').hidden=next==='execution';
       heading.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});scheduleNavigation();
     };
     if(animate&&document.startViewTransition&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
@@ -217,7 +246,7 @@ export function configureHostedWorkspace() {
     get('cli-command').textContent=equivalent?.command??'';
     cli.querySelector<HTMLButtonElement>('[command="--copy"]')!.disabled=!equivalent;
     get('cli-help').textContent=!equivalent?'Finish the configuration to generate a command.':equivalent.usesJson?`This job needs JSON to preserve its settings within native command-line limits. Export the job, replace input and output with full local paths, then run beside ${executable} and chopper-job.json.`:`Steps follow editor order. Replace the browser names with full local paths on the target system; output must name a new folder. Run beside ${executable}. JSON export remains available.`;
-    get('cli-platform-help').textContent=windows?'Use Chopper 0.2 with PowerShell 7.3+ and its default argument handling.':'Use the Chopper 0.2 Linux CLI package. macOS currently requires a source build.';
+    get('cli-platform-help').textContent=windows?'Use Chopper 0.3 with PowerShell 7.3+ and its default argument handling.':'Use the Chopper 0.3 Linux CLI package. macOS currently requires a source build.';
     const download=get('cli-download') as HTMLAnchorElement;
     download.href=windows?'https://github.com/jsmatfess/chopper/releases':'https://github.com/jsmatfess/chopper';
     download.textContent=windows?'CLI releases':'Build CLI from source';
@@ -237,11 +266,15 @@ export function configureHostedWorkspace() {
   if('CommandEvent' in window)get('cli-command').addEventListener('command',event=>{if((event as Event & {command:string}).command==='--copy')void copyCommand();});
   else cli.querySelector<HTMLButtonElement>('[command="--copy"]')!.onclick=()=>void copyCommand();
   const report=document.createElement('section');report.id='run-results';report.className='card run-results';report.hidden=true;
-  report.innerHTML='<div class="section-title"><h2>Results & analysis</h2></div><div class="section-body"></div>';
+  report.innerHTML='<div class="section-title"><h2>Results</h2></div><div class="section-body"></div>';
   report.querySelector('.section-title')!.append(get('status'));report.querySelector('.section-title')!.setAttribute('aria-live','polite');
   const reportBody=report.querySelector('.section-body')!;
-  for(const id of ['progress','input-profile','analysis','result-path'])reportBody.append(get(id));
+  for(const id of ['result-path','analysis','progress'])reportBody.append(get(id));
   observations.after(report);decorate(report,'results');
+  get('execution-results-link').onclick=()=>{
+    report.tabIndex=-1;report.focus({preventScroll:true});
+    report.scrollIntoView({block:'nearest',behavior:'instant'});
+  };
   nav.addEventListener('click',event=>{
     const link=(event.target as HTMLElement).closest<HTMLAnchorElement>('a');
     if(!link)return;
@@ -255,6 +288,16 @@ export function configureHostedWorkspace() {
     while(parent){if(parent instanceof HTMLDetailsElement)parent.open=true;parent=parent.parentElement;}
   },true);
   return {
+    readiness(next:{message:string;reveal:()=>void}|undefined){
+      const button=get('run-next-step') as HTMLButtonElement;
+      button.hidden=!next;
+      const message=next?.message.replace(/ with Browse\.$/,'.')??'';
+      const step=message.match(/^Step (\d+):/);
+      button.textContent=message.length<=64?message:step?`Review step ${step[1]}`:'Review a setting';
+      button.title=next?.message??'';
+      button.onclick=next?.reveal??null;
+      get('run-readiness').textContent=next?'':'Ready to run';
+    },
     preview(schema:{columns:number;preview:string[][]}|null,failed=false){
       const input=get('input') as HTMLInputElement;
       facts.hidden=!input.value;preview.hidden=!failed&&!schema?.preview.length;
@@ -297,31 +340,65 @@ export function configureHostedWorkspace() {
       }
       filterValues();
     },
-    draft(job: Job | null, operations: number) {
+    draft(job: Job | null, operations: number, dirty: boolean) {
+      if(dirty)showAutoSettings();
       cliJob=job;renderCommand();
       get('pipeline-count').textContent = operations ? `${operations} step${operations===1?'':'s'}` : 'Optional';
       get('draft-source').textContent = job?.input ? `Read ${job.input}${job.zip_member?` → ${job.zip_member}`:''}.` : 'Choose a source file to begin.';
-      get('draft-output').textContent = job?.output ? `${job.compression==='none'?'CSV':job.compression.toUpperCase()} → ${job.output} / new folder.` : 'Choose a parent folder for results.';
-      get('draft-resources').textContent = job ? `${job.resources.memory_mb==='auto'?'Auto budget · up to 256 MiB':`${(get('memory') as HTMLInputElement).value} ${(get('memory-unit') as HTMLSelectElement).value} working budget`} · ${job.resources.workers===0?'auto workers':`${job.resources.workers} worker(s)`}.` : 'Finish the highlighted configuration fields to review the draft.';
+      const format=job?.compression==='zip'?'a ZIP of CSVs':job?.compression==='gzip'?'gzip-compressed CSVs':job?.compression==='zstd'?'Zstandard-compressed CSVs':'uncompressed CSVs';
+      const amount=(id:string)=>{const input=get(id) as HTMLInputElement;const unit=(document.getElementById(id+'-unit') as HTMLSelectElement|null)?.value;return input.value?`${input.value}${unit?' '+unit:''}`:'';};
+      const caps=[job?.limits.rows?`${job.limits.rows.toLocaleString()} rows`:'',job?.limits.bytes?amount('max-bytes'):''].filter(Boolean);
+      const destination=job?.output?` to a new folder in ${job.output}`:'';
+      get('draft-output').textContent=`Write ${format}${destination}${caps.length?`. Up to ${caps.join(' and ')} per CSV`:''}.`;
+      get('analyze-advice').textContent=job?.operations.some(op=>op.type==='partition'&&op.columns?.length)
+        ?'Optional. Estimate distinct partition keys and inspect column values.'
+        :'Optional. Count input rows and inspect column values.';
+      get('draft-resources').textContent = job ? !(get('execution-mode') as HTMLInputElement).checked ? 'Auto sets working memory, workers, grouping and writers.' : `${job.resources.memory_mb==='auto'?'Auto budget · chosen at Run':`${(get('memory') as HTMLInputElement).value} ${(get('memory-unit') as HTMLSelectElement).value} working budget`} · ${job.resources.workers===0?'auto workers':`${job.resources.workers} worker(s)`}.` : 'Finish the highlighted configuration fields to review the draft.';
     },
     state(state: State, dirty: boolean) {
-      const busy=['profiling','running'].includes(state.status),finished=processingStarted!==null&&!busy;processing.hidden=!busy;
-      if(busy){processingStarted??=performance.now();get('processing-activity').textContent=state.progress.phase||'Processing';get('processing-activity').title=state.progress.phase||'Processing';get('processing-elapsed').textContent=`${Math.floor((performance.now()-processingStarted)/1000).toLocaleString()} s elapsed`;}
-      else processingStarted=null;
-      (get('processing-cancel') as HTMLButtonElement).disabled=(get('cancel') as HTMLButtonElement).disabled;
+      if(state.status==='complete'&&!dirty)showAutoSettings(state.analysis?.auto_plan);
+      const busy=['profiling','running'].includes(state.status),finished=processingStarted!==null&&!busy;
+      const completed=state.status==='complete'?state.analysis:null;
+      const files=completed?`${completed.output_files.toLocaleString()} CSV ${completed.output_files===1?'file':'files'}`:'';
+      processing.hidden=!busy;setup.hidden=busy;get('execution-live').hidden=!busy&&!completed;
+      const viewResults=get('execution-results-link');viewResults.hidden=!completed;
+      if(completed){
+        get('execution-phase').textContent=dirty?`Previous run · ${files} saved`:`${files} saved`;
+        get('execution-counters').textContent=[state.output,completed.warnings.length?`${completed.warnings.length} ${completed.warnings.length===1?'warning':'warnings'}`:''].filter(Boolean).join(' · ');
+      }
+      if(busy){
+        if(run===document.activeElement)cancel.focus({preventScroll:true});
+        get('execution-phase').textContent=state.progress.phase||'Processing';
+        get('execution-counters').textContent=[
+          state.progress.rows>0?`${state.progress.rows.toLocaleString()} ${state.progress.rows===1?'row':'rows'} in this phase`:'',
+          state.progress.temp_bytes>0?`${(state.progress.temp_bytes/2**20).toLocaleString(undefined,{maximumFractionDigits:1})} MiB temporary storage`:'',
+        ].filter(Boolean).join(' · ');
+      }
+      get('processing-view').hidden=view==='execution';
+      if(busy){
+        processingStarted??=performance.now();
+        const phase=state.progress.phase||'Processing',activity=get('processing-activity');
+        if(activity.textContent!==phase)activity.textContent=activity.title=phase;
+        get('processing-elapsed').textContent=`${Math.floor((performance.now()-processingStarted)/1000).toLocaleString()} s elapsed`;
+      }else{
+        processingStarted=null;
+        if(finished&&state.status==='cancelled'&&document.activeElement===document.body)run.focus({preventScroll:true});
+      }
       scheduleNavigation();
-      report.hidden=state.status==='idle'&&!state.analysis&&!state.profile;
+      report.hidden=!state.analysis&&['idle','profiled','profiling','running'].includes(state.status);
       get('analysis').setAttribute('aria-label',dirty?'Previous processing result; draft has changed':'Processing result');
       if(dirty && state.analysis) {
         const saved=state.status==='complete'&&state.output?` Last completed result folder: ${state.output}.`:'';
         get('result-path').textContent = `Draft changed. Processing results describe the previous submitted configuration.${saved} Run again to process the current settings.`;
       }
-      if(state.status==='complete' && !dirty) get('result-path').textContent = `✓ Complete. Results saved to ${state.output}. Files closed and CHOPPER-COMPLETE.json written.`;
+      if(completed&&!dirty){
+        get('result-path').textContent=`✓ Complete. ${files} ${cliJob?.compression==='zip'?'in a ZIP archive saved to':'saved to'} ${state.output}.`;
+      }
       if(finished&&['complete','failed','profiled'].includes(state.status)&&!(document.activeElement as HTMLElement|null)?.closest('#job-form')){
         const active=document.activeElement as HTMLElement|null;
         if(view==='execution'&&state.status!=='failed'){
-          if(active?.closest('#processing-strip')||active===get('cancel')||active===document.body)heading.focus({preventScroll:true});
-        }else{const target=state.status==='failed'?get('error'):report;target.tabIndex=-1;target.focus({preventScroll:true});target.scrollIntoView({block:view==='execution'?'nearest':'start'});}
+          if(active?.closest('#run-dock')||active===get('cancel')||active===document.body)heading.focus({preventScroll:true});
+        }else{const target=state.status==='failed'?get('error'):state.status==='profiled'?get('input-profile'):report;target.tabIndex=-1;target.focus({preventScroll:true});target.scrollIntoView({block:view==='execution'?'nearest':'start'});}
       }
     },
   };

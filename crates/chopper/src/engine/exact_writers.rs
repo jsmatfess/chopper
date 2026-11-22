@@ -30,14 +30,15 @@ pub(super) struct Prepared<'a> {
 }
 
 fn eligible(job: &Job, ctx: &Context) -> bool {
-    cfg!(all(
-        feature = "experimental-retained-exact-writers",
-        not(target_os = "wasi")
-    )) && ctx.direct_terminal_output
+    (ctx.auto_retained_exact
+        || (cfg!(all(
+            feature = "experimental-retained-exact-writers",
+            not(target_os = "wasi")
+        )) && matches!(job.operations.as_slice(), [Operation::Assign { groups, strata }]
+        if !strata.is_empty() && configured_writer_capacity(job).is_some_and(|cap| groups.len() <= cap))))
+        && ctx.direct_terminal_output
         && !ctx.physical_enabled()
         && job.output_csv.encoding.eq_ignore_ascii_case("utf-8")
-        && matches!(job.operations.as_slice(), [Operation::Assign { groups, strata }]
-            if !strata.is_empty() && configured_writer_capacity(job).is_some_and(|cap| groups.len() <= cap))
 }
 
 pub(super) fn prepare<'a>(
@@ -70,6 +71,7 @@ pub(super) fn prepare<'a>(
         // Parent-reader setup can deny before the Proposal has a parent to borrow.
         // Both setup paths drop their owners before this cancellation/cleanup recheck.
         ctx.check()?;
+        ctx.retained_exact_fallback();
         ctx.event(
             "Using original exact allocation after preparation denial",
             0,
@@ -354,6 +356,7 @@ mod tests {
         *owner.lock().unwrap() = Some(held);
         assert!(prepare(&ingested.dataset, &job, &ingested.analysis, &ctx)?.is_none());
         assert_eq!(fallback.load(Ordering::SeqCst), 1);
+        assert_eq!(ctx.completed_measurements().retained_exact_fallbacks, 1);
         assert!(owner.lock().unwrap().is_none());
         assert_eq!(writer.files(), 0);
         let (seed, files, bytes) = writer.finish_direct()?;
@@ -387,6 +390,7 @@ mod tests {
         assert!(result.is_err());
         drop(result);
         assert_eq!(fallback.load(Ordering::SeqCst), 0);
+        assert_eq!(ctx.completed_measurements().retained_exact_fallbacks, 0);
         assert!(!std::path::Path::new(&job.output).exists());
         assert_eq!(pool.usage().reserved_bytes, before + held.bytes());
         drop(held);

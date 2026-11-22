@@ -50,7 +50,7 @@ const GLOBAL: &[(&str, &str)] = &[
     ("rows", "Maximum rows per output CSV"),
     ("bytes", "Maximum serialized bytes per CSV"),
     ("compressed-bytes", "Advisory compressed-byte target"),
-    ("memory-mb", "Working budget in MiB or auto (default 256)"),
+    ("memory-mb", "Working budget in MiB or auto (default auto)"),
     (
         "workers",
         "Sort/compression workers; 0 selects automatically",
@@ -139,7 +139,13 @@ pub fn command() -> Command {
             .short('c')
             .value_parser(clap::value_parser!(PathBuf))
             .conflicts_with_all(config_conflicts)
-            .help("JSON job file; allows only --memory-mb, --workers and --yes overrides"),
+            .help("JSON job file; allows --memory-mb, --workers, --analysis and --yes"),
+    );
+    command = command.arg(
+        Arg::new("analysis")
+            .long("analysis")
+            .value_parser(clap::value_parser!(PathBuf))
+            .help("Optional JSON report from chopper analyze"),
     );
     command.arg(
         Arg::new("yes")
@@ -217,7 +223,10 @@ pub fn source(matches: &ArgMatches) -> Result<super::CliJob> {
 }
 
 pub fn parse(matches: &ArgMatches) -> Result<(Job, bool)> {
-    let mut job = Job::default();
+    let mut job = Job {
+        resources: Resources::automatic(),
+        ..Job::default()
+    };
     for &(flag, _) in GLOBAL {
         let Some(value) = matches.get_one::<String>(flag) else {
             continue;

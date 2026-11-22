@@ -19,6 +19,7 @@ function observedDestination(parent:FileSystemDirectoryHandle,targetName:string|
     if(key!=='getDirectoryHandle')return bind(target,key);
     return async(name:string,options?:FileSystemGetDirectoryOptions)=>{
       const directory=await target.getDirectoryHandle(name,options);
+      if(!options?.create)return directory;
       return new Proxy(directory,{get(target,key){
         if(key!=='getFileHandle')return bind(target,key);
         return async(name:string,options?:FileSystemGetFileOptions)=>{
@@ -113,9 +114,11 @@ async function browserExportContract(root:DiskDirectory,parent:FileSystemDirecto
     try{await exportResults(source,rejected.handle,'failed',callbacks);}catch(error){exportFailure=error;}
     assert(exportFailure instanceof DOMException&&exportFailure.name==='QuotaExceededError','Mid-copy rejection did not propagate');
     assert(lastObservation.export?.status==='failed'&&!lastObservation.marker,'Export failure attribution was lost');
-    const partial=await parent.getDirectoryHandle('failed');
-    let markerAbsent=false;
-    try{await partial.getFileHandle(markerName);}catch(error){if(error instanceof DOMException&&error.name==='NotFoundError')markerAbsent=true;else throw error;}
+    const absent=async(name:string)=>{
+      try{await parent.getDirectoryHandle(name);return false;}
+      catch(error){if(error instanceof DOMException&&error.name==='NotFoundError')return true;throw error;}
+    };
+    const markerAbsent=await absent('failed');
     assert(markerAbsent&&rejected.state.marker_open_calls===0,'Failed export acquired a completion marker');
     assert(rejected.state.injected_write_rejections===1&&rejected.state.successful_target_writes_before_failure===1&&rejected.state.abort_calls===1,'Mid-copy rejection did not abort the real writable');
     assert(rejected.state.closed_files>0,'Mid-copy fixture did not retain an earlier closed file');
@@ -125,15 +128,12 @@ async function browserExportContract(root:DiskDirectory,parent:FileSystemDirecto
       let failure:unknown;
       try{await exportResults(source,observed.handle,fault,callbacks);}catch(error){failure=error;}
       assert(failure instanceof DOMException&&failure.name===(fault==='marker_write'?'QuotaExceededError':'UnknownError'),'Destination fault was lost: '+fault);
-      const directory=await parent.getDirectoryHandle(fault);
+      assert(await absent(fault),'Failed export folder was not removed: '+fault);
       assert(fault==='close'?lastObservation.export?.status==='failed':lastObservation.marker?.status==='failed','Destination failure was not attributed to its physical step');
-      let markerBytes=0;
-      try{markerBytes=(await(await directory.getFileHandle(markerName)).getFile()).size;}catch(error){if(!(error instanceof DOMException&&error.name==='NotFoundError'))throw error;}
-      assert(markerBytes===0,'Failed export left completion marker content: '+fault);
       assert(observed.state.abort_calls===1,'Failed destination writable was not aborted: '+fault);
       assert(observed.state.marker_open_calls===(fault==='close'?0:1),'Unexpected marker acquisition: '+fault);
       if(fault!=='close')assert(observed.state.closed_files===6&&observed.state.marker_opened_after_files_closed,'Marker fault preceded result close: '+fault);
-      terminalFaults.push({fault,...observed.state,error_name:(failure as DOMException).name,completion_marker_bytes:markerBytes});
+      terminalFaults.push({fault,...observed.state,error_name:(failure as DOMException).name,completion_marker_bytes:0});
     }
     // A second export to the same destination must reject before modifying the
     // previously completed result or sending an export-start notification.
@@ -141,7 +141,7 @@ async function browserExportContract(root:DiskDirectory,parent:FileSystemDirecto
     try{await exportResults(source,parent,'complete',{...callbacks,postMessage:()=>{collisionMessages++;},observe:observation=>{if(observation.export?.status==='active')collisionStarts++;callbacks.observe(observation);}});}catch(error){collision=error;}
     assert(collision instanceof Error&&collision.message==='Result folder already exists. Analyze again.'&&collisionMessages===0&&collisionStarts===0,'Existing result was not rejected before export');
     assert(await(await(await destination.getFileHandle(markerName)).getFile()).text()===JSON.stringify(marker)+'\n','Existing result marker was modified');
-    report={contract:'retained-parent-browser-export-contract-v1',source:'verified-wasi-retained-parent-retry',destination_context:'same-origin-opfs',source_files:files.length,csv_files:csvFiles,csv_bytes:csvBytes,byte_cap:published.byte_cap,exact_source_bytes:true,complete_marker:marker,marker_after_result_writers_closed:true,success_files:successFiles,failure:{...rejected.state,partial_directory_present:true,completion_marker_absent:true},terminal_faults:terminalFaults,existing_destination_rejected:true};
+    report={contract:'retained-parent-browser-export-contract-v1',source:'verified-wasi-retained-parent-retry',destination_context:'same-origin-opfs',source_files:files.length,csv_files:csvFiles,csv_bytes:csvBytes,byte_cap:published.byte_cap,exact_source_bytes:true,complete_marker:marker,marker_after_result_writers_closed:true,success_files:successFiles,failure:{...rejected.state,partial_directory_present:false,completion_marker_absent:true},terminal_faults:terminalFaults,existing_destination_rejected:true};
   }catch(error){failure=error;}
   finally{
     if(parent){

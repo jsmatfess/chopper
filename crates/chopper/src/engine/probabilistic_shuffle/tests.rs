@@ -61,6 +61,7 @@ fn execute(
         pool,
         physical,
         false,
+        None,
         |job, ctx, p, b, s| {
             input_reads += 1;
             with_input(job, Reservation::new(ctx), |mut source| {

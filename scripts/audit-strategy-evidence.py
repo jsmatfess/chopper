@@ -73,6 +73,14 @@ def main():
 
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
+    'Auto Chromium thresholds and resource calibration (2026-11-21)': 'adaptive-routing',
+    'Browser Auto resource calibration (2026-11-21)': 'adaptive-routing',
+    'Browser Auto memory tiers (2026-11-21)': 'adaptive-routing',
+    'Browser preview and Analyze calibration (2026-11-21)': 'adaptive-routing',
+    'Auto width sampling merge passes and native contention (2026-11-21)': 'adaptive-routing',
+'Browser Auto calibration at multiple GiB (2026-11-21)': 'adaptive-routing',
+'Browser preview calibration on larger files (2026-11-21)': 'adaptive-routing',
+    'Auto shadow held-out panel (2026-11-21)': 'adaptive-routing',
     'Current Balanced cross-tool at 8 GiB (2026-11-21)': 'profiling',
     'Integrated Balanced cross-tool at 8 GiB (2026-11-21)': 'profiling',
     'Uniform Balanced cross-tool at 40 GiB (2026-11-21)': 'profiling',
@@ -91,6 +99,12 @@ SECTIONS = {
     'Counted Partition and Balanced (2026-11-21)': 'ownership-and-lifecycle',
     'Explicit Sort and Zstandard input Balanced (2026-11-21)': 'ownership-and-lifecycle',
     'Memory proportional writers and publication scheduling (2026-11-21)': 'ownership-and-lifecycle',
+    'Input prefetch native publication and digest overlap (2026-11-22)': 'ownership-and-lifecycle',
+    'Bounded I/O overlap adoption (2026-11-22)': 'ownership-and-lifecycle',
+    'Automatic native execution bounds (2026-11-22)': 'ownership-and-lifecycle',
+    'Desktop picker write overlap (2026-11-22)': 'ownership-and-lifecycle',
+    'Browser direct destination write overlap (2026-11-22)': 'ownership-and-lifecycle',
+    'Browser direct destination writes and batching (2026-11-21)': 'ownership-and-lifecycle',
     'Bounded final writers and composed pipelines (2026-11-19)': 'ownership-and-lifecycle',
     'Pipeline publication and byte cap comparisons (2026-11-18)': 'ownership-and-lifecycle',
     'Partition routing and assignment tradeoffs (2026-11-18)': 'ownership-and-lifecycle',

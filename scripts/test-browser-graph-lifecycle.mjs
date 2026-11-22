@@ -1,3 +1,4 @@
+import {stagedDestinationWorker} from './browser-destination-fixtures.mjs';
 // Public hosted Run with production workers/WASI/OPFS; scoped test-only faults.
 import {withHostedBrowser,revealFormControl} from './browser-acceptance.mjs';
 import {browserChannel} from './browser-launch.mjs';
@@ -11,6 +12,7 @@ import {assertProductionWasm} from './browser-artifacts.mjs';
 const root=fileURLToPath(new URL('../',import.meta.url));
 const production=await readFile(root+'ui/dist/engine-worker.js','utf8');
 const storageProduction=await readFile(root+'ui/dist/storage-worker.js','utf8');
+const stagedWorker=await stagedDestinationWorker();
 const wasm=await readFile(root+'ui/dist/engine.wasm');assertProductionWasm(wasm);
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
 const wrapper=`
@@ -61,7 +63,7 @@ globalThis.postMessage=(message,...args)=>send(failCleanup&&message.cleaned?{err
 const reports=[],owned=[];
 await withHostedBrowser({port:8425},async({context,url,browserVersion})=>{
  const headers={'Cross-Origin-Embedder-Policy':'require-corp','Cross-Origin-Resource-Policy':'same-origin'};
- await context.route('**/engine-worker-production.js',route=>route.fulfill({contentType:'application/javascript',headers,body:production}));
+ await context.route('**/engine-worker-production.js',route=>route.fulfill({contentType:'application/javascript',headers,body:stagedWorker}));
  await context.route('**/engine-worker.js',route=>route.fulfill({contentType:'application/javascript',headers,body:wrapper}));
  await context.route('**/storage-worker-production.js',route=>route.fulfill({contentType:'application/javascript',headers,body:storageProduction}));
  await context.route('**/storage-worker.js',route=>route.fulfill({contentType:'application/javascript',headers,body:storageWrapper}));
@@ -127,7 +129,8 @@ await withHostedBrowser({port:8425},async({context,url,browserVersion})=>{
   },parent);
   const valid=['success','marker_read','marker_closed','marker_confirmed','marker_late','transport_throw','loss_after_active','render_throw','cleanup_error_success'].includes(mode);
   assert.equal(snapshot.some(folder=>folder.valid),valid,'independent marker validity for '+mode);
-  if(valid||['marker_write','marker_close'].includes(mode)){
+  if(['result_close','marker_write','marker_close'].includes(mode))assert.deepEqual(snapshot,[],'failed export folder removed');
+  if(valid){
    const csvs=snapshot.flatMap(folder=>Object.entries(folder.files).filter(([name])=>name.endsWith('.csv')||name.endsWith('.gz')).map(([,file])=>{if(!file.bytes)return file;const decoded=gunzipSync(Buffer.from(file.bytes));return {size:decoded.length,text:decoded.toString('utf8')};}));assert.equal(csvs.length,composed?4:3);assert.ok(csvs.every(file=>file.size<=20&&file.text.trimEnd().split('\n').length-1<=2));assert.deepEqual(csvs.flatMap(file=>file.text.trimEnd().split('\n').slice(1)).sort(),['1,a','2,b','3,a','4,b','5,a','6,b']);
    const manifest=snapshot.flatMap(folder=>(folder.files['manifest.jsonl']?.text??'').trim().split('\n').filter(Boolean).map(line=>JSON.parse(line))).filter(record=>record.type==='output');assert.equal(manifest.length,composed?4:3);assert.equal(manifest.reduce((sum,record)=>sum+record.rows,0),6);
   }
@@ -138,5 +141,5 @@ await withHostedBrowser({port:8425},async({context,url,browserVersion})=>{
   await page.evaluate(async parent=>(await navigator.storage.getDirectory()).removeEntry(parent,{recursive:true}),parent);
  }
  for(const parent of owned)await page.evaluate(async parent=>{try{await(await navigator.storage.getDirectory()).removeEntry(parent,{recursive:true});}catch(error){if(error.name!=='NotFoundError')throw error;}},parent);
- console.log(JSON.stringify({binary_sha256:{engine:sha(wasm),worker:sha(production),storage:sha(storageProduction),app:sha(await readFile(root+'ui/dist/app.js'))},harness_sha256:sha(await readFile(fileURLToPath(import.meta.url))),worker_wrapper_sha256:sha(wrapper),storage_wrapper_sha256:sha(storageWrapper),browserVersion,browserChannel,composed,scope:'real hosted Run, production engine/workers, test-only faults; no reload persistence, scale or RSS claim',reports},null,2));
+ console.log(JSON.stringify({binary_sha256:{engine:sha(wasm),worker:sha(production),storage:sha(storageProduction),app:sha(await readFile(root+'ui/dist/app.js'))},harness_sha256:sha(await readFile(fileURLToPath(import.meta.url))),staged_worker_sha256:sha(stagedWorker),worker_wrapper_sha256:sha(wrapper),storage_wrapper_sha256:sha(storageWrapper),browserVersion,browserChannel,composed,scope:'real hosted Run, production engine/workers, test-only faults; no reload persistence, scale or RSS claim',reports},null,2));
 });

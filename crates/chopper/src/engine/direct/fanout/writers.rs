@@ -47,10 +47,13 @@ impl<'a> Writers<'a> {
                 && self.job.limits.compressed_bytes.is_none());
         let mut writer =
             output::PlanWriter::direct_fanout(self.job, header, self.ctx, single_chunk)?;
-        if cfg!(feature = "experimental-release-final-header-scratch") {
+        if self.ctx.auto_final_writers
+            || cfg!(feature = "experimental-release-final-header-scratch")
+        {
             writer.release_serialization_scratch()?;
         }
         self.entries.push(Some(Output { writer, group }));
+        self.ctx.bounded_writer_slots(self.entries.len());
         Ok(())
     }
     pub(in crate::engine) fn len(&self) -> usize {
@@ -72,7 +75,7 @@ impl<'a> Writers<'a> {
             .writer
             .allow_additional_files(self.ctx.max_files - self.opened_files)?;
         let before = output.writer.files();
-        if cfg!(feature = "experimental-shared-final-serializer") {
+        if self.ctx.auto_final_writers || cfg!(feature = "experimental-shared-final-serializer") {
             self.serializer
                 .serialize_fields_reserved(fields, &mut |bytes| {
                     self._serialization.resize(bytes)

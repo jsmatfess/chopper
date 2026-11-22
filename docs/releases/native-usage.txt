@@ -20,7 +20,7 @@ source's vendor/zip-2.4.2/CHOPPER.md and vendor/zstd-sys-2.1.1/CHOPPER.md.
 THIRD-PARTY COMPONENTS AND UPSTREAM NOTICES
 ===============================================================================
 
-Chopper 0.2.0 default production dependency and runtime notice inventory.
+Chopper 0.3.0 default production dependency and runtime notice inventory.
 This text accompanies the Windows/Linux CLI packages and hosted WASI/browser
 distribution. Upstream notice texts below are preserved byte for byte. Identical
 texts appear once with all source files identified.
@@ -37,8 +37,8 @@ broader than each target linked subset. System libraries not redistributed by
 Chopper are outside this inventory; this is not a linker-reachability report.
 
 Source pins:
-Cargo.lock SHA-256: e1554f704f291ea0a77948b954fbce55bdb87b5f969c01a4eb270a54e9dcb04d
-ui/package-lock.json SHA-256: e4dd13d7334db98066f0f75f5e32533ee588440e731fb2932dbb462cdd6ed14c
+Cargo.lock SHA-256: 90ebca8141413f943879855eb46b6b12cb50b4809b3e34af1bc2e9a060291130
+ui/package-lock.json SHA-256: d50d5b7e4684ce880ad4ed749ea93fd57e816712d3669f442ee2d4a00e5204b8
 Rust standard library: 1.99.1, commit 58cf8f9c35b355199727627d07ae34a4e2846d67
 wasi-sdk-33 wasi-libc: 161b3195fc2558d2b1ba3eb9ffae3b2b47407623
 wasi-sdk-33 LLVM runtime: 4434dabb69916856b824f68a64b029c67175e532
@@ -58,9 +58,9 @@ bitflags | 2.13.2 | MIT OR Apache-2.0
 blake3 | 1.8.7 | CC0-1.0 OR Apache-2.0 OR Apache-2.0 WITH LLVM-exception
 bumpalo | 3.20.3 | MIT OR Apache-2.0
 cfg-if | 1.0.5 | MIT OR Apache-2.0
-chopper | 0.2.0 | MIT
-chopper-browser | 0.2.0 | MIT
-chopper-core | 0.2.0 | MIT
+chopper | 0.3.0 | MIT
+chopper-browser | 0.3.0 | MIT
+chopper-core | 0.3.0 | MIT
 clap | 4.6.7 | MIT OR Apache-2.0
 clap_builder | 4.6.7 | MIT OR Apache-2.0
 clap_derive | 4.6.7 | MIT OR Apache-2.0
@@ -1134,9 +1134,9 @@ Source files:
 ===============================================================================
 Notice 11; SHA-256: 0e2f209b726650ef0b6569ed2d31d23ccd062b48650e16abf5d49b830d9df073
 Source files:
-  licenses/rust/chopper-0.2.0/LICENSE
-  licenses/rust/chopper-browser-0.2.0/LICENSE
-  licenses/rust/chopper-core-0.2.0/LICENSE
+  licenses/rust/chopper-0.3.0/LICENSE
+  licenses/rust/chopper-browser-0.3.0/LICENSE
+  licenses/rust/chopper-core-0.3.0/LICENSE
 -------------------------------------------------------------------------------
 MIT License
 

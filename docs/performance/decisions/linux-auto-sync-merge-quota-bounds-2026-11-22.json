@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "id": "linux-auto-sync-merge-quota-bounds-2026-11-22",
+  "date": "2026-11-22",
+  "title": "Select bounded Linux sync scheduling, shuffle merges, and indexed quotas",
+  "subsystem": "execution",
+  "question": "Which independently verified complete jobs justify automatic native selection?",
+  "disposition": "adopt",
+  "delivery": "default",
+  "outcome": "favorable",
+  "summary": "Default Linux Run applies the measured 8,192\u201316,384-file sync range, terminal Uniform reader tiers, and a 1,000-destination exact quota rule. Lower controls keep their ordinary routes.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "2 GiB Interleaved sync jobs, 8 GiB Uniform followed by Balanced, and 4.2-million-row standalone exact assignment."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Independent byte, field, quota, group, and cleanup checks pass for scoped paired jobs. A feature-free CLI smoke verifies the 1 GiB automatic sync tier and 8,192 files."
+  },
+  "limitations": [
+    "One WSL ext4 host. The integrated merge comparison includes terminal publication; earlier feature-only records isolate merge behavior."
+  ],
+  "exclusions": [
+    "1,024-group or 1.05-million-row indexed scope, non-Linux runtimes, and a separate 40 GiB short-tail selector."
+  ],
+  "reopen_when": null,
+  "supersedes": [
+    "wide-terminal-uniform-merge-2026-11-21",
+    "terminal-uniform-short-tail-2026-11-21",
+    "indexed-exact-quota-lookup-at-2-gib-2026-11-21"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#automatic-native-execution-bounds-2026-11-22",
+      "sha256": "2737122a7f5a529381ae238bf63b703731ee38916b9e6e3b0a598466842b4de0"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-linux-final-sync.jsonl",
+      "sha256": "c3df69fad99c20171f9f260048372517bafbdf5da077b51af386cabc89d6c015"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-pending-final-sync-ceiling.jsonl",
+      "sha256": "6b865cfefd2fa5b49efa09919acf3f696b4f75f222bd7c05a606ebf988f6af7b"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-final-terminal-wide.jsonl",
+      "sha256": "c051967d98a4d7088085230c1b585db33c37efac29a271023692d13ad63837a1"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-final-terminal-short.jsonl",
+      "sha256": "85b2af96ff45f63d2d982d3fe3da77a1586cfb57eadad059ae17a48ba5b64f7d"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-final-quota-index-heavy.jsonl",
+      "sha256": "0919caae5e4f1b843178eb340084c86371238ff4faa810fcf234fa02885dc6c5"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-qualified-quota-index.jsonl",
+      "sha256": "622cef76c7cfb33c7fc0c1a9906e8b6723a29bd2200c64e708c5f92a71d41fd8"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-final-index-cap1024.jsonl",
+      "sha256": "0fa269939184d12f7f7522b69e1511002424f075125ef04600be5b6d798605e7"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-pending-final-sync-control.jsonl",
+      "sha256": "c4071e69b5b0038257fc000206724e68d9114dd40b8715b4cbc65c6fb5f8deb9"
+    }
+  ],
+  "contracts": [
+    "docs/direct-execution.md",
+    "docs/execution-decisions.md",
+    "docs/run-cli.md"
+  ]
+}

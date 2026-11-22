@@ -550,7 +550,7 @@ mod tests {
 
     #[test]
     fn equal_random_keys_preserve_collision_refinement_through_hierarchical_merges() -> Result<()> {
-        for budget in [4096, 32 * 1024 * 1024] {
+        for budget in [crate::storage::SORT_HIERARCHY_TEST_MEMORY, 32 * 1024 * 1024] {
             let job = job();
             let mut ctx = context(&job)?;
             ctx.memory = budget;
@@ -636,7 +636,7 @@ mod tests {
                 &ctx,
             )?;
             assert_eq!(snapshot(&writer.finish()?, &ctx)?, snapshot(&serial, &ctx)?);
-            if budget == 4096 {
+            if budget == crate::storage::SORT_HIERARCHY_TEST_MEMORY {
                 assert!(ctx.diagnostics()["merge_operations"].as_u64().unwrap() > 2);
             }
         }

@@ -10,13 +10,19 @@ pub struct WriterEstimate {
     pub estimated_groups_fit_writer_capacity: Option<bool>,
     pub estimated_groups_fit_file_limit: Option<bool>,
     pub bounded_partition_shape: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub suggested_max_files: Option<u64>,
 }
 
 pub(super) fn estimate(job: &Job, profile: &InputProfile) -> Option<WriterEstimate> {
-    if !cfg!(all(
+    let experimental = cfg!(all(
         feature = "experimental-final-writers",
         not(target_os = "wasi")
-    )) {
+    ));
+    if !experimental
+        && (!cfg!(any(target_os = "linux", windows))
+            || !matches!(job.operations.as_slice(), [Operation::Partition { .. }]))
+    {
         return None;
     }
     let mut groups = Some(1u64);
@@ -48,7 +54,18 @@ pub(super) fn estimate(job: &Job, profile: &InputProfile) -> Option<WriterEstima
         exact &= groups.is_some();
         unchanged_parent &= multiplier == 1;
     }
-    let capacity = engine::configured_writer_capacity(job);
+    let suggested = groups.filter(|_| exact).and_then(|keys| {
+        engine::auto::suggested_partition_max_files(
+            job,
+            keys,
+            profile.metadata_buffers.effective_memory_bytes() / (1024 * 1024),
+        )
+    });
+    if !experimental && suggested.is_none() {
+        return None;
+    }
+    let capacity = engine::configured_writer_capacity(job)
+        .or_else(|| suggested.map(|_| engine::auto::descriptor_writer_ceiling(2).min(32)));
     Some(WriterEstimate {
         estimated_groups: groups,
         exact_if_feasible: exact,
@@ -59,6 +76,7 @@ pub(super) fn estimate(job: &Job, profile: &InputProfile) -> Option<WriterEstima
             .map(|(groups, cap)| groups <= cap as u64),
         estimated_groups_fit_file_limit: groups.map(|groups| groups <= job.resources.max_files),
         bounded_partition_shape: engine::bounded_final_partition_shape(job),
+        suggested_max_files: suggested,
     })
 }
 

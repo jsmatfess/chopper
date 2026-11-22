@@ -1,14 +1,8 @@
 # Execution decisions, visually
 
-The [product direction](product-direction.md) owns the new workload-led Auto
-investigation. The future design below is a prior candidate, not a settled
-selector or delivery sequence. Current-behavior diagrams include the seeded-policy removal and default
-shuffle/partition fusion delivered for local evaluation on 2026-11-15.
-
-Read this as three separate decisions: how Run produces output, how execution
-fits its working budget, and how a future Auto policy could choose strategies.
-Solid diagrams below describe current behavior; the final diagram is explicitly
-a design. The [specification](specification.md), [rewrite rules](pipeline-rewrites.md)
+The [product direction](product-direction.md) owns workload-led Auto policy.
+These diagrams cover Run dispatch, working-budget admission and the current
+Auto planner. The [specification](specification.md), [rewrite rules](pipeline-rewrites.md)
 and [GitHub Issues](https://github.com/jsmatfess/chopper/issues) own contracts and delivery status.
 
 ## 1. Current workflow: Analyze or Run
@@ -19,34 +13,36 @@ flowchart TD
     Schema -->|No| RejectSeed[Reject obsolete seed / internal random_seed fields]
     Schema -->|Yes| Action{Which action?}
     Action -->|Analyze input| Profile[Full-file validation and bounded statistics]
-    Profile --> Report[Return profile; no output snapshot]
-    Action -->|UI or CLI Run with current configuration| Counted{Native CLI counted-balanced experiment, eligible UTF-8 source and Balanced shape?}
+    Profile --> Report[Return bounded observations and source binding]
+    Action -->|UI or CLI Run with current configuration| Advice[Read cheap metadata and check optional Analyze binding]
+    Report -.->|Optional| Advice
+    Advice --> Counted{Native counted Auto or opt-in, eligible UTF-8 source and Balanced shape?}
     Counted -->|Yes| CountPass[Strict count pass and direct write with decoded header, count and metadata checks]
     CountPass --> ReleaseCounted[Release first-pass metadata and any Partition proof after comparison]
     ReleaseCounted --> Publish
     Counted -->|No| Eligible{Limits-only or single plain Balanced step?}
     Eligible -->|Yes| Direct[Validate and serialize directly to private output]
-    Eligible -->|No| BoundedPartition{Native bounded-final-partition experiment, unobserved single plain Partition, Auto and max_files within writer capacity?}
+    Eligible -->|No| BoundedPartition{Native bounded Partition Auto or opt-in, plain input and declared caps fit?}
     BoundedPartition -->|Yes| FanoutBuffers[Select CSV/catalog capacities; admit as owners construct]
     FanoutBuffers --> CatalogForm{Per writer: single-record experiment and exact group or no chunk caps?}
     CatalogForm -->|Yes| TypedRecord[Retain admitted name and scalars; materialize canonical root catalog in original stage at finish]
     CatalogForm -->|No| DiskRecords[Retain ordinary disk catalog]
-    TypedRecord --> SyncBatch{Linux batched-sync experiment and unobserved plain output?}
+    TypedRecord --> SyncBatch{Linux large Interleaved Auto or sync opt-in, typed records and live resources fit?}
     SyncBatch -->|Yes| SyncQueue[Select flush-all-then-sync finish; every original handle syncs before Analysis]
     SyncBatch -->|No| Direct
     SyncQueue --> Direct
     DiskRecords --> Direct
-    BoundedPartition -->|No| Fanout{Native final-writers experiment, unobserved single plain Interleaved or probabilistic, Auto and within bounded memory/descriptor writer ceiling?}
+    BoundedPartition -->|No| Fanout{Native bounded final writers for eligible Interleaved, probabilistic or writer-chain work?}
     Fanout -->|Yes| FanoutBuffers
     Fanout -->|No| Chains{Native unobserved final-writer chains, 2–4 count-independent steps and leaf product within bounded memory/descriptor writer ceiling?}
     Chains -->|Yes| FanoutBuffers
-    Chains -->|No| Experiment{Opt-in terminal-shuffle eligibility?}
-    Experiment -->|Yes| TailMerge{Opt-in Linux unobserved raw terminal Uniform with pending and reader budgets?}
+    Chains -->|No| Experiment{Eligible Linux Auto terminal Uniform or opt-in terminal shuffle?}
+    Experiment -->|Yes| TailMerge{Linux short-tail eligibility with admitted pending and reader budgets?}
     TailMerge -->|Admitted| ShortTail[Retain bounded pending owners and consolidate only excess runs before final merge]
     TailMerge -->|Otherwise or limit reached| Direct
     ShortTail --> Direct
-    Experiment -->|No| Routing{Native terminal-routing experiment, single plain Partition, Interleaved, stratified exact or probabilistic assignment?}
-    Routing -->|Yes| ExactWriters{Retained-exact-writers experiment, unobserved singleton stratified exact, Auto, UTF-8 and configured writer count fits?}
+    Experiment -->|No| Routing{Native retained exact Auto or terminal-routing opt-in?}
+    Routing -->|Yes| ExactWriters{Singleton stratified exact with bounded configured writers and live headroom?}
     ExactWriters -->|Yes| ExactSetup[Keep original empty writer witness; count retained tuples, quotas and RNG states; admit final writers]
     ExactSetup --> ExactReady{Preparation admitted and no cancellation or cleanup fault?}
     ExactReady -->|Yes| ExactEmit[Traverse same parent in source order; emit original quota streams; all later errors terminal]
@@ -58,15 +54,41 @@ flowchart TD
     Routing -->|No| Internal[Prepare snapshot internally, then execute]
     Direct --> Publish[Finalize and publish or export]
     Internal --> Publish
-    Publish --> Native[Native: atomic destination directory commit] --> NativeReceipt[Engine publication receipt]
-    Publish --> Browser[Browser: close exported files, then completion marker] --> VerifyMarker[Read back exact marker] --> BrowserReceipt[Verified destination receipt]
+    Publish --> Native{Linux or Windows Run at snapshot publication, one plain Partition, at least 2 GiB and 1,152 files, and four workers?}
+    Native -->|Yes| NativeBatch[Choose up to four writers per batch using live memory, descriptors and remaining files]
+    Native -->|Other native publication| NativeCommit[Atomic destination directory commit]
+    NativeBatch --> NativeCommit --> NativeReceipt[Engine publication receipt]
+    Publish --> Browser[Browser destination publication]
+    Browser --> Format{ZIP?}
+    Format -->|No| StreamIO{Selected CSV with plain output and supported pipeline?}
+    StreamIO -->|Empty pipeline with plain CSV input/output| Overlap[Prefetch one source window and coalesce one destination block]
+    StreamIO -->|One Partition with plain CSV input/output| SourceAhead[Prefetch one source window]
+    StreamIO -->|Other direct output| DirectFile[Write final files to the selected destination during engine publication]
+    Overlap --> DirectFile
+    SourceAhead --> DirectFile
+    Format -->|Yes| StagedFile[Copy closed OPFS results to the selected destination]
+    DirectFile --> Marker[Drain pending writes, close all destination streams and write completion marker]
+    StagedFile --> Marker
+    Marker --> VerifyMarker{Read back exact marker}
+    VerifyMarker -->|Exact match| BrowserReceipt[Verified destination receipt]
+    VerifyMarker -->|Confirmed invalid or missing| BrowserCleanup[Attempt cleanup of job-owned incomplete output]
+    VerifyMarker -->|Closed marker unreadable| BrowserRetain[Preserve destination and report verification failure]
 ```
 
 The unified `run` CLI accepts either admitted `--config` JSON or a caller-owned
 Job from ordered `--step` blocks, then uses the same confirmation and
 `engine::run` dispatch as `split`. Config and job-building flags cannot mix;
 existing JSON memory/worker overrides remain supported.
-It adds no rewrite, resource-resolution or publication policy.
+[Native Auto paths](direct-execution.md#native-auto-paths) lists the measured
+route bounds. Native direct dispatch checks live working headroom after building
+the context. It may return to the ordinary plan before opening the destination.
+Linux checks the actual rounded quota vector before selecting the in-place
+exact allocation cursor.
+
+Run also returns an Auto report alongside its existing diagnostics. It is attached
+after successful engine publication and is separate from the manifest snapshot.
+It counts a retained-exact preparation denial when the engine retries with
+ordinary exact allocation.
 
 The terminal-shuffle experiment retains root Uniform/Auto–Balanced eligibility.
 Its native unobserved extension permits a standalone full Shuffle or root
@@ -84,11 +106,14 @@ temporary-space or pending-file bounds retain or restore ordinary hierarchical
 merging. Fallback transfers the admitted run owners before another merge reads
 them, preserving ownership, cleanup and final order.
 
-The configured writer ceiling remains 16 unless the native opt-in
+The configured writer ceiling is at most 16 unless the native opt-in
 `experimental-memory-final-writers` feature is enabled. That experiment uses
 `min(4096, memory_mb * 4)`, conservatively substituting 32 MiB for unresolved
 `auto`; Unix additionally limits two descriptors per writer after leaving 64
-from the soft `RLIMIT_NOFILE` ceiling. This pre-consumption selection bound grants
+from the soft `RLIMIT_NOFILE` ceiling. The ordinary fixed ceiling also respects
+the descriptor guard. Auto uses a conservative ceiling of 16 when native
+descriptor availability is unknown. Non-Unix builds of the opt-in writer
+use the memory-derived limit. This pre-consumption selection bound grants
 no memory or handles. All owners still admit capacity; wide headers, concurrent
 pressure and opens can fail terminally. Larger fanouts retain the existing path.
 With `experimental-small-final-buffers`, configured fanout alone uses 16 KiB
@@ -227,12 +252,14 @@ flowchart TD
     Source --> Config[Resolve requested resources]
     Other[Other existing admitted or caller-owned adapters] --> Config
     Config --> Memory{memory_mb setting?}
-    Memory -->|Omitted| Default[256 MiB numeric budget]
+    Memory -->|Omitted| Observe
     Memory -->|Integer| Numeric[Use explicit numeric budget]
     Memory -->|auto| Observe[Refresh pressure; observe shared admission headroom]
-    Observe --> Resolve[Resolve once, capped at 256 MiB]
-    Default --> Validate[Validate budget, record limit and workers]
-    Numeric --> Validate
+    Observe --> Target[Hosted Run: eligible shuffle uses file size, matching preview, bounded interior widths or gzip trailer, and matching Analyze]
+    Target --> Resolve[Resolve available Run target and fallback tier]
+    Observe --> LinuxTarget[Linux shuffle: matching Analyze can target 384 MiB to avoid an extra merge]
+    LinuxTarget --> Resolve
+    Numeric --> Validate[Validate budget, record limit and workers]
     Resolve --> Validate
     Validate --> Hosted{Hosted WASI?}
     Hosted -->|Yes| BrowserLimit[At most 2048 MiB requested; one worker]
@@ -547,54 +574,55 @@ preparation/emission rules remain in exact_plan::Proposal. Consecutive partition
 and partition/balanced preserve their own typed-denial rules; this diagram does
 not broaden replay eligibility. Raw input and nested shared ranges are separate.
 
-## 3. Future Auto strategy selection: design, not enabled
+## 3. Current Auto planning
 
 ```mermaid
 flowchart TD
-    Contract[Ordered job, exactness and randomization distribution] --> Legal[Prove joint semantics of candidates and fusions]
-    Legal --> Feasible[Filter by runtime and resource feasibility]
-    Facts[Metadata and bounded observations from required work] --> Feasible
-    Feasible --> Evidence{Matched evidence supports a material total-job benefit?}
-    Evidence -->|Unknown or no| Existing[Keep existing legal plan]
-    Evidence -->|Yes| Choose[Choose a versioned rule's candidate]
-    Existing --> Admission[Attempt actual storage admission]
-    Choose --> Admission
-    Admission --> Execute[Execute with owned grants and defined fallback boundaries]
-    Execute --> Explain[Record effective choices and bounded reasons]
+    Job[Ordered job and explicit limits] --> Estimate[Choose baseline or estimate eligible hosted sort tier]
+    Analyze[Optional matching Analyze observations] -.-> Estimate
+    Estimate --> Budget[Resolve memory and worker settings against current headroom]
+    Budget --> Validate[Read and validate the current CSV]
+    Validate --> Eligible{Retained pipeline meets a calibrated fusion gate?}
+    Eligible -->|Yes| Try[Prepare fused partition-child shuffle under current admission]
+    Try -->|Typed denial before emission| Standard[Run existing stages on retained data]
+    Eligible -->|No| Standard
+    Try -->|Admitted| Publish[Size writer batches and publish transactionally]
+    Standard --> Publish
+    Publish --> Report[Show effective settings, executed strategy and retries]
 ```
 
-The engine will own selection for CLI, server and WASI; adapters supply runtime
-capabilities. Cost includes observation, failed attempts, preparation, processing,
-serialization and export. Optional new full profiling is skipped by default in
-the design until measured savings justify it. Unknown width, skew, capacity or
-cost favors the existing legal plan. No universal crossover is established.
+User-facing jobs default to automatic working memory. Explicit budgets and worker
+counts take precedence. Native serial routes with automatic workers use one.
+A prepared native Run with matching Analyze facts at or below 10,000 rows and
+1 MiB decoded payload also uses one automatic worker. Other native jobs reuse
+the CPU and memory worker ceiling. WASI uses a single processing worker.
+For plain-output uniform shuffle and Partition → Uniform Shuffle with automatic
+grouping, hosted Run estimates sort footprint and can target 512, 1024, or 2048
+MiB. It starts with plain CSV file size and pipeline shape, and uses matching
+Analyze row and width facts when available. Insufficient free capacity returns
+to the baseline Auto budget before processing. Actual allocation admission and
+the normal external sort fallback still apply.
+[Hosted memory evidence](performance/investigations/browser-auto-memory-tiers-2026-11-21.md).
 
-Randomized output has no seeded replay policy. Auto selection and fallback may
-choose different realizations of the requested distribution. Exact counts,
-pipeline membership, publication and cleanup remain required. Prepared
-confirmation uses its retained immutable output snapshot.
+Prepared Run sizes concurrent publication batches on the routes that support
+them using remaining chunks, workspace and shared memory headroom, worker count
+and descriptor headroom. Plain output and WASI use serial publication by default.
+Actual allocations and opens still require admission.
 
-Current ordinary builds fuse adjacent automatic/uniform shuffle and column
-partitioning into one tuple/random-key sort. The measured partition-first plus
-independent child shuffle candidate remains rejected because of skew regressions.
-A trial resident selector is also withheld after complete-job regressions.
+The shipped WASI fusion gate accepts plain-output Partition → Probabilistic
+Assign → Uniform or Auto shuffle with Auto grouping, 2–8 validated root groups,
+at least 40,000 validated records, at least 4 MiB decoded payload, and a 32 or
+256 MiB budget. The narrow Linux gate uses four groups, one worker, a 128 MiB
+budget, at least 8 million records and 1,900 MiB decoded payload, and an estimated
+largest parent payload of at least 256 MiB. The Linux estimate filters candidates
+using the validated largest group count and average payload. Actual allocation
+always uses the existing shared and local admission checks.
 
-Under the [future product direction](product-direction.md), any requested
-randomization, including random allocation, removes the input-order preservation
-requirement. Allocation alone does not promise uniformly shuffled output;
-explicit shuffle and downstream positional semantics remain
-eligibility constraints. Current allocation-order behavior is unchanged.
-
-Future field sorting also constrains eligibility: stable multi-field text/numeric
-ordering and subsequent consecutive or balanced batch membership must survive
-physical rewrites. A later shuffle randomizes within those batches, not across
-their boundaries. See the product direction for sorting modes and batch policies;
-this does not enable new operations in the current engine.
-
-There is no omitted-policy default or runtime policy selector. The earlier
-[Auto reconciliation](adaptive-execution.md#auto-policy-reconciliation-2026-10-28)
-is historical where it discusses seeded replay; the current specification owns
-randomization guarantees.
+Typed pre-emission memory denial falls back on the same retained parent.
+Cancellation, cleanup failures and errors after emission stay terminal.
+The experimental index, terminal direct variants and archived resident buckets
+are outside automatic selection. See the [Chromium calibration](performance/investigations/auto-chromium-thresholds-and-resource-calibration-2026-11-21.md)
+and [Linux fusion evidence](performance/investigations/probabilistic-shuffle-fusion-at-2-gib-2026-11-21.md).
 
 ## Keeping these diagrams current
 

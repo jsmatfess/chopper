@@ -89,6 +89,7 @@ fn stable(analysis: &Analysis) -> Result<Value> {
         "analysis_seconds",
         "timings",
         "diagnostics",
+        "auto_plan",
     ] {
         value.as_object_mut().unwrap().remove(key);
     }
@@ -100,10 +101,13 @@ fn parity(job: Job) -> Result<Analysis> {
     assert_eq!(direct_manifest[0]["type"], "job");
     // Compare parsed wire JSON on both sides; fractional timings can shift by
     // one float step in serde_json's default parser.
-    assert_eq!(
-        direct_manifest[0]["analysis"],
-        serde_json::from_slice::<Value>(&serde_json::to_vec(&direct)?)?
-    );
+    let mut report = serde_json::from_slice::<Value>(&serde_json::to_vec(&direct)?)?;
+    assert!(report
+        .as_object_mut()
+        .unwrap()
+        .remove("auto_plan")
+        .is_some());
+    assert_eq!(direct_manifest[0]["analysis"], report);
     let mut prepared_job = job.clone();
     prepared_job.output.push_str("-prepared");
     let prepared = engine::prepare(

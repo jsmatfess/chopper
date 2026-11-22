@@ -9,6 +9,7 @@ export function percentageUnits(text: string): number | null {
   return Number.isSafeInteger(units) && units <= 100_000_000 ? units : null;
 }
 
+export const GROUP_TOTAL_ERROR = 'Percentages must total exactly 100%.';
 export function groupErrors(groups: Group[]): string[] {
   const names = groups.map(g => g.name);
   const units = groups.map(g => percentageUnits(g.percent));
@@ -17,7 +18,10 @@ export function groupErrors(groups: Group[]): string[] {
   if (names.some(n => !n.trim())) errors.push('Give every group a name.');
   if (new Set(names).size !== names.length) errors.push('Group names must be unique.');
   if (units.some(n => n === null)) errors.push('Use percentages from 0 to 100 with at most 6 decimal places.');
-  else if (units.reduce<number>((sum, n) => sum + n!, 0) !== 100_000_000) errors.push('Percentages must total exactly 100%.');
+  else {
+    const total = units.reduce<number>((sum, n) => sum + n!, 0);
+    if (total !== 100_000_000) errors.push(`${GROUP_TOTAL_ERROR} Current total: ${total / 1_000_000}%.`);
+  }
   return errors;
 }
 

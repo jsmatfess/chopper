@@ -57,6 +57,30 @@ impl Serialize for Snapshot<'_> {
             "peak_temporary_files",
             &(self.ctx.budget.peak_files.load(AtomicOrdering::Relaxed)),
         )?;
+        let count = self
+            .ctx
+            .budget
+            .probabilistic_shuffle_attempts
+            .load(AtomicOrdering::Relaxed);
+        if count != 0 {
+            map.serialize_entry("probabilistic_shuffle_attempts", &count)?;
+        }
+        let count = self
+            .ctx
+            .budget
+            .probabilistic_shuffle_retries
+            .load(AtomicOrdering::Relaxed);
+        if count != 0 {
+            map.serialize_entry("probabilistic_shuffle_retries", &count)?;
+        }
+        let count = self
+            .ctx
+            .budget
+            .indexed_exact_quota_scopes
+            .load(AtomicOrdering::Relaxed);
+        if count != 0 {
+            map.serialize_entry("indexed_exact_quota_scopes", &count)?;
+        }
         map.serialize_entry("grouping_policy", &(self.ctx.grouping))?;
         map.serialize_entry(
             "resident_sorts",

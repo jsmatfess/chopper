@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "id": "probabilistic-fusion-auto-delivery-2026-11-22",
+  "title": "Use the validated probabilistic shuffle fusion in native Linux and hosted Auto",
+  "date": "2026-11-22",
+  "subsystem": "execution",
+  "question": "Can the integrated actual-spill-owner fusion justify opt-in eligibility against the original stages when output and competitor requests are matched?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "The engine applies narrow Linux and Chromium fusion gates using mandatory validated row, payload, and Partition facts. The browser keeps linear quota lookup.",
+  "scope": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Plain-output Partition then probabilistic assignment then Uniform. Gates use the runtime-specific size, group and worker bounds."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Paired verified tests cover the admitted controls. The feature-free hosted contract exercises the integrated decision and caps."
+  },
+  "limitations": [
+    "The narrow guarded runtime envelopes apply to the recorded jobs."
+  ],
+  "exclusions": [
+    "Native Windows and out-of-scope job shapes."
+  ],
+  "reopen_when": null,
+  "supersedes": [
+    "probabilistic-shuffle-fusion-at-2-gib-2026-11-21"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#probabilistic-shuffle-fusion-at-2-gib-2026-11-21",
+      "sha256": "dfcea56ab4ad89393d3f4ce0b8cd549e47fcd1cd5fec5f322f9939fca955bf76"
+    },
+    {
+      "section": "docs/performance.md#auto-chromium-thresholds-and-resource-calibration-2026-11-21",
+      "sha256": "315c2bcf384e078f884b95b8649c7d2b579e6da40ed5d708aec516a807f32400"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/probabilistic-shuffle-fusion-2gib-2026-11-21.json",
+      "sha256": "dde5c51ad0ad57ae40afe2ae21c1e34c72a472e03ed9defce3af09b5538871f1"
+    },
+    {
+      "path": "docs/benchmarks/auto-chromium-thresholds-and-resource-calibration-2026-11-21-summary.json",
+      "sha256": "8775a8fbbd010b8f9bee17044ca66ecc6555ddc949f2e86c6addda7cc7054355"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/execution-decisions.md",
+    "docs/validation.md"
+  ]
+}

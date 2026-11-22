@@ -42,22 +42,143 @@ pub(super) fn counted_eligible(job: &Job) -> bool {
     {
         return false;
     }
-    // An advisory signature peek precedes CSV consumption. Unknown sources use
-    // the existing path and its normal validation/error precedence.
-    let eligible_input = || -> Result<bool> {
-        if !std::fs::metadata(&job.input)?.is_file() {
-            return Ok(false);
-        }
-        let mut file = File::open(&job.input)?;
-        let mut magic = [0; 4];
-        let read = file.read(&mut magic)?;
-        let kind = input_kind(magic, read);
-        Ok(kind.is_none()
+    input_signature(job).is_some_and(|kind| {
+        kind.is_none()
             || (!partition
                 && cfg!(feature = "experimental-counted-zstd-input-balanced")
-                && kind == Some(crate::observation::physical::Kind::ZstandardInput)))
-    };
-    eligible_input().unwrap_or(false)
+                && kind == Some(crate::observation::physical::Kind::ZstandardInput))
+    })
+}
+
+fn input_signature(job: &Job) -> Option<Option<crate::observation::physical::Kind>> {
+    let (header, read) = input_prefix(job)?;
+    Some(input_kind(header[..4].try_into().ok()?, read.min(4)))
+}
+
+fn input_prefix(job: &Job) -> Option<([u8; 18], usize)> {
+    if !std::fs::metadata(&job.input).ok()?.is_file() {
+        return None;
+    }
+    let mut file = File::open(&job.input).ok()?;
+    let mut header = [0; 18];
+    let read = file.read(&mut header).ok()?;
+    Some((header, read))
+}
+
+pub(super) fn native_input_hint(job: &Job) -> Option<(u64, bool)> {
+    use crate::observation::physical::Kind;
+    let (header, read) = input_prefix(job)?;
+    match input_kind(header[..4].try_into().ok()?, read.min(4)) {
+        None => Some((std::fs::metadata(&job.input).ok()?.len(), false)),
+        Some(Kind::ZstandardInput) => Some((
+            zstd::zstd_safe::get_frame_content_size(&header[..read])
+                .ok()
+                .flatten()
+                .unwrap_or(0),
+            true,
+        )),
+        _ => None,
+    }
+}
+
+#[derive(Clone, Copy)]
+pub(super) enum Plan {
+    Streaming,
+    BatchedFanout,
+    Counted {
+        partition: bool,
+        automatic: bool,
+        from_analyze: bool,
+    },
+    Fanout {
+        chain: bool,
+        automatic: bool,
+    },
+}
+
+impl Plan {
+    pub(super) fn route(self) -> auto::Route {
+        match self {
+            Self::Streaming => auto::Route::Streaming,
+            Self::Counted { .. } => auto::Route::Counted,
+            Self::Fanout { .. } | Self::BatchedFanout => auto::Route::BoundedWriters,
+        }
+    }
+    pub(super) fn memory_targets(self) -> [u64; 2] {
+        if matches!(self, Self::BatchedFanout) {
+            [1024, 256]
+        } else {
+            [256, 256]
+        }
+    }
+
+    pub(super) fn ready(self, ctx: &Context) -> bool {
+        const MIB: usize = 1024 * 1024;
+        let (memory, headroom) = match self {
+            Self::BatchedFanout => (1024 * MIB, 511 * MIB as u64),
+            Self::Fanout {
+                automatic: true, ..
+            }
+            | Self::Counted {
+                automatic: true, ..
+            } => (
+                auto::NATIVE_DIRECT_MIN_MEMORY_MB as usize * MIB,
+                auto::NATIVE_DIRECT_HEADROOM_BYTES,
+            ),
+            _ => return true,
+        };
+        ctx.memory >= memory && ctx.working_headroom() >= headroom
+    }
+
+    pub(super) fn uses_analyze(self) -> bool {
+        matches!(
+            self,
+            Self::Counted {
+                from_analyze: true,
+                ..
+            }
+        )
+    }
+
+    pub(super) fn strategy(self) -> Option<auto::Strategy> {
+        match self {
+            Self::Streaming => None,
+            Self::Counted {
+                partition: true, ..
+            } => Some(auto::Strategy::CountedPartitionBalanced),
+            Self::Counted {
+                partition: false, ..
+            } => Some(auto::Strategy::CountedBalanced),
+            Self::Fanout { chain: true, .. } => Some(auto::Strategy::BoundedWriterChain),
+            Self::Fanout { chain: false, .. } => Some(auto::Strategy::BoundedFinalWriters),
+            Self::BatchedFanout => Some(auto::Strategy::BatchedFinalSync),
+        }
+    }
+}
+
+pub(super) fn select(
+    job: &Job,
+    pool: &crate::resources::MemoryPool,
+    hint: Option<auto::AutoObservations>,
+) -> Option<Plan> {
+    if job.operations.is_empty() {
+        return Some(Plan::Streaming);
+    }
+    if counted_eligible(job) {
+        return Some(Plan::Counted {
+            partition: counted_partition_eligible(job),
+            automatic: false,
+            from_analyze: false,
+        });
+    }
+    if fanout_eligible(job) || chain_eligible(job) {
+        return Some(Plan::Fanout {
+            chain: chain_eligible(job),
+            automatic: false,
+        });
+    }
+
+    auto::native_direct_candidate(job, pool, hint)
 }
 
 struct Counted {
@@ -127,18 +248,27 @@ fn count(source: &mut dyn Read, job: &Job, ctx: &Context, partition: bool) -> Re
 
 pub(super) fn run(
     job: Job,
-    cancel: Arc<AtomicBool>,
-    notify: Notify,
-    pool: Arc<crate::resources::MemoryPool>,
-    sink: Option<crate::observation::Sink<'_>>,
-    physical: Option<crate::observation::physical::Sink>,
+    mut ctx: Context,
+    (sink, physical): (
+        Option<crate::observation::Sink<'_>>,
+        Option<crate::observation::physical::Sink>,
+    ),
+    plan: Plan,
+    started: std::time::Instant,
 ) -> Result<output::PublishedAnalysis> {
-    let started = std::time::Instant::now();
-    job.validate()?;
-    let fanout_job = fanout_eligible(&job);
-    let chain_job = chain_eligible(&job);
-    let counted_job = !job.operations.is_empty() && !fanout_job && !chain_job;
-    let counted_partition = counted_job && counted_partition_eligible(&job);
+    let fanout_job = matches!(
+        plan,
+        Plan::Fanout { chain: false, .. } | Plan::BatchedFanout
+    );
+    let chain_job = matches!(plan, Plan::Fanout { chain: true, .. });
+    let counted_job = matches!(plan, Plan::Counted { .. });
+    let counted_partition = matches!(
+        plan,
+        Plan::Counted {
+            partition: true,
+            ..
+        }
+    );
     ensure!(
         !counted_job
             || (counted_output_eligible(&job)
@@ -146,9 +276,20 @@ pub(super) fn run(
                     || matches!(job.operations.as_slice(), [Operation::Balanced { .. }]))),
         "direct count requires one eligible Balanced operation"
     );
-    ensure!(!job.output.is_empty(), "output path is required");
-    let mut ctx = Context::with_memory_pool(&job.resources, cancel, notify, pool)?;
     ctx.physical = physical;
+    ctx.auto_final_writers = matches!(
+        plan,
+        Plan::Fanout {
+            automatic: true,
+            ..
+        } | Plan::Counted {
+            partition: true,
+            automatic: true,
+            ..
+        }
+    );
+    ctx.auto_final_sync = matches!(plan, Plan::BatchedFanout);
+    ctx.auto_final_writers |= ctx.auto_final_sync;
     let mut observer = sink.and_then(|sink| Observer::new(&ctx, sink));
     let job = PreparedJob::admit(job, Reservation::new(&ctx))?;
     ctx.event(
@@ -227,7 +368,7 @@ pub(super) fn run(
         .publish(&job, &analysis, &ctx)
         .map_err(|error| observe_error(&mut observer, true, analysis.rows, error))?;
     observe(&mut observer, true, Status::Completed, analysis.rows, true);
-    Ok(receipt.with_analysis(analysis))
+    Ok(receipt.with_analysis(analysis, &ctx))
 }
 
 fn consume(
@@ -465,7 +606,7 @@ fn consume(
         workers: ctx.workers(), analysis_seconds: 0.0, timings: Default::default(),
         diagnostics: Default::default(), stages, warnings: Warnings::default(),
         accuracy: AnalysisText::copy("Exact row, group, file and uncompressed byte counts; complete strict validation. Compressed sizes and runtime are not guaranteed.", Reservation::new(ctx))?,
-        execution: None,
+        execution: None, auto_plan: None,
     };
     Ok((analysis, publication))
 }

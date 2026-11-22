@@ -8,7 +8,7 @@ use std::{
     io::{BufWriter, Read, Seek, SeekFrom, Write},
     path::Path,
 };
-#[cfg(feature = "experimental-batched-final-sync")]
+#[cfg(target_os = "linux")]
 mod deferred_sync;
 mod deflate;
 mod direct;
@@ -48,12 +48,18 @@ pub struct EnginePublication(());
 pub(crate) struct PublishedAnalysis {
     analysis: crate::engine::Analysis,
     publication: EnginePublication,
+    pub(crate) measurements: crate::engine::auto::RunMeasurements,
 }
 impl EnginePublication {
-    pub(crate) fn with_analysis(self, analysis: crate::engine::Analysis) -> PublishedAnalysis {
+    pub(crate) fn with_analysis(
+        self,
+        analysis: crate::engine::Analysis,
+        ctx: &Context,
+    ) -> PublishedAnalysis {
         PublishedAnalysis {
             analysis,
             publication: self,
+            measurements: ctx.completed_measurements(),
         }
     }
 }
@@ -62,6 +68,7 @@ impl PublishedAnalysis {
         let Self {
             analysis,
             publication: _publication,
+            ..
         } = self;
         analysis
     }
@@ -135,7 +142,7 @@ impl PublicationWriter {
             _buffer: buffer,
         })
     }
-    #[cfg(feature = "experimental-batched-final-sync")]
+    #[cfg(target_os = "linux")]
     fn into_file(mut self) -> Result<File> {
         self.writer.flush()?;
         let Self { writer, _buffer } = self;
@@ -323,7 +330,9 @@ impl<'a> PlanWriter<'a> {
             Reservation::new(ctx),
             || {
                 Ok(EncodedTarget::Direct(
-                    if cfg!(feature = "experimental-single-final-catalog") && single_chunk {
+                    if (ctx.auto_final_sync || cfg!(feature = "experimental-single-final-catalog"))
+                        && single_chunk
+                    {
                         DirectPublication::grouped_single(job, header, ctx)?
                     } else {
                         DirectPublication::grouped_with_catalog(job, header, ctx, capacity)?
@@ -334,11 +343,12 @@ impl<'a> PlanWriter<'a> {
         let EncodedTarget::Direct(target) = &mut result.target else {
             unreachable!("direct constructor");
         };
-        target.buffer_capacity = if cfg!(feature = "experimental-small-final-buffers") {
-            16 * 1024
-        } else {
-            PUBLICATION_BUFFER
-        };
+        target.buffer_capacity =
+            if ctx.auto_final_sync || cfg!(feature = "experimental-small-final-buffers") {
+                16 * 1024
+            } else {
+                PUBLICATION_BUFFER
+            };
         Ok(result)
     }
     fn with_target(
@@ -723,7 +733,7 @@ impl Write for ObservedSink {
     }
 }
 impl ObservedSink {
-    #[cfg(feature = "experimental-batched-final-sync")]
+    #[cfg(target_os = "linux")]
     fn finish_deferred(self) -> Result<File> {
         let Self { inner, observation } = self;
         ensure!(
@@ -866,6 +876,22 @@ fn write_chunk(
         crc: crc.finalize(),
     })
 }
+fn auto_plain_publication_workers(job: &Job, bytes: u64, files: u64, workers: usize) -> usize {
+    // The competing Partition jobs used four workers, 1,152 files and
+    // at least 2 GiB of already validated, serialized output.
+    if cfg!(any(target_os = "linux", windows))
+        && job.compression == Compression::None
+        && matches!(job.operations.as_slice(), [Operation::Partition { .. }])
+        && bytes >= 2 * 1024 * 1024 * 1024
+        && files >= 1_152
+        && workers >= 4
+    {
+        4
+    } else {
+        1
+    }
+}
+
 pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
     let Prepared {
         job,
@@ -911,12 +937,16 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
     let mut processed = 0;
     // Reuse the compressed-publication worker/memory ceiling. Every live task
     // still admits its own buffers, decoded lineage and retained result owners.
-    let parallel_plain = cfg!(all(
+    let experimental_plain = cfg!(all(
         feature = "experimental-plain-publication",
         not(target_family = "wasm")
     )) && job.compression == Compression::None;
-    let concurrency = if job.compression == Compression::None && !parallel_plain {
-        1
+    let concurrency = if job.compression == Compression::None && !experimental_plain {
+        if ctx.auto_run {
+            auto_plain_publication_workers(job, output_plan.bytes, output_plan.files, ctx.workers())
+        } else {
+            1
+        }
     } else {
         ctx.workers()
             .min((ctx.memory / (16 * 1024 * 1024 + 2 * ctx.max_record)).max(1))
@@ -929,7 +959,9 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
         }
         // A one-file or final partial plain batch needs no unused task slots.
         // Keep a slot for the existing catalog/plan disagreement error path.
-        let batch_limit = if parallel_plain {
+        let batch_limit = if ctx.auto_run && !experimental_plain {
+            ctx.publication_writer_limit(concurrency, output_plan.files.saturating_sub(files))
+        } else if experimental_plain {
             concurrency.min(
                 usize::try_from(output_plan.files.saturating_sub(files))
                     .unwrap_or(usize::MAX)
@@ -963,6 +995,9 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
         }
         if batch.tasks.is_empty() {
             break;
+        }
+        if ctx.auto_run {
+            ctx.bounded_writer_slots(batch.tasks.len());
         }
         ctx.for_each_batch(&mut batch.tasks, |task| {
             task.completed = Some(write_chunk(

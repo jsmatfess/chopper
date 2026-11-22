@@ -39,6 +39,10 @@ impl<'a> QuotaCursor<'a> {
         Self { quota, first_step }
     }
 
+    pub(in crate::engine) fn is_indexed(&self) -> bool {
+        self.first_step != 0
+    }
+
     #[inline]
     pub(in crate::engine) fn take(&mut self, mut draw: u64) -> usize {
         if self.first_step == 0 {
@@ -104,6 +108,7 @@ mod tests {
             pool.clone(),
             None,
             false,
+            None,
             |job, ctx, partitions, balanced, streaming| {
                 visits += 1;
                 with_input(job, Reservation::new(ctx), |mut source| {

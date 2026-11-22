@@ -6,7 +6,7 @@ import {ExecutionDag,edgePath,DAG_NODE_WIDTH,DAG_NODE_HEIGHT,type DagFrame} from
 import {ExecutionEvents,MAX_EXECUTION_EVENTS,eventKinds,stepSlot,type ExecutionEvent} from './execution-events';
 import {PHYSICAL_ID_BASE,MAX_PHYSICAL_STEPS,physicalTitles,type PhysicalSummary} from './physical-history';
 import type {Job} from '../app';
-import {ExecutionTiming,MAX_TIMING_WINDOWS,validTiming,type TimingWindow} from './execution-timing';
+import {ExecutionTiming,TimingGapLog,TimingGapWriter,MAX_TIMING_WINDOWS,validTiming,type TimingWindow} from './execution-timing';
 import {ExecutionTimeline,type TimelineRow} from './execution-timeline';
 export type StepStatus='unknown'|'active'|'completed'|'interrupted'|'failed'|'handed_off';
 export type Measurement={status:StepStatus;rows?:number;seconds?:number;files?:number};
@@ -32,11 +32,20 @@ export class ExecutionHistory {
   processingComplete=false;
   readonly completedStages=new Set<number>();
   readonly timeline=new Map<number,TimingWindow>();
+  readonly timingGaps=new TimingGapLog();
   private timelineClock=0;
   private timelineReceived=0;
   private timelineStopped:number|null=null;
   timelineNow(now=performance.now()):TimelineSeconds{
     return timelineSeconds(this.timelineStopped??(this.timeline.size?this.timelineClock+(this.active&&!this.steps.some(step=>step.id===3&&step.status==='completed')?Math.max(0,(now-this.timelineReceived)/1000):0):0));
+  }
+  addTimingGapBlock(run:number,buffer:unknown){
+    if(run!==this.run)return false;
+    if(!this.timingGaps.add(buffer))this.unavailable=true;
+    if(this.active)return false;
+    if(!this.timingGaps.read(Infinity))this.unavailable=true;
+    this.timelineStopped=Math.max(this.timelineNow(),this.timingGaps.last);
+    this.revision++;return true;
   }
   interruptedAs:'interrupted'|'unknown'='unknown';
   constructor(readonly run:number,job:Job){
@@ -99,19 +108,23 @@ export class ExecutionHistory {
       const clock=observation.timeline_seconds;
       if(!Number.isFinite(clock)||clock!<0||!Array.isArray(observation.timeline)||observation.timeline.length>MAX_TIMING_WINDOWS){this.unavailable=true;return;}
       if(clock!<this.timelineClock)return;
+      if(!this.timingGaps.read(clock!))this.unavailable=true;
+      const received=performance.now(),displayed=this.timelineNow(received);
       for(const value of observation.timeline){
         if(!validTiming(value,clock!)){this.unavailable=true;continue;}
         if(!this.steps.some(step=>step.id===value.step))continue;
         const prior=this.timeline.get(value.step);if(prior&&prior.last>value.last)continue;
-        this.timeline.set(value.step,{step:value.step,start:prior?prior.start:value.start,last:value.last,status:value.status==='active'&&!this.active?this.interruptedAs:value.status});
+        if(prior&&prior.start!==value.start){this.unavailable=true;continue;}
+        const {step,start,last,status}=value;
+        this.timeline.set(step,{step,start,last,status});
       }
-      const displayed=this.timelineNow();
-      this.timelineClock=clock!;this.timelineReceived=performance.now()-Math.max(0,displayed-clock!)*1000;
+      this.timelineClock=clock!;this.timelineReceived=received-Math.max(0,displayed-clock!)*1000;
       if(this.timelineStopped!==null)this.timelineStopped=Math.max(this.timelineStopped,clock!);
     }
   }
   interrupt(status:'interrupted'|'unknown'){
-    this.timelineStopped=this.timelineNow();
+    if(!this.timingGaps.read(Infinity))this.unavailable=true;
+    this.timelineStopped=Math.max(this.timelineNow(),this.timingGaps.last);
     this.revision++;this.interruptedAs=status;
     if(this.active&&status==='unknown'&&(!this.steps.length||this.steps.some(step=>step.status==='active')))this.unavailable=true;
     this.active=false;
@@ -123,11 +136,17 @@ export class ExecutionHistory {
 export class ObservationDelivery {
   private latest:Observation={};
   private readonly events=new ExecutionEvents();
-  private readonly timing=new ExecutionTiming();
+  private readonly timing:ExecutionTiming;
   recordPhysical(fact:import('./physical-history').PhysicalFact){if(!this.disabled){this.events.physical(fact);if(fact.kind!=='omitted')this.timing.record(fact.id,fact.status,fact.attempt);}}
   private dirty=false;
   disabled=false;
-  constructor(private run:number,private credit:Int32Array,private send:(message:unknown)=>void){}
+  get unavailable(){return !!this.latest.unavailable;}
+  constructor(private run:number,private credit:Int32Array,private send:(message:unknown)=>void){
+    const gaps=new TimingGapWriter(buffer=>send({timingGapBlock:buffer,observationRun:run}));
+    this.timing=new ExecutionTiming((step,end,resume)=>{
+      try{gaps.record(step,end,resume);}catch{this.latest.unavailable=true;this.disabled=true;}
+    });
+  }
   update(observation:Observation){
     if(this.disabled)return;
     if(this.dirty)this.latest.deliveryCoalesced=true;
@@ -173,6 +192,7 @@ function stageFinished(history:ExecutionHistory,step:ObservedStep){
 
 export function displayStepStatus(history:ExecutionHistory,step:ObservedStep):string{
  if(step.kind&&!stageFinished(history,step)&&['completed','handed_off'].includes(step.status))return history.active?'in_progress':history.interruptedAs;
+ if(step.kind&&step.status==='interrupted'&&history.active&&!stageFinished(history,step))return 'in_progress';
  return step.status==='active'?'in_progress':step.status;
 }
 
@@ -293,13 +313,21 @@ function category(step:ObservedStep){
  if(['materialize','dataset_materialize','spill','merge','hierarchical_merge'].includes(step.kind||''))return 'storage';
  return step.kind==='elided'?'annotation':'transform';
 }
+function syncGraphZoom(){
+ const slider=panel!.querySelector<HTMLInputElement>('[data-graph-zoom]')!;
+ const percent=Math.round(zoom*100);
+ slider.value=String(percent);
+ slider.setAttribute('aria-valuetext',zoom<.01?'Less than 1%':`${percent}%`);
+ panel!.querySelector<HTMLInputElement>('[data-auto-fit]')!.checked=autoFit;
+ panel!.querySelector<HTMLElement>('.execution-stage')!.style.setProperty('--dag-zoom',String(zoom));
+}
 function renderDag(history:ExecutionHistory,frame:DagFrame){
  const stage=panel!.querySelector<HTMLElement>('.execution-stage')!,canvas=panel!.querySelector<HTMLElement>('.execution-canvas')!;
  stage.classList.toggle('is-list',listView);
  const viewport=panel!.querySelector<HTMLElement>('.execution-viewport')!;
  if(autoFit&&!listView&&viewport.clientWidth)zoom=Math.min(1,Math.max(1,viewport.clientWidth-20)/frame.width);
- panel!.querySelector<HTMLInputElement>('[data-auto-fit]')!.checked=autoFit;viewport.dataset.navigation=autoFit?'fit':'manual';
- stage.style.setProperty('--dag-width',`${frame.width}px`);stage.style.setProperty('--dag-height',`${frame.height}px`);stage.style.setProperty('--dag-zoom',String(zoom));
+ stage.style.setProperty('--dag-width',`${frame.width}px`);stage.style.setProperty('--dag-height',`${frame.height}px`);
+ syncGraphZoom();
 
  const svg=canvas.querySelector<SVGSVGElement>('.execution-dag-edges')!;
  if(drawnRevision!==frame.revision){
@@ -329,16 +357,6 @@ function renderDag(history:ExecutionHistory,frame:DagFrame){
   for(const path of edges.values())path.classList.toggle('is-related',matching.has(Number(path.dataset.source))||matching.has(Number(path.dataset.target)));
  }
  panel!.querySelector<HTMLElement>('.execution-zoom-controls')!.hidden=listView||timelineView;
- panel!.querySelector('output')!.textContent=`${Math.round(zoom*100)}%`;
- for(const button of panel!.querySelectorAll<HTMLButtonElement>('[data-zoom]'))button.onclick=()=>{
-  if(button.dataset.zoom==='fit'){
-   dag=new ExecutionDag();drawnRevision=-1;frame=dag.update(dagInput(history));
-   const viewport=panel!.querySelector<HTMLElement>('.execution-viewport')!;
-   zoom=Math.min(1,Math.max(1,viewport.clientWidth-20)/frame.width);
-   viewport.scrollTop=0;viewport.scrollLeft=0;
-  }else {autoFit=false;zoom=Math.max(.2,Math.min(1.5,zoom+(button.dataset.zoom==='in'?.15:-.15)));}
-  renderDag(history,frame);
- };
  if(listView){
   const list=panel!.querySelector('.execution-list')!,focused=document.activeElement as HTMLElement;
   const ordered=[...cards].sort(([a],[b])=>{const x=frame.positions.get(a)!,y=frame.positions.get(b)!;return x.column-y.column||x.row-y.row;}).map(([,card])=>card);
@@ -348,26 +366,31 @@ function renderDag(history:ExecutionHistory,frame:DagFrame){
 }
 
 function bindGraphNavigation(viewport:HTMLElement){
- viewport.tabIndex=0;viewport.setAttribute('role','region');viewport.setAttribute('aria-label','Execution graph. Scroll to zoom; drag the background to pan. Arrow keys scroll.');
- let drag:{id:number;x:number;y:number;left:number;top:number}|null=null;
- const draw=()=>{if(shownHistory)renderDag(shownHistory,dag.update(dagInput(shownHistory)));};
- viewport.addEventListener('wheel',event=>{
-  if(listView||timelineView||!shownHistory||!event.deltaY)return;
-  event.preventDefault();const rect=viewport.getBoundingClientRect(),x=event.clientX-rect.left,y=event.clientY-rect.top,previous=zoom,left=viewport.scrollLeft,top=viewport.scrollTop;
-  autoFit=false;zoom=Math.max(.2,Math.min(1.5,zoom*Math.exp(-event.deltaY*(event.deltaMode===1?.035:event.deltaMode===2?1:.002))));
-  draw();viewport.scrollLeft=(left+x)*zoom/previous-x;viewport.scrollTop=(top+y)*zoom/previous-y;
- },{passive:false});
+ viewport.tabIndex=0;viewport.setAttribute('role','region');viewport.setAttribute('aria-label','Execution graph. Drag the background or use left and right arrow keys to pan.');
+ let drag:{id:number;x:number;y:number;left:number}|null=null;
+ let dragged=false;
  viewport.addEventListener('pointerdown',event=>{
-  if(listView||timelineView||event.button!==0||event.pointerType!=='mouse'||(event.target as Element).closest('button,a,input,select'))return;
-  drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:viewport.scrollLeft,top:viewport.scrollTop};viewport.setPointerCapture(event.pointerId);
+  if(!event.isPrimary||event.button!==0)return;
+  dragged=false;
+  if(listView||timelineView||event.pointerType!=='mouse'||(event.target as Element).closest('button,a,input,select'))return;
+  drag={id:event.pointerId,x:event.clientX,y:event.clientY,left:viewport.scrollLeft};viewport.setPointerCapture(event.pointerId);
  });
  viewport.addEventListener('pointermove',event=>{
   if(!drag||event.pointerId!==drag.id)return;
   if(!viewport.classList.contains('is-panning')&&Math.hypot(event.clientX-drag.x,event.clientY-drag.y)<4)return;
-  if(!viewport.classList.contains('is-panning')){autoFit=false;draw();viewport.classList.add('is-panning');}viewport.scrollLeft=drag.left+drag.x-event.clientX;viewport.scrollTop=drag.top+drag.y-event.clientY;
+  if(!viewport.classList.contains('is-panning')){dragged=true;viewport.classList.add('is-panning');}
+  viewport.scrollLeft=drag.left+drag.x-event.clientX;
  });
  viewport.addEventListener('pointerup',event=>{if(viewport.hasPointerCapture(event.pointerId))viewport.releasePointerCapture(event.pointerId);});
  viewport.addEventListener('lostpointercapture',()=>{drag=null;viewport.classList.remove('is-panning');});
+ viewport.addEventListener('click',event=>{
+  // A pan can produce a click after pointer capture has already been released.
+  if(dragged){dragged=false;return;}
+  if(listView||timelineView||(event.target as Element).closest('button,a,input,select'))return;
+  if(selectedStep===null&&selectedOperation===null)return;
+  selectedStep=null;selectedOperation=null;renderedRevision=-1;
+  if(shownHistory)renderExecutionHistory(shownHistory);
+ });
 }
 
 function operationsFor(step:ObservedStep){return step.operations??(step.operation?[step.operation]:[]);}
@@ -375,26 +398,30 @@ export function renderExecutionHistory(history:ExecutionHistory|null){
  if(!history){shownHistory=null;updateTimelineTimer();return;}shownHistory=history;
  if(!panel){
   panel=document.createElement('details');panel.id='execution-history';panel.className='card';panel.style.setProperty('--dag-node-width',`${DAG_NODE_WIDTH}px`);panel.style.setProperty('--dag-node-height',`${DAG_NODE_HEIGHT}px`);
-  panel.innerHTML='<summary></summary><div class="execution-flow" aria-label="Configured Run operations"></div><p class="execution-note"></p><div class="execution-controls" role="toolbar" aria-label="Execution view controls" focusgroup="toolbar wrap"><span class="execution-view-switch" role="group" aria-label="View"><button type="button" data-view="graph">Graph view</button><button type="button" data-view="list">List view</button><button type="button" data-view="timeline">Timeline view</button></span><span class="execution-control-divider" role="separator" aria-orientation="vertical"></span><span class="execution-zoom-controls" role="group" aria-label="Zoom"><label class="execution-auto-fit"><input type="checkbox" data-auto-fit checked>Auto-fit</label><button type="button" data-zoom="out" aria-label="Zoom out" title="Zoom out">−</button><output aria-label="Graph zoom">100%</output><button type="button" data-zoom="in" aria-label="Zoom in" title="Zoom in">+</button><button type="button" data-zoom="fit">Fit graph</button></span></div><span class="sr-only" id="execution-operation-match">Matches the selected configured operation.</span><div class="execution-map-heading"><span>Observed execution</span><span class="execution-navigation-hint">Scroll to zoom · Drag to pan</span></div><div class="execution-viewport"><div class="execution-stage"><div class="execution-canvas"><svg class="execution-dag-edges" aria-hidden="true"><defs><marker id="execution-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" markerUnits="userSpaceOnUse" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8ba69d"></path></marker></defs></svg><ol class="execution-list execution-graph" aria-label="Observed execution steps"></ol></div></div></div><div class="execution-timeline" hidden></div><section class="execution-inspector" aria-label="Selected execution step"><p>Select a step or configured operation.</p></section>';
+  panel.innerHTML='<summary></summary><div class="execution-flow" aria-label="Configured Run operations"></div><p class="execution-note"></p><div class="execution-controls" role="toolbar" aria-label="Execution view controls"><span class="execution-view-switch" role="group" aria-label="View" focusgroup="toolbar wrap"><button type="button" data-view="graph">Graph view</button><button type="button" data-view="list">List view</button><button type="button" data-view="timeline">Timeline view</button></span><span class="execution-control-divider" role="separator" aria-orientation="vertical"></span><span class="execution-zoom-controls" role="group" aria-label="Graph controls"><label class="execution-auto-fit"><input type="checkbox" data-auto-fit checked>Auto-fit</label><label class="execution-zoom">Zoom<input type="range" data-graph-zoom min="1" max="150" step="1" value="100"></label></span></div><span class="sr-only" id="execution-operation-match">Matches the selected configured operation.</span><div class="execution-map-heading"><span>Observed execution</span><span class="execution-navigation-hint">Drag sideways to pan</span></div><div class="execution-viewport"><div class="execution-stage"><div class="execution-canvas"><svg class="execution-dag-edges" aria-hidden="true"><defs><marker id="execution-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" markerUnits="userSpaceOnUse" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8ba69d"></path></marker></defs></svg><ol class="execution-list execution-graph" aria-label="Observed execution steps"></ol></div></div></div><div class="execution-timeline" hidden></div><section class="execution-inspector" aria-label="Selected execution step"><p>Select a step or configured operation.</p></section>';
   panel.querySelector<HTMLElement>('.execution-map-heading')!.title='Arrows show observed data dependencies, not parallel workers.';
   if(document.body.classList.contains('hosted-workspace'))(document.querySelector('.execution-pane')??document.querySelector('.editor'))!.append(panel);
   else document.querySelector('.editor')!.prepend(panel);
   bindGraphNavigation(panel.querySelector<HTMLElement>('.execution-viewport')!);
+  panel.querySelector<HTMLInputElement>('[data-graph-zoom]')!.oninput=event=>{
+   autoFit=false;zoom=(event.target as HTMLInputElement).valueAsNumber/100;syncGraphZoom();
+  };
   motionObserver=new IntersectionObserver(entries=>{for(const entry of entries)(entry.target as HTMLElement).dataset.motionVisible=String(entry.isIntersecting);},{threshold:.1});
   const motionButton=document.createElement('button');motionButton.type='button';motionButton.className='execution-motion-toggle';
   let motionPaused=false;const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
   const syncMotion=()=>{panel!.dataset.motionEnabled=String(!motionPaused&&!reducedMotion.matches&&!document.hidden);motionButton.disabled=reducedMotion.matches;motionButton.textContent=reducedMotion.matches?'Reduced motion':motionPaused?'Resume motion':'Pause motion';};
   motionButton.onclick=()=>{motionPaused=!motionPaused;syncMotion();};reducedMotion.addEventListener('change',syncMotion);document.addEventListener('visibilitychange',syncMotion);syncMotion();
   const toolbar=panel.querySelector<HTMLElement>('[role="toolbar"]')!;
-  toolbar.append(motionButton);
+  const viewSwitch=toolbar.querySelector<HTMLElement>('.execution-view-switch')!;
+  toolbar.querySelector('.execution-zoom-controls')!.append(motionButton);
   const icons:Record<string,string>={graph:'<rect x="3" y="3" width="6" height="5" rx="1"/><rect x="15" y="16" width="6" height="5" rx="1"/><path d="M6 8v10h9"/>',list:'<path d="M9 5h12M9 12h12M9 19h12M3 5h1M3 12h1M3 19h1"/>',timeline:'<path d="M4 3v18M4 7h9M9 12h11M14 17h7"/>'};
   for(const button of toolbar.querySelectorAll<HTMLButtonElement>('[data-view]')){const icon=document.createElementNS(svgNamespace,'svg');icon.setAttribute('viewBox','0 0 24 24');icon.setAttribute('aria-hidden','true');icon.innerHTML=icons[button.dataset.view!];button.prepend(icon);}
   // Native focusgroup owns keyboard navigation where supported.
   if(!('focusGroup' in HTMLElement.prototype)){
-   const controls=()=>[...toolbar.querySelectorAll<HTMLElement>('button,input')].filter(button=>!button.closest('[hidden]')&&!button.matches(':disabled'));
-   controls().forEach((button,index)=>button.tabIndex=index?-1:0);
-   toolbar.addEventListener('focusin',event=>{for(const button of controls())button.tabIndex=button===event.target?0:-1;});
-   toolbar.addEventListener('keydown',event=>{if(event.altKey||event.ctrlKey||event.metaKey)return;const buttons=controls(),index=buttons.indexOf(document.activeElement as HTMLElement),direction=getComputedStyle(toolbar).direction==='rtl'?-1:1;
+   const buttons=[...viewSwitch.querySelectorAll('button')];
+   buttons.forEach((button,index)=>button.tabIndex=index?-1:0);
+   viewSwitch.addEventListener('focusin',event=>{for(const button of buttons)button.tabIndex=button===event.target?0:-1;});
+   viewSwitch.addEventListener('keydown',event=>{if(event.altKey||event.ctrlKey||event.metaKey)return;const index=buttons.indexOf(event.target as HTMLButtonElement),direction=getComputedStyle(viewSwitch).direction==='rtl'?-1:1;
     const next=event.key==='Home'?0:event.key==='End'?buttons.length-1:event.key==='ArrowRight'?(index+direction+buttons.length)%buttons.length:event.key==='ArrowLeft'?(index-direction+buttons.length)%buttons.length:-1;
     if(index>=0&&next>=0){event.preventDefault();buttons[next].focus();}
    });
@@ -419,6 +446,7 @@ export function renderExecutionHistory(history:ExecutionHistory|null){
    const button=document.createElement('button'),index=document.createElement('span'),label=document.createElement('span'),text=document.createElement('span'),strategy=document.createElement('span');button.type='button';button.dataset.operation=String(item.id);button.title=configuredLabel(item.label);button.setAttribute('aria-label',configuredLabel(item.label));
    index.className='execution-flow-index';index.textContent=String(item.id).padStart(2,'0');label.className='execution-flow-label';
    const kind=item.label.replace(/^\d+\. /,'').split(/[ (]/)[0];label.textContent=kind==='CSV'?'CSV output':operationName(kind);
+   if(kind!=='CSV')index.dataset.planColor=operationColor(kind);
    strategy.className='execution-flow-strategy';strategy.id=`execution-strategy-${item.id}`;text.className='execution-flow-text';text.append(label,strategy);
    button.append(index,text);button.onclick=()=>{selectedOperation=item.id;selectedStep=null;redraw();};flow.append(button);
   }
@@ -436,14 +464,21 @@ export function renderExecutionHistory(history:ExecutionHistory|null){
  }
  for(const button of panel.querySelectorAll<HTMLButtonElement>('[data-view]')){button.setAttribute('aria-pressed',String(button.dataset.view===(timelineView?'timeline':listView?'list':'graph')));button.onclick=()=>{listView=button.dataset.view==='list';timelineView=button.dataset.view==='timeline';redraw();};}
  panel.querySelector<HTMLElement>('.execution-note')!.hidden=!history.unavailable&&!history.configurationOmitted;
- panel.querySelector<HTMLInputElement>('[data-auto-fit]')!.onchange=event=>{autoFit=(event.target as HTMLInputElement).checked;redraw();};
+ panel.querySelector<HTMLInputElement>('[data-auto-fit]')!.onchange=event=>{
+  autoFit=(event.target as HTMLInputElement).checked;
+  if(autoFit){dag=new ExecutionDag();drawnRevision=-1;panel!.querySelector('.execution-viewport')!.scrollLeft=0;}
+  redraw();
+ };
  panel.querySelector<HTMLButtonElement>('.execution-motion-toggle')!.hidden=listView||timelineView;panel.querySelector<HTMLElement>('.execution-navigation-hint')!.hidden=listView||timelineView;
  const list=panel.querySelector('.execution-list')!;list.classList.toggle('execution-graph',!listView);list.classList.toggle('execution-list-view',listView);
  for(const step of history.steps){
   let card=cards.get(step.id);
-  if(!card){card=document.createElement('li');card.dataset.step=String(step.id);const button=document.createElement('button');button.type='button';button.innerHTML='<span class="execution-node-context"></span><strong class="execution-node-title"></strong><span class="execution-node-detail"></span><span class="execution-node-meta"><span class="execution-node-status"></span></span>';button.onclick=()=>{selectedStep=step.id;selectedOperation=null;redraw();};card.append(button);cards.set(step.id,card);list.append(card);motionObserver?.observe(card);}
+  if(!card){card=document.createElement('li');card.dataset.step=String(step.id);const button=document.createElement('button');button.type='button';button.innerHTML='<span class="execution-node-context"></span><strong class="execution-node-title"></strong><span class="execution-node-detail"></span><span class="execution-node-meta"><span class="execution-node-status"></span></span>';button.onclick=()=>{selectedStep=!listView&&selectedStep===step.id?null:step.id;selectedOperation=null;redraw();};card.append(button);cards.set(step.id,card);list.append(card);motionObserver?.observe(card);}
   const button=card.firstElementChild as HTMLButtonElement,text=describeStep(history,step)+(operationsFor(step).length?'':' · Supporting work');
-  button.setAttribute('aria-label',text);
+  const attempts=step.attempts??0,hasOpenAttempt=(step.last_attempt??0)>(step.last_terminal??0);
+  const repeated=attempts+Number(hasOpenAttempt)>1;
+  card.toggleAttribute('data-repeated',repeated);
+  button.setAttribute('aria-label',text+(repeated?' · Repeated work':''));
   button.dataset.planTargets=operationsFor(step).length?operationsFor(step).map(id=>id===history.configured.at(-1)!.id?'output':`step-${id-1}`).join(' '):category(step)==='input'?'input':['output','export','confirm'].includes(category(step))?'output':'resources';
   const title=button.querySelector('.execution-node-title')!,detail=button.querySelector('.execution-node-detail')!;
   if(title.textContent!==step.title)title.textContent=step.title;
@@ -467,7 +502,7 @@ export function renderExecutionHistory(history:ExecutionHistory|null){
  panel.querySelector<HTMLElement>('.execution-timeline')!.hidden=!timelineView;
  panel.querySelector('.execution-map-heading span')!.textContent=timelineView?'Observed timeline':'Observed execution';
  if(timelineView){
-  timelineRows=history.steps.map(step=>({id:step.id,title:step.title,color:operationColor(history.configured.find(op=>op.id===operationsFor(step)[0])?.label.replace(/^\d+\. /,'').split(/[ (]/)[0]??''),group:cards.get(step.id)?.querySelector('.execution-node-context')?.textContent??'',status:displayStepStatus(history,step),seconds:step.seconds==null?null:workSeconds(stepMetrics(step).seconds),window:history.timeline.get(step.id),selected:step.id===selectedStep,matching:selectedOperation!==null&&operationsFor(step).includes(selectedOperation),targets:(cards.get(step.id)?.firstElementChild as HTMLElement)?.dataset.planTargets??''}));
+  timelineRows=history.steps.map(step=>({id:step.id,title:step.title,color:operationColor(history.configured.find(op=>op.id===operationsFor(step)[0])?.label.replace(/^\d+\. /,'').split(/[ (]/)[0]??''),group:cards.get(step.id)?.querySelector('.execution-node-context')?.textContent??'',status:displayStepStatus(history,step),seconds:step.seconds==null?null:workSeconds(stepMetrics(step).seconds),window:history.timeline.get(step.id),gaps:history.timingGaps.byStep.get(step.id),selected:step.id===selectedStep,matching:selectedOperation!==null&&operationsFor(step).includes(selectedOperation),targets:(cards.get(step.id)?.firstElementChild as HTMLElement)?.dataset.planTargets??''}));
   if(panel.open&&!document.hidden)refreshTimeline();
  }
  updateTimelineTimer();

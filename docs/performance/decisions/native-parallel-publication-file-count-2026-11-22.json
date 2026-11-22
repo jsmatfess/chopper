@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "native-parallel-publication-file-count-2026-11-22",
+  "date": "2026-11-22",
+  "title": "Retain native parallel publication after the high-file-count holdout",
+  "subsystem": "output",
+  "question": "Does the native plain publication opt-in save whole-job time with realistic input and more output files?",
+  "disposition": "retain-experimental",
+  "delivery": "opt-in",
+  "outcome": "favorable",
+  "summary": "The existing native four-slot opt-in clears the elapsed and CPU gates at 1,152 output files on Linux/WSL and native Windows, and at 192 files in the Linux control.",
+  "scope": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "workloads": [
+      "2 GiB plain snapshot Partition on WSL ext4 and Windows NTFS."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "summary": "Twelve jobs verified exact groups, per-key order, caps, conservation, atomic output and cleanup."
+  },
+  "limitations": [
+    "One physical host, one workload family and four configured workers."
+  ],
+  "exclusions": [
+    "Generic worker or file-count Auto promotion and physical throughput."
+  ],
+  "reopen_when": "Calibrate pressure and concurrent owner behavior for a proposed automatic selector.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#input-prefetch-native-publication-and-digest-overlap-2026-11-22",
+      "sha256": "4fee88c77d308d299822d4b3981f8b7f8ca692e636fd7a7fea83796ceea976f0"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-publication.jsonl",
+      "sha256": "7ba1d3cdf49ac17c14965bd7503ec218e46c95e6987b1c786a20e043c106b2a7"
+    },
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-publication-coarse.jsonl",
+      "sha256": "6fec21a14e59982ed4288be672abe76a9cff8ee76367d2910e6de74619e19abb"
+    },
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-windows-publication.jsonl",
+      "sha256": "0f9f82e7a5cb3cf771daf5f0069b9a1e557e6e3460116853cc68ba4e1a9f6b8a"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/browser.md"
+  ]
+}

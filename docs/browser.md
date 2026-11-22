@@ -21,6 +21,16 @@ The link is a user entry point; this documentation does not assert a current
 deployment identity. Historical deployment evidence is scoped to its recorded
 source, browser and fixtures.
 
+The hosted form starts in **Auto**. Open **Advanced** to change working memory,
+workers, grouping, or the shuffle algorithm. Switching to Auto asks the engine
+to choose these settings. Switching back restores the advanced draft. Output
+caps and safety limits apply in both modes. Importing a job with explicit
+execution settings opens Advanced.
+
+**Results → Auto plan** shows the resource settings, actual strategy,
+writer slots and retries. Run validates its current input and can use the
+calibrated shuffle fusion without Analyze. A completed Analyze remains optional.
+
 ## Local development
 
 Use desktop Chrome or Edge. The application requires a secure context (HTTPS or localhost), File System Access, OPFS, Web Locks, and cross-origin isolation. The supplied server and Cloudflare `_headers` configure isolation. Opening `index.html` directly will not work.
@@ -57,6 +67,16 @@ npm.cmd --prefix ui run serve:hosted
 On Linux, run `rustup target add wasm32-wasip1`, set `WASI_SDK_PATH`, then run `node scripts/build-browser.mjs`, `npm --prefix ui ci`, `npm --prefix ui run build:hosted`, and `npm --prefix ui run serve:hosted`. `npm --prefix ui run build` is an alias for `build:hosted`. Native CLI builds do not need Node or a generated UI bundle.
 
 Open **http://127.0.0.1:8421/**. Browse for an input and an output parent folder, configure the pipeline and choose Run. Analyze is optional and returns input statistics and estimates; Run validates the current configuration independently. Results go into a new `chopper-results-<UUID>` subdirectory. A `CHOPPER-COMPLETE.json` marker is written only after every result file has closed successfully.
+
+A hosted Run with a selected `.csv` file and plain output can prefetch
+one 256 KiB source window for an empty pipeline or a single Partition. With
+an empty pipeline, the storage worker also batches adjacent writes to the
+current file in one 1 MiB block. The two shared slots and the worker buffers have a combined
+live capacity of 2.5 MiB plus 24 control bytes, outside the WASI working-memory
+reservations. A rejected source prefetch falls back to the current synchronous
+read. Destination errors fail Run before completion. The storage worker waits
+for outstanding operations before aborting open streams and cleaning incomplete
+results. See the [publication contract](direct-execution.md).
 
 For large local benchmark jobs, use a persistent browser profile. The external
 comparison harness now does so explicitly. On the recorded Chromium build,
@@ -105,11 +125,11 @@ strategies remain `uniform`, `auto` and `fisher_yates`; see the
 
 The original operations and the explicit probabilistic allocation, interleaved split and Fisher–Yates options, plus all native CSV encodings/dialects, gzip, ZIP, and Zstandard use the existing Rust implementation. Exact allocation and grouping semantics are preserved. There is no reproducibility checkbox or seeded-output policy; randomized output may change across execution plans and resource budgets. There is no seed field in the form or exported Job. Older jobs containing `seed` are rejected with a removal message. Results show the algorithm version. Resources contains one expandable resource-budget section. See the [seed contract](specification.md#shuffling-and-seeds). ZIP output remains one archive containing all CSV chunks.
 
-Charged allocations in one WASI engine instance now share a 1 GiB aggregate admission ledger across profiling, cached/returned profiles, preparation and execution. Per-job numeric or opt-in `"auto"` budgets still apply; automatic selection observes this instance’s free admission capacity without reserving it. See the [resource contract](specification.md#resources-publication-and-interfaces). Pressure can trigger spills or a bounded failure; this is not a JavaScript/WASM/process RSS cap, and separate workers/tabs do not share the ledger. [Hosted limit evidence](performance/investigations/hosted-memory-ceiling-2026-11-16.md).
+Charged allocations in one WASI engine instance now share a 1 GiB aggregate admission ledger across profiling, cached/returned profiles, preparation and execution. Per-job Auto or explicit numeric budgets still apply. Automatic selection observes this instance’s free admission capacity without reserving it. See the [resource contract](specification.md#resources-publication-and-interfaces). Pressure can trigger spills or a bounded failure; this is not a JavaScript/WASM/process RSS cap, and separate workers/tabs do not share the ledger. [Hosted limit evidence](performance/investigations/hosted-memory-ceiling-2026-11-16.md).
 
 Input uses bounded `File.slice()` reads. Temporary spools, external merge runs, and staged results are stored in OPFS, not an in-memory filesystem. A storage worker services synchronous WASI file operations through a 1 MiB shared transfer buffer. It caps open OPFS handles at 64 and evicts handles earlier when the browser reports a handle quota; closed WASI descriptors are reused. Only file/directory metadata is retained in the JavaScript directory tree.
 
-The browser currently uses one processing worker and accepts a 32–2048 MiB working-memory budget or explicit `"auto"` (at most 256 MiB). Omission remains numeric 256; automatic selection can fail normal record/worker validation rather than increasing the budget or lowering record limits. This is an algorithm working budget, not a limit on total browser process memory. WebAssembly linear memory is capped at 2 GiB. OPFS space is subject to browser quota and free disk space; there is no default temporary-space cap or quota-estimate reserve. Actual OPFS quota/write failures fail the job. An explicit `resources.temp_bytes` limit still applies to engine temporary files; staged output also consumes real quota. The input section gives a rough 2–8× uncompressed source-size guide for sorting/grouping, not an upper bound. Compressed source expansion is unknown. Source size itself is not limited by WebAssembly address space. Billion-row browser operation has **not** been validated.
+The browser currently uses one processing worker and accepts a 32–2048 MiB working-memory budget or `"auto"`. Omission selects Auto. Auto usually targets at most 256 MiB. An eligible plain-output uniform shuffle can target 512, 1024, or 2048 MiB to avoid spilling. Before Analyze, Run uses the size of a plain UTF-8 CSV and the pipeline shape. For supported CSV settings, the existing eight-row preview can raise the target using sampled field widths and column count. For eligible plain CSVs starting at 1024 MiB, Run can refine the estimate using up to 256 KiB sampled farther into the file. The samples can reveal width changes beyond the preview. Run uses them to size memory and still parses the current source. If the larger tier lacks capacity, Run can use the original tier when it fits. For gzip, the same preview can use the final member's trailer as a size hint. This hint can miss expansion in earlier members. Preview observations apply only to the same selected file, parsing settings, and record ceiling. Run can start without a preview and validates the entire input. With applicable Analyze observations it estimates the retained sort footprint from decoded payload, row count and column count. The Analyze card shows its memory estimate. The Run plan reports the selected starting target, whether Analyze changed it, and any capacity fallback. Run resolves it against available engine capacity. Automatic selection can fail normal record/worker validation rather than increasing the budget or lowering record limits. This is an algorithm working budget, not a limit on total browser process memory. WebAssembly linear memory is capped at 2 GiB. OPFS space is subject to browser quota and free disk space; there is no default temporary-space cap or quota-estimate reserve. Actual OPFS quota/write failures fail the job. An explicit `resources.temp_bytes` limit still applies to engine temporary files; staged output also consumes real quota. The input section gives a rough 2–8× uncompressed source-size guide for sorting/grouping, not an upper bound. Compressed source expansion is unknown. Source size itself is not limited by WebAssembly address space. Billion-row browser operation has **not** been validated.
 
 The 2 GiB ceiling avoids changing the current WASI shim: imported i32 pointer
 arguments arrive in JavaScript as signed numbers, and its DataView/typed-array
@@ -126,13 +146,20 @@ See [V8's wasm32 memory explanation](https://v8.dev/blog/4gb-wasm-memory) and
 
 Analyze scans every record without producing output spools or retaining an
 executable snapshot. Run processes limits-only jobs and a single uncompressed
-Balanced step directly into private output without an additional complete CSV
+Balanced step directly into publication output without an additional complete CSV
 snapshot; other pipelines prepare internally.
-Both paths stage the full result in OPFS before export. Browser quota must still
-fit private output and any intermediates or metadata. Run starts from the current
+Final CSV, gzip and Zstandard files and their manifest go directly to a fresh
+folder under the selected destination. Intermediate data and retained engine
+snapshots still use OPFS. ZIP uses the staged export path because archive
+finalization reopens the manifest. The storage worker forwards one bounded write
+at a time and closes each destination stream before acknowledging its close. Run starts from the current
 configuration and validates its input independently of earlier Analyze results.
 
-Browser APIs cannot atomically publish a directory. An interrupted export may leave incomplete files in the new results directory. Completion requires a valid `CHOPPER-COMPLETE.json` record, not just a file with that name. The v1 JSON record contains `complete: true`, `engine: "chopper-browser"`, `version: 1`, and `files` counting every exported result file including the manifest, excluding the marker itself. An empty or unparseable entry is incomplete. Cancellation or tab close after the marker commits does not roll back that completed folder, even if the client has not received the success reply. The native CLI retains its native publication behavior.
+Browser APIs cannot atomically publish a directory. An active direct Run can
+have files visible in its results folder before it finishes. A failed or
+cancelled direct Run aborts open destination streams and attempts to remove its
+own incomplete folder. Failed staged exports attempt the same removal.
+If the browser process or tab is lost, manual destination cleanup may be needed. Completion requires a valid `CHOPPER-COMPLETE.json` record, not just a file with that name. The v1 JSON record contains `complete: true`, `engine: "chopper-browser"`, `version: 1`, and `files` counting every exported result file including the manifest, excluding the marker itself. An empty or unparseable entry is incomplete. Cancellation or tab close after the marker commits does not roll back that completed folder, even if the client has not received the success reply. The native CLI retains its native publication behavior.
 
 Keep the tab open. Cancellation stops the engine and deletes its OPFS workspace. Closing/crashing the tab can leave temporary data behind. Opening the hosted app starts a background sweep of unlocked Chopper workspaces, skipping jobs active in other tabs or workers. Returning to the tab checks for abandoned data without deleting it. **Clear temporary data** appears only when an unlocked workspace remains, including when automatic deletion fails; successful cleanup hides the control. Checks and sweeps do not overlap within a tab. Storage-access failures alone do not expose the link. It never deletes exported results. Browser storage is origin-specific, so localhost and the hosted site have separate workspaces.
 
@@ -293,7 +320,7 @@ Zstandard library for this acceptance harness (Ubuntu provides `libzstd1`); the
 small-fixture helper is test-only and does not alter engine codec dependencies.
 
 `node scripts/test-browser-graph-lifecycle.mjs` checks the public hosted Run page
-with real production workers/WASI and OPFS. Test-context routes inject worker,
+with production WASI and OPFS, specializing the worker to the staged copy path. Test-context routes inject worker,
 result-writer and marker failures, cancellation at processing/marker boundaries,
 queued old-generation facts, observation transport loss and a one-shot rendering
 failure. It independently reads output CSVs/manifests and markers. A marker closed
@@ -335,8 +362,15 @@ This covers deletion coordination, not shared memory admission across instances,
 engine cancellation or export interruption. The harness serves its scripts from
 test-only request routes; it adds no assets to the deployable build.
 
+`node scripts/test-browser-direct-destination.mjs` exercises direct destination
+publication with real WASI and OPFS, including late input failure, destination
+write/close failure, confirmed invalid markers, unknown readback outcomes and
+cancellation during writes and stalled prefetch. It also kills a disposable
+browser process before and after the marker closes, then verifies the
+destination and workspace cleanup on restart.
+
 `node scripts/test-browser-termination.mjs` separately exercises the production
-client, engine WASM and storage worker with test-only pauses during preparation,
+client, engine WASM and storage worker on the staged copy path with test-only pauses during preparation,
 after a real destination write before close, and after one result file closes.
 It also pauses after a marker write before close and after marker close before
 the worker's success reply. It checks cancellation and forced tab close, peer
@@ -1197,7 +1231,7 @@ CSV settings can now be detected explicitly from a sample of at most 64 KiB of d
 
 Analysis includes expandable distinct-value lists for selected partition/stratification columns. Lists cover the whole validated input but are capped at 64 columns, 100 values per column, and 256 KiB total; incomplete lists are labeled. Progress shows phase-local rows, elapsed time, observed throughput, and temporary usage. No overall percentage is shown because multi-pass work does not provide a reliable completion total.
 
-Analyze uses the same full-file input-statistics path as native `chopper analyze`. It reports exact input row counts and exact or explicitly approximate distinct counts; sorted input is not truncated to a prefix. The cached profile can be reused across configuration edits in the current worker. Picking another File object clears it, and Run, cancellation, or completion can terminate that worker and discard the cache. A new multi-column grouping/stratification combination triggers another full scan. Analyze retains no executable output. Run does not depend on an earlier analysis.
+Analyze uses the same full-file input-statistics path as native `chopper analyze`. It reports exact input row counts and exact or explicitly approximate distinct counts; sorted input is not truncated to a prefix. The cached profile can be reused across configuration edits in the current worker. Picking another File object clears it, and Run, cancellation, or completion can terminate that worker and discard the cache. A new multi-column grouping or stratification combination triggers another full scan. A root Partition can reuse matching cached skew or derive it from complete single-column counts. If those facts are missing, Analyze refreshes them in its usual scan. Analyze retains no executable output. Run does not depend on an earlier analysis.
 
 The graph inspection harness exercises the real hosted page with fused/repeated
 work, default/advanced and graph/list selection, events, keyboard focus and frozen
@@ -1239,13 +1273,13 @@ Completed Runs retain their submitted origin for historical results; they never
 supply column values to an unrelated current input.
 
 Browser processing and destination publication remain different boundaries.
-`exportResults` closes every output writer, closes the marker, then reads back
+Either destination path closes every output writer, closes the marker, then reads back
 that exact marker (at most 256 bytes), with or without observation enabled. Only
 an exact match returns a destination-bound publication receipt. The page validates
 its folder, output path, version and file count before obtaining a typed verified
 publication and entering Complete. Missing, malformed or stale receipts fail the
 Run. Readback failure can leave valid files and a marker on disk, but cannot
-claim verified success. It adds no rollback, directory scan or content-hash check.
+claim verified success. Cleanup checks ownership and preserves results with a committed marker.
 Cancellation and cleanup retain their existing policies, including a retained
 same-Run confirmation without resurrecting cancelled job state.
 
@@ -1277,8 +1311,7 @@ while the interface scrolls above it. A fine
 tonal card border add depth around solid card surfaces; focus highlights the active section without
 changing geometry. Header dividers are softly inset inside cards so they do not
 visually join the page grid; paired title/body rows retain their geometry.
-Forced colors use solid native surfaces/borders. Shared section icons and muted section-colored headers carry the
-hierarchy across otherwise neutral editing surfaces. Field values use regular weight, labels
+Forced colors use solid native surfaces and borders. The workspace uses a themed grid and accent behind neutral editing cards with consistent icon and divider colors. Step numbers use operation colors, and hover connectors and outlines match those numbers. Icons use the neutral palette. Field values use regular weight, labels
 and secondary controls use medium weight, and headings/main actions retain
 semibold emphasis. Desktop inputs are 0.875rem (14px at the default root size);
 coarse-pointer inputs stay at 1rem to avoid mobile focus zoom. Keyboard focus and
@@ -1310,10 +1343,12 @@ graph-to-plan connectors remain available in Execution. The header view switch
 also allows manual inspection before a Run. A short View Transition keeps the
 plan as an anchor on desktop, with a simple crossfade on narrow layouts. Reduced
 motion and missing API support switch immediately and focus the new view heading.
-During profiling, preparation and Run, a separate fixed bottom bar shows current
-activity, elapsed time, View execution and Cancel. The page reserves the measured
-bar height, including safe-area padding, so content remains reachable above it.
-The bar disappears on completion, preparation readiness, cancellation or failure.
+The fixed bottom action bar shows Run and the next setup requirement. During
+profiling and Run it shows the current activity, elapsed time, and Cancel, with
+View execution available from Configure. The page reserves the measured bar
+height, including safe-area padding, so content remains reachable above it.
+Execution also shows the active phase and available row and temporary-storage
+counts above the graph. At the end of the job, the bar returns to Run.
 In Configure, completion returns focus to results (failure to the error) unless
 focus is inside the editor, preserving in-progress configuration edits. Execution
 preserves graph focus and scroll on completion; disappearing processing controls
@@ -1378,11 +1413,12 @@ links use neutral text; hover and selection use faint neutral surfaces and outli
 while explicit processing status keeps its semantic accents.
 
 The hosted execution graph uses a dedicated wide pane beside the plan in Execution.
-Scroll over the graph to zoom about the pointer; drag its background to pan.
-Manual navigation disables Auto-fit and bounds the viewport height; zoom buttons,
-Fit graph, native scrollbars and keyboard scrolling remain available. Timeline
-colors match output-plan operations, with fused work using its first mapped
-operation color and readable context labels.
+The graph grows with its content at every zoom level, so the page scrolls through
+all activity rows. Drag the Zoom slider or use its arrow keys to change the scale.
+Moving the slider disables Auto-fit. Check Auto-fit to fit the width again.
+When the graph is wider than its pane, drag the background sideways or use
+horizontal scrolling. Timeline colors match output-plan operations, with fused
+work using its first mapped operation color and readable context labels.
 Each graph card has a small decorative diagram for its observed physical step.
 Fisher–Yates swaps records; uniform shuffle ranks random-key rows; spills, merges,
 allocation, grouping and codecs have their own gestures. Auto follows the observed
@@ -1416,8 +1452,11 @@ do not apply to that direction are hidden while their configuration values remai
 intact. Resource budget groups Processing and Safety limits separately; the
 browser-managed temporary directory is retained in configuration but hidden.
 `CHOPPER_CONFIG_SCREENSHOTS=DIR npm --prefix ui run test:workspace` optionally
-captures the expanded editor in both themes at desktop and mobile widths. The output-plan card contains the current configuration summary and processing
-actions; a separate Results & analysis card holds observations and results. Configuration stays visible at narrow widths;
+captures the expanded editor in both themes at desktop and mobile widths. The
+Output plan starts with the proposed format, destination, and strict CSV caps,
+then shows the linked pipeline. Details are available on demand. The Results
+card leads with the saved location and file count, followed by warnings and
+details. Configuration stays visible at narrow widths, and
 counts and CSV bytes remain unknown until processing. Input and output parsing/serialization controls remain
 independent. Source detection is explicit and bounded; Analyze input remains an
 optional full-file profile. Run submits the current draft without requiring
@@ -1463,9 +1502,9 @@ performance or accessibility certification.
 Selecting a source or importing a job requests a bounded sample using the current
 input encoding, dialect and ZIP member. The preview is incomplete and never
 replaces full validation. Imported browser paths still require choosing the file
-with Browse to grant access. Analyze and Run appear
-in the output plan. Run always submits the current settings and does not
-require an earlier Analyze.
+with Browse to grant access. Analyze input sits beside the Source preview and
+describes the input facts it can show. Run stays in the bottom action bar and
+submits the current settings independently of Analyze.
 
 ### Pipeline operation modes
 
@@ -1489,9 +1528,9 @@ submission attempt. Run and Prepare reject invalid configurations locally;
 Analyze input permits a missing output destination. Checks cover paths being
 filled, numeric/byte-size limits, exact percentage totals and group names, selected
 columns, supported CSV encodings/dialect/header/BOM combinations, part/file limits,
-and record/worker limits versus the requested memory budget. Automatic memory
-checks use its maximum 256 MiB budget; a smaller resolved budget can still fail
-engine admission. Filesystem existence/permissions, full-input validity and
+and record/worker limits versus the requested memory budget. The browser form checks Auto record limits against its 256 MiB baseline. Choose
+manual memory in Advanced to configure larger record limits. Run still checks
+the actual resolved budget. Filesystem existence/permissions, full-input validity and
 output-cap feasibility remain engine checks. Equal parts with hard limits remains
 an advisory warning because the combination can be valid.
 
@@ -1503,6 +1542,15 @@ disabled. The hosted temporary directory is disabled with an explanation that
 browser-managed storage is used. Automatic memory does not override explicit
 worker or record limits, so those controls remain editable.
 
+### Auto and Advanced execution
+
+Auto shows who controls processing settings in the Resources card and on
+shuffle steps. Switch on Advanced to edit working memory, worker requests,
+grouping, and shuffle strategy. Safety limits and requested pipeline and
+output settings apply in both modes. The hosted engine uses one worker.
+After a completed Auto run, Resources reports its working-memory budget and
+peak writer slots used. The Output Plan reports the physical plan.
+
 ### Linked output-plan text
 
 The current configuration summary and plan sentences are color-coded buttons.
@@ -1511,8 +1559,9 @@ disclosure is highlighted without opening it. Clicking or pressing Enter/Space
 opens relevant disclosures, scrolls to the setting and focuses its control. Each
 pipeline step has a separate sentence so links remain unambiguous after reordering.
 Row/byte targets, compression, source, destination and resources link to
-their own controls. Section numbers and headings mirror the configuration cards;
-ordered plan items use the corresponding pipeline step numbers. Underlines are
+their own controls. Configure places Output directly after Source. The Output Plan
+keeps Output after Pipeline and links each heading to its configuration card.
+Ordered plan items use the corresponding pipeline step numbers. Hovering an editor step brings its plan entry into view. Underlines are
 omitted, while hover backgrounds and keyboard focus outlines indicate interaction.
 A noninteractive curved connector joins the active text to the highlighted
 configuration on hover, focus or click, following scrolling and resizing. The
@@ -1530,6 +1579,6 @@ uses MiB or GiB and still resolves to whole MiB. Changing a unit re-expresses th
 same exact value, including fractional amounts, without rounding byte limits or
 changing the next Run configuration. Editing the amount still changes
 the draft normally.
-Defaults remain 256 MiB manual memory, an 8 MiB record working limit, and blank
+Defaults are automatic working memory, an 8 MiB record working limit, and blank
 optional size caps. Imports/exports and engine requests retain the existing
 numeric byte and memory_mb fields; display units are not Job schema fields.

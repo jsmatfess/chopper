@@ -2,7 +2,7 @@ import {formatAmount,populateSize,readSize,type SizeControls} from './size-units
 export type RequestedMemory = number | 'auto';
 type MemoryControls = {mode:Pick<HTMLSelectElement,'value'>;manual:HTMLInputElement;unit:HTMLSelectElement};
 const size=({manual,unit}:MemoryControls):SizeControls=>({input:manual,unit});
-export function populateMemory(controls:MemoryControls,requested:RequestedMemory=256):void{
+export function populateMemory(controls:MemoryControls,requested:RequestedMemory='auto'):void{
  controls.mode.value=requested==='auto'?'auto':'manual';populateSize(size(controls),(requested==='auto'?256:requested)*1024**2);updateMemory(controls);
 }
 export function updateMemory({mode,manual,unit}:MemoryControls):void{

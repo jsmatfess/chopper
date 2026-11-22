@@ -261,6 +261,12 @@ pub(super) fn input_adapters() -> Result<serde_json::Value> {
         "manual_memory": manual_memory::run()?,
         "cleanup_failure": cleanup::run()?,
     });
+    #[cfg(target_os = "wasi")]
+    let report = {
+        let mut report = report;
+        report["auto_fusion"] = auto_fusion()?;
+        report
+    };
     #[cfg(feature = "experimental-spill-blocks")]
     let report = {
         let mut report = report;
@@ -295,4 +301,112 @@ pub(super) fn input_adapters() -> Result<serde_json::Value> {
         report
     };
     Ok(report)
+}
+
+#[cfg(target_os = "wasi")]
+fn auto_fusion() -> Result<serde_json::Value> {
+    use std::sync::{atomic::Ordering::Relaxed, Mutex};
+    let root = tempfile::tempdir_in("/tmp")?;
+    let input = root.path().join("input.csv");
+    let mut fixture = std::io::BufWriter::new(File::create(&input)?);
+    writeln!(fixture, "id,key,payload")?;
+    let payload = "x".repeat(112);
+    for id in 0..45_000 {
+        writeln!(fixture, "{id},{},{payload}", id % 3)?;
+    }
+    fixture.flush()?;
+    drop(fixture);
+    for cancel_at_boundary in [false, true] {
+        let scratch = root.path().join("work");
+        std::fs::create_dir(&scratch)?;
+        let output = root.path().join(if cancel_at_boundary {
+            "cancelled"
+        } else {
+            "retry"
+        });
+        let job = Job {
+            input: input.to_string_lossy().into_owned(),
+            output: output.to_string_lossy().into_owned(),
+            operations: vec![
+                Operation::Partition {
+                    columns: vec![Column::Index(1)],
+                },
+                Operation::AssignProbabilistic {
+                    groups: vec![Allocation {
+                        name: "all".into(),
+                        percent: "100".into(),
+                    }],
+                    strata: vec![],
+                },
+                Operation::Shuffle {
+                    strategy: Shuffle::Auto,
+                },
+            ],
+            resources: Resources {
+                memory_mb: 32.into(),
+                max_record_bytes: 1024 * 1024,
+                temp_dir: Some(scratch.to_string_lossy().into_owned()),
+                ..Resources::default()
+            },
+            ..Job::default()
+        };
+        let capacity = 32 * 1024 * 1024;
+        let pool = Arc::new(MemoryPool::new(capacity));
+        let injected = Arc::new(AtomicBool::new(false));
+        let cancel = Arc::new(AtomicBool::new(false));
+        let peer = Arc::new(Mutex::new(Reservation::for_workspace(Arc::new(
+            Workspace::shared(capacity as usize, pool.clone()),
+        ))));
+        let notify = {
+            let (pool, injected, cancel, peer) =
+                (pool.clone(), injected.clone(), cancel.clone(), peer.clone());
+            Arc::new(move |progress: crate::storage::Progress| {
+                if progress.phase == "Before prepared probabilistic spill"
+                    && !injected.swap(true, Relaxed)
+                {
+                    let available = capacity - pool.reservation_counts().0;
+                    peer.lock()
+                        .unwrap()
+                        .resize((available - 32 * 1024) as usize)
+                        .unwrap();
+                    cancel.store(cancel_at_boundary, Relaxed);
+                }
+                if progress.phase == "Retrying probabilistic assignment and shuffle" {
+                    peer.lock().unwrap().resize(0).unwrap();
+                }
+            })
+        };
+        let result = run_with_memory_pool(job, cancel, notify, pool.clone());
+        ensure!(
+            injected.load(Relaxed),
+            "Auto never reached fusion preparation"
+        );
+        drop(peer);
+        if cancel_at_boundary {
+            ensure!(
+                result.is_err() && !output.exists(),
+                "cancelled fusion published output"
+            );
+        } else {
+            let analysis = result?;
+            ensure!(
+                analysis.rows == 45_000 && analysis.output_files == 3,
+                "retry changed output"
+            );
+            ensure!(
+                analysis.diagnostics["probabilistic_shuffle_retries"] == 1,
+                "typed denial did not retry"
+            );
+        }
+        ensure!(
+            pool.reservation_counts().0 == 0,
+            "fusion leaked working grants"
+        );
+        ensure!(
+            std::fs::read_dir(&scratch)?.next().is_none(),
+            "fusion leaked temporary files"
+        );
+        std::fs::remove_dir(scratch)?;
+    }
+    Ok(json!({"pre_emission_retry":true,"cancellation_cleanup":true}))
 }

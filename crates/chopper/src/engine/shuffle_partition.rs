@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn forced_collisions_match_global_shuffle_then_stable_partition_through_hierarchy() -> Result<()>
     {
-        for budget in [4096, 32 * 1024 * 1024] {
+        for budget in [crate::storage::SORT_HIERARCHY_TEST_MEMORY, 32 * 1024 * 1024] {
             let mut ctx = context()?;
             ctx.memory = budget; // Force many tiny runs without changing the shared ledger.
             let parent = Group {
@@ -237,7 +237,7 @@ mod tests {
             )?;
             let actual = actual.finish()?;
             assert_eq!(snapshot(&actual, &ctx)?, snapshot(&expected, &ctx)?);
-            if budget == 4096 {
+            if budget == crate::storage::SORT_HIERARCHY_TEST_MEMORY {
                 assert!(ctx.diagnostics()["merge_operations"].as_u64().unwrap() > 2);
             }
             drop(actual);

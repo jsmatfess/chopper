@@ -1,7 +1,7 @@
 import {sourceIdentity,resultOrigin,belongsToSource,type ResultOrigin} from './result-ownership';
-import {operationName} from './step-labels';
+import {operationColor,operationName} from './step-labels';
 import {browserApi,configureBrowserUI,invalidateBrowserDraft} from './browser/client';
-import {groupErrors,percentageUnits} from './plan';
+import {percentageUnits} from './plan';
 import {bindColumnPickers,pickerMarkup,type ColumnSchema} from './column-picker';
 import {populateMemory,updateMemory,readMemory} from './memory';
 import {createSizeControl,populateSize,readSize,type SizeUnit} from './size-units';
@@ -13,10 +13,23 @@ export {};
 type Csv = { encoding: string; headers: boolean; delimiter: string; quote: string; escape: string | null; line_ending: string; bom: boolean; skip_empty_lines: boolean };
 type Operation = { type: string; files?: number; columns?: (string | number)[]; groups?: {name: string; percent: string}[]; strata?: (string | number)[]; strategy?: string };
 export type Job = {version: number; input: string; output: string; zip_member: string | null; input_csv: Csv; output_csv: Csv; compression: string; operations: Operation[]; limits: {rows: number | null; bytes: number | null; compressed_bytes: number | null}; resources: {grouping?: 'auto' | 'sort'; workers: number; memory_mb: number | 'auto'; max_files: number; max_record_bytes: number; temp_dir: string | null; temp_bytes: number | null}; full_shuffle_rng?: 'blake3_counter_v1'; full_shuffle_algorithm?: 'adaptive_v1'};
-export type Analysis = {algorithm_version?: string; execution?: {replay_guarantee: string; plan_version: number; records: number; rng_version: string; plan_digest_blake3: number[]}; diagnostics?: {routing_reused_runs?: number; resident_sorts: number; routed_groupings: number; routing_fallbacks: number; sort_runs: number; merge_operations: number; peak_workspace_reserved_bytes: number}; column_values?: {column: number; values: string[]; frequencies?:Record<string,number>; truncated: boolean}[]; analysis_seconds: number; peak_temp_bytes: number; memory_budget_bytes: number; workers: number; rows: number; columns: number; header: string[] | null; preview: string[][]; groups: number; output_files: number; output_csv_bytes: number; temp_bytes: number; seed: string; accuracy: string; warnings: string[]; stages: {operation: number; input_groups: number; output_groups: number}[]};
-export type InputProfile = {rows:number;columns:number;cache_hit:boolean;seconds:number;accuracy:string;header:string[]|null;column_values:{column:number;values:string[];frequencies?:Record<string,number>;truncated:boolean;distinct:number;distinct_exact:boolean}[];stages:{operation:number;strategy:string;input_distinct_keys:number|null;distinct_exact:boolean}[]};
+type AutoFact = {value:number|null;accuracy:'exact'|'estimated'|'unknown'};
+type AutoPlan = {
+  physical_plan:string;actual_strategy:string;
+  effective_memory_bytes:number;effective_workers:number;
+  memory_plan?:{file_size_tier_mb:number;preview_tier_mb?:number|null;gzip_member_bytes?:number|null;interior_sort_bytes?:number|null;starting_tier_mb?:number|null;analyze_outside_range?:boolean;target_mb:number;estimated_sort_bytes:AutoFact;from_analyze:boolean};
+  analysis_status:'matched'|'absent'|'unverified';worker_limit_from_analyze?:boolean;
+  input_file_bytes:AutoFact;analyzed_rows:AutoFact;decoded_field_bytes:AutoFact;
+  largest_decoded_row_bytes:AutoFact;partition_joint_keys:AutoFact;largest_partition_rows:AutoFact;
+  expected_live_fanout:AutoFact;effective_grouping:string;validated_root_partitions?:AutoFact;
+  probabilistic_shuffle_retries:number;routing_fallbacks:number;
+  measurements:{peak_writer_slots:number;retained_exact_fallbacks?:number};
+};
+export type Analysis = {auto_plan?:AutoPlan;algorithm_version?: string; execution?: {replay_guarantee: string; plan_version: number; records: number; rng_version: string; plan_digest_blake3: number[]}; diagnostics?: {shuffle_partition_retries?: number;partition_balanced_retries?: number;streaming_chain_retries?: number;consecutive_partition_retries?: number;compact_spill_fallbacks?: number;routing_reused_runs?: number; resident_sorts: number; routed_groupings: number; routing_fallbacks: number; sort_runs: number; merge_operations: number; peak_workspace_reserved_bytes: number}; column_values?: {column: number; values: string[]; frequencies?:Record<string,number>; truncated: boolean}[]; analysis_seconds: number; peak_temp_bytes: number; memory_budget_bytes: number; workers: number; rows: number; columns: number; header: string[] | null; preview: string[][]; groups: number; output_files: number; output_csv_bytes: number; temp_bytes: number; seed: string; accuracy: string; warnings: string[]; stages: {operation: number; input_groups: number; output_groups: number}[]};
+export type InputProfile = {auto_observations?:unknown;suggested_run_memory_mb?:number;rows:number;columns:number;cache_hit:boolean;seconds:number;accuracy:string;header:string[]|null;column_values:{column:number;values:string[];frequencies?:Record<string,number>;truncated:boolean;distinct:number;distinct_exact:boolean}[];stages:{operation:number;strategy:string;input_distinct_keys:number|null;distinct_exact:boolean}[]};
 export type State = {origins?:{profile?:ResultOrigin;analysis?:ResultOrigin};profile?:InputProfile|null;status: string; progress: {phase: string; rows: number; temp_bytes: number}; analysis: Analysis | null; error: string | null; output: string | null};
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+const advancedExecution = () => $<HTMLInputElement>('execution-mode').checked;
 const value = (id: string) => $<HTMLInputElement>(id).value;
 const setValue = (id: string, v: unknown) => { $<HTMLInputElement>(id).value = v == null ? '' : String(v); };
 const escape = (s: unknown) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
@@ -51,7 +64,8 @@ async function loadColumns() {
   renderPickers();
   if(!value('input'))return;
   try {
-    const schema=await api<ColumnSchema & {preview:string[][]}>('preview',{...job,input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input')});
+    const schema=await api<ColumnSchema & {preview:string[][]}>('preview',{...job,input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input'),
+      resources:{...job.resources,max_record_bytes:readSizeField('max-record')??job.resources.max_record_bytes}});
     if(request!==columnRequest||columnSource!==sourceKey())return;
     renderPreview(schema);hostedWorkspace?.preview(schema);columnSchema=schema;columnMessage=schema.columns?'':'The input file has no columns.';
   } catch(e) {if(request!==columnRequest||columnSource!==sourceKey())return;columnMessage=e instanceof Error?e.message:String(e);$('preview').textContent=`Input preview unavailable: ${columnMessage}`;$('preview-card').hidden=false;hostedWorkspace?.preview(null,true);}
@@ -94,8 +108,8 @@ function renderOps() {
     let fields = '';
     if(op.type==='balanced'||op.type==='interleaved') fields = `<label>Number of equal parts<input data-field="files" type="number" min="1" value="${op.files}"></label><small>Counts differ by at most one. Fewer rows than parts is an error. ${op.type==='interleaved'?'Rows alternate between parts; concatenating files will not restore input order.':'Each part contains a consecutive range of rows.'}</small>`;
     if(op.type==='partition') fields = pickerMarkup('columns',op.columns||[],i,columnSchema,columnMessage);
-    if(op.type==='assign'||op.type==='assign_probabilistic') fields = `<fieldset class="group-builder"><legend>Named percentages</legend>${(op.groups||[]).map((g,j)=>`<div class="group-row" data-group="${j}"><label>Group name<input data-group-field="name" required value="${escape(g.name)}" placeholder="e.g. treatment"></label><label>Percent<input data-group-field="percent" required inputmode="decimal" value="${escape(g.percent)}" placeholder="80"></label><button type="button" class="text-button" data-action="remainder" aria-label="Fill remaining percentage for group ${j+1}">Fill remainder</button><button type="button" class="icon-button" data-action="remove-group" aria-label="Remove group ${j+1}" ${(op.groups?.length||0)<=1?'disabled':''}>×</button></div>`).join('')}<button type="button" class="secondary" data-action="add-group" ${(op.groups?.length||0)>=1024?'disabled':''}>+ Add group</button><small data-group-feedback></small></fieldset>${pickerMarkup('strata',op.strata||[],i,columnSchema,columnMessage)}${operationNote('Allocation & stratification',op.type==='assign_probabilistic'?'Each row is assigned independently using the target percentages. Counts are approximate, including within strata; small strata may have no rows in a destination. Membership is random and row order is preserved.':'Stratification applies these percentages separately within every combination of the selected column values. For example, stratifying by country keeps an 80% / 20% allocation within each country, rounded to whole rows. Membership is random; row order is preserved.')}`;
-    if(op.type==='shuffle') fields = `<div><label>Strategy<select data-field="strategy">${[['auto','Automatic (full shuffle; recommended)'],['uniform','Uniform (random-key sort)'],['fisher_yates','Uniform in memory (Fisher–Yates v1)']].map(([v,l])=>`<option value="${v}" ${op.strategy===v?'selected':''}>${l}</option>`).join('')}</select></label></div>${operationNote('How shuffle strategies work','Automatic uses a full external-capable shuffle and combines compatible steps. Output order may vary with resources and execution plan. Explicit Fisher–Yates requires each group to fit in memory; oversized groups fail.')}`;
+    if(op.type==='assign'||op.type==='assign_probabilistic') fields = `<fieldset class="group-builder"><legend>Named percentages</legend>${(op.groups||[]).map((g,j)=>`<div class="group-row" data-group="${j}"><label>Group name<input data-group-field="name" required value="${escape(g.name)}" placeholder="e.g. treatment"></label><label>Percent<input data-group-field="percent" required inputmode="decimal" value="${escape(g.percent)}" placeholder="80"></label><button type="button" class="text-button" data-action="remainder" aria-label="Fill remaining percentage for group ${j+1}">Fill remainder</button><button type="button" class="icon-button" data-action="remove-group" aria-label="Remove group ${j+1}" ${(op.groups?.length||0)<=1?'disabled':''}>×</button></div>`).join('')}<button type="button" class="secondary" data-action="add-group" ${(op.groups?.length||0)>=1024?'disabled':''}>+ Add group</button><small id="group-feedback-${i}" data-group-feedback></small></fieldset>${pickerMarkup('strata',op.strata||[],i,columnSchema,columnMessage)}${operationNote('Allocation & stratification',op.type==='assign_probabilistic'?'Each row is assigned independently using the target percentages. Counts are approximate, including within strata; small strata may have no rows in a destination. Membership is random and row order is preserved.':'Stratification applies these percentages separately within every combination of the selected column values. For example, stratifying by country keeps an 80% / 20% allocation within each country, rounded to whole rows. Membership is random; row order is preserved.')}`;
+    if(op.type==='shuffle') fields = advancedExecution() ? `<div><label>Strategy<select data-field="strategy">${[['auto','Automatic (full shuffle; recommended)'],['uniform','Uniform (random-key sort)'],['fisher_yates','Uniform in memory (Fisher–Yates v1)']].map(([v,l])=>`<option value="${v}" ${op.strategy===v?'selected':''}>${l}</option>`).join('')}</select></label>${operationNote('How shuffle strategies work','Automatic uses a full external-capable shuffle and combines compatible steps. Output order may vary with resources and execution plan. Explicit Fisher–Yates requires each group to fit in memory; oversized groups fail.')}</div>` : '<p class="hint auto-shuffle-strategy">Shuffle strategy set by Auto · Full shuffle</p>';
     const split=op.type==='balanced'||op.type==='interleaved';
     const assignment=op.type==='assign'||op.type==='assign_probabilistic';
     const name=split?'Split into equal parts':assignment?'Assign groups by percentage':operationName(op.type);
@@ -107,22 +121,11 @@ function renderOps() {
 
     const descriptions:Record<string,string>={partition:'Create groups from matching column values',balanced:'Divide each group into consecutive parts',interleaved:'Distribute rows cyclically across parts',assign:'Allocate rows using exact percentage quotas',assign_probabilistic:'Allocate each row independently by probability',shuffle:'Randomize row order within each group'};
     const paths:Record<string,string>={partition:'M4 4h16v5H4zM4 15h6v5H4zM14 15h6v5h-6zM7 9v6m10-6v6',balanced:'M4 5h16M4 12h16M4 19h16',interleaved:'M4 5h16M4 12h16M4 19h16',assign:'M4 6h6v12H4zM14 6h6v5h-6zM14 15h6v3h-6z',assign_probabilistic:'M4 6h6v12H4zM14 6h6v5h-6zM14 15h6v3h-6z',shuffle:'M3 5h3c5 0 7 14 12 14h3m-4-4 4 4-4 3M3 19h3c5 0 7-14 12-14h3m-4-3 4 3-4 4'};
+    const color=operationColor(op.type);
     const identity=`<span class="operation-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="${paths[op.type]||paths.partition}"/></svg></span><span class="step-identity"><span class="step-title">${name}</span><span class="step-description">${descriptions[op.type]||''}</span></span>`;
-    return `<div class="step" data-step="${i}" data-operation-id="${operationId(op)}"><div class="step-head"><button type="button" class="step-grip" data-step-grip draggable="true" aria-label="Reorder step ${i+1}: ${name}" aria-describedby="pipeline-reorder-help" title="Drag to reorder, or use Up and Down arrow keys"><svg viewBox="0 0 16 24" aria-hidden="true" fill="currentColor"><circle cx="5" cy="5" r="1.4"/><circle cx="11" cy="5" r="1.4"/><circle cx="5" cy="12" r="1.4"/><circle cx="11" cy="12" r="1.4"/><circle cx="5" cy="19" r="1.4"/><circle cx="11" cy="19" r="1.4"/></svg></button><span class="step-index">${String(i+1).padStart(2,'0')}</span>${identity}<button type="button" class="icon-button" data-action="up" title="Move earlier" aria-label="Move step ${i+1} up" ${i===0?'disabled':''}>${actionIcon('up')}</button><button type="button" class="icon-button" data-action="down" title="Move later" aria-label="Move step ${i+1} down" ${i===job.operations.length-1?'disabled':''}>${actionIcon('down')}</button><button type="button" class="icon-button" data-action="remove" title="Remove step" aria-label="Remove step ${i+1}">${actionIcon('remove')}</button></div><div class="step-fields">${fields}</div></div>`;
+    return `<div class="step" data-step="${i}" data-plan-color="${color}" data-operation-id="${operationId(op)}"><div class="step-head"><button type="button" class="step-grip" data-step-grip draggable="true" aria-label="Reorder step ${i+1}: ${name}" aria-describedby="pipeline-reorder-help" title="Drag to reorder, or use Up and Down arrow keys"><svg viewBox="0 0 16 24" aria-hidden="true" fill="currentColor"><circle cx="5" cy="5" r="1.4"/><circle cx="11" cy="5" r="1.4"/><circle cx="5" cy="12" r="1.4"/><circle cx="11" cy="12" r="1.4"/><circle cx="5" cy="19" r="1.4"/><circle cx="11" cy="19" r="1.4"/></svg></button><span class="step-index">${String(i+1).padStart(2,'0')}</span>${identity}<button type="button" class="icon-button" data-action="up" title="Move earlier" aria-label="Move step ${i+1} up" ${i===0?'disabled':''}>${actionIcon('up')}</button><button type="button" class="icon-button" data-action="down" title="Move later" aria-label="Move step ${i+1} down" ${i===job.operations.length-1?'disabled':''}>${actionIcon('down')}</button><button type="button" class="icon-button" data-action="remove" title="Remove step" aria-label="Remove step ${i+1}">${actionIcon('remove')}</button></div><div class="step-fields">${fields}</div></div>`;
   }).join('') : '<div class="empty-steps">Add a step to group, split, assign or shuffle rows. File limits also work on their own.</div>';
-  updateGroupValidation();
   if(activeOperation&&activeField)$('operations').querySelector<HTMLElement>(`[data-operation-id="${activeOperation}"] [data-field="${activeField}"]${activeField==='type'?':checked':''}`)?.focus();
-}
-function updateGroupValidation() {
-  $('operations').querySelectorAll<HTMLElement>('[data-step]').forEach(step=>{
-    const op=job.operations[Number(step.dataset.step)];if(op.type!=='assign'&&op.type!=='assign_probabilistic')return;
-    const errors=groupErrors(op.groups||[]);
-    step.querySelectorAll<HTMLInputElement>('[data-group-field]').forEach(el=>el.setCustomValidity(''));
-    step.querySelector<HTMLInputElement>('[data-group-field="percent"]')?.setCustomValidity(errors.join(' '));
-    const feedback=step.querySelector<HTMLElement>('[data-group-feedback]')!;
-    feedback.textContent=errors.length?errors.join(' '):(op.type==='assign_probabilistic'?'Total target: 100%. Actual counts may vary.':'Total: 100%. Exact percentages, rounded to whole rows.');
-    feedback.classList.toggle('invalid-groups',!!errors.length);
-  });
 }
 const unitFields=new Map(['max-bytes','compressed-bytes','temp-bytes','max-record','memory'].map(id=>[id,createSizeControl($<HTMLInputElement>(id),id==='memory'?['MiB','GiB']:['B','KB','MB','GB','TB','KiB','MiB','GiB','TiB'] as SizeUnit[])]));
 const memoryControls={mode:$<HTMLSelectElement>('memory-mode'),manual:$<HTMLInputElement>('memory'),unit:unitFields.get('memory')!.unit};
@@ -135,13 +138,21 @@ function populate() {
   setValue('grouping',job.resources.grouping || 'auto');setValue('workers',job.resources.workers);populateMemory(memoryControls,job.resources.memory_mb);setValue('max-files',job.resources.max_files);populateSize(unitFields.get('max-record')!,job.resources.max_record_bytes);setValue('temp-dir',job.resources.temp_dir);populateSize(unitFields.get('temp-bytes')!,job.resources.temp_bytes);
   csvForm('input',job.input_csv);csvForm('output',job.output_csv);renderOps();markDirty();void loadColumns();
 }
+const effectiveOperations = () => advancedExecution() ? job.operations :
+  job.operations.map(op=>op.type==='shuffle'?{...op,strategy:'auto'}:op);
 function readJob(): Job {
-  return {...job,input:value('input'),output:value('output'),zip_member:value('zip-member')||null,compression:value('compression'),
+  const advanced = advancedExecution();
+  return {...job,operations:effectiveOperations(),input:value('input'),output:value('output'),zip_member:value('zip-member')||null,compression:value('compression'),
     input_csv:readCsv('input'),output_csv:readCsv('output'),limits:{rows:value('max-rows')?Number(value('max-rows')):null,bytes:readSizeField('max-bytes'),compressed_bytes:value('compression')==='none'?null:readSizeField('compressed-bytes')},
-    resources:{...job.resources,grouping:value('grouping') as 'auto' | 'sort',workers:Number(value('workers')),memory_mb:readMemory(memoryControls),max_files:Number(value('max-files')),max_record_bytes:readSizeField('max-record')!,temp_dir:value('temp-dir')||null,temp_bytes:readSizeField('temp-bytes')}};
+    resources:{...job.resources,grouping:advanced?value('grouping') as 'auto' | 'sort':'auto',workers:advanced?Number(value('workers')):0,memory_mb:advanced?readMemory(memoryControls):'auto',max_files:Number(value('max-files')),max_record_bytes:readSizeField('max-record')!,temp_dir:value('temp-dir')||null,temp_bytes:readSizeField('temp-bytes')}};
 }
 function updateFields() {
   updateMemory(memoryControls);
+  const advanced = advancedExecution();
+  $('advanced-processing').hidden = !advanced;
+  $('auto-processing').hidden = advanced;
+  for(const id of ['memory-mode','workers','grouping']) $<HTMLInputElement>(id).disabled = !advanced;
+  if(!advanced) memoryControls.manual.disabled=memoryControls.unit.disabled=true;
   const zip = columnSchema?.input_is_zip ?? (/\.zip$/i.test(value('input')) || !!value('zip-member'));
   $('zip-member').closest('label')!.hidden = !zip;
   $<HTMLInputElement>('zip-member').disabled=!zip;
@@ -160,7 +171,7 @@ function markDirty() {
   if(lastProfileData&&!profileDirty&&status==='profiled')renderProfile(lastProfileData);
   updateFields();
   editRevision++;invalidateBrowserDraft(sourceKey()); dirty = true; updateRunControl();
-  if(job) planLinks.render(job.operations,{rows:value('max-rows'),bytes:sizeText('max-bytes'),compressed:sizeText('compressed-bytes')},value('compression'));
+  if(job) planLinks.render(effectiveOperations(),{rows:value('max-rows'),bytes:sizeText('max-bytes'),compressed:sizeText('compressed-bytes')},value('compression'));
   const finalGrouping = job?.operations.filter(op=>op.type!=='shuffle').at(-1);
   const conflict = ['balanced','interleaved'].includes(finalGrouping?.type||'') && !!(value('max-rows')||value('max-bytes'));
   $('conflict').hidden = !conflict; $('conflict').textContent = 'Equal parts and hard limits can conflict. Processing will reject balanced groups that cannot fit without extra files.';
@@ -170,15 +181,17 @@ function updateDraft() {
   if(!job)return;
   let draft: Job | null = null;
   try { draft=readJob(); } catch { /* Keep invalid intermediate input editable. */ }
-  hostedWorkspace?.draft(draft,job.operations.length);
-  planLinks.summary(job.operations);
+  hostedWorkspace?.draft(draft,job.operations.length,dirty);
+  planLinks.summary();
 }
 function renderProfile(p:InputProfile,showValues=true){
   $('input-profile').hidden=false;$('empty-plan').hidden=true;
   let changed=true;try{changed=profileOrigin?.configuration!==JSON.stringify(readJob());}catch{/* Keep incomplete edits editable. */}
   if(showValues){inspectionSource=profileOrigin?.source??null;hostedWorkspace?.values(p.column_values,p.header,'Full-file input analysis',p.rows);}
   const key=JSON.stringify([p,changed]);if(key===lastProfile)return;lastProfile=key;
-  $('input-profile').innerHTML=`<h3>Input analysis</h3><dl class="profile-facts"><div><dt>Records · exact</dt><dd>${format(p.rows)}</dd></div><div><dt>Columns</dt><dd>${format(p.columns)}</dd></div></dl><p class="profile-duration">Scanned in ${p.seconds.toFixed(2)} s${p.cache_hit?' · reused profile':''}</p>${changed?'<p class="profile-context">Input unchanged. Pipeline estimates reflect the earlier configuration.</p>':''}${p.stages.length?`<details><summary>Pipeline estimates${changed?' · previous settings':''}</summary><ul class="profile-stages">${p.stages.map(stage=>`<li>Step ${stage.operation}: ${escape(stage.strategy)}${stage.input_distinct_keys===null?'':` · ${stage.distinct_exact?'':'~'}${format(stage.input_distinct_keys)} distinct keys (${stage.distinct_exact?'exact':'estimated'})`}</li>`).join('')}</ul></details>`:''}<details><summary>Coverage & methodology</summary><p>${escape(p.accuracy)}</p><p>Statistics cover up to 64 selected columns. Value lists show at most 100 values per column and 256 KiB in total. Run reports the final exact group counts and file sizes. Analyzing input does not create output files.</p></details>`;
+  const memoryTarget=!changed&&p.suggested_run_memory_mb!=null
+    ?`<div><dt>Run memory target · estimated</dt><dd>${size(p.suggested_run_memory_mb*2**20)}</dd></div>`:'';
+  $('input-profile').innerHTML=`<h3>Input analysis</h3><dl class="profile-facts"><div><dt>Records · exact</dt><dd>${format(p.rows)}</dd></div><div><dt>Columns</dt><dd>${format(p.columns)}</dd></div>${memoryTarget}</dl><p class="profile-duration">Scanned in ${p.seconds.toFixed(2)} s${p.cache_hit?' · reused profile':''}</p>${changed?'<p class="profile-context">Input unchanged. Pipeline estimates reflect the earlier configuration.</p>':''}${p.stages.length?`<details><summary>Pipeline estimates${changed?' · previous settings':''}</summary><ul class="profile-stages">${p.stages.map(stage=>`<li>Step ${stage.operation}: ${escape(stage.strategy)}${stage.input_distinct_keys===null?'':` · ${stage.distinct_exact?'':'~'}${format(stage.input_distinct_keys)} distinct keys (${stage.distinct_exact?'exact':'estimated'})`}</li>`).join('')}</ul></details>`:''}<details><summary>Coverage & methodology</summary><p>${escape(p.accuracy)}</p><p>Statistics cover up to 64 selected columns. Value lists show at most 100 values per column and 256 KiB in total. Run reports the final exact group counts and file sizes. Analyzing input does not create output files.</p></details>`;
 }
 function renderAnalysis(a: Analysis) {
   if(belongsToSource(analysisOrigin,sourceKey())){inspectionSource=analysisOrigin?.source??null;hostedWorkspace?.values(a.column_values||[],a.header,'Completed output analysis',a.rows);}
@@ -187,10 +200,60 @@ function renderAnalysis(a: Analysis) {
   const facts=(items:[string,string][])=>`<dl class="analysis-facts">${items.map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl>`;
   const metrics=[[format(a.rows),'Input rows'],[format(a.output_files),'Output CSVs'],[format(a.groups),'Logical groups'],[size(a.output_csv_bytes),'CSV bytes · exact'],[`${a.analysis_seconds.toFixed(1)} s`,'Processing time'],[format(Math.round(a.rows/Math.max(a.analysis_seconds,0.001))),'Avg rows/s']];
   const d=a.diagnostics;
-  $('analysis').innerHTML=`<div class="stat-grid">${metrics.map(([value,label])=>`<div class="stat"><strong>${value}</strong><span>${label}</span></div>`).join('')}</div><p class="analysis-note">${escape(a.accuracy)}</p>
-    ${a.warnings.length?`<section class="analysis-warnings" aria-label="Warnings"><h3>Warnings <span>${format(a.warnings.length)}</span></h3><ul>${a.warnings.map(w=>`<li>${escape(w)}</li>`).join('')}</ul></section>`:''}
+  const auto=a.auto_plan;
+  const explain=(fact:AutoFact)=>fact.value===null?'Unknown':`${format(fact.value)} · ${fact.accuracy}`;
+  const memoryPlan=auto?.memory_plan;
+  const startingTier=memoryPlan?.starting_tier_mb??memoryPlan?.preview_tier_mb??memoryPlan?.file_size_tier_mb;
+  const describe=(value:string)=>value.replaceAll('_',' ');
+  const autoDetails=auto?facts([
+    ['Physical plan',describe(auto.physical_plan)],
+    ['Strategy run',auto.actual_strategy==='existing'?'Standard execution':describe(auto.actual_strategy)],
+    ['Analyze observations',auto.analysis_status==='matched'?(auto.worker_limit_from_analyze?'Matched · selected one worker':'Matched this input')
+      :auto.analysis_status==='unverified'?'Different input or parser settings':'Unavailable for this Run'],
+    ['Working memory',size(auto.effective_memory_bytes)],
+    ...(memoryPlan?([
+      ['Memory target',`${size(memoryPlan.target_mb*2**20)} · ${memoryPlan.from_analyze?'Analyze':memoryPlan.interior_sort_bytes?'sampled input widths':memoryPlan.gzip_member_bytes?'gzip trailer and input preview':memoryPlan.preview_tier_mb?'input preview':memoryPlan.estimated_sort_bytes.value===null?'baseline':'file size and pipeline'}`],
+      ...(memoryPlan.gzip_member_bytes?[
+        ['Gzip final member size hint',size(memoryPlan.gzip_member_bytes)],
+      ]:[]),
+      ['Estimated sort footprint',memoryPlan.estimated_sort_bytes.value===null?'Unknown':size(memoryPlan.estimated_sort_bytes.value)],
+      ...(memoryPlan.from_analyze&&memoryPlan.target_mb!==startingTier?[
+        ['Memory target without Analyze',size((startingTier??memoryPlan.file_size_tier_mb)*2**20)],
+      ]:[]),
+      ...(memoryPlan.analyze_outside_range?[
+        ['Analyze memory estimate','Above the calibrated range · using the starting target'],
+      ]:[]),
+      ...(auto.effective_memory_bytes<memoryPlan.target_mb*2**20?[
+        ['Memory fallback','Available capacity limited the budget'],
+      ]:[]),
+    ] as [string,string][]):[]),
+    ['Workers',format(auto.effective_workers)],
+    ['Grouping',describe(auto.effective_grouping)],
+    ['Input file bytes',explain(auto.input_file_bytes)],
+    ['Analyzed rows',explain(auto.analyzed_rows)],
+    ['Decoded field bytes',explain(auto.decoded_field_bytes)],
+    ['Largest decoded row bytes',explain(auto.largest_decoded_row_bytes)],
+    ['Partition keys',explain(auto.partition_joint_keys)],
+    ['Largest partition rows',explain(auto.largest_partition_rows)],
+    ['Expected live fanout',explain(auto.expected_live_fanout)],
+    ...(auto.validated_root_partitions?[['Validated root partitions',explain(auto.validated_root_partitions)] as [string,string]]:[]),
+    ['Peak writer slots used',format(auto.measurements.peak_writer_slots)],
+    ['Grouping fallbacks',format(auto.routing_fallbacks)],
+    ['Retained exact fallbacks',format(auto.measurements.retained_exact_fallbacks??0)],
+    ['Probabilistic shuffle retries',format(auto.probabilistic_shuffle_retries)],
+    ...(d?([
+      ['Shuffle / partition retries',d.shuffle_partition_retries],
+      ['Partition / balanced retries',d.partition_balanced_retries],
+      ['Streaming chain retries',d.streaming_chain_retries],
+      ['Consecutive partition retries',d.consecutive_partition_retries],
+      ['Compact spill fallbacks',d.compact_spill_fallbacks],
+    ] as const).flatMap(([label,count]):[string,string][]=>count?[[label,format(count)]]:[]):[]),
+  ]):'';
+  $('analysis').innerHTML=`${a.warnings.length?`<section class="analysis-warnings" aria-label="Warnings"><h3>Warnings <span>${format(a.warnings.length)}</span></h3><ul>${a.warnings.map(w=>`<li>${escape(w)}</li>`).join('')}</ul></section>`:''}
+    <div class="stat-grid">${metrics.map(([value,label])=>`<div class="stat"><strong>${value}</strong><span>${label}</span></div>`).join('')}</div><p class="analysis-note">${escape(a.accuracy)}</p>
     <details class="analysis-section analysis-details"><summary>Processing details</summary>${facts([['Temporary storage retained',size(a.temp_bytes)],['Peak temporary storage',size(a.peak_temp_bytes)],['Working memory budget',size(a.memory_budget_bytes)],['Workers',format(a.workers)],['Algorithm version',a.algorithm_version??'See manifest']])}
     ${a.stages.length?`<h3>Group counts by step</h3><ul class="analysis-stages">${a.stages.map(stage=>`<li><span>Step ${stage.operation}</span><span>${format(stage.input_groups)} → ${format(stage.output_groups)} groups</span></li>`).join('')}</ul>`:''}</details>
+    ${autoDetails?`<details class="analysis-section"><summary>Auto plan</summary>${autoDetails}</details>`:''}
     ${d?`<details class="analysis-section"><summary>Execution strategies</summary>${facts([['In-memory sorts',format(d.resident_sorts)],['Bounded groupings',format(d.routed_groupings)],['Spilled sort runs',format(d.sort_runs)],['Merges',format(d.merge_operations)],['Grouping fallbacks to sorting',format(d.routing_fallbacks)],['Sorted group files reused',format(d.routing_reused_runs??0)],['Peak reserved workspace',size(d.peak_workspace_reserved_bytes)]])}<p class="analysis-explanation">Automatic grouping routes low-cardinality, ordered groups and falls back to sorting if their shape changes. Reserved workspace includes intermediate dataset buffers; it excludes parser, final output, codec and runtime overhead and is not process memory.</p></details>`:''}
     `;
 
@@ -241,7 +304,7 @@ bindColumnPickers($('operations'),picker=>{
 let columnTimer: ReturnType<typeof setTimeout>;
 $('job-form').addEventListener('input',event=>{
   const target=event.target as HTMLElement;
-  if(target.matches('[data-column-search],[data-inspection-search]'))return;
+  if(target.matches('#execution-mode,[data-column-search],[data-inspection-search]'))return;
   if(target.matches('[data-size-unit]')){
     updateFields();
     if(job)planLinks.render(job.operations,{rows:value('max-rows'),bytes:sizeText('max-bytes'),compressed:sizeText('compressed-bytes')},value('compression'));
@@ -256,7 +319,7 @@ $('job-form').addEventListener('input',event=>{
 $('operations').addEventListener('input',e=>{
   const el=e.target as HTMLInputElement;const step=el.closest<HTMLElement>('[data-step]');if(!step)return;
   const op=job.operations[Number(step.dataset.step)],field=el.dataset.field;
-  if(el.dataset.groupField){const group=op.groups![Number(el.closest<HTMLElement>('[data-group]')!.dataset.group)];group[el.dataset.groupField as 'name'|'percent']=el.value;updateGroupValidation();return;}
+  if(el.dataset.groupField){const group=op.groups![Number(el.closest<HTMLElement>('[data-group]')!.dataset.group)];group[el.dataset.groupField as 'name'|'percent']=el.value;return;}
   if(!field)return;
   if(field==='files') op[field]=Number(el.value);
   else if(field==='strategy'){op.strategy=el.value;renderOps();}
@@ -346,14 +409,14 @@ $('sniff-csv').onclick=async()=>{
 $('copy-csv').onclick=()=>{csvForm('output',readCsv('input'));markDirty();};
 $('profile').onclick=async()=>{
   if(!validation.check(false))return;
-  try{job=readJob();$('error').hidden=true;profileOrigin=resultOrigin(sourceKey(),job,editRevision,++resultSerial);profileDirty=false;lastProfileData=null;await api('profile',job);lastProfile='';lastAnalysis='';$('input-profile').hidden=true;$('analysis').hidden=true;await poll();}catch(e){error(e);}
+  try{const submitted=readJob();$('error').hidden=true;profileOrigin=resultOrigin(sourceKey(),submitted,editRevision,++resultSerial);profileDirty=false;lastProfileData=null;await api('profile',submitted);lastProfile='';lastAnalysis='';$('input-profile').hidden=true;$('analysis').hidden=true;await poll();}catch(e){error(e);}
 };
 async function startJob(){
   if(!validation.check())return;
   try{
-    job=readJob();updateDraft();$('error').hidden=true;
-    const submittedRevision=editRevision;analysisOrigin=resultOrigin(sourceKey(),job,editRevision,++resultSerial);
-    await api('run-direct',job);
+    const submitted=readJob();updateDraft();$('error').hidden=true;
+    const submittedRevision=editRevision;analysisOrigin=resultOrigin(sourceKey(),submitted,editRevision,++resultSerial);
+    await api('run-direct',submitted);
     // Acknowledgement validates only the draft revision that was submitted.
     if(submittedRevision===editRevision)dirty=false;
     lastAnalysis='';$('input-profile').hidden=true;$('analysis').hidden=true;
@@ -373,7 +436,10 @@ $('job-form').onsubmit=async e=>{
 $('cancel').onclick=async()=>{try{await api('cancel',{});await poll();}catch(e){error(e);}};
 $('export').onclick=()=>{try{const blob=new Blob([JSON.stringify(readJob(),null,2)+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='chopper-job.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){error(e);}};
 $('import').onclick=()=>$<HTMLInputElement>('import-file').click();
-$<HTMLInputElement>('import-file').onchange=async e=>{try{const file=(e.target as HTMLInputElement).files?.[0];if(!file)return;if(file.size>1048576)throw new Error('Job JSON exceeds 1 MiB.');const config=JSON.parse(await file.text());if(Object.hasOwn(config,"seed")||Object.hasOwn(config,"random_seed"))throw new Error("Seed settings are no longer supported. Remove the seed field from the job JSON.");const defaults=await api<Job>('defaults');job={...defaults,...config,input_csv:{...defaults.input_csv,...config.input_csv},output_csv:{...defaults.output_csv,...config.output_csv},limits:{...defaults.limits,...config.limits},resources:{...defaults.resources,...config.resources}};populate();}catch(e){error(e);}};
+$<HTMLInputElement>('import-file').onchange=async e=>{try{const file=(e.target as HTMLInputElement).files?.[0];if(!file)return;if(file.size>1048576)throw new Error('Job JSON exceeds 1 MiB.');const config=JSON.parse(await file.text());if(Object.hasOwn(config,"seed")||Object.hasOwn(config,"random_seed"))throw new Error("Seed settings are no longer supported. Remove the seed field from the job JSON.");const defaults=await api<Job>('defaults');job={...defaults,...config,input_csv:{...defaults.input_csv,...config.input_csv},output_csv:{...defaults.output_csv,...config.output_csv},limits:{...defaults.limits,...config.limits},resources:{...defaults.resources,...config.resources}};
+const manual=typeof config.resources?.memory_mb==='number'||job.resources.workers!==0||job.resources.grouping==='sort'
+  ||job.operations.some(op=>op.type==='shuffle'&&op.strategy&&op.strategy!=='auto');
+$<HTMLInputElement>('execution-mode').checked=manual;populate();}catch(e){error(e);}};
 for(const mode of ['input','output']) $('browse-'+mode).onclick=async()=>{
   const buttons=['input','output'].map(m=>$<HTMLButtonElement>('browse-'+m));
   buttons.forEach(b=>b.disabled=true);
@@ -385,7 +451,8 @@ for(const mode of ['input','output']) $('browse-'+mode).onclick=async()=>{
 };
 async function start(){try{job=await api<Job>('defaults');populate();await poll();setInterval(()=>void poll(),1000);}catch(e){$('connection').hidden=false;$('connection').textContent=`${e instanceof Error?e.message:e}. Open the browser app in desktop Chrome or Edge.`;}}
 const planLinks=configurePlanLinks();
-const validation=configureValidation(()=>job,()=>columnSchema,readSizeField,()=>readMemory(memoryControls));
+const validation=configureValidation(()=>job,()=>columnSchema,readSizeField,()=>advancedExecution()?readMemory(memoryControls):'auto',next=>hostedWorkspace.readiness(next));
+$('execution-mode').onchange=()=>{renderOps();markDirty();};
 const hostedWorkspace=configureHostedWorkspace();
 configureBrowserUI();
 void start();

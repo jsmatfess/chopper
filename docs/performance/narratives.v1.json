@@ -8826,6 +8826,188 @@
       "original_section_sha256": "629e43693763aa4a674b2a0c2deb31a9ae1ec9ec4359b65dc9e3238572f1e049",
       "sha256": "70a500d3a55dc057dccbc0bb881dfa3f6c9a19c515dac38fa78c763eb693bbf2",
       "relocations": []
+    },
+    {
+      "id": "auto-shadow-held-out-panel-2026-11-21",
+      "title": "Auto shadow held-out panel (2026-11-21)",
+      "anchor": "auto-shadow-held-out-panel-2026-11-21",
+      "path": "docs/performance/investigations/auto-shadow-held-out-panel-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "auto-shadow-held-out-panel-2026-11-21"
+      ],
+      "original_section_sha256": "8726272a2f5c8bcd325c9551c120ed8d6de6c07c22234fde7b962fac2d1a9896",
+      "sha256": "4466ca657fcaedf00befbf671d66dc4839d6037fbcdc74c16c2e8437de8c302d",
+      "relocations": []
+    },
+    {
+      "id": "auto-chromium-thresholds-and-resource-calibration-2026-11-21",
+      "title": "Auto Chromium thresholds and resource calibration (2026-11-21)",
+      "anchor": "auto-chromium-thresholds-and-resource-calibration-2026-11-21",
+      "path": "docs/performance/investigations/auto-chromium-thresholds-and-resource-calibration-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "auto-chromium-thresholds-and-resource-calibration-2026-11-21"
+      ],
+      "original_section_sha256": "315c2bcf384e078f884b95b8649c7d2b579e6da40ed5d708aec516a807f32400",
+      "sha256": "a8bbc984f8cfd12763f8a65dcb2c5b771c2009605ef5f2e707d5efa938d1ee4a",
+      "relocations": []
+    },
+    {
+      "id": "browser-direct-destination-writes-and-batching-2026-11-21",
+      "title": "Browser direct destination writes and batching (2026-11-21)",
+      "anchor": "browser-direct-destination-writes-and-batching-2026-11-21",
+      "path": "docs/performance/investigations/browser-direct-destination-writes-and-batching-2026-11-21.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "browser-direct-destination-writes-and-batching-2026-11-21"
+      ],
+      "original_section_sha256": "728b423f35f8d8a27262a28a22b82c110f2d3ea89780881a8b9b30c88355d101",
+      "sha256": "d36f140a2eb33c62553b8e7255a79ca2bd82882986cd1e665ce83c7271b5c3d2",
+      "relocations": []
+    },
+    {
+      "id": "browser-auto-resource-calibration-2026-11-21",
+      "title": "Browser Auto resource calibration (2026-11-21)",
+      "anchor": "browser-auto-resource-calibration-2026-11-21",
+      "path": "docs/performance/investigations/browser-auto-resource-calibration-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "browser-auto-resource-calibration-2026-11-21"
+      ],
+      "original_section_sha256": "b4d62b55fb724f1e885d905e5798d18ff116325a3f304176e49841db97737717",
+      "sha256": "9b158cafd14ad7752ee4b3963fbc92b025f38de8be7711d3cdb4bee5ee410160",
+      "relocations": []
+    },
+    {
+      "id": "browser-auto-memory-tiers-2026-11-21",
+      "title": "Browser Auto memory tiers (2026-11-21)",
+      "anchor": "browser-auto-memory-tiers-2026-11-21",
+      "path": "docs/performance/investigations/browser-auto-memory-tiers-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "browser-auto-memory-tiers-2026-11-21"
+      ],
+      "original_section_sha256": "7ea353ce8f2594067733861da61ba56c650c579926bc1b81dabbb6cdbf8096e1",
+      "sha256": "a9132edef8a3cc6781941273d7f2b2aae1bc626f97e05f41f8ebba0a79d24b0d",
+      "relocations": []
+    },
+    {
+      "id": "browser-preview-and-analyze-calibration-2026-11-21",
+      "title": "Browser preview and Analyze calibration (2026-11-21)",
+      "anchor": "browser-preview-and-analyze-calibration-2026-11-21",
+      "path": "docs/performance/investigations/browser-preview-and-analyze-calibration-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "browser-preview-and-analyze-calibration-2026-11-21"
+      ],
+      "original_section_sha256": "4c7203bcf388e12cd8d95d776565747bd84b4f990fde2cbb5b0ea91e0eeece80",
+      "sha256": "b881d6581a9a5f3ecf09ce607c959c88e3db1492df3e867dedf4154c69bc7d25",
+      "relocations": []
+    },
+    {
+      "id": "browser-preview-calibration-on-larger-files-2026-11-21",
+      "title": "Browser preview calibration on larger files (2026-11-21)",
+      "anchor": "browser-preview-calibration-on-larger-files-2026-11-21",
+      "path": "docs/performance/investigations/browser-preview-calibration-on-larger-files-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "browser-preview-calibration-on-larger-files-2026-11-21"
+      ],
+      "original_section_sha256": "3af390b77295b726c6c5843b029df9b5900aaed606ec8c6c5bc4ac95ca72f2ed",
+      "sha256": "df101b5518fe2599d2b827b34a50a1cc8a2a5ec12217faa0dad80e1f44c67c80",
+      "relocations": []
+    },
+    {
+      "id": "browser-auto-calibration-at-multiple-gib-2026-11-21",
+      "title": "Browser Auto calibration at multiple GiB (2026-11-21)",
+      "anchor": "browser-auto-calibration-at-multiple-gib-2026-11-21",
+      "path": "docs/performance/investigations/browser-auto-calibration-at-multiple-gib-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "browser-auto-calibration-at-multiple-gib-2026-11-21"
+      ],
+      "original_section_sha256": "5d063a65d61f5c17aebc3fdcf2f73f1843507536ccfe0ce04b4f3953119059c7",
+      "sha256": "11f69f92eb80d24a5d74b18c6021e22f06cc6bcec94e67fd36391f9edf8e29fb",
+      "relocations": []
+    },
+    {
+      "id": "auto-width-sampling-merge-passes-and-native-contention-2026-11-21",
+      "title": "Auto width sampling merge passes and native contention (2026-11-21)",
+      "anchor": "auto-width-sampling-merge-passes-and-native-contention-2026-11-21",
+      "path": "docs/performance/investigations/auto-width-sampling-merge-passes-and-native-contention-2026-11-21.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "auto-width-sampling-merge-passes-and-native-contention-2026-11-21"
+      ],
+      "original_section_sha256": "90245737c22ddf08c0aefaa274847ebc335f44a0143b02774b33ec241991e607",
+      "sha256": "084c4eb5396f36b689c11136c3f63bfa722f2952977f8a2b9f4246c354b9bc88",
+      "relocations": []
+    },
+    {
+      "id": "browser-direct-destination-write-overlap-2026-11-22",
+      "title": "Browser direct destination write overlap (2026-11-22)",
+      "anchor": "browser-direct-destination-write-overlap-2026-11-22",
+      "path": "docs/performance/investigations/browser-direct-destination-write-overlap-2026-11-22.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "browser-direct-destination-write-overlap-2026-11-22"
+      ],
+      "original_section_sha256": "6b8fbba55d51cf062cc0884d1d9f34bcc7733c1768af2df5bb74b772f1ab2466",
+      "sha256": "bce29c2a54e8d80b431d49f85342908b50c96e3c9206d0c8fad7cb6789250429",
+      "relocations": []
+    },
+    {
+      "id": "desktop-picker-write-overlap-2026-11-22",
+      "title": "Desktop picker write overlap (2026-11-22)",
+      "anchor": "desktop-picker-write-overlap-2026-11-22",
+      "path": "docs/performance/investigations/desktop-picker-write-overlap-2026-11-22.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "desktop-picker-write-overlap-2026-11-22"
+      ],
+      "original_section_sha256": "9b65bacfc4c561e323e2279050518ba6f9891408a5b35b28d1c2bc8d30ecf508",
+      "sha256": "540dac2e4e99efd0837605c5bb6b8b7de85093dabb428df9370e1eee381024f3",
+      "relocations": []
+    },
+    {
+      "id": "input-prefetch-native-publication-and-digest-overlap-2026-11-22",
+      "title": "Input prefetch native publication and digest overlap (2026-11-22)",
+      "anchor": "input-prefetch-native-publication-and-digest-overlap-2026-11-22",
+      "path": "docs/performance/investigations/input-prefetch-native-publication-and-digest-overlap-2026-11-22.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "input-prefetch-native-publication-and-digest-overlap-2026-11-22"
+      ],
+      "original_section_sha256": "4fee88c77d308d299822d4b3981f8b7f8ca692e636fd7a7fea83796ceea976f0",
+      "sha256": "9342a0f651288ef53fd4e52459964d5b7e215d0ebbaf6c92b05ab504d4b56fcc",
+      "relocations": []
+    },
+    {
+      "id": "bounded-io-overlap-adoption-2026-11-22",
+      "title": "Bounded I/O overlap adoption (2026-11-22)",
+      "anchor": "bounded-io-overlap-adoption-2026-11-22",
+      "path": "docs/performance/investigations/bounded-io-overlap-adoption-2026-11-22.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "bounded-io-overlap-adoption-2026-11-22"
+      ],
+      "original_section_sha256": "fad8363618998a5a428f107e8f603df839aa9542b628a0c3c5c1aa52e734a107",
+      "sha256": "3528fc1445f3a2ba66a25d3dcf0f67787f4229e9353877f6d26ca2b6b49e85c2",
+      "relocations": []
+    },
+    {
+      "id": "automatic-native-execution-bounds-2026-11-22",
+      "title": "Automatic native execution bounds (2026-11-22)",
+      "anchor": "automatic-native-execution-bounds-2026-11-22",
+      "path": "docs/performance/investigations/automatic-native-execution-bounds-2026-11-22.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "automatic-native-execution-bounds-2026-11-22"
+      ],
+      "original_section_sha256": "2737122a7f5a529381ae238bf63b703731ee38916b9e6e3b0a598466842b4de0",
+      "sha256": "f88c63f305adda8304600d7eb1c6e053b5d03a7831a9d2f1be30a32507da8a20",
+      "relocations": []
     }
   ],
   "migrated_count": 193

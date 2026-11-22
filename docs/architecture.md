@@ -1,6 +1,6 @@
 # Architecture and development entry points
 
-This describes the current implementation. The [Auto brief](auto-mode-and-maintainability.md)
+This describes the current implementation. The [product direction](product-direction.md)
 describes future behavior; [GitHub Issues](https://github.com/jsmatfess/chopper/issues) orders changes. Start with the
 [README](../README.md) for setup and [AGENTS.md](../AGENTS.md) for applicable checks.
 
@@ -115,6 +115,15 @@ The separate public evidence-site source has been retired. The hosted Chopper
 app is the only web UI. [Evidence storage](evidence-storage.md) preserves the
 archive and historical reader metadata contracts; those contracts do not imply
 that the retired evidence site remains a current product.
+
+## Auto planning
+
+The [engine planner](../crates/chopper/src/engine/auto.rs) reports the physical
+Run route, current resource envelope and selected strategy. The
+[profile cache](../crates/chopper/src/profile.rs) uses its existing validated scan
+to produce compact input-bound advice. The CLI can pass an Analyze report
+explicitly, while the hosted session forwards advice for the current File
+selection to its new Run worker. See the [decision diagrams](execution-decisions.md#3-current-auto-planning).
 
 ## Hosted Run observations
 

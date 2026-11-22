@@ -4,6 +4,8 @@
 *.log
 !browser-opfs-contexts-2026-10-17.jsonl
 !catalog.json
+!auto-shadow-held-out-summary-2026-11-21.json
+!auto-chromium-thresholds-and-resource-calibration-2026-11-21-summary.json
 !options-browser-2026-10-13.jsonl
 !performance-decisions-2026-10-20.json
 !strategy-corpus-review-2026-10-23.json
@@ -186,3 +188,41 @@ reservation-entry-2026-11-05-linux-lock.py
 !bounded-writers-summary-2026-11-19.json
 !partition-routing-checks-summary-2026-11-18.json
 !partition-routing-summary-2026-11-18.json
+
+# Matched browser destination writing and write coalescing runs.
+!browser-direct-destination-writes-2026-11-21.json
+
+# Verified Chromium Auto resource calibration panels.
+!browser-auto-resource-calibration-2026-11-21-primary.jsonl
+!browser-auto-resource-calibration-2026-11-21-holdout.jsonl
+!browser-auto-resource-calibration-2026-11-21-pipeline.jsonl
+
+# Held-out checks of the delivered browser Auto memory tier policy.
+!browser-auto-memory-tiers-2026-11-21.jsonl
+
+# Held-out browser preview and Analyze break-even calibration.
+!browser-preview-analyze-calibration-2026-11-21-preview.jsonl
+!browser-preview-analyze-calibration-2026-11-21-codec-control.jsonl
+
+# Matched preview calibration on larger browser jobs.
+!browser-large-preview-calibration-2026-11-21-main.jsonl
+!browser-large-preview-calibration-2026-11-21-shuffle-control.jsonl
+
+# Multi-GiB and production hosted Auto calibration controls.
+!browser-auto-multigib-2026-11-21-*.jsonl
+
+# Auto input-width, merge-pass and native contention controls.
+!auto-followup-2026-11-21-*.jsonl
+!auto-followup-2026-11-21-build-inputs.json
+
+# Direct destination write overlap screen and holdout.
+!browser-direct-destination-write-overlap-2026-11-22-*.json
+!browser-direct-destination-write-overlap-2026-11-22-*.jsonl
+
+# Browser input overlap and native publication/digest follow-up.
+!overlap-followup-2026-11-22-*.jsonl
+!overlap-followup-2026-11-22-*.json
+!overlap-followup-2026-11-22-*.patch
+!io-overlap-adoption-2026-11-22-*.jsonl
+!native-auto-bounds-2026-11-22-*.jsonl
+!native-auto-bounds-2026-11-22-smoke.json

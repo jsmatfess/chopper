@@ -33,14 +33,21 @@ await withHostedBrowser({port:8427,viewport:{width:1280,height:900}},async({cont
   const mapped=panel.locator('[data-plan-targets^="step-"]').first();await mapped.hover();await page.waitForFunction(()=>[...document.querySelectorAll('.plan-connector.is-visible')].some(svg=>svg.querySelectorAll('path').length>=2));
   assert.ok(await page.locator('.results .plan-config-highlight').count()>0,'hover maps observed work to its output plan step');
   assert.ok(await page.locator('.execution-plan-connector').evaluate(svg=>svg.viewBox.baseVal.width>0&&svg.viewBox.baseVal.height>0),'connector has a drawable viewport on first hover');
+  const colors=await page.evaluate(()=>{
+    const targets=[...document.querySelectorAll('.results .plan-config-highlight')];
+    const connectors=[...document.querySelectorAll('.execution-plan-connector .plan-connector-line')];
+    const markers=targets.map(el=>getComputedStyle(el.closest('li'),'::marker').color);
+    return {markers:markers.sort(),outlines:targets.map(el=>getComputedStyle(el).outlineColor).sort(),lines:connectors.map(el=>getComputedStyle(el).stroke).sort()};
+  });
+  assert.deepEqual(colors.lines,colors.markers,'graph connector colors match the linked step numbers');
+  assert.deepEqual(colors.outlines,colors.markers,'plan outlines match the linked step numbers');
   await mapped.focus();await page.waitForFunction(()=>document.querySelector('.results .plan-config-highlight'));await page.locator('h1').click();
 
-  const dimensions=()=>panel.locator('.execution-viewport').evaluate(el=>({height:el.clientHeight,scrollHeight:el.scrollHeight,width:el.clientWidth,stageHeight:el.querySelector('.execution-stage').getBoundingClientRect().height,stageWidth:el.querySelector('.execution-stage').getBoundingClientRect().width,scale:Number(el.querySelector('.execution-stage').style.getPropertyValue('--dag-zoom')),graphWidth:parseFloat(el.querySelector('.execution-stage').style.getPropertyValue('--dag-width'))}));
-  await panel.locator('[data-auto-fit]').check();
+  const dimensions=()=>panel.locator('.execution-viewport').evaluate(el=>({height:el.clientHeight,scrollHeight:el.scrollHeight,width:el.clientWidth,scrollWidth:el.scrollWidth,stageHeight:el.querySelector('.execution-stage').getBoundingClientRect().height,stageWidth:el.querySelector('.execution-stage').getBoundingClientRect().width,scale:Number(el.querySelector('.execution-stage').style.getPropertyValue('--dag-zoom')),graphWidth:parseFloat(el.querySelector('.execution-stage').style.getPropertyValue('--dag-width'))}));
+  await panel.getByRole('checkbox',{name:'Auto-fit'}).check();
   const natural=await dimensions();assert.ok(natural.height>600,'live graph grows with its activity rows');assert.ok(natural.scrollHeight<=natural.height+1,'all activity rows are visible without vertical graph scrolling');
-  await page.getByRole('button',{name:'Fit graph',exact:true}).click();
-  const fitted=await dimensions();assert.ok(Math.abs(fitted.scale-Math.min(1,(fitted.width-20)/fitted.graphWidth))<.001,'Fit graph depends only on available width');assert.ok(Math.abs(fitted.height-fitted.stageHeight)<18,'Fit graph height follows the scaled content');assert.ok(fitted.stageWidth<=fitted.width,'Fit graph needs no horizontal scrolling');
-  await page.getByRole('button',{name:'Zoom in',exact:true}).click();const enlarged=await dimensions();assert.ok(enlarged.height<=await page.evaluate(()=>innerHeight*.8),'manual zoom bounds the viewport for panning');assert.ok(enlarged.scrollHeight>=enlarged.stageHeight-1,'manual navigation retains the full scrollable graph');assert.ok(enlarged.stageHeight>fitted.stageHeight,'zoom enlarges the scrollable graph');
+  const fitted=await dimensions();assert.ok(Math.abs(fitted.scale-Math.min(1,(fitted.width-20)/fitted.graphWidth))<.001,'Auto-fit depends only on available width');assert.ok(Math.abs(fitted.height-fitted.stageHeight)<18,'fitted height follows the scaled content');assert.ok(fitted.scrollWidth<=fitted.width+1,'Auto-fit needs no horizontal scrolling');
+  await page.getByRole('slider',{name:'Zoom',exact:true}).press('End');const enlarged=await dimensions();assert.ok(Math.abs(enlarged.height-enlarged.stageHeight)<=1,'manual zoom also gives the graph its full height');assert.ok(enlarged.scrollHeight<=enlarged.height+1,'manual zoom adds no vertical graph scrolling');assert.ok(enlarged.height>fitted.height,'zoom grows the card with the graph');
 
   assert.equal(await page.getByRole('button',{name:'Advanced details',exact:true}).count(),0);assert.equal(await panel.locator('.execution-events').count(),0);
   assert.doesNotMatch(await panel.locator('.execution-flow button').evaluateAll(buttons=>buttons.map(button=>button.getAttribute('aria-label')).join(' ')),/compressed_bytes/);assert.match(await panel.locator('.execution-flow button').evaluateAll(buttons=>buttons.map(button=>button.getAttribute('aria-label')).join(' ')),new RegExp(`${job.operations.length+1}\\. CSV output`));
@@ -56,7 +63,12 @@ await withHostedBrowser({port:8427,viewport:{width:1280,height:900}},async({cont
   assert.deepEqual(independent.ids,Array.from({length:dense?100000:4},(_,i)=>dense?i:i+1));assert.ok(independent.groups.every(count=>count===1));assert.equal(independent.rows,dense?100000:4);assert.deepEqual(independent.marker,{complete:true,files:independent.saved,engine:'chopper-browser',version:1});
   const screenshots=process.argv.find(arg=>arg.startsWith('--screenshots='))?.slice(14);if(screenshots){await mkdir(screenshots,{recursive:true});await panel.screenshot({path:screenshots+`/inspection-${shape}-wide.png`});await page.setViewportSize({width:390,height:844});await panel.screenshot({path:screenshots+`/inspection-${shape}-narrow.png`});assert.ok(await panel.evaluate(el=>el.scrollWidth<=el.clientWidth),'narrow panel fits viewport');await page.setViewportSize({width:1280,height:900});await page.getByRole('button',{name:'List view',exact:true}).click();await panel.screenshot({path:screenshots+`/inspection-${shape}-list.png`});await page.getByRole('button',{name:'Graph view',exact:true}).click();}
   if(!dense){const retained=await panel.locator('.execution-list').textContent();await revealFormControl(page,'#profile');await page.locator('#profile').click();await page.waitForFunction(()=>document.getElementById('status').textContent==='PROFILED');assert.equal(await panel.locator('.execution-list').textContent(),retained);assert.equal(await page.locator('#cancel').isHidden(),true,'Analyze retains no pending output to cancel');}
-  reports.push({shape,dense,real_observations:true,starts_expanded:true,mappings_and_view_selection:true,independent_rows:independent.rows});await panel.locator('summary').click();
+  reports.push({shape,dense,real_observations:true,starts_expanded:true,mappings_and_view_selection:true,independent_rows:independent.rows});
+  if(!dense){
+   await page.locator('.workspace-view-controls [data-workspace-view=execution]').click();
+   await page.waitForFunction(()=>document.body.dataset.workspaceView==='execution');
+  }
+  await panel.locator('summary').click();
  }
  await page.evaluate(async()=>(await navigator.storage.getDirectory()).removeEntry(window.inspectionParent,{recursive:true}));
  const hashes={};for(const name of ['engine.wasm','engine-worker.js','storage-worker.js','app.js'])hashes[name]=createHash('sha256').update(await readFile(root+'ui/dist/'+name)).digest('hex');console.log(JSON.stringify({browserVersion,browserChannel,harness_sha256:createHash('sha256').update(await readFile(fileURLToPath(import.meta.url))).digest('hex'),wrapper_sha256:createHash('sha256').update(wrapper).digest('hex'),hashes,reports},null,2));

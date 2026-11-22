@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "browser-direct-destination-write-overlap-2026-11-22",
+  "title": "Measure bounded destination write overlap in Chromium",
+  "date": "2026-11-22",
+  "subsystem": "output",
+  "question": "Does one in-flight destination write save time in addition to removing the copy and coalescing writes?",
+  "disposition": "retain-experimental",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "A single in-flight write repeatedly helped plain streaming to OPFS. Coalescing accounted for most of the gain and combining the two further reduced whole-job time. Preserve normal publication until desktop selection and production buffer accounting are qualified.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Direct browser CSV and gzip streaming and eight-key partition output to same-origin OPFS.",
+      "Disk-backed 390.63 MiB direct CSV holdout."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "Verified 48 screen jobs and eight disk-backed jobs. Direct, async and combined worker variants each passed eight marker, failure, and cancellation cases."
+  },
+  "limitations": [
+    "One headless Chromium build on WSL and one destination model in this experiment.",
+    "The prototype owns up to two additional 1 MiB buffers outside WASI working reservations."
+  ],
+  "exclusions": [
+    "User-selected-folder speed claims, sustained device throughput, and default promotion."
+  ],
+  "reopen_when": "Repeat the comparison with picker-selected output and qualify browser buffer ownership and end-to-end failure controls.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#browser-direct-destination-write-overlap-2026-11-22",
+      "sha256": "6b8fbba55d51cf062cc0884d1d9f34bcc7733c1768af2df5bb74b772f1ab2466"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-screen.json",
+      "sha256": "8a4f5dda5c0d5b97adc732fb2544b90725610801f7eb6cead00d471c479c6ce3"
+    },
+    {
+      "path": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-holdout.jsonl",
+      "sha256": "92573dca0ab0156c9bda4cc1a2e13c2a49bb33fb069609b780f1896d8290cc4c"
+    },
+    {
+      "path": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-faults.json",
+      "sha256": "54cf758e22b51f0a510cec45fdc05cfdee789621db5a48f4394ba009def987d8"
+    }
+  ],
+  "contracts": [
+    "docs/direct-execution.md",
+    "docs/browser.md"
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "id": "desktop-picker-write-overlap-2026-11-22",
+  "title": "Retain bounded async writes after the desktop picker holdout",
+  "date": "2026-11-22",
+  "subsystem": "output",
+  "question": "Does the plain streaming speedup survive native picker-selected destination writes?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "A real picker-selected ext4 folder reproduced the plain streaming speedup. Coalescing plus one in-flight write was fastest. Production buffer ownership and failure integration remain prerequisites.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "96 MiB plain streaming to a picker-selected ext4 folder through headed Chromium on WSLg.",
+      "Earlier direct OPFS and disk-backed plain streaming comparisons for provenance."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "All 12 desktop runs preserved output contents and strict caps and verified publication and cleanup. The OPFS fault panel covers rejection and in-flight cancellation."
+  },
+  "limitations": [
+    "One desktop filesystem and physical host. Desktop timings cover one plain streaming fixture."
+  ],
+  "exclusions": [
+    "Production rollout, desktop compressed and partition throughput, and native Windows throughput."
+  ],
+  "reopen_when": "Integrate bounded buffer ownership and run the existing error and cancellation controls against the production path.",
+  "supersedes": [
+    "browser-direct-destination-write-overlap-2026-11-22"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#desktop-picker-write-overlap-2026-11-22",
+      "sha256": "9b65bacfc4c561e323e2279050518ba6f9891408a5b35b28d1c2bc8d30ecf508"
+    },
+    {
+      "section": "docs/performance.md#browser-direct-destination-write-overlap-2026-11-22",
+      "sha256": "6b8fbba55d51cf062cc0884d1d9f34bcc7733c1768af2df5bb74b772f1ab2466"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-desktop.jsonl",
+      "sha256": "01655f081fad67e5ea5dd99dbad14f4df00a414dbaec4b4b94c33cea94f7abe6"
+    },
+    {
+      "path": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-holdout.jsonl",
+      "sha256": "92573dca0ab0156c9bda4cc1a2e13c2a49bb33fb069609b780f1896d8290cc4c"
+    },
+    {
+      "path": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-screen.json",
+      "sha256": "8a4f5dda5c0d5b97adc732fb2544b90725610801f7eb6cead00d471c479c6ce3"
+    },
+    {
+      "path": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-faults.json",
+      "sha256": "54cf758e22b51f0a510cec45fdc05cfdee789621db5a48f4394ba009def987d8"
+    }
+  ],
+  "contracts": [
+    "docs/direct-execution.md",
+    "docs/browser.md"
+  ]
+}

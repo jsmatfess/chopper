@@ -54,8 +54,11 @@ try {
       assert.equal(await app.locator('#run-direct').getAttribute('type'),'submit');
       assert.equal(await app.locator('#profile').getAttribute('type'),'button');
       assert.equal(await app.locator('#require-reproducible').count(),0);
-      assert.equal(await app.locator('#memory-mode').inputValue(),'manual');
+      assert.equal(await app.locator('#memory-mode').inputValue(),'auto');
       assert.equal(await app.locator('#memory').inputValue(),'256');
+      assert.equal(await app.getByRole('switch',{name:'Advanced execution mode'}).isChecked(),false);
+      assert.equal(await app.locator('#memory-mode').isVisible(),false);
+      await app.locator('#execution-mode').check();
       await revealFormControl(app,'#memory-mode');
       await app.locator('#memory-mode').selectOption('auto');
       assert.equal(await app.locator('#memory').isDisabled(),true);
@@ -105,7 +108,7 @@ try {
       await app.locator('#run-direct').click();
       await app.waitForFunction(()=>['COMPLETE','FAILED'].includes(document.getElementById('status')?.textContent),{},{timeout:30000});
       assert.equal(await app.locator('#status').textContent(),'COMPLETE');
-      await app.waitForFunction(previous=>document.getElementById('status')?.textContent==='COMPLETE'&&document.getElementById('result-path')?.textContent!==previous&&document.getElementById('result-path')?.textContent.includes('Results saved'),previousResult,{timeout:30000});
+      await app.waitForFunction(previous=>document.getElementById('status')?.textContent==='COMPLETE'&&document.getElementById('result-path')?.textContent!==previous&&document.getElementById('result-path')?.textContent.includes('CSV files saved to'),previousResult,{timeout:30000});
       const disabled=await app.evaluate(async()=>{
         const root=await navigator.storage.getDirectory(),parent=await root.getDirectoryHandle(window.directSmokeParent);
         const folders=[];for await(const [,handle]of parent.entries())folders.push(handle);
@@ -113,7 +116,7 @@ try {
         const csvs=await Promise.all(files.filter(f=>f.name.endsWith('.csv')).sort((a,b)=>a.name.localeCompare(b.name)).map(f=>f.text()));
         const marker=JSON.parse(await files.find(f=>f.name==='CHOPPER-COMPLETE.json').text());
         const manifest=JSON.parse((await files.find(f=>f.name==='manifest.jsonl').text()).split('\n')[0]);
-        await root.removeEntry(window.directSmokeParent,{recursive:true});
+        await parent.removeEntry(folders[0].name,{recursive:true});
         return {csvs,marker,manifest};
       });
       assert.deepEqual(disabled.csvs,exported.csvs);assert.deepEqual(disabled.marker,exported.marker);
@@ -121,6 +124,8 @@ try {
       assert.equal(disabled.manifest.analysis.logical_digest,exported.manifest.analysis.logical_digest);
       await app.evaluate(()=>{window.observationDisabled=false;});
       // Analyze reads input without retaining a prepared output result.
+      await app.locator('.workspace-view-controls [data-workspace-view=configuration]').click();
+      await app.locator('#execution-mode').uncheck();
       await revealFormControl(app,'#profile');
       await app.locator('#profile').click();
       await app.waitForFunction(()=>['PROFILED','FAILED'].includes(document.getElementById('status')?.textContent),{},{timeout:30000});
@@ -135,6 +140,26 @@ try {
       const current=await exportJob();
       assert.equal(Object.hasOwn(current,'seed'),false);assert.equal(current.resources.memory_mb,'auto');
       assert.equal(Object.hasOwn(current,'full_shuffle_policy'),false);
+      await app.locator('#run-direct').click();
+      await app.waitForFunction(()=>['COMPLETE','FAILED'].includes(document.getElementById('status')?.textContent),{},{timeout:30000});
+      assert.equal(await app.locator('#status').textContent(),'COMPLETE',await app.locator('#error').textContent());
+      const auto=app.locator('#analysis details').filter({has:app.getByText('Auto plan',{exact:true})});
+      await auto.locator('summary').click();
+      assert.match(await auto.textContent(),/Analyze observationsMatched this input/);
+      assert.match(await auto.textContent(),/Analyzed rows2 · exact/);
+      assert.match(await auto.textContent(),/Physical planstreaming/);
+      await app.locator('.workspace-view-controls [data-workspace-view=configuration]').click();
+      await app.waitForFunction(()=>document.body.dataset.workspaceView==='configuration');
+      await app.locator('#auto-processing summary').click();
+      assert.match(await app.locator('#auto-memory').innerText(),/MiB budget for this Run/);
+      assert.match(await app.locator('#auto-writers').innerText(),/peak slots used/);
+      await app.locator('#max-rows').fill('2');
+      assert.match(await app.locator('#auto-memory').innerText(),/Chosen at Run/);
+      await app.evaluate(async()=>{
+        const root=await navigator.storage.getDirectory();
+        await root.removeEntry(window.directSmokeParent,{recursive:true});
+      });
+
       assert.deepEqual(errors,[]);
       result.tests.push({name:'hosted page Run action submits current settings and exports complete results',seconds:(performance.now()-started)/1000});
     }catch(error){result.error=String(error);result.tests.push({name:'hosted page Run action submits current settings and exports complete results',error:String(error),seconds:(performance.now()-started)/1000});}

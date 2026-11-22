@@ -45,10 +45,38 @@ struct Key {
     modified: SystemTime,
     created: Option<SystemTime>,
     input_options: String,
+    memory_mb: u64,
     #[cfg(unix)]
     identity: (u64, u64, i64, i64),
 }
 impl Key {
+    fn binding(&self) -> Option<[u8; 32]> {
+        if cfg!(windows) {
+            return None;
+        }
+        let mut hash = blake3::Hasher::new();
+        // Virtual stat timestamps do not identify a File across new WASI
+        // workers. The browser session verifies the selection before forwarding
+        // observations; the reactor independently checks size and parser settings.
+        #[cfg(target_os = "wasi")]
+        serde_json::to_writer(&mut hash, &(&self.path, self.length, &self.input_options)).ok()?;
+        #[cfg(not(target_os = "wasi"))]
+        serde_json::to_writer(
+            &mut hash,
+            &(
+                &self.path,
+                self.length,
+                self.modified,
+                self.created,
+                &self.input_options,
+            ),
+        )
+        .ok()?;
+        #[cfg(unix)]
+        serde_json::to_writer(&mut hash, &self.identity).ok()?;
+        Some(*hash.finalize().as_bytes())
+    }
+
     fn read(job: &Job, memory_mb: u64) -> Result<Self> {
         #[cfg(not(target_os = "wasi"))]
         let path = std::fs::canonicalize(&job.input)?;
@@ -67,8 +95,8 @@ impl Key {
                 &job.input_csv,
                 &job.zip_member,
                 job.resources.max_record_bytes,
-                memory_mb,
             ))?,
+            memory_mb,
             #[cfg(unix)]
             identity: {
                 use std::os::unix::fs::MetadataExt;
@@ -82,6 +110,10 @@ impl Key {
         })
     }
 }
+pub(crate) fn auto_binding(job: &Job) -> Option<[u8; 32]> {
+    Key::read(job, 0).ok()?.binding()
+}
+
 /// HyperLogLog with 1024 registers: about 3.25% relative standard error.
 /// Only cardinality estimates use hashes; output equality never does.
 /// Algorithm: https://dmtcs.episciences.org/3545/pdf (64-bit hashes here).
@@ -152,6 +184,10 @@ pub struct InputProfile {
     pub stages: Vec<StageProfile>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub writer_estimate: Option<WriterEstimate>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub auto_observations: Option<engine::AutoObservations>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub suggested_run_memory_mb: Option<u64>,
     pub cache_hit: bool,
     pub seconds: f64,
     pub accuracy: String,
@@ -226,6 +262,8 @@ impl InputProfile {
             column_values,
             stages,
             writer_estimate: self.writer_estimate,
+            auto_observations: self.auto_observations,
+            suggested_run_memory_mb: self.suggested_run_memory_mb,
             cache_hit: self.cache_hit,
             seconds: self.seconds,
             accuracy,
@@ -290,9 +328,53 @@ fn reserve_preview(
 struct Observations {
     profile: InputProfile,
     combinations: Vec<(Vec<usize>, u64)>,
+    partition: Option<engine::auto::PartitionObservation>,
+    decoded_field_bytes: u64,
+    largest_decoded_row_bytes: u64,
     _combination_buffers: Reservation,
     key_buffers: Reservation,
 }
+impl Observations {
+    fn partition_for(
+        &self,
+        configured_columns: [u8; 32],
+        indices: &[usize],
+    ) -> Option<engine::auto::PartitionObservation> {
+        if let Some(mut partition) = self
+            .partition
+            .filter(|p| p.columns == selection_hash(indices))
+        {
+            partition.columns = configured_columns;
+            return Some(partition);
+        }
+        let [column] = indices else {
+            return None;
+        };
+        let summary = self
+            .profile
+            .column_values
+            .iter()
+            .find(|s| s.column == *column && s.distinct_exact)?;
+        Some(engine::auto::PartitionObservation {
+            columns: configured_columns,
+            keys: summary.distinct,
+            keys_exact: true,
+            largest_key_bucket_rows: summary.frequencies.values().copied().max().unwrap_or(0),
+            skew_exact: true,
+        })
+    }
+}
+
+// Cache coverage uses resolved columns, so aliases and permutations can reuse
+// the same joint statistics. Run receives a separate binding to the job syntax.
+fn selection_hash(indices: &[usize]) -> [u8; 32] {
+    let mut hash = blake3::Hasher::new();
+    for index in indices {
+        hash.update(&index.to_le_bytes());
+    }
+    *hash.finalize().as_bytes()
+}
+
 #[derive(Default)]
 pub struct ProfileCache {
     entry: Option<(Key, Observations)>,
@@ -378,6 +460,7 @@ impl ProfileCache {
             .unwrap_or_else(crate::resources::process_memory)?;
         let memory_mb = pool.resolve_memory(&job.resources)?;
         let key = Key::read(job, memory_mb)?;
+        let partition_columns = engine::auto::partition_columns(job);
         let mut cache_hit = false;
         if let Some((old, observations)) = &self.entry {
             // Windows timestamp metadata can remain unchanged across rapid
@@ -387,7 +470,9 @@ impl ProfileCache {
                 let p = &observations.profile;
                 let (wanted, _selection_buffers) =
                     selections(job, p.header.as_deref(), p.columns, &p.metadata_buffers)?;
-                cache_hit = wanted.iter().all(|indices| match indices.as_slice() {
+                cache_hit = partition_columns.is_none_or(|columns| {
+                    observations.partition_for(columns, &wanted[0]).is_some()
+                }) && wanted.iter().all(|indices| match indices.as_slice() {
                     [] => true,
                     [column] => p.column_values.iter().any(|c| c.column == *column),
                     _ => observations
@@ -452,7 +537,7 @@ impl ProfileCache {
         }
         ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
         // Do not retain a cache owner that this runtime cannot safely reuse.
-        let observations = &uncached.as_ref().or(self.entry.as_ref()).unwrap().1;
+        let (key, observations) = uncached.as_ref().or(self.entry.as_ref()).unwrap();
         let mut profile = observations.profile.try_clone()?;
         let (wanted, _selection_buffers) = selections(
             job,
@@ -460,6 +545,8 @@ impl ProfileCache {
             profile.columns,
             &profile.metadata_buffers,
         )?;
+        let partition =
+            partition_columns.and_then(|columns| observations.partition_for(columns, &wanted[0]));
         // Cached observations have no stages. Returned copies own their stage
         // allocation and text independently of the cache and other responses.
         profile
@@ -490,6 +577,17 @@ impl ProfileCache {
             });
         }
         profile.writer_estimate = writers::estimate(job, &profile);
+        profile.auto_observations = key.binding().map(|binding| engine::AutoObservations {
+            binding,
+            rows: profile.rows,
+            columns: profile.columns as u64,
+            decoded_field_bytes: observations.decoded_field_bytes,
+            largest_decoded_row_bytes: observations.largest_decoded_row_bytes,
+            partition,
+        });
+        profile.suggested_run_memory_mb = profile
+            .auto_observations
+            .and_then(|hint| engine::auto::analyzed_memory_target(job, key.length, hint));
         profile.cache_hit = cache_hit;
         profile.seconds = started.elapsed().as_secs_f64();
         Ok(profile)
@@ -625,6 +723,10 @@ fn scan_configured(
         key.extend_from_slice(indices);
         combinations.push((key, Cardinality::default()));
     }
+    let first_partition = engine::auto::partition_columns(job).map(|_| wanted[0].as_slice());
+    let mut partition_buckets = [0u64; 64];
+    let mut decoded_field_bytes = 0u64;
+    let mut largest_decoded_row_bytes = 0u64;
     let mut rows = 0;
     let mut values_bytes = 0;
     let mut preview = Vec::new();
@@ -638,6 +740,13 @@ fn scan_configured(
     );
     while let Some(record) = records.next(&stats, &combinations, cancel)? {
         let fields = record.fields;
+        let row_bytes = fields.iter().map(|field| field.len() as u64).sum();
+        decoded_field_bytes += row_bytes;
+        largest_decoded_row_bytes = largest_decoded_row_bytes.max(row_bytes);
+        if let Some([column]) = first_partition {
+            let hash = blake3::hash(fields[*column].as_bytes());
+            partition_buckets[hash.as_bytes()[0] as usize % 64] += 1;
+        }
         ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
         for (i, (summary, cardinality)) in stats.iter_mut().enumerate() {
             let value = &fields[summary.column];
@@ -678,10 +787,14 @@ fn scan_configured(
             }
         }
         for (i, (indices, cardinality)) in combinations.iter_mut().enumerate() {
-            cardinality.add(record.hashes.map_or_else(
+            let hash = record.hashes.map_or_else(
                 || combination_hash(fields, indices),
                 |hashes| hashes[stats.len() + i],
-            ));
+            );
+            cardinality.add(hash);
+            if first_partition.is_some_and(|wanted| wanted == indices) {
+                partition_buckets[hash.as_bytes()[0] as usize % 64] += 1;
+            }
         }
         if preview.len() < 8 {
             // Preserve v1 preview selection: its byte-at-a-time parser grew
@@ -738,16 +851,49 @@ fn scan_configured(
     for (indices, cardinality) in combinations {
         retained_combinations.push((indices, cardinality.estimate().min(rows)));
     }
+    let partition = first_partition.and_then(|indices| {
+        let bucket = partition_buckets.into_iter().max().unwrap_or(0);
+        let (keys, keys_exact, largest_key_bucket_rows) = match indices {
+            [column] => {
+                let summary = column_values
+                    .iter()
+                    .find(|summary| summary.column == *column)?;
+                let largest = summary.frequencies.values().copied().max().unwrap_or(0);
+                (
+                    summary.distinct,
+                    summary.distinct_exact,
+                    if summary.distinct_exact {
+                        largest
+                    } else {
+                        bucket
+                    },
+                )
+            }
+            _ => {
+                let (_, keys) = retained_combinations
+                    .iter()
+                    .find(|(key, _)| key == indices)?;
+                (*keys, false, bucket)
+            }
+        };
+        Some(engine::auto::PartitionObservation {
+            columns: selection_hash(indices),
+            keys,
+            keys_exact,
+            largest_key_bucket_rows,
+            skew_exact: keys_exact,
+        })
+    });
     notify(crate::storage::Progress {
         phase: crate::storage::ProgressPhase::literal("Input profile complete"),
         rows,
         temp_bytes: 0,
     });
     Ok(Observations {
-        profile: InputProfile { rows, columns, header, preview, column_values, stages: vec![], writer_estimate: None, cache_hit: false, seconds: 0.0,
+        profile: InputProfile { rows, columns, header, preview, column_values, stages: vec![], writer_estimate: None, auto_observations: None, suggested_run_memory_mb: None, cache_hit: false, seconds: 0.0,
             accuracy: metadata_buffers.copy_string("Every input record validated; row count is exact. Distinct counts marked approximate use full-file sketches (about 3.25% relative standard error, not a bound). Input key counts are not final pipeline group counts. Run applies operations and validates output limits independently.")?, header_buffers, preview_buffers, metadata_buffers,
             execution: { execution.scan_peak_reserved_bytes = workspace.peak(); execution } },
-        combinations: retained_combinations, _combination_buffers: combination_buffers, key_buffers,
+        combinations: retained_combinations, partition, decoded_field_bytes, largest_decoded_row_bytes, _combination_buffers: combination_buffers, key_buffers,
     })
 }
 

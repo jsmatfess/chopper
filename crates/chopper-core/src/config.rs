@@ -16,6 +16,7 @@ pub struct Job {
     pub compression: Compression,
     pub operations: Vec<Operation>,
     pub limits: Limits,
+    #[serde(default = "Resources::automatic")]
     pub resources: Resources,
     /// Internal execution/test state; never accepted or emitted in Job JSON.
     #[doc(hidden)]
@@ -163,7 +164,7 @@ pub struct Limits {
     pub compressed_bytes: Option<u64>,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(default, deny_unknown_fields)]
+#[serde(default = "Resources::automatic", deny_unknown_fields)]
 pub struct Resources {
     pub memory_mb: MemoryBudget,
     pub workers: usize,
@@ -195,6 +196,14 @@ impl Default for Resources {
     }
 }
 impl Resources {
+    /// Resource defaults for user-authored jobs and forms.
+    pub fn automatic() -> Self {
+        Self {
+            memory_mb: MemoryBudget::Auto,
+            ..Self::default()
+        }
+    }
+
     /// Validate a resolved budget without changing the requested configuration.
     pub fn validate_effective_memory(&self, memory_mb: u64) -> Result<()> {
         ensure!(

@@ -72,7 +72,7 @@ enum Command {
         compression: String,
         #[arg(long)]
         zip_member: Option<String>,
-        #[arg(long, default_value = "256")]
+        #[arg(long, default_value = "auto")]
         memory_mb: MemoryBudget,
         #[arg(long, default_value_t = 0)]
         workers: usize,
@@ -104,14 +104,19 @@ impl CliJob {
             Self::Decoded(owner) => owner.job(),
         }
     }
-    fn execute(self, cancel: Arc<AtomicBool>, notify: Notify) -> Result<engine::Analysis> {
+    fn execute(
+        self,
+        cancel: Arc<AtomicBool>,
+        notify: Notify,
+        hint: Option<engine::AutoObservations>,
+    ) -> Result<engine::Analysis> {
         match self {
-            Self::Ordinary(job) => engine::run(job, cancel, notify),
-            Self::Decoded(owner) => owner.run(cancel, notify),
+            Self::Ordinary(job) => engine::run_advised(job, cancel, notify, hint),
+            Self::Decoded(owner) => owner.run_advised(cancel, notify, hint),
         }
     }
 }
-fn run_job(source: CliJob, yes: bool) -> Result<()> {
+fn run_job(source: CliJob, yes: bool, advice: Option<&std::path::Path>) -> Result<()> {
     let job = source.job();
     if !yes {
         ensure!(
@@ -145,9 +150,34 @@ fn run_job(source: CliJob, yes: bool) -> Result<()> {
             "execution declined"
         );
     }
-    let analysis = source.execute(cancelled, notify)?;
+    let hint = advice.and_then(|path| match read_advice(path) {
+        Ok(hint) => hint,
+        Err(error) => {
+            eprintln!("Analyze advice unavailable: {error:#}");
+            None
+        }
+    });
+    let analysis = source.execute(cancelled, notify, hint)?;
     cli_json::write_pretty(&mut io::stdout().lock(), &analysis)?;
     Ok(())
+}
+
+fn read_advice(path: &std::path::Path) -> Result<Option<engine::AutoObservations>> {
+    use std::io::Read;
+    #[derive(serde::Deserialize)]
+    struct Report {
+        auto_observations: Option<engine::AutoObservations>,
+    }
+    let limit = 8 * 1024 * 1024;
+    let metadata = std::fs::metadata(path)?;
+    ensure!(
+        metadata.is_file() && metadata.len() <= limit,
+        "expected an Analyze JSON file up to 8 MiB"
+    );
+    let report: Report = serde_json::from_reader(io::BufReader::new(
+        std::fs::File::open(path)?.take(limit + 1),
+    ))?;
+    Ok(report.auto_observations)
 }
 
 fn main() {
@@ -160,7 +190,13 @@ fn main_result() -> Result<()> {
     let matches = Cli::command().subcommand(run_cli::command()).get_matches();
     if let Some(("run", arguments)) = matches.subcommand() {
         let source = run_cli::source(arguments)?;
-        return run_job(source, arguments.get_flag("yes"));
+        return run_job(
+            source,
+            arguments.get_flag("yes"),
+            arguments
+                .get_one::<PathBuf>("analysis")
+                .map(PathBuf::as_path),
+        );
     }
     match Cli::from_arg_matches(&matches)?.command {
         Command::Guide { config } => guide::run(config)?,
@@ -168,6 +204,7 @@ fn main_result() -> Result<()> {
             let mut job = Job {
                 input: "input.csv".into(),
                 output: "chopped".into(),
+                resources: Resources::automatic(),
                 ..Job::default()
             };
             job.limits.rows = Some(100_000);
@@ -299,7 +336,7 @@ fn main_result() -> Result<()> {
                     Operation::Balanced { files }
                 });
             }
-            run_job(CliJob::Ordinary(job), yes)?;
+            run_job(CliJob::Ordinary(job), yes, None)?;
         }
     }
     Ok(())

@@ -128,7 +128,14 @@ fn scenario(
     };
     let error = crate::engine::run_with_memory_pool(job, cancel, notify, pool.clone())
         .expect_err("injected complete Run must fail");
-    assert_eq!(resolved.load(Ordering::Relaxed), expected_workers);
+    assert_eq!(
+        resolved.load(Ordering::Relaxed),
+        if direct && workers == 0 {
+            1
+        } else {
+            expected_workers
+        }
+    );
     assert!(
         retained.load(Ordering::Relaxed) > 0,
         "injection must be reached"

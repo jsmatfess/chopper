@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "id": "auto-width-sampling-merge-passes-and-native-contention-2026-11-21",
+  "title": "Size Auto from bounded widths and the Linux merge crossover",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Can cheap width evidence, known merge boundaries, or contention measurements improve automatic resource choices?",
+  "disposition": "adopt",
+  "outcome": "mixed",
+  "delivery": "default",
+  "summary": "Hosted shuffles can use four bounded interior width samples and keep the starting tier under pressure. Linux shuffles can use matching Analyze to target 384 MiB in the measured extra-merge band. Retain the automatic worker policy and bounded-writer opt-in.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium",
+      "native-linux",
+      "native-windows"
+    ],
+    "workloads": [
+      "Chromium plain CSV uniform and skewed composed shuffles, including quoted and above-range controls.",
+      "Linux file-backed 2.00\u20134.01 GiB uniform shuffles at multiple budgets.",
+      "Two concurrent native jobs testing gzip shuffle publication workers and 12- or 96-group writers."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium",
+      "native-linux",
+      "native-windows"
+    ],
+    "summary": "Verified full record contents, conservation, caps, grouping, applicable stable ordering, publication and cleanup. Tested the actual resource targets with the integrated planner and matched Analyze."
+  },
+  "limitations": [
+    "One physical host, Linux in WSL, native Windows on NTFS, and Chromium using OPFS.",
+    "Small synthetic cells. Some independent experiments overlapped, and sampled widths can miss shape changes or fall inside a quoted field."
+  ],
+  "exclusions": [
+    "Automatic starts of full Analyze, Windows merge-tier promotion, and default publication strategy promotion."
+  ],
+  "reopen_when": "Calibrate inexpensive features that predict a materially profitable full Analyze beyond the sampled plain CSV cases.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#auto-width-sampling-merge-passes-and-native-contention-2026-11-21",
+      "sha256": "90245737c22ddf08c0aefaa274847ebc335f44a0143b02774b33ec241991e607"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-browser-integrated.jsonl",
+      "sha256": "619b2a10237fa342776453f7d752e33f9df1ba1259f9ea4b57fcfba9b5d88cc3"
+    },
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-browser-composed.jsonl",
+      "sha256": "6a9841df0ba3fea600906f7fc16ad1caee4dbe3d55789cb81429cc28c4a1be58"
+    },
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-browser-merge-pass.jsonl",
+      "sha256": "8352d990b11001741b6a96a847034874087ee7355f3de6e0e4c5fd8e12a7b6f3"
+    },
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-linux-merge.jsonl",
+      "sha256": "9c9cf0e5926e6499cf1c97bc90675208215cc6e90e6a4db1c553ae7290c6499a"
+    },
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-linux-merge-dense.jsonl",
+      "sha256": "44d8487b3f48af94300f0b85aaced6286691773a13f9fcb39e4b8927062ff6ff"
+    },
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-linux-merge-planned.jsonl",
+      "sha256": "665dcb86305850e04a61ff1972f67c00a62d913e471add36f0e27e0713bc8c35"
+    },
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-linux-merge-small-planned.jsonl",
+      "sha256": "74b22cbc055cc4bbeda1854221d0edf9bb70e77e8d2e6bc662b10a017ba02ff2"
+    },
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-linux-workers.jsonl",
+      "sha256": "44fce06a9b6f35618bbdf68c5a423681a2aceca0d178c7004fdc697d710bfe71"
+    },
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-linux-writers.jsonl",
+      "sha256": "e3a833a9b41084c4e6a22ec4e6a48531fb14622a4b79e504bd99618f7d7687af"
+    },
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-windows-workers.jsonl",
+      "sha256": "a0a7adfe011208ccd43aa3fcd1de2943908a17a0bb8414bc850806d557b6c976"
+    },
+    {
+      "path": "docs/benchmarks/auto-followup-2026-11-21-windows-writers.jsonl",
+      "sha256": "9af01706fb0af1ad03c0b7dbb0972a98cb54ea1474cced57f60fd01ed6376e0e"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/browser.md",
+    "docs/execution-decisions.md"
+  ]
+}

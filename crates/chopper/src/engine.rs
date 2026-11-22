@@ -1,3 +1,5 @@
+pub(crate) mod auto;
+pub use auto::{AutoObservations, AutoPlan, PreviewObservations};
 mod analysis_text;
 pub use analysis_text::AnalysisText;
 mod timings;
@@ -40,10 +42,7 @@ mod nested_balanced;
 #[cfg(feature = "experimental-partition-balanced")]
 mod partition_balanced;
 mod preview;
-#[cfg(all(
-    target_os = "linux",
-    feature = "experimental-probabilistic-shuffle-fusion"
-))]
+#[cfg(any(target_os = "linux", target_os = "wasi"))]
 mod probabilistic_shuffle;
 pub use preview::Preview;
 mod exact_plan;
@@ -142,6 +141,8 @@ pub struct Analysis {
     pub accuracy: AnalysisText,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub execution: Option<ExecutionSummary>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub auto_plan: Option<AutoPlan>,
 }
 impl Analysis {
     pub(crate) fn algorithm_version_for(_job: &Job) -> &'static str {
@@ -238,44 +239,144 @@ pub fn run_with_memory_pool(
     notify: Notify,
     pool: Arc<crate::resources::MemoryPool>,
 ) -> Result<Analysis> {
-    run_using(job, cancel, notify, pool, None).map(output::PublishedAnalysis::into_analysis)
+    run_with_auto(job, cancel, notify, pool, None)
 }
+
+pub fn run_advised(
+    job: Job,
+    cancel: Arc<AtomicBool>,
+    notify: Notify,
+    hint: Option<AutoObservations>,
+) -> Result<Analysis> {
+    run_with_auto(
+        job,
+        cancel,
+        notify,
+        crate::resources::process_memory()?,
+        hint,
+    )
+}
+
+/// Run with optional observations from a completed Analyze. The source is read
+/// and validated normally regardless of whether the advice is applicable.
+pub fn run_with_auto(
+    job: Job,
+    cancel: Arc<AtomicBool>,
+    notify: Notify,
+    pool: Arc<crate::resources::MemoryPool>,
+    hint: Option<AutoObservations>,
+) -> Result<Analysis> {
+    run_using(job, cancel, notify, pool, (hint, None), None, None)
+}
+
 fn run_using(
     job: Job,
     cancel: Arc<AtomicBool>,
     notify: Notify,
     pool: Arc<crate::resources::MemoryPool>,
-    sink: Option<crate::observation::Sink<'_>>,
-) -> Result<output::PublishedAnalysis> {
-    // Flexible execution retains its explicit prepared-snapshot replay/audit contract.
-    if job.operations.is_empty()
-        || (sink.is_none()
-            && (direct::counted_eligible(&job)
-                || direct::fanout_eligible(&job)
-                || direct::chain_eligible(&job)))
-    {
-        direct::run(job, cancel, notify, pool, sink, None)
+    (hint, preview): (Option<AutoObservations>, Option<PreviewObservations>),
+    snapshot: Option<crate::observation::Sink<'_>>,
+    physical: Option<crate::observation::physical::Sink>,
+) -> Result<Analysis> {
+    use auto::Route;
+    let observed = snapshot.is_some() || physical.is_some();
+    let started = std::time::Instant::now();
+    let mut direct_plan = if job.operations.is_empty() {
+        Some(direct::Plan::Streaming)
+    } else if observed {
+        None
     } else {
-        let direct_terminal = terminal_direct_eligible(&job)
-            || (sink.is_none() && native_shuffle_direct_eligible(&job));
-        process_using(
+        direct::select(&job, &pool, hint)
+    };
+    let proposed_direct = direct_plan.is_some();
+    let direct_context = if let Some(mode) = direct_plan {
+        job.validate()?;
+        ensure!(!job.output.is_empty(), "output path is required");
+        let ctx = Context::with_run_limits(
+            &job.resources,
+            cancel.clone(),
+            notify.clone(),
+            pool.clone(),
+            1,
+            mode.memory_targets(),
+        )?;
+        if mode.ready(&ctx) {
+            Some(ctx)
+        } else {
+            // No destination or parser has started. Reuse the ordinary plan.
+            direct_plan = None;
+            None
+        }
+    } else {
+        None
+    };
+    let merge = (!observed && direct_plan.is_none())
+        .then(|| auto::native_terminal_merge(&job, &pool))
+        .flatten();
+    let try_retained_exact = !observed
+        && direct_plan.is_none()
+        && merge.is_none()
+        && auto::native_retained_exact(&job, &pool);
+    let route = if let Some(plan) = direct_plan {
+        plan.route()
+    } else if merge.is_some()
+        || try_retained_exact
+        || terminal_direct_eligible(&job)
+        || (!observed && native_shuffle_direct_eligible(&job))
+    {
+        Route::PrivateTerminal
+    } else {
+        Route::Snapshot
+    };
+    let mut plan = auto::AutoPlan::start(&job, &pool, hint, route, preview);
+    plan.set_native_merge_fan_in(merge);
+    plan.try_retained_exact = try_retained_exact;
+    plan.direct_preflight_fallback = proposed_direct && direct_plan.is_none();
+    plan.direct_from_analyze = direct_plan.is_some_and(direct::Plan::uses_analyze);
+    let published = match route {
+        Route::Streaming | Route::Counted | Route::BoundedWriters => direct::run(
             job,
-            cancel,
-            notify,
-            pool,
-            None,
-            direct_terminal,
-            |job, ctx, partitions, balanced, streaming| {
-                with_input(job, Reservation::new(ctx), |mut source| {
-                    ingest_options(source.as_mut(), job, ctx, partitions, balanced, streaming)
-                })
-            },
-        )?
-        .publish()
-    }
+            direct_context.expect("direct context"),
+            (snapshot, physical),
+            direct_plan.expect("direct route"),
+            started,
+        )?,
+        Route::PrivateTerminal | Route::Snapshot => {
+            let observe_input = physical.is_some();
+            process_using(
+                job,
+                cancel,
+                notify,
+                pool,
+                physical,
+                matches!(route, Route::PrivateTerminal),
+                Some(&plan),
+                |job, ctx, p, b, s| {
+                    if observe_input {
+                        with_input_observed(job, Reservation::new(ctx), ctx, |source, input_ctx| {
+                            ingest_options(source, job, input_ctx, p, b, s)
+                        })
+                    } else {
+                        with_input(job, Reservation::new(ctx), |mut source| {
+                            ingest_options(source.as_mut(), job, ctx, p, b, s)
+                        })
+                    }
+                },
+            )?
+            .publish()?
+        }
+    };
+    let measurements = published.measurements;
+    let mut analysis = published.into_analysis();
+    plan.finish(
+        &mut analysis,
+        measurements,
+        direct_plan.and_then(direct::Plan::strategy),
+    );
+    Ok(analysis)
 }
-/// Optional structured observations for the limits-only direct path. Other paths
-/// retain their behavior and emit no physical nodes in this first slice.
+
+/// Optional structured observations for the limits-only direct path.
 pub fn run_observed(
     job: Job,
     cancel: Arc<AtomicBool>,
@@ -287,11 +388,13 @@ pub fn run_observed(
         cancel,
         notify,
         crate::resources::process_memory()?,
+        (None, None),
         Some(sink),
+        None,
     )
-    .map(output::PublishedAnalysis::into_analysis)
 }
-/// Hosted direct Run can retain its fixed snapshots and actual adapter facts together.
+
+/// Keep physical facts and optional Analyze advice together in hosted Run.
 pub fn run_observed_with_physical(
     job: Job,
     cancel: Arc<AtomicBool>,
@@ -299,19 +402,43 @@ pub fn run_observed_with_physical(
     snapshot: crate::observation::Sink<'_>,
     physical: crate::observation::physical::Sink,
 ) -> Result<Analysis> {
-    if job.operations.is_empty() {
-        direct::run(
-            job,
-            cancel,
-            notify,
-            crate::resources::process_memory()?,
-            Some(snapshot),
-            Some(physical),
-        )
-        .map(output::PublishedAnalysis::into_analysis)
-    } else {
-        run_with_observations(job, cancel, notify, physical)
-    }
+    run_hosted(job, cancel, notify, None, Some((snapshot, physical)))
+}
+
+pub fn run_hosted(
+    job: Job,
+    cancel: Arc<AtomicBool>,
+    notify: Notify,
+    hint: Option<AutoObservations>,
+    observers: Option<(
+        crate::observation::Sink<'_>,
+        crate::observation::physical::Sink,
+    )>,
+) -> Result<Analysis> {
+    run_hosted_with_preview(job, cancel, notify, hint, None, observers)
+}
+
+pub fn run_hosted_with_preview(
+    job: Job,
+    cancel: Arc<AtomicBool>,
+    notify: Notify,
+    hint: Option<AutoObservations>,
+    preview: Option<PreviewObservations>,
+    observers: Option<(
+        crate::observation::Sink<'_>,
+        crate::observation::physical::Sink,
+    )>,
+) -> Result<Analysis> {
+    let (snapshot, physical) = observers.map_or((None, None), |(s, p)| (Some(s), Some(p)));
+    run_using(
+        job,
+        cancel,
+        notify,
+        crate::resources::process_memory()?,
+        (hint, preview),
+        snapshot,
+        physical,
+    )
 }
 /// Prepare against a caller-owned aggregate capacity ledger. Retained profiles,
 /// returned copies and prepared jobs can share this pool without sharing a job limit.
@@ -342,25 +469,8 @@ pub fn run_with_observations(
     sink: crate::observation::physical::Sink,
 ) -> Result<Analysis> {
     let pool = crate::resources::process_memory()?;
-    if job.operations.is_empty() {
-        return run_with_memory_pool(job, cancel, notify, pool);
-    }
-    let direct_terminal = terminal_direct_eligible(&job);
-    process_using(
-        job,
-        cancel,
-        notify,
-        pool,
-        Some(sink),
-        direct_terminal,
-        |job, ctx, p, b, s| {
-            with_input_observed(job, Reservation::new(ctx), ctx, |source, input_ctx| {
-                ingest_options(source, job, input_ctx, p, b, s)
-            })
-        },
-    )?
-    .publish()
-    .map(output::PublishedAnalysis::into_analysis)
+    let physical = (!job.operations.is_empty()).then_some(sink);
+    run_using(job, cancel, notify, pool, (None, None), None, physical)
 }
 fn prepare_using(
     job: Job,
@@ -370,7 +480,7 @@ fn prepare_using(
     physical: Option<crate::observation::physical::Sink>,
     read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
 ) -> Result<Prepared> {
-    match process_using(job, cancel, notify, pool, physical, false, read_input)? {
+    match process_using(job, cancel, notify, pool, physical, false, None, read_input)? {
         Processed::Snapshot(prepared) => Ok(prepared),
         Processed::Direct { .. } => anyhow::bail!("explicit preparation requires a snapshot"),
     }
@@ -425,7 +535,7 @@ impl Processed {
                 ctx,
             } => Ok(publication
                 .publish(&job, &analysis, &ctx)?
-                .with_analysis(analysis)),
+                .with_analysis(analysis, &ctx)),
         }
     }
 }
@@ -438,13 +548,27 @@ fn process_using(
     pool: Arc<crate::resources::MemoryPool>,
     physical: Option<crate::observation::physical::Sink>,
     direct_terminal: bool,
+    auto_plan: Option<&AutoPlan>,
     mut read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
 ) -> Result<Processed> {
     let started = std::time::Instant::now();
     job.validate()?;
-    let mut ctx = Context::with_memory_pool(&job.resources, cancel, notify, pool)?;
+    let mut ctx = Context::with_run_limits(
+        &job.resources,
+        cancel,
+        notify,
+        pool,
+        auto_plan.map_or(usize::MAX, AutoPlan::automatic_worker_limit),
+        auto_plan.map_or([256, 256], AutoPlan::memory_targets_mb),
+    )?;
     ctx.physical = physical;
     ctx.direct_terminal_output = direct_terminal;
+    ctx.auto_run = auto_plan.is_some();
+    ctx.auto_quota_index = ctx.auto_run
+        && matches!(job.operations.as_slice(), [Operation::Assign { strata, .. }] if strata.is_empty());
+    ctx.auto_merge_ceiling = auto_plan.and_then(AutoPlan::native_merge_fan_in);
+    ctx.auto_retained_exact = auto_plan.is_some_and(|plan| plan.try_retained_exact);
+    ctx.auto_final_writers = ctx.auto_retained_exact;
 
     let job = PreparedJob::admit(job, Reservation::new(&ctx))?;
     ctx.event("Reading and validating CSV", 0)?;
@@ -691,15 +815,10 @@ fn process_using(
             index += 1;
             continue;
         }
-        #[cfg(all(
-            target_os = "linux",
-            feature = "experimental-probabilistic-shuffle-fusion"
-        ))]
-        let probabilistic_after = probabilistic_shuffle::Plan::at(&job, index).is_some();
-        #[cfg(not(all(
-            target_os = "linux",
-            feature = "experimental-probabilistic-shuffle-fusion"
-        )))]
+        #[cfg(any(target_os = "linux", target_os = "wasi"))]
+        let probabilistic_after =
+            probabilistic_shuffle::Plan::selected(&job, index, &analysis, &ctx).is_some();
+        #[cfg(not(any(target_os = "linux", target_os = "wasi")))]
         let probabilistic_after = false;
         let following_shuffles = if probabilistic_after
             || matches!(
@@ -773,6 +892,7 @@ fn process_using(
                 let (seed, files, bytes) = writer.finish_direct()?;
                 ensure!(files == 0 && bytes == 0, "nonempty exact allocation setup");
                 let (publication, files, bytes, completed_stats) = prepared.emit(&dataset, seed)?;
+                ctx.used_retained_exact_writers();
                 analysis.groups = completed_stats.output_groups;
                 stats = completed_stats;
                 terminal_publication = Some((publication, files, bytes));
@@ -1348,6 +1468,7 @@ fn ingest_records(
     let mut digest = crate::digest::LogicalDigest::reserved(Reservation::new(ctx))?;
     let mut preview = preview::Builder::new(Reservation::new(ctx));
     let mut largest = 0;
+    let mut total_record_bytes = 0u64;
     let mut column_values = column_summaries::Builder::new(Reservation::new(ctx));
     // Plain serialization keeps owned strings; retaining operations keep compact records.
     let owned_ingestion = job.operations.is_empty();
@@ -1385,6 +1506,7 @@ fn ingest_records(
             input.compact().payload_bytes()
         };
         largest = largest.max(size as u64);
+        total_record_bytes = total_record_bytes.saturating_add(size as u64);
         preview.consider(record_fields, size)?;
         if owned_ingestion {
             digest.record(input.owned());
@@ -1913,10 +2035,11 @@ fn ingest_records(
             stages.push(stats.clone())?;
         }
     }
+    ctx.input_record_bytes(total_record_bytes);
     Ok(Ingested { dataset, final_plan, terminal_publication, consumed, analysis: Analysis { algorithm_version: Analysis::algorithm_version_for(job), column_values: column_values.finish()?, seed, rows, columns: width, header, preview: preview.finish()?,
         logical_digest: AnalysisText::copy(digest.finalize().to_hex().as_str(), Reservation::new(ctx))?, groups: group_count, output_files: 0, output_csv_bytes: 0,
         largest_record_bytes: largest, temp_bytes: 0, peak_temp_bytes: 0, memory_budget_bytes: ctx.memory as u64, workers: ctx.workers(), analysis_seconds: 0.0, timings: Default::default(), diagnostics: Default::default(), stages, warnings: Warnings::default(),
-        accuracy: AnalysisText::copy("Exact row, group, file and uncompressed byte counts; complete strict validation. Compressed sizes and runtime are not guaranteed.", Reservation::new(ctx))?, execution: None } })
+        accuracy: AnalysisText::copy("Exact row, group, file and uncompressed byte counts; complete strict validation. Compressed sizes and runtime are not guaranteed.", Reservation::new(ctx))?, execution: None, auto_plan: None } })
 }
 fn initial_balanced(
     job: &Job,
@@ -2133,11 +2256,8 @@ fn apply_into(
             return plan.apply(data, job, analysis, ctx, output);
         }
     }
-    #[cfg(all(
-        target_os = "linux",
-        feature = "experimental-probabilistic-shuffle-fusion"
-    ))]
-    if let Some(plan) = probabilistic_shuffle::Plan::at(job, step) {
+    #[cfg(any(target_os = "linux", target_os = "wasi"))]
+    if let Some(plan) = probabilistic_shuffle::Plan::selected(job, step, analysis, ctx) {
         return plan.apply(data, job, analysis, ctx, output);
     }
     for parent in data.groups()? {
@@ -2686,18 +2806,25 @@ fn assign(
                             observation: &mut Option<crate::observation::physical::Attempt>|
          -> Result<()> {
             scratch.reset_quota(scope.rows);
-            #[cfg(all(target_os = "linux", feature = "experimental-exact-quota-index"))]
-            let mut quota = assignment::indexed::QuotaCursor::new(
-                &mut scratch.quota,
-                assignment::indexed::enabled(),
-            );
+            #[cfg(target_os = "linux")]
+            let mut quota = {
+                let index = assignment::indexed::enabled()
+                    && (cfg!(feature = "experimental-exact-quota-index")
+                        || (ctx.auto_quota_index
+                            && auto::use_quota_index(&scratch.quota, scope.rows)));
+                assignment::indexed::QuotaCursor::new(&mut scratch.quota, index)
+            };
+            #[cfg(target_os = "linux")]
+            if quota.is_indexed() {
+                ctx.indexed_exact_quota_scope();
+            }
             let mut remaining = scope.rows;
             let mut rng = Random::new(seed);
             for row in source.packed_rows(scope, ctx.max_record)? {
                 let mut row = row?;
-                #[cfg(all(target_os = "linux", feature = "experimental-exact-quota-index"))]
+                #[cfg(target_os = "linux")]
                 let index = quota.take(rng.below(remaining));
-                #[cfg(not(all(target_os = "linux", feature = "experimental-exact-quota-index")))]
+                #[cfg(not(target_os = "linux"))]
                 let index = assignment::take_linear(&mut scratch.quota, rng.below(remaining));
                 remaining -= 1;
                 scratch.counts[index] += 1;
@@ -2831,7 +2958,7 @@ impl Prepared {
                 Err(error) => span.finish_error(error, 0),
             }
         }
-        Ok(result?.with_analysis(self.analysis))
+        Ok(result?.with_analysis(self.analysis, &self.ctx))
     }
 }
 

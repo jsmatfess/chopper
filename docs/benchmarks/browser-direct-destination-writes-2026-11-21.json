@@ -1,0 +1,3661 @@
+{
+  "commit": "cf0c1e4f0d5beea05fdbd79e11fb3eb39d7ebd4e",
+  "os": "linux",
+  "kernel": "6.18.33.1-microsoft-standard-WSL2",
+  "cpu": "AMD Ryzen 7 5800X 8-Core Processor",
+  "benchmark_sha256": "fbb1e7eb9d5546ba0b8ed0361ebf3ced32715c83d2a7cb89a80a5416c5c8e9b4",
+  "fixture_worker_sha256": "98e18fb5f9683c011af84f8747c48797f4220b08bd18cbeb14b219e9c02797a9",
+  "node": "v22.23.4",
+  "storage": "Same-origin OPFS parent in disposable Chromium contexts",
+  "fixture": {
+    "bytes": 16766121,
+    "sha256": "c94cf3541a65a2cf816209ada87b546bf22eb76983b25bc2dbe7239f211b2bec",
+    "rows": 32768
+  },
+  "builds": {
+    "engine.wasm": "567e8d3d74f509aa44f15a6c7ab154608dea897a75743b361b0bbfab7d99c291",
+    "engine-worker.js": "f3dd70cfb9d6d74d33d7f24b977043c27dc78732671f1d82c8d22fee16c1c921",
+    "storage-worker.js": "50c70784cc764fe3f9c324a15c60780af14d7f297a47c09c08cf504fda93cd1c",
+    "benchmark.js": "d18854633382ab6538756999ecfa7ba29aba30121d667d668bcf93dbe95df32f",
+    "staged": "9e1e8cb82e7b95a25e68473416d2ff1f9709466e0afd315cee8b71f53117816a",
+    "batched": "6aff60ecd95446c300bc4f1bb508c929721508ee35755d874c50dec986248425"
+  },
+  "runs": [
+    {
+      "job": "streaming",
+      "rep": 0,
+      "mode": "staged",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.7124350000619888,
+      "analysis_seconds": 0.49042,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.05286500012874605
+          },
+          "create": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.022865000128746028
+          },
+          "handle_open": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.014259999990463255
+          },
+          "write": {
+            "calls": 264,
+            "bytes": 16778639,
+            "seconds": 0.3134899996519089
+          },
+          "flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0014499999284744262
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0006100000143051148
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0007750000953674316
+          }
+        },
+        "export": {
+          "read": {
+            "calls": 17,
+            "bytes": 16776271,
+            "seconds": 0.027080000042915338
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "destination_write": {
+            "calls": 18,
+            "bytes": 16776339,
+            "seconds": 0.07913499975204469
+          },
+          "account_export": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.0018050000667572024
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16778639,
+          "workspace_bytes_before_cleanup": 16776271,
+          "workspace_peak_files": 18,
+          "profiled_destination_bytes": 16776339,
+          "workspace_and_destination_peak_bytes": 33552610,
+          "peak_open_handles": 18,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 0,
+      "mode": "direct",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.5034400000572204,
+      "analysis_seconds": 0.438675,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0005199999809265137
+          },
+          "handle_open": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.05326000022888183
+          },
+          "create": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0015850000381469726
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0205849996805191
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.00909500014781952
+          },
+          "destination_write": {
+            "calls": 263,
+            "bytes": 16776272,
+            "seconds": 0.25307500040531145
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0014450000524520877
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.010599999904632566
+          },
+          "write": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0011399999856948854
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.000625
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0007750000953674316
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.003909999966621399
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 2368,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 1,
+          "profiled_destination_bytes": 16776340,
+          "workspace_and_destination_peak_bytes": 16778640,
+          "peak_open_handles": 1,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 0,
+      "mode": "batched",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.37707999992370606,
+      "analysis_seconds": 0.308045,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0005399999618530273
+          },
+          "handle_open": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.05629000031948089
+          },
+          "create": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.001409999966621399
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.021474999785423284
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009344999790191651
+          },
+          "destination_write": {
+            "calls": 263,
+            "bytes": 16776272,
+            "seconds": 0.029825000405311646
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0847149999141693
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.01078999996185303
+          },
+          "write": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.001159999966621399
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0005799999237060547
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0007099999189376831
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0039750000238418575
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 2368,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 1,
+          "profiled_destination_bytes": 16776340,
+          "workspace_and_destination_peak_bytes": 16778640,
+          "peak_open_handles": 1,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 1,
+      "mode": "direct",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.5131999999284744,
+      "analysis_seconds": 0.447005,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0005449999570846558
+          },
+          "handle_open": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.053889999985694874
+          },
+          "create": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0015550000667572022
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.02082000005245209
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.00937500011920929
+          },
+          "destination_write": {
+            "calls": 263,
+            "bytes": 16776273,
+            "seconds": 0.25987999916076665
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0015450000762939455
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.011060000300407408
+          },
+          "write": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0011200000047683716
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0005049999952316285
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.000690000057220459
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0038949999809265137
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 2368,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 1,
+          "profiled_destination_bytes": 16776341,
+          "workspace_and_destination_peak_bytes": 16778641,
+          "peak_open_handles": 1,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 1,
+      "mode": "batched",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.3767999999523163,
+      "analysis_seconds": 0.31016,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0004899998903274537
+          },
+          "handle_open": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.05741999995708466
+          },
+          "create": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0013550000190734864
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.021055000066757205
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009325000166893008
+          },
+          "destination_write": {
+            "calls": 263,
+            "bytes": 16776271,
+            "seconds": 0.030304999828338668
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.08603999972343444
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.010870000004768371
+          },
+          "write": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.001215000033378601
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0006499999761581421
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0007450000047683716
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.003995000004768372
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 2368,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 1,
+          "profiled_destination_bytes": 16776339,
+          "workspace_and_destination_peak_bytes": 16778639,
+          "peak_open_handles": 1,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 1,
+      "mode": "staged",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.7100099999904632,
+      "analysis_seconds": 0.494715,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.05381500053405761
+          },
+          "create": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.02446999990940094
+          },
+          "handle_open": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.014290000200271607
+          },
+          "write": {
+            "calls": 264,
+            "bytes": 16778641,
+            "seconds": 0.314725000143051
+          },
+          "flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.001464999794960022
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0006200000047683716
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0007999999523162842
+          }
+        },
+        "export": {
+          "read": {
+            "calls": 17,
+            "bytes": 16776273,
+            "seconds": 0.027050000309944148
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "destination_write": {
+            "calls": 18,
+            "bytes": 16776341,
+            "seconds": 0.07760999989509582
+          },
+          "account_export": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.0018600003719329834
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16778641,
+          "workspace_bytes_before_cleanup": 16776273,
+          "workspace_peak_files": 18,
+          "profiled_destination_bytes": 16776341,
+          "workspace_and_destination_peak_bytes": 33552614,
+          "peak_open_handles": 18,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 2,
+      "mode": "batched",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.37806500005722044,
+      "analysis_seconds": 0.31071,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0004900000095367431
+          },
+          "handle_open": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.057014999032020564
+          },
+          "create": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0016000000238418578
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.021330000162124635
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.00940999972820282
+          },
+          "destination_write": {
+            "calls": 263,
+            "bytes": 16776271,
+            "seconds": 0.02981499874591833
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.08680500006675719
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.01122000002861023
+          },
+          "write": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0011999999284744262
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0005749999284744262
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0007050000429153442
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.004020000100135803
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 2368,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 1,
+          "profiled_destination_bytes": 16776339,
+          "workspace_and_destination_peak_bytes": 16778639,
+          "peak_open_handles": 1,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 2,
+      "mode": "staged",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.7112100000381469,
+      "analysis_seconds": 0.48987,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.05274499928951264
+          },
+          "create": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.02284499990940094
+          },
+          "handle_open": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.013854999899864197
+          },
+          "write": {
+            "calls": 264,
+            "bytes": 16778638,
+            "seconds": 0.31448500001430524
+          },
+          "flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0013899999856948851
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0005800000429153442
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0008650000095367431
+          }
+        },
+        "export": {
+          "read": {
+            "calls": 17,
+            "bytes": 16776270,
+            "seconds": 0.027200000166893005
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "destination_write": {
+            "calls": 18,
+            "bytes": 16776338,
+            "seconds": 0.07717999994754793
+          },
+          "account_export": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.0018149999380111693
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16778638,
+          "workspace_bytes_before_cleanup": 16776270,
+          "workspace_peak_files": 18,
+          "profiled_destination_bytes": 16776338,
+          "workspace_and_destination_peak_bytes": 33552608,
+          "peak_open_handles": 18,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 2,
+      "mode": "direct",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.5131499999761582,
+      "analysis_seconds": 0.447415,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0005500000715255737
+          },
+          "handle_open": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.05389499998092653
+          },
+          "create": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0017749999761581421
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.021614999651908877
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009635000109672547
+          },
+          "destination_write": {
+            "calls": 263,
+            "bytes": 16776273,
+            "seconds": 0.2553199994564054
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0015399998426437378
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.01106499993801117
+          },
+          "write": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.001325000047683716
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0005299999713897706
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0007299998998641968
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0039450000524520875
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 2368,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 1,
+          "profiled_destination_bytes": 16776341,
+          "workspace_and_destination_peak_bytes": 16778641,
+          "peak_open_handles": 1,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 3,
+      "mode": "staged",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.7425199999809265,
+      "analysis_seconds": 0.49132,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.051840000510215756
+          },
+          "create": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.023305000305175783
+          },
+          "handle_open": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.014764999985694884
+          },
+          "write": {
+            "calls": 264,
+            "bytes": 16778640,
+            "seconds": 0.31758000016212445
+          },
+          "flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0014399999380111694
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0011899999380111694
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.002975000023841858
+          }
+        },
+        "export": {
+          "read": {
+            "calls": 17,
+            "bytes": 16776272,
+            "seconds": 0.0324249997138977
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "destination_write": {
+            "calls": 18,
+            "bytes": 16776340,
+            "seconds": 0.08975500011444092
+          },
+          "account_export": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.002569999933242798
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16778640,
+          "workspace_bytes_before_cleanup": 16776272,
+          "workspace_peak_files": 18,
+          "profiled_destination_bytes": 16776340,
+          "workspace_and_destination_peak_bytes": 33552612,
+          "peak_open_handles": 18,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 3,
+      "mode": "direct",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.5026200000047684,
+      "analysis_seconds": 0.44048,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.00046499991416931155
+          },
+          "handle_open": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.05270999979972839
+          },
+          "create": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0013650000095367433
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.020689999938011173
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009864999771118165
+          },
+          "destination_write": {
+            "calls": 263,
+            "bytes": 16776271,
+            "seconds": 0.25694499957561473
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0015099998712539671
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.01059499990940094
+          },
+          "write": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0012399998903274536
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0005299999713897706
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0007300000190734864
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.004134999990463257
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 2368,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 1,
+          "profiled_destination_bytes": 16776339,
+          "workspace_and_destination_peak_bytes": 16778639,
+          "peak_open_handles": 1,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 3,
+      "mode": "batched",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.37750999999046325,
+      "analysis_seconds": 0.307755,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.00048000001907348635
+          },
+          "handle_open": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.05617500007152559
+          },
+          "create": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0014100000858306885
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.021444999933242802
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009309999942779543
+          },
+          "destination_write": {
+            "calls": 263,
+            "bytes": 16776273,
+            "seconds": 0.03168499910831457
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.08642999982833861
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.011320000171661376
+          },
+          "write": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0011899999380111694
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0006100000143051148
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0008450000286102295
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.004680000066757202
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 2368,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 1,
+          "profiled_destination_bytes": 16776341,
+          "workspace_and_destination_peak_bytes": 16778641,
+          "peak_open_handles": 1,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 4,
+      "mode": "direct",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.5035149999856949,
+      "analysis_seconds": 0.441435,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.00046500003337860107
+          },
+          "handle_open": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.053885000109672544
+          },
+          "create": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0014950000047683715
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.02137999951839447
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009274999856948853
+          },
+          "destination_write": {
+            "calls": 263,
+            "bytes": 16776272,
+            "seconds": 0.2562099986076353
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0015050004720687864
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.01078499984741211
+          },
+          "write": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0012450000047683715
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0005750000476837158
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0007350000143051148
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.004009999990463257
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 2368,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 1,
+          "profiled_destination_bytes": 16776340,
+          "workspace_and_destination_peak_bytes": 16778640,
+          "peak_open_handles": 1,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 4,
+      "mode": "batched",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.3769099999666214,
+      "analysis_seconds": 0.30904,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0005549999475479126
+          },
+          "handle_open": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.0593450003862381
+          },
+          "create": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0015199999809265136
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.02123000013828278
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009349999904632568
+          },
+          "destination_write": {
+            "calls": 263,
+            "bytes": 16776271,
+            "seconds": 0.03324500024318698
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.08332000029087065
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.011114999890327455
+          },
+          "write": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0012100000381469727
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0006099998950958252
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.00075
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.004319999933242798
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 2368,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 1,
+          "profiled_destination_bytes": 16776339,
+          "workspace_and_destination_peak_bytes": 16778639,
+          "peak_open_handles": 1,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "streaming",
+      "rep": 4,
+      "mode": "staged",
+      "config": {
+        "operations": [],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.743039999961853,
+      "analysis_seconds": 0.51282,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 205974,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.054940000295639044
+          },
+          "create": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.024470000028610234
+          },
+          "handle_open": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.01475000023841858
+          },
+          "write": {
+            "calls": 264,
+            "bytes": 16778639,
+            "seconds": 0.3259599999189374
+          },
+          "flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0014700003862380985
+          },
+          "read": {
+            "calls": 1,
+            "bytes": 2368,
+            "seconds": 0.0006099998950958252
+          },
+          "delete": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0008250000476837158
+          }
+        },
+        "export": {
+          "read": {
+            "calls": 17,
+            "bytes": 16776271,
+            "seconds": 0.028819999933242798
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "destination_write": {
+            "calls": 18,
+            "bytes": 16776339,
+            "seconds": 0.08373499965667723
+          },
+          "account_export": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.002089999914169312
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16778639,
+          "workspace_bytes_before_cleanup": 16776271,
+          "workspace_peak_files": 18,
+          "profiled_destination_bytes": 16776339,
+          "workspace_and_destination_peak_bytes": 33552610,
+          "peak_open_handles": 18,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "2326d351799dcd1123867a60e7378c9b834afd09c25fbc33177226ed460d7966",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 0,
+      "mode": "staged",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.8047699999809265,
+      "analysis_seconds": 0.32798,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.06223500013351441
+          },
+          "create": {
+            "calls": 21,
+            "bytes": 0,
+            "seconds": 0.02853999996185303
+          },
+          "handle_open": {
+            "calls": 21,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "write": {
+            "calls": 131,
+            "bytes": 33545869,
+            "seconds": 0.2537650002241134
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.003955000042915344
+          },
+          "truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.014290000081062315
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05515499985218045
+          },
+          "flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.001484999895095825
+          }
+        },
+        "export": {
+          "read": {
+            "calls": 17,
+            "bytes": 16777188,
+            "seconds": 0.027809999942779544
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "destination_write": {
+            "calls": 18,
+            "bytes": 16777256,
+            "seconds": 0.07964499998092651
+          },
+          "account_export": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.0019650002717971804
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 33545869,
+          "workspace_bytes_before_cleanup": 16777188,
+          "workspace_peak_files": 19,
+          "profiled_destination_bytes": 16777256,
+          "workspace_and_destination_peak_bytes": 33554444,
+          "peak_open_handles": 19,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 0,
+      "mode": "direct",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.6365299999713898,
+      "analysis_seconds": 0.326945,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0006299999952316285
+          },
+          "handle_open": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.0612550003528595
+          },
+          "create": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.00571999990940094
+          },
+          "write": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.1305100001096725
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.004054999947547913
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.023769999861717225
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009840000271797182
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05669000041484831
+          },
+          "destination_write": {
+            "calls": 66,
+            "bytes": 16777190,
+            "seconds": 0.11189999961853028
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0015850003957748415
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.011054999828338625
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0039450000524520875
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16768681,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 4,
+          "profiled_destination_bytes": 16777258,
+          "workspace_and_destination_peak_bytes": 33545871,
+          "peak_open_handles": 4,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 0,
+      "mode": "batched",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.6141349999904633,
+      "analysis_seconds": 0.32472,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0005
+          },
+          "handle_open": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.061769999384880064
+          },
+          "create": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.005644999980926514
+          },
+          "write": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.12707999992370606
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.004289999961853027
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.024749999880790713
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009610000252723693
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.054289999604225155
+          },
+          "destination_write": {
+            "calls": 66,
+            "bytes": 16777190,
+            "seconds": 0.007820000290870665
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.08101999998092652
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.01135000014305115
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0038700000047683716
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16768681,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 4,
+          "profiled_destination_bytes": 16777258,
+          "workspace_and_destination_peak_bytes": 33545871,
+          "peak_open_handles": 4,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 1,
+      "mode": "direct",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.6241150000095368,
+      "analysis_seconds": 0.31774,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0005299999713897706
+          },
+          "handle_open": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.06102999961376192
+          },
+          "create": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.005324999928474426
+          },
+          "write": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.1263949999809265
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.004240000009536744
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.023985000133514407
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009120000004768371
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05530500030517578
+          },
+          "destination_write": {
+            "calls": 66,
+            "bytes": 16777187,
+            "seconds": 0.10765500032901762
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0015249997377395628
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.010814999938011171
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0038799999952316283
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16768681,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 4,
+          "profiled_destination_bytes": 16777255,
+          "workspace_and_destination_peak_bytes": 33545868,
+          "peak_open_handles": 4,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 1,
+      "mode": "batched",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.6101950000524521,
+      "analysis_seconds": 0.3171,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0004750000238418579
+          },
+          "handle_open": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.06264500021934509
+          },
+          "create": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.005639999985694885
+          },
+          "write": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.12591000044345854
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.0037200000286102294
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.024839999794960033
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009670000195503235
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.055059999585151675
+          },
+          "destination_write": {
+            "calls": 66,
+            "bytes": 16777184,
+            "seconds": 0.007780000329017638
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.08083000004291535
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.012360000133514407
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0038650000095367433
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16768681,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 4,
+          "profiled_destination_bytes": 16777252,
+          "workspace_and_destination_peak_bytes": 33545865,
+          "peak_open_handles": 4,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 1,
+      "mode": "staged",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.7939600000381469,
+      "analysis_seconds": 0.32574,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.06117000007629395
+          },
+          "create": {
+            "calls": 21,
+            "bytes": 0,
+            "seconds": 0.029205000281333923
+          },
+          "handle_open": {
+            "calls": 21,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "write": {
+            "calls": 131,
+            "bytes": 33545868,
+            "seconds": 0.2528449989557266
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.0041150000095367435
+          },
+          "truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.014364999771118166
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05408000063896181
+          },
+          "flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0014549999237060544
+          }
+        },
+        "export": {
+          "read": {
+            "calls": 17,
+            "bytes": 16777187,
+            "seconds": 0.027305000305175787
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "destination_write": {
+            "calls": 18,
+            "bytes": 16777255,
+            "seconds": 0.07995500028133393
+          },
+          "account_export": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.0018449999094009401
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 33545868,
+          "workspace_bytes_before_cleanup": 16777187,
+          "workspace_peak_files": 19,
+          "profiled_destination_bytes": 16777255,
+          "workspace_and_destination_peak_bytes": 33554442,
+          "peak_open_handles": 19,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 2,
+      "mode": "batched",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.6213650000095368,
+      "analysis_seconds": 0.324455,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0006150000095367431
+          },
+          "handle_open": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.0621699994802475
+          },
+          "create": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.005600000023841858
+          },
+          "write": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.1265100001096726
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.004419999837875366
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.02434999966621399
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009530000209808352
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05575500047206878
+          },
+          "destination_write": {
+            "calls": 66,
+            "bytes": 16777189,
+            "seconds": 0.007874999761581425
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.08201999998092652
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.011849999785423277
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.004615000009536743
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16768681,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 4,
+          "profiled_destination_bytes": 16777257,
+          "workspace_and_destination_peak_bytes": 33545870,
+          "peak_open_handles": 4,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 2,
+      "mode": "staged",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.8316950000524521,
+      "analysis_seconds": 0.34053,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.06262999975681306
+          },
+          "create": {
+            "calls": 21,
+            "bytes": 0,
+            "seconds": 0.030749999761581426
+          },
+          "handle_open": {
+            "calls": 21,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "write": {
+            "calls": 131,
+            "bytes": 33545867,
+            "seconds": 0.2601950002908706
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.003884999990463257
+          },
+          "truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.014730000019073486
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.056609999895095825
+          },
+          "flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0015449998378753663
+          }
+        },
+        "export": {
+          "read": {
+            "calls": 17,
+            "bytes": 16777186,
+            "seconds": 0.029035000085830695
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "destination_write": {
+            "calls": 18,
+            "bytes": 16777254,
+            "seconds": 0.07857499980926512
+          },
+          "account_export": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.0019499998092651365
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 33545867,
+          "workspace_bytes_before_cleanup": 16777186,
+          "workspace_peak_files": 19,
+          "profiled_destination_bytes": 16777254,
+          "workspace_and_destination_peak_bytes": 33554440,
+          "peak_open_handles": 19,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 2,
+      "mode": "direct",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.6256849999427796,
+      "analysis_seconds": 0.3218,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0005299999713897706
+          },
+          "handle_open": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.061495000123977656
+          },
+          "create": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.005550000071525573
+          },
+          "write": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.1266700006723404
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.004410000085830689
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.023399999856948857
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009475000023841858
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05470000028610229
+          },
+          "destination_write": {
+            "calls": 66,
+            "bytes": 16777188,
+            "seconds": 0.10837000024318696
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.001544999599456787
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.01087999999523163
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0037050000429153444
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16768681,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 4,
+          "profiled_destination_bytes": 16777256,
+          "workspace_and_destination_peak_bytes": 33545869,
+          "peak_open_handles": 4,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 3,
+      "mode": "staged",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.7832300000190735,
+      "analysis_seconds": 0.320005,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.059439999580383276
+          },
+          "create": {
+            "calls": 21,
+            "bytes": 0,
+            "seconds": 0.02983500003814698
+          },
+          "handle_open": {
+            "calls": 21,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "write": {
+            "calls": 131,
+            "bytes": 33545869,
+            "seconds": 0.24657500016689293
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.004085000038146973
+          },
+          "truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.014230000019073485
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05381499958038331
+          },
+          "flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0014150002002716064
+          }
+        },
+        "export": {
+          "read": {
+            "calls": 17,
+            "bytes": 16777188,
+            "seconds": 0.027394999861717232
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "destination_write": {
+            "calls": 18,
+            "bytes": 16777256,
+            "seconds": 0.07650000011920928
+          },
+          "account_export": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.0017999997138977053
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 33545869,
+          "workspace_bytes_before_cleanup": 16777188,
+          "workspace_peak_files": 19,
+          "profiled_destination_bytes": 16777256,
+          "workspace_and_destination_peak_bytes": 33554444,
+          "peak_open_handles": 19,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 3,
+      "mode": "direct",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.6237049999237061,
+      "analysis_seconds": 0.32051,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.000559999942779541
+          },
+          "handle_open": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.05955000019073487
+          },
+          "create": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.005629999995231628
+          },
+          "write": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.12641500008106232
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.004195000052452087
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.023255000114440927
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009300000190734863
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05398500025272371
+          },
+          "destination_write": {
+            "calls": 66,
+            "bytes": 16777189,
+            "seconds": 0.10811999964714053
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0015199999809265136
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.01075499999523163
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0038299999237060545
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16768681,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 4,
+          "profiled_destination_bytes": 16777257,
+          "workspace_and_destination_peak_bytes": 33545870,
+          "peak_open_handles": 4,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 3,
+      "mode": "batched",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.6103099999427796,
+      "analysis_seconds": 0.323245,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.00046999990940093994
+          },
+          "handle_open": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.0613149995803833
+          },
+          "create": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.005670000076293946
+          },
+          "write": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.1290300005674362
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.004455000162124634
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.023845000028610234
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009239999771118165
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.054635000109672566
+          },
+          "destination_write": {
+            "calls": 66,
+            "bytes": 16777186,
+            "seconds": 0.00788000011444092
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.07727500009536743
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.01068500018119812
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0038650000095367433
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16768681,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 4,
+          "profiled_destination_bytes": 16777254,
+          "workspace_and_destination_peak_bytes": 33545867,
+          "peak_open_handles": 4,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 4,
+      "mode": "direct",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.6271000000238418,
+      "analysis_seconds": 0.32026,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0006850000619888306
+          },
+          "handle_open": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.06136000037193296
+          },
+          "create": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.0056350001096725465
+          },
+          "write": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.12587000024318692
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.003925000190734863
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.023069999814033508
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009415000200271608
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05496500051021576
+          },
+          "destination_write": {
+            "calls": 66,
+            "bytes": 16777186,
+            "seconds": 0.10716499948501589
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.0015049998760223388
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.011030000090599061
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.0039600000381469725
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16768681,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 4,
+          "profiled_destination_bytes": 16777254,
+          "workspace_and_destination_peak_bytes": 33545867,
+          "peak_open_handles": 4,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 4,
+      "mode": "batched",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.6173450000286103,
+      "analysis_seconds": 0.323585,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "destination_init": {
+            "calls": 1,
+            "bytes": 0,
+            "seconds": 0.0005449999570846558
+          },
+          "handle_open": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.06279000055789948
+          },
+          "create": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.0058799999952316275
+          },
+          "write": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.12561500000953676
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.004434999942779541
+          },
+          "destination_create": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.023414999842643742
+          },
+          "destination_truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.009130000114440918
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05402999985218047
+          },
+          "destination_write": {
+            "calls": 66,
+            "bytes": 16777187,
+            "seconds": 0.007690000772476193
+          },
+          "destination_flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.07871000003814697
+          },
+          "destination_close": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.010995000004768373
+          }
+        },
+        "export": {
+          "destination_finish": {
+            "calls": 1,
+            "bytes": 17,
+            "seconds": 0.003919999957084656
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 16768681,
+          "workspace_bytes_before_cleanup": 0,
+          "workspace_peak_files": 4,
+          "profiled_destination_bytes": 16777255,
+          "workspace_and_destination_peak_bytes": 33545868,
+          "peak_open_handles": 4,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    },
+    {
+      "job": "partition",
+      "rep": 4,
+      "mode": "staged",
+      "config": {
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              1
+            ]
+          }
+        ],
+        "limits": {
+          "rows": null,
+          "bytes": 1048576,
+          "compressed_bytes": null
+        }
+      },
+      "requested_memory": "auto",
+      "elapsed_seconds": 0.781875,
+      "analysis_seconds": 0.31934,
+      "effective_memory_bytes": 268435456,
+      "workers": 1,
+      "peak_working_reserved_bytes": 20550819,
+      "output_files": 16,
+      "output_csv_bytes": 16766346,
+      "diagnostics": {
+        "execute": {
+          "source_read": {
+            "calls": 64,
+            "bytes": 16766121,
+            "seconds": 0.06208000004291533
+          },
+          "create": {
+            "calls": 21,
+            "bytes": 0,
+            "seconds": 0.030320000171661372
+          },
+          "handle_open": {
+            "calls": 21,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "write": {
+            "calls": 131,
+            "bytes": 33545870,
+            "seconds": 0.2458999997377395
+          },
+          "delete": {
+            "calls": 4,
+            "bytes": 0,
+            "seconds": 0.0038949999809265137
+          },
+          "truncate": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.013994999885559082
+          },
+          "read": {
+            "calls": 65,
+            "bytes": 16768681,
+            "seconds": 0.05364499998092652
+          },
+          "flush": {
+            "calls": 17,
+            "bytes": 0,
+            "seconds": 0.001475000500679016
+          }
+        },
+        "export": {
+          "read": {
+            "calls": 17,
+            "bytes": 16777189,
+            "seconds": 0.0270699999332428
+          },
+          "handle_open": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "handle_eviction": {
+            "calls": 0,
+            "bytes": 0,
+            "seconds": 0
+          },
+          "destination_write": {
+            "calls": 18,
+            "bytes": 16777257,
+            "seconds": 0.07918500006198882
+          },
+          "account_export": {
+            "calls": 18,
+            "bytes": 0,
+            "seconds": 0.0018350001573562628
+          }
+        },
+        "storage": {
+          "version": "opfs-workspace-and-profiled-export-v1",
+          "maximum_workspace_bytes": 9007199254740991,
+          "workspace_peak_bytes": 33545870,
+          "workspace_bytes_before_cleanup": 16777189,
+          "workspace_peak_files": 19,
+          "profiled_destination_bytes": 16777257,
+          "workspace_and_destination_peak_bytes": 33554446,
+          "peak_open_handles": 19,
+          "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+          "workspace_bytes_after_cleanup": 0
+        }
+      },
+      "output_sha256": "d3b3351878ae55ac1e44a012f9beb8b117e83a583fff9ab0a0b8093ede1b6157",
+      "conservation_verified": true
+    }
+  ],
+  "browser": "156.0.8078.4"
+}

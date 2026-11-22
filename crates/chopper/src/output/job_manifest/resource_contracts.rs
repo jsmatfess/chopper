@@ -103,6 +103,7 @@ fn fixture() -> (Job, Analysis) {
         .into(),
         warnings: vec!["warning\n\u{754c}".into()].into(),
         accuracy: "exact".into(),
+        auto_plan: None,
         execution: Some(ExecutionSummary {
 
             plan_version: 1,

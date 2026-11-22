@@ -1,7 +1,7 @@
 //! Exact-assignment scratch retained across strata and charged before allocation.
 use super::*;
 
-#[cfg(all(target_os = "linux", feature = "experimental-exact-quota-index"))]
+#[cfg(target_os = "linux")]
 pub(super) mod indexed;
 
 pub(super) struct AssignmentScratch {

@@ -155,10 +155,11 @@ retained. Their measured decisions and limitations belong to the
 [swarm investigation](performance/investigations/shuffle-swarm-decisions-2026-11-15.md).
 No new size threshold, resident Auto selector or alternate runner is enabled.
 
-### Linux prepared-spill probabilistic shuffle
+### Prepared-spill probabilistic shuffle
 
-`experimental-probabilistic-shuffle-fusion` recognizes plain Partition →
-probabilistic assignment → explicit Uniform. It replaces the intermediate
+Auto recognizes plain Partition → probabilistic assignment → Uniform or Auto
+shuffle under the [runtime gates](execution-decisions.md#3-current-auto-planning).
+The Linux build opt-in can also request the same fusion directly. It replaces the intermediate
 allocation Dataset and individual child sorts with a grouped sort per retained
 partition parent. The key contains the configured allocation index and the
 original child's Uniform key and collision domain. Membership uses the original

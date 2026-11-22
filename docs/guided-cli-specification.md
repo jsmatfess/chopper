@@ -207,7 +207,7 @@ not a total archive ceiling. Explain filenames, safe labels and where manifests
 retain original group values. Large fanout is limited by `max_files`, not an
 estimated cardinality permission.
 
-New jobs retain resource defaults, including numeric 256 MiB and workers=0.
+New jobs default to automatic working memory and automatic workers (`workers = 0`).
 Exact versus approximate allocation remains independent from profile accuracy;
 approximate counts do not weaken CSV caps or full-shuffle guarantees. There is no
 reproducibility requirement control, user seed or seeded-output policy. Saved Job

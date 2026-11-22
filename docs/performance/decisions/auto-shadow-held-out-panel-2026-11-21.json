@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "auto-shadow-held-out-panel-2026-11-21",
+  "title": "Keep the first Auto strategy rules in shadow",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Do source-bound observations and cheap predecision facts justify activating either Linux strategy rule?",
+  "disposition": "block-promotion",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Keep the existing Linux opt-ins and report both shadow hypotheses. The correlated cases favor fusion, while the cheap input threshold misses them. Quota-index crossover and Analyze cost need more calibration.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "Six synthetic native jobs, including raw and gzip correlated keys, small and late-wide inputs, and standalone exact assignment with 1,000 destinations.",
+      "Two concurrent processes for the larger correlated and exact assignment jobs."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "80 native jobs verified through publication; source and parser binding, exact quotas, caps and document ownership checks. The Chromium handoff check verifies browser advice reuse without changing destination commit."
+  },
+  "limitations": [
+    "Two repetitions per cell on a single WSL2 host with uncontrolled backing cache.",
+    "Cross-process contention uses independent ledgers. Earlier typed shared-ledger controls apply only to their recorded scopes."
+  ],
+  "exclusions": [
+    "No native Windows, browser throughput, default strategy or general crossover claim."
+  ],
+  "reopen_when": "Calibrate around measured ingest facts on representative storage and workload shapes, and confirm matched complete-job benefit before seeking default approval.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#auto-shadow-held-out-panel-2026-11-21",
+      "sha256": "8726272a2f5c8bcd325c9551c120ed8d6de6c07c22234fde7b962fac2d1a9896"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/auto-shadow-held-out-summary-2026-11-21.json",
+      "sha256": "f8a760f12b71b6fa2b86a1650b9d405b03e94fbdd908f1e40139d6e3994c47d2"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/execution-decisions.md"
+  ]
+}

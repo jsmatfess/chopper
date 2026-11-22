@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "id": "native-auto-bounded-writers-and-counted-runs-2026-11-22",
+  "date": "2026-11-22",
+  "title": "Select bounded writers and counted native Run paths automatically",
+  "subsystem": "execution",
+  "question": "Which independently verified complete jobs justify automatic native selection?",
+  "disposition": "adopt",
+  "delivery": "default",
+  "outcome": "favorable",
+  "summary": "Bounded Partition, configured writers, two-step chains, retained stratified exact and counted Balanced variants pass paired complete-job gates in the measured native regimes.",
+  "scope": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "workloads": [
+      "2 GiB configured fanout, counted and composed jobs, 293 MiB Partition lower control and scoped Linux wide UTF-16LE output."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "summary": "Exact field and row conservation, encounter and composed order, strict byte caps, quotas, and cleanup pass. Native shared admission and staged hosted contracts pass."
+  },
+  "limitations": [
+    "One physical host. Linux uses WSL ext4 and Windows uses actual native NTFS. Zstandard adoption covers a highly compressible checksummed frame."
+  ],
+  "exclusions": [
+    "Broader compressed containers, unknown writer bounds, observed native direct routes and WASI."
+  ],
+  "reopen_when": null,
+  "supersedes": [
+    "bounded-final-writers-and-composed-pipelines-2026-11-19",
+    "counted-partition-and-balanced-2026-11-21"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#automatic-native-execution-bounds-2026-11-22",
+      "sha256": "2737122a7f5a529381ae238bf63b703731ee38916b9e6e3b0a598466842b4de0"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-final-bounded-partition-control.jsonl",
+      "sha256": "2ee06d7bae20ceab58489419e19b02b8545dacc47fdfeb474dee48a18e6ba5cd"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-linux-bounded.jsonl",
+      "sha256": "22318019eda9a4050fc7b77c2c844bc19aa9678d75ba14472cb1b955623c3aac"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-bounded-partition.jsonl",
+      "sha256": "57577e62504e460ecb94932c42a8fd1e64730fba6aad351249efae6fddd696e8"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-final-bounded-interleaved.jsonl",
+      "sha256": "db431274345a8e1f459ed4335f7e138888ac59c386aa3bddc14c50574cbba3f7"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-final-bounded-interleaved.jsonl",
+      "sha256": "27a5b82846b36de968966bdb5875ea2d342f872dcdf618885fa1c3c383575764"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-final-bounded-probabilistic.jsonl",
+      "sha256": "0e559cb813aeb24f551e66a58818950efd8eb97b2178c0d7f791879d69b98c87"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-final-bounded-probabilistic.jsonl",
+      "sha256": "c3d091b88789d37c3e71ed6cec8dde43d1acffa474bd04c10aea2319249f0461"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-final-wide-utf16.jsonl",
+      "sha256": "8cb743a6810847cf87f75253ff053dda47d4c9a6c42176823a487ab88d8b981c"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-counted-balanced.jsonl",
+      "sha256": "10ec20a5e99ecbe77ee824fc8b11b3e9e7eaac97d136f97aabd8631b41e4ce8c"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-counted-balanced.jsonl",
+      "sha256": "fec426b174e5376bf773dc9497fcd9fcf34c6bd75e32c755dcbb9497fb1188f1"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-counted-partition.jsonl",
+      "sha256": "0d9c3d14525baaedf2fdde1199fbfc29bd3e084a11303a03e5b60e117040b738"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-counted-partition.jsonl",
+      "sha256": "85de078c65a133e7a4b97a50e49bd8f54698c6a279364a64146c30aac91c1cf1"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-final-counted-zstd.jsonl",
+      "sha256": "b4660836df7db44f93ef48bad1e0284cc4f04d7e567401f6c82391b8fad35093"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-counted-zstd.jsonl",
+      "sha256": "5bac56e894eacfa49346f9ffa00b62d8724f0ccf487e56dc8ffba288761ae473"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-chain-forward.jsonl",
+      "sha256": "d6aa3c98fef82d02057d2c73e3e667f1ba241ac48c00f9bcf6e34b924bd23a78"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-chain-forward.jsonl",
+      "sha256": "a8fc24007a8da8716acc9dbf2cd9c998cce4f7dafcdcfd957e930f7e9190fced"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-chain-reverse.jsonl",
+      "sha256": "8a7e4554ebf57facd692c5aad447fa05f4d0aae5ed51a496d3d1acd273cd3c14"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-chain-reverse.jsonl",
+      "sha256": "bc26632e37661c32e93249f16c7a3dddf4f2b9bd31d649f18e19eb0be90b6b01"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-final-retained-exact.jsonl",
+      "sha256": "c812a8830408e45f424f0646070efb95c612ca026af99d99e646a657c5ecb40b"
+    },
+    {
+      "path": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-retained-exact.jsonl",
+      "sha256": "a29424793a3d6254c6b2a9d0a3136ef02313e4cb876e5de9a084bd2a442c9071"
+    }
+  ],
+  "contracts": [
+    "docs/direct-execution.md",
+    "docs/execution-decisions.md",
+    "docs/run-cli.md"
+  ]
+}

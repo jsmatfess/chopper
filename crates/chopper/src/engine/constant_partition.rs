@@ -304,6 +304,7 @@ mod tests {
         let analysis = Analysis {
             algorithm_version: Analysis::algorithm_version_for(&job),
             execution: None,
+            auto_plan: None,
             column_values: ColumnSummaries::default(),
             seed: "x".into(),
             rows: 0,

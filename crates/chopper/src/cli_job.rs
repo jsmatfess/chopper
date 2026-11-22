@@ -162,8 +162,16 @@ impl DecodedJob {
     }
     /// Retain the source grant until all consuming engine work returns.
     pub fn run(self, cancel: Arc<AtomicBool>, notify: Notify) -> Result<engine::Analysis> {
+        self.run_advised(cancel, notify, None)
+    }
+    pub fn run_advised(
+        self,
+        cancel: Arc<AtomicBool>,
+        notify: Notify,
+        hint: Option<engine::AutoObservations>,
+    ) -> Result<engine::Analysis> {
         let Self { job, grant } = self;
-        let result = engine::run_with_memory_pool(job, cancel, notify, grant.pool.clone());
+        let result = engine::run_with_auto(job, cancel, notify, grant.pool.clone(), hint);
         drop(grant);
         result
     }

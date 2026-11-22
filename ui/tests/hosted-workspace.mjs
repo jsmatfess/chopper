@@ -32,7 +32,7 @@ async function bundle(){
   }}]});return result.outputFiles[0].text;
 }
 const hostedScript=await bundle();
-async function harness(browser,hosted=true,clock=false,scrollspy=true,transitions=false){
+async function harness(browser,hosted=true,clock=false,scrollspy=true,transitions=false,isolated=false){
   const page=await browser.newPage();if(clock)await page.clock.install();page.setDefaultTimeout(5000); const errors=[];
   page.on('pageerror',error=>errors.push(error.message));
   await page.addInitScript(({defaults,analysis})=>{
@@ -41,16 +41,17 @@ async function harness(browser,hosted=true,clock=false,scrollspy=true,transition
     window.Worker=class {constructor(){throw new Error('Worker forbidden in DOM controls');}};
     const create=URL.createObjectURL.bind(URL);URL.createObjectURL=blob=>{window.exported=blob;return create(blob);};
   },{defaults,analysis});
-  await page.route('http://ui.test/**',async route=>{
+  const origin=isolated?'http://localhost':'http://ui.test';
+  await page.route(origin+'/**',async route=>{
     const path=new URL(route.request().url()).pathname;
-    if(path==='/')return route.fulfill({contentType:'text/html',body:html});
+    if(path==='/')return route.fulfill({contentType:'text/html',body:html,headers:isolated?{'Cross-Origin-Opener-Policy':'same-origin','Cross-Origin-Embedder-Policy':'require-corp'}:undefined});
     if(path==='/style.css')return route.fulfill({contentType:'text/css',body:css});
     if(path==='/app.js')return route.fulfill({contentType:'text/javascript',body:hostedScript});
     return route.abort();
   });
   if(!scrollspy)await page.addInitScript(()=>{const supports=CSS.supports.bind(CSS);CSS.supports=(...args)=>args[0]==='scroll-target-group: auto'?false:supports(...args);});
   if(!transitions)await page.addInitScript(()=>document.startViewTransition=undefined);
-  await page.goto('http://ui.test/');
+  await page.goto(origin+'/');
   await page.waitForFunction(()=>document.querySelector('#input-csv select'));
   return {page,errors};
 }
@@ -147,7 +148,7 @@ test('keyboard validation, column picker, seed-free submission and mobile reacha
     assert.equal(Object.hasOwn(await exported(page),'seed'),false);
     await page.locator('#cancel').click();await page.locator('#run-direct').click();assert.equal(Object.hasOwn(await exported(page),'seed'),false);
     await page.evaluate(()=>{window.fixtureState={...window.fixtureState,status:'complete',output:'destination/result',analysis:window.analysis};});await tick(page);
-    assert.match(await page.locator('#result-path').innerText(),/Files closed and CHOPPER-COMPLETE.json/);
+    assert.match(await page.locator('#result-path').innerText(),/2 CSV files saved to destination\/result/);
     await page.locator('#max-rows').fill('7');await tick(page);
     assert.match(await page.locator('#result-path').innerText(),/Draft changed/);
     assert.ok((await page.locator('#result-path').textContent()).includes('destination/result'),'draft edits retain the completed result location');
@@ -184,6 +185,7 @@ test('source detection, independent serialization and operation edits remain rea
     assert.equal(await page.evaluate(()=>document.activeElement.dataset.action),'add-group');
     await page.locator('[data-group="2"] [data-action="remove-group"]').click();
     await page.locator('#new-operation').selectOption('shuffle');await page.locator('#add-operation').click();
+    await page.locator('#execution-mode').check();
     await page.locator('[data-field="strategy"]').focus();
     await page.locator('[data-field="strategy"]').selectOption('fisher_yates');
     assert.equal(await page.evaluate(()=>document.activeElement.dataset.field),'strategy');
@@ -235,16 +237,36 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} encoding aliases su
   }finally{await browser.close();}
 });
 
-for(const hosted of [true])test(`${hosted?'hosted':'native'} sample loads on import and run controls share the output plan`,async()=>{
+for(const hosted of [true])test(`${hosted?'hosted':'native'} sample loads on import and Run stays in the action bar`,async()=>{
   const browser=await chromium.launch({headless:true});
   try {
     const {page,errors}=await harness(browser,hosted);
+    await page.waitForFunction(()=>document.querySelector('#run-next-step').textContent==='Choose an input file.');
+    await page.locator('#run-next-step').click();
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'browse-input');
     await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({...defaults,input:'source.csv',output:'destination'}))});
     await page.waitForFunction(()=>!document.getElementById('preview-card').hidden);
     assert.match(await page.locator('#preview').innerText(),/US/);
-    for(const id of ['profile','run-direct','cancel'])assert.equal(await page.locator(`.results .plan #${id}`).count(),1);
+    assert.equal(await page.locator('.results .plan :is(#profile,#run-direct,#cancel)').count(),0);
+    assert.equal(await page.locator('#run-dock #cancel').count(),1);
+    assert.equal(await page.locator('#profile').innerText(),'Analyze input');
     assert.equal(await page.locator('#execute').count(),0);
-    assert.equal(await page.locator('.editor #run-direct, .editor #profile, .editor #analyze, .editor #cancel').count(),0);
+    assert.equal(await page.locator('#run-dock #run-direct, #source #profile').count(),2);
+    await page.waitForFunction(()=>document.querySelector('#run-readiness').textContent==='Ready to run');
+    for(const width of [1280,390]){
+      await page.setViewportSize({width,height:720});
+      const run=await page.locator('#run-direct').boundingBox();
+      assert.ok(run.y>=0&&run.y+run.height<=720,'Run is in view on desktop and mobile');
+    }
+    assert.equal(await page.locator('#plan-description').evaluate(el=>el.firstElementChild.id),'draft-output');
+    assert.match(await page.locator('#draft-output').innerText(),/Write uncompressed CSVs to a new folder in destination/);
+    for(const [selector,edge,width] of [
+      ['#draft-output','borderBottomWidth','1px'],
+      ['.plan-summary-section[data-config-section="source"]','borderTopWidth','0px'],
+      ['#plan-description > details','borderTopWidth','1px'],
+      ['#plan-description','borderBottomWidth','0px'],
+      ['.cli-handoff','borderTopWidth','1px'],
+    ])assert.equal(await page.locator(selector).evaluate((el,edge)=>getComputedStyle(el)[edge],edge),width,selector);
     assert.equal(await page.locator('#run-direct').evaluate(button=>button.form?.id),'job-form');
     if(hosted){
       assert.equal(await page.locator('.results > .card').count(),2);
@@ -355,6 +377,57 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} live guidance block
   }finally{await browser.close();}
 });
 
+test('allocation feedback stays below the rows without moving percentage controls',async()=>{
+  const browser=await chromium.launch({headless:true});
+  try{
+    const {page,errors}=await harness(browser);
+    const config={...defaults,input:'source.csv',output:'destination',operations:[{type:'assign',groups:[{name:'a',percent:'80'},{name:'b',percent:'20'}],strata:[]}]};
+    await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(config))});
+    const groups=page.locator('fieldset:has([data-group-feedback])');
+    const hint=groups.locator('[data-group-feedback]');
+    const first=groups.locator('[data-group-field="percent"]').first(),second=groups.locator('[data-group-field="percent"]').last();
+    const summary=page.locator('#validation-panel').getByRole('button',{name:/Percentages must total/});
+    const positions=()=>groups.evaluate(group=>{
+      const top=group.getBoundingClientRect().top;
+      return [...group.querySelectorAll('.group-row input,.group-row button')].map(control=>Math.round((control.getBoundingClientRect().top-top)*10)/10);
+    });
+    for(const [width,mode] of [[1280,'Exact counts'],[390,'Approximate counts']]){
+      await page.setViewportSize({width,height:900});
+      await page.getByRole('radio',{name:mode,exact:true}).check();
+      const before=await positions();
+      const neutral=await hint.evaluate(el=>getComputedStyle(el).color);
+      await second.fill('2');
+      assert.equal(await hint.isVisible(),true);
+      assert.match(await hint.innerText(),/Percentages must total exactly 100/);
+      assert.equal(await second.getAttribute('aria-invalid'),'true','show the error while the edited field still has focus');
+      assert.equal(await second.getAttribute('aria-describedby'),await hint.getAttribute('id'));
+      assert.notEqual(await hint.evaluate(el=>getComputedStyle(el).color),neutral,'the shared error is distinguishable from help text');
+      assert.deepEqual(await positions(),before);
+      await second.fill('40');
+      assert.match(await hint.innerText(),/Current total: 120%/);
+      assert.equal(await summary.count(),1,'a group total has one summary entry');
+      await page.waitForFunction(()=>document.getElementById('validation-announcement').textContent.includes('Current total: 120%'));
+      assert.deepEqual(await positions(),before);
+      await first.focus();await first.press('Tab');
+      assert.equal(await first.getAttribute('aria-invalid'),'true');
+      assert.equal(await first.getAttribute('aria-describedby'),await hint.getAttribute('id'));
+      await second.fill('');
+      assert.match(await hint.innerText(),/Use percentages from 0 to 100/);
+      assert.deepEqual(await positions(),before);
+      await second.fill('20');
+      assert.match(await hint.innerText(),/Total(?: target)?: 100%/);
+      assert.deepEqual(await positions(),before);
+      assert.equal(await first.getAttribute('aria-invalid'),'false');
+      assert.equal(await first.getAttribute('aria-describedby'),null);
+      assert.equal(await second.getAttribute('aria-invalid'),'false');
+      assert.equal(await second.getAttribute('aria-describedby'),null);
+      assert.equal(await summary.count(),0);
+      assert.equal(await page.locator('#validation-announcement').textContent(),'');
+    }
+    assert.deepEqual(errors,[]);await page.close();
+  }finally{await browser.close();}
+});
+
 for(const hosted of [true])test(`${hosted?'hosted':'native'} cross-field checks and inactive settings update without discarding user values`,async()=>{
   const browser=await chromium.launch({headless:true});
   try {
@@ -435,9 +508,36 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} linked plan text hi
     await partition.hover();
     assert.equal(await page.locator('[data-step="1"]').evaluate(el=>el.classList.contains('plan-config-highlight')),true);
     if(hosted)for(const theme of ['light','dark']){
-      await setTheme(page,theme);await partition.hover();
+      await setTheme(page,theme);
+      await page.mouse.move(0,0);
+      const styles=await page.evaluate(()=>{
+        const steps=[1,2].map(index=>document.querySelector(`#operations [data-step="${index}"]`));
+        return steps.map((step,i)=>({
+          icon:getComputedStyle(step.querySelector('.operation-icon')).color,
+          number:getComputedStyle(step.querySelector('.step-index')).color,
+          marker:getComputedStyle(document.querySelector(`.plan-steps li[value="${i+2}"]`),'::marker').color,
+          label:getComputedStyle(step.querySelector('.step-title')).color,
+          planLabel:getComputedStyle(document.querySelector(`.plan-steps>li>button[data-plan-target="step-${i+1}"]`)).color,
+        }));
+      });
+      assert.equal(styles[0].icon,styles[1].icon,`${theme} icons use the same neutral color`);
+      assert.notEqual(styles[0].number,styles[1].number,`${theme} numbers identify the operation`);
+      for(const style of styles)assert.equal(style.number,style.marker);
+      assert.equal(styles[0].label,styles[1].label);
+      assert.equal(styles[0].planLabel,styles[1].planLabel);
+      const accents=[];
+      for(const index of [2,1]){
+        await page.locator(`.plan-steps>li>button[data-plan-target="step-${index}"]`).hover();
+        await page.waitForFunction(index=>document.querySelector('.plan-connector.is-visible')?.dataset.target===`step-${index}`,index);
+        accents.push(await page.evaluate(()=>{
+          const outline=document.querySelector('#operations .plan-config-highlight');
+          const connector=document.querySelector('.plan-connector.is-visible .plan-connector-line');
+          return [getComputedStyle(outline).outlineColor,getComputedStyle(connector).stroke];
+        }));
+      }
+      assert.deepEqual(accents,[styles[1],styles[0]].map(({number})=>[number,number]),`${theme} each line and outline matches its step number`);
       const color=await page.locator('[data-step="1"]').evaluate(el=>getComputedStyle(el).backgroundColor.match(/\d+/g).slice(0,3).map(Number));
-      assert(color[2]>=color[1]&&color[1]>=color[0],`${theme} linked step uses neutral shading rather than a green wash`);
+      assert(color[2]>=color[1]&&color[1]>=color[0],`${theme} linked steps retain their neutral surface`);
     }
     await partition.click();
     assert.equal(await page.evaluate(()=>document.activeElement.id),'column-picker-1-columns');
@@ -450,7 +550,6 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} linked plan text hi
     assert.equal(await page.evaluate(()=>document.activeElement.id),'max-rows');
     const compressed=page.locator('#plan-description [data-plan-target="compressed-bytes"]').first();
     await compressed.click();assert.equal(await page.evaluate(()=>document.activeElement.id),'compressed-bytes');
-    assert.notEqual(await partition.getAttribute('data-plan-color'),await page.locator('#plan-description [data-plan-target="step-2"]').first().getAttribute('data-plan-color'));
     assert.equal(await page.locator('#plan-description img').count(),0);
     assert.match(await page.locator('#plan-description').innerText(),/<img src=x onerror=alert\(1\)>/);
     await page.locator('[data-step="0"] [data-action="down"]').click();
@@ -470,15 +569,23 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} linked plan text hi
   }finally{await browser.close();}
 });
 
-for(const hosted of [true])test(`${hosted?'hosted':'native'} plan numbering mirrors configuration and curved connectors track navigation`,async()=>{
+for(const hosted of [true])test(`${hosted?'hosted':'native'} plan keeps its own section order and curved connectors track configuration`,async()=>{
  const browser=await chromium.launch({headless:true});
  try{
   const {page,errors}=await harness(browser,hosted);
   const config={...defaults,input:'source.csv',output:'destination',operations:[{type:'balanced',files:3},{type:'assign',groups:[{name:'a',percent:'50'},{name:'b',percent:'50'}],strata:[]}]};
   await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(config))});
   await page.waitForFunction(()=>document.getElementById('input').value==='source.csv');
-  const numbers=await page.locator('#job-form > section .number').allTextContents();
+  const configOrder=['source','output-settings','pipeline','review'];
+  const planOrder=['source','pipeline','output-settings','review'];
+  assert.deepEqual(await page.locator('#job-form > section').evaluateAll(cards=>cards.map(card=>card.id)),configOrder);
+  assert.deepEqual(await page.locator('.plan-summary-section').evaluateAll(cards=>cards.map(card=>card.dataset.configSection)),planOrder);
+  assert.deepEqual(await page.locator('.workspace-nav a').evaluateAll(links=>links.map(link=>link.hash.slice(1))),configOrder);
+  const numbers=['01','02','03','04'];
+  assert.deepEqual(await page.locator('#job-form > section .number').allTextContents(),numbers);
   assert.deepEqual(await page.locator('.plan-section-index').allTextContents(),numbers);
+  await page.locator('.plan-section-heading [data-plan-target="section-3"]').click();
+  assert.equal(await page.evaluate(()=>document.activeElement.id),'browse-output','the plan Output heading still opens Output in Configure');
   assert.deepEqual(await page.locator('.plan-steps > li').evaluateAll(items=>items.map(item=>item.value)),[1,2]);
   assert.equal(await page.locator('.plan-steps').filter({has:page.locator('[data-plan-target="step-0"]')}).evaluate(el=>getComputedStyle(el).listStyleType),'decimal-leading-zero');
   const link=page.locator('.plan-steps [data-plan-target="step-0"]').first();
@@ -506,7 +613,7 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} plan numbering mirr
   assert.doesNotMatch(await page.locator('.plan-connector-line').getAttribute('d'),/NaN/);
   await page.locator('#compression').focus();
   assert.equal(await page.locator('.plan-connector:not(.execution-plan-connector)').evaluate(el=>el.classList.contains('is-visible')),false);
-  const pipelineSection=hosted?3:2;
+  const pipelineSection=2;
   await page.locator(`.plan-section-heading [data-plan-target="section-${pipelineSection}"]`).click();
   assert.equal(await page.evaluate(()=>document.activeElement.id),'new-operation');
   for(const width of [390,760,1280]){
@@ -518,6 +625,37 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} plan numbering mirr
  }finally{await browser.close();}
 });
 
+
+test('hovering a pipeline step reveals its matching plan entry',async()=>{
+  const browser=await chromium.launch({headless:true});
+  try{
+    const {page,errors}=await harness(browser);
+    const config={...defaults,operations:Array.from({length:16},()=>({type:'shuffle'}))};
+    await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(config))});
+    const step=page.locator('#operations [data-step="15"] .step-title');
+    const link=page.locator('.plan-steps>li>button[data-plan-target="step-15"]');
+    const visible=el=>{
+      const box=el.getBoundingClientRect(),panel=el.closest('.results').getBoundingClientRect();
+      const rail=document.querySelector('.rail').getBoundingClientRect();
+      return box.top>=Math.max(panel.top,rail.bottom)&&box.bottom<=Math.min(panel.bottom,innerHeight);
+    };
+    for(const width of [1280,1920,390]){
+      await page.setViewportSize({width,height:720});
+      await page.mouse.move(0,0);
+      await step.scrollIntoViewIfNeeded();
+      await page.locator('.results').evaluate(panel=>panel.scrollTop=0);
+      assert.equal(await link.evaluate(visible),false);
+      const before=await page.evaluate(()=>scrollY);
+      await step.hover();
+      await page.waitForFunction(visible,await link.elementHandle());
+      if(width>760){
+        assert.equal(await page.evaluate(()=>scrollY),before,'only the plan scrolls in side-by-side layouts');
+        assert.equal(await page.locator('.plan-connector:not(.execution-plan-connector)').getAttribute('data-target'),'step-15');
+      }
+    }
+    assert.deepEqual(errors,[]);await page.close();
+  }finally{await browser.close();}
+});
 
 test('execution view opens beside the plan once per Run and preserves inspection state',async()=>{
   const browser=await chromium.launch({headless:true});
@@ -538,7 +676,7 @@ test('execution view opens beside the plan once per Run and preserves inspection
     assert(planBox.x>=graphBox.x+graphBox.width,'output plan sits beside the graph');
     assert.equal(await panel.locator('.execution-viewport').isVisible(),true);
     assert.equal(await page.locator('#cancel').isVisible(),true);
-    assert.ok((await page.locator('#processing-cancel').boundingBox()).y<900,'sticky cancellation stays reachable above the wide graph');
+    assert.ok((await page.locator('#cancel').boundingBox()).y<900,'sticky cancellation stays reachable above the wide graph');
     for(const width of [1280,390]){
       await page.setViewportSize({width,height:900});
       await page.evaluate(()=>{
@@ -548,6 +686,11 @@ test('execution view opens beside the plan once per Run and preserves inspection
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       if(process.env.CHOPPER_UI_SCREENSHOTS)await page.screenshot({path:resolve(process.env.CHOPPER_UI_SCREENSHOTS,`processing-${width}.png`),fullPage:true});
     }
+    await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'complete',analysis:window.analysis,output:'destination/result'});
+    await page.waitForFunction(()=>document.getElementById('execution-phase').textContent.includes('2 CSV files saved'));
+    assert.match(await page.locator('#execution-counters').innerText(),/destination\/result · 1 warning/);
+    await page.locator('#execution-results-link').click();
+    assert.equal(await page.evaluate(()=>document.activeElement.id),'run-results');
     await panel.locator('summary').click();
     await page.evaluate(()=>{
       window.graphHistory.accept(1,{read:{status:'completed',rows:4,bytes:80,seconds:1}});
@@ -561,13 +704,13 @@ test('execution view opens beside the plan once per Run and preserves inspection
 });
 
 
-test('seeded saved jobs are rejected and resources have one disclosure',async()=>{
+test('seeded saved jobs are rejected and resource details are disclosed separately',async()=>{
  const browser=await chromium.launch({headless:true});
  try{
   const {page,errors}=await harness(browser);await choose(page);
   assert.equal(await page.locator('#seed').count(),0);
-  assert.equal(await page.locator('#review details').count(),1);
-  assert.equal(await page.locator('#review summary').innerText(),'Resource budget');
+  assert.equal(await page.locator('#review details').count(),2);
+  assert.equal(await page.locator('#resource-settings > summary').innerText(),'Resource budget');
   for(const field of ['seed','random_seed']){
    await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({...defaults,[field]:'obsolete'}))});
    await page.waitForFunction(()=>document.getElementById('error').textContent.includes('no longer supported'));
@@ -593,14 +736,14 @@ test('execution cards retain peak height per Run and connectors attach to plan b
    renderExecutionHistory(h);const short=measure();
    Object.assign(h.steps[0],{title:'Allocation scope '.repeat(16)});h.revision++;renderExecutionHistory(h);const tall=measure();
    Object.assign(h.steps[0],{title:'Allocation'});h.revision++;renderExecutionHistory(h);const shorter=measure();
-   document.querySelector('[data-zoom="fit"]').click();const fitted=document.querySelector('.execution-list li>button').offsetHeight;
+   const fit=document.querySelector('[data-auto-fit]');fit.click();fit.click();const fitted=document.querySelector('.execution-list li>button').offsetHeight;
    const fresh=new ExecutionHistory(701,job);fresh.accept(701,{physical:[{...h.steps[0]}]});renderExecutionHistory(fresh);const reset=measure();
    return {short,tall,shorter,fitted,reset};
   },config);
   assert(sizes.tall>sizes.short,'longer live counters grow the card');assert.equal(sizes.shorter,sizes.tall,'shorter counters never shrink the card');assert.equal(sizes.fitted,Math.round(sizes.tall),'Fit preserves retained card height');assert(sizes.reset<=sizes.short,'a new Run starts with fresh card heights, independent of prior zoom');
   const source=page.locator('#execution-history .execution-list li>button');
   for(const width of [1280,390]){
-   await page.setViewportSize({width,height:900});await source.hover();await page.waitForFunction(()=>document.querySelector('.execution-plan-connector.is-visible circle')&&document.querySelector('.execution-plan-connector').viewBox.baseVal.width===innerWidth);
+   await page.setViewportSize({width,height:width===390?1900:900});await source.hover();await page.waitForFunction(()=>document.querySelectorAll('.execution-plan-connector.is-visible circle').length===2&&document.querySelector('.execution-plan-connector').viewBox.baseVal.width===innerWidth);
    const geometry=await page.evaluate(()=>{
     const svg=document.querySelector('.execution-plan-connector'),dots=svg.querySelectorAll('circle'),source=document.querySelector('#execution-history .execution-list li>button').getBoundingClientRect(),plan=document.querySelector('.plan').getBoundingClientRect();
     return {start:Number(dots[0].getAttribute('cx')),end:Number(dots[1].getAttribute('cx')),source:source.toJSON(),plan:plan.toJSON(),paths:svg.querySelectorAll('path').length,radii:[...dots].map(dot=>dot.getAttribute('r'))};
@@ -608,6 +751,41 @@ test('execution cards retain peak height per Run and connectors attach to plan b
    assert(Math.abs(geometry.start-geometry.source.right)<1,'line starts at card border');
    assert(Math.abs(geometry.end-(width===1280?geometry.plan.left-5:geometry.plan.right+4))<1,'line ends at plan border for side-by-side and stacked layouts');
    assert.deepEqual(geometry.radii,['3.5','4']);assert.equal(geometry.paths,2);
+  }
+  const longConfig={...config,operations:[...config.operations,...Array.from({length:15},()=>({type:'shuffle'}))]};
+  await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(longConfig))});
+  const target=page.locator('.plan-steps>li>button[data-plan-target="step-15"]');
+  await target.waitFor({state:'attached'});
+  await page.evaluate(job=>{
+   const h=new GraphFixture.ExecutionHistory(702,job);
+   h.accept(702,{physical:[{id:1040,kind:'resident_sort',operations:[16],status:'completed',rows:4,groups:1,seconds:1}]});
+   GraphFixture.renderExecutionHistory(h);
+  },longConfig);
+  const state=()=>target.evaluate(el=>{
+   const panel=el.closest('.results'),box=panel.getBoundingClientRect(),entry=el.getBoundingClientRect();
+   const svg=document.querySelector('.execution-plan-connector.is-visible');
+   return {scrollY,scrollTop:panel.scrollTop,visible:entry.top>=Math.max(box.top,0)&&entry.bottom<=Math.min(box.bottom,innerHeight),
+     dots:svg?.querySelectorAll('circle').length??0,path:svg?.querySelector('.plan-connector-line')?.getAttribute('d')??''};
+  });
+  for(const width of [1280,390]){
+   await page.setViewportSize({width,height:720});await page.mouse.move(0,0);
+   await source.scrollIntoViewIfNeeded();
+   await target.evaluate(el=>el.closest('.results').scrollTop=0);
+   const before=await state();assert.equal(before.visible,false);
+   await source.hover();
+   await page.waitForFunction(()=>document.querySelector('.execution-plan-connector.is-visible path'));
+   const after=await state();
+   assert.equal(after.scrollY,before.scrollY,'graph hover keeps the page in place');
+   if(width===1280){
+    assert.ok(after.visible&&after.scrollTop>before.scrollTop,'graph hover reveals the linked plan entry inside its panel');
+    assert.equal(after.dots,2,'a visible entry gets its normal endpoint');
+   }else{
+    assert.equal(after.visible,false);
+    assert.equal(after.dots,1,'an offscreen entry gets a continuation arrow');
+    assert.match(after.path,/ M [\d.]+ [\d.]+ L [\d.]+ [\d.]+ L [\d.]+ [\d.]+$/);
+    const coordinates=after.path.match(/-?[\d.]+/g).map(Number);
+    assert.ok(coordinates.every((value,i)=>value>0&&value<(i%2?720:width)),'continuation stays within the screen');
+   }
   }
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
@@ -622,10 +800,15 @@ test('terminal phase timing freezes and results are separate from the draft plan
   const initial=await page.locator('#progress-detail').textContent();await page.clock.runFor(5000);assert.notEqual(await page.locator('#progress-detail').textContent(),initial,'busy phase time advances');
   await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'complete',analysis:window.analysis,output:'destination/result'});
   await page.clock.runFor(1100);await page.waitForFunction(()=>document.getElementById('status').textContent==='COMPLETE');
+  assert.deepEqual(await page.locator('#result-path').evaluate(el=>[getComputedStyle(el).borderTopWidth,getComputedStyle(el).borderBottomWidth]),['0px','1px']);
   const stopped=await page.locator('#progress-detail').textContent();await page.clock.runFor(9000);assert.equal(await page.locator('#progress-detail').textContent(),stopped,'terminal polls cannot advance phase time');
-  assert.equal(await page.locator('#progress').isHidden(),true);assert.equal(await page.locator('#output-plan #analysis').count(),0);assert.equal(await page.locator('#run-results #analysis').isVisible(),true);assert.equal(await page.locator('#run-results #result-path').isVisible(),true);assert.equal(await page.locator('#output-plan #run-direct').count(),1);
+  assert.equal(await page.locator('#progress').isHidden(),true);assert.equal(await page.locator('#output-plan #analysis').count(),0);assert.equal(await page.locator('#run-results #analysis').isVisible(),true);assert.equal(await page.locator('#run-results #result-path').isVisible(),true);assert.equal(await page.locator('#run-dock #run-direct').count(),1);
   for(const width of [390,1280,1920]){await page.setViewportSize({width,height:1000});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}
   const boxes=await page.locator('#output-plan,#run-results').evaluateAll(nodes=>nodes.map(node=>({box:node.getBoundingClientRect().toJSON(),divider:node.querySelector('.section-title').getBoundingClientRect().bottom})));assert(Math.abs(boxes[0].box.top-boxes[1].box.top)<1,'plan and results sit alongside each other on a wide screen');assert(Math.abs(boxes[0].box.height-boxes[1].box.height)<1,'paired cards have equal total heights');assert(Math.abs(boxes[0].divider-boxes[1].divider)<1,'paired title/body dividers align');
+  await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'cancelled',analysis:null});
+  await page.clock.runFor(1100);await page.waitForFunction(()=>document.getElementById('status').textContent==='CANCELLED');
+  assert.equal(await page.locator('#progress').isVisible(),true);
+  assert.equal(await page.locator('#progress').evaluate(el=>getComputedStyle(el).borderBottomWidth),'0px');
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
 });
@@ -643,7 +826,7 @@ test('execution controls keep compact flow, full settings and keyboard navigatio
   await list.press('Enter');assert.equal(await list.getAttribute('aria-pressed'),'true');await list.press('Home');assert.equal(await graph.evaluate(button=>button===document.activeElement),true);await graph.press('Enter');
   const flow=page.locator('.execution-flow');assert.equal(await flow.locator('button').count(),3);assert.doesNotMatch(await flow.textContent(),/rows:|compression:/);assert.match(await flow.locator('button').last().getAttribute('aria-label'),/rows: 100000/);await flow.locator('button').last().click();assert.match(await page.locator('.execution-inspector').textContent(),/rows: 100000/);
   assert.equal(await page.locator('.execution-node-percentage').count(),0);assert.doesNotMatch(await page.locator('.execution-list button').first().getAttribute('aria-label'),/% complete/);
-  for(const width of [390,1280]){await page.setViewportSize({width,height:900});assert.equal(await bar.evaluate(el=>el.scrollWidth<=el.clientWidth),true);}
+  for(const width of [320,390,1280]){await page.setViewportSize({width,height:900});assert.equal(await bar.evaluate(el=>el.scrollWidth<=el.clientWidth),true);}
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
 });
@@ -675,9 +858,27 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} friendly units pres
  try{
   const {page,errors}=await harness(browser,hosted);await choose(page);await page.locator('#memory').evaluate(el=>el.closest('details').open=true);
   assert.equal(await page.locator('#memory').inputValue(),'256');assert.equal(await page.locator('#memory-unit').inputValue(),'MiB');assert.equal(await page.locator('#max-record').inputValue(),'8');assert.equal(await page.locator('#max-record-unit').inputValue(),'MiB');
+  assert.equal((await exported(page)).resources.memory_mb,'auto');
+  assert.equal(await page.locator('#memory-mode').isVisible(),false);
+  assert.match(await page.locator('#auto-summary').innerText(),/Memory and writers sized at Run · 1 browser worker/);
+  await page.locator('#auto-processing summary').click();
+  assert.match(await page.locator('#auto-processing').innerText(),/View Auto decisions.*Working memory.*256 MiB.*Processing workers.*1 in the browser.*Grouping strategy.*Writer concurrency/s);
+  assert.equal(await page.locator('#max-files').isEnabled(),true);
+  const mode=page.getByRole('switch',{name:'Advanced execution mode'});
+  assert.equal(await mode.isChecked(),false);
+  await mode.focus();await page.keyboard.press('Space');
+  assert.equal(await mode.isChecked(),true);
+  assert.equal(await page.locator('#auto-processing').isVisible(),false);
   assert.deepEqual((await exported(page)).resources,defaults.resources);
   await page.locator('#memory-unit').selectOption('GiB');assert.equal(await page.locator('#memory').inputValue(),'0.25');assert.equal((await exported(page)).resources.memory_mb,256);assert.match(await page.locator('#draft-resources').textContent(),/0.25 GiB/);
   assert.equal(await page.locator('#memory').getAttribute('max'),hosted?'2':'1024');
+  await page.locator('#execution-mode').uncheck();
+  assert.equal(await page.locator('#memory-unit').isVisible(),false);
+  assert.equal((await exported(page)).resources.memory_mb,'auto');
+  await page.locator('#execution-mode').check();
+  assert.equal(await page.locator('#memory').inputValue(),'0.25');
+  assert.equal((await exported(page)).resources.memory_mb,256);
+
   if(hosted){await page.locator('#memory').fill('2');assert.equal((await exported(page)).resources.memory_mb,2048);await page.locator('#memory').fill('0.25');}
   await page.locator('#memory-mode').selectOption('auto');assert.equal(await page.locator('#memory-unit').isDisabled(),true);assert.equal((await exported(page)).resources.memory_mb,'auto');await page.locator('#memory-mode').selectOption('manual');assert.equal(await page.locator('#memory').inputValue(),'0.25');
   await page.locator('#max-bytes-unit').selectOption('MB');await page.locator('#max-bytes').fill('1.5');assert.equal((await exported(page)).limits.bytes,1500000);
@@ -707,7 +908,7 @@ test('execution auto-fit follows width and new graph lanes until manual zoom dis
   await page.waitForFunction(()=>Number(document.querySelector('.execution-stage').style.getPropertyValue('--dag-zoom'))<1);const wide=await scale();
   assert.match(await panel.locator('.execution-flow-strategy').first().textContent(),/Random-key sort · in memory/);
   await page.setViewportSize({width:390,height:900});await page.waitForFunction(wide=>Number(document.querySelector('.execution-stage').style.getPropertyValue('--dag-zoom'))<wide,wide);const narrow=await scale();
-  await panel.getByRole('button',{name:'Zoom in',exact:true}).click();assert.equal(await auto.isChecked(),false);const manual=await scale();assert(manual>narrow);
+  await panel.getByRole('slider',{name:'Zoom',exact:true}).press('ArrowRight');assert.equal(await auto.isChecked(),false);const manual=await scale();assert(manual>narrow);
   await page.setViewportSize({width:1280,height:900});await page.waitForTimeout(50);assert.equal(await scale(),manual,'manual zoom survives resize');
   await auto.check();await page.waitForFunction(manual=>Number(document.querySelector('.execution-stage').style.getPropertyValue('--dag-zoom'))!==manual,manual);
   await panel.getByRole('button',{name:'List view',exact:true}).click();assert.equal(await panel.locator('.execution-node-context').first().isVisible(),true);
@@ -719,29 +920,76 @@ test('execution auto-fit follows width and new graph lanes until manual zoom dis
 });
 
 test('timeline shows overlapping observed windows, supports selection and freezes on stop',async()=>{
- const renderer=await build({stdin:{contents:"export * from './src/browser/execution-history';",resolveDir:process.cwd()},bundle:true,write:false,format:'iife',globalName:'GraphFixture'});
+ const renderer=await build({stdin:{contents:"export * from './src/browser/execution-history';export {TimingGapWriter} from './src/browser/execution-timing';",resolveDir:process.cwd()},bundle:true,write:false,format:'iife',globalName:'GraphFixture'});
  const browser=await chromium.launch({headless:true});
  try{
-  const {page,errors}=await harness(browser,true);await page.addScriptTag({content:renderer.outputFiles[0].text});
+  const {page,errors}=await harness(browser,true,false,true,false,true);await page.addScriptTag({content:renderer.outputFiles[0].text});
   await page.evaluate(config=>{
    window.timelineHistory=new GraphFixture.ExecutionHistory(970,{...config,operations:[{type:'shuffle',strategy:'auto'}]});
+   window.gapWriter=new GraphFixture.TimingGapWriter(buffer=>timelineHistory.addTimingGapBlock(970,buffer));
    timelineHistory.accept(970,{read:{status:'active',rows:1000,seconds:2},physical:[{id:1040,kind:'resident_sort',operations:[1],status:'active',rows:500,seconds:1}],timeline:[{step:0,start:0,last:4,status:'active'},{step:1040,start:2,last:4,status:'active'}],timeline_seconds:4});GraphFixture.renderExecutionHistory(timelineHistory);
   },defaults);
   const panel=page.locator('#execution-history');await panel.getByRole('button',{name:'Timeline view',exact:true}).click();
   assert.equal(await panel.locator('.execution-viewport').isVisible(),false);assert.equal(await panel.locator('.execution-zoom-controls').isVisible(),false);assert.equal(await panel.locator('.execution-timeline tr').count(),3);
-  assert.match(await panel.locator('.execution-timeline-note').textContent(),/gaps.*not parallel/);
+  assert.match(await panel.locator('.execution-timeline-note').textContent(),/Gaps.*not parallel/);
   const lefts=await panel.locator('.execution-timeline-bar').evaluateAll(nodes=>nodes.map(n=>parseFloat(n.style.left)));assert.equal(lefts[0],0);assert(lefts[1]>0&&lefts[1]<100);
+  const readBar=panel.locator('tr[data-timeline-row="0"] .execution-timeline-bar');
+  const width=()=>readBar.evaluate(bar=>parseFloat(bar.style.width));
+  const initialWidth=await width();
   const elapsed=await panel.locator('.execution-timeline-elapsed').textContent();await page.waitForFunction(before=>document.querySelector('.execution-timeline-elapsed').textContent!==before,elapsed);
+  assert((await width())>initialWidth&&initialWidth<100,'a live bar that starts at zero visibly grows');
+  const sort=panel.locator('tr[data-timeline-row="1040"]');
+  const sortTimes=sort.locator('.execution-timeline-times');
+  await page.evaluate(()=>{
+   timelineHistory.accept(970,{physical:[{id:1040,kind:'resident_sort',operations:[1],status:'interrupted',rows:500,seconds:1}],timeline:[{step:1040,start:2,last:4.5,status:'interrupted'}],timeline_seconds:4.5});
+   GraphFixture.renderExecutionHistory(timelineHistory);
+  });
+  assert.equal(await sort.getAttribute('data-status'),'in_progress');
+  assert.equal(await sortTimes.textContent(),'2.0 s – 4.5 s · In Progress');
+  const pausedClock=await panel.locator('.execution-timeline-elapsed').textContent();
+  await page.waitForFunction(before=>document.querySelector('.execution-timeline-elapsed').textContent!==before,pausedClock);
+  assert.equal(await sortTimes.textContent(),'2.0 s – 4.5 s · In Progress','the attempt window stops growing in the gap');
+  await page.evaluate(()=>{
+   gapWriter.record(1040,4.5,5);
+   timelineHistory.accept(970,{physical:[{id:1040,kind:'resident_sort',operations:[1],status:'active',rows:0,seconds:0}],timeline:[{step:1040,start:2,last:5,status:'active'}],timeline_seconds:5});
+   GraphFixture.renderExecutionHistory(timelineHistory);
+  });
+  assert.equal(await sort.getAttribute('data-status'),'in_progress');
+  assert.notEqual(await sortTimes.textContent(),'2.0 s – 4.5 s · In Progress');
+  assert.match(await sortTimes.textContent(),/1 pause \(0.5 s\)/);
+  const segments=await sort.locator('.execution-timeline-bar').evaluateAll(bars=>bars.map(bar=>[parseFloat(bar.style.left),parseFloat(bar.style.width)]));
+  assert.equal(segments.length,2);
+  assert(segments[0][0]+segments[0][1]<segments[1][0],'observed work before and after the pause renders as separate segments');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  assert.equal(await readBar.evaluate(bar=>getComputedStyle(bar).transitionDuration),'0s');
   const visibleClock=await panel.locator('.execution-timeline-elapsed').textContent();
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));timelineHistory.accept(970,{read:{status:'active',rows:2000,seconds:3},timeline:[{step:0,start:0,last:10,status:'active'}],timeline_seconds:10});GraphFixture.renderExecutionHistory(timelineHistory);});
   await page.waitForTimeout(350);assert.equal(await panel.locator('.execution-timeline-elapsed').textContent(),visibleClock,'hidden tabs retain data without redrawing the timeline');
   await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});assert.notEqual(await panel.locator('.execution-timeline-elapsed').textContent(),visibleClock);
-  await panel.locator('tr[data-timeline-row="0"] .execution-timeline-bar').click();assert.match(await panel.locator('.execution-inspector').textContent(),/Read input/);
+  await panel.locator('tr[data-timeline-row="0"] .execution-timeline-track').click();assert.match(await panel.locator('.execution-inspector').textContent(),/Read input/);
   const button=panel.locator('button[data-timeline-step="1040"]');await button.focus();await page.keyboard.press('Enter');assert.equal(await button.getAttribute('aria-pressed'),'true');assert.match(await panel.locator('.execution-inspector').textContent(),/Resident random-key sort/);assert.equal(await button.evaluate(n=>n===document.activeElement),true);
   await page.evaluate(()=>{timelineHistory.interrupt('interrupted');GraphFixture.renderExecutionHistory(timelineHistory);});
   assert.match(await panel.locator('.execution-timeline-times').first().textContent(),/end not observed/);
+  assert.match(await sortTimes.textContent(),/1 pause \(0.5 s\)/,'stopping leaves the earlier gap visible');
+  const fill=await sort.locator('.execution-timeline-bar').evaluateAll(bars=>bars.map(bar=>{
+   const style=getComputedStyle(bar);return {color:style.backgroundColor,border:style.borderTopStyle};
+  }));
+  assert.ok(fill.every(bar=>bar.color!=='rgba(0, 0, 0, 0)'),'interrupted work stays filled');
+  assert.deepEqual(fill.map(bar=>bar.border),['solid','dashed'],'only the final attempt has an unobserved end');
   const stopped=await panel.locator('.execution-timeline-elapsed').textContent(),bars=await panel.locator('.execution-timeline-bar').evaluateAll(nodes=>nodes.map(n=>n.style.width));await page.waitForTimeout(350);assert.equal(await panel.locator('.execution-timeline-elapsed').textContent(),stopped);assert.deepEqual(await panel.locator('.execution-timeline-bar').evaluateAll(nodes=>nodes.map(n=>n.style.width)),bars);
   for(const width of [320,390,1280]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}
+  await page.evaluate(()=>{
+   for(let i=0;i<40;i++)gapWriter.record(1040,7+i,7.5+i);
+   timelineHistory.accept(970,{physical:[{id:1040,kind:'resident_sort',operations:[1],status:'completed',rows:500,seconds:7}],processingComplete:true,timeline:[{step:1040,start:2,last:48,status:'completed'}],timeline_seconds:48});
+   GraphFixture.renderExecutionHistory(timelineHistory);
+  });
+  assert.match(await sortTimes.textContent(),/41 pauses \(20.5 s\)/);
+  assert.equal(await sort.locator('.execution-timeline-bar').count(),1,'dense traces keep a bounded number of elements');
+  const pixels=await sort.locator('canvas').evaluate(canvas=>{
+   const alpha=canvas.getContext('2d').getImageData(0,4,canvas.width,1).data.filter((_,i)=>i%4===3);
+   return {filled:alpha.some(value=>value>0),gap:alpha.some(value=>value===0)};
+  });
+  assert.deepEqual(pixels,{filled:true,gap:true});
   await panel.getByRole('button',{name:'Graph view',exact:true}).click();assert.equal(await panel.locator('.execution-timeline').isVisible(),false);
   await page.evaluate(config=>{const next=new GraphFixture.ExecutionHistory(971,config);next.accept(971,{read:{status:'completed',rows:2,seconds:1}});GraphFixture.renderExecutionHistory(next);},defaults);
   await panel.getByRole('button',{name:'Timeline view',exact:true}).click();assert.equal(await panel.locator('.execution-timeline-empty').isVisible(),true);assert.equal(await panel.locator('button[data-timeline-step]').count(),1);
@@ -767,6 +1015,7 @@ test('CLI handoff exports the current draft and copies a shell-safe command with
   let command=await cli.locator('#cli-command').textContent();assert.ok(command.indexOf('--step=shuffle')<command.indexOf('--step=partition'));
   await page.locator('#operations [data-step="1"] [data-action="up"]').click();
   command=await cli.locator('#cli-command').textContent();assert.ok(command.indexOf('--step=partition')<command.indexOf('--step=shuffle'));
+  await page.locator('#execution-mode').check();
   await page.locator('#memory').evaluate(el=>el.closest('details').open=true);await page.locator('#memory').fill('0');
   assert.equal(await cli.getByRole('button',{name:'Copy command'}).isDisabled(),true);
   await page.locator('#memory').fill('256');assert.equal(await cli.getByRole('button',{name:'Copy command'}).isEnabled(),true);
@@ -857,7 +1106,7 @@ test('config controls keep theme contrast, keyboard choices and resource default
   const {page,errors}=await harness(browser);await choose(page);
   const original=await exported(page);
   await page.locator('#resource-settings>summary').click();
-  assert.deepEqual(await page.locator('#resource-settings .config-group legend').allTextContents(),['Processing','Safety limits']);
+  assert.deepEqual(await page.locator('#resource-settings .config-group legend').allTextContents(),['Processing','Safety limits · independent of Auto']);
   assert.equal(await page.locator('#temp-dir').isVisible(),false);
   assert.deepEqual((await exported(page)).resources,original.resources,'presentation preserves resource defaults');
   await page.locator('#new-operation').selectOption('balanced');await page.locator('#add-operation').click();
@@ -874,7 +1123,9 @@ test('config controls keep theme contrast, keyboard choices and resource default
     const header=document.querySelector(`#${id}>.section-title`),badge=document.querySelector(`[data-config-section="${id}"] .plan-section-index`);
     return {id,header:getComputedStyle(header).backgroundColor,badge:getComputedStyle(badge).backgroundColor,heading:getComputedStyle(header.querySelector('h2')).color,number:getComputedStyle(badge).color};
    }));
-   for(const section of sections){assert.equal(section.badge,section.header,`${theme} ${section.id} number matches the card header`);assert.equal(section.number,section.heading,`${theme} ${section.id} label colors match`);}
+   for(const key of ['header','badge','heading','number'])assert.equal(new Set(sections.map(section=>section[key])).size,1,`${theme} section colors use a consistent palette`);
+   assert.equal(await page.evaluate(()=>getComputedStyle(document.querySelector('main>header')).backgroundImage),'none');
+   assert.equal(await page.evaluate(()=>getComputedStyle(document.body,'::before').backgroundImage.startsWith('linear-gradient')),true);
    const colors=await page.evaluate(()=>{
     const rgb=selector=>getComputedStyle(document.querySelector(selector)).backgroundColor.match(/\d+/g).slice(0,3).map(Number);
     const lum=rgb=>rgb.map(x=>{x/=255;return x<=.04045?x/12.92:((x+.055)/1.055)**2.4;}).reduce((s,x,i)=>s+x*[.2126,.7152,.0722][i],0);
@@ -938,13 +1189,13 @@ for(const scrollspy of [true,false])test(`hosted navigation (${scrollspy?'native
   for(const width of [320,390,760,1440,1920,2560]){
    await page.setViewportSize({width,height:900});await page.locator('.workspace-nav a[href="#review"]').click();await page.clock.runFor(100);
    const rail=await page.locator('.rail').boundingBox(),bar=await page.locator('.workspace-toolbar').boundingBox();if(width<1600){assert(Math.abs(bar.y-rail.height)<1,'top navigation stays flush beneath the rail');assert(bar.height<60,'top navigation stays compact');}else{assert(Math.abs(bar.y-rail.height-16)<1,'wide section navigation stays within reach');assert(bar.width<180,'rail stays slim');}
-   const bottom=await page.locator('#processing-strip').boundingBox();assert(Math.abs(bottom.y+bottom.height-900)<1,'processing bar sits at the viewport bottom');assert(bottom.height<110,'processing bar stays compact');
+   const bottom=await page.locator('#run-dock').boundingBox();assert(Math.abs(bottom.y+bottom.height-900)<1,'processing bar sits at the viewport bottom');assert(bottom.height<110,'processing bar stays compact');
    await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));await page.clock.runFor(100);const last=await page.locator('#review').evaluate(el=>el.getBoundingClientRect().bottom);assert(last<=bottom.y,'bottom padding keeps the final content above processing controls');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`busy overflow at ${width}`);
    if(process.env.CHOPPER_CONFIG_SCREENSHOTS&&[390,1920].includes(width)){const dir=process.env.CHOPPER_CONFIG_SCREENSHOTS;await mkdir(dir,{recursive:true});await page.screenshot({path:`${dir}/processing-${scrollspy?'native':'fallback'}-${width}.png`});}
   }
   if(process.env.CHOPPER_CONFIG_SCREENSHOTS){const dir=process.env.CHOPPER_CONFIG_SCREENSHOTS;await mkdir(dir,{recursive:true});await page.screenshot({path:`${dir}/processing-${scrollspy?'native':'fallback'}.png`});}
-  await page.locator('#processing-cancel').click();await tick(page);
+  await page.locator('#cancel').click();await tick(page);
   assert.equal(await page.locator('#processing-strip').isHidden(),true);assert.equal(await page.evaluate(()=>window.calls.filter(c=>c.path!=='state').at(-1).path),'cancel');
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
@@ -973,10 +1224,11 @@ test('column inspection lives by the preview, survives config edits, and retires
   await page.evaluate(()=>{
    const header=['country','note','segment','label','status','bucket'];
    window.previewFixture={columns:6,header,preview:[['US','sample','a','first','active','1']],input_is_zip:false};
-   window.profileFixture={rows:4000,columns:6,header,seconds:1.25,cache_hit:false,accuracy:'Full-file fixture count; selected-column distinct values may use estimates.',stages:[{operation:1,strategy:'automatic grouping',input_distinct_keys:12,distinct_exact:false}],column_values:header.map((name,column)=>({column,values:column===0?['US','CA','<img src=x onerror=alert(1)>','']:['sample','second'],frequencies:column===0?{'US':3000,'CA':500,'<img src=x onerror=alert(1)>':499,'':1}:column===1?{}:{sample:3000,second:1000},truncated:column===1,distinct:column===1?1000:column===0?4:2,distinct_exact:column!==1}))};
+   window.profileFixture={suggested_run_memory_mb:512,rows:4000,columns:6,header,seconds:1.25,cache_hit:false,accuracy:'Full-file fixture count; selected-column distinct values may use estimates.',stages:[{operation:1,strategy:'automatic grouping',input_distinct_keys:12,distinct_exact:false}],column_values:header.map((name,column)=>({column,values:column===0?['US','CA','<img src=x onerror=alert(1)>','']:['sample','second'],frequencies:column===0?{'US':3000,'CA':500,'<img src=x onerror=alert(1)>':499,'':1}:column===1?{}:{sample:3000,second:1000},truncated:column===1,distinct:column===1?1000:column===0?4:2,distinct_exact:column!==1}))};
   });
   await choose(page);await page.locator('#profile').click();
   assert.match(await page.locator('#input-profile').innerText(),/4,000/);
+  assert.match(await page.locator('#input-profile').innerText(),/Run memory target · estimated\s+512.0 MiB/);
   assert.equal(await page.locator('#source #input-values').isVisible(),true);
   assert.equal(await page.locator('.column-values-row[open]').count(),0,'column values start collapsed');
   await page.locator('.column-values-row>summary').first().click();
@@ -993,6 +1245,7 @@ test('column inspection lives by the preview, survives config edits, and retires
   await page.locator('[data-inspection-search]').fill('missing');assert.equal(await page.locator('.input-values-empty').isVisible(),true);await page.locator('[data-inspection-search]').fill('');
   await page.locator('#max-rows').fill('20');await tick(page);
   assert.equal(await page.locator('#input-profile').isVisible(),true);assert.equal(await page.locator('#input-values').isVisible(),true);assert.match(await page.locator('.profile-context').innerText(),/Input unchanged/);
+  assert.doesNotMatch(await page.locator('#input-profile').innerText(),/Run memory target/);
   assert.equal(await page.locator('#input-profile details').first().evaluate(el=>el.open),false,'dense estimates start collapsed');
   for(const mode of ['light','dark']){
    await setTheme(page,mode);
@@ -1044,7 +1297,7 @@ test('filtering completed column values keeps the analysis source and fresh Run 
  }finally{await browser.close();}
 });
 
-test('bottom processing bar retires into results or the error without leaving an overlay',async()=>{
+test('bottom action bar returns to Run and focuses results or the error',async()=>{
  const browser=await chromium.launch({headless:true});
  try{
   const {page,errors}=await harness(browser,true,true);await choose(page);
@@ -1054,7 +1307,8 @@ test('bottom processing bar retires into results or the error without leaving an
    await page.evaluate(status=>window.fixtureState={...window.fixtureState,status,error:status==='failed'?'Fixture write failed':null,analysis:window.analysis,output:'destination/result'},terminal);await tick(page);
    assert.equal(await page.locator('#processing-strip').isHidden(),true);
    assert.equal(await page.evaluate(()=>document.activeElement.id),terminal==='failed'?'error':'run-results');
-   assert.equal(await page.locator('main').evaluate(el=>parseFloat(getComputedStyle(el).paddingBottom)),24,'completed jobs release the processing strip space');
+   const dock=await page.locator('#run-dock').boundingBox();
+   assert.ok(Math.abs(await page.locator('main').evaluate(el=>parseFloat(getComputedStyle(el).paddingBottom))-dock.height-24)<1,'completed jobs reserve the idle Run bar height');
   }
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
@@ -1065,9 +1319,15 @@ test('pipeline handles preview insertion gaps, retain settings, and keep arrow c
  try{
   const {page,errors}=await harness(browser);await choose(page);
   for(const type of ['partition','balanced','shuffle']){await page.locator('#new-operation').selectOption(type);await page.locator('#add-operation').click();}
+  await page.locator('#execution-mode').check();
   await page.locator('[data-step="1"] [data-field=files]').fill('7');await page.locator('[data-field=strategy]').selectOption('uniform');
   await page.locator('[data-step="0"] [data-column-search]').fill('country');await page.keyboard.press('Enter');
   const original=(await exported(page)).operations;
+  await page.locator('#execution-mode').uncheck();
+  assert.match(await page.locator('.auto-shuffle-strategy').innerText(),/Shuffle strategy set by Auto · Full shuffle/);
+  assert.equal((await exported(page)).operations[2].strategy,'auto');
+  await page.locator('#execution-mode').check();
+  assert.equal(await page.locator('[data-field=strategy]').inputValue(),'uniform');
   await page.locator('#profile').click();assert.equal(await page.locator('#run-direct').innerText(),'Run →');
   const drag=await page.evaluateHandle(()=>new DataTransfer());
   await page.locator('[data-step="1"] [data-step-grip]').dispatchEvent('dragstart',{dataTransfer:drag});
@@ -1122,7 +1382,9 @@ test('native browser drag gestures reorder steps and selected partition columns'
  try{
   const {page,errors}=await harness(browser);await choose(page);
   for(const type of ['shuffle','balanced']){await page.locator('#new-operation').selectOption(type);await page.locator('#add-operation').click();}
-  await page.locator('[data-step="1"] [data-step-grip]').dragTo(page.locator('[data-step="0"] .step-head'),{targetPosition:{x:50,y:2}});
+  const firstStep=page.locator('[data-step="0"] .step-head');
+  await firstStep.evaluate(el=>el.scrollIntoView({block:'center'}));
+  await page.locator('[data-step="1"] [data-step-grip]').dragTo(firstStep,{targetPosition:{x:50,y:2}});
   assert.deepEqual((await exported(page)).operations.map(op=>op.type),['balanced','shuffle']);
   await page.locator('#new-operation').selectOption('partition');await page.locator('#add-operation').click();
   const search=page.locator('[data-step="2"] [data-column-search]');for(const name of ['country','note']){await search.fill(name);await search.press('Enter');}
@@ -1150,7 +1412,7 @@ for(const transitions of [false,true])test(`workspace views preserve controls an
   await toggle('configuration').click();await wait('configuration');assert.equal(await page.locator('#max-rows').inputValue(),'17');assert.equal(await panel.isVisible(),false);
   await page.evaluate(()=>{viewHistory.accept(1,{read:{status:'active',rows:20,seconds:2}});ViewFixture.renderExecutionHistory(viewHistory);});assert.equal(await page.locator('body').getAttribute('data-workspace-view'),'configuration','live updates do not steal the editor back');
   await toggle('execution').click();await wait('execution');assert.equal(await panel.getByRole('button',{name:'List view',exact:true}).getAttribute('aria-pressed'),'true','same graph retains selection');
-  await panel.getByRole('button',{name:'Graph view',exact:true}).click();await panel.getByRole('button',{name:'Zoom in',exact:true}).click();
+  await panel.getByRole('button',{name:'Graph view',exact:true}).click();await panel.getByRole('slider',{name:'Zoom',exact:true}).press('End');
   const manualZoom=await panel.locator('.execution-stage').evaluate(el=>el.style.getPropertyValue('--dag-zoom'));
   await toggle('configuration').click();await wait('configuration');
   await page.evaluate(()=>{viewHistory.accept(1,{read:{status:'active',rows:Number.MAX_SAFE_INTEGER,seconds:2}});ViewFixture.renderExecutionHistory(viewHistory);});
@@ -1183,7 +1445,7 @@ test('step motion follows actual attempts and pauses without touching processing
   await page.locator('.workspace-view-controls [data-workspace-view=configuration]').click();await page.waitForFunction(()=>document.querySelector('[data-step="1040"]').dataset.motionVisible==='false');assert.equal(await style(fisher,'animationPlayState'),'paused');
   await page.locator('.workspace-view-controls [data-workspace-view=execution]').click();await page.waitForFunction(()=>document.querySelector('[data-step="1040"]').dataset.motionVisible==='true');
   await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});assert.equal(await style(fisher,'animationPlayState'),'paused');await page.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'));});
-  await page.emulateMedia({reducedMotion:'reduce'});await page.getByRole('button',{name:'Reduced motion',exact:true}).waitFor();assert.equal(await style(fisher,'animationName'),'none');await page.locator('[data-zoom=fit]').focus();await page.keyboard.press('ArrowRight');assert.equal(await page.locator('[data-view=graph]').evaluate(el=>el===document.activeElement),true,'keyboard navigation skips disabled reduced-motion control');
+  await page.emulateMedia({reducedMotion:'reduce'});await page.getByRole('button',{name:'Reduced motion',exact:true}).waitFor();assert.equal(await style(fisher,'animationName'),'none');await page.getByRole('slider',{name:'Zoom',exact:true}).focus();await page.keyboard.press('Tab');assert.equal(await page.locator('.execution-viewport').evaluate(el=>el===document.activeElement),true,'keyboard navigation skips disabled reduced-motion control');
   await page.evaluate(()=>{motionHistory.accept(1,{processingComplete:true,physical:motionHistory.steps.map(step=>({id:step.id,kind:step.kind,operations:step.operations,status:'completed',rows:20,seconds:2}))});MotionFixture.renderExecutionHistory(motionHistory);});assert.equal(await waiting.locator('.execution-node-status').textContent(),'Completed');
   await page.emulateMedia({reducedMotion:'no-preference'});await page.evaluate(()=>{motionHistory.interrupt('unknown');MotionFixture.renderExecutionHistory(motionHistory);});assert.equal(await style(fisher,'animationName'),'none','terminal work stops animating');
   assert.deepEqual(errors,[]);await page.close();
@@ -1198,9 +1460,46 @@ test('execution graph shows finished attempts, friendly labels, pan/zoom and pla
   await page.evaluate(()=>{window.polishHistory=new GraphPolish.ExecutionHistory(903,{...window.defaults,operations:[{type:'partition',columns:['key']},{type:'assign_probabilistic',groups:[{name:'a',percent:'100'}]}]});polishHistory.accept(903,{physical:[{id:1040,kind:'resident_sort',operations:[1],status:'completed',rows:100,seconds:1},{id:1041,kind:'probabilistic_membership',operations:[2],status:'active',rows:50,seconds:.5}],timeline:[{step:1040,start:0,last:1,status:'completed'},{step:1041,start:1,last:2,status:'active'}],timeline_seconds:2});for(let i=2;i<10;i++)polishHistory.accept(903,{physical:[{id:1040+i,kind:'grouping',operations:[1],source:1039+i,status:'completed',rows:100,seconds:1}]});GraphPolish.renderExecutionHistory(polishHistory);});
   const panel=page.locator('#execution-history'),viewport=panel.locator('.execution-viewport');await viewport.scrollIntoViewIfNeeded();
   assert.equal(await panel.locator('[data-step="1040"] .execution-node-status').textContent(),'In Progress');assert.equal(await panel.locator('[data-step="1041"] .execution-node-status').textContent(),'In Progress');assert.match(await panel.locator('[data-step="1041"] .execution-node-context').textContent(),/Assign approximate groups/);assert.doesNotMatch(await panel.textContent(),/assign_probabilistic/);
-  const zoom=()=>panel.locator('output').textContent(),before=await zoom();const box=await viewport.boundingBox();await page.mouse.move(box.x+box.width-12,box.y+100);await page.mouse.wheel(0,-300);await page.waitForFunction(before=>document.querySelector('#execution-history output').textContent!==before,before);assert.equal(await panel.locator('[data-auto-fit]').isChecked(),false);
-  await panel.getByRole('button',{name:'Zoom in',exact:true}).click();await panel.getByRole('button',{name:'Zoom in',exact:true}).click();await viewport.evaluate(el=>el.scrollLeft=80);const previous=await viewport.evaluate(el=>el.scrollLeft);const bounds=await viewport.boundingBox();await page.mouse.move(bounds.x+Math.min(bounds.width-20,400),bounds.y+12);await page.mouse.down();await page.mouse.move(bounds.x+Math.min(bounds.width-20,400)-60,bounds.y+12,{steps:6});await page.mouse.up();assert((await viewport.evaluate(el=>el.scrollLeft))>previous,'background dragging pans');assert.equal(await viewport.evaluate(el=>el.classList.contains('is-panning')),false);
-  await panel.getByRole('button',{name:'Fit graph',exact:true}).click();await panel.getByRole('button',{name:'Timeline view',exact:true}).click();assert.equal(await panel.locator('[data-timeline-row="1040"]').getAttribute('data-plan-color'),'blue');assert.equal(await panel.locator('[data-timeline-row="1041"]').getAttribute('data-plan-color'),'purple');assert.match(await panel.locator('[data-timeline-row="1041"] .execution-timeline-group').textContent(),/Assign approximate groups/);
+  const card=panel.locator('[data-step="1040"] > button'),inspector=panel.locator('.execution-inspector');
+  await card.click();assert.equal(await card.getAttribute('aria-pressed'),'true');
+  await card.click();assert.equal(await card.getAttribute('aria-pressed'),'false');
+  assert.match(await inspector.textContent(),/Select a step or configured operation/);
+  await card.press('Enter');assert.equal(await card.getAttribute('aria-pressed'),'true');
+  await page.setViewportSize({width:1440,height:620});
+  await card.scrollIntoViewIfNeeded();
+  const slider=panel.getByRole('slider',{name:'Zoom',exact:true}),before=await slider.inputValue();
+  const point=await card.boundingBox(),pageTop=await page.evaluate(()=>scrollY);
+  await page.mouse.move(point.x+point.width/2,point.y+point.height/2);
+  await page.mouse.wheel(0,300);
+  await page.waitForFunction(top=>scrollY>top,pageTop);
+  assert.equal(await slider.inputValue(),before,'wheel over the graph scrolls the page at the same zoom');
+  assert.equal(await viewport.evaluate(el=>el.scrollTop),0);
+  assert.equal(await viewport.evaluate(el=>el.dispatchEvent(new WheelEvent('wheel',{altKey:true,deltaY:-300,bubbles:true,cancelable:true}))),true);
+  assert.equal(await slider.inputValue(),before,'Alt plus wheel no longer changes zoom');
+  await slider.scrollIntoViewIfNeeded();
+  const track=await slider.boundingBox(),center=track.y+track.height/2;
+  await page.mouse.move(track.x+track.width*.4,center);await page.mouse.down();
+  await page.mouse.move(track.x+track.width-1,center,{steps:5});await page.mouse.up();
+  assert.equal(await slider.inputValue(),'150','dragging the slider changes graph zoom');
+  assert.equal(await slider.getAttribute('aria-valuetext'),'150%');
+  await slider.press('ArrowLeft');
+  assert.equal(await slider.inputValue(),'149','arrow keys adjust the slider directly');
+  assert.equal(await slider.evaluate(el=>el===document.activeElement),true);
+  await slider.press('End');
+  assert.equal(await panel.locator('.execution-stage').evaluate(el=>el.style.getPropertyValue('--dag-zoom')),'1.5');
+  assert.equal(await panel.locator('[data-auto-fit]').isChecked(),false);
+  assert.equal(await viewport.evaluate(el=>el.scrollHeight<=el.clientHeight+1),true,'manual zoom keeps the full graph height in the page');
+  await page.setViewportSize({width:1440,height:1000});
+  await viewport.evaluate(el=>el.scrollLeft=80);const previous=await viewport.evaluate(el=>el.scrollLeft);const bounds=await viewport.boundingBox();await page.mouse.move(bounds.x+Math.min(bounds.width-20,400),bounds.y+12);await page.mouse.down();await page.mouse.move(bounds.x+Math.min(bounds.width-20,400)-60,bounds.y+12,{steps:6});await page.mouse.up();assert((await viewport.evaluate(el=>el.scrollLeft))>previous,'background dragging pans');assert.equal(await viewport.evaluate(el=>el.classList.contains('is-panning')),false);
+  assert.equal(await card.getAttribute('aria-pressed'),'true','dragging preserves the selection');
+  await page.mouse.click(bounds.x+Math.min(bounds.width-20,400)-60,bounds.y+12);
+  assert.equal(await card.getAttribute('aria-pressed'),'false','clicking the background clears the selection');
+  assert.match(await inspector.textContent(),/Select a step or configured operation/);
+  const panned=await viewport.evaluate(el=>el.scrollLeft);
+  await viewport.press('ArrowRight');
+  await page.waitForFunction(left=>document.querySelector('.execution-viewport').scrollLeft>left,panned);
+  assert.equal(await slider.inputValue(),'150','arrowing across the graph pans at the current scale');
+  await panel.getByRole('checkbox',{name:'Auto-fit'}).check();await panel.getByRole('button',{name:'Timeline view',exact:true}).click();assert.equal(await panel.locator('[data-timeline-row="1040"]').getAttribute('data-plan-color'),'blue');assert.equal(await panel.locator('[data-timeline-row="1041"]').getAttribute('data-plan-color'),'purple');assert.match(await panel.locator('[data-timeline-row="1041"] .execution-timeline-group').textContent(),/Assign approximate groups/);
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
 });
@@ -1238,7 +1537,7 @@ test('rail utilities stay sticky and clear the navigation and processing strip',
   }
   await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'running',progress:{phase:'Sorting rows',rows:10,temp_bytes:0}});await tick(page);await page.waitForFunction(()=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--processing-strip-height'))>0);
   const dock=await utilities.boundingBox(),strip=await page.locator('#processing-strip').boundingBox();assert(dock.y+dock.height<strip.y,'utilities clear the running status controls');
-  await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'complete',analysis:window.analysis,output:'destination/result'});await tick(page);await page.waitForFunction(()=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--processing-strip-height'))===0);assert.equal((await utilities.boundingBox()).y,dock.y,'utilities remain in the rail after processing');
+  await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'complete',analysis:window.analysis,output:'destination/result'});await tick(page);await page.waitForFunction(()=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--processing-strip-height'))===document.querySelector('#run-dock').offsetHeight);assert.equal((await utilities.boundingBox()).y,dock.y,'utilities remain in the rail after processing');
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
 });
@@ -1247,14 +1546,29 @@ test('repeated comparison sorts keep their badge and pause the same animation be
  const browser=await chromium.launch({headless:true});
  try{
   const {page,errors}=await harness(browser);await page.emulateMedia({reducedMotion:'no-preference'});
-  const renderer=await build({stdin:{contents:"export {ExecutionHistory,renderExecutionHistory} from './src/browser/execution-history';",resolveDir:resolve('.')},bundle:true,write:false,format:'iife',globalName:'StableFixture'});await page.addScriptTag({content:renderer.outputFiles[0].text});
-  await page.evaluate(()=>{window.stableHistory=new StableFixture.ExecutionHistory(904,{...window.defaults,operations:[{type:'partition',columns:['key']}]});window.feedStable=(status,attempt)=>{stableHistory.accept(904,{physical:[{id:1040,kind:'resident_sort',operations:[1],status,last_attempt:attempt,last_terminal:status==='active'?attempt-1:attempt,rows:status==='active'?0:10,seconds:status==='active'?0:.2,active_rows:status==='active'?10:0,active_seconds:status==='active'?.2:0}]});StableFixture.renderExecutionHistory(stableHistory);};feedStable('active',1);});
+  const renderer=await build({stdin:{contents:"export {ExecutionHistory,renderExecutionHistory} from './src/browser/execution-history';export {PhysicalHistory} from './src/browser/physical-history';",resolveDir:resolve('.')},bundle:true,write:false,format:'iife',globalName:'StableFixture'});await page.addScriptTag({content:renderer.outputFiles[0].text});
+  await page.evaluate(()=>{
+   window.stableHistory=new StableFixture.ExecutionHistory(904,{...window.defaults,operations:[{type:'partition',columns:['key']}]});
+   const physical=new StableFixture.PhysicalHistory();
+   window.feedStable=(status,attempt)=>{
+    physical.accept({id:1040,kind:'resident_sort',operations:[1,0],status,attempt:attempt*100,rows:10,seconds:.2});
+    stableHistory.accept(904,{physical:physical.snapshot()});StableFixture.renderExecutionHistory(stableHistory);
+   };
+   feedStable('active',1);
+  });
   const card=page.locator('[data-step="1040"]'),actor=card.locator('.motion-actor').first(),badge=card.locator('.execution-node-status');await page.waitForFunction(()=>document.querySelector('[data-step="1040"]').dataset.motionVisible==='true');
+  const stack=()=>card.evaluate(el=>getComputedStyle(el,'::after').content);
+  assert.equal(await stack(),'none','a single attempt does not get a stack, regardless of its attempt ID');
   await actor.evaluate(el=>{window.retainedAnimation=el.getAnimations()[0];retainedAnimation.currentTime=900;});
-  await page.evaluate(()=>feedStable('completed',1));assert.equal(await badge.textContent(),'In Progress');assert.equal(await actor.evaluate(el=>getComputedStyle(el).animationPlayState),'paused');assert.equal(await actor.evaluate(el=>el.getAnimations()[0]===window.retainedAnimation),true,'attempt completion retains the animation');
+  await page.evaluate(()=>feedStable('completed',1));assert.equal(await badge.textContent(),'In Progress');assert.equal(await actor.evaluate(el=>getComputedStyle(el).animationPlayState),'paused');assert.equal(await actor.evaluate(el=>el.getAnimations()[0]===window.retainedAnimation),true,'attempt completion retains the animation');assert.equal(await stack(),'none','one completed attempt is still a single card');
   const paused=await page.evaluate(()=>retainedAnimation.currentTime);await page.waitForTimeout(150);assert.equal(await page.evaluate(()=>retainedAnimation.currentTime),paused,'no motion is invented between groups');
   await page.evaluate(()=>feedStable('active',2));assert.equal(await badge.textContent(),'In Progress');assert.equal(await actor.evaluate(el=>el.getAnimations()[0]===window.retainedAnimation),true,'next group resumes the same animation');assert.equal(await actor.evaluate(el=>getComputedStyle(el).animationPlayState),'running');assert((await page.evaluate(()=>retainedAnimation.currentTime))>=paused,'animation does not restart at zero');
+  assert.equal(await stack(),'""','the stack appears as soon as the second attempt starts');
+  assert.match(await card.locator('button').getAttribute('aria-label'),/Repeated work/);
   await page.evaluate(()=>{feedStable('completed',2);stableHistory.accept(904,{processingComplete:true});StableFixture.renderExecutionHistory(stableHistory);});assert.equal(await badge.textContent(),'Completed');assert.equal(await actor.evaluate(el=>getComputedStyle(el).animationName),'none');
+  assert.equal(await stack(),'""','a completed repeat retains its stack');
+  await page.getByRole('button',{name:'List view',exact:true}).click();
+  assert.equal(await card.evaluate(el=>getComputedStyle(el,'::after').pointerEvents),'auto','list rows keep their own styling');
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
 });

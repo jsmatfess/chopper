@@ -1,6 +1,8 @@
 //! Native Run contracts for serial/default and opt-in plain publication.
 use super::*;
 use crate::{engine::run_with_memory_pool, resources::MemoryPool};
+#[cfg(any(target_os = "linux", windows))]
+use chopper_core::Column;
 use chopper_core::{Limits, Resources, Shuffle};
 use std::{
     cell::RefCell,
@@ -233,5 +235,40 @@ fn shared_denial_after_written_prefix_releases_every_task_and_stage() -> Result<
     assert!(pool.usage().reserved_bytes > 0);
     drop(grant);
     assert_eq!(pool.usage().reserved_bytes, 0);
+    Ok(())
+}
+
+#[test]
+#[cfg(any(target_os = "linux", windows))]
+fn auto_plain_publication_uses_validated_scope_and_live_shared_headroom() -> Result<()> {
+    let (_dir, mut job) = fixture(4, false)?;
+    let bytes = 2 * 1024 * 1024 * 1024;
+    assert_eq!(auto_plain_publication_workers(&job, bytes, 1_152, 4), 1);
+    job.operations = vec![Operation::Partition {
+        columns: vec![Column::Index(1)],
+    }];
+    assert_eq!(auto_plain_publication_workers(&job, bytes - 1, 1_152, 4), 1);
+    assert_eq!(auto_plain_publication_workers(&job, bytes, 1_151, 4), 1);
+    assert_eq!(auto_plain_publication_workers(&job, bytes, 1_152, 3), 1);
+    assert_eq!(auto_plain_publication_workers(&job, bytes, 1_152, 8), 4);
+
+    job.resources.memory_mb = 256.into();
+    const SHARED: u64 = 256 * 1024 * 1024;
+    let pool = Arc::new(MemoryPool::new(SHARED));
+    let ctx = Context::with_memory_pool(
+        &job.resources,
+        Arc::new(AtomicBool::new(false)),
+        Arc::new(|_| {}),
+        pool.clone(),
+    )?;
+    let mut competitor =
+        Reservation::for_workspace(Arc::new(Workspace::shared(SHARED as usize, pool.clone())));
+    let nominal = auto_plain_publication_workers(&job, bytes, 1_152, ctx.workers());
+    assert_eq!(ctx.publication_writer_limit(nominal, 1_152), 4);
+    assert_eq!(ctx.publication_writer_limit(nominal, 2), 2);
+    competitor.resize((SHARED - 30 * 1024 * 1024) as usize)?;
+    assert_eq!(ctx.publication_writer_limit(nominal, 1_152), 1);
+    drop(competitor);
+    assert_eq!(ctx.publication_writer_limit(nominal, 1_152), 4);
     Ok(())
 }

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "57a003015872a8077f97b90b6e5dd1b7ffe681df0364b14498230fc66b984c54",
+  "catalog_sha256": "ed5afa717364ecb84819c9ee42eba26a9c5e5fe3cd5777fb5661ae7f8b08c464",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -110,6 +110,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-desktop.jsonl",
+      "source_sha256": "01655f081fad67e5ea5dd99dbad14f4df00a414dbaec4b4b94c33cea94f7abe6",
+      "aliases": [
+        "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-desktop.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 12,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 12
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/browser-opfs-contexts-2026-10-17.jsonl",
@@ -458,6 +475,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-quota-index-heavy.jsonl",
+      "source_sha256": "0919caae5e4f1b843178eb340084c86371238ff4faa810fcf234fa02885dc6c5",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-final-quota-index-heavy.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/parallel-profile-native-2026-10-16.jsonl",
       "source_sha256": "0928680fb050f04f2dd429f86b05cb34be97236e74cb6fe81bffb7de466d64ee",
       "aliases": [
@@ -565,12 +599,42 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-paired.jsonl",
+      "source_sha256": "0b8538d89c69df580a68d2ac33e3d03cbdfd6f86bffea7038dfa85756603d4a9",
+      "aliases": [
+        "docs/benchmarks/browser-auto-multigib-2026-11-21-paired.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/windows-retained-parent-current-builds-2026-10-21.json",
       "source_sha256": "0c020f8fa1af01d5b6b8eba68e3db7e6567bebe73c6646a91dd6d40524e782cf",
       "aliases": [
         "docs/benchmarks/windows-retained-parent-current-builds-2026-10-21.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-digest-overlap.patch",
+      "source_sha256": "0c16eda217a135832831899f362c5af9db28ef4f7672c95f4594c00e82f7f672",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-digest-overlap.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -589,6 +653,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-gzip-production.jsonl",
+      "source_sha256": "0c3415e85499c7f2e36daa6e52dc32b318db04a1e09f5668024726eb9178626b",
+      "aliases": [
+        "docs/benchmarks/browser-auto-multigib-2026-11-21-gzip-production.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 12,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 12
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/e3-direct-r24-2026-10-26-source-map.json",
@@ -693,6 +774,40 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-counted-partition.jsonl",
+      "source_sha256": "0d9c3d14525baaedf2fdde1199fbfc29bd3e084a11303a03e5b60e117040b738",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-counted-partition.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-browser-windows.jsonl",
+      "source_sha256": "0e1782d8bd58dc404895d099aaa39527d96902349286733b03135ca063778e1d",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-browser-windows.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 24,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 24
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/analysis-diagnostics-package-identities-2026-10-23.json",
       "source_sha256": "0e1c885f777455240746aedaf938ca7ca54064def596969b80776172ec72d89c",
       "aliases": [
@@ -717,6 +832,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-bounded-probabilistic.jsonl",
+      "source_sha256": "0e559cb813aeb24f551e66a58818950efd8eb97b2178c0d7f791879d69b98c87",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-final-bounded-probabilistic.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/execution-graph-validation-summary-2026-11-05.json",
@@ -758,6 +890,57 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-windows-publication.jsonl",
+      "source_sha256": "0f9f82e7a5cb3cf771daf5f0069b9a1e557e6e3460116853cc68ba4e1a9f6b8a",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-windows-publication.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-index-cap1024.jsonl",
+      "source_sha256": "0fa269939184d12f7f7522b69e1511002424f075125ef04600be5b6d798605e7",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-final-index-cap1024.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/io-overlap-adoption-2026-11-22-windows-opt-in.jsonl",
+      "source_sha256": "0fa8373d677a52098001be828db9d6ac9b1e96b6867a733b3d2a2b6a087bb815",
+      "aliases": [
+        "docs/benchmarks/io-overlap-adoption-2026-11-22-windows-opt-in.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/parallel-groups-browser-2026-10-16.json",
@@ -862,6 +1045,23 @@
       "validation_records": 24,
       "classes": {
         "contract-duration": 24
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-counted-balanced.jsonl",
+      "source_sha256": "10ec20a5e99ecbe77ee824fc8b11b3e9e7eaac97d136f97aabd8631b41e4ce8c",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-counted-balanced.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -1109,6 +1309,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/io-overlap-adoption-2026-11-22-browser-partition.jsonl",
+      "source_sha256": "170196c69d8e432a48fc339108af145cb6fa4c1d20a8fa394553b20015e2e92a",
+      "aliases": [
+        "docs/benchmarks/io-overlap-adoption-2026-11-22-browser-partition.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/zstandard-output-native-parity-2026-10-23.json",
@@ -1518,6 +1735,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/browser-large-preview-calibration-2026-11-21-main.jsonl",
+      "source_sha256": "1e23f65acc497cb1992601eaef17d23fecd4bf9d9b0dc0b5861c033c972294a5",
+      "aliases": [
+        "docs/benchmarks/browser-large-preview-calibration-2026-11-21-main.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 36,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 36
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/e3-direct-r24-2026-10-26-baseline.json",
       "source_sha256": "1e41e831d588335a80bd6897d2414728379c9a9460c8ada6ecb97e7e346e6975",
       "aliases": [
@@ -1799,6 +2033,36 @@
         "unclassified": 27
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-linux-bounded.jsonl",
+      "source_sha256": "22318019eda9a4050fc7b77c2c844bc19aa9678d75ba14472cb1b955623c3aac",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-linux-bounded.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-smoke.json",
+      "source_sha256": "2237084c30208fd976e3c3341e07bdb44d1e4aae3d2897fe39aad1981fc0e4a9",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-smoke.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/picker-capture-package-identities-2026-10-23.json",
@@ -2148,6 +2412,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-final-bounded-interleaved.jsonl",
+      "source_sha256": "27a5b82846b36de968966bdb5875ea2d342f872dcdf618885fa1c3c383575764",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-windows-final-bounded-interleaved.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/partition-balanced-controls-2026-10-18.jsonl",
       "source_sha256": "27d22837fb73aabfb513a19fa4cf5bc18a19b0da84734aef39ae5a027c64cafa",
       "aliases": [
@@ -2248,6 +2529,19 @@
         "docs/benchmarks/allocation-retry-evaluation-2026-11-03.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-digest-profile.patch",
+      "source_sha256": "28c1e68cae164850d38587dbcbc54052d7304fd1af68007a59dd9c4aa229c72a",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-digest-profile.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -2411,6 +2705,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-digest-very-wide-retry.jsonl",
+      "source_sha256": "2bf7a97174d78d38ccb634a3d360ecfce6de5ff293406b96efb97ceaf3c04098",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-digest-very-wide-retry.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 6,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 6
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/csv-marker-cache-2026-11-05-attest.py",
       "source_sha256": "2bfc69006e35faae008d8b2596fe8e6337a2820e72f4f756d132382077755964",
       "aliases": [
@@ -2451,6 +2762,23 @@
       "classes": {
         "allocation-census": 36,
         "measurement": 108
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-digest-overlap.jsonl",
+      "source_sha256": "2d49e012e6a2bfdb004f4e75dc78d144a3a475c30d46abc3bf81c6b1fc4e36b8",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-digest-overlap.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 6,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 6
       },
       "coverage": "adapted"
     },
@@ -2532,6 +2860,23 @@
       "validation_records": 0,
       "classes": {
         "measurement": 72
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-bounded-partition-control.jsonl",
+      "source_sha256": "2ee06d7bae20ceab58489419e19b02b8545dacc47fdfeb474dee48a18e6ba5cd",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-final-bounded-partition-control.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -3378,6 +3723,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-digest-isolated.jsonl",
+      "source_sha256": "413a3c754a1630619189ee7ba4fd377e7119919cdbe1c258853b2234883eafea",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-digest-isolated.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 6,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 6
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/dynamic-pressure-injected-2026-10-16.jsonl",
       "source_sha256": "4183c925cd9d57fcd975eeee069d6f2b96d6b2d0623a95270dd0fecff676c7c1",
       "aliases": [
@@ -3605,6 +3967,40 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-merge-dense.jsonl",
+      "source_sha256": "44d8487b3f48af94300f0b85aaced6286691773a13f9fcb39e4b8927062ff6ff",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-merge-dense.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-workers.jsonl",
+      "source_sha256": "44fce06a9b6f35618bbdf68c5a423681a2aceca0d178c7004fdc697d710bfe71",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-workers.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 24,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 24
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/random-buckets-summary-2026-10-19.json",
       "source_sha256": "45001bf961e5c9b1c5984844a889b6d77d1fd117b3ef736a9e39f7cb991efa92",
       "aliases": [
@@ -3693,6 +4089,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-merge-dense-planned.jsonl",
+      "source_sha256": "48101169ccf43a9b1c2622cb7a7a4d77caded8a3bef285d28801a3de75d579a3",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-merge-dense-planned.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 2,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 2
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/pipeline-sorting-source-codec-summary-2026-11-21.json",
       "source_sha256": "486ac1486a9aa0c5d5527ff3c3cb37bdbc939464794358a481528276d9bf2178",
       "aliases": [
@@ -3704,6 +4117,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-large-preview-calibration-2026-11-21-shuffle-control.jsonl",
+      "source_sha256": "486cf245f1fc4611cd59adfa95d5c025c18d404817bdfc4870f4e4cfe22cf6e2",
+      "aliases": [
+        "docs/benchmarks/browser-large-preview-calibration-2026-11-21-shuffle-control.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/parallel-groups-native-2026-10-16.jsonl",
@@ -4086,6 +4516,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-digest-narrow.jsonl",
+      "source_sha256": "4f2407350eea85c86eaafab0d2616ece8a1da855f12926931f45b938370df2b0",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-digest-narrow.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 6,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 6
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/compact-parser-initial-native-2026-10-15.jsonl",
       "source_sha256": "4f345b2a6920c912ac0530e69bc52ea94b9e3c8a7bd4bf5ac1a06d261b369a83",
       "aliases": [
@@ -4214,6 +4661,40 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-digest-wide.jsonl",
+      "source_sha256": "50f480394f36e60a36c006963fd206ac3cbc981d5fb3bbc6eb79192026f5a24f",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-digest-wide.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 6,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 6
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-merge-small.jsonl",
+      "source_sha256": "50f4d87d73ff031e3f87334894867d3d75c44fc3e35dce26a3b17df897aae772",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-merge-small.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/random-buckets-native-2026-10-19.jsonl",
@@ -4371,6 +4852,36 @@
         "docs/benchmarks/shuffle-policy-production-native-2026-11-15.bin"
       ],
       "format": "bin",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/io-overlap-adoption-2026-11-22-windows-auto.jsonl",
+      "source_sha256": "54c47ea33f4751d7b9857538171cebff8a82b6dde183cb4d080115ef1e08233f",
+      "aliases": [
+        "docs/benchmarks/io-overlap-adoption-2026-11-22-windows-auto.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-faults.json",
+      "source_sha256": "54cf758e22b51f0a510cec45fdc05cfdee789621db5a48f4394ba009def987d8",
+      "aliases": [
+        "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-faults.json"
+      ],
+      "format": "json",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -4565,6 +5076,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-bounded-partition.jsonl",
+      "source_sha256": "57577e62504e460ecb94932c42a8fd1e64730fba6aad351249efae6fddd696e8",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-bounded-partition.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/native-request-json-package-identities-2026-10-23.json",
       "source_sha256": "579ca932b42929f023b3816abbc75ca02ccbe471e39ca5e724de99ad18110234",
       "aliases": [
@@ -4751,6 +5279,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/browser-preview-analyze-calibration-2026-11-21-preview.jsonl",
+      "source_sha256": "5af155d129ad9240875902fed4ddba1488b3985c1371bedec6dda11d9e9f1fa5",
+      "aliases": [
+        "docs/benchmarks/browser-preview-analyze-calibration-2026-11-21-preview.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 54,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 54
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/shuffle-lineage-browser-packaging-2026-10-22.json",
       "source_sha256": "5af2c20c85be3b89ff99656efe69aeaf8b8885ba7579442f609c47bf608f0f78",
       "aliases": [
@@ -4821,6 +5366,23 @@
       "validation_records": 24,
       "classes": {
         "contract-duration": 24
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-counted-zstd.jsonl",
+      "source_sha256": "5bac56e894eacfa49346f9ffa00b62d8724f0ccf487e56dc8ffba288761ae473",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-counted-zstd.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -5094,6 +5656,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-browser-integrated.jsonl",
+      "source_sha256": "619b2a10237fa342776453f7d752e33f9df1ba1259f9ea4b57fcfba9b5d88cc3",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-browser-integrated.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 30,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 30
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/probabilistic-shuffle-external-wide-2026-11-05.patch",
       "source_sha256": "61d9c5339493e488dcf6d42db0bec02317f41b5a2c598bfc18b381a4688ede76",
       "aliases": [
@@ -5133,6 +5712,23 @@
       "validation_records": 0,
       "classes": {
         "measurement": 27
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-qualified-quota-index.jsonl",
+      "source_sha256": "622cef76c7cfb33c7fc0c1a9906e8b6723a29bd2200c64e708c5f92a71d41fd8",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-qualified-quota-index.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -5358,6 +5954,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/browser-direct-destination-writes-2026-11-21.json",
+      "source_sha256": "650da81ed21f871f7f0d6ab41aea16508a05fccfbc9d7ada74454d9621f465f8",
+      "aliases": [
+        "docs/benchmarks/browser-direct-destination-writes-2026-11-21.json"
+      ],
+      "format": "json",
+      "layouts": [
+        "diagnostic-runs"
+      ],
+      "observation_records": 30,
+      "validation_records": 0,
+      "classes": {
+        "diagnostic": 30
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/data-movement-summary-2026-11-18.json",
       "source_sha256": "6533874d5e2935e5ddda7c003e17ecd444a3d9bd37050055376811537e486109",
       "aliases": [
@@ -5415,6 +6028,23 @@
       "validation_records": 0,
       "classes": {
         "unclassified": 36
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-merge-planned.jsonl",
+      "source_sha256": "665dcb86305850e04a61ff1972f67c00a62d913e471add36f0e27e0713bc8c35",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-merge-planned.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -5655,6 +6285,40 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-browser-composed.jsonl",
+      "source_sha256": "6a9841df0ba3fea600906f7fc16ad1caee4dbe3d55789cb81429cc28c4a1be58",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-browser-composed.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 6,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 6
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-windows-writer-low.jsonl",
+      "source_sha256": "6a9fd23462746826f563fa575dd6fa879e9cf09ec0e8cc6f921cb96cb419d134",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-windows-writer-low.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 18,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 18
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/benchmark-windows-device-io-measured-2026-10-20.py",
       "source_sha256": "6aac47e6d3e99d2e351a50ea3f956e7f7eba93dc595982c239e01ad0e4354f4f",
       "aliases": [
@@ -5705,6 +6369,40 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-writer-low.jsonl",
+      "source_sha256": "6b3e9186aa8f39e606e6d02a581832bc4e7a1ae06631548f8c79ed8dcc6c75b5",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-writer-low.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 18,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 18
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-pending-final-sync-ceiling.jsonl",
+      "source_sha256": "6b865cfefd2fa5b49efa09919acf3f696b4f75f222bd7c05a606ebf988f6af7b",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-pending-final-sync-ceiling.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/consecutive-partitions-chain-2026-10-17.jsonl",
@@ -5984,6 +6682,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-publication-coarse.jsonl",
+      "source_sha256": "6fec21a14e59982ed4288be672abe76a9cff8ee76367d2910e6de74619e19abb",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-publication-coarse.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/windows-retained-parent-audit-current-2026-10-21.jsonl",
       "source_sha256": "703d1a7e341b75eea9908be6d6f459008bd50b096bb4d63532eb0e0e285e127f",
       "aliases": [
@@ -6227,6 +6942,23 @@
       "validation_records": 0,
       "classes": {
         "summary": 4
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-merge-small-planned.jsonl",
+      "source_sha256": "74b22cbc055cc4bbeda1854221d0edf9bb70e77e8d2e6bc662b10a017ba02ff2",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-merge-small-planned.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -6600,6 +7332,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-publication.jsonl",
+      "source_sha256": "7ba1d3cdf49ac17c14965bd7503ec218e46c95e6987b1c786a20e043c106b2a7",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-publication.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/shuffle-swarm-replay-2026-11-15.tar.gz",
       "source_sha256": "7bac9d054e3e201e844fba0d4c69bde806737c645812b2712fddac27508d6ebb",
       "aliases": [
@@ -6617,6 +7366,36 @@
       "source_sha256": "7c46a081f4b024b3db27916904d1964aec09b7b12ecc30908fc264002f04e63c",
       "aliases": [
         "docs/benchmarks/directory-path-ownership-validation-2026-10-21.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-gzip-screen.jsonl",
+      "source_sha256": "7cac1e5a6d8e15f3e180c4e757c7a953472e18cad42b327da86a2335ea351fc1",
+      "aliases": [
+        "docs/benchmarks/browser-auto-multigib-2026-11-21-gzip-screen.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 24,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 24
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-build-inputs.json",
+      "source_sha256": "7cc627c9cf5bcee3e169b0f35638e7c20d470e751cd816fb778224525ea396e5",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-build-inputs.json"
       ],
       "format": "json",
       "layouts": [],
@@ -6694,6 +7473,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-browser-controls.jsonl",
+      "source_sha256": "7e49cd632b5fbb26b35a48bb4d509f1277736e93e97d8b0f8bfaa21a002914d4",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-browser-controls.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 9,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 9
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/windows-shuffle-partition-device-io-2026-10-20.jsonl",
@@ -6963,6 +7759,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-browser-merge-pass.jsonl",
+      "source_sha256": "8352d990b11001741b6a96a847034874087ee7355f3de6e0e4c5fd8e12a7b6f3",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-browser-merge-pass.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/picker-capture-final-package-identities-2026-10-23.json",
       "source_sha256": "83788148ac6f8b2f8438a26ad64db0671f693f7d1bcbca552f13a8f355fd56b4",
       "aliases": [
@@ -7019,6 +7832,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-linux-terminal-wide.jsonl",
+      "source_sha256": "853ac8761b05a82a750f6eab1d9445508910a3d7bafdbe7754c8f7269dfb4d59",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-linux-terminal-wide.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 2,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 2
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/shuffle-scale-verifier-controls-2026-10-16.json",
       "source_sha256": "857398e6cf4341690a006d434f5d4bf110ad3b866c7fcc7868a1f5063450f4d7",
       "aliases": [
@@ -7050,6 +7880,40 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-terminal-short.jsonl",
+      "source_sha256": "85b2af96ff45f63d2d982d3fe3da77a1586cfb57eadad059ae17a48ba5b64f7d",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-final-terminal-short.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-counted-partition.jsonl",
+      "source_sha256": "85de078c65a133e7a4b97a50e49bd8f54698c6a279364a64146c30aac91c1cf1",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-counted-partition.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/e3-direct-r24-2026-10-26-final-scope.json",
       "source_sha256": "864ecbe8bb7786389421b41dbcfaa62b97545ffdafb80377da546d51e0437214",
       "aliases": [
@@ -7067,6 +7931,19 @@
       "source_sha256": "871b72b64daa13ccc45f6469c09d88ba1e7baa26da5cd8e9bf7594bc1590e204",
       "aliases": [
         "docs/benchmarks/bounded-parent-decision-audit-2026-10-21.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-chromium-thresholds-and-resource-calibration-2026-11-21-summary.json",
+      "source_sha256": "8775a8fbbd010b8f9bee17044ca66ecc6555ddc949f2e86c6addda7cc7054355",
+      "aliases": [
+        "docs/benchmarks/auto-chromium-thresholds-and-resource-calibration-2026-11-21-summary.json"
       ],
       "format": "json",
       "layouts": [],
@@ -7209,6 +8086,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-screen.json",
+      "source_sha256": "8a4f5dda5c0d5b97adc732fb2544b90725610801f7eb6cead00d471c479c6ce3",
+      "aliases": [
+        "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-screen.json"
+      ],
+      "format": "json",
+      "layouts": [
+        "diagnostic-runs"
+      ],
+      "observation_records": 48,
+      "validation_records": 0,
+      "classes": {
+        "diagnostic": 48
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/followup-final-2026-10-11.jsonl",
       "source_sha256": "8a62bac45ef1d86ef2fe979e0ba7869d70db0d9ba3cc04ae03073a522d4239e9",
       "aliases": [
@@ -7222,6 +8116,40 @@
       "validation_records": 0,
       "classes": {
         "unclassified": 30
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-chain-reverse.jsonl",
+      "source_sha256": "8a7e4554ebf57facd692c5aad447fa05f4d0aae5ed51a496d3d1acd273cd3c14",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-chain-reverse.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-screen.jsonl",
+      "source_sha256": "8a91afd56fd680af012b1faade979e583979e5586763ae229c6fd3eb31a26891",
+      "aliases": [
+        "docs/benchmarks/browser-auto-multigib-2026-11-21-screen.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
       },
       "coverage": "adapted"
     },
@@ -7347,6 +8275,23 @@
       "validation_records": 0,
       "classes": {
         "unclassified": 2
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-wide-utf16.jsonl",
+      "source_sha256": "8cb743a6810847cf87f75253ff053dda47d4c9a6c42176823a487ab88d8b981c",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-final-wide-utf16.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -7587,6 +8532,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-holdout.jsonl",
+      "source_sha256": "92573dca0ab0156c9bda4cc1a2e13c2a49bb33fb069609b780f1896d8290cc4c",
+      "aliases": [
+        "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-holdout.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/indexed-exact-quota-lookup-2026-11-21.json",
@@ -8080,6 +9042,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-windows-writers.jsonl",
+      "source_sha256": "9af01706fb0af1ad03c0b7dbb0972a98cb54ea1474cced57f60fd01ed6376e0e",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-windows-writers.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 18,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 18
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/plain-publication-production-transfer-2026-11-05.patch",
       "source_sha256": "9b20279efe60ef1abae392f7a04d6841e94721fb91ea2f2549ffff0dbcbf680d",
       "aliases": [
@@ -8198,6 +9177,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-merge.jsonl",
+      "source_sha256": "9c9cf0e5926e6499cf1c97bc90675208215cc6e90e6a4db1c553ae7290c6499a",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-merge.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 6,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 6
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/followup-native-2026-10-11.jsonl",
@@ -8435,6 +9431,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-windows-workers.jsonl",
+      "source_sha256": "a0a7adfe011208ccd43aa3fcd1de2943908a17a0bb8414bc850806d557b6c976",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-windows-workers.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 24,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 24
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/allocation-ranges-resource-2026-10-19.jsonl",
       "source_sha256": "a0fcf5b9f6a86dfc58d59ac4d7ec436331b8571c72eb965f1cf9fd28bc60df9e",
       "aliases": [
@@ -8509,6 +9522,40 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-retry-bounded-partition.jsonl",
+      "source_sha256": "a27ddce80e050427dd4709530aaedf7691b2480ec0788e9ae5f76908b5536636",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-windows-retry-bounded-partition.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 3,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 3
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-retained-exact.jsonl",
+      "source_sha256": "a29424793a3d6254c6b2a9d0a3136ef02313e4cb876e5de9a084bd2a442c9071",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-retained-exact.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/profile-rows-summary-2026-10-16.json",
       "source_sha256": "a3489abcf7bdfec0322e2bfd9028261c2ed1be602a66f017163c5a7a3aec58b6",
       "aliases": [
@@ -8558,19 +9605,6 @@
         "docs/benchmarks/shuffle-policy-native-harness-2026-11-15.py"
       ],
       "format": "py",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "a4bced404d47156df7f315f50c0c3e5e2d9480b13b0945df3ff3823d449dfe35",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -8630,6 +9664,23 @@
       "validation_records": 0,
       "classes": {
         "measurement": 72
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-browser-prefetch.jsonl",
+      "source_sha256": "a6c6dcb093168ea79a0091b3eb8301a1dd930c0713b65445644c77af3bd63954",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-browser-prefetch.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -8720,6 +9771,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-production.jsonl",
+      "source_sha256": "a88ec0342f98222967262323d89ebf6ef0063e288daa975ed63795bf7007baee",
+      "aliases": [
+        "docs/benchmarks/browser-auto-multigib-2026-11-21-production.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 12,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 12
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/shuffle-policy-browser-harness-2026-11-15.mjs",
       "source_sha256": "a8bd7eb3c92db8f8dae4c53edcba6eb6ec177675124f574f53f66c1a48d1abc1",
       "aliases": [
@@ -8759,6 +9827,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-chain-forward.jsonl",
+      "source_sha256": "a8fc24007a8da8716acc9dbf2cd9c998cce4f7dafcdcfd957e930f7e9190fced",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-chain-forward.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/consecutive-partitions-independent-2026-10-17.jsonl",
@@ -8824,6 +9909,19 @@
         "docs/benchmarks/memory-proportional-writers-checks-2026-11-21.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-quota-ephemeral.jsonl",
+      "source_sha256": "aaa0045c39dfb52750a9e980937661a78a6de21836f357de46fa2908f4b48aec",
+      "aliases": [
+        "docs/benchmarks/browser-auto-multigib-2026-11-21-quota-ephemeral.jsonl"
+      ],
+      "format": "jsonl",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -9115,6 +10213,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-gzip.jsonl",
+      "source_sha256": "af97a353261785e6518cb49b4e08e573387c2b2af70c3b7b052ed6c8626e6f92",
+      "aliases": [
+        "docs/benchmarks/browser-auto-multigib-2026-11-21-gzip.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 36,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 36
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/allocation-events-transfer-2026-11-03.json",
       "source_sha256": "b010843efd84dc5e65d4e2a122df7cbe211655851b607f4dc74ffb02efa180d9",
       "aliases": [
@@ -9338,6 +10453,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "b3c8b58a7ab23174215b2826f5ebefb4835859202623941f1364abbac51a3b2a",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/inspection-result-owner-development-2026-10-21.json",
       "source_sha256": "b4163627f2d1e74f08925e5c1370f528d989f07abdceb9377b03fb623db88339",
       "aliases": [
@@ -9382,6 +10510,23 @@
       "classes": {
         "allocation-census": 4,
         "measurement": 12
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-counted-zstd.jsonl",
+      "source_sha256": "b4660836df7db44f93ef48bad1e0284cc4f04d7e567401f6c82391b8fad35093",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-final-counted-zstd.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -9551,6 +10696,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-digest-profile.jsonl",
+      "source_sha256": "b845f006a6853854b0cfb9d3c0fc3bbfad15b55c2af9fe0838d9ee6d838e65d8",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-digest-profile.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 2,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 2
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/random-buckets-diagnostics-native-2026-10-19.jsonl",
       "source_sha256": "b86c1e27ce2ba6d8089cc2a1eb49e99ca2c6a8746cff6715fe10924828e6aea9",
       "aliases": [
@@ -9588,6 +10750,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/io-overlap-adoption-2026-11-22-linux-coarse.jsonl",
+      "source_sha256": "b91d7b01914bd82d6aa452779b7b67f54386046563b2a237db0a52c69078b111",
+      "aliases": [
+        "docs/benchmarks/io-overlap-adoption-2026-11-22-linux-coarse.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/accounting-batch-initial-engines-2026-10-16.jsonl",
@@ -9708,6 +10887,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-chain-reverse.jsonl",
+      "source_sha256": "bc26632e37661c32e93249f16c7a3dddf4f2b9bd31d649f18e19eb0be90b6b01",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-chain-reverse.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/balanced-8gib-cross-tool-summary-2026-11-21.json",
@@ -9999,6 +11195,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-terminal-wide.jsonl",
+      "source_sha256": "c051967d98a4d7088085230c1b585db33c37efac29a271023692d13ad63837a1",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-final-terminal-wide.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/zip-metadata-owner-cross-runtime-2026-10-21.json",
       "source_sha256": "c0bad41b7e6be9d99b8954c9a0b90a2b0df836b339790bfde9854988220914b1",
       "aliases": [
@@ -10130,6 +11343,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-final-bounded-probabilistic.jsonl",
+      "source_sha256": "c3d091b88789d37c3e71ed6cec8dde43d1acffa474bd04c10aea2319249f0461",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-windows-final-bounded-probabilistic.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/model-example-2026-10-11.jsonl",
       "source_sha256": "c3daf486f870678c6508d5b8c1f39a395a1330ae71d0a323bd86234d0ce51234",
       "aliases": [
@@ -10156,6 +11386,40 @@
       "validation_records": 0,
       "classes": {
         "measurement": 8
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-linux-final-sync.jsonl",
+      "source_sha256": "c3df69fad99c20171f9f260048372517bafbdf5da077b51af386cabc89d6c015",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-linux-final-sync.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-pending-final-sync-control.jsonl",
+      "source_sha256": "c4071e69b5b0038257fc000206724e68d9114dd40b8715b4cbc65c6fb5f8deb9",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-pending-final-sync-control.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -10310,6 +11574,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-bounded-partition.jsonl",
+      "source_sha256": "c62ed5ee808ea0530ec3b51a2e519a6025e0d70848151b28eb6783d989f6906f",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-bounded-partition.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/planned-lineage-validation-2026-10-21.json",
       "source_sha256": "c66a32cab4a35ec810b4b47e8bf7e66b046ee53e2a4c4a39196b53b9a540b5f9",
       "aliases": [
@@ -10426,6 +11707,23 @@
       "validation_records": 0,
       "classes": {
         "measurement": 24
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-retained-exact.jsonl",
+      "source_sha256": "c812a8830408e45f424f0646070efb95c612ca026af99d99e646a657c5ecb40b",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-final-retained-exact.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },
@@ -10733,6 +12031,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-paired-assertion.jsonl",
+      "source_sha256": "ccef6af1dbb3c65b7b27d5c34819027e2de1a30a10b08b75f530a8a9dbada4e1",
+      "aliases": [
+        "docs/benchmarks/browser-auto-multigib-2026-11-21-paired-assertion.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/profile-rows-browser-2026-10-16.json",
       "source_sha256": "cd080e94d616b6348164145a50057b253a48e39f4a118d6bf648d33fa262e1a6",
       "aliases": [
@@ -10764,6 +12079,23 @@
       "validation_records": 0,
       "classes": {
         "unclassified": 36
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/io-overlap-adoption-2026-11-22-linux-auto.jsonl",
+      "source_sha256": "cd26091b0a6f4068f061c3908976c836c3717416979e2aeef7d9a8ec294cfb39",
+      "aliases": [
+        "docs/benchmarks/io-overlap-adoption-2026-11-22-linux-auto.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
       },
       "coverage": "adapted"
     },
@@ -11006,6 +12338,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/browser-auto-memory-tiers-2026-11-21.jsonl",
+      "source_sha256": "d1a64ffaa96e59de288b45ec77894235cd754f4617df3a2056a09dcb0002fe30",
+      "aliases": [
+        "docs/benchmarks/browser-auto-memory-tiers-2026-11-21.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 54,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 54
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/serializer-initial-native-2026-10-16.jsonl",
       "source_sha256": "d1e21535a37660a49eff6d013136a0754c46612c06ef0c8e2d156f908fce1c7e",
       "aliases": [
@@ -11120,6 +12469,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-workers-four-cpus.jsonl",
+      "source_sha256": "d3f63fd8f25a759966fc47087a9cef15e059745b23fb437fb6f19c90d4584a3d",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-workers-four-cpus.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 24,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 24
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/counted-balanced-first-pass-fingerprint-validation-2026-11-21.json",
@@ -11260,6 +12626,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/browser-auto-resource-calibration-2026-11-21-primary.jsonl",
+      "source_sha256": "d5f154c89d491166297e6c14398481404ca900425f954af36d5cafaacc040f02",
+      "aliases": [
+        "docs/benchmarks/browser-auto-resource-calibration-2026-11-21-primary.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 48,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 48
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/shuffle-partition-multilevel-2026-10-16.jsonl",
       "source_sha256": "d63681f9cf25e1d2dacabbdc9d06bdb10f7c72b199b3f4c25bf57e55f4d03a55",
       "aliases": [
@@ -11289,6 +12672,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-chain-forward.jsonl",
+      "source_sha256": "d6aa3c98fef82d02057d2c73e3e667f1ba241ac48c00f9bcf6e34b924bd23a78",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-chain-forward.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/shuffle-partition-persistent-engines-2026-10-17.jsonl",
@@ -11532,6 +12932,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-descriptor-control.jsonl",
+      "source_sha256": "db180a826da867fec821398357f2e26d92d1f9c26e903d7469a222da0a440925",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-descriptor-control.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 18,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 18
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/profile-2026-10-11.jsonl",
       "source_sha256": "db1a3e0a2d59e4dcc31f9aa628d8500a24b179ebf785bafaa60fad0673af2faa",
       "aliases": [
@@ -11549,6 +12966,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-bounded-interleaved.jsonl",
+      "source_sha256": "db431274345a8e1f459ed4335f7e138888ac59c386aa3bddc14c50574cbba3f7",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-final-bounded-interleaved.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/streaming-shuffle-adapters-2gib-summary-2026-11-21.json",
       "source_sha256": "db83c32f89afa3a5c8cb517549c3cd84c05dae4236b4ade5a55d31dafd1430e5",
       "aliases": [
@@ -11560,6 +12994,36 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/overlap-followup-2026-11-22-attempt-notes.json",
+      "source_sha256": "db942ddb2ab77d8ee6bd9251be45cb8d1965786fb269b8f912af75cb98b356b3",
+      "aliases": [
+        "docs/benchmarks/overlap-followup-2026-11-22-attempt-notes.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-counted-zstd.jsonl",
+      "source_sha256": "dbc750b6f13b2e774696406c8ed633c87c9ad041cbdae97c2facb005523bb8cb",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-integrated-counted-zstd.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 2,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 2
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/followup-narrow-2026-10-11.jsonl",
@@ -11700,6 +13164,23 @@
       "validation_records": 0,
       "classes": {
         "measurement": 8
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-auto-resource-calibration-2026-11-21-pipeline.jsonl",
+      "source_sha256": "dee542e1de4c6b5b4f10927dd0710d1f0986c3f318b07e5784aabc04ff098568",
+      "aliases": [
+        "docs/benchmarks/browser-auto-resource-calibration-2026-11-21-pipeline.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 12,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 12
       },
       "coverage": "adapted"
     },
@@ -12006,6 +13487,36 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/auto-followup-2026-11-21-linux-writers.jsonl",
+      "source_sha256": "e3a833a9b41084c4e6a22ec4e6a48531fb14622a4b79e504bd99618f7d7687af",
+      "aliases": [
+        "docs/benchmarks/auto-followup-2026-11-21-linux-writers.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 18,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 18
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-quota-persistent.jsonl",
+      "source_sha256": "e3bab00452155b4a13027143cd61bedbe114d83bcf2323073d089edef1d30979",
+      "aliases": [
+        "docs/benchmarks/browser-auto-multigib-2026-11-21-quota-persistent.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/followup-snapshot-batches-2026-10-11.jsonl",
       "source_sha256": "e3cc593a9ee28ae3441409af1362d5c0aace46b8a3fe09a2b37e4cb084c4f56f",
       "aliases": [
@@ -12148,6 +13659,23 @@
       "validation_records": 0,
       "classes": {
         "measurement": 84
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/io-overlap-adoption-2026-11-22-linux-opt-in.jsonl",
+      "source_sha256": "e6ed12bc2a2d9f47d2dd7b953992f3582740f3ea3d48a54f7faea21aeeeb74c1",
+      "aliases": [
+        "docs/benchmarks/io-overlap-adoption-2026-11-22-linux-opt-in.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
       },
       "coverage": "adapted"
     },
@@ -12502,6 +14030,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/browser-preview-analyze-calibration-2026-11-21-codec-control.jsonl",
+      "source_sha256": "ec6ef1f1a2b02679fd3769da67f9a9c4c207238e7ebd16d0bc5593ba2a8c3c68",
+      "aliases": [
+        "docs/benchmarks/browser-preview-analyze-calibration-2026-11-21-codec-control.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 6,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 6
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/csv-marker-cache-2026-11-05-plan.json",
       "source_sha256": "ecf219aa9489da392b9daecd9d351c78055fbd9bbafbac9f3dbf7cc6b42819f1",
       "aliases": [
@@ -12650,6 +14195,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/io-overlap-adoption-2026-11-22-browser.jsonl",
+      "source_sha256": "f03da4ebf23935009ac54597db81d8d9d606e5a42eaba408788a333f3c1f39b5",
+      "aliases": [
+        "docs/benchmarks/io-overlap-adoption-2026-11-22-browser.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/inline-spool-key-2026-11-05.json",
       "source_sha256": "f079c32bf3ccec894dbd1658cddaaf25f0c3812f3ead6388c16531f716256bbf",
       "aliases": [
@@ -12707,6 +14269,23 @@
       "validation_records": 24,
       "classes": {
         "contract-duration": 24
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-auto-resource-calibration-2026-11-21-holdout.jsonl",
+      "source_sha256": "f11c7b3b76ab256a3ffd76cc2e894d621be2ea0b34b82979fcabd0519244943e",
+      "aliases": [
+        "docs/benchmarks/browser-auto-resource-calibration-2026-11-21-holdout.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 27,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 27
       },
       "coverage": "adapted"
     },
@@ -13166,6 +14745,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/auto-shadow-held-out-summary-2026-11-21.json",
+      "source_sha256": "f8a760f12b71b6fa2b86a1650b9d405b03e94fbdd908f1e40139d6e3994c47d2",
+      "aliases": [
+        "docs/benchmarks/auto-shadow-held-out-summary-2026-11-21.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/partition-balanced-tiny-2026-10-18.jsonl",
       "source_sha256": "f8b27cbd99f8e81445ee868fb9a7e8ebbb313b913cb374753e70f99dfdaa11af",
       "aliases": [
@@ -13381,6 +14973,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-counted-balanced.jsonl",
+      "source_sha256": "fec426b174e5376bf773dc9497fcd9fcf34c6bd75e32c755dcbb9497fb1188f1",
+      "aliases": [
+        "docs/benchmarks/native-auto-bounds-2026-11-22-windows-qualified-counted-balanced.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/field-stream-boundaries-2026-10-15.jsonl",
       "source_sha256": "fed96ad9bdb7e602dbc6068f2c3db87ca1d2959956c49c932c562fec019b5aef",
       "aliases": [
@@ -13394,6 +15003,23 @@
       "validation_records": 0,
       "classes": {
         "measurement": 24
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-repeat.jsonl",
+      "source_sha256": "ff8f1e54c9ca90b86597dddfd81e3ebc269eec8e179b800cc2a4980f66b8ddb6",
+      "aliases": [
+        "docs/benchmarks/browser-auto-multigib-2026-11-21-repeat.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 4
       },
       "coverage": "adapted"
     },

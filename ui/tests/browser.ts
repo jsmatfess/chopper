@@ -114,6 +114,70 @@ async function main(){
     const headerless=await api<{header:null;preview:string[][]}>('preview',job({input_csv:{...defaults.input_csv,headers:false}}));
     assert(headerless.header===null&&headerless.preview[0][0]==='id','headerless first row lost');
   });
+  await test('automatic shuffle memory reuses only the matching preview',async()=>{
+    const header=Array.from({length:42},(_,i)=>`c${i}`).join(',')+'\n';
+    const row=Array(42).fill('abcdef').join(',')+'\n';
+    const block=row.repeat(4096);
+    const input=new File([header,...Array(32).fill(block)],'fixture.csv');
+    const config=job({operations:[{type:'shuffle',strategy:'uniform'}],limits:{rows:null,bytes:8*1048576,compressed_bytes:null}});
+    await select(input);
+    await api('preview',config);
+    await api('run-direct',config);
+    let done=await wait('complete');
+    let plan=done.analysis!.auto_plan!;
+    assert(plan.analysis_status==='absent'&&plan.memory_plan?.preview_tier_mb===512
+      &&plan.memory_plan.target_mb===512,'matching preview did not raise the target');
+    await destination.removeEntry(done.output!.split('/').at(-1)!,{recursive:true});
+
+    await select(input);
+    await api('preview',config);
+    await api('run-direct',{...config,input_csv:{...config.input_csv,headers:false},
+      output_csv:{...config.output_csv,headers:false}});
+    done=await wait('complete');
+    plan=done.analysis!.auto_plan!;
+    assert(plan.memory_plan?.preview_tier_mb==null&&plan.memory_plan?.target_mb===256,
+      'preview was reused after parser settings changed');
+    await destination.removeEntry(done.output!.split('/').at(-1)!,{recursive:true});
+
+    await select(input);
+    await api('preview',config);
+    await api('run-direct',{...config,resources:{...config.resources,max_record_bytes:1048576}});
+    done=await wait('complete');
+    plan=done.analysis!.auto_plan!;
+    assert(plan.memory_plan?.preview_tier_mb==null&&plan.memory_plan?.target_mb===256,
+      'preview was reused after the record ceiling changed');
+    await destination.removeEntry(done.output!.split('/').at(-1)!,{recursive:true});
+  });
+  await test('automatic gzip shuffle uses the trailer as a memory hint and still validates it',async()=>{
+    const header=Array.from({length:42},(_,i)=>`c${i}`).join(',')+'\n';
+    const block=(Array(42).fill('abcdef').join(',')+'\n').repeat(4096);
+    const plain=new Blob([header,...Array(32).fill(block)]);
+    const compressed=await new Response(plain.stream().pipeThrough(new CompressionStream('gzip'))).blob();
+    const input=new File([compressed],'fixture.csv.gzip');
+    const config=job({input:input.name,operations:[{type:'shuffle',strategy:'uniform'}],
+      limits:{rows:null,bytes:8*1048576,compressed_bytes:null}});
+    await select(input);
+    await api('preview',config);
+    await api('run-direct',config);
+    const done=await wait('complete');
+    const plan=done.analysis!.auto_plan!.memory_plan;
+    assert(plan?.target_mb===512&&plan.gzip_member_bytes===plain.size,'gzip hint did not raise the target');
+    await destination.removeEntry(done.output!.split('/').at(-1)!,{recursive:true});
+
+    const damaged=new File([compressed.slice(0,-8),new Uint8Array(4),compressed.slice(-4)],input.name);
+    await select(damaged);
+    await api('preview',config);
+    await api('run-direct',config);
+    let failed=false;
+    try{await wait('complete');}catch(error){failed=/corrupt gzip|corrupt deflate|checksum|corrupt gzip stream/i.test(String(error));}
+    assert(failed,'Run accepted a damaged gzip checksum');
+    await api('cancel',{});
+    for await(const [name] of (destination as any).entries()){
+      const folder=await destination.getDirectoryHandle(name);
+      const marker=await folder.getFileHandle('CHOPPER-COMPLETE.json').catch(()=>null);
+      assert(marker,'damaged gzip left an incomplete destination');
+    }
+  });
   await test('full input profiling sees late keys and caches across config edits',async()=>{
     await select(csv('id,key\n'+Array.from({length:20000},(_,i)=>`${i},${i<15000?'a':'z'}`).join('\n')+'\n'));
     await api('profile',job());const first=(await wait('profiled')).profile!;
@@ -137,7 +201,7 @@ async function main(){
     assert(refused,'cancelled profile authorized execution');
   });
   await test('automatic memory Run-only and Analyze-then-Run flows preserve requested and effective manifest resources',async()=>{
-    assert(defaults.resources.memory_mb===256,'default memory changed');
+    assert(defaults.resources.memory_mb==='auto','missing automatic memory default');
     for(const direct of [true,false]){
       const config=job({resources:{...defaults.resources,memory_mb:'auto',workers:0,max_record_bytes:1048576}});
       const original=JSON.stringify(config);
@@ -152,6 +216,26 @@ async function main(){
       assert(record.config.resources.workers===0&&record.config.resources.max_record_bytes===1048576,'manifest changed explicit limits');
       assert(record.analysis.memory_budget_bytes===result.plan.memory_budget_bytes&&record.analysis.workers===1,'manifest lost effective resources');
     }
+  });
+  await test('Auto selects calibrated shuffle fusion with ordinary Run and preserves caps and rows',async()=>{
+    const payload='x'.repeat(112);
+    const source=csv('id,key,payload\n'+Array.from({length:45000},(_,i)=>`${i},${i%3},${payload}\n`).join(''));
+    const config=job({
+      operations:[
+        {type:'partition',columns:['key']},
+        {type:'assign_probabilistic',groups:[{name:'all',percent:'100'}]},
+        {type:'shuffle',strategy:'auto'},
+      ],
+      limits:{rows:2000,bytes:250000,compressed_bytes:null},
+    });
+    const result=await run(source,config,true);
+    assert(result.plan.auto_plan?.actual_strategy==='probabilistic_shuffle_fusion','calibrated fusion did not run');
+    assert(result.plan.auto_plan?.measurements.peak_writer_slots===1,'hosted writer policy changed');
+    assert(result.files.filter(file=>file.name.endsWith('.csv')).every(file=>file.size<=250000),'serialized cap exceeded');
+    await verifyPlainRows(result.files,source);
+    const sorted=await run(source,{...config,resources:{...config.resources,grouping:'sort'}},true);
+    assert(sorted.plan.auto_plan?.actual_strategy==='existing','forced sorting selected fusion');
+    await verifyPlainRows(sorted.files,source);
   });
   await test('hosted memory accepts 2 GiB and rejects larger budgets before publication',async()=>{
     for(const action of ['profile','run-direct']){
@@ -223,12 +307,28 @@ async function main(){
     let refused=false;try{await api('run',{});}catch{refused=true;}assert(refused,'cancelled direct run authorized execution');
     for await(const [name] of (workspaces as any).entries())assert(before.has(name),'direct cancellation leaked workspace');
   });
-  await test('direct Run rejects late malformed input before destination export and retries cleanly',async()=>{
+  await test('direct Run rejects late malformed input, cleans incomplete output, and retries',async()=>{
     const before=new Set<string>();for await(const [name] of (destination as any).entries())before.add(name);
     await select(csv('id,key\n1,a\n2,b,c\n'));
     await api('run-direct',job({limits:{rows:1,bytes:null,compressed_bytes:null}}));
     const failed=await wait('failed');assert(failed.error?.includes('expected 2'),'late direct width error missing');
-    for await(const [name] of (destination as any).entries())assert(before.has(name),'failed direct input exported partial output');
+    // The failure status arrives before storage retirement finishes.
+    const cleanupDeadline=Date.now()+15000;
+    for(;;){
+      let incomplete=false;
+      for await(const [name,folder] of (destination as any).entries()){
+        if(before.has(name))continue;
+        const marker=await folder.getFileHandle('CHOPPER-COMPLETE.json').catch((error:DOMException)=>{
+          if(error.name==='NotFoundError')return null;
+          throw error;
+        });
+        assert(!marker,'failed direct input published a completion marker');
+        incomplete=true;
+      }
+      if(!incomplete)break;
+      assert(Date.now()<cleanupDeadline,'failed direct input left incomplete output');
+      await pause();
+    }
     const retried=await run(csv('id,key\n1,a\n2,b\n'),job({limits:{rows:1,bytes:null,compressed_bytes:null}}),true);
     assert(retried.plan.rows===2&&retried.plan.output_files===2,'direct failure corrupted retry');
   });

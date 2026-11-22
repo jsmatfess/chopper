@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "counted-balanced-digest-overlap-2026-11-22",
+  "date": "2026-11-22",
+  "title": "Reject broad counted Balanced digest overlap",
+  "subsystem": "execution",
+  "question": "Does one buffered background hash worker improve counted Balanced across row shapes?",
+  "disposition": "reject",
+  "delivery": "unapplied",
+  "outcome": "mixed",
+  "summary": "The isolated 512-byte fixture benefits, but narrower and very-wide records miss the wall target and a 4 KiB pair reverses. Preserve the prototype as rejected evidence.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "Counted singleton Balanced with plain CSV, eight parts and Linux/WSL ext4."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Verified exact contents, quotas, strict caps and matching logical digests. A focused test exercises early join, exact hashing and capacity denial."
+  },
+  "limitations": [
+    "One WSL host. The thread stack is outside the prototype working grants."
+  ],
+  "exclusions": [
+    "Automatic use and other digest or pipeline strategies."
+  ],
+  "reopen_when": "Reopen for a specific verified eligibility rule and a candidate that owns every worker, channel and buffer allocation through its actual lifetime.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#input-prefetch-native-publication-and-digest-overlap-2026-11-22",
+      "sha256": "4fee88c77d308d299822d4b3981f8b7f8ca692e636fd7a7fea83796ceea976f0"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-digest-profile.jsonl",
+      "sha256": "b845f006a6853854b0cfb9d3c0fc3bbfad15b55c2af9fe0838d9ee6d838e65d8"
+    },
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-digest-overlap.jsonl",
+      "sha256": "2d49e012e6a2bfdb004f4e75dc78d144a3a475c30d46abc3bf81c6b1fc4e36b8"
+    },
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-digest-isolated.jsonl",
+      "sha256": "413a3c754a1630619189ee7ba4fd377e7119919cdbe1c258853b2234883eafea"
+    },
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-digest-wide.jsonl",
+      "sha256": "50f480394f36e60a36c006963fd206ac3cbc981d5fb3bbc6eb79192026f5a24f"
+    },
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-digest-narrow.jsonl",
+      "sha256": "4f2407350eea85c86eaafab0d2616ece8a1da855f12926931f45b938370df2b0"
+    },
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-digest-very-wide-retry.jsonl",
+      "sha256": "2bf7a97174d78d38ccb634a3d360ecfce6de5ff293406b96efb97ceaf3c04098"
+    },
+    {
+      "path": "docs/benchmarks/overlap-followup-2026-11-22-digest-overlap.patch",
+      "sha256": "0c16eda217a135832831899f362c5af9db28ef4f7672c95f4594c00e82f7f672"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/browser.md"
+  ]
+}

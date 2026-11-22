@@ -65,13 +65,34 @@ exactly one literal Unicode character; a tab must be passed as an actual tab,
 not the two characters `\t`. Omitted escape is null (doubled-quote behavior).
 Byte caps accept the existing byte-size syntax, such as `100MB` or `64MiB`.
 `--max-record-bytes` takes an integer byte count. Omitted resources match Job
-JSON defaults, including 256 MiB, 8 MiB record size and no temporary-space cap;
+JSON defaults, including automatic memory and workers, an 8 MiB record size and no temporary-space cap;
 there is no seed flag or public replay guarantee. Use `--help` for the full list.
 
 Parsing and Job validation do not read the input. Execution uses the existing
 confirmation path (`--yes` for noninteractive runs), engine dispatch, cancellation
 and native atomic publication. The output path must be a new directory. CLI
 ordering changes requested logical operations, not the rewrite eligibility rules.
+
+Run includes an `auto_plan` in its stdout report with the effective memory and
+workers, publication route and strategy, peak writer slots and merge reader
+fan-in, validated facts, and fallback counts. For an eligible uncapped native
+Partition, Analyze can report `writer_estimate.suggested_max_files` using the
+exact key count. A matching Run can include that recommendation in
+`auto_plan.suggested_max_files`. It is a limit for this input and remains a
+user setting. The large Linux file-sync rule can raise automatic working
+memory when live headroom permits. See [native Auto paths](direct-execution.md#native-auto-paths)
+for the workload bounds. To reuse compact advice from a completed Analyze:
+
+```sh
+chopper analyze --config job.json > input-analysis.json
+chopper run --config job.json --analysis input-analysis.json --yes
+```
+
+`--analysis` also works with ordered flags. Run checks source and parser identity,
+uses only applicable observations, and validates the current input normally.
+Native Windows currently uses fresh Run facts because the existing profile
+identity cannot reliably check rapid same-size edits on that runtime.
+See [Auto planning](execution-decisions.md#3-current-auto-planning).
 
 `chopper analyze --config job.json` scans input statistics and reports pipeline
 estimates without building output files. It replaces the former exact-plan

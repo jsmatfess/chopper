@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "browser-auto-calibration-at-multiple-gib-2026-11-21",
+  "title": "Use matched preview observations to size eligible hosted shuffle jobs",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Can inexpensive preview and container facts improve Auto memory selection, and does larger input justify a full Analyze before Run?",
+  "disposition": "adopt",
+  "outcome": "mixed",
+  "delivery": "default",
+  "summary": "Hosted Auto reuses a matching input preview to size eligible shuffles and supports a bounded gzip trailer hint. Analyze can refine that budget. The 2 GiB sorts still merged at both tested budgets, and fresh Analyze cost 15 to 29 seconds on the scale panel without changing Run.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Bundled Chromium on WSL2, file-backed 2 GiB shuffles and 4 GiB streaming with persistent OPFS.",
+      "Hosted plain and gzip uniform shuffle, skewed partition followed by shuffle, and two competing 42-column jobs."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "Validated 12 multi-GiB jobs, the integrated memory observations, capped output, source fields, row conservation, grouping, stream order, publication and cleanup. Acceptance rejected a damaged gzip checksum despite a plausible size hint."
+  },
+  "limitations": [
+    "Single WSL2 host and a small synthetic panel. Sampled browser RSS includes shared pages and differs from working reservations.",
+    "The last gzip member reports decoded size modulo 4 GiB, and the eight-row preview can miss tail widths."
+  ],
+  "exclusions": [
+    "Automatic Analyze triggers, arbitrary budget increases on large files, unrelated runtimes and new execution strategy promotion."
+  ],
+  "reopen_when": "Calibrate cheap facts that identify a material Analyze plus Run saving on distinct workloads, including width skew and concatenated compressed inputs.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#browser-auto-calibration-at-multiple-gib-2026-11-21",
+      "sha256": "5d063a65d61f5c17aebc3fdcf2f73f1843507536ccfe0ce04b4f3953119059c7"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/browser-auto-multigib-2026-11-21-screen.jsonl",
+      "sha256": "8a91afd56fd680af012b1faade979e583979e5586763ae229c6fd3eb31a26891"
+    },
+    {
+      "path": "docs/benchmarks/browser-auto-multigib-2026-11-21-repeat.jsonl",
+      "sha256": "ff8f1e54c9ca90b86597dddfd81e3ebc269eec8e179b800cc2a4980f66b8ddb6"
+    },
+    {
+      "path": "docs/benchmarks/browser-auto-multigib-2026-11-21-production.jsonl",
+      "sha256": "a88ec0342f98222967262323d89ebf6ef0063e288daa975ed63795bf7007baee"
+    },
+    {
+      "path": "docs/benchmarks/browser-auto-multigib-2026-11-21-gzip.jsonl",
+      "sha256": "af97a353261785e6518cb49b4e08e573387c2b2af70c3b7b052ed6c8626e6f92"
+    },
+    {
+      "path": "docs/benchmarks/browser-auto-multigib-2026-11-21-gzip-production.jsonl",
+      "sha256": "0c3415e85499c7f2e36daa6e52dc32b318db04a1e09f5668024726eb9178626b"
+    },
+    {
+      "path": "docs/benchmarks/browser-auto-multigib-2026-11-21-paired.jsonl",
+      "sha256": "0b8538d89c69df580a68d2ac33e3d03cbdfd6f86bffea7038dfa85756603d4a9"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/execution-decisions.md",
+    "docs/browser.md"
+  ]
+}

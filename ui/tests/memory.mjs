@@ -23,11 +23,11 @@ test('import, selected controls, read and export preserve auto and exact numeric
   }
 });
 
-test('omitted memory defaults to manual 256 and explicit selections retain the manual value',()=>{
+test('omitted memory defaults to automatic and explicit selections retain the manual value',()=>{
   const fields=controls();
   populateMemory(fields,JSON.parse('{}').memory_mb);
-  assert.equal(fields.mode.value,'manual');
-  assert.equal(readMemory(fields),256);
+  assert.equal(fields.mode.value,'auto');
+  assert.equal(readMemory(fields),'auto');
   fields.manual.value='513';
   fields.mode.value='auto';updateMemory(fields);
   assert.equal(readMemory(fields),'auto');
@@ -39,13 +39,13 @@ test('omitted memory defaults to manual 256 and explicit selections retain the m
   assert.equal(readMemory(fields),'auto');
 });
 
-test('memory markup defaults to manual and exposes both choices without changing other limits',async()=>{
+test('memory markup defaults to automatic and exposes both choices without changing other limits',async()=>{
   const html=await readFile('index.html','utf8');
-  assert.match(html,/<select id="memory-mode"[^>]*><option value="manual" selected>Manual<\/option><option value="auto">Automatic<\/option>/);
+  assert.match(html,/<select id="memory-mode"[^>]*><option value="auto" selected>Automatic<\/option><option value="manual">Manual<\/option>/);
   assert.match(html,/<input id="memory" required type="number" min="32" max="1048576" value="256"/);
   const app=await readFile('src/app.ts','utf8');
   assert.match(app,/populateMemory\(memoryControls,job.resources.memory_mb\)/);
-  assert.match(app,/memory_mb:readMemory\(memoryControls\)/);
+  assert.match(app,/memory_mb:advanced\?readMemory\(memoryControls\)/);
   assert.match(app,/resources:\{\.\.\.defaults.resources,\.\.\.config.resources\}/);
 });
 

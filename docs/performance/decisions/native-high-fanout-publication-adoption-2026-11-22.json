@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "id": "native-high-fanout-publication-adoption-2026-11-22",
+  "date": "2026-11-22",
+  "title": "Enable bounded native publication for high-fanout plain Partition",
+  "subsystem": "output",
+  "question": "Can automatic native publication improve competing large jobs while respecting live limits?",
+  "disposition": "adopt",
+  "delivery": "default",
+  "outcome": "favorable",
+  "summary": "At 1,152 files per job, competing makespan falls from 34.20 to 19.14 seconds on Linux and 22.45 to 18.41 seconds on Windows. The 192-file control misses the all-pairs gate.",
+  "scope": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "workloads": [
+      "Two concurrent 2 GiB snapshot Partition jobs with four configured workers and 256 MiB working budgets."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows"
+    ],
+    "summary": "Sixteen integrated high-fanout runs verify semantics and cleanup. A shared-pool contract limits the rule to one writer under pressure, then restores headroom."
+  },
+  "limitations": [
+    "Both native runtimes use the same physical host. The automatic implementation reached three writer slots in the matched panel."
+  ],
+  "exclusions": [
+    "Lower fanout, other pipeline shapes, browser publication, and physical device throughput."
+  ],
+  "reopen_when": null,
+  "supersedes": [
+    "native-parallel-publication-file-count-2026-11-22"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#bounded-io-overlap-adoption-2026-11-22",
+      "sha256": "fad8363618998a5a428f107e8f603df839aa9542b628a0c3c5c1aa52e734a107"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/io-overlap-adoption-2026-11-22-linux-auto.jsonl",
+      "sha256": "cd26091b0a6f4068f061c3908976c836c3717416979e2aeef7d9a8ec294cfb39"
+    },
+    {
+      "path": "docs/benchmarks/io-overlap-adoption-2026-11-22-linux-coarse.jsonl",
+      "sha256": "b91d7b01914bd82d6aa452779b7b67f54386046563b2a237db0a52c69078b111"
+    },
+    {
+      "path": "docs/benchmarks/io-overlap-adoption-2026-11-22-linux-opt-in.jsonl",
+      "sha256": "e6ed12bc2a2d9f47d2dd7b953992f3582740f3ea3d48a54f7faea21aeeeb74c1"
+    },
+    {
+      "path": "docs/benchmarks/io-overlap-adoption-2026-11-22-windows-auto.jsonl",
+      "sha256": "54c47ea33f4751d7b9857538171cebff8a82b6dde183cb4d080115ef1e08233f"
+    },
+    {
+      "path": "docs/benchmarks/io-overlap-adoption-2026-11-22-windows-opt-in.jsonl",
+      "sha256": "0fa8373d677a52098001be828db9d6ac9b1e96b6867a733b3d2a2b6a087bb815"
+    }
+  ],
+  "contracts": [
+    "docs/direct-execution.md",
+    "docs/execution-decisions.md"
+  ]
+}

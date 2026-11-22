@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "browser-bounded-io-adoption-2026-11-22",
+  "date": "2026-11-22",
+  "title": "Enable bounded browser I/O overlap on plain CSV jobs",
+  "subsystem": "storage",
+  "question": "Do one-window source prefetch and batched asynchronous writes save time in the hosted implementation?",
+  "disposition": "adopt",
+  "delivery": "default",
+  "outcome": "favorable",
+  "summary": "Plain streaming saves 7.02 to 16.10 seconds. A single plain Partition uses source prefetch and saves 1.06 to 4.12 seconds.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "File-backed 391 MiB and 977 MiB CSV, streaming and a single eight-key Partition."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "Sixteen runs verify order within each group, exact contents, byte caps, marker and cleanup. Thirteen browser fault cases include in-flight source and coalesced write cancellation."
+  },
+  "limitations": [
+    "Integrated measurements use same-origin OPFS and Chromium on one WSL host. Earlier picker evidence qualifies the separate write prototype."
+  ],
+  "exclusions": [
+    "Compressed codecs, batched Partition writes and multi-step pipelines."
+  ],
+  "reopen_when": null,
+  "supersedes": [
+    "browser-source-prefetch-2026-11-22",
+    "browser-direct-destination-write-overlap-2026-11-22",
+    "desktop-picker-write-overlap-2026-11-22"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#bounded-io-overlap-adoption-2026-11-22",
+      "sha256": "fad8363618998a5a428f107e8f603df839aa9542b628a0c3c5c1aa52e734a107"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/io-overlap-adoption-2026-11-22-browser.jsonl",
+      "sha256": "f03da4ebf23935009ac54597db81d8d9d606e5a42eaba408788a333f3c1f39b5"
+    },
+    {
+      "path": "docs/benchmarks/io-overlap-adoption-2026-11-22-browser-partition.jsonl",
+      "sha256": "170196c69d8e432a48fc339108af145cb6fa4c1d20a8fa394553b20015e2e92a"
+    }
+  ],
+  "contracts": [
+    "docs/browser.md",
+    "docs/direct-execution.md"
+  ]
+}

@@ -101,9 +101,11 @@ manual memory tuning. Respect explicit limits, use conservative availability
 estimates, and report when resources genuinely cannot support the job.
 
 Minimize total elapsed time from Run to completed output, including observation,
-planning, retries, processing and publication/export. Prefer simpler strategies
-and lower resource use in close comparisons. Numeric thresholds and the meaning
-of a close comparison require evidence; none are established by this brief.
+planning, retries, processing and publication/export. Rank improvements by
+absolute seconds saved and prioritize larger inputs and longer pipelines when
+they offer greater savings. Prefer simpler strategies and lower resource use
+in close comparisons. Numeric thresholds and the meaning of a close comparison
+require evidence.
 
 Weigh implementation complexity, algorithm maturity and failure risk alongside
 elapsed time and resource use. Prefer simple, known, safe approaches over
@@ -115,7 +117,9 @@ Take an obvious conservative path for small jobs rather than paying for elaborat
 planning. File size alone does not prove resident feasibility, especially for
 compressed input or expanded grouping structures. Gather observations during
 required work, and perform extra analysis only when its expected absolute
-benefit justifies its cost. Auto may adapt at safe execution boundaries, accounting
+benefit justifies its cost. When the user has already run Analyze, reuse
+applicable observations and optimize the remaining Run time. Auto may adapt
+at safe execution boundaries, accounting
 for switching costs and preserving semantics, admission and failure cleanup.
 
 Seeded-output policy has been removed. Randomized results may change with the

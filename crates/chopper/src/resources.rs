@@ -113,14 +113,27 @@ impl MemoryPool {
 
     /// Resolve without granting the observed free capacity.
     pub(crate) fn resolve_memory(&self, resources: &chopper_core::Resources) -> Result<u64> {
+        self.resolve_memory_for_run(resources, [256, 256])
+    }
+
+    pub(crate) fn resolve_memory_for_run(
+        &self,
+        resources: &chopper_core::Resources,
+        auto_targets_mb: [u64; 2],
+    ) -> Result<u64> {
         self.recheck_pressure();
         let mb = resources.memory_mb.as_mib().unwrap_or_else(|| {
             self.with_usage(|usage| {
-                (usage
+                let available_mb = usage
                     .admission_limit_bytes
                     .saturating_sub(usage.reserved_bytes)
-                    / (1024 * 1024 / 2))
-                    .min(256)
+                    / (1024 * 1024 / 2);
+                // A target needs its full working allowance. Reuse a
+                // calibrated lower tier when it still fits.
+                auto_targets_mb
+                    .into_iter()
+                    .find(|&target| available_mb >= target)
+                    .unwrap_or_else(|| available_mb.min(256))
             })
         });
         resources.validate_effective_memory(mb).map_err(|error| {
@@ -803,6 +816,31 @@ mod automatic_memory_tests {
     use super::*;
     use chopper_core::{Job, MemoryBudget, Resources};
     const MIB: u64 = 1024 * 1024;
+    #[test]
+    fn estimated_run_tier_falls_back_when_free_capacity_is_insufficient() -> Result<()> {
+        let resources = Resources::automatic();
+        for (free, wanted, resolved) in [
+            (512 * MIB, [1024, 256], 1024),
+            (512 * MIB - 1, [1024, 256], 256),
+            (96 * MIB, [512, 256], 192),
+            (768 * MIB, [2048, 1024], 1024),
+            (512 * MIB - 1, [2048, 1024], 256),
+        ] {
+            let pool = MemoryPool::new(free);
+            assert_eq!(pool.resolve_memory_for_run(&resources, wanted)?, resolved);
+            assert_eq!(pool.reservation_counts().0, 0);
+        }
+        let explicit = Resources {
+            memory_mb: 512.into(),
+            ..resources
+        };
+        assert_eq!(
+            MemoryPool::new(1).resolve_memory_for_run(&explicit, [2048, 1024])?,
+            512
+        );
+        Ok(())
+    }
+
     #[test]
     fn automatic_byte_boundaries_and_numeric_preservation() -> Result<()> {
         let mut resources = Resources {

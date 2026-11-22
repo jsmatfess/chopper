@@ -8,3 +8,55 @@ export function verifyPublication(result:unknown,folder:string,output:string):Ve
  if(value?.output!==output||!receipt||receipt.kind!=='browser-completion-marker'||receipt.version!==1||receipt.folder!==folder||receipt.marker!=='CHOPPER-COMPLETE.json'||!Number.isSafeInteger(receipt.files)||receipt.files!<1)throw new Error('Missing or invalid verified publication receipt');
  return Object.freeze({output,receipt:Object.freeze({kind:'browser-completion-marker',version:1,folder,files:receipt.files!,marker:'CHOPPER-COMPLETE.json'})}) as VerifiedPublication;
 }
+
+const markerName='CHOPPER-COMPLETE.json';
+export async function createDestination(parent:FileSystemDirectoryHandle,name:string){
+  try{await parent.getDirectoryHandle(name);throw new Error('Result folder already exists. Analyze again.');}
+  catch(error){if(!(error instanceof DOMException&&error.name==='NotFoundError'))throw error;}
+  return await parent.getDirectoryHandle(name,{create:true});
+}
+
+export async function completeDestination(destination:FileSystemDirectoryHandle,files:number,account:(bytes:number,start:number)=>void,preserveMarker:(preserve:boolean)=>void){
+  const markerHandle=await destination.getFileHandle(markerName,{create:true});
+  const marker=await markerHandle.createWritable();
+  const text=JSON.stringify({complete:true,files,engine:'chopper-browser',version:1})+'\n';
+  const bytes=new TextEncoder().encode(text);
+  try{const start=performance.now();await marker.write(bytes);account(bytes.length,start);await marker.close();preserveMarker(true);}
+  catch(error){await marker.abort().catch(()=>{});throw error;}
+  try{
+    const file=await markerHandle.getFile();
+    if(file.size===bytes.length&&await file.text()===text)return;
+  }catch(error){
+    if(error instanceof DOMException&&error.name==='NotFoundError')preserveMarker(false);
+    throw new Error('Could not verify completion marker',{cause:error});
+  }
+  preserveMarker(false);
+  throw new Error('Could not verify completion marker: content did not match');
+}
+
+export async function removeIncompleteDestination(parent:FileSystemDirectoryHandle,name:string,owned:FileSystemDirectoryHandle,files:number){
+  try{
+    const current=await parent.getDirectoryHandle(name);
+    if(!await owned.isSameEntry(current))return false;
+    try{
+      const marker=await(await current.getFileHandle(markerName)).getFile();
+      if(marker.size<=256){
+        const text=await marker.text();
+        try{
+          const record=JSON.parse(text);
+          if(record?.complete===true&&record.engine==='chopper-browser'&&record.version===1&&record.files===files)return false;
+        }catch{/* Incomplete marker. */}
+      }
+    }catch(error){if(!(error instanceof DOMException&&error.name==='NotFoundError'))throw error;}
+    await parent.removeEntry(name,{recursive:true});
+    return true;
+  }catch(error){
+    if(!(error instanceof DOMException&&error.name==='NotFoundError'))throw new Error(`Could not remove incomplete output ${parent.name}/${name}: ${error}`,{cause:error});
+    return true;
+  }
+}
+
+export function publicationResult(parent:FileSystemDirectoryHandle,name:string,files:number){
+  const publication:PublicationReceipt={kind:'browser-completion-marker',version:1,folder:name,files,marker:markerName};
+  return {output:parent.name+'/'+name,publication};
+}

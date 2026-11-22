@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "auto-chromium-thresholds-and-resource-calibration-2026-11-21",
+  "title": "Calibrate Auto strategy and resource thresholds in Chromium",
+  "date": "2026-11-21",
+  "subsystem": "execution",
+  "question": "Can Run choose strategies and resource settings for common hosted jobs using facts it already validates?",
+  "disposition": "block-promotion",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Keep the measured resource envelope. A narrow validated-row and decoded-payload gate clears the fusion margin at tested Chromium settings. Keep quota lookup out of hosted Auto. The fresh large job failed the frozen practical margin in at least one pair.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium",
+      "native-linux"
+    ],
+    "workloads": [
+      "Persistent Chromium OPFS synthetic shuffle and quota jobs with verified destination export.",
+      "Hosted 32 through 256 MiB resource sweep and native 1, 2 and 4-worker screen."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium",
+      "native-linux"
+    ],
+    "summary": "123 verified jobs. Actual strategy, effective resources, byte caps, conservation, memberships or exact quotas, and cleanup checked."
+  },
+  "limitations": [
+    "One WSL2 host and three pairs per cell with uncontrolled cache.",
+    "Disposable WASI feature build and benchmark profiling. Resource limits and unrelated tabs have independent admission.",
+    "Native worker sweep varies workers only for one composed job shape."
+  ],
+  "exclusions": [
+    "No generic strategy crossover, Windows or other browser runtime claim, or promotion."
+  ],
+  "reopen_when": "Qualify integrated WASI rules and fallback under pressure and cancellation, then confirm the complete-job margins with the shipping adapter and representative runtime before approval.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#auto-chromium-thresholds-and-resource-calibration-2026-11-21",
+      "sha256": "315c2bcf384e078f884b95b8649c7d2b579e6da40ed5d708aec516a807f32400"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/auto-chromium-thresholds-and-resource-calibration-2026-11-21-summary.json",
+      "sha256": "8775a8fbbd010b8f9bee17044ca66ecc6555ddc949f2e86c6addda7cc7054355"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/execution-decisions.md",
+    "docs/browser.md"
+  ]
+}

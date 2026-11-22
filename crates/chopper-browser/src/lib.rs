@@ -52,7 +52,13 @@ mod reactor {
     }
     #[no_mangle]
     pub extern "C" fn chopper_defaults() -> i32 {
-        report(serde_json::to_value(Job::default()).map_err(Into::into))
+        report(
+            serde_json::to_value(Job {
+                resources: chopper::core::Resources::automatic(),
+                ..Job::default()
+            })
+            .map_err(Into::into),
+        )
     }
     #[no_mangle]
     pub extern "C" fn chopper_columns() -> i32 {
@@ -125,24 +131,26 @@ mod reactor {
             let cancel = Arc::new(AtomicBool::new(false));
             let notify: chopper::storage::Notify =
                 Arc::new(|p| println!("{}", serde_json::json!({"progress":p})));
-            let analysis = if enabled && !job.operations.is_empty() {
-                engine::run_with_observations(
-                    job,
-                    cancel,
-                    notify,
-                    Arc::new(|fact| emit(fact, "{\"physical\":")),
-                )?
-            } else if enabled {
-                engine::run_observed_with_physical(
-                    job,
-                    cancel,
-                    notify,
-                    &mut observe,
-                    Arc::new(|fact| emit(fact, "{\"physical\":")),
-                )?
-            } else {
-                engine::run(job, cancel, notify)?
-            };
+            let hint = std::fs::File::open("/auto-observations.json")
+                .ok()
+                .and_then(|file| {
+                    use std::io::Read;
+                    serde_json::from_reader(file.take(4096)).ok()
+                });
+            let preview = std::fs::File::open("/preview-observations.json")
+                .ok()
+                .and_then(|file| {
+                    use std::io::Read;
+                    serde_json::from_reader(file.take(256)).ok()
+                });
+            let observers = enabled.then(|| {
+                let snapshot: chopper::observation::Sink<'_> = &mut observe;
+                let physical: chopper::observation::physical::Sink =
+                    Arc::new(|fact| emit(fact, "{\"physical\":"));
+                (snapshot, physical)
+            });
+            let analysis =
+                engine::run_hosted_with_preview(job, cancel, notify, hint, preview, observers)?;
             Ok(serde_json::json!({"analysis":analysis,"complete":true}))
         })())
     }

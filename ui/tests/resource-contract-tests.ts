@@ -39,6 +39,7 @@ async function main(){
         }
         engine=new Worker('/resource-contract-worker.js'+(candidate?'?shuffle-partition=1':''),{type:'module'});
         const {result,diagnostics,browserExport}=await request(engine,{available,shared,port:channel.port2,exportDirectory},[channel.port2],'result');
+        assert(result.auto_fusion?.pre_emission_retry&&result.auto_fusion?.cancellation_cleanup,'Active Auto fusion resource contract failed');
         assert(result.schema_version===1&&result.contract==='input-adapter-resource-contracts-v1','Wrong resource contract report');
         if(new URLSearchParams(location.search).has('spill-blocks')){
           assert(result.spill_blocks?.contract==='spill-block-resource-contracts-v1','Missing actual spill-block contracts');
@@ -273,7 +274,7 @@ async function main(){
           assert(marker?.complete===true&&marker.files===6&&marker.engine==='chopper-browser'&&marker.version===1&&browserExport.marker_after_result_writers_closed===true,'Completion marker preceded closed result files');
           assert(Array.isArray(browserExport.success_files)&&browserExport.success_files.length===6&&browserExport.success_files.every((file:any)=>typeof file.name==='string'&&file.bytes>0&&/^[a-f0-9]{64}$/.test(file.sha256)),'Missing exported file identities');
           const failure=browserExport.failure;
-          assert(failure?.injected_write_rejections===1&&failure.successful_target_writes_before_failure===1&&failure.abort_calls===1&&failure.closed_files>0&&failure.marker_open_calls===0&&failure.partial_directory_present===true&&failure.completion_marker_absent===true,'Mid-copy failure did not abort without marker');
+          assert(failure?.injected_write_rejections===1&&failure.successful_target_writes_before_failure===1&&failure.abort_calls===1&&failure.closed_files>0&&failure.marker_open_calls===0&&failure.partial_directory_present===false&&failure.completion_marker_absent===true,'Mid-copy failure did not abort without marker');
           assert(browserExport.existing_destination_rejected===true,'Existing export destination was modified');
           assert(Array.isArray(browserExport.terminal_faults)&&browserExport.terminal_faults.length===3,'Missing destination finalization faults');
           for(const [index,fault] of ['close','marker_write','marker_close'].entries()){

@@ -11,6 +11,26 @@ Status: behavior contract and original design baseline, with explicit later exte
 - Analysis and confirmation, progress, cancellation and cleanup, safe publication, and output manifests.
 - Fully client-side hosted UI is implemented; see [browser execution and limits](browser.md). Resumable jobs remain deferred. GPU acceleration has been assessed and deferred; there is no GPU dependency.
 
+## Auto planning
+
+Run resolves automatic memory and workers, applies calibrated strategy rules to
+validated input, and reports the effective settings, execution route, and fallback
+counts. For a matching small Analyze, native Run can choose one automatic worker.
+See [execution decisions](execution-decisions.md#3-current-auto-planning).
+
+A completed Analyze can supply exact row counts and decoded UTF-8 field payload
+widths. For the first Partition's key tuple it can supply distinct-key estimates
+and the busiest of 64 hash buckets as an estimated largest-key count. Complete
+single-column frequencies supply exact cardinality and largest-key count. An
+estimated count can include hash collisions. Run also observes validated rows,
+record sizes and applicable group counts during its normal processing.
+
+Native Linux binds Analyze advice to path, source identity and change metadata.
+The hosted app additionally binds it to the selected File within the session.
+Both check parser settings, ZIP member and record limit, and reuse partition
+facts only for the measured columns. Identity is advisory. Run validates the
+current source and admits every allocation separately.
+
 ## Data and order
 
 Every input data record has a stable ordinal; headers are not data records. Counts and offsets use checked 64-bit or wider arithmetic, never platform-sized row counters.
@@ -176,12 +196,12 @@ Analyze is advisory and does not certify a later Run. Run validates and hashes t
 
 `resources.memory_mb` accepts an unsigned JSON integer in MiB or the exact string
 `"auto"`; numeric strings, fractions and other scalar/container forms fail strict
-decoding. Omission remains numeric 256. CLI `--memory-mb` accepts an unsigned
+decoding. Omission selects `"auto"`. CLI `--memory-mb` accepts an unsigned
 integer or `auto`. Optional `run`/`analyze` memory and worker flags override
 imported values; absent flags retain imported values or the omitted defaults.
 Explicit numeric budgets remain exact.
 
-For `"auto"`, after the existing pressure refresh, let F be the effective shared
+For the baseline `"auto"` policy, after the existing pressure refresh, let F be the effective shared
 admission limit minus current usage (saturating at zero). The nominal MiB budget
 is `min(256, floor(F / (MiB / 2)))`. This observation grants no capacity: actual
 allocations still compete with concurrent owners. Resolve once before Context
@@ -194,17 +214,47 @@ RSS caps; see [shared reservations](resource-policy-research.md#explicit-setting
 Validate the resolved budget using the normal 32 to 1,048,576 MiB bounds,
 `max_record_bytes <= nominal_memory_mb * MiB / 16`, and explicit workers at most
 `min(64, nominal MiB / 8)`. Fail rather than round up the budget or shrink record
-limits. `workers: 0` retains native selection
+limits. Native automatic worker selection is bounded by
 `min(available CPUs, 4, max(memory_mb / 64, 1))`; WASI uses one worker and accepts
-only 0 or 1. Browser numeric budgets are bounded to 2048 MiB; automatic budgets
-never exceed 256 MiB. Default record size remains 8 MiB, so a small automatic
-budget can require an explicit lower record limit.
+only 0 or 1. Serial Run routes can use one automatic worker. Browser numeric
+budgets are bounded to 2048 MiB. Default record size remains 8 MiB, so a small
+automatic budget can require an explicit lower record limit.
+
+Hosted Run can target a 512, 1024, or 2048 MiB automatic budget for plain
+output with automatic grouping and a standalone uniform shuffle or
+Partition → Uniform Shuffle. The planner uses a rough estimate from file
+size for a plain UTF-8 CSV of at least 48 MiB. A matching eight-row input
+preview can raise that target for simple plain CSVs of at least 32 MiB. It uses
+sampled decoded field widths and column count. If an eligible UTF-8 CSV with
+headers starts at 1024 MiB, Run can inspect four 64 KiB ranges farther into
+the file. It drops partial boundary lines and rejects windows with quotes,
+carriage returns, invalid UTF-8 or inconsistent field counts. The sampled
+widths can raise the tier to 2048 MiB for estimates above 256 MiB and through
+528 MiB. Offset samples can miss changes in row shape or sit within a quoted
+field. Run uses them only for memory targeting and validates the current CSV.
+
+For a matching preview of a `.gz` or `.gzip` input, Run can use the final
+member's decoded length modulo 4 GiB as a sizing hint. A matching Analyze
+result uses full row count, column count and decoded payload to revise the
+target. The planner selects the smallest tier whose nominal quarter-budget
+sort target fits the estimate, with a calibrated margin up to 528 MiB for
+Analyze at the top tier. Analyze estimates beyond that range keep the starting
+target. Run uses a higher tier only when shared free capacity is at least half
+that tier. When interior sampling raises the target to 2048 MiB, Run can fall
+back to the original 1024 MiB tier if that tier fits. All allocations require
+admission.
+
+On Linux, an existing matching Analyze can target 384 MiB for a standalone
+uniform shuffle of a UTF-8 CSV with uncompressed output and automatic grouping.
+The rule covers a calibrated packed-row footprint above 4 GiB and through
+5 GiB and ordinary average row widths. It aims to avoid an extra merge pass.
+Other native shapes and Analyze itself use the baseline memory policy.
 
 The hosted WASI instance has a fixed 1 GiB shared tracked-allocation ledger and
 a 2 GiB linear-memory ceiling. Neither is discovered host RAM or a browser RSS
 cap. Numeric requests remain algorithm budgets, with a half-budget workspace;
 actual allocations must also satisfy shared admission. A larger manual request
-does not preallocate that amount. Keep default and automatic budgets at 256 MiB.
+does not preallocate that amount. A larger automatic target also grants no capacity.
 The signed i32 pointer arguments in the current WASI JavaScript shim make 2 GiB
 the boundary without bridge changes; see [browser limits](browser.md#processing-and-limits).
 

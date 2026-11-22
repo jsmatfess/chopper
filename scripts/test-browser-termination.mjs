@@ -1,3 +1,4 @@
+import {stagedDestinationWorker} from './browser-destination-fixtures.mjs';
 import {serverLifetime} from './browser-acceptance.mjs';
 import {finishBrowserObservation} from './browser-small-observer.mjs';
 // Production client/WASI workers with test-only pauses at actual lifecycle edges.
@@ -18,6 +19,7 @@ const root=fileURLToPath(new URL('../',import.meta.url));
 const composed=process.argv.includes('--composed');
 const direct=process.argv.includes('--direct')||composed;
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex');
+const stagedWorker=await stagedDestinationWorker();
 const wasm=await readFile(root+'ui/dist/engine.wasm');
 assertProductionWasm(wasm);
 const engineSource=await readFile(root+'ui/dist/engine-worker.js');
@@ -200,7 +202,7 @@ try{
   async function routes(){
     await context.route('**/termination-page.html',route=>route.fulfill({contentType:'text/html',headers,body:'<!doctype html><title>Engine termination contract</title>'}));
     await context.route('**/termination-fixture.js',route=>route.fulfill({contentType:'application/javascript',headers,body:bundle.outputFiles[0].text}));
-    await context.route('**/engine-worker-production.js',route=>route.fulfill({contentType:'application/javascript',headers,body:engineSource}));
+    await context.route('**/engine-worker-production.js',route=>route.fulfill({contentType:'application/javascript',headers,body:stagedWorker}));
     await context.route('**/engine-worker.js',route=>route.fulfill({contentType:'application/javascript',headers,body:workerWrapper}));
   }
   await routes();
@@ -450,6 +452,8 @@ try{
   assert.equal(sha(await readFile(root+'ui/dist/storage-worker.js')),report.binary_sha256['ui/dist/storage-worker.js']);
   assert.equal(sha(await readFile(root+'ui/dist/engine.wasm')),report.binary_sha256['ui/dist/engine.wasm']);
   report.production_worker_artifacts_unchanged=true;
+  report.destination_mode='staged copy fault fixture';
+  report.staged_worker_sha256=sha(stagedWorker);
   await closeRuntime();await removeProfile();
   console.log(JSON.stringify(report,null,2));
 }catch(error){primary=error;report.error=String(error);if(activeOwner&&!activeOwner.isClosed())report.failure_state=await activeOwner.evaluate(()=>window.lifecycle.debug()).catch(String);console.log(JSON.stringify(report,null,2));}

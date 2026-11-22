@@ -357,7 +357,7 @@ mod tests {
     #[test]
     fn resident_and_hierarchical_grouping_preserve_all_stages_and_downstream_domains() -> Result<()>
     {
-        for budget in [4096, 32 * 1024 * 1024] {
+        for budget in [crate::storage::SORT_HIERARCHY_TEST_MEMORY, 32 * 1024 * 1024] {
             let mut operations = vec![Operation::Balanced { files: 2 }];
             operations.extend(parts());
             operations.push(Operation::Shuffle {
@@ -435,7 +435,7 @@ mod tests {
             )?;
             let actual = apply(&actual, &job.operations[4], 4, &job, &source.analysis, &ctx)?;
             assert_eq!(snapshot(&expected, &ctx)?, snapshot(&actual, &ctx)?);
-            if budget == 4096 {
+            if budget == crate::storage::SORT_HIERARCHY_TEST_MEMORY {
                 assert!(ctx.diagnostics()["merge_operations"].as_u64().unwrap() > 2);
             }
         }

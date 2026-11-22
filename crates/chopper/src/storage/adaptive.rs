@@ -76,19 +76,19 @@ impl Workspace {
     pub fn peak(&self) -> u64 {
         self.peak.load(AtomicOrdering::Relaxed)
     }
-    #[cfg(all(
-        target_os = "linux",
-        feature = "experimental-probabilistic-shuffle-fusion"
-    ))]
-    pub(super) fn available_sort_buffer_limit(&self, nominal: usize) -> usize {
+    pub(super) fn available_bytes(&self) -> u64 {
         let local = self.limit.saturating_sub(self.used());
-        let available = self.pool.as_ref().map_or(local, |pool| {
+        self.pool.as_ref().map_or(local, |pool| {
             local.min(
                 pool.admission_limit()
                     .saturating_sub(pool.reservation_counts().0),
             )
-        });
-        nominal.min((available / 2).min(usize::MAX as u64) as usize)
+        })
+    }
+
+    #[cfg(any(target_os = "linux", target_os = "wasi"))]
+    pub(super) fn available_sort_buffer_limit(&self, nominal: usize) -> usize {
+        nominal.min(usize::try_from(self.available_bytes() / 2).unwrap_or(usize::MAX))
     }
     pub(super) fn sort_buffer_limit(&self, nominal: usize) -> usize {
         self.pool.as_ref().map_or(nominal, |pool| {

@@ -84,6 +84,10 @@ pub struct Budget {
     sort_runs: AtomicU64,
     merge_operations: AtomicU64,
     merge_inputs: AtomicU64,
+    peak_merge_fan_in: AtomicU64,
+    retained_exact_writers: AtomicBool,
+    retained_exact_fallbacks: AtomicU64,
+    used_short_tail: AtomicBool,
     resident_sorts: AtomicU64,
     sort_calls: AtomicU64,
     sort_rows: AtomicU64,
@@ -102,6 +106,11 @@ pub struct Budget {
     compact_spill_fallbacks: AtomicU64,
     shuffle_partition_fusions: AtomicU64,
     shuffle_partition_rows: AtomicU64,
+    input_record_bytes: AtomicU64,
+    peak_bounded_writer_slots: AtomicU64,
+    probabilistic_shuffle_attempts: AtomicU64,
+    probabilistic_shuffle_retries: AtomicU64,
+    indexed_exact_quota_scopes: AtomicU64,
     shuffle_partition_retries: AtomicU64,
     consecutive_partition_fusions: AtomicU64,
     consecutive_partition_rows: AtomicU64,
@@ -145,6 +154,12 @@ pub struct Context {
     pub(crate) physical_source: Option<u32>,
     pub(crate) physical_role: u8,
     pub(crate) direct_terminal_output: bool,
+    pub(crate) auto_run: bool,
+    pub(crate) auto_final_writers: bool,
+    pub(crate) auto_final_sync: bool,
+    pub(crate) auto_merge_ceiling: Option<usize>,
+    pub(crate) auto_retained_exact: bool,
+    pub(crate) auto_quota_index: bool,
     workspace: Arc<Workspace>,
     directory_path_bytes: Arc<AtomicU64>,
     grouping: chopper_core::Grouping,
@@ -236,8 +251,38 @@ impl Context {
         notify: Notify,
         memory_pool: Arc<crate::resources::MemoryPool>,
     ) -> Result<Self> {
+        Self::with_worker_limit(resources, cancel, notify, memory_pool, usize::MAX)
+    }
+
+    pub(crate) fn with_worker_limit(
+        resources: &chopper_core::Resources,
+        cancel: Arc<AtomicBool>,
+        notify: Notify,
+        memory_pool: Arc<crate::resources::MemoryPool>,
+        automatic_worker_limit: usize,
+    ) -> Result<Self> {
+        Self::with_run_limits(
+            resources,
+            cancel,
+            notify,
+            memory_pool,
+            automatic_worker_limit,
+            [256, 256],
+        )
+    }
+
+    pub(crate) fn with_run_limits(
+        resources: &chopper_core::Resources,
+        cancel: Arc<AtomicBool>,
+        notify: Notify,
+        memory_pool: Arc<crate::resources::MemoryPool>,
+        automatic_worker_limit: usize,
+        auto_memory_targets_mb: [u64; 2],
+    ) -> Result<Self> {
+        #[cfg(target_os = "wasi")]
+        let _ = automatic_worker_limit;
         ensure!(!cancel.load(AtomicOrdering::Relaxed), "job cancelled");
-        let memory_mb = memory_pool.resolve_memory(resources)?;
+        let memory_mb = memory_pool.resolve_memory_for_run(resources, auto_memory_targets_mb)?;
         let workspace = Arc::new(Workspace::shared(
             (memory_mb * 1024 * 1024 / 2) as usize,
             memory_pool,
@@ -259,15 +304,7 @@ impl Context {
             u64::MAX
         };
         #[cfg(not(target_os = "wasi"))]
-        let workers = if resources.workers == 0 {
-            std::thread::available_parallelism()
-                .map(usize::from)
-                .unwrap_or(1)
-                .min(4)
-                .min((memory_mb / 64).max(1) as usize)
-        } else {
-            resources.workers
-        };
+        let workers = crate::engine::auto::workers(resources, memory_mb, automatic_worker_limit);
         #[cfg(not(target_os = "wasi"))]
         let pool = rayon::ThreadPoolBuilder::new()
             .num_threads(workers)
@@ -294,6 +331,10 @@ impl Context {
                 sort_runs: AtomicU64::new(0),
                 merge_operations: AtomicU64::new(0),
                 merge_inputs: AtomicU64::new(0),
+                peak_merge_fan_in: AtomicU64::new(0),
+                retained_exact_writers: AtomicBool::new(false),
+                retained_exact_fallbacks: AtomicU64::new(0),
+                used_short_tail: AtomicBool::new(false),
                 resident_sorts: AtomicU64::new(0),
                 sort_calls: AtomicU64::new(0),
                 sort_rows: AtomicU64::new(0),
@@ -312,6 +353,11 @@ impl Context {
                 compact_spill_fallbacks: AtomicU64::new(0),
                 shuffle_partition_fusions: AtomicU64::new(0),
                 shuffle_partition_rows: AtomicU64::new(0),
+                input_record_bytes: AtomicU64::new(0),
+                peak_bounded_writer_slots: AtomicU64::new(0),
+                probabilistic_shuffle_attempts: AtomicU64::new(0),
+                probabilistic_shuffle_retries: AtomicU64::new(0),
+                indexed_exact_quota_scopes: AtomicU64::new(0),
                 shuffle_partition_retries: AtomicU64::new(0),
                 consecutive_partition_fusions: AtomicU64::new(0),
                 consecutive_partition_rows: AtomicU64::new(0),
@@ -336,6 +382,12 @@ impl Context {
             physical_source: None,
             physical_role: 0,
             direct_terminal_output: false,
+            auto_run: false,
+            auto_final_writers: false,
+            auto_final_sync: false,
+            auto_merge_ceiling: None,
+            auto_retained_exact: false,
+            auto_quota_index: false,
             workspace,
             directory_path_bytes,
             grouping: resources.grouping,
@@ -413,6 +465,69 @@ impl Context {
     pub(crate) fn pressure_boundary(&self) {
         self.workspace.recheck_pressure();
     }
+    pub(crate) fn input_record_bytes(&self, bytes: u64) {
+        self.budget
+            .input_record_bytes
+            .store(bytes, AtomicOrdering::Relaxed);
+    }
+
+    #[cfg(any(target_os = "linux", target_os = "wasi"))]
+    pub(crate) fn validated_payload_bytes(&self) -> u64 {
+        self.budget.input_record_bytes.load(AtomicOrdering::Relaxed)
+    }
+
+    pub(crate) fn working_headroom(&self) -> u64 {
+        self.workspace.available_bytes()
+    }
+
+    pub(crate) fn publication_writer_limit(&self, nominal: usize, remaining_files: u64) -> usize {
+        let per_writer = 16 * 1024 * 1024 + 2 * self.max_record as u64;
+        let room = (self.workspace.available_bytes() / per_writer).max(1);
+        nominal
+            .min(usize::try_from(room.min(remaining_files.max(1))).unwrap_or(usize::MAX))
+            .min(crate::engine::auto::descriptor_writer_ceiling(2).max(1))
+    }
+
+    pub(crate) fn bounded_writer_slots(&self, count: usize) {
+        self.budget
+            .peak_bounded_writer_slots
+            .fetch_max(count as u64, AtomicOrdering::Relaxed);
+    }
+
+    pub(crate) fn used_retained_exact_writers(&self) {
+        self.budget
+            .retained_exact_writers
+            .store(true, AtomicOrdering::Relaxed);
+    }
+
+    pub(crate) fn retained_exact_fallback(&self) {
+        self.budget
+            .retained_exact_fallbacks
+            .fetch_add(1, AtomicOrdering::Relaxed);
+    }
+
+    pub(crate) fn completed_measurements(&self) -> crate::engine::auto::RunMeasurements {
+        crate::engine::auto::RunMeasurements {
+            temporary_bytes_written: self.budget.written.load(AtomicOrdering::Relaxed),
+            temporary_bytes_read: self.budget.read.load(AtomicOrdering::Relaxed),
+            peak_merge_fan_in: self.budget.peak_merge_fan_in.load(AtomicOrdering::Relaxed),
+            retained_exact_writers: self
+                .budget
+                .retained_exact_writers
+                .load(AtomicOrdering::Relaxed),
+            peak_workspace_reserved_bytes: self.workspace.peak(),
+            retained_exact_fallbacks: self
+                .budget
+                .retained_exact_fallbacks
+                .load(AtomicOrdering::Relaxed),
+            used_short_tail: self.budget.used_short_tail.load(AtomicOrdering::Relaxed),
+            peak_writer_slots: self
+                .budget
+                .peak_bounded_writer_slots
+                .load(AtomicOrdering::Relaxed)
+                .max(1),
+        }
+    }
     pub fn used(&self) -> u64 {
         self.budget.used.load(AtomicOrdering::Relaxed)
     }
@@ -460,6 +575,24 @@ impl Context {
         self.budget
             .shuffle_partition_rows
             .fetch_add(rows, AtomicOrdering::Relaxed);
+    }
+    #[cfg(any(target_os = "linux", target_os = "wasi"))]
+    pub(crate) fn probabilistic_shuffle_attempt(&self) {
+        self.budget
+            .probabilistic_shuffle_attempts
+            .fetch_add(1, AtomicOrdering::Relaxed);
+    }
+    #[cfg(any(target_os = "linux", target_os = "wasi"))]
+    pub(crate) fn probabilistic_shuffle_retry(&self) {
+        self.budget
+            .probabilistic_shuffle_retries
+            .fetch_add(1, AtomicOrdering::Relaxed);
+    }
+    #[cfg(target_os = "linux")]
+    pub(crate) fn indexed_exact_quota_scope(&self) {
+        self.budget
+            .indexed_exact_quota_scopes
+            .fetch_add(1, AtomicOrdering::Relaxed);
     }
     pub(crate) fn shuffle_partition_retry(&self) {
         self.budget
@@ -1580,7 +1713,7 @@ impl SortOrder {
         })
     }
 }
-#[cfg(all(target_os = "linux", feature = "experimental-wide-uniform-merge"))]
+#[cfg(target_os = "linux")]
 fn wide_merge_handles_available() -> bool {
     let mut limit = std::mem::MaybeUninit::<libc::rlimit>::uninit();
     // getrlimit initializes the result on success. A failure keeps the old cap.
@@ -1592,19 +1725,13 @@ fn wide_merge_handles_available() -> bool {
     unsafe { limit.assume_init() }.rlim_cur >= 4096
 }
 
-#[cfg(all(
-    target_os = "linux",
-    feature = "experimental-probabilistic-shuffle-fusion"
-))]
+#[cfg(any(target_os = "linux", target_os = "wasi"))]
 struct PreparedSpill {
     // Drop the writer, including its admitted path, before the buffer grant.
     writer: BufWriter<SpillFile>,
     buffer: Reservation,
 }
-#[cfg(all(
-    target_os = "linux",
-    feature = "experimental-probabilistic-shuffle-fusion"
-))]
+#[cfg(any(target_os = "linux", target_os = "wasi"))]
 impl PreparedSpill {
     fn new(ctx: &Context) -> Result<Self> {
         let mut buffer = Reservation::new(ctx);
@@ -1622,10 +1749,7 @@ enum SortSpillMode {
     #[default]
     Ordinary,
     Routing(Router),
-    #[cfg(all(
-        target_os = "linux",
-        feature = "experimental-probabilistic-shuffle-fusion"
-    ))]
+    #[cfg(any(target_os = "linux", target_os = "wasi"))]
     Prepared(PreparedSpill),
 }
 impl SortSpillMode {
@@ -1644,10 +1768,7 @@ impl SortSpillMode {
         }
         None
     }
-    #[cfg(all(
-        target_os = "linux",
-        feature = "experimental-probabilistic-shuffle-fusion"
-    ))]
+    #[cfg(any(target_os = "linux", target_os = "wasi"))]
     fn take_prepared(&mut self) -> Option<PreparedSpill> {
         if let Self::Prepared(_) = self {
             if let Self::Prepared(owner) = std::mem::take(self) {
@@ -1678,6 +1799,17 @@ pub struct Sorter {
     routing_candidate: bool,
     spill_mode: SortSpillMode,
 }
+// The fixtures leave room for a small packed row and still force spills.
+#[cfg(all(
+    test,
+    any(
+        feature = "experimental-consecutive-partitions",
+        feature = "experimental-partition-balanced",
+        feature = "experimental-shuffle-partition"
+    )
+))]
+pub(crate) const SORT_HIERARCHY_TEST_MEMORY: usize = 4 * (std::mem::size_of::<Sorter>() + 256);
+
 impl Sorter {
     pub fn new(ctx: &Context, order: SortOrder) -> Self {
         // A large explicit job ceiling cannot expand shared admission. Retain
@@ -1687,20 +1819,15 @@ impl Sorter {
         let buffer_limit = ctx.workspace.sort_buffer_limit(ctx.memory / 4);
         let routing_candidate =
             matches!(order, SortOrder::Key) && ctx.grouping == chopper_core::Grouping::Auto;
-        #[cfg(all(
-            target_os = "linux",
-            feature = "experimental-short-terminal-uniform-merge",
-            not(feature = "experimental-spill-blocks")
-        ))]
-        let defer_terminal_merges = ctx.direct_terminal_output
+        #[cfg(target_os = "linux")]
+        let defer_terminal_merges = !cfg!(feature = "experimental-spill-blocks")
+            && (ctx.auto_merge_ceiling == Some(512)
+                || cfg!(feature = "experimental-short-terminal-uniform-merge"))
+            && ctx.direct_terminal_output
             && !ctx.physical_enabled()
             && matches!(order, SortOrder::Random(_))
             && wide_merge_handles_available();
-        #[cfg(not(all(
-            target_os = "linux",
-            feature = "experimental-short-terminal-uniform-merge",
-            not(feature = "experimental-spill-blocks")
-        )))]
+        #[cfg(not(target_os = "linux"))]
         let defer_terminal_merges = false;
         Self {
             ctx: ctx.clone(),
@@ -1717,10 +1844,7 @@ impl Sorter {
             spill_mode: SortSpillMode::Ordinary,
         }
     }
-    #[cfg(all(
-        target_os = "linux",
-        feature = "experimental-probabilistic-shuffle-fusion"
-    ))]
+    #[cfg(any(target_os = "linux", target_os = "wasi"))]
     pub(crate) fn probabilistic_shuffle(ctx: &Context) -> Result<Self> {
         let mut sorter = Self::new(ctx, SortOrder::GroupRandom);
         sorter.spill_mode = SortSpillMode::Prepared(PreparedSpill::new(ctx)?);
@@ -1984,28 +2108,16 @@ impl Sorter {
         // The spill writer overlaps the retained rows. Reserve it separately
         // from the row-storage ceiling and release it before merge allocation.
         let mut io = Reservation::new(&self.ctx);
-        #[cfg(all(
-            target_os = "linux",
-            feature = "experimental-probabilistic-shuffle-fusion"
-        ))]
+        #[cfg(any(target_os = "linux", target_os = "wasi"))]
         let prepared = self.spill_mode.take_prepared();
-        #[cfg(all(
-            target_os = "linux",
-            feature = "experimental-probabilistic-shuffle-fusion"
-        ))]
+        #[cfg(any(target_os = "linux", target_os = "wasi"))]
         let renew_prepared = _may_spill_again && prepared.is_some();
-        #[cfg(all(
-            target_os = "linux",
-            feature = "experimental-probabilistic-shuffle-fusion"
-        ))]
+        #[cfg(any(target_os = "linux", target_os = "wasi"))]
         let writer = prepared.map(|owner| {
             io = owner.buffer;
             owner.writer
         });
-        #[cfg(not(all(
-            target_os = "linux",
-            feature = "experimental-probabilistic-shuffle-fusion"
-        )))]
+        #[cfg(not(any(target_os = "linux", target_os = "wasi")))]
         let writer = None;
         if writer.is_none() {
             io.resize(64 * 1024)?;
@@ -2040,10 +2152,7 @@ impl Sorter {
             span.finish_counts(observed_rows, 1, None);
         }
         self.add_run(run, 0)?;
-        #[cfg(all(
-            target_os = "linux",
-            feature = "experimental-probabilistic-shuffle-fusion"
-        ))]
+        #[cfg(any(target_os = "linux", target_os = "wasi"))]
         if renew_prepared {
             self.spill_mode = SortSpillMode::Prepared(PreparedSpill::new(&self.ctx)?);
         }
@@ -2051,8 +2160,10 @@ impl Sorter {
     }
     fn fan_in(&self) -> usize {
         let ceiling = 64;
-        #[cfg(all(target_os = "linux", feature = "experimental-wide-uniform-merge"))]
-        let ceiling = if self.ctx.direct_terminal_output
+        #[cfg(target_os = "linux")]
+        let ceiling = if (self.ctx.auto_merge_ceiling.is_some()
+            || cfg!(feature = "experimental-wide-uniform-merge"))
+            && self.ctx.direct_terminal_output
             && !self.ctx.physical_enabled()
             && matches!(self.order, SortOrder::Random(_))
             && wide_merge_handles_available()
@@ -2067,7 +2178,11 @@ impl Sorter {
         };
         // Only headers are live per run. Leave headroom for the winner's
         // separately reserved decode/conversion capacity and growth overlap.
-        ((self.ctx.memory / 4).saturating_sub(self.largest_row) / (self.largest_key + 65536 + 512))
+        let mut budget = self.ctx.memory / 4;
+        if ceiling > 64 && self.ctx.auto_merge_ceiling.is_some() {
+            budget = budget.min(self.ctx.working_headroom() as usize);
+        }
+        (budget.saturating_sub(self.largest_row) / (self.largest_key + 65536 + 512))
             .clamp(2, ceiling)
     }
     fn add_run(&mut self, run: SortRun, level: usize) -> Result<()> {
@@ -2206,10 +2321,7 @@ impl Sorter {
             }));
         }
         self.flush_run(false)?;
-        #[cfg(all(
-            target_os = "linux",
-            feature = "experimental-probabilistic-shuffle-fusion"
-        ))]
+        #[cfg(any(target_os = "linux", target_os = "wasi"))]
         drop(self.spill_mode.take_prepared());
         let fan_in = self.fan_in();
         let mut levels = std::mem::replace(&mut self.levels, Catalog::new(&self.ctx)).into_iter();
@@ -2217,6 +2329,12 @@ impl Sorter {
             let mut pending = levels.next().context("missing pending terminal runs")?;
             debug_assert_eq!(levels.len(), 0);
             // Consolidate only the inputs needed to fit the final merge.
+            if pending.len() > 64 {
+                self.ctx
+                    .budget
+                    .used_short_tail
+                    .store(true, AtomicOrdering::Relaxed);
+            }
             while pending.len() > fan_in {
                 let count = (pending.len() - fan_in + 1).min(fan_in);
                 let merged = self.merge(pending.take_prefix(count)?, None)?;
@@ -2498,6 +2616,9 @@ impl MergeRows {
         ctx.budget
             .merge_inputs
             .fetch_add(files.len() as u64, AtomicOrdering::Relaxed);
+        ctx.budget
+            .peak_merge_fan_in
+            .fetch_max(files.len() as u64, AtomicOrdering::Relaxed);
         let mut readers = Vec::new();
         reservation.reserve_vec(&mut readers, files.len())?;
         reservation

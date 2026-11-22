@@ -2,18 +2,52 @@ import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {build} from 'esbuild';
 const bundle=await build({stdin:{contents:"export * from './src/browser/execution-history';export {PhysicalHistory} from './src/browser/physical-history';export * from './src/browser/execution-dag';export * from './src/browser/execution-timing';",resolveDir:process.cwd()},bundle:true,write:false,format:'esm',platform:'node'});
-const {ExecutionHistory,ObservationDelivery,PhysicalHistory,ExecutionDag,edgePath,MAX_DAG_NODES,MAX_DAG_EDGES,DAG_PADDING,DAG_NODE_WIDTH,observedSources,displayStepStatus,describeStep,summarizeStep,measurementParts,observedStrategy,ExecutionTiming,MAX_TIMING_WINDOWS}=await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString('base64')}`);
+const {ExecutionHistory,ObservationDelivery,PhysicalHistory,ExecutionDag,edgePath,MAX_DAG_NODES,MAX_DAG_EDGES,DAG_PADDING,DAG_NODE_WIDTH,observedSources,displayStepStatus,describeStep,summarizeStep,measurementParts,observedStrategy,ExecutionTiming,MAX_TIMING_WINDOWS,TIMING_GAPS_PER_BLOCK,TimingGapWriter,TimingGapLog}=await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString('base64')}`);
 const job={operations:[],compression:'none',output_csv:{encoding:'utf-8',headers:true},limits:{rows:2,bytes:null,compressed_bytes:null}};
 test('timeline retains first start and latest attempt end without drifting on duplicate terminals',(t)=>{
- let ms=100;t.mock.method(performance,'now',()=>ms);const timing=new ExecutionTiming();
+ let ms=100;t.mock.method(performance,'now',()=>ms);const gaps=[],timing=new ExecutionTiming((...gap)=>gaps.push(gap));
  timing.record(1000,'active',1);ms=1100;timing.record(1000,'completed',1);
  ms=3100;timing.record(1000,'active',2);ms=5100;timing.record(1000,'completed',2);
  assert.deepEqual(timing.snapshot(),[{step:1000,start:0,last:5,status:'completed'}]);
+ assert.deepEqual(gaps,[[1000,1,3]]);
  ms=8100;timing.record(1000,'active',1);timing.record(1000,'completed',2);timing.record(1000,'active',2);
  assert.equal(timing.snapshot()[0].last,5);
  timing.record(1001,'completed',3);assert.equal(timing.snapshot()[1].start,null);
  timing.record(1001,'active',4);assert.equal(timing.snapshot()[1].start,null,'a later attempt cannot invent the first start');
  timing.record(0,'active');ms=9100;timing.record(0,'completed');ms=10100;timing.record(0,'completed');timing.record(0,'active');assert.equal(timing.snapshot()[2].last,9);
+});
+test('timeline retains every pause in fixed-size shared blocks even with observation credit held',t=>{
+ let ms=0;t.mock.method(performance,'now',()=>ms);
+ const credit=new Int32Array(new SharedArrayBuffer(4));Atomics.store(credit,0,1);
+ const h=new ExecutionHistory(860,job),messages=[];
+ const delivery=new ObservationDelivery(h.run,credit,value=>{messages.push(value);h.addTimingGapBlock(value.observationRun,value.timingGapBlock);});
+ const count=TIMING_GAPS_PER_BLOCK+10;
+ for(let attempt=1;attempt<=count+1;attempt++){
+  const fact={id:1000,kind:'resident_sort',operations:[1,0],rows:0,seconds:0,attempt};
+  delivery.recordPhysical({...fact,status:'active'});ms+=1000;
+  delivery.recordPhysical({...fact,status:'completed'});ms+=1000;
+ }
+ assert.equal(messages.length,2);
+ assert(messages.every(message=>message.timingGapBlock.byteLength===messages[0].timingGapBlock.byteLength));
+ h.interrupt('interrupted');
+ const gaps=h.timingGaps.byStep.get(1000);
+ assert.equal(gaps.length,count);
+ assert.deepEqual(gaps[0],[1,2]);assert.deepEqual(gaps.at(-1),[2*count-1,2*count]);
+ assert.equal(h.timingGaps.read(Infinity),true);assert.equal(gaps.length,count);
+});
+test('paused readers consume entries only through the matching observation clock',()=>{
+ const log=new TimingGapLog(),writer=new TimingGapWriter(buffer=>assert(log.add(buffer)));
+ writer.record(1000,1,2);writer.record(1001,2,3);
+ assert(log.read(2));assert.deepEqual(log.byStep.get(1000),[[1,2]]);assert.equal(log.byStep.has(1001),false);
+ assert(log.read(3));assert.deepEqual(log.byStep.get(1001),[[2,3]]);
+ assert.equal(log.add(new SharedArrayBuffer(8)),false);
+});
+test('timeline records an observed pause after an unknown start without inferring missing boundaries',t=>{
+ let ms=0;t.mock.method(performance,'now',()=>ms);const gaps=[],timing=new ExecutionTiming((...gap)=>gaps.push(gap));
+ timing.record(1000,'completed',1);ms=1000;timing.record(1000,'active',2);
+ ms=2000;timing.record(1000,'active',3); // The preceding attempt's end was not observed.
+ assert.deepEqual(timing.snapshot(),[{step:1000,start:null,last:2,status:'active'}]);
+ assert.deepEqual(gaps,[[1000,0,1]]);
 });
 test('timeline has its own bounded capture beyond event saturation',(t)=>{
  let ms=0;t.mock.method(performance,'now',()=>ms);const d=new ObservationDelivery(850,new Int32Array(new SharedArrayBuffer(4)),()=>{});
@@ -32,6 +66,13 @@ test('timeline freezes on interruption or confirmed completion and rejects inval
  const complete=new ExecutionHistory(852,job);complete.accept(852,{marker:{status:'completed'},timeline:[{step:3,start:2,last:3,status:'completed'}],timeline_seconds:3});ms=19000;assert.equal(complete.timelineNow(),3);
  complete.accept(999,{timeline:[],timeline_seconds:1000});assert.equal(complete.timelineNow(),3);
  const invalid=new ExecutionHistory(853,job);invalid.accept(853,{read:{status:'active'},timeline:[{step:0,start:2,last:1,status:'active'}],timeline_seconds:1});assert(invalid.unavailable);assert.equal(invalid.timeline.size,0);
+});
+test('the first live timeline window starts on the worker clock',t=>{
+ let ms=30000;t.mock.method(performance,'now',()=>ms);
+ const h=new ExecutionHistory(854,job);
+ h.accept(854,{read:{status:'active'},timeline:[{step:0,start:0,last:1,status:'active'}],timeline_seconds:1});
+ assert.equal(h.timelineNow(),1,'page time before Run must not count toward the timeline');
+ ms+=500;assert.equal(h.timelineNow(),1.5);
 });
 test('observed strategies distinguish pending, mixed parents, fallback and fused operations',()=>{
  const h=new ExecutionHistory(800,{...job,operations:[{type:'shuffle',strategy:'auto'},{type:'partition',columns:['key']}]});
@@ -301,12 +342,16 @@ test('resident sort titles distinguish random-key and comparison work from froze
  assert.deepEqual(h.steps.map(step=>step.title),['Resident random-key sort','Fused resident random-key sort','Resident comparison sort']);
 });
 
-test('completed attempts keep In Progress while more groups may still run',()=>{
+test('completed and interrupted attempts keep In Progress while more groups may still run',()=>{
  const h=new ExecutionHistory(902,{...job,operations:[{type:'partition',columns:['key']}]});
  h.accept(902,{physical:[{id:1040,kind:'resident_sort',operations:[1],status:'completed',rows:10,seconds:1}]});
  assert.equal(displayStepStatus(h,h.steps[0]),'in_progress');
  h.accept(902,{physical:[{id:1040,kind:'resident_sort',operations:[1],status:'active',rows:0,seconds:0}]});
  assert.equal(displayStepStatus(h,h.steps[0]),'in_progress');
+ h.accept(902,{physical:[{id:1040,kind:'resident_sort',operations:[1],status:'interrupted',rows:0,seconds:0}]});
+ assert.equal(displayStepStatus(h,h.steps[0]),'in_progress');
+ h.interrupt('interrupted');
+ assert.equal(displayStepStatus(h,h.steps[0]),'interrupted');
 });
 
 test('attempt, stage and processing completion are separate boundaries',()=>{

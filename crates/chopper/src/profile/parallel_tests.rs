@@ -129,6 +129,7 @@ fn denied_late_batch_restarts_serially_after_releasing_partial_scan() -> Result<
     let serial = scan_bytes(text.as_bytes(), &job, serial_workspace.clone(), false)?;
     let serial_peak = serial_workspace.peak();
     let expected = serde_json::to_value(&serial.profile)?;
+    let expected_widths = (serial.decoded_field_bytes, serial.largest_decoded_row_bytes);
     drop(serial);
     let parallel_workspace = Arc::new(Workspace::new(16 * 1024 * 1024));
     drop(scan_bytes(
@@ -171,6 +172,14 @@ fn denied_late_batch_restarts_serially_after_releasing_partial_scan() -> Result<
         );
     }
     actual["stages"] = serde_json::json!([]);
+    if let Some(advice) = result.auto_observations {
+        assert_eq!(advice.rows, result.rows);
+        assert_eq!(
+            (advice.decoded_field_bytes, advice.largest_decoded_row_bytes),
+            expected_widths
+        );
+    }
+    actual.as_object_mut().unwrap().remove("auto_observations");
     actual.as_object_mut().unwrap().remove("writer_estimate");
     assert_eq!(actual, expected);
     let cached = cache.profile(&job, Arc::new(AtomicBool::new(false)), Arc::new(|_| {}))?;

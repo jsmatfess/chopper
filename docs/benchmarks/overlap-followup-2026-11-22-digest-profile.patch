@@ -1,0 +1,70 @@
+diff --git a/crates/chopper/src/digest.rs b/crates/chopper/src/digest.rs
+--- a/crates/chopper/src/digest.rs
++++ b/crates/chopper/src/digest.rs
+@@ -3,8 +3,19 @@
+ use anyhow::Result;
+ const CAPACITY: usize = 16 * 1024;
+ 
++fn thread_cpu_ns() -> u64 {
++    // CLOCK_THREAD_CPUTIME_ID writes a timespec owned by this thread.
++    let mut time = std::mem::MaybeUninit::<libc::timespec>::uninit();
++    if unsafe { libc::clock_gettime(libc::CLOCK_THREAD_CPUTIME_ID, time.as_mut_ptr()) } != 0 {
++        return 0;
++    }
++    let time = unsafe { time.assume_init() };
++    time.tv_sec as u64 * 1_000_000_000 + time.tv_nsec as u64
++}
++
+ pub(crate) struct LogicalDigest {
+     hasher: blake3::Hasher,
++    hash_cpu_ns: u64,
+     buffer: Vec<u8>,
+     _reservation: Option<Reservation>,
+ }
+@@ -13,6 +24,7 @@
+     pub fn new() -> Self {
+         Self {
+             hasher: blake3::Hasher::new(),
++            hash_cpu_ns: 0,
+             buffer: Vec::with_capacity(CAPACITY),
+             _reservation: None,
+         }
+@@ -23,12 +35,15 @@
+         reservation.reserve_vec(&mut buffer, CAPACITY)?;
+         Ok(Self {
+             hasher: blake3::Hasher::new(),
++            hash_cpu_ns: 0,
+             buffer,
+             _reservation: Some(reservation),
+         })
+     }
+     fn flush(&mut self) {
++        let begin = thread_cpu_ns();
+         self.hasher.update(&self.buffer);
++        self.hash_cpu_ns += thread_cpu_ns().saturating_sub(begin);
+         self.buffer.clear();
+     }
+     fn update(&mut self, bytes: &[u8]) {
+@@ -36,7 +51,9 @@
+             self.flush();
+         }
+         if bytes.len() >= CAPACITY {
++            let begin = thread_cpu_ns();
+             self.hasher.update(bytes);
++            self.hash_cpu_ns += thread_cpu_ns().saturating_sub(begin);
+         } else {
+             self.buffer.extend_from_slice(bytes);
+         }
+@@ -53,7 +70,11 @@
+     }
+     pub fn finalize(mut self) -> blake3::Hash {
+         self.flush();
+-        self.hasher.finalize()
++        let begin = thread_cpu_ns();
++        let result = self.hasher.finalize();
++        self.hash_cpu_ns += thread_cpu_ns().saturating_sub(begin);
++        eprintln!("digest_profile_cpu_ns={}", self.hash_cpu_ns);
++        result
+     }
+ }
+ 

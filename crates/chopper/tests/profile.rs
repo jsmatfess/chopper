@@ -48,8 +48,38 @@ fn reuses_input_across_pipeline_output_and_seed_edits() {
     assert_eq!(second.stages[0].input_distinct_keys, Some(2));
     assert!(second.stages[0].distinct_exact);
     assert_eq!(second.column_values[1].values, ["a\nb", "c"]);
+    if !cfg!(windows) {
+        let wire = serde_json::to_value(&second).unwrap();
+        let partition = &wire["auto_observations"]["partition"];
+        assert_eq!(partition["keys"], 2);
+        assert_eq!(partition["largest_key_bucket_rows"], 2);
+        assert_eq!(partition["skew_exact"], true);
+    }
     assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 1);
 }
+#[test]
+#[cfg(not(windows))]
+fn profiling_rebuilds_missing_skew_for_a_truncated_root_partition() {
+    let csv = format!(
+        "id,key\n{}",
+        (0..120).map(|i| format!("{i},{i}\n")).collect::<String>()
+    );
+    let (_dir, mut job) = fixture(&csv);
+    let mut cache = ProfileCache::default();
+    let first = profile(&mut cache, &job).unwrap();
+    assert!(first.column_values[1].truncated);
+    job.operations = vec![Operation::Partition {
+        columns: vec![Column::Index(1)],
+    }];
+    let second = profile(&mut cache, &job).unwrap();
+    assert!(!second.cache_hit);
+    let wire = serde_json::to_value(&second).unwrap();
+    let partition = &wire["auto_observations"]["partition"];
+    assert_eq!(partition["skew_exact"], false);
+    assert!(partition["largest_key_bucket_rows"].as_u64().unwrap() > 0);
+    assert!(profile(&mut cache, &job).unwrap().cache_hit);
+}
+
 #[test]
 fn source_settings_and_new_combination_invalidate_cache() {
     let (_dir, mut job) = fixture("id,key\n1,a\n");

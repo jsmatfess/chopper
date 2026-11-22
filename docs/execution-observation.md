@@ -101,6 +101,8 @@ is an attributable average for that scope, not exclusive CPU time. Missing or
 zero-duration rates are omitted. The graph is data flow, not parallelism.
 
 The export adapter reports saved-and-closed files including manifest.jsonl.
+On the browser's direct destination path, saving starts when the storage bridge
+confirms the first destination writer opened. It can overlap CSV processing.
 Processing completion does not confirm destination export. The marker step starts
 after result writers close. It confirms only after the existing marker writer
 closes and a bounded read of that exact marker matches the v1 completion record;
@@ -128,10 +130,10 @@ These are current fixed capacities, independent of rows, files and duration
 | Rust producer | Two inline steps; no Vec, String, graph, event queue or summary map. Snapshot contains two enum statuses, two u64 counts, two f64 durations and one availability flag. |
 | Rust delivery | At most one snapshot serialization at a time; fixed 1024-byte stack buffer. An 8192-byte workspace/shared grant covers callback serialization overlap and scratch. It is released before mandatory CSV work resumes, including after sink rejection. Inline retained state has no heap allocation. |
 | Adapter stdout | One observation line at most 1024 UTF-8 bytes. Static field names/statuses; no producer-controlled text. |
-| Worker retained state | One cumulative snapshot, four fixed direct/export categories plus at most 1152 prepared physical summaries. No per-file records. At most 128 significant events and a 1156-slot Uint16 deduplication mask (2312 bytes), described below. Independently, at most 1156 worker-clock timing windows retain first observed start (nullable), last activity, status and an internal latest-attempt counter; no per-attempt trace is retained. |
-| Worker → page | One observation message outstanding, using one 4-byte shared credit. One pending cumulative snapshot replaces intermediate measurements. A terminal request reply may additionally contain one final cumulative snapshot; it never waits for credit. Each producer record is under 1024 serialized bytes; prepared delivery batches are bounded by 4 MiB serialized observation content. |
-| Page retained state | Four direct/export steps plus at most 1152 prepared summaries, up to four source edges per summary, 128 retained significant events, at most 1156 timing windows and one frozen configured flow. Up to 16 operation projections (16 column names of 64 UTF-16 code units each), eight CSV setting values of at most 64 code units, and three numeric limits. Compression and strategy text are clipped to 64 code units; part counts and requested percentages to 32. Extra configuration detail is explicitly labeled omitted. No submitted Job or row payload is retained by the history. |
-| Presentation | One shared semantic list of at most 1156 selectable step cards, styled as graph/list, plus a lazily rendered Timeline table of at most 1156 selectable rows; at most 17 configured-operation buttons, one inspector and one warning/summary. Retained significant events are not rendered as event buttons. Generated measurement text has fixed structure and bounded numeric fields. Controlled observation strings/serialized copies/DOM text stay within a conservative 32 MiB logical payload envelope across worker/page copies; this is not a JS heap/RSS claim. |
+| Worker retained state | One cumulative snapshot, four fixed direct/export categories plus at most 1152 prepared physical summaries. No per-file records. At most 128 significant events and a 1156-slot Uint16 deduplication mask (2312 bytes), described below. At most 1156 worker-clock timing windows retain first observed start (nullable), last activity, status and the latest attempt ID. The worker writes pause coordinates to a single current shared block of 1,024 entries and sends each block to the page when it starts filling it. |
+| Worker → page | One observation message outstanding, using one 4-byte shared credit. One pending cumulative snapshot replaces intermediate measurements. A terminal request reply may additionally contain one final cumulative snapshot; it never waits for credit. Each producer record is under 1024 serialized bytes. Prepared delivery batches are bounded by 4 MiB serialized observation content. Pauses use separate fixed-size shared blocks and continue to accumulate while observation credit is held. |
+| Page retained state | Four direct/export steps plus at most 1152 prepared summaries, up to four source edges per summary, 128 retained significant events, at most 1156 timing windows and one frozen configured flow. Coordinates for all observed pauses remain available until the next Run, so their memory usage grows with the number of pauses. Up to 16 operation projections (16 column names of 64 UTF-16 code units each), eight CSV setting values of at most 64 code units, and three numeric limits. Compression and strategy text are clipped to 64 code units; part counts and requested percentages to 32. Extra configuration detail is explicitly labeled omitted. No submitted Job or row payload is retained by the history. |
+| Presentation | One shared semantic list of at most 1156 selectable step cards, styled as graph/list, plus a lazily rendered Timeline table of at most 1156 selectable rows; at most 17 configured-operation buttons, one inspector and one warning/summary. Retained significant events are not rendered as event buttons. Generated measurement text has fixed structure and bounded numeric fields. Controlled observation strings, aggregate snapshots and DOM text stay within a conservative 32 MiB logical payload envelope across worker/page copies. Full pause coordinates are separate from that envelope. Dense rows draw their earlier segments in one bitmap. These bounds do not cap JS heap or RSS. |
 
 The direct schema saturates at four categories/three dependencies; the prepared extension has the additional fixed bounds below: additional
 work cannot append nodes, edges, text or categories. Repeated updates replace
@@ -161,9 +163,9 @@ The page validates finite, ordered coordinates and the fixed count before
 copying timing fields. Live windows extrapolate elapsed time from the latest
 worker clock; completion/interruption freezes the page clock, while legitimate
 late terminal confirmation can supply final captured data without reactivation.
-An interrupted window without a terminal observation has a dashed tail to the
-frozen capture cutoff and an explicit “end not observed” label; that cutoff is
-not a known step completion time.
+An interrupted window without a terminal observation has a filled final segment
+with a dashed border to the frozen capture cutoff and an explicit “end not
+observed” label. Earlier segments keep their solid borders.
 Timeline refresh runs at most four times per second only while visible, open and
 active. It pauses in hidden tabs/collapsed panels, retaining observations and
 refreshing on return. A new Run releases prior timing rows/models. Missing data
@@ -549,13 +551,12 @@ Live counter updates reuse the layout and existing focusable buttons. New nodes
 append activity slots; each activity row shares its largest measured card height.
 Late producers repair left-to-right dependency order without replacing card DOM
 or keyboard focus. Redundant within-row edges are omitted when another observed
-path already connects the same producer and consumer. Opening the panel or pressing Fit graph recomputes dependency order
-from all observations then available. The graph container grows vertically with the scaled content, including newly
-observed steps. Fit graph scales to the available width only; graph height never
-limits that scale. Zoom controls and horizontal scrolling allow exploration
-with an Auto-fit checkbox checked initially. Auto-fit follows new graph lanes
-and viewport-width changes; manual zoom disables it, and checking it restores
-continuous fitting. The fit scale never enlarges cards above their natural size.
+path already connects the same producer and consumer. Opening the panel or
+reenabling Auto-fit recomputes dependency order from available observations.
+The graph grows vertically with the scaled content, including newly observed
+steps. Auto-fit scales to the available width and follows new lanes and viewport
+resizing. It never enlarges cards above their natural size. The Zoom slider
+switches to a manual scale until Auto-fit is checked again.
 Node state, operation matching, selection, upstream omission and the full inspector
 share the retained observations. Color has visible status labels;
 List view provides the same cumulative measurements and selected-step inspection
@@ -601,11 +602,15 @@ after all result writers close.
 
 The hosted graph grows vertically with its observed activity rows and wrapped
 card content. Each activity row retains its greatest measured card height for the Run, including
-across Fit graph and panel reopening; a new Run resets that minimum. Rows identify
+when Auto-fit is reenabled or the panel reopens. A new Run resets that minimum. Rows identify
 the configured operation or input/output/export activity; raw partition values are not collected. Hover or keyboard focus on a
 card or activity label connects to matching output-plan entries at the plan card
-border, using the editor connector routing, colors and endpoint dots. The shared
-semantic list, bounded node count and retained selection remain unchanged.
+border. A scrollable plan pane reveals the matching entries while the graph stays
+in place. An entry outside the visible area gets a continuation arrow at the
+edge. In a stacked layout hover leaves the page in place. Click the selected card
+again or click empty graph space to clear the selection. Dragging to pan preserves
+it. Stacked card edges mark a step with more than one observed attempt. The shared
+semantic list and bounded node count remain unchanged.
 
 New physical identities and attempt/status transitions bypass the 100 ms
 counter-display throttle. Storage bridge activity flushes pending delivery when
@@ -682,17 +687,19 @@ contain both modes. JSON/CLI operation identifiers remain unchanged. Timeline ba
 output plan's operation colors; a fused step uses its first mapped operation's
 color and lists all mapped operations. Unmapped work stays neutral.
 
-Graph wheel scrolling zooms about the pointer and disables Auto-fit. Dragging
-empty graph space pans without taking card clicks or text selection. Native
-scrollbars, arrow-key scrolling in the focusable graph, zoom buttons and Fit graph
-remain available. Manual navigation limits the viewport height to 80dvh for
-vertical panning; Auto-fit retains the automatically extending graph.
+The graph grows to fit all activity rows at every zoom level. Vertical scrolling
+moves the page. The Zoom slider supports dragging and native keyboard controls.
+Dragging empty graph space pans horizontally without taking card clicks or text
+selection. The focusable graph also supports horizontal arrow-key scrolling.
 
 The results metrics promote the existing analysis processing duration and average
 row throughput. That processing duration excludes destination export/publication;
 it is not a newly introduced end-to-end stopwatch. Warning messages have a separate
-section outside the resource/strategy disclosures. Timeline window and Measured
-work calculations are unchanged: a window covers first observed start to latest
-activity (including gaps), while work sums recorded attributable attempt durations
-plus the observed active/partial measurement. Nested scopes may overlap; sums are
-not exclusive CPU time or a decomposition of the complete job's wall time.
+section outside the resource/strategy disclosures. A timeline row spans the first
+observed start to the latest activity. The worker records pauses between an
+observed attempt ending and the next attempt starting for the same step, before
+delivery to the page can coalesce observations. Every observed pause is retained and included in the row count and duration.
+Gaps narrower than a pixel may be hard to distinguish at the full-run scale. Measured work sums
+recorded attributable attempt durations plus the observed active or partial
+measurement. Nested scopes may overlap, so sums cannot isolate CPU time or
+decompose the complete job's wall time.

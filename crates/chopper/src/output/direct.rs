@@ -25,7 +25,7 @@ struct SingleRecord {
     // Move the existing admitted relative name; no second string/tree copy.
     name: PublicationName,
     numbers: RecordNumbers,
-    #[cfg(feature = "experimental-batched-final-sync")]
+    #[cfg(target_os = "linux")]
     pending_sync: Option<File>,
 }
 enum Records {
@@ -104,7 +104,7 @@ pub(crate) struct DirectPublication {
     pub(super) buffer_capacity: usize,
     archive: Option<ZipStream>,
     records: Records,
-    #[cfg(feature = "experimental-batched-final-sync")]
+    #[cfg(target_os = "linux")]
     sync: deferred_sync::Queue,
     _records_buffer: Reservation,
     destination: std::path::PathBuf,
@@ -126,7 +126,7 @@ impl DirectPublication {
             "fanout requires plain output"
         );
         ensure!(other.current.is_none(), "unfinished fanout output");
-        #[cfg(feature = "experimental-batched-final-sync")]
+        #[cfg(target_os = "linux")]
         let mut other = other;
         // Each source has its own private directory. Its admitted Group retains
         // lineage until this merge, so a typed one-chunk record needs no clone.
@@ -183,7 +183,7 @@ impl DirectPublication {
                 }
             }
         }
-        #[cfg(feature = "experimental-batched-final-sync")]
+        #[cfg(target_os = "linux")]
         {
             if let Records::Single(Some(record)) = &mut other.records {
                 self.sync.take(&mut record.pending_sync)?;
@@ -237,7 +237,7 @@ impl DirectPublication {
             &record.numbers.output(record.name.as_str(), &group.lineage),
         )?;
         disk.write_all(b"\n")?;
-        #[cfg(feature = "experimental-batched-final-sync")]
+        #[cfg(target_os = "linux")]
         self.sync.take(&mut record.pending_sync)?;
         self.records = Records::Disk(disk);
         Ok(())
@@ -278,7 +278,7 @@ impl DirectPublication {
             buffer_capacity: PUBLICATION_BUFFER,
             archive,
             records,
-            #[cfg(feature = "experimental-batched-final-sync")]
+            #[cfg(target_os = "linux")]
             sync: deferred_sync::Queue::new(ctx),
             _records_buffer: buffer,
             destination,
@@ -358,14 +358,16 @@ impl DirectPublication {
             path,
             crc,
         } = self.current.take().context("direct chunk is not open")?;
-        #[cfg(feature = "experimental-batched-final-sync")]
-        let (compressed, pending_sync) =
-            if cfg!(target_os = "linux") && matches!(self.records, Records::Single(_)) {
-                (None, Some(sink.finish_deferred()?))
-            } else {
-                (sink.finish()?, None)
-            };
-        #[cfg(not(feature = "experimental-batched-final-sync"))]
+        #[cfg(target_os = "linux")]
+        let (compressed, pending_sync) = if (ctx.auto_final_sync
+            || cfg!(feature = "experimental-batched-final-sync"))
+            && matches!(self.records, Records::Single(_))
+        {
+            (None, Some(sink.finish_deferred()?))
+        } else {
+            (sink.finish()?, None)
+        };
+        #[cfg(not(target_os = "linux"))]
         let compressed = sink.finish()?;
         let stored = if let Some(file) = &compressed {
             file.len()
@@ -408,7 +410,7 @@ impl DirectPublication {
                 *slot = Some(SingleRecord {
                     name,
                     numbers,
-                    #[cfg(feature = "experimental-batched-final-sync")]
+                    #[cfg(target_os = "linux")]
                     pending_sync,
                 });
             }
@@ -421,9 +423,9 @@ impl DirectPublication {
         Ok(())
     }
     pub(crate) fn sync_pending(&mut self, ctx: &Context) -> Result<()> {
-        #[cfg(feature = "experimental-batched-final-sync")]
+        #[cfg(target_os = "linux")]
         self.sync.sync(ctx)?;
-        #[cfg(not(feature = "experimental-batched-final-sync"))]
+        #[cfg(not(target_os = "linux"))]
         let _ = ctx;
         Ok(())
     }

@@ -296,10 +296,78 @@ Windows uses admitted verbatim UTF-16 paths and `MoveFileExW` without replacemen
 or copy flags; a competing empty destination is rejected as on Linux. Native
 output remains private on the destination filesystem until complete
 validation, finalization and the existing no-replacement directory commit.
-Browser engine output remains private in its workspace; the browser export module
-closes exported files and then commits `CHOPPER-COMPLETE.json`. These lifetimes
-remain distinct. Failure and cancellation must clean owned private output, report
-cleanup failure and never claim an incomplete browser export is complete.
+Browser CSV, gzip and Zstandard publication writes final result files to the
+selected destination through the storage worker. ZIP retains staged export
+because finalization reads the manifest. Both paths close every result stream
+before committing and verifying `CHOPPER-COMPLETE.json`. The browser attempts
+cleanup of job-owned incomplete destination folders after direct Run failure or
+cancellation and after staged export failure. A confirmed invalid marker triggers
+this cleanup. A closed marker with an unreadable readback remains in place for
+inspection. If cancellation leaves a destination, the browser reports its path.
+An outstanding speculative source read does not delay storage cleanup.
+For plain output from a `.csv` selection with an empty pipeline or one
+Partition, the hosted bridge keeps one bounded source read outstanding.
+An empty pipeline also permits one pending batched destination write. The
+bridge drains the write before every destination control operation. The
+storage worker flushes buffered data before closing a stream or publishing
+the marker. Failure or cancellation discards any uncommitted write buffer.
+
+For a Linux or Windows Run that reaches snapshot publication for one plain Partition,
+2 GiB or more of validated serialized output and at least 1,152 files qualify for
+up to four publication workers when the resolved worker count is at least four.
+Each batch uses current workspace and shared memory headroom, the descriptor
+ceiling and the remaining file count. Writers still admit their own allocations.
+The ordered publisher writes the manifest and commits the destination after
+all tasks succeed.
+
+
+### Native Auto paths
+
+Unobserved native Run can use bounded Partition, a two-step Interleaved and
+probabilistic assignment chain, counted Balanced, counted Partition followed
+by Balanced, and retained stratified exact writers. Auto requires plain UTF-8
+output, Auto grouping, about 256 MiB of nominal memory and at least 96 MiB of
+live working headroom. Bounded Partition starts at 307,200,000 source bytes
+with a declared 128 KiB record ceiling and at most 32 files on Linux or 16
+on Windows. Counted Partition and composed writers start at 2 GiB with the
+same declared record ceiling and a hard writer bound. Known writer leaves
+are capped at 16. Large singleton Interleaved and probabilistic assignment
+use their configured fanout. Linux Interleaved with sixteen plain UTF-16LE
+outputs may share one row serializer from 1.5 GiB of input and a declared
+1 MiB record ceiling. Counted Partition uses the declared file limit up to 64
+and actual descriptor capacity. Counted singleton Balanced starts at 2 GiB.
+A checksummed input is still validated normally. For Zstandard inputs up to 8 MiB on disk, a frame's declared
+decoded size or applicable Analyze facts may guide the counted choice.
+Larger compressed containers keep the ordinary path.
+
+Large uncapped plain Interleaved jobs on Linux can batch syncs for 8,192 to
+16,384 known outputs. The path requires at least 2 GiB of input, a declared
+4 KiB record ceiling, room for the live descriptors and 512 MiB of working
+headroom. With automatic memory it targets 1,024 MiB. A smaller explicit
+memory setting uses the ordinary path. Native batching keeps each
+original file handle,
+flushes all files and syncs every handle before publishing.
+
+Linux can widen a terminal Uniform merge for plain Shuffle followed by
+Balanced on inputs of at least 8 GiB with one resolved worker and descriptor
+headroom. The nominal 256 MiB tier allows up to 256 readers. The nominal
+96 MiB tier can retain a bounded short tail of runs and admits up to 512
+readers within the actual memory calculation. Low descriptors or tight live
+reader admission retain the ordinary hierarchy.
+
+Linux exact assignment can use an in-place quota index for a single
+unstratified operation with 1,000 destinations, at least 4,200,000 validated
+scope rows and at least 500 estimated linear tests per draw. The cost is
+computed from the rounded quota vector and uses no Analyze scan. The indexed
+cursor selects the same position for each draw. Retained exact writers have
+a separate typed-memory fallback at their existing preparation boundary.
+
+All auto-selected direct writers keep the existing incremental admission,
+file limits, serialization and atomic publication checks. Auto can decline a
+direct plan before opening any output when its actual workspace no longer
+meets the starting bound. Analyze can recommend a tighter file ceiling for
+an uncapped singleton Partition when it has an exact count and the other
+configuration bounds fit. The user decides whether to change that limit.
 
 ## Interface and acceptance
 
@@ -338,12 +406,12 @@ deployment claims retain their previous evidence scopes.
 
 ## Terminal pipeline output
 
-Run currently selects grouped direct publication only for a single Balanced
-operation with no compression. It shares chunk construction and header-aware
-naming, and carries admitted private publication through final Analysis creation.
-Errors remain terminal; no raw-input replay is added. Other eligible experimental paths are described above; unsupported terminal
-pipelines retain the snapshot path. The studies below describe earlier prototypes, not
-additional current eligibility.
+A single uncompressed Balanced operation can use grouped direct publication.
+The [native Auto paths](#native-auto-paths) and opt-in paths above cover
+additional terminal shapes. These paths share chunk construction and
+header-aware naming, and carry admitted private publication through final
+Analysis creation. Errors after emission remain terminal. Other terminal
+pipelines use the snapshot path. The studies below describe earlier prototypes.
 
 The [current implementation and measurements](performance/investigations/csv-data-movement-and-analyze-run-2026-11-18.md)
 record source identities, runtime coverage and the remaining eligibility limits.

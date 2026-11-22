@@ -1,9 +1,9 @@
 import type {Job} from './app';
 import {columnIndex,type ColumnSchema} from './column-picker';
-import {groupErrors,percentageUnits} from './plan';
+import {GROUP_TOTAL_ERROR,groupErrors,percentageUnits} from './plan';
 
 type Field = HTMLInputElement | HTMLSelectElement;
-type Issue = {field: HTMLElement; message: string};
+type Issue = {field: HTMLElement; message: string; related?: HTMLElement[]};
 const get = <T extends HTMLElement = HTMLInputElement>(id:string) => document.getElementById(id) as T;
 const reveal = (field:HTMLElement) => {
   document.dispatchEvent(new Event('chopper-edit-configuration'));
@@ -13,12 +13,13 @@ const reveal = (field:HTMLElement) => {
 };
 
 // Validate editable configuration only. Filesystem state and unseen rows still need the engine.
-export function configureValidation(getJob:()=>Job, getSchema:()=>ColumnSchema|null, parseSize:(id:string)=>number|null,requestedMemory:()=>number|'auto') {
+export function configureValidation(getJob:()=>Job, getSchema:()=>ColumnSchema|null, parseSize:(id:string)=>number|null,requestedMemory:()=>number|'auto',showNext?:(issue:{message:string;reveal:()=>void}|undefined)=>void) {
   const form=get<HTMLFormElement>('job-form'),panel=get('validation-panel'),list=get('validation-list');
   let touched=new WeakSet<HTMLElement>();
   const feedback=new WeakMap<HTMLElement,HTMLElement>();
   let submitted=false,serial=0,issues:Issue[]=[],announced:HTMLElement|null=null,announceTimer:ReturnType<typeof setTimeout>;
-  const add=(field:HTMLElement|null,message:string)=>{if(field)issues.push({field,message});};
+  const add=(field:HTMLElement|null,message:string,related?:HTMLElement[])=>{if(field)issues.push({field,message,related});};
+  const issueFor=(field:HTMLElement)=>issues.find(issue=>issue.field===field||issue.related?.includes(field));
   const collect=()=>{
     issues=[];
     const job=getJob();if(!job)return;
@@ -40,12 +41,12 @@ export function configureValidation(getJob:()=>Job, getSchema:()=>ColumnSchema|n
       const field=get(id);if(field.disabled)continue;
       try{if(id==='memory')requestedMemory();else parseSize(id);}catch(e){add(field,`${field.labels?.[0]?.childNodes[0]?.textContent?.trim()}: ${e instanceof Error?e.message:String(e)}`);}
     }
-    const automatic=get('memory-mode').value==='auto';
+    const automatic=get('memory-mode').disabled||get('memory-mode').value==='auto';
     let memory:number=NaN;try{const requested=requestedMemory();memory=requested==='auto'?256:requested;}catch{/* Reported by the size field above. */}
     if(Number.isSafeInteger(memory)&&memory>=32){
       let record=0;try{record=parseSize('max-record')??0;}catch{/* Reported above. */}
-      if(record>memory*1024*1024/16)add(get('max-record'),`Maximum record working size must fit within 1/16 of the ${automatic?'maximum automatic budget':'memory budget'} (${memory/16} MiB). Lower this limit or increase manual memory.`);
-      if(Number(get('workers').value)>Math.min(64,Math.floor(memory/8)))add(get('workers'),`Reduce workers to at most ${Math.min(64,Math.floor(memory/8))} for this memory budget, or increase manual memory. Zero selects automatic workers.`);
+      if(record>memory*1024*1024/16)add(get('max-record'),`Maximum record working size must fit within 1/16 of the ${automatic?'256 MiB Auto baseline':'memory budget'} (${memory/16} MiB). Lower this limit or increase manual memory.`);
+      if(!get('workers').disabled&&Number(get('workers').value)>Math.min(64,Math.floor(memory/8)))add(get('workers'),`Reduce workers to at most ${Math.min(64,Math.floor(memory/8))} for this memory budget, or increase manual memory. Zero selects automatic workers.`);
     }
     for(const prefix of ['input','output']){
       const field=(key:string)=>get(prefix+'-csv').querySelector<Field>(`[data-csv="${key}"]`)!;
@@ -80,8 +81,17 @@ export function configureValidation(getJob:()=>Job, getSchema:()=>ColumnSchema|n
         if((op.files||0)>Number(get('max-files').value))add(step.querySelector('[data-field="files"]'),`Step ${index+1}: reduce equal parts to the maximum output files / groups limit, or increase that limit.`);
       }
       if(op.type==='assign'||op.type==='assign_probabilistic'){
-        const groups=op.groups||[];
-        for(const message of groupErrors(groups)){
+        const groups=op.groups||[],errors=groupErrors(groups);
+        const note=get<HTMLElement>(`group-feedback-${index}`);
+        const text=errors.length?errors.join(' '):(op.type==='assign_probabilistic'?'Total target: 100%. Actual counts may vary.':'Total: 100%. Exact percentages, rounded to whole rows.');
+        if(note.textContent!==text)note.textContent=text;
+        note.classList.toggle('invalid-groups',errors.length>0);
+        for(const message of errors){
+          if(message.startsWith(GROUP_TOTAL_ERROR)){
+            const [first,...related]=step.querySelectorAll<HTMLElement>('[data-group-field="percent"]');
+            add(first??step.querySelector('[data-action="add-group"]'),`Step ${index+1}: ${message}`,related);
+            continue;
+          }
           const field=message.includes('name')?'name':'percent';
           let group=field==='name'?groups.findIndex((g,i)=>!g.name.trim()||groups.slice(0,i).some(other=>other.name===g.name)):groups.findIndex(g=>percentageUnits(g.percent)===null);
           if(group<0)group=0;
@@ -97,16 +107,22 @@ export function configureValidation(getJob:()=>Job, getSchema:()=>ColumnSchema|n
       }
     });
     const messages=new Map<HTMLElement,string>();
-    for(const issue of issues)messages.set(issue.field,[messages.get(issue.field),issue.message].filter(Boolean).join(' '));
+    for(const issue of issues)for(const field of [issue.field,...(issue.related??[])]){
+      messages.set(field,[messages.get(field),issue.message].filter(Boolean).join(' '));
+    }
     for(const field of controls){
       const message=messages.get(field)||'';
       field.setCustomValidity(message);
-      const shown=!!message&&(submitted||touched.has(field));
+      // Allocation errors already have a shared message below the rows.
+      const groupNote=field.hasAttribute('data-group-field')
+        ?get<HTMLElement>(`group-feedback-${field.closest<HTMLElement>('[data-step]')?.dataset.step}`)
+        :null;
+      const shown=!!message&&(!!groupNote||submitted||touched.has(field));
       field.setAttribute('aria-invalid',String(shown));
-      let note=feedback.get(field);
+      let note=groupNote??feedback.get(field);
       if(message&&!note){note=document.createElement('small');note.id=`field-error-${++serial}`;note.className='field-guidance';(field.closest('.quantity-field,label')||field.parentElement)!.append(note);feedback.set(field,note);}
       if(note){
-        note.textContent=message;note.hidden=!message;note.classList.toggle('field-error',shown);
+        if(!groupNote){note.textContent=message;note.hidden=!message;note.classList.toggle('field-error',shown);}
         const ids=(field.getAttribute('aria-describedby')||'').split(/\s+/).filter(id=>id&&id!==note!.id);
         if(shown)ids.push(note.id);
         if(ids.length)field.setAttribute('aria-describedby',ids.join(' '));else field.removeAttribute('aria-describedby');
@@ -115,8 +131,10 @@ export function configureValidation(getJob:()=>Job, getSchema:()=>ColumnSchema|n
   };
   const update=()=>{
     const previous=issues;collect();panel.hidden=!issues.length;
-    if(announced&&!issues.some(issue=>issue.field===announced)){clearTimeout(announceTimer);get('validation-announcement').textContent='';}
+    if(announced&&!issueFor(announced)){clearTimeout(announceTimer);get('validation-announcement').textContent='';announced=null;}
     if(issues.length===previous.length&&issues.every((issue,i)=>issue.field===previous[i].field&&issue.message===previous[i].message))return;
+    const next=issues[0];
+    showNext?.(next?{message:next.message,reveal:()=>reveal(next.field)}:undefined);
     list.replaceChildren();
     for(const {field,message} of issues){
       const item=document.createElement('li'),button=document.createElement('button');
@@ -124,12 +142,19 @@ export function configureValidation(getJob:()=>Job, getSchema:()=>ColumnSchema|n
       item.append(button);list.append(item);
     }
   };
+  const announce=(field:HTMLElement)=>{
+    clearTimeout(announceTimer);announced=field;
+    const message=issueFor(field)?.message||'';
+    announceTimer=setTimeout(()=>{get('validation-announcement').textContent=message;},500);
+  };
+  form.addEventListener('input',event=>{
+    const field=event.target as HTMLElement;
+    if(field.matches('[data-group-field]')&&issueFor(field))announce(field);
+  });
   form.addEventListener('focusout',event=>{
     const field=event.target as HTMLElement;
     if(!field.matches('input,select'))return;
-    touched.add(field);update();clearTimeout(announceTimer);announced=field;
-    const message=issues.find(issue=>issue.field===field)?.message||'';
-    announceTimer=setTimeout(()=>{get('validation-announcement').textContent=message;},500);
+    touched.add(field);update();announce(field);
   });
   form.addEventListener('invalid',event=>{touched.add(event.target as HTMLElement);update();},true);
   return {update,reset(){submitted=false;touched=new WeakSet();clearTimeout(announceTimer);get('validation-announcement').textContent='';},check(outputRequired=true){

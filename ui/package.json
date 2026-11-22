@@ -1,7 +1,7 @@
 {
   "name": "chopper-ui",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "test": "node --test tests/plan.mjs tests/column-picker.mjs tests/browser-fs.mjs tests/storage-worker.mjs tests/browser-session.mjs tests/submission.mjs tests/memory.mjs tests/size-units.mjs tests/run-command.mjs tests/execution-history.mjs tests/execution-motion.mjs tests/physical-history.mjs tests/live-physical.mjs tests/contracts.mjs",

@@ -24,7 +24,7 @@ class WorkerSession {
   private unlock:(()=>void)|null=null;
   private serial=0;
   private ready:Promise<Job>|null=null;
-  private cleanup:Promise<void>|null=null;
+  private cleanup:Promise<string|null|undefined>|null=null;
   private readonly pending=new Map<number,{resolve:(value:any)=>void;reject:(error:Error)=>void}>();
   private readonly cancelled:Promise<never>;
   private cancel!:()=>void;
@@ -80,7 +80,10 @@ class WorkerSession {
       storage.postMessage({type:'init',jobId,available,shared,port:channel.port1},[channel.port1]);
     }));this.alive();
     storage.onerror=e=>this.transportFailed(new Error(e.message));
-    storage.onmessage=({data})=>{if(data.error)this.transportFailed(new Error(data.error));};
+    storage.onmessage=({data})=>{
+      if(data.error)this.transportFailed(new Error(data.error));
+      else if(data.exporting)this.message(data,this);
+    };
     const engine=this.engine=this.effects.worker('/engine-worker.js');
     engine.onerror=e=>this.transportFailed(new Error(e.message));
     engine.onmessage=({data})=>{
@@ -102,17 +105,19 @@ class WorkerSession {
       }
     });
   }
-  retire():Promise<void>{
+  // Direct storage reports the remaining path, null for a removed folder,
+  // or undefined when it never owned an output folder.
+  retire():Promise<string|null|undefined>{
     if(this.cleanup)return this.cleanup;
     this.retired=true;this.cancel();this.ready=null;this.engine?.terminate();this.engine=null;
     this.rejectPending(new Error('Cancelled'));this.profileInput=null;
     const storage=this.storage,release=this.unlock;this.storage=null;this.unlock=null;
     this.cleanup=(async()=>{
-      try{if(storage)await new Promise<void>((resolve,reject)=>{
-        const finish=(error?:Error)=>{this.effects.clearTimeout(timer);storage.terminate();error?reject(error):resolve();};
+      try{if(storage)return await new Promise<string|null|undefined>((resolve,reject)=>{
+        const finish=(error?:Error,folder?:string|null)=>{this.effects.clearTimeout(timer);storage.terminate();error?reject(error):resolve(typeof folder==='string'?this.exportPath(folder):folder);};
         const timer=this.effects.timeout(()=>finish(new Error('Temporary storage cleanup timed out. Reload and clear temporary storage.')),15000);
         storage.onerror=e=>finish(new Error(e.message));
-        storage.onmessage=({data})=>{if(data.cleaned||data.error){this.message({retiredStorage:data.storage},this);finish(data.error?new Error(data.error):undefined);}};
+        storage.onmessage=({data})=>{if(data.cleaned||data.error){this.message({retiredStorage:data.storage},this);finish(data.error?new Error(data.error):undefined,data.retainedDestination);}};
         try{storage.postMessage({type:'cleanup'});}catch(error){finish(error instanceof Error?error:new Error(String(error)));}
       });}finally{release?.();}
     })();return this.cleanup;
@@ -132,13 +137,14 @@ export class BrowserLifecycle {
   private folder='';
   private inputSelection=0;
   private draftRevision=0;
+  private previewAdvice:{source:string;facts:{rows:number;columns:number;decoded_field_bytes:number;max_record_bytes:number}}|null=null;
   private currentSource:string|null=null;
   private observationSerial=0;
   private history:ExecutionHistory|null=null;
   private exporting=false;
   private readonly state:State={status:'idle',progress:{phase:'',rows:0,temp_bytes:0},analysis:null,error:null,output:null};
   constructor(private effects:BrowserEffects){}
-  selectInput(input:File){this.input=input;this.inputSelection++;this.currentSource=null;}
+  selectInput(input:File){this.input=input;this.inputSelection++;this.currentSource=null;this.previewAdvice=null;}
   invalidateDraft(source?:string){this.draftRevision++;if(source!==undefined)this.currentSource=source;}
   selectOutput(output:FileSystemDirectoryHandle){this.output=output;}
   enableProfiling(){this.profiling=true;}
@@ -149,6 +155,10 @@ export class BrowserLifecycle {
   private showHistory(){try{this.effects.historyChanged(this.history);}catch{if(this.history)this.history.unavailable=true;}}
   private receive(data:any,session:WorkerSession){
     if(data.retiredStorage){if(this.profiling&&this.latestSession===session)this.diagnostics.storage=data.retiredStorage;return;}
+    if(data.timingGapBlock!==undefined){
+      if(this.history?.addTimingGapBlock(data.observationRun,data.timingGapBlock))this.showHistory();
+      return;
+    }
     if(session!==this.session||session.retired){
       const observation:Observation|undefined=data.observation??data.observationFinal;
       if(this.history&&data.observationRun===this.history.run&&observation){
@@ -169,6 +179,7 @@ export class BrowserLifecycle {
     if(data.profile)this.diagnostics[data.profile.phase]=data.profile.metrics;
     if(data.progress)this.state.progress=data.progress;
     if(data.exporting){this.exporting=true;this.state.output=session.exportPath(data.exporting);}
+    if(data.outputRemoved){this.exporting=false;this.state.output=null;}
     if(data.diagnostic)this.effects.diagnostic(data.diagnostic);
   }
   private start():WorkerSession{
@@ -180,22 +191,28 @@ export class BrowserLifecycle {
     if(session!==this.session||session.retired)return;
     void this.fail(error,this.generation);
   }
-  private stop():Promise<void>{
+  private stop():Promise<string|null|undefined>{
     this.history?.interrupt('unknown');this.showHistory();
     this.generation++;const session=this.session;this.session=null;
-    return session?.retire()??Promise.resolve();
+    return session?.retire()??Promise.resolve(undefined);
   }
   private async completeRun(publication:VerifiedPublication){
     this.state.output=publication.output;
     const cleanup=this.stop(),current=this.generation;
     try{await cleanup;}catch(error){if(current===this.generation)this.state.error=String(error);}
-    if(current===this.generation)this.state.status='complete';
+    if(current===this.generation){this.state.status='complete';this.exporting=false;}
   }
   private async fail(error:unknown,current:number){
     if(current!==this.generation)return;
-    this.state.status='failed';this.state.error=String(error)+(this.exporting?` Any incomplete export is in ${this.state.output}; only folders with a valid CHOPPER-COMPLETE.json record are complete.`:'');
+    const report=(destination:string|null)=>String(error)+(destination?` Check ${destination}: a valid CHOPPER-COMPLETE.json record marks completed results.`:'');
+    this.state.status='failed';this.state.error=report(this.exporting?this.state.output:null);
     const cleanup=this.stop(),retirement=this.generation;
-    try{await cleanup;}catch(error){if(retirement===this.generation)this.state.error+=' '+String(error);}
+    try{
+      const destination=await cleanup;
+      if(retirement===this.generation&&destination!==undefined){
+        this.state.output=destination;this.state.error=report(destination);
+      }
+    }catch(cleanupError){if(retirement===this.generation)this.state.error+=' '+String(cleanupError);}
   }
   private async setup(promise:Promise<unknown>,current:number){
     try{await promise;}catch(error){
@@ -219,8 +236,23 @@ export class BrowserLifecycle {
       data=structuredClone(data);
       if(!this.input)throw new Error('Choose an input file with Browse to load its columns.');
       if(this.active())throw new Error('Wait for the active job to finish before loading columns.');
-      const file=this.input,session=this.start();await this.setup(session.start(),this.generation);
-      return await session.request(path,{job:data,file});
+      const file=this.input,selection=this.inputSelection,session=this.start(),current=this.generation;
+      const source=sourceIdentity(selection,data);
+      await this.setup(session.start(),current);
+      const result=await session.request(path,{job:data,file});
+      if(path==='preview'&&current===this.generation&&selection===this.inputSelection
+        &&(this.currentSource===null||source===this.currentSource)){
+        this.previewAdvice=null;
+        const rows=result.preview as string[][],columns=result.columns as number;
+        if(/\.(csv|gz(ip)?)$/i.test(file.name)&&rows?.length===8&&columns>0&&rows.every(row=>row.length===columns
+          &&row.every(field=>!/[,"\r\n]/.test(field)))){
+          const utf8=new TextEncoder();
+          const decoded_field_bytes=rows.reduce((sum,row)=>row.reduce(
+            (bytes,field)=>bytes+utf8.encode(field).length,sum),0);
+          if(decoded_field_bytes<=32768)this.previewAdvice={source,facts:{rows:rows.length,columns,decoded_field_bytes,max_record_bytes:data.resources.max_record_bytes}};
+        }
+      }
+      return result;
     }
     if(path==='profile'){
       data=structuredClone(data);
@@ -243,6 +275,10 @@ export class BrowserLifecycle {
       if(data.resources.temp_dir)throw new Error('Browser temporary storage is managed by the browser; leave temporary directory blank.');
       const file=this.input,output=this.output;
       const origin=resultOrigin(sourceIdentity(this.inputSelection,data),data,this.draftRevision,this.generation+1);
+      const autoObservations=belongsToSource(this.state.origins?.profile,origin.source)
+        ?this.state.profile?.auto_observations:undefined;
+      const previewObservations=this.previewAdvice?.source===origin.source
+        &&this.previewAdvice.facts.max_record_bytes===data.resources.max_record_bytes?this.previewAdvice.facts:undefined;
       const permissionGeneration=this.generation;await this.permission(output);if(permissionGeneration!==this.generation)return {};
       if(this.active())throw new Error('A job is active.');
       this.state.status='running';this.state.error=null;
@@ -258,7 +294,7 @@ export class BrowserLifecycle {
       this.state.status='running';this.state.error=null;this.clearResults();this.state.output=null;
       for(const key of Object.keys(this.diagnostics))delete this.diagnostics[key];
       const session=this.session!;session.exportTo(output);
-      void session.request('run-direct',{job:data,file,profiling:this.profiling,output,folder:this.folder,...session.observationRequest(this.history?.run,!this.history?.unavailable)}).then(async result=>{
+      void session.request('run-direct',{job:data,file,autoObservations,previewObservations,profiling:this.profiling,output,folder:this.folder,...session.observationRequest(this.history?.run,!this.history?.unavailable)}).then(async result=>{
         if(current!==this.generation)return;
         const analysis=result.analysis as Analysis;
         analysis.warnings.push('Browser export is not atomic. A valid CHOPPER-COMPLETE.json record marks successful completion.');
@@ -268,12 +304,13 @@ export class BrowserLifecycle {
     }
     if(path==='cancel'){
       this.history?.interrupt('interrupted');this.showHistory();
-      const wasExporting=this.exporting,cancelledOutput=this.state.output,cleanup=this.stop(),current=this.generation;
-      let failure:string|null=null;try{await cleanup;}catch(error){failure=String(error);}
+      const pendingOutput=this.exporting?this.state.output:null,cleanup=this.stop(),current=this.generation;
+      let failure:string|null=null,destination=pendingOutput;
+      try{const result=await cleanup;if(result!==undefined)destination=result;}catch(error){failure=String(error);}
       if(current!==this.generation)return {};
-      this.state.status='cancelled';this.clearResults();
-      const warning=wasExporting?`Export cancelled. Check ${cancelledOutput}: a valid CHOPPER-COMPLETE.json record marks completed results; otherwise files are incomplete.`:null;
-      this.state.error=failure!==null?[warning,`Temporary storage cleanup failed: ${failure}`].filter(Boolean).join(' '):warning;
+      this.state.status='cancelled';this.clearResults();this.state.output=destination;
+      const warning=destination?`Export cancelled. Check ${destination}: a valid CHOPPER-COMPLETE.json record marks completed results; otherwise files are incomplete.`:null;
+      this.state.error=failure!==null?[warning,`Cleanup failed: ${failure}`].filter(Boolean).join(' '):warning;
       this.exporting=false;return {};
     }
     throw new Error('Unknown browser operation');
