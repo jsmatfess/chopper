@@ -14,24 +14,23 @@
   header p { max-width: 62ch; }
   nav { display: flex; flex-wrap: wrap; gap: .65rem 1.5rem; }
   a { color: #1d5f4f; text-underline-offset: .18em; }
-  h3 { margin-top: 1.9rem; }
   details { border-bottom: 1px solid #bccdc7; padding-block: .8rem; }
   summary { cursor: pointer; font-weight: 650; }
-  tbody th { font-weight: 550; }
-  @media (max-width: 30rem) {
-    .series { grid-template-columns: minmax(5rem, 7.5rem) 1fr auto; font-size: .875rem; }
-    .chart { padding-inline: .65rem; }
-  }
-  table { border-collapse: collapse; width: 100%; text-align: left; }
-  th, td { border-bottom: 1px solid #bccdc7; padding: .55rem .75rem; vertical-align: top; }
-  .table { overflow-x: auto; }
-  .muted { color: #455c56; }
-  .chart { border: 1px solid #bccdc7; border-radius: .6rem; padding: 1rem 1.4rem; margin: 1rem 0; }
-  .chart figcaption { font-weight: 650; margin-bottom: .8rem; }
-  .series { display: grid; grid-template-columns: 8rem 1fr 5rem; align-items: center; gap: .5rem; margin: .35rem 0; }
-  .series meter { width: 100%; height: 1.3rem; accent-color: #266756; }
+  .muted, .change { color: #455c56; }
+  .chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: .75rem; margin-block: 1rem; align-items: start; }
+  .chart { container-type: inline-size; min-width: 0; border: 1px solid #bccdc7; border-radius: .6rem; padding: .85rem 1rem; margin: 0; }
+  .chart figcaption { font-weight: 650; margin-bottom: .55rem; }
+  .series { display: grid; grid-template-columns: minmax(0, 8rem) minmax(0, 1fr) auto; align-items: center; gap: .5rem; margin: .35rem 0; }
+  .series .value { font-variant-numeric: tabular-nums; text-align: end; }
+  .series meter { min-width: 0; width: 100%; height: 1.3rem; accent-color: #266756; }
   .series meter::-webkit-meter-optimum-value { background: #266756; }
   .series.baseline meter::-webkit-meter-optimum-value { background: #708985; }
+  .change { font-size: .875rem; margin: .3rem 0 .65rem; }
+  .change strong { display: block; }
+  @container (max-width: 20rem) {
+    .series { grid-template-columns: minmax(0, 1fr) auto; gap: 0 .5rem; font-size: .875rem; }
+    .series meter { grid-row: 2; grid-column: 1 / -1; }
+  }
 </style>
 </head>
 <body>
@@ -44,63 +43,145 @@
 </header>
 <section id="results">
   <h2>Complete-job timing</h2>
-  <p>Median seconds from the baseline to Auto, three verified runs per build and case. Each row uses a 256 MiB CSV. The 1 MiB cap emitted 257 chunks. The Chromium values below precede the final change to retire large ZIP spools earlier. A separate 36-job follow-up found that every median paired change was within 0.02 seconds.</p>
-<div class="table"><table><thead><tr><th scope="col">Runtime and workload</th>
-<th scope="col">Gzip</th><th scope="col">ZIP</th></tr></thead><tbody>
-<tr><th scope="row">WSL native · One file</th>
-<td>10.84 → 2.89 s</td>
-<td>10.77 → 2.90 s</td>
-</tr>
-<tr><th scope="row">WSL native · 1 MiB cap</th>
-<td>11.71 → 4.47 s</td>
-<td>10.37 → 3.13 s</td>
-</tr>
-<tr><th scope="row">WSL native · 256 prepared files</th>
-<td>4.98 → 4.96 s</td>
-<td>4.43 → 4.32 s</td>
-</tr>
-<tr><th scope="row">Windows native · One file</th>
-<td>10.56 → 3.49 s</td>
-<td>10.64 → 3.52 s</td>
-</tr>
-<tr><th scope="row">Windows native · 1 MiB cap</th>
-<td>11.44 → 6.44 s</td>
-<td>11.80 → 5.02 s</td>
-</tr>
-<tr><th scope="row">Windows native · 256 prepared files</th>
-<td>4.87 → 5.06 s</td>
-<td>5.92 → 4.57 s</td>
-</tr>
-<tr><th scope="row">Hosted Chromium · One file</th>
-<td>17.57 → 7.14 s</td>
-<td>16.98 → 6.71 s</td>
-</tr>
-<tr><th scope="row">Hosted Chromium · 1 MiB cap</th>
-<td>17.74 → 8.50 s</td>
-<td>18.16 → 7.43 s</td>
-</tr>
-<tr><th scope="row">Hosted Chromium · 256 prepared files</th>
-<td>19.79 → 11.65 s</td>
-<td>20.38 → 10.41 s</td>
-</tr>
-<tr><th scope="row">Hosted Chromium · Partition → Balanced</th>
-<td>21.65 → 13.28 s</td>
-<td>21.84 → 13.24 s</td>
-</tr>
-</tbody></table></div>
+  <p>Median elapsed times for 256 MiB CSV jobs. The overview charts share an elapsed-time scale. The 1 MiB cap emitted 257 chunks. The Chromium values below precede the final change to retire large ZIP spools earlier. A separate 36-job follow-up found that every median paired change was within 0.02 seconds.</p>
+<h3>WSL native</h3><div class="chart-grid">
+<figure class="chart"><figcaption>One file · GZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="10.84042141" aria-hidden="true"></meter><span class="value">10.840 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="2.88903188" aria-hidden="true"></meter><span class="value">2.889 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.965 s saved · 73.08% saved across 3 pairs. Range 2.870–2.934 s.</p>
+</figure>
+<figure class="chart"><figcaption>One file · ZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="10.76685665" aria-hidden="true"></meter><span class="value">10.767 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="2.89635162" aria-hidden="true"></meter><span class="value">2.896 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.887 s saved · 73.21% saved across 3 pairs. Range 2.880–2.973 s.</p>
+</figure>
+<figure class="chart"><figcaption>1 MiB output cap · GZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="11.71282685" aria-hidden="true"></meter><span class="value">11.713 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="4.46681104" aria-hidden="true"></meter><span class="value">4.467 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.255 s saved · 61.94% saved across 3 pairs. Range 4.458–4.477 s.</p>
+</figure>
+<figure class="chart"><figcaption>1 MiB output cap · ZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="10.36752734" aria-hidden="true"></meter><span class="value">10.368 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="3.12652503" aria-hidden="true"></meter><span class="value">3.127 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.241 s saved · 69.91% saved across 3 pairs. Range 3.094–3.145 s.</p>
+</figure>
+<figure class="chart"><figcaption>256 files · GZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="4.98068621" aria-hidden="true"></meter><span class="value">4.981 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="4.96083667" aria-hidden="true"></meter><span class="value">4.961 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +0.046 s saved · 0.93% saved across 3 pairs. Range 4.934–4.964 s.</p>
+</figure>
+<figure class="chart"><figcaption>256 files · ZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="4.42874153" aria-hidden="true"></meter><span class="value">4.429 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="4.32310641" aria-hidden="true"></meter><span class="value">4.323 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +0.120 s saved · 2.71% saved across 3 pairs. Range 4.274–4.348 s.</p>
+</figure>
+</div>
+<h3>Windows native</h3><div class="chart-grid">
+<figure class="chart"><figcaption>One file · GZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="10.55519980" aria-hidden="true"></meter><span class="value">10.555 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="3.49251030" aria-hidden="true"></meter><span class="value">3.493 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.063 s saved · 66.84% saved across 3 pairs. Range 3.487–3.622 s.</p>
+</figure>
+<figure class="chart"><figcaption>One file · ZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="10.64041190" aria-hidden="true"></meter><span class="value">10.640 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="3.51724850" aria-hidden="true"></meter><span class="value">3.517 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.119 s saved · 66.93% saved across 3 pairs. Range 3.502–3.555 s.</p>
+</figure>
+<figure class="chart"><figcaption>1 MiB output cap · GZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="11.43595700" aria-hidden="true"></meter><span class="value">11.436 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="6.44104240" aria-hidden="true"></meter><span class="value">6.441 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +5.398 s saved · 47.20% saved across 3 pairs. Range 6.038–6.640 s.</p>
+</figure>
+<figure class="chart"><figcaption>1 MiB output cap · ZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="11.80311710" aria-hidden="true"></meter><span class="value">11.803 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="5.01738390" aria-hidden="true"></meter><span class="value">5.017 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +6.790 s saved · 57.52% saved across 3 pairs. Range 5.014–5.022 s.</p>
+</figure>
+<figure class="chart"><figcaption>256 files · GZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="4.86922070" aria-hidden="true"></meter><span class="value">4.869 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="5.05915200" aria-hidden="true"></meter><span class="value">5.059 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> -0.150 s saved · 3.08% slower across 3 pairs. Range 5.019–5.268 s.</p>
+</figure>
+<figure class="chart"><figcaption>256 files · ZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="5.91610460" aria-hidden="true"></meter><span class="value">5.916 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="4.56591810" aria-hidden="true"></meter><span class="value">4.566 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +1.363 s saved · 22.99% saved across 3 pairs. Range 4.456–4.599 s.</p>
+</figure>
+</div>
+<h3>Hosted Chromium</h3><div class="chart-grid">
+<figure class="chart"><figcaption>One file · GZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="17.57402500" aria-hidden="true"></meter><span class="value">17.574 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="7.14316000" aria-hidden="true"></meter><span class="value">7.143 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +10.459 s saved · 59.44% saved across 3 pairs. Range 7.116–7.170 s.</p>
+</figure>
+<figure class="chart"><figcaption>One file · ZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="16.98377000" aria-hidden="true"></meter><span class="value">16.984 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="6.71461500" aria-hidden="true"></meter><span class="value">6.715 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +10.301 s saved · 60.39% saved across 3 pairs. Range 6.610–6.770 s.</p>
+</figure>
+<figure class="chart"><figcaption>1 MiB output cap · GZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="17.73792500" aria-hidden="true"></meter><span class="value">17.738 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="8.49601500" aria-hidden="true"></meter><span class="value">8.496 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +9.283 s saved · 52.33% saved across 3 pairs. Range 8.455–8.538 s.</p>
+</figure>
+<figure class="chart"><figcaption>1 MiB output cap · ZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="18.15822000" aria-hidden="true"></meter><span class="value">18.158 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="7.42865500" aria-hidden="true"></meter><span class="value">7.429 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +10.730 s saved · 59.09% saved across 3 pairs. Range 7.363–7.442 s.</p>
+</figure>
+<figure class="chart"><figcaption>256 files · GZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="19.79103500" aria-hidden="true"></meter><span class="value">19.791 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="11.65475500" aria-hidden="true"></meter><span class="value">11.655 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +8.164 s saved · 41.25% saved across 3 pairs. Range 11.627–11.681 s.</p>
+</figure>
+<figure class="chart"><figcaption>256 files · ZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="20.38230500" aria-hidden="true"></meter><span class="value">20.382 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="10.41290000" aria-hidden="true"></meter><span class="value">10.413 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +9.951 s saved · 48.82% saved across 3 pairs. Range 10.412–10.442 s.</p>
+</figure>
+<figure class="chart"><figcaption>Partition → Balanced · GZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="21.64862500" aria-hidden="true"></meter><span class="value">21.649 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="13.28189500" aria-hidden="true"></meter><span class="value">13.282 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +8.367 s saved · 38.65% saved across 3 pairs. Range 13.257–13.282 s.</p>
+</figure>
+<figure class="chart"><figcaption>Partition → Balanced · ZIP</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="21.84294000" aria-hidden="true"></meter><span class="value">21.843 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="13.23603500" aria-hidden="true"></meter><span class="value">13.236 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +8.666 s saved · 39.67% saved across 3 pairs. Range 13.177–13.240 s.</p>
+</figure>
+</div>
   <p>Native Auto already used parallel writers on the 256-file balance. The main native gains came from parallel compression inside a file or member. Windows prepared gzip varied from 4.87 to 5.06 seconds at the median. The existing gzip route still dispatched three writers on both builds.</p>
   <p>On the 768 MiB WSL holdout, gzip fell from 32.38 to 8.60 seconds and ZIP from 32.80 to 8.65. The distinct fixture seed checked the predeclared target of saving at least ten seconds.</p>
 </section>
 <section id="resources">
   <h2>ZIP uses less scratch</h2>
-  <div class="table"><table>
-    <thead><tr><th scope="col">256 MiB WSL ZIP job</th><th scope="col">Scratch writes avoided</th><th scope="col">Scratch reads avoided</th><th scope="col">Baseline → final</th></tr></thead>
-    <tbody>
-      <tr><th scope="row">One member</th><td>104.5 MiB</td><td>104.5 MiB</td><td>10.77 → 2.90 s</td></tr>
-      <tr><th scope="row">1 MiB cap</th><td>104.6 MiB</td><td>104.6 MiB</td><td>10.37 → 3.13 s</td></tr>
-      <tr><th scope="row">256 balanced members</th><td>104.6 MiB</td><td>104.6 MiB</td><td>4.43 → 4.32 s</td></tr>
-    </tbody>
-  </table></div>
+  <p>Logical temporary traffic for 256 MiB WSL ZIP jobs. The six charts share a scale.</p>
+<div class="chart-grid">
+<figure class="chart"><figcaption>One file · Scratch bytes written</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="744.72067177" value="104.53747940" aria-hidden="true"></meter><span class="value">104.537 MiB</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="744.72067177" value="0.00031853" aria-hidden="true"></meter><span class="value">334 bytes</span></div>
+<p class="change"><strong>104.54 MiB avoided · 99.9997% less</strong></p></figure>
+<figure class="chart"><figcaption>One file · Scratch bytes read</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="744.72067177" value="104.53747940" aria-hidden="true"></meter><span class="value">104.537 MiB</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="744.72067177" value="0.00031853" aria-hidden="true"></meter><span class="value">334 bytes</span></div>
+<p class="change"><strong>104.54 MiB avoided · 99.9997% less</strong></p></figure>
+<figure class="chart"><figcaption>1 MiB output cap · Scratch bytes written</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="744.72067177" value="104.64744568" aria-hidden="true"></meter><span class="value">104.647 MiB</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="744.72067177" value="0.05841255" aria-hidden="true"></meter><span class="value">0.058 MiB</span></div>
+<p class="change"><strong>104.59 MiB avoided · 99.9442% less</strong></p></figure>
+<figure class="chart"><figcaption>1 MiB output cap · Scratch bytes read</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="744.72067177" value="104.64744568" aria-hidden="true"></meter><span class="value">104.647 MiB</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="744.72067177" value="0.05841255" aria-hidden="true"></meter><span class="value">0.058 MiB</span></div>
+<p class="change"><strong>104.59 MiB avoided · 99.9442% less</strong></p></figure>
+<figure class="chart"><figcaption>256 files · Scratch bytes written</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="744.72067177" value="708.51732922" aria-hidden="true"></meter><span class="value">708.517 MiB</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="744.72067177" value="603.92730522" aria-hidden="true"></meter><span class="value">603.927 MiB</span></div>
+<p class="change"><strong>104.59 MiB avoided · 14.7618% less</strong></p></figure>
+<figure class="chart"><figcaption>256 files · Scratch bytes read</figcaption>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="744.72067177" value="716.07756901" aria-hidden="true"></meter><span class="value">716.078 MiB</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="744.72067177" value="611.48754501" aria-hidden="true"></meter><span class="value">611.488 MiB</span></div>
+<p class="change"><strong>104.59 MiB avoided · 14.6060% less</strong></p></figure>
+</div>
   <p>In a separate comparison between two Chromium builds with parallel block compression, streaming into the final archive cut the median from 7.19 to 6.61 seconds and eliminated about 104.7 MiB of scratch writes and the same number of scratch reads for this fixture.</p>
   <p>For the 16-member hosted Partition → Balanced fixture, the largest batch of four compressed spools held 26.12 MiB. The largest individual member was 6.54 MiB. The one-member lifetime frees that space earlier during publication. The measured whole-job scratch peak occurred earlier during planning.</p>
   <p>Chromium also avoided 104.5 MiB each of scratch reads and writes for one 256 MiB ZIP. Its peak charged workspace rose from 0.53 to 9.26 MiB, including admitted bridge and worker buffers.</p>
@@ -122,6 +203,8 @@
 </section>
 <section id="method">
   <h2>How to read the results</h2>
+  <p>Timing bars show the median for each build. The notes show the median seconds saved and the median percentage saved across matched runs. Each percentage divides the time saved by that pair’s reference time. A negative time saving means the candidate took longer. Detailed charts use a separate scale for each workload.</p>
+  <p>Scratch percentages divide the bytes avoided by the baseline median for the same workload and direction.</p>
   <p>Each repeated cell times three complete verified jobs per arm with alternating or rotated execution order. CLI timing ends at successful publication and process exit. Chromium timing ends at successful export and the completion marker. Input selection and independent verification are outside the clock. The benchmarks validate decoded byte order, row counts, names, file and byte caps, and manifests. The Partition → Balanced pipeline verifies order inside each region and its two child splits.</p>
   <p>Measurements come from one Ryzen 7 5800X machine. The WSL CLI uses Linux ext4. The Windows CLI uses native NTFS. Bundled Chromium 156.0.8078.4 uses a disposable persistent profile and OPFS. Cache state is warm and uncontrolled. The fixtures are synthetic CSVs, so storage and timing results depend on compressibility, hardware and the rest of the job.</p>
   <details><summary>Startup and screening history</summary>
@@ -137,334 +220,334 @@
 <!-- CHARTS START -->
 <section id="comparisons"><h2>Detailed timings</h2>
 <details><summary>Final WSL comparison</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>256 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="11.27403827" value="10.84042141" aria-label="Baseline median seconds"></meter><span>10.840 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="11.27403827" value="2.88903188" aria-label="Final Auto median seconds"></meter><span>2.889 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="11.27403827" value="10.84042141" aria-hidden="true"></meter><span class="value">10.840 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="11.27403827" value="2.88903188" aria-hidden="true"></meter><span class="value">2.889 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.965 s saved · 73.08% saved across 3 pairs. Range 2.870–2.934 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="11.19753092" value="10.76685665" aria-label="Baseline median seconds"></meter><span>10.767 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="11.19753092" value="2.89635162" aria-label="Final Auto median seconds"></meter><span>2.896 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="11.19753092" value="10.76685665" aria-hidden="true"></meter><span class="value">10.767 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="11.19753092" value="2.89635162" aria-hidden="true"></meter><span class="value">2.896 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.887 s saved · 73.21% saved across 3 pairs. Range 2.880–2.973 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 1 MiB output cap · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="12.18133992" value="11.71282685" aria-label="Baseline median seconds"></meter><span>11.713 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="12.18133992" value="4.46681104" aria-label="Final Auto median seconds"></meter><span>4.467 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="12.18133992" value="11.71282685" aria-hidden="true"></meter><span class="value">11.713 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="12.18133992" value="4.46681104" aria-hidden="true"></meter><span class="value">4.467 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.255 s saved · 61.94% saved across 3 pairs. Range 4.458–4.477 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 1 MiB output cap · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="10.78222844" value="10.36752734" aria-label="Baseline median seconds"></meter><span>10.368 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="10.78222844" value="3.12652503" aria-label="Final Auto median seconds"></meter><span>3.127 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="10.78222844" value="10.36752734" aria-hidden="true"></meter><span class="value">10.368 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="10.78222844" value="3.12652503" aria-hidden="true"></meter><span class="value">3.127 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.241 s saved · 69.91% saved across 3 pairs. Range 3.094–3.145 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="5.17991366" value="4.98068621" aria-label="Baseline median seconds"></meter><span>4.981 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="5.17991366" value="4.96083667" aria-label="Final Auto median seconds"></meter><span>4.961 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="5.17991366" value="4.98068621" aria-hidden="true"></meter><span class="value">4.981 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="5.17991366" value="4.96083667" aria-hidden="true"></meter><span class="value">4.961 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +0.046 s saved · 0.93% saved across 3 pairs. Range 4.934–4.964 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="4.60589120" value="4.42874153" aria-label="Baseline median seconds"></meter><span>4.429 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="4.60589120" value="4.32310641" aria-label="Final Auto median seconds"></meter><span>4.323 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="4.60589120" value="4.42874153" aria-hidden="true"></meter><span class="value">4.429 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="4.60589120" value="4.32310641" aria-hidden="true"></meter><span class="value">4.323 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +0.120 s saved · 2.71% saved across 3 pairs. Range 4.274–4.348 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>256 MiB · One file · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+7.965 s</td><td>2.870–2.934 s</td></tr>
-<tr><td>256 MiB · One file · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+7.887 s</td><td>2.880–2.973 s</td></tr>
-<tr><td>256 MiB · 1 MiB output cap · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+7.255 s</td><td>4.458–4.477 s</td></tr>
-<tr><td>256 MiB · 1 MiB output cap · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+7.241 s</td><td>3.094–3.145 s</td></tr>
-<tr><td>256 MiB · 256 files · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+0.046 s</td><td>4.934–4.964 s</td></tr>
-<tr><td>256 MiB · 256 files · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+0.120 s</td><td>4.274–4.348 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 <details><summary>Native Windows comparison</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>256 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="10.97740779" value="10.55519980" aria-label="Baseline median seconds"></meter><span>10.555 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="10.97740779" value="3.49251030" aria-label="Final Auto median seconds"></meter><span>3.493 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="10.97740779" value="10.55519980" aria-hidden="true"></meter><span class="value">10.555 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="10.97740779" value="3.49251030" aria-hidden="true"></meter><span class="value">3.493 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.063 s saved · 66.84% saved across 3 pairs. Range 3.487–3.622 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="11.06602838" value="10.64041190" aria-label="Baseline median seconds"></meter><span>10.640 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="11.06602838" value="3.51724850" aria-label="Final Auto median seconds"></meter><span>3.517 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="11.06602838" value="10.64041190" aria-hidden="true"></meter><span class="value">10.640 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="11.06602838" value="3.51724850" aria-hidden="true"></meter><span class="value">3.517 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +7.119 s saved · 66.93% saved across 3 pairs. Range 3.502–3.555 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 1 MiB output cap · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="11.89339528" value="11.43595700" aria-label="Baseline median seconds"></meter><span>11.436 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="11.89339528" value="6.44104240" aria-label="Final Auto median seconds"></meter><span>6.441 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="11.89339528" value="11.43595700" aria-hidden="true"></meter><span class="value">11.436 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="11.89339528" value="6.44104240" aria-hidden="true"></meter><span class="value">6.441 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +5.398 s saved · 47.20% saved across 3 pairs. Range 6.038–6.640 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 1 MiB output cap · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="12.27524178" value="11.80311710" aria-label="Baseline median seconds"></meter><span>11.803 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="12.27524178" value="5.01738390" aria-label="Final Auto median seconds"></meter><span>5.017 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="12.27524178" value="11.80311710" aria-hidden="true"></meter><span class="value">11.803 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="12.27524178" value="5.01738390" aria-hidden="true"></meter><span class="value">5.017 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +6.790 s saved · 57.52% saved across 3 pairs. Range 5.014–5.022 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="5.26151808" value="4.86922070" aria-label="Baseline median seconds"></meter><span>4.869 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="5.26151808" value="5.05915200" aria-label="Final Auto median seconds"></meter><span>5.059 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="5.26151808" value="4.86922070" aria-hidden="true"></meter><span class="value">4.869 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="5.26151808" value="5.05915200" aria-hidden="true"></meter><span class="value">5.059 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> -0.150 s saved · 3.08% slower across 3 pairs. Range 5.019–5.268 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="6.15274878" value="5.91610460" aria-label="Baseline median seconds"></meter><span>5.916 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="6.15274878" value="4.56591810" aria-label="Final Auto median seconds"></meter><span>4.566 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="6.15274878" value="5.91610460" aria-hidden="true"></meter><span class="value">5.916 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="6.15274878" value="4.56591810" aria-hidden="true"></meter><span class="value">4.566 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +1.363 s saved · 22.99% saved across 3 pairs. Range 4.456–4.599 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>256 MiB · One file · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+7.063 s</td><td>3.487–3.622 s</td></tr>
-<tr><td>256 MiB · One file · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+7.119 s</td><td>3.502–3.555 s</td></tr>
-<tr><td>256 MiB · 1 MiB output cap · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+5.398 s</td><td>6.038–6.640 s</td></tr>
-<tr><td>256 MiB · 1 MiB output cap · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+6.790 s</td><td>5.014–5.022 s</td></tr>
-<tr><td>256 MiB · 256 files · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>-0.150 s</td><td>5.019–5.268 s</td></tr>
-<tr><td>256 MiB · 256 files · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+1.363 s</td><td>4.456–4.599 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 <details><summary>Hosted production comparison</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>256 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="18.27698600" value="17.57402500" aria-label="Baseline median seconds"></meter><span>17.574 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="18.27698600" value="7.14316000" aria-label="Final Auto median seconds"></meter><span>7.143 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="18.27698600" value="17.57402500" aria-hidden="true"></meter><span class="value">17.574 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="18.27698600" value="7.14316000" aria-hidden="true"></meter><span class="value">7.143 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +10.459 s saved · 59.44% saved across 3 pairs. Range 7.116–7.170 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="17.66312080" value="16.98377000" aria-label="Baseline median seconds"></meter><span>16.984 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="17.66312080" value="6.71461500" aria-label="Final Auto median seconds"></meter><span>6.715 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="17.66312080" value="16.98377000" aria-hidden="true"></meter><span class="value">16.984 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="17.66312080" value="6.71461500" aria-hidden="true"></meter><span class="value">6.715 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +10.301 s saved · 60.39% saved across 3 pairs. Range 6.610–6.770 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 1 MiB output cap · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="18.44744200" value="17.73792500" aria-label="Baseline median seconds"></meter><span>17.738 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="18.44744200" value="8.49601500" aria-label="Final Auto median seconds"></meter><span>8.496 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="18.44744200" value="17.73792500" aria-hidden="true"></meter><span class="value">17.738 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="18.44744200" value="8.49601500" aria-hidden="true"></meter><span class="value">8.496 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +9.283 s saved · 52.33% saved across 3 pairs. Range 8.455–8.538 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 1 MiB output cap · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="18.88454880" value="18.15822000" aria-label="Baseline median seconds"></meter><span>18.158 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="18.88454880" value="7.42865500" aria-label="Final Auto median seconds"></meter><span>7.429 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="18.88454880" value="18.15822000" aria-hidden="true"></meter><span class="value">18.158 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="18.88454880" value="7.42865500" aria-hidden="true"></meter><span class="value">7.429 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +10.730 s saved · 59.09% saved across 3 pairs. Range 7.363–7.442 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="20.58267640" value="19.79103500" aria-label="Baseline median seconds"></meter><span>19.791 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="20.58267640" value="11.65475500" aria-label="Final Auto median seconds"></meter><span>11.655 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="20.58267640" value="19.79103500" aria-hidden="true"></meter><span class="value">19.791 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="20.58267640" value="11.65475500" aria-hidden="true"></meter><span class="value">11.655 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +8.164 s saved · 41.25% saved across 3 pairs. Range 11.627–11.681 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="21.19759720" value="20.38230500" aria-label="Baseline median seconds"></meter><span>20.382 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="21.19759720" value="10.41290000" aria-label="Final Auto median seconds"></meter><span>10.413 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="21.19759720" value="20.38230500" aria-hidden="true"></meter><span class="value">20.382 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="21.19759720" value="10.41290000" aria-hidden="true"></meter><span class="value">10.413 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +9.951 s saved · 48.82% saved across 3 pairs. Range 10.412–10.442 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · Partition → Balanced · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="22.51457000" value="21.64862500" aria-label="Baseline median seconds"></meter><span>21.649 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="22.51457000" value="13.28189500" aria-label="Final Auto median seconds"></meter><span>13.282 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.51457000" value="21.64862500" aria-hidden="true"></meter><span class="value">21.649 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.51457000" value="13.28189500" aria-hidden="true"></meter><span class="value">13.282 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +8.367 s saved · 38.65% saved across 3 pairs. Range 13.257–13.282 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · Partition → Balanced · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="21.84294000" aria-label="Baseline median seconds"></meter><span>21.843 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="13.23603500" aria-label="Final Auto median seconds"></meter><span>13.236 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.71665760" value="21.84294000" aria-hidden="true"></meter><span class="value">21.843 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="22.71665760" value="13.23603500" aria-hidden="true"></meter><span class="value">13.236 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +8.666 s saved · 39.67% saved across 3 pairs. Range 13.177–13.240 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>256 MiB · One file · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+10.459 s</td><td>7.116–7.170 s</td></tr>
-<tr><td>256 MiB · One file · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+10.301 s</td><td>6.610–6.770 s</td></tr>
-<tr><td>256 MiB · 1 MiB output cap · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+9.283 s</td><td>8.455–8.538 s</td></tr>
-<tr><td>256 MiB · 1 MiB output cap · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+10.730 s</td><td>7.363–7.442 s</td></tr>
-<tr><td>256 MiB · 256 files · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+8.164 s</td><td>11.627–11.681 s</td></tr>
-<tr><td>256 MiB · 256 files · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+9.951 s</td><td>10.412–10.442 s</td></tr>
-<tr><td>256 MiB · Partition → Balanced · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+8.367 s</td><td>13.257–13.282 s</td></tr>
-<tr><td>256 MiB · Partition → Balanced · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+8.666 s</td><td>13.177–13.240 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 <details><summary>Final hosted batch scheduling follow-up</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>256 MiB · Partition → Balanced · GZIP</figcaption>
-<div class="series baseline"><span>Final Auto</span><meter min="0" max="13.87828520" value="13.32220000" aria-label="Final Auto median seconds"></meter><span>13.322 s</span></div>
-<div class="series"><span>One large member at a time</span><meter min="0" max="13.87828520" value="13.34450500" aria-label="One large member at a time median seconds"></meter><span>13.345 s</span></div>
+<div class="series baseline"><span>Final Auto</span><meter min="0" max="13.87828520" value="13.32220000" aria-hidden="true"></meter><span class="value">13.322 s</span></div>
+<div class="series"><span>One large member at a time</span><meter min="0" max="13.87828520" value="13.34450500" aria-hidden="true"></meter><span class="value">13.345 s</span></div>
+<p class="change"><strong>One large member at a time vs Final Auto</strong> -0.009 s saved · 0.06% slower across 3 pairs. Range 13.324–13.375 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · Partition → Balanced · ZIP</figcaption>
-<div class="series baseline"><span>Final Auto</span><meter min="0" max="13.83388240" value="13.30181000" aria-label="Final Auto median seconds"></meter><span>13.302 s</span></div>
-<div class="series"><span>One large member at a time</span><meter min="0" max="13.83388240" value="13.28227000" aria-label="One large member at a time median seconds"></meter><span>13.282 s</span></div>
+<div class="series baseline"><span>Final Auto</span><meter min="0" max="13.83388240" value="13.30181000" aria-hidden="true"></meter><span class="value">13.302 s</span></div>
+<div class="series"><span>One large member at a time</span><meter min="0" max="13.83388240" value="13.28227000" aria-hidden="true"></meter><span class="value">13.282 s</span></div>
+<p class="change"><strong>One large member at a time vs Final Auto</strong> +0.020 s saved · 0.15% saved across 3 pairs. Range 13.236–13.322 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · GZIP</figcaption>
-<div class="series baseline"><span>Final Auto</span><meter min="0" max="12.08878320" value="11.60532500" aria-label="Final Auto median seconds"></meter><span>11.605 s</span></div>
-<div class="series"><span>One large member at a time</span><meter min="0" max="12.08878320" value="11.62383000" aria-label="One large member at a time median seconds"></meter><span>11.624 s</span></div>
+<div class="series baseline"><span>Final Auto</span><meter min="0" max="12.08878320" value="11.60532500" aria-hidden="true"></meter><span class="value">11.605 s</span></div>
+<div class="series"><span>One large member at a time</span><meter min="0" max="12.08878320" value="11.62383000" aria-hidden="true"></meter><span class="value">11.624 s</span></div>
+<p class="change"><strong>One large member at a time vs Final Auto</strong> -0.009 s saved · 0.08% slower across 3 pairs. Range 11.614–11.657 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · ZIP</figcaption>
-<div class="series baseline"><span>Final Auto</span><meter min="0" max="10.76954840" value="10.35533500" aria-label="Final Auto median seconds"></meter><span>10.355 s</span></div>
-<div class="series"><span>One large member at a time</span><meter min="0" max="10.76954840" value="10.35303000" aria-label="One large member at a time median seconds"></meter><span>10.353 s</span></div>
+<div class="series baseline"><span>Final Auto</span><meter min="0" max="10.76954840" value="10.35533500" aria-hidden="true"></meter><span class="value">10.355 s</span></div>
+<div class="series"><span>One large member at a time</span><meter min="0" max="10.76954840" value="10.35303000" aria-hidden="true"></meter><span class="value">10.353 s</span></div>
+<p class="change"><strong>One large member at a time vs Final Auto</strong> -0.007 s saved · 0.07% slower across 3 pairs. Range 10.299–10.363 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Final Auto</span><meter min="0" max="7.48710040" value="7.19913000" aria-label="Final Auto median seconds"></meter><span>7.199 s</span></div>
-<div class="series"><span>One large member at a time</span><meter min="0" max="7.48710040" value="7.19913500" aria-label="One large member at a time median seconds"></meter><span>7.199 s</span></div>
+<div class="series baseline"><span>Final Auto</span><meter min="0" max="7.48710040" value="7.19913000" aria-hidden="true"></meter><span class="value">7.199 s</span></div>
+<div class="series"><span>One large member at a time</span><meter min="0" max="7.48710040" value="7.19913500" aria-hidden="true"></meter><span class="value">7.199 s</span></div>
+<p class="change"><strong>One large member at a time vs Final Auto</strong> -0.000 s saved · &lt;0.01% slower across 3 pairs. Range 7.166–7.202 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Final Auto</span><meter min="0" max="6.91097680" value="6.64517000" aria-label="Final Auto median seconds"></meter><span>6.645 s</span></div>
-<div class="series"><span>One large member at a time</span><meter min="0" max="6.91097680" value="6.63394000" aria-label="One large member at a time median seconds"></meter><span>6.634 s</span></div>
+<div class="series baseline"><span>Final Auto</span><meter min="0" max="6.91097680" value="6.64517000" aria-hidden="true"></meter><span class="value">6.645 s</span></div>
+<div class="series"><span>One large member at a time</span><meter min="0" max="6.91097680" value="6.63394000" aria-hidden="true"></meter><span class="value">6.634 s</span></div>
+<p class="change"><strong>One large member at a time vs Final Auto</strong> -0.002 s saved · 0.02% slower across 3 pairs. Range 6.611–6.647 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>256 MiB · Partition → Balanced · GZIP</td><td>One large member at a time vs Final Auto</td><td>3</td><td>-0.009 s</td><td>13.324–13.375 s</td></tr>
-<tr><td>256 MiB · Partition → Balanced · ZIP</td><td>One large member at a time vs Final Auto</td><td>3</td><td>+0.020 s</td><td>13.236–13.322 s</td></tr>
-<tr><td>256 MiB · 256 files · GZIP</td><td>One large member at a time vs Final Auto</td><td>3</td><td>-0.009 s</td><td>11.614–11.657 s</td></tr>
-<tr><td>256 MiB · 256 files · ZIP</td><td>One large member at a time vs Final Auto</td><td>3</td><td>-0.007 s</td><td>10.299–10.363 s</td></tr>
-<tr><td>256 MiB · One file · GZIP</td><td>One large member at a time vs Final Auto</td><td>3</td><td>-0.000 s</td><td>7.166–7.202 s</td></tr>
-<tr><td>256 MiB · One file · ZIP</td><td>One large member at a time vs Final Auto</td><td>3</td><td>-0.002 s</td><td>6.611–6.647 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 <details><summary>Direct ZIP staging comparison</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>256 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Parallel blocks</span><meter min="0" max="7.48122440" value="7.19348500" aria-label="Parallel blocks median seconds"></meter><span>7.193 s</span></div>
-<div class="series"><span>Streamed ZIP</span><meter min="0" max="7.48122440" value="6.61278000" aria-label="Streamed ZIP median seconds"></meter><span>6.613 s</span></div>
+<div class="series baseline"><span>Parallel blocks</span><meter min="0" max="7.48122440" value="7.19348500" aria-hidden="true"></meter><span class="value">7.193 s</span></div>
+<div class="series"><span>Streamed ZIP</span><meter min="0" max="7.48122440" value="6.61278000" aria-hidden="true"></meter><span class="value">6.613 s</span></div>
+<p class="change"><strong>Streamed ZIP vs Parallel blocks</strong> +0.598 s saved · 8.29% saved across 3 pairs. Range 6.549–6.664 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>256 MiB · One file · ZIP</td><td>Streamed ZIP vs Parallel blocks</td><td>3</td><td>+0.598 s</td><td>6.549–6.664 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 <details><summary>768 MiB native holdout</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>768 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="33.67652810" value="32.38127702" aria-label="Baseline median seconds"></meter><span>32.381 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="33.67652810" value="8.59546957" aria-label="Final Auto median seconds"></meter><span>8.595 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="33.67652810" value="32.38127702" aria-hidden="true"></meter><span class="value">32.381 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="33.67652810" value="8.59546957" aria-hidden="true"></meter><span class="value">8.595 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +23.793 s saved · 73.48% saved across 3 pairs. Range 8.588–8.684 s.</p>
 </figure>
 <figure class="chart"><figcaption>768 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="34.11619122" value="32.80403002" aria-label="Baseline median seconds"></meter><span>32.804 s</span></div>
-<div class="series"><span>Final Auto</span><meter min="0" max="34.11619122" value="8.64600910" aria-label="Final Auto median seconds"></meter><span>8.646 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="34.11619122" value="32.80403002" aria-hidden="true"></meter><span class="value">32.804 s</span></div>
+<div class="series"><span>Final Auto</span><meter min="0" max="34.11619122" value="8.64600910" aria-hidden="true"></meter><span class="value">8.646 s</span></div>
+<p class="change"><strong>Final Auto vs Baseline</strong> +24.209 s saved · 73.80% saved across 3 pairs. Range 8.595–8.739 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>768 MiB · One file · GZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+23.793 s</td><td>8.588–8.684 s</td></tr>
-<tr><td>768 MiB · One file · ZIP</td><td>Final Auto vs Baseline</td><td>3</td><td>+24.209 s</td><td>8.595–8.739 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 <details><summary>Native input decoding comparison</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>256 MiB · Decode and publish</figcaption>
-<div class="series baseline"><span>Chopper gzip input</span><meter min="0" max="1.30714558" value="1.25687075" aria-label="Chopper gzip input median seconds"></meter><span>1.257 s</span></div>
-<div class="series"><span>Chopper plain input</span><meter min="0" max="1.30714558" value="0.85842956" aria-label="Chopper plain input median seconds"></meter><span>0.858 s</span></div>
-<div class="series"><span>Chopper ZIP input</span><meter min="0" max="1.30714558" value="1.20826075" aria-label="Chopper ZIP input median seconds"></meter><span>1.208 s</span></div>
-<div class="series"><span>Parallel decode first</span><meter min="0" max="1.30714558" value="1.19607565" aria-label="Parallel decode first median seconds"></meter><span>1.196 s</span></div>
+<div class="series baseline"><span>Chopper gzip input</span><meter min="0" max="1.30714558" value="1.25687075" aria-hidden="true"></meter><span class="value">1.257 s</span></div>
+<div class="series"><span>Chopper plain input</span><meter min="0" max="1.30714558" value="0.85842956" aria-hidden="true"></meter><span class="value">0.858 s</span></div>
+<p class="change"><strong>Chopper plain input vs Chopper gzip input</strong> +0.398 s saved · 31.70% saved across 3 pairs. Range 0.781–1.003 s.</p>
+<div class="series"><span>Chopper ZIP input</span><meter min="0" max="1.30714558" value="1.20826075" aria-hidden="true"></meter><span class="value">1.208 s</span></div>
+<p class="change"><strong>Chopper ZIP input vs Chopper gzip input</strong> +0.057 s saved · 4.59% saved across 3 pairs. Range 1.188–1.256 s.</p>
+<div class="series"><span>Parallel decode first</span><meter min="0" max="1.30714558" value="1.19607565" aria-hidden="true"></meter><span class="value">1.196 s</span></div>
+<p class="change"><strong>Parallel decode first vs Chopper gzip input</strong> +0.052 s saved · 4.21% saved across 3 pairs. Range 1.193–1.312 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>256 MiB · Decode and publish</td><td>Chopper plain input vs Chopper gzip input</td><td>3</td><td>+0.398 s</td><td>0.781–1.003 s</td></tr>
-<tr><td>256 MiB · Decode and publish</td><td>Chopper ZIP input vs Chopper gzip input</td><td>3</td><td>+0.057 s</td><td>1.188–1.256 s</td></tr>
-<tr><td>256 MiB · Decode and publish</td><td>Parallel decode first vs Chopper gzip input</td><td>3</td><td>+0.052 s</td><td>1.193–1.312 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 <details><summary>Native block compression screen</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>1 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="0.05639782" value="0.05401839" aria-label="Baseline median seconds"></meter><span>0.054 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="0.05639782" value="0.05422868" aria-label="Parallel blocks median seconds"></meter><span>0.054 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="0.05639782" value="0.05401839" aria-hidden="true"></meter><span class="value">0.054 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="0.05639782" value="0.05422868" aria-hidden="true"></meter><span class="value">0.054 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +0.000 s saved · 0.37% saved across 3 pairs. Range 0.054–0.055 s.</p>
 </figure>
 <figure class="chart"><figcaption>1 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="0.06123219" value="0.05530839" aria-label="Baseline median seconds"></meter><span>0.055 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="0.06123219" value="0.05887711" aria-label="Parallel blocks median seconds"></meter><span>0.059 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="0.06123219" value="0.05530839" aria-hidden="true"></meter><span class="value">0.055 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="0.06123219" value="0.05887711" aria-hidden="true"></meter><span class="value">0.059 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> -0.003 s saved · 6.26% slower across 3 pairs. Range 0.055–0.061 s.</p>
 </figure>
 <figure class="chart"><figcaption>8 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="0.36387600" value="0.34988077" aria-label="Baseline median seconds"></meter><span>0.350 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="0.36387600" value="0.10530064" aria-label="Parallel blocks median seconds"></meter><span>0.105 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="0.36387600" value="0.34988077" aria-hidden="true"></meter><span class="value">0.350 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="0.36387600" value="0.10530064" aria-hidden="true"></meter><span class="value">0.105 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +0.241 s saved · 69.59% saved across 3 pairs. Range 0.104–0.109 s.</p>
 </figure>
 <figure class="chart"><figcaption>8 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="0.36336296" value="0.34938746" aria-label="Baseline median seconds"></meter><span>0.349 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="0.36336296" value="0.10821473" aria-label="Parallel blocks median seconds"></meter><span>0.108 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="0.36336296" value="0.34938746" aria-hidden="true"></meter><span class="value">0.349 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="0.36336296" value="0.10821473" aria-hidden="true"></meter><span class="value">0.108 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +0.241 s saved · 69.03% saved across 3 pairs. Range 0.106–0.113 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="11.15672380" value="10.72761904" aria-label="Baseline median seconds"></meter><span>10.728 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="11.15672380" value="2.89830755" aria-label="Parallel blocks median seconds"></meter><span>2.898 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="11.15672380" value="10.72761904" aria-hidden="true"></meter><span class="value">10.728 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="11.15672380" value="2.89830755" aria-hidden="true"></meter><span class="value">2.898 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +7.873 s saved · 72.96% saved across 3 pairs. Range 2.833–2.918 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="11.25936786" value="10.82631525" aria-label="Baseline median seconds"></meter><span>10.826 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="11.25936786" value="2.89923850" aria-label="Parallel blocks median seconds"></meter><span>2.899 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="11.25936786" value="10.82631525" aria-hidden="true"></meter><span class="value">10.826 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="11.25936786" value="2.89923850" aria-hidden="true"></meter><span class="value">2.899 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +7.927 s saved · 73.22% saved across 3 pairs. Range 2.888–2.911 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · Partition → Balanced · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="5.70985842" value="5.49024848" aria-label="Baseline median seconds"></meter><span>5.490 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="5.70985842" value="5.00986783" aria-label="Parallel blocks median seconds"></meter><span>5.010 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="5.70985842" value="5.49024848" aria-hidden="true"></meter><span class="value">5.490 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="5.70985842" value="5.00986783" aria-hidden="true"></meter><span class="value">5.010 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +0.476 s saved · 8.67% saved across 3 pairs. Range 4.986–5.014 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · Partition → Balanced · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="5.71901657" value="5.49905440" aria-label="Baseline median seconds"></meter><span>5.499 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="5.71901657" value="5.06882997" aria-label="Parallel blocks median seconds"></meter><span>5.069 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="5.71901657" value="5.49905440" aria-hidden="true"></meter><span class="value">5.499 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="5.71901657" value="5.06882997" aria-hidden="true"></meter><span class="value">5.069 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +0.412 s saved · 7.53% saved across 3 pairs. Range 5.017–5.096 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>1 MiB · One file · GZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+0.000 s</td><td>0.054–0.055 s</td></tr>
-<tr><td>1 MiB · One file · ZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>-0.003 s</td><td>0.055–0.061 s</td></tr>
-<tr><td>8 MiB · One file · GZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+0.241 s</td><td>0.104–0.109 s</td></tr>
-<tr><td>8 MiB · One file · ZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+0.241 s</td><td>0.106–0.113 s</td></tr>
-<tr><td>256 MiB · One file · GZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+7.873 s</td><td>2.833–2.918 s</td></tr>
-<tr><td>256 MiB · One file · ZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+7.927 s</td><td>2.888–2.911 s</td></tr>
-<tr><td>256 MiB · Partition → Balanced · GZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+0.476 s</td><td>4.986–5.014 s</td></tr>
-<tr><td>256 MiB · Partition → Balanced · ZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+0.412 s</td><td>5.017–5.096 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 <details><summary>Existing native concurrency across files</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>256 MiB · Eight files · GZIP</figcaption>
-<div class="series baseline"><span>One worker</span><meter min="0" max="11.07357055" value="10.64766399" aria-label="One worker median seconds"></meter><span>10.648 s</span></div>
-<div class="series"><span>Baseline</span><meter min="0" max="11.07357055" value="4.80614176" aria-label="Baseline median seconds"></meter><span>4.806 s</span></div>
+<div class="series baseline"><span>One worker</span><meter min="0" max="11.07357055" value="10.64766399" aria-hidden="true"></meter><span class="value">10.648 s</span></div>
+<div class="series"><span>Baseline</span><meter min="0" max="11.07357055" value="4.80614176" aria-hidden="true"></meter><span class="value">4.806 s</span></div>
+<p class="change"><strong>Baseline vs One worker</strong> +5.836 s saved · 54.85% saved across 3 pairs. Range 4.804–4.840 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · Eight files · ZIP</figcaption>
-<div class="series baseline"><span>One worker</span><meter min="0" max="11.12807721" value="10.70007424" aria-label="One worker median seconds"></meter><span>10.700 s</span></div>
-<div class="series"><span>Baseline</span><meter min="0" max="11.12807721" value="4.90068940" aria-label="Baseline median seconds"></meter><span>4.901 s</span></div>
+<div class="series baseline"><span>One worker</span><meter min="0" max="11.12807721" value="10.70007424" aria-hidden="true"></meter><span class="value">10.700 s</span></div>
+<div class="series"><span>Baseline</span><meter min="0" max="11.12807721" value="4.90068940" aria-hidden="true"></meter><span class="value">4.901 s</span></div>
+<p class="change"><strong>Baseline vs One worker</strong> +5.797 s saved · 54.36% saved across 3 pairs. Range 4.860–4.932 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · GZIP</figcaption>
-<div class="series baseline"><span>One worker</span><meter min="0" max="11.93906846" value="11.47987352" aria-label="One worker median seconds"></meter><span>11.480 s</span></div>
-<div class="series"><span>Baseline</span><meter min="0" max="11.93906846" value="4.95731044" aria-label="Baseline median seconds"></meter><span>4.957 s</span></div>
+<div class="series baseline"><span>One worker</span><meter min="0" max="11.93906846" value="11.47987352" aria-hidden="true"></meter><span class="value">11.480 s</span></div>
+<div class="series"><span>Baseline</span><meter min="0" max="11.93906846" value="4.95731044" aria-hidden="true"></meter><span class="value">4.957 s</span></div>
+<p class="change"><strong>Baseline vs One worker</strong> +6.523 s saved · 56.77% saved across 3 pairs. Range 4.957–4.997 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · ZIP</figcaption>
-<div class="series baseline"><span>One worker</span><meter min="0" max="10.64407253" value="10.23468512" aria-label="One worker median seconds"></meter><span>10.235 s</span></div>
-<div class="series"><span>Baseline</span><meter min="0" max="10.64407253" value="4.41103813" aria-label="Baseline median seconds"></meter><span>4.411 s</span></div>
+<div class="series baseline"><span>One worker</span><meter min="0" max="10.64407253" value="10.23468512" aria-hidden="true"></meter><span class="value">10.235 s</span></div>
+<div class="series"><span>Baseline</span><meter min="0" max="10.64407253" value="4.41103813" aria-hidden="true"></meter><span class="value">4.411 s</span></div>
+<p class="change"><strong>Baseline vs One worker</strong> +5.824 s saved · 56.90% saved across 3 pairs. Range 4.385–4.421 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>256 MiB · Eight files · GZIP</td><td>Baseline vs One worker</td><td>3</td><td>+5.836 s</td><td>4.804–4.840 s</td></tr>
-<tr><td>256 MiB · Eight files · ZIP</td><td>Baseline vs One worker</td><td>3</td><td>+5.797 s</td><td>4.860–4.932 s</td></tr>
-<tr><td>256 MiB · 256 files · GZIP</td><td>Baseline vs One worker</td><td>3</td><td>+6.523 s</td><td>4.957–4.997 s</td></tr>
-<tr><td>256 MiB · 256 files · ZIP</td><td>Baseline vs One worker</td><td>3</td><td>+5.824 s</td><td>4.385–4.421 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 <details><summary>Hosted block compression screen</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>1 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="0.15450760" value="0.14856500" aria-label="Baseline median seconds"></meter><span>0.149 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="0.15450760" value="0.14499000" aria-label="Parallel blocks median seconds"></meter><span>0.145 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="0.15450760" value="0.14856500" aria-hidden="true"></meter><span class="value">0.149 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="0.15450760" value="0.14499000" aria-hidden="true"></meter><span class="value">0.145 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +0.003 s saved · 2.26% saved across 3 pairs. Range 0.145–0.145 s.</p>
 </figure>
 <figure class="chart"><figcaption>1 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="0.18635760" value="0.17919000" aria-label="Baseline median seconds"></meter><span>0.179 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="0.18635760" value="0.17646500" aria-label="Parallel blocks median seconds"></meter><span>0.176 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="0.18635760" value="0.17919000" aria-hidden="true"></meter><span class="value">0.179 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="0.18635760" value="0.17646500" aria-hidden="true"></meter><span class="value">0.176 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +0.003 s saved · 1.56% saved across 3 pairs. Range 0.176–0.180 s.</p>
 </figure>
 <figure class="chart"><figcaption>8 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="0.65997880" value="0.63459500" aria-label="Baseline median seconds"></meter><span>0.635 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="0.65997880" value="0.35915000" aria-label="Parallel blocks median seconds"></meter><span>0.359 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="0.65997880" value="0.63459500" aria-hidden="true"></meter><span class="value">0.635 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="0.65997880" value="0.35915000" aria-hidden="true"></meter><span class="value">0.359 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +0.266 s saved · 42.60% saved across 3 pairs. Range 0.346–0.370 s.</p>
 </figure>
 <figure class="chart"><figcaption>8 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="0.67597400" value="0.64997500" aria-label="Baseline median seconds"></meter><span>0.650 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="0.67597400" value="0.37760000" aria-label="Parallel blocks median seconds"></meter><span>0.378 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="0.67597400" value="0.64997500" aria-hidden="true"></meter><span class="value">0.650 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="0.67597400" value="0.37760000" aria-hidden="true"></meter><span class="value">0.378 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +0.278 s saved · 42.53% saved across 3 pairs. Range 0.372–0.378 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · One file · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="18.25617560" value="17.55401500" aria-label="Baseline median seconds"></meter><span>17.554 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="18.25617560" value="7.18241500" aria-label="Parallel blocks median seconds"></meter><span>7.182 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="18.25617560" value="17.55401500" aria-hidden="true"></meter><span class="value">17.554 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="18.25617560" value="7.18241500" aria-hidden="true"></meter><span class="value">7.182 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +10.347 s saved · 58.95% saved across 3 pairs. Range 7.178–7.207 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · One file · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="17.72432480" value="17.04262000" aria-label="Baseline median seconds"></meter><span>17.043 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="17.72432480" value="7.25377500" aria-label="Parallel blocks median seconds"></meter><span>7.254 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="17.72432480" value="17.04262000" aria-hidden="true"></meter><span class="value">17.043 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="17.72432480" value="7.25377500" aria-hidden="true"></meter><span class="value">7.254 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +9.784 s saved · 57.41% saved across 3 pairs. Range 7.215–7.258 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>1 MiB · One file · GZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+0.003 s</td><td>0.145–0.145 s</td></tr>
-<tr><td>1 MiB · One file · ZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+0.003 s</td><td>0.176–0.180 s</td></tr>
-<tr><td>8 MiB · One file · GZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+0.266 s</td><td>0.346–0.370 s</td></tr>
-<tr><td>8 MiB · One file · ZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+0.278 s</td><td>0.372–0.378 s</td></tr>
-<tr><td>256 MiB · One file · GZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+10.347 s</td><td>7.178–7.207 s</td></tr>
-<tr><td>256 MiB · One file · ZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+9.784 s</td><td>7.215–7.258 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 <details><summary>Hosted block and file scheduling screen</summary>
+<div class="chart-grid">
 <figure class="chart"><figcaption>256 MiB · Eight files · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="19.91962440" value="19.15348500" aria-label="Baseline median seconds"></meter><span>19.153 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="19.91962440" value="10.30785000" aria-label="Parallel blocks median seconds"></meter><span>10.308 s</span></div>
-<div class="series"><span>Parallel files</span><meter min="0" max="19.91962440" value="10.28832000" aria-label="Parallel files median seconds"></meter><span>10.288 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="19.91962440" value="19.15348500" aria-hidden="true"></meter><span class="value">19.153 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="19.91962440" value="10.30785000" aria-hidden="true"></meter><span class="value">10.308 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +8.846 s saved · 46.18% saved across 3 pairs. Range 10.278–10.332 s.</p>
+<div class="series"><span>Parallel files</span><meter min="0" max="19.91962440" value="10.28832000" aria-hidden="true"></meter><span class="value">10.288 s</span></div>
+<p class="change"><strong>Parallel files vs Baseline</strong> +8.865 s saved · 46.28% saved across 3 pairs. Range 10.256–10.330 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · Eight files · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="19.98649640" value="19.21778500" aria-label="Baseline median seconds"></meter><span>19.218 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="19.98649640" value="10.38103500" aria-label="Parallel blocks median seconds"></meter><span>10.381 s</span></div>
-<div class="series"><span>Parallel files</span><meter min="0" max="19.98649640" value="10.33107000" aria-label="Parallel files median seconds"></meter><span>10.331 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="19.98649640" value="19.21778500" aria-hidden="true"></meter><span class="value">19.218 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="19.98649640" value="10.38103500" aria-hidden="true"></meter><span class="value">10.381 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +8.837 s saved · 45.98% saved across 3 pairs. Range 10.300–10.404 s.</p>
+<div class="series"><span>Parallel files</span><meter min="0" max="19.98649640" value="10.33107000" aria-hidden="true"></meter><span class="value">10.331 s</span></div>
+<p class="change"><strong>Parallel files vs Baseline</strong> +8.868 s saved · 46.14% saved across 3 pairs. Range 10.292–10.350 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="20.50613760" value="19.71744000" aria-label="Baseline median seconds"></meter><span>19.717 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="20.50613760" value="19.66425000" aria-label="Parallel blocks median seconds"></meter><span>19.664 s</span></div>
-<div class="series"><span>Parallel files</span><meter min="0" max="20.50613760" value="11.68027000" aria-label="Parallel files median seconds"></meter><span>11.680 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="20.50613760" value="19.71744000" aria-hidden="true"></meter><span class="value">19.717 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="20.50613760" value="19.66425000" aria-hidden="true"></meter><span class="value">19.664 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +0.088 s saved · 0.45% saved across 3 pairs. Range 19.473–19.717 s.</p>
+<div class="series"><span>Parallel files</span><meter min="0" max="20.50613760" value="11.68027000" aria-hidden="true"></meter><span class="value">11.680 s</span></div>
+<p class="change"><strong>Parallel files vs Baseline</strong> +8.067 s saved · 40.84% saved across 3 pairs. Range 11.472–11.685 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · 256 files · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="21.15912760" value="20.33379500" aria-label="Baseline median seconds"></meter><span>20.334 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="21.15912760" value="20.34531500" aria-label="Parallel blocks median seconds"></meter><span>20.345 s</span></div>
-<div class="series"><span>Parallel files</span><meter min="0" max="21.15912760" value="11.83042000" aria-label="Parallel files median seconds"></meter><span>11.830 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="21.15912760" value="20.33379500" aria-hidden="true"></meter><span class="value">20.334 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="21.15912760" value="20.34531500" aria-hidden="true"></meter><span class="value">20.345 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> -0.070 s saved · 0.34% slower across 3 pairs. Range 20.342–20.531 s.</p>
+<div class="series"><span>Parallel files</span><meter min="0" max="21.15912760" value="11.83042000" aria-hidden="true"></meter><span class="value">11.830 s</span></div>
+<p class="change"><strong>Parallel files vs Baseline</strong> +8.503 s saved · 41.82% saved across 3 pairs. Range 11.769–11.953 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · Partition → Balanced · GZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="22.90796040" value="22.02688500" aria-label="Baseline median seconds"></meter><span>22.027 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="22.90796040" value="13.42642500" aria-label="Parallel blocks median seconds"></meter><span>13.426 s</span></div>
-<div class="series"><span>Parallel files</span><meter min="0" max="22.90796040" value="13.39255000" aria-label="Parallel files median seconds"></meter><span>13.393 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.90796040" value="22.02688500" aria-hidden="true"></meter><span class="value">22.027 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="22.90796040" value="13.42642500" aria-hidden="true"></meter><span class="value">13.426 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +8.555 s saved · 38.88% saved across 3 pairs. Range 13.416–13.472 s.</p>
+<div class="series"><span>Parallel files</span><meter min="0" max="22.90796040" value="13.39255000" aria-hidden="true"></meter><span class="value">13.393 s</span></div>
+<p class="change"><strong>Parallel files vs Baseline</strong> +8.643 s saved · 39.24% saved across 3 pairs. Range 13.384–13.402 s.</p>
 </figure>
 <figure class="chart"><figcaption>256 MiB · Partition → Balanced · ZIP</figcaption>
-<div class="series baseline"><span>Baseline</span><meter min="0" max="22.92802720" value="22.04618000" aria-label="Baseline median seconds"></meter><span>22.046 s</span></div>
-<div class="series"><span>Parallel blocks</span><meter min="0" max="22.92802720" value="13.38699500" aria-label="Parallel blocks median seconds"></meter><span>13.387 s</span></div>
-<div class="series"><span>Parallel files</span><meter min="0" max="22.92802720" value="13.34629000" aria-label="Parallel files median seconds"></meter><span>13.346 s</span></div>
+<div class="series baseline"><span>Baseline</span><meter min="0" max="22.92802720" value="22.04618000" aria-hidden="true"></meter><span class="value">22.046 s</span></div>
+<div class="series"><span>Parallel blocks</span><meter min="0" max="22.92802720" value="13.38699500" aria-hidden="true"></meter><span class="value">13.387 s</span></div>
+<p class="change"><strong>Parallel blocks vs Baseline</strong> +8.680 s saved · 39.36% saved across 3 pairs. Range 13.366–13.398 s.</p>
+<div class="series"><span>Parallel files</span><meter min="0" max="22.92802720" value="13.34629000" aria-hidden="true"></meter><span class="value">13.346 s</span></div>
+<p class="change"><strong>Parallel files vs Baseline</strong> +8.660 s saved · 39.32% saved across 3 pairs. Range 13.343–13.386 s.</p>
 </figure>
-<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th><th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>
-<tr><td>256 MiB · Eight files · GZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+8.846 s</td><td>10.278–10.332 s</td></tr>
-<tr><td>256 MiB · Eight files · GZIP</td><td>Parallel files vs Baseline</td><td>3</td><td>+8.865 s</td><td>10.256–10.330 s</td></tr>
-<tr><td>256 MiB · Eight files · ZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+8.837 s</td><td>10.300–10.404 s</td></tr>
-<tr><td>256 MiB · Eight files · ZIP</td><td>Parallel files vs Baseline</td><td>3</td><td>+8.868 s</td><td>10.292–10.350 s</td></tr>
-<tr><td>256 MiB · 256 files · GZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+0.088 s</td><td>19.473–19.717 s</td></tr>
-<tr><td>256 MiB · 256 files · GZIP</td><td>Parallel files vs Baseline</td><td>3</td><td>+8.067 s</td><td>11.472–11.685 s</td></tr>
-<tr><td>256 MiB · 256 files · ZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>-0.070 s</td><td>20.342–20.531 s</td></tr>
-<tr><td>256 MiB · 256 files · ZIP</td><td>Parallel files vs Baseline</td><td>3</td><td>+8.503 s</td><td>11.769–11.953 s</td></tr>
-<tr><td>256 MiB · Partition → Balanced · GZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+8.555 s</td><td>13.416–13.472 s</td></tr>
-<tr><td>256 MiB · Partition → Balanced · GZIP</td><td>Parallel files vs Baseline</td><td>3</td><td>+8.643 s</td><td>13.384–13.402 s</td></tr>
-<tr><td>256 MiB · Partition → Balanced · ZIP</td><td>Parallel blocks vs Baseline</td><td>3</td><td>+8.680 s</td><td>13.366–13.398 s</td></tr>
-<tr><td>256 MiB · Partition → Balanced · ZIP</td><td>Parallel files vs Baseline</td><td>3</td><td>+8.660 s</td><td>13.343–13.386 s</td></tr>
-</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>
+</div>
 </details>
 </section>
 <!-- CHARTS END -->

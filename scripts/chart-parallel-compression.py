@@ -34,16 +34,59 @@ def samples(path):
     return fixtures, by_cell
 
 
+def bar(label, value, maximum, display, baseline=False):
+    style = " baseline" if baseline else ""
+    return (f'<div class="series{style}"><span>{escape(label)}</span>'
+            f'<meter min="0" max="{maximum:.8f}" value="{value:.8f}" aria-hidden="true"></meter>'
+            f'<span class="value">{escape(display)}</span></div>')
+
+
+def percent_saved(value):
+    if value == 0:
+        return "0.00%"
+    magnitude = abs(value)
+    if magnitude < 0.01:
+        return f"<0.01% {'saved' if value > 0 else 'slower'}"
+    return f"{magnitude:.2f}% {'saved' if value > 0 else 'slower'}"
+
+
+def timing_chart(title, arms, maximum=None):
+    result = [f'<figure class="chart"><figcaption>{escape(title)}</figcaption>']
+    seconds = {key: median(row["seconds"] for row in runs) for key, runs in arms.items()}
+    scale = maximum if maximum is not None else max(seconds.values()) * 1.04
+    base = next(
+        (key for key in ("serial", "baseline", "blocks", "gzip-input", "auto") if key in arms),
+        next(iter(arms)),
+    )
+    base_times = {row["repeat"]: row["seconds"] for row in arms[base]}
+    for key in [base, *(arm for arm in arms if arm != base)]:
+        label = LABELS.get(key, key)
+        value = seconds[key]
+        result.append(bar(label, value, scale, f"{value:.3f} s", baseline=key == base))
+        if key == base:
+            continue
+        current = [row["seconds"] for row in arms[key]]
+        pairs = [(base_times[row["repeat"]], row["seconds"])
+                 for row in arms[key] if row["repeat"] in base_times]
+        if pairs:
+            saved = median(before - after for before, after in pairs)
+            relative = median(100 * (before - after) / before for before, after in pairs)
+            effect = f"{saved:+.3f} s saved · {percent_saved(relative)}"
+            comparison = f"{effect} across {len(pairs)} pairs"
+        else:
+            comparison = "No matched pairs"
+        result.append(f'<p class="change"><strong>{escape(label)} vs {escape(LABELS.get(base, base))}</strong> '
+                      f'{escape(comparison)}. Range {min(current):.3f}–{max(current):.3f} s.</p>')
+    result.append("</figure>")
+    return "\n".join(result)
+
+
 def figure(title, paths):
-    result = [f"<details><summary>{escape(title)}</summary>"]
-    table = []
+    result = [f"<details><summary>{escape(title)}</summary>", '<div class="chart-grid">']
     for path in paths:
         fixtures, cells = samples(path)
         for (size, shape, codec), arms in cells.items():
-            if not arms or min(map(len, arms.values())) < 2:
-                continue
-            seconds = {key:median(t["seconds"] for t in terms) for key, terms in arms.items()}
-            if len(seconds) < 2:
+            if len(arms) < 2 or min(map(len, arms.values())) < 2:
                 continue
             mib = fixtures[size]["bytes"] / 2**20
             label = (
@@ -51,33 +94,8 @@ def figure(title, paths):
                 if codec == "input"
                 else f"{mib:.0f} MiB · {SHAPES.get(shape, shape)} · {codec.upper()}"
             )
-            maximum = max(seconds.values()) * 1.04
-            result.append(f'<figure class="chart"><figcaption>{escape(label)}</figcaption>')
-            base = next(
-                (key for key in ("serial", "baseline", "blocks", "gzip-input", "auto") if key in arms),
-                next(iter(arms)),
-            )
-            base_times = {row["repeat"]:row["seconds"] for row in arms[base]}
-            for key in [base, *(arm for arm in arms if arm != base)]:
-                terms = arms[key]
-                label_arm = LABELS.get(key, key)
-                value = seconds[key]
-                style = ' baseline' if key == base else ''
-                samples_s = [row["seconds"] for row in terms]
-                result.append(f'<div class="series{style}"><span>{escape(label_arm)}</span>'
-                    f'<meter min="0" max="{maximum:.8f}" value="{value:.8f}" aria-label="{escape(label_arm)} median seconds"></meter>'
-                    f'<span>{value:.3f} s</span></div>')
-                if key != base:
-                    paired = [(base_times[row["repeat"]]-row["seconds"]) for row in terms if row["repeat"] in base_times]
-                    table.append([label,f"{label_arm} vs {LABELS.get(base,base)}",f"{len(paired)}",
-                        f"{median(paired):+.3f} s", f"{min(samples_s):.3f}–{max(samples_s):.3f} s"])
-            result.append("</figure>")
-    if table:
-        result.append('<div class="table"><table><thead><tr><th scope="col">Workload</th><th scope="col">Comparison</th>'
-            '<th scope="col">Pairs</th><th scope="col">Median seconds saved</th><th scope="col">Candidate range</th></tr></thead><tbody>')
-        result.extend('<tr>'+''.join(f'<td>{escape(cell)}</td>' for cell in row)+'</tr>' for row in table)
-        result.append('</tbody></table></div><p class="muted">Positive savings mean faster. Each bar starts at zero and shows the median of independently verified complete jobs. Scales differ by workload.</p>')
-    result.append("</details>")
+            result.append(timing_chart(label, arms))
+    result.extend(['</div>', '</details>'])
     return "\n".join(result)
 
 
