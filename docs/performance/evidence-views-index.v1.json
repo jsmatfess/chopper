@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "ed5afa717364ecb84819c9ee42eba26a9c5e5fe3cd5777fb5661ae7f8b08c464",
+  "catalog_sha256": "68bc92a62c02c45b4b8d476b28268d2a64d7bc6aaabc231c71d75770ee3cd23a",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -8056,6 +8056,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "89f6d654e7d80d6107289c4e570fa7ad18e5f3efb12b487f6e5bdf82680fb96a",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/shuffle-policy-auto-fit-native-2026-11-15.jsonl",
       "source_sha256": "89f9381a68361c894bbaf4bb636d03fc35c7e92d8268283fc0c1818dc38432b3",
       "aliases": [
@@ -10453,19 +10466,6 @@
       "coverage": "not-adapted"
     },
     {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "b3c8b58a7ab23174215b2826f5ebefb4835859202623941f1364abbac51a3b2a",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
       "source": "docs/benchmarks/inspection-result-owner-development-2026-10-21.json",
       "source_sha256": "b4163627f2d1e74f08925e5c1370f528d989f07abdceb9377b03fb623db88339",
       "aliases": [
@@ -11862,6 +11862,19 @@
       "source_sha256": "cab33e352adfc1abdb3814bf62fae6741d80fd508055a99266e71b647a0602c7",
       "aliases": [
         "docs/benchmarks/native-request-json-development-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/parallel-compression-summary-2026-11-22.json",
+      "source_sha256": "cabeff8bf1961b9683f05b54c72e06732368ce5d798c854bd95f7ad813bb266a",
+      "aliases": [
+        "docs/benchmarks/parallel-compression-summary-2026-11-22.json"
       ],
       "format": "json",
       "layouts": [],

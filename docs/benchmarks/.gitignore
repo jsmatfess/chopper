@@ -226,3 +226,6 @@ reservation-entry-2026-11-05-linux-lock.py
 !io-overlap-adoption-2026-11-22-*.jsonl
 !native-auto-bounds-2026-11-22-*.jsonl
 !native-auto-bounds-2026-11-22-smoke.json
+
+# Compact parallel gzip and ZIP evidence; originals remain in local scratch.
+!parallel-compression-summary-2026-11-22.json

@@ -9008,6 +9008,19 @@
       "original_section_sha256": "2737122a7f5a529381ae238bf63b703731ee38916b9e6e3b0a598466842b4de0",
       "sha256": "f88c63f305adda8304600d7eb1c6e053b5d03a7831a9d2f1be30a32507da8a20",
       "relocations": []
+    },
+    {
+      "id": "parallel-gzip-and-zip-output-2026-11-22",
+      "title": "Parallel gzip and ZIP output (2026-11-22)",
+      "anchor": "parallel-gzip-and-zip-output-2026-11-22",
+      "path": "docs/performance/investigations/parallel-gzip-and-zip-output-2026-11-22.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "parallel-gzip-and-zip-output-2026-11-22"
+      ],
+      "original_section_sha256": "aac8cad45b4f0ddb61b19453046281399a2f19b781abc0d67886b47195245b1f",
+      "sha256": "43b6fd24b52a9981150e453a46069b95b1692dc388f4aacac526533b3f13709a",
+      "relocations": []
     }
   ],
   "migrated_count": 193

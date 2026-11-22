@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "4e2619145e74d20f0a93f5ee6d89744708a134b3966fbda211660e46f9532b84",
+  "analysis_script_sha256": "922698e657b37c84ef820555050d20fb5c81cba4aaaf7d52b7a2d220785f1fbe",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "13407bf94f610da8c47cd2e41ed545423e9c056e9dac8ed18f70afdab2352853"
+    "sha256": "faa328b2f0550c1597ef45da3c0eba28252c28b1e3f5ff475aa0063e2333f13e"
   },
   "families": [
     "adaptive-routing",
@@ -4667,6 +4667,24 @@
       "narrative": {
         "path": "docs/performance/investigations/automatic-native-execution-bounds-2026-11-22.md",
         "sha256": "f88c63f305adda8304600d7eb1c6e053b5d03a7831a9d2f1be30a32507da8a20",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Parallel gzip and ZIP output (2026-11-22)",
+      "evidence": "docs/performance.md#parallel-gzip-and-zip-output-2026-11-22",
+      "artifacts": [
+        "docs/benchmarks/parallel-compression-summary-2026-11-22.json"
+      ],
+      "scripts": [
+        "scripts/benchmark-parallel-compression-browser.mjs",
+        "scripts/benchmark-parallel-compression.py",
+        "scripts/chart-parallel-compression.py"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/parallel-gzip-and-zip-output-2026-11-22.md",
+        "sha256": "43b6fd24b52a9981150e453a46069b95b1692dc388f4aacac526533b3f13709a",
         "topic": "ownership-and-lifecycle"
       },
       "family": "ownership-and-lifecycle"
@@ -35730,6 +35748,39 @@
         "ownership-and-lifecycle"
       ],
       "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/parallel-compression-summary-2026-11-22.json",
+      "sha256": "cabeff8bf1961b9683f05b54c72e06732368ce5d798c854bd95f7ad813bb266a",
+      "bytes": 372743,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "kind",
+        "panels",
+        "raw_root",
+        "schema_version"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#parallel-gzip-and-zip-output-2026-11-22"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {

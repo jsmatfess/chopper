@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "parallel-gzip-and-zip-output-2026-11-22",
+  "date": "2026-11-22",
+  "title": "Select parallel gzip and ZIP output automatically",
+  "subsystem": "output",
+  "question": "Which compression and publication paths improve complete-job time and temporary storage?",
+  "disposition": "adopt",
+  "delivery": "default",
+  "outcome": "favorable",
+  "summary": "Bounded parallel blocks save about 7–10 seconds on one 256 MiB output across WSL, Windows and Chromium. Chromium also benefits from dividing small outputs among workers. Direct ZIP publication and bounded small-member buffering cut logical scratch.",
+  "scope": {
+    "runtimes": [
+      "native-linux",
+      "native-windows",
+      "wasi-chromium"
+    ],
+    "measurement": "complete-run",
+    "workloads": [
+      "Synthetic CSVs at 1, 8 and 256 MiB on one host, with a distinct 768 MiB native WSL holdout.",
+      "Limits-only, 1 MiB capped output, Balanced file counts and Partition followed by Balanced."
+    ]
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "native-windows",
+      "wasi-chromium"
+    ],
+    "summary": "Matched jobs verified ordered decoded bytes, caps, manifest records and ZIP order. Hosted checks verified completion markers, worker limits and publication cleanup."
+  },
+  "limitations": [
+    "One Ryzen host and synthetic data. Native Windows used NTFS, WSL used ext4, and bundled Chromium used OPFS.",
+    "Three measured pairs per final cell with warm uncontrolled cache. Exact threshold crossings and competing Runs were outside the experiment.",
+    "Logical temporary traffic, workspace grants and WSL process RSS use independent accounting boundaries."
+  ],
+  "exclusions": [
+    "Physical I/O, whole-browser RSS and installed-browser release qualification.",
+    "Integrated parallel input decoding. The Rapidgzip decode-first workflow is a separate diagnostic.",
+    "Speed of the retired Zstandard codec. Its removal follows product direction."
+  ],
+  "reopen_when": null,
+  "supersedes": [
+    "explicit-sort-and-zstandard-input-balanced-2026-11-21"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#parallel-gzip-and-zip-output-2026-11-22",
+      "sha256": "aac8cad45b4f0ddb61b19453046281399a2f19b781abc0d67886b47195245b1f"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/parallel-compression-summary-2026-11-22.json",
+      "sha256": "cabeff8bf1961b9683f05b54c72e06732368ce5d798c854bd95f7ad813bb266a"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/browser.md",
+    "docs/execution-decisions.md"
+  ]
+}

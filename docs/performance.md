@@ -268,3 +268,4 @@ Topics reuse the reviewed strategy-family assignments; they do not establish com
 | <a id="input-prefetch-native-publication-and-digest-overlap-2026-11-22"></a>[Input prefetch native publication and digest overlap (2026-11-22)](performance/investigations/input-prefetch-native-publication-and-digest-overlap-2026-11-22.md) | ownership-and-lifecycle |
 | <a id="bounded-io-overlap-adoption-2026-11-22"></a>[Bounded I/O overlap adoption (2026-11-22)](performance/investigations/bounded-io-overlap-adoption-2026-11-22.md) | ownership-and-lifecycle |
 | <a id="automatic-native-execution-bounds-2026-11-22"></a>[Automatic native execution bounds (2026-11-22)](performance/investigations/automatic-native-execution-bounds-2026-11-22.md) | ownership-and-lifecycle |
+| <a id="parallel-gzip-and-zip-output-2026-11-22"></a>[Parallel gzip and ZIP output (2026-11-22)](performance/investigations/parallel-gzip-and-zip-output-2026-11-22.md) | ownership-and-lifecycle |

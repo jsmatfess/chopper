@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "13407bf94f610da8c47cd2e41ed545423e9c056e9dac8ed18f70afdab2352853"
+    "sha256": "faa328b2f0550c1597ef45da3c0eba28252c28b1e3f5ff475aa0063e2333f13e"
   },
   "experiments": [
     {
@@ -4392,6 +4392,23 @@
       "narrative": {
         "path": "docs/performance/investigations/automatic-native-execution-bounds-2026-11-22.md",
         "sha256": "f88c63f305adda8304600d7eb1c6e053b5d03a7831a9d2f1be30a32507da8a20",
+        "topic": "ownership-and-lifecycle"
+      }
+    },
+    {
+      "title": "Parallel gzip and ZIP output (2026-11-22)",
+      "evidence": "docs/performance.md#parallel-gzip-and-zip-output-2026-11-22",
+      "artifacts": [
+        "docs/benchmarks/parallel-compression-summary-2026-11-22.json"
+      ],
+      "scripts": [
+        "scripts/benchmark-parallel-compression-browser.mjs",
+        "scripts/benchmark-parallel-compression.py",
+        "scripts/chart-parallel-compression.py"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/parallel-gzip-and-zip-output-2026-11-22.md",
+        "sha256": "43b6fd24b52a9981150e453a46069b95b1692dc388f4aacac526533b3f13709a",
         "topic": "ownership-and-lifecycle"
       }
     }
@@ -24335,6 +24352,25 @@
       ]
     },
     {
+      "path": "docs/benchmarks/parallel-compression-summary-2026-11-22.json",
+      "sha256": "cabeff8bf1961b9683f05b54c72e06732368ce5d798c854bd95f7ad813bb266a",
+      "bytes": 372743,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "kind",
+        "panels",
+        "raw_root",
+        "schema_version"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#parallel-gzip-and-zip-output-2026-11-22"
+      ]
+    },
+    {
       "path": "docs/benchmarks/parallel-counted-balanced-digest-summary-2026-11-21.json",
       "sha256": "08d2c5b539b4a1b287e51a3432b414b64940213444c0d99a4402db2c83ead2c3",
       "bytes": 14270,
@@ -36030,8 +36066,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "b3c8b58a7ab23174215b2826f5ebefb4835859202623941f1364abbac51a3b2a",
-      "bytes": 1704714,
+      "sha256": "89f6d654e7d80d6107289c4e570fa7ad18e5f3efb12b487f6e5bdf82680fb96a",
+      "bytes": 1706412,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -40328,7 +40364,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "c33d6064289e384abe8d9c80a74efb61915afc12e59a66992f469eeb69385d23"
+    "sha256": "48d588cd243368db93c3fd055efb79eb07ee75286292d06a8d9eb7a34dc447ed"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

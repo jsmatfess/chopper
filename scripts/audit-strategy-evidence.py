@@ -102,6 +102,7 @@ SECTIONS = {
     'Input prefetch native publication and digest overlap (2026-11-22)': 'ownership-and-lifecycle',
     'Bounded I/O overlap adoption (2026-11-22)': 'ownership-and-lifecycle',
     'Automatic native execution bounds (2026-11-22)': 'ownership-and-lifecycle',
+'Parallel gzip and ZIP output (2026-11-22)': 'ownership-and-lifecycle',
     'Desktop picker write overlap (2026-11-22)': 'ownership-and-lifecycle',
     'Browser direct destination write overlap (2026-11-22)': 'ownership-and-lifecycle',
     'Browser direct destination writes and batching (2026-11-21)': 'ownership-and-lifecycle',
