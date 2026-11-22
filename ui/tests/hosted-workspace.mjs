@@ -443,6 +443,9 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} cross-field checks 
     assert.equal(await page.locator('#manual-memory-help').isVisible(),true);
     assert.equal((await exported(page)).resources.memory_mb,'auto');
     assert.equal(await page.locator('#workers').isEnabled(),true,'automatic memory does not override an explicit worker choice');
+    const workers=page.getByRole('spinbutton',{name:/Compression workers/});
+    await workers.fill('2');
+    assert.equal((await exported(page)).resources.workers,2);
     await page.locator('#memory-mode').selectOption('manual');
     assert.equal(await page.locator('#memory').inputValue(),'32');
     await page.locator('#max-record').fill('1');

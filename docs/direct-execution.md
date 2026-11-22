@@ -332,7 +332,7 @@ can start up to four codec Web Workers. A prepared batch can compress separate
 files when the planned average is at least 256 KiB and each file in the batch is
 below 2 MiB. Larger files may use several workers within a file. Compression
 buffer admission or unavailable Web Workers can reduce parallelism. An explicit
-single worker uses serial compression.
+worker count caps concurrency. A count of one uses serial compression.
 
 Direct ZIP writes each member into its private archive and fills its ZIP64 local
 header once the CRC and sizes are known. Ordered prepared publication may
