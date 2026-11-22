@@ -1545,9 +1545,11 @@ worker or record limits, so those controls remain editable.
 Auto shows who controls processing settings in the Resources card and on
 shuffle steps. Switch on Advanced to edit working memory, worker requests,
 grouping, and shuffle strategy. Safety limits and requested pipeline and
-output settings apply in both modes. The hosted engine uses one worker.
-After a completed Auto run, Resources reports its working-memory budget and
-peak writer slots used. The Output Plan reports the physical plan.
+output settings apply in both modes. The hosted engine uses one processing
+worker and can start additional workers for gzip and ZIP compression.
+After a completed Auto run, Resources reports its working-memory budget,
+peak writer slots, and peak parallel compression workers when used.
+The Output Plan reports the physical plan.
 
 ### Linked output-plan text
 

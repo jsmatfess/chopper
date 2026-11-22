@@ -100,7 +100,8 @@ flowchart TD
     NativeFiles -->|One writer| Large
     Route -->|Hosted| HostedFiles{Several small files and codec buffers fit?}
     HostedFiles -->|Yes| FileParallel
-    HostedFiles -->|Otherwise| Large
+    HostedFiles -->|Otherwise| HostedSingle[Finish one file before opening the next]
+    HostedSingle --> Large
     Route -->|Direct Run| Hint[Use current source size and declared byte cap]
     Hint --> Large{Enough bytes and workers for bounded blocks?}
     Large -->|Yes| BlockParallel[Compress DEFLATE blocks and write them in order]

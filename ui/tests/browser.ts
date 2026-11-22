@@ -523,11 +523,35 @@ async function main(){
     }
     assert(JSON.stringify(results[0].plan.stages)===JSON.stringify(results[1].plan.stages),'budget changed stages');
   });
-  await test('cancellation cleans active workspace',async()=>{
+  await test('cancelling active gzip and ZIP compression cleans the workspace without a marker',async()=>{
     const workspaces=await root.getDirectoryHandle('chopper-workspaces');
-    const before=new Set<string>();for await(const [name] of (workspaces as any).entries())before.add(name);
-    await select(await(await destination.getFileHandle('large-source.csv')).getFile());await api('run-direct',job());await api('cancel',{});assert((await api<State>('state')).status==='cancelled','cancel failed');
-    for await(const [name] of (workspaces as any).entries())assert(before.has(name),'cancellation leaked temporary workspace');
+    const before=new Set<string>();
+    for await(const [name] of (workspaces as any).entries())before.add(name);
+    const published=new Set<string>();
+    for await(const [name] of (destination as any).entries())published.add(name);
+    const source=await(await destination.getFileHandle('large-source.csv')).getFile();
+    for(const compression of ['gzip','zip']){
+      await select(source);
+      await api('run-direct',job({compression}));
+      const deadline=Date.now()+15000;
+      let state=await api<State>('state');
+      while(state.status==='running'&&state.progress.rows<65536&&Date.now()<deadline){
+        await pause();state=await api<State>('state');
+      }
+      assert(state.status==='running'&&state.progress.rows>=65536,'compression never reached active output');
+      await api('cancel',{});
+      assert((await api<State>('state')).status==='cancelled','cancel failed');
+      for await(const [name] of (workspaces as any).entries())assert(before.has(name),'cancellation leaked temporary workspace');
+      for await(const [name,handle] of (destination as any).entries()){
+        if(published.has(name)||handle.kind!=='directory')continue;
+        try {
+          await handle.getFileHandle('CHOPPER-COMPLETE.json');
+          throw new Error('cancelled compression published a marker');
+        } catch(error) {
+          if(!(error instanceof DOMException&&error.name==='NotFoundError'))throw error;
+        }
+      }
+    }
   });
   await api('cancel',{});
   await root.removeEntry(destination.name,{recursive:true});

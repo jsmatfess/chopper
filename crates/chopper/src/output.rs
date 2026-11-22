@@ -994,17 +994,28 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
             concurrency
         };
         #[cfg(target_os = "wasi")]
-        let batch_limit = batch_limit.max(
-            parallel_deflate::hosted_files::batch_limit(job, ctx, output_plan).min(
-                usize::try_from(output_plan.files.saturating_sub(files)).unwrap_or(usize::MAX),
-            ),
-        );
+        let batch_limit = match chunks.peek() {
+            Some(Ok(chunk)) if parallel_deflate::hosted_files::small(chunk.bytes) => batch_limit
+                .max(
+                    parallel_deflate::hosted_files::batch_limit(job, ctx, output_plan).min(
+                        usize::try_from(output_plan.files.saturating_sub(files))
+                            .unwrap_or(usize::MAX),
+                    ),
+                ),
+            _ => batch_limit,
+        };
         let mut batch = PublicationBatch::new(batch_limit, Reservation::new(ctx))?;
         #[cfg(all(test, not(target_family = "wasm")))]
         plain_publication_contracts::observe_batch(batch.tasks.capacity());
         let mut reserved = 0u64;
         while batch.tasks.len() < batch_limit {
             if let Some(Ok(next)) = chunks.peek() {
+                // A large hosted member uses the codec slots on its own. End
+                // the smaller-file batch before opening that member's spool.
+                #[cfg(target_os = "wasi")]
+                if !batch.tasks.is_empty() && !parallel_deflate::hosted_files::small(next.bytes) {
+                    break;
+                }
                 let estimate = next
                     .bytes
                     .saturating_add(next.bytes / 10)

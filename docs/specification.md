@@ -218,11 +218,11 @@ Validate the resolved budget using the normal 32 to 1,048,576 MiB bounds,
 `max_record_bytes <= nominal_memory_mb * MiB / 16`, and explicit workers at most
 `min(64, nominal MiB / 8)`. Fail rather than round up the budget or shrink record
 limits. Native automatic worker selection is bounded by
-`min(available CPUs, 4, max(memory_mb / 64, 1))`. WASI uses one engine worker.
-The hosted setting accepts 0 (Auto, which may start up to four codec Web Workers)
-or 1 (single-worker compression). Native serial Run routes can use one automatic
-worker. Browser numeric
-budgets are bounded to 2048 MiB. Default record size remains 8 MiB, so a small
+`min(available CPUs, 4, max(memory_mb / 64, 1))`. Native serial Run routes can
+use one automatic worker. WASI uses one engine worker. Hosted compression can
+use up to four codec Web Workers under Auto. An explicit worker request caps
+that concurrency, and 1 selects serial compression. Browser numeric budgets
+are bounded to 2048 MiB. Default record size remains 8 MiB, so a small
 automatic budget can require an explicit lower record limit.
 
 Hosted Run can target a 512, 1024, or 2048 MiB automatic budget for plain

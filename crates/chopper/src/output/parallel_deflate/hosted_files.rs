@@ -20,6 +20,10 @@ use std::{
 
 const MIN_AVERAGE_FILE_BYTES: u64 = BLOCK_BYTES as u64;
 
+pub(in crate::output) fn small(bytes: u64) -> bool {
+    bytes < MIN_PARALLEL_BYTES
+}
+
 pub(in crate::output) fn batch_limit(job: &Job, ctx: &Context, plan: &OutputPlan) -> usize {
     if plan.files < 2
         || plan.bytes / plan.files < MIN_AVERAGE_FILE_BYTES
@@ -138,14 +142,10 @@ pub(in crate::output) fn write_batch(
     ctx: &Context,
 ) -> Result<bool> {
     let count = batch.tasks.len();
-    if count < 2
-        || batch
-            .tasks
-            .iter()
-            .any(|task| task.chunk.bytes >= MIN_PARALLEL_BYTES)
-    {
+    if count < 2 {
         return Ok(false);
     }
+    debug_assert!(batch.tasks.iter().all(|task| small(task.chunk.bytes)));
     let Some(_blocks) = reserve(ctx, count) else {
         return Ok(false);
     };

@@ -330,9 +330,11 @@ multiple existing writers and can parallelize blocks when one writer is active.
 Hosted Run coordinates from one WASI engine worker. With automatic workers it
 can start up to four codec Web Workers. A prepared batch can compress separate
 files when the planned average is at least 256 KiB and each file in the batch is
-below 2 MiB. Larger files may use several workers within a file. Compression
-buffer admission or unavailable Web Workers can reduce parallelism. An explicit
-worker count caps concurrency. A count of one uses serial compression.
+below 2 MiB. Close the batch before a larger file so it can use several
+workers within the file and finish publication before another large spool
+opens. Compression buffer admission or unavailable Web Workers can reduce
+parallelism. An explicit worker count caps concurrency. A count of one uses
+serial compression.
 
 Direct ZIP writes each member into its private archive and fills its ZIP64 local
 header once the CRC and sizes are known. Ordered prepared publication may
