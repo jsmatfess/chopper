@@ -5,7 +5,7 @@ const bundle=await build({stdin:{contents:"export * from './src/browser/stages';
 const c=await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString('base64')}`);
 test('stage finalization is bounded, monotone and separate from attempt completion',()=>{
  const stages=new c.StageCompletions();
- const event=operation=>({kind:'stage_complete',id:1000+operation*32+c.kinds.length,operations:[operation,0],rows:0,status:'completed',attempt:operation+1});
+ const event=operation=>({kind:'stage_complete',id:1030+operation*32,operations:[operation,0],rows:0,status:'completed',attempt:operation+1});
  for(const stage of [0,2,1,2])stages.accept(event(stage));assert.deepEqual(stages.snapshot(),[0,1,2]);assert.equal(stages.unavailable,false);
  stages.accept({...event(3),status:'active'});assert.equal(stages.unavailable,true);assert.deepEqual(stages.snapshot(),[0,1,2]);
 });
