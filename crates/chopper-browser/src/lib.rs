@@ -211,10 +211,6 @@ mod reactor {
             job.resources.memory_mb.as_mib().is_none_or(|mb| mb <= 2048),
             "browser working memory is limited to 2048 MiB"
         );
-        anyhow::ensure!(
-            job.resources.workers <= 1,
-            "browser engine currently uses one processing worker; select 0 or 1"
-        );
         Ok(())
     }
 }

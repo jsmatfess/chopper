@@ -51,10 +51,10 @@ export function configureBrowserUI(){
   for(const id of ['input','output']){const el=document.getElementById(id) as HTMLInputElement;el.readOnly=true;el.placeholder='Choose with Browse';}
   (document.getElementById('memory') as HTMLInputElement).max='2048';
   const workers=document.getElementById('workers') as HTMLInputElement;
-  workers.max='1';
+  document.getElementById('workers-label')!.textContent='Compression workers (0 = automatic)';
   const workerHelp=document.createElement('small');
   workerHelp.id='workers-help';
-  workerHelp.textContent='Use 0 to let Chopper choose parallel gzip or ZIP compression. Use 1 to compress on a single worker.';
+  workerHelp.textContent='Use 1 for serial compression. Auto uses up to four workers for gzip and ZIP.';
   workers.setAttribute('aria-describedby',workerHelp.id);
   workers.closest('label')!.append(workerHelp);
   const temporary=document.getElementById('temp-dir') as HTMLInputElement;

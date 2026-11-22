@@ -140,13 +140,7 @@ impl MemoryPool {
             anyhow::anyhow!("resolved memory budget {mb} MiB with max_record_bytes {} (record allowance requires at least {} MiB): {error}", resources.max_record_bytes, (resources.max_record_bytes as u64).saturating_mul(16).div_ceil(1024 * 1024))
         })?;
         #[cfg(target_os = "wasi")]
-        {
-            anyhow::ensure!(mb <= 2048, "browser working memory is limited to 2048 MiB");
-            anyhow::ensure!(
-                resources.workers <= 1,
-                "browser engine currently uses one processing worker; select 0 or 1"
-            );
-        }
+        anyhow::ensure!(mb <= 2048, "browser working memory is limited to 2048 MiB");
         Ok(mb)
     }
     pub(crate) fn reservation_counts(&self) -> (u64, u64) {
