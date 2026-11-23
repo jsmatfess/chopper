@@ -17,11 +17,15 @@ try {
   const help = page.getByRole('navigation', { name: 'Chopper help' });
   const docs = help.getByRole('link', { name: 'Docs (opens in a new tab)', exact: true });
   const sample = help.getByRole('link', { name: 'Try a sample (opens in a new tab)', exact: true });
+  const folder = page.getByRole('link', { name: 'Folder and export help (opens in a new tab)', exact: true });
   await docs.waitFor();
   assert.equal(await docs.getAttribute('href'), target);
   assert.equal(await sample.getAttribute('href'), docsOrigin
     ? new URL('browser#try-a-sample-export', target).href
     : 'https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#try-a-sample-export');
+  assert.equal(await folder.getAttribute('href'), docsOrigin
+    ? new URL('browser#choosing-an-output-folder', target).href
+    : 'https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#choosing-an-output-folder');
 
   if (['localhost', '127.0.0.1'].includes(app.hostname)) {
     const files = await readdir(new URL('../ui/dist/', import.meta.url));
@@ -30,7 +34,7 @@ try {
       'index.html', 'storage-worker.js', 'style.css',
     ]);
   } else if (docsOrigin) {
-    for (const [link, heading] of [[docs, 'h1#user-guide'], [sample, 'h2#try-a-sample-export']]) {
+    for (const [link, heading] of [[docs, 'h1#user-guide'], [sample, 'h2#try-a-sample-export'], [folder, 'h2#choosing-an-output-folder']]) {
       const popup = page.waitForEvent('popup');
       await link.click();
       const opened = await popup;
@@ -38,7 +42,8 @@ try {
       await opened.locator(heading).waitFor();
       await opened.close();
     }
-    assert.equal(page.url(), app.href);
+    const workbench = new URL(page.url());
+    assert.equal(workbench.origin + workbench.pathname, app.origin + app.pathname);
   }
   console.log(`Hosted app Docs link targets ${target}`);
 } finally {

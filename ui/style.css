@@ -726,7 +726,7 @@ input:disabled,select:disabled{background:#edf0ec;color:#66736b;opacity:.7;curso
 @media(forced-colors:active){.hosted-workspace .value-track{background:Canvas;border:1px solid CanvasText;block-size:8px}.hosted-workspace .value-track:after{display:none}.hosted-workspace .value-fill{background:Highlight;border:0}.hosted-workspace .value-share{color:CanvasText}}
 
 .hosted-workspace .project-footer{display:block;max-inline-size:var(--config-width);margin:0 auto;padding:0;border:0;letter-spacing:normal;color:var(--muted)}
-.hosted-workspace .workspace-utilities{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:4px 14px;margin-inline-start:auto;max-inline-size:min(360px,100%);min-inline-size:0;color:var(--ink)}
+.hosted-workspace .workspace-utilities{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:4px 14px;margin-inline-start:auto;max-inline-size:100%;min-inline-size:0;color:var(--ink)}
 .hosted-workspace .workspace-utilities .theme-control{margin:0}
 .hosted-workspace :is(.workspace-help,.workspace-utilities nav){display:flex;align-items:center;flex-wrap:wrap;gap:4px 14px}
 .hosted-workspace :is(.workspace-help,.workspace-utilities) a{display:inline-flex;align-items:center;min-block-size:34px;color:var(--ink);font-size:.8125rem;text-decoration:underline;text-decoration-color:var(--input-line);text-underline-offset:4px}

@@ -31,8 +31,9 @@ export function configureHostedWorkspace() {
   const footer=document.querySelector('footer')!;
   footer.classList.add('project-footer');
   footer.innerHTML='<nav aria-label="Chopper project"><a href="https://github.com/jsmatfess/chopper" target="_blank" rel="noopener noreferrer">GitHub<span class="sr-only"> (opens in a new tab)</span></a><a href="https://buymeacoffee.com/tblflip" target="_blank" rel="noopener noreferrer">Buy me a coffee<span class="sr-only"> (opens in a new tab)</span></a></nav><div class="footer-cleanup" hidden></div>';
-  const utilities=document.createElement('div');utilities.className='workspace-utilities';utilities.setAttribute('role','region');utilities.setAttribute('aria-label','Appearance and project links');
-  utilities.append(document.querySelector('.theme-control')!,footer.querySelector('nav')!,footer.querySelector('.footer-cleanup')!);document.querySelector('.rail')!.append(utilities);
+  const utilities=document.createElement('div');utilities.className='workspace-utilities';utilities.setAttribute('role','region');utilities.setAttribute('aria-label','Appearance, project links and help');
+  utilities.append(document.querySelector('.theme-control')!,footer.querySelector('nav')!,document.querySelector('.workspace-help')!,footer.querySelector('.footer-cleanup')!);
+  document.querySelector('.rail')!.append(utilities);
   document.querySelector('h1')!.textContent = 'CSV workbench';
   document.querySelector('.eyebrow')!.remove();
   document.querySelector('.intro')!.textContent = 'Split, group, shuffle. All on your device.';
@@ -105,7 +106,7 @@ export function configureHostedWorkspace() {
   caps.classList.add('file-limits');
   outputBody.append(get('output-picker'),label('compression'),caps);
   const capHelp = document.createElement('p'); capHelp.className = 'hint';
-  capHelp.textContent = 'Per CSV: rows or encoded bytes, including headers. Records stay whole.';
+  capHelp.textContent = 'The row limit counts data rows. The size limit counts CSV bytes including headers, before compression. Records stay whole.';
   outputBody.append(capHelp);
   const serialization = document.createElement('details');
   serialization.innerHTML = '<summary>Encoding & compression</summary>';
@@ -176,7 +177,7 @@ export function configureHostedWorkspace() {
     });
   }
   syncNavigation();
-  const facts=document.createElement('p');facts.id='source-facts';facts.className='source-facts';facts.hidden=true;label('input').after(facts);
+  const facts=document.createElement('p');facts.id='source-facts';facts.className='source-facts';facts.hidden=true;get('input-picker').after(facts);
   const preview=document.createElement('details');preview.id='source-preview';preview.hidden=true;preview.open=true;
   preview.innerHTML='<summary>Input preview <span id="source-sample-note"></span></summary>';
   const previewCard=get('preview-card');previewCard.classList.remove('card');previewCard.querySelector('.section-title')!.remove();preview.append(previewCard);facts.after(preview);
@@ -250,10 +251,14 @@ export function configureHostedWorkspace() {
     get('cli-command').textContent=equivalent?.command??'';
     cli.querySelector<HTMLButtonElement>('[command="--copy"]')!.disabled=!equivalent;
     get('cli-help').textContent=!equivalent?'Finish the configuration to generate a command.':equivalent.usesJson?`This job needs JSON to preserve its settings within native command-line limits. Export the job, replace input and output with full local paths, then run beside ${executable} and chopper-job.json.`:`Steps follow editor order. Replace the browser names with full local paths on the target system; output must name a new folder. Run beside ${executable}. JSON export remains available.`;
-    get('cli-platform-help').textContent=windows?`Use Chopper ${cliVersion} with PowerShell 7.3+ and its default argument handling.`:`Use the Chopper ${cliVersion} Linux CLI package. macOS currently requires a source build.`;
+    get('cli-platform-help').textContent=windows
+      ? `Use Chopper ${cliVersion} with PowerShell 7.3+ and its default argument handling.`
+      : platform==='linux'
+        ? `Use the Chopper ${cliVersion} Linux CLI package.`
+        : 'macOS requires a source build and is outside the supported release platforms.';
     const download=get('cli-download') as HTMLAnchorElement;
-    download.href=windows?'https://github.com/jsmatfess/chopper/releases':'https://github.com/jsmatfess/chopper';
-    download.textContent=windows?'CLI releases':'Build CLI from source';
+    download.href=platform==='macos'?'https://github.com/jsmatfess/chopper#build-the-cli-from-source':'https://github.com/jsmatfess/chopper/releases';
+    download.textContent=platform==='macos'?'Build CLI from source':'CLI releases';
     clearTimeout(copyTimer);cli.querySelector('.cli-copy-status')!.textContent='';
   }
   for(const input of cliPlatforms)input.onchange=renderCommand;

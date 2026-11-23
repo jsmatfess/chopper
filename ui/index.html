@@ -12,13 +12,16 @@
     <div id="connection" role="alert" hidden></div>
     <div class="workspace"><div class="editor"><form id="job-form">
       <section class="card"><div class="section-title"><span class="number">01</span><h2>Source & destination</h2></div><div class="section-body">
-        <label>Input file<div class="input-action"><input id="input" required placeholder="Path to a CSV, .gz, .zst or .zip file"><button type="button" id="browse-input" class="secondary">Browse</button></div></label>
+        <div id="input-picker">
+          <label for="input">Input file</label>
+          <div class="input-action"><input id="input" required placeholder="Path to a CSV, gzip or ZIP file"><button type="button" id="browse-input" class="secondary" aria-label="Browse for input file">Browse</button></div>
+        </div>
         <div id="output-picker">
           <label for="output">Output directory</label>
-          <div class="input-action"><input id="output" required aria-describedby="output-picker-help"><button type="button" id="browse-output" class="secondary" aria-describedby="output-picker-help">Browse</button></div>
+          <div class="input-action"><input id="output" required aria-describedby="output-picker-help"><button type="button" id="browse-output" class="secondary" aria-label="Browse for output folder" aria-describedby="output-picker-help">Browse</button></div>
           <small id="output-picker-help">Use desktop Chrome or Edge with file and folder access enabled. If the browser blocks a folder, try a new subfolder or a different writable folder. Each Run saves to a new results folder. Keep this tab open until saving finishes.</small>
           <small id="output-picker-status" role="status"></small>
-          <small><a href="https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#choosing-an-output-folder" target="_blank" rel="noopener noreferrer">Folder and export help<span class="sr-only"> (opens in a new tab)</span></a></small>
+          <small><a data-folder-docs-link href="https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#choosing-an-output-folder" target="_blank" rel="noopener noreferrer">Folder and export help<span class="sr-only"> (opens in a new tab)</span></a></small>
         </div>
         <div class="grid2"><label>Output format<select id="compression"></select></label><label>ZIP input member <span class="optional">optional</span><input id="zip-member" placeholder="e.g. data/customers.csv" aria-describedby="zip-member-help"><small id="zip-member-help">A member is a file inside the input ZIP archive. Leave blank if the archive has one CSV; otherwise enter the exact path of the CSV inside it, such as data/customers.csv. This setting only applies to ZIP input.</small></label></div>
         <details><summary>CSV dialect & encoding <span>UTF-8 · comma · headers</span></summary><div class="dialects"><div><h3>Input</h3><button type="button" id="sniff-csv" class="text-button">Detect CSV settings</button><small id="sniff-note" role="status"></small><div id="input-csv"></div></div><div><div class="heading-action"><h3>Output</h3><button type="button" id="copy-csv" class="text-button">Copy input settings ↗</button></div><div id="output-csv"></div></div></div></details>

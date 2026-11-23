@@ -42,9 +42,9 @@ export function temporarySpaceEstimate(file:{size:number;name:string}){
   return `Allow roughly ${gib(file.size*2)}–${gib(file.size*8)} of temporary storage for sorting or grouping. This is a rough guide, not an upper bound; pipelines and row shape can use more. No default temporary-space limit; available browser storage still applies.`;
 }
 function showTemporaryEstimate(file:File){
-  const label=document.getElementById('input')?.closest('label');if(!label)return;
+  const picker=document.getElementById('input-picker');if(!picker)return;
   let note=document.getElementById('temporary-space-estimate');
-  if(!note){note=document.createElement('small');note.id='temporary-space-estimate';label.append(note);}
+  if(!note){note=document.createElement('small');note.id='temporary-space-estimate';picker.append(note);}
   note.textContent=temporarySpaceEstimate(file);
 }
 export function configureBrowserUI(){

@@ -26,6 +26,7 @@ if(releaseDocs){
   const links=[
     ['data-docs-link',releaseDocs],
     ['data-sample-docs-link',new URL('browser#try-a-sample-export',releaseDocs).href],
+    ['data-folder-docs-link',new URL('browser#choosing-an-output-folder',releaseDocs).href],
   ];
   for(const [attribute,href] of links){
     const marker=new RegExp(`${attribute} href="[^"]+"`);

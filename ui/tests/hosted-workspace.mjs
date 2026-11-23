@@ -92,13 +92,16 @@ test('hosted workspace preserves configuration and real app action wiring throug
     const docs=help.getByRole('link',{name:'Docs (opens in a new tab)',exact:true});
     assert.equal(await docs.isVisible(),true);
     assert.equal(await docs.getAttribute('href'),'https://github.com/jsmatfess/chopper/blob/main/docs/user/README.md');
-    await page.getByRole('link',{name:'Chopper home'}).focus();
+    await page.getByRole('link',{name:/^Buy me a coffee/}).focus();
     await page.keyboard.press('Tab');
     assert.equal(await docs.evaluate(link=>link===document.activeElement),true);
     await page.keyboard.press('Tab');
     const sample=help.getByRole('link',{name:'Try a sample (opens in a new tab)',exact:true});
     assert.equal(await sample.evaluate(link=>link===document.activeElement),true);
     assert.equal(await sample.getAttribute('href'),'https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#try-a-sample-export');
+    assert.equal(await page.getByRole('textbox',{name:'Input file',exact:true}).count(),1);
+    assert.equal(await page.getByRole('button',{name:'Browse for input file',exact:true}).count(),1);
+    assert.equal(await page.getByRole('button',{name:'Browse for output folder',exact:true}).count(),1);
     assert.equal(await page.getByRole('link',{name:'GitHub',exact:false}).last().getAttribute('href'),'https://github.com/jsmatfess/chopper');
     const support=page.getByRole('link',{name:'Buy me a coffee',exact:false});
     assert.equal(await support.getAttribute('href'),'https://buymeacoffee.com/tblflip');
@@ -867,7 +870,7 @@ test('hosted visible text is readable and technical result metadata is disclosed
   const tiny=await page.evaluate(()=>{const found=[],walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);for(let text;text=walker.nextNode();){if(!text.textContent.trim())continue;const el=text.parentElement;if(!el||el.closest('script,style,[aria-hidden=true],.sr-only'))continue;const range=document.createRange();range.selectNodeContents(text);if(!range.getBoundingClientRect().width||!range.getBoundingClientRect().height)continue;const px=parseFloat(getComputedStyle(el).fontSize);if(px<13)found.push({text:text.textContent.slice(0,70),px,tag:el.tagName,class:el.className});}return found;});assert.deepEqual(tiny,[],'visible text must be at least 13px at the default text preference');
   assert.equal(await page.locator('#input').evaluate(el=>getComputedStyle(el).fontSize),'14px');
   assert.equal(await page.locator('#input').evaluate(el=>getComputedStyle(el).fontWeight),'400');
-  assert.equal(await page.locator('#input').evaluate(el=>getComputedStyle(el.closest('label')).fontWeight),'500');
+  assert.equal(await page.locator('#input').evaluate(el=>getComputedStyle(el.labels[0]).fontWeight),'500');
   assert.equal(await page.locator('#source h2').evaluate(el=>getComputedStyle(el).fontWeight),'600');
   await page.evaluate(()=>document.documentElement.style.fontSize='20px');assert.equal(await page.locator('#input').evaluate(el=>getComputedStyle(el).fontSize),'17.5px');
   const touch=await browser.newContext({hasTouch:true,isMobile:true,viewport:{width:390,height:844}});
@@ -1063,7 +1066,9 @@ test('CLI handoff exports the current draft and copies a shell-safe command with
   for(const platform of ['linux','macos']){
    await cli.locator(`[name=cli-platform][value=${platform}]`).check();
    assert.equal(await cli.locator('.cli-copy-status').textContent(),'');
-   assert.equal(await cli.getByRole('link').getAttribute('href'),'https://github.com/jsmatfess/chopper');
+   assert.equal(await cli.getByRole('link').getAttribute('href'),platform==='linux'
+    ? 'https://github.com/jsmatfess/chopper/releases'
+    : 'https://github.com/jsmatfess/chopper#build-the-cli-from-source');
    assert.doesNotMatch(await cli.innerText(),/Run beside chopper.exe|Use PowerShell/);
    await checkCopy();
   }
@@ -1550,7 +1555,7 @@ test('rail utilities stay sticky and clear the navigation and processing strip',
    await page.setViewportSize({width,height:900});await page.evaluate(()=>scrollTo(0,0));const before=await utilities.boundingBox();await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));const after=await utilities.boundingBox();assert(Math.abs(after.y-before.y)<1,'utilities stay fixed during page scrolling');assert(after.x>=0&&after.x+after.width<=width,'utilities fit the viewport');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
    const rail=await page.locator('.rail').boundingBox(),nav=await page.locator('.workspace-toolbar').boundingBox();assert.equal(rail.y,0,'rail stays flush with the viewport top');assert(nav.y>=rail.y+rail.height-1,'sticky section navigation clears the rail');
    const help=await page.getByRole('navigation',{name:'Chopper help'}).boundingBox();
-   assert(help.x>=0&&help.x+help.width<=width&&help.y+help.height<=rail.height,'top-bar help fits inside the visible rail');
+   assert(help.x>=0&&Math.abs(help.x+help.width-after.x-after.width)<1&&help.y+help.height<=rail.height,'top-bar help is right-aligned inside the visible rail');
   }
   await setTheme(page,'dark');assert.equal(await page.locator('meta[name="color-scheme"]').getAttribute('content'),'dark');
   assert.equal(await utilities.locator('select').count(),0,'theme is a button rather than a dropdown');

@@ -120,7 +120,7 @@ export function configureValidation(getJob:()=>Job, getSchema:()=>ColumnSchema|n
       const shown=!!message&&(!!groupNote||submitted||touched.has(field));
       field.setAttribute('aria-invalid',String(shown));
       let note=groupNote??feedback.get(field);
-      if(message&&!note){note=document.createElement('small');note.id=`field-error-${++serial}`;note.className='field-guidance';(field.closest('.quantity-field,label')||field.parentElement)!.append(note);feedback.set(field,note);}
+      if(message&&!note){note=document.createElement('small');note.id=`field-error-${++serial}`;note.className='field-guidance';(field.closest('#input-picker,#output-picker,.quantity-field,label')||field.parentElement)!.append(note);feedback.set(field,note);}
       if(note){
         if(!groupNote){note.textContent=message;note.hidden=!message;note.classList.toggle('field-error',shown);}
         const ids=(field.getAttribute('aria-describedby')||'').split(/\s+/).filter(id=>id&&id!==note!.id);
