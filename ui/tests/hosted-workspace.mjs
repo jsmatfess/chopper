@@ -11,7 +11,9 @@ const csv={encoding:'utf-8',headers:true,delimiter:',',quote:'"',escape:null,lin
 const {job_values: jobValues}=JSON.parse(await readFile(new URL('../../docs/cli-reference-data.json',import.meta.url),'utf8'));
 const defaults={version:1,input:'',output:'',zip_member:null,input_csv:csv,output_csv:csv,compression:'none',operations:[],limits:{rows:null,bytes:null,compressed_bytes:null},resources:{grouping:'auto',workers:0,memory_mb:256,max_files:100000,max_record_bytes:8388608,temp_dir:null,temp_bytes:null}};
 const analysis={algorithm_version:'test-only',rows:4,columns:2,header:['country','note'],preview:[['US','sample']],groups:1,output_files:2,output_csv_bytes:32,temp_bytes:0,peak_temp_bytes:0,analysis_seconds:1,memory_budget_bytes:268435456,workers:1,seed:'fixture',accuracy:'Exact fixture response',warnings:['Fixture warning'],stages:[]};
-const html=await readFile('index.html','utf8');
+const sampleCsv=await readFile(new URL('../../examples/customers.csv',import.meta.url));
+const html=(await readFile('index.html','utf8')).replace('id="try-sample"',
+  `id="try-sample" data-csv="${sampleCsv.toString('base64')}" data-rows="5"`);
 const css=await readFile('style.css','utf8');
 async function bundle(){
   const result=await build({entryPoints:['src/app.ts'],bundle:true,write:false,plugins:[{name:'mock-client',setup(build){
@@ -23,7 +25,7 @@ async function bundle(){
         if(path==='defaults')return structuredClone(window.defaults);
         if(path==='state'){const snapshot=structuredClone(window.fixtureState);if(window.deferNextState){window.deferNextState=false;return await new Promise(resolve=>window.releaseState=()=>resolve(snapshot));}return snapshot;}
         if(path==='preview'){if(window.deferPreview)await new Promise(resolve=>window.releasePreview=resolve);return window.previewFixture??{columns:2,header:['country','note'],preview:[[data.input==='old.csv'?'OLD':'US','sample']],input_is_zip:false};}
-        if(path==='pick-path')return {path:data.mode==='input'?'source.csv':'destination'};
+        if(path==='pick-path')return {path:data.mode==='sample'?'customers.csv':data.mode==='input'?'source.csv':'destination'};
         if(path==='sniff')return {settings:{...data.input_csv,delimiter:';'},note:'Fixture detection; no scan'};
         if(path==='profile'){if(window.deferAnalysisAck)await new Promise(resolve=>window.releaseAnalysisAck=resolve);const finish=()=>window.fixtureState={...window.fixtureState,status:'profiled',profile:window.profileFixture??{rows:4,columns:2,header:['country','note'],seconds:1,accuracy:'Exact fixture input count',stages:[],column_values:[]}};if(window.deferProfile){window.fixtureState={...window.fixtureState,status:'profiling',profile:null};window.finishProfile=finish;}else finish();return {};}
         if(path==='run-direct'){window.fixtureState={...window.fixtureState,status:'running',error:null,progress:{phase:'Fixture processing',rows:1,temp_bytes:0}};return {};}
@@ -57,6 +59,30 @@ async function harness(browser,hosted=true,clock=false,scrollspy=true,transition
   return {page,errors};
 }
 async function choose(page){await page.locator('#browse-input').click();await page.locator('#browse-output').click();}
+test('sample loads the source and row cap without opening a picker or starting Run',async()=>{
+  const browser=await chromium.launch();
+  try{
+    const {page,errors}=await harness(browser);
+    await page.locator('#browse-output').click();
+    await page.locator('#max-rows').fill('10');
+    const sample=page.getByRole('button',{name:'Try a sample',exact:true});
+    page.once('dialog',dialog=>dialog.dismiss());
+    await sample.click();
+    assert.equal(await page.locator('#input').inputValue(),'');
+    assert.equal(await page.locator('#max-rows').inputValue(),'10');
+    page.once('dialog',dialog=>dialog.accept());
+    await sample.click();
+    await page.locator('#sample-status').filter({hasText:'Loaded customers.csv with a 5-row cap'}).waitFor();
+    assert.equal(await page.locator('#input').inputValue(),'customers.csv');
+    assert.equal(await page.locator('#output').inputValue(),'destination');
+    assert.equal(await page.locator('#max-rows').inputValue(),'5');
+    assert.deepEqual(await page.evaluate(()=>window.calls.filter(call=>call.path==='pick-path'||call.path==='run-direct').map(call=>[call.path,call.data.mode])),[
+      ['pick-path','output'],['pick-path','sample'],
+    ]);
+    assert.deepEqual(Buffer.from(await page.evaluate(()=>[...window.calls.find(call=>call.data?.mode==='sample').data.bytes])),sampleCsv);
+    assert.deepEqual(errors,[]);
+  }finally{await browser.close();}
+});
 async function exported(page){await page.locator('#export').click();return page.evaluate(async()=>JSON.parse(await window.exported.text()));}
 async function tick(page){await page.waitForTimeout(1100);}
 
@@ -96,9 +122,8 @@ test('hosted workspace preserves configuration and real app action wiring throug
     await page.keyboard.press('Tab');
     assert.equal(await docs.evaluate(link=>link===document.activeElement),true);
     await page.keyboard.press('Tab');
-    const sample=help.getByRole('link',{name:'Try a sample (opens in a new tab)',exact:true});
+    const sample=help.getByRole('button',{name:'Try a sample',exact:true});
     assert.equal(await sample.evaluate(link=>link===document.activeElement),true);
-    assert.equal(await sample.getAttribute('href'),'https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#try-a-sample-export');
     assert.equal(await page.getByRole('textbox',{name:'Input file',exact:true}).count(),1);
     assert.equal(await page.getByRole('button',{name:'Browse for input file',exact:true}).count(),1);
     assert.equal(await page.getByRole('button',{name:'Browse for output folder',exact:true}).count(),1);
@@ -1218,7 +1243,10 @@ for(const scrollspy of [true,false])test(`hosted navigation (${scrollspy?'native
   await page.locator('.workspace-view-controls [data-workspace-view=configuration]').click();
   for(const width of [320,390,760,1440,1920,2560]){
    await page.setViewportSize({width,height:900});await page.locator('.workspace-nav a[href="#review"]').click();await page.clock.runFor(100);
-   const rail=await page.locator('.rail').boundingBox(),bar=await page.locator('.workspace-toolbar').boundingBox();if(width<1600){assert(Math.abs(bar.y-rail.height)<1,'top navigation stays flush beneath the rail');assert(bar.height<60,'top navigation stays compact');}else{assert(Math.abs(bar.y-rail.height-16)<1,'wide section navigation stays within reach');assert(bar.width<180,'rail stays slim');}
+   const rail=await page.locator('.rail').boundingBox(),bar=await page.locator('.workspace-toolbar').boundingBox();
+   const railOffset=width<=640?0:rail.height;
+   if(width<1600){assert(Math.abs(bar.y-railOffset)<1,'top navigation stays flush with the sticky stack');assert(bar.height<60,'top navigation stays compact');}
+   else{assert(Math.abs(bar.y-railOffset-16)<1,'wide section navigation stays within reach');assert(bar.width<180,'rail stays slim');}
    const bottom=await page.locator('#run-dock').boundingBox();assert(Math.abs(bottom.y+bottom.height-900)<1,'processing bar sits at the viewport bottom');assert(bottom.height<110,'processing bar stays compact');
    await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));await page.clock.runFor(100);const last=await page.locator('#review').evaluate(el=>el.getBoundingClientRect().bottom);assert(last<=bottom.y,'bottom padding keeps the final content above processing controls');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`busy overflow at ${width}`);
@@ -1552,10 +1580,14 @@ test('rail utilities stay sticky and clear the navigation and processing strip',
   assert.equal(await utilities.getByRole('button',{name:/Switch to .* theme/}).count(),1);assert.equal(await page.locator('.rail .theme-control').count(),1);
   assert.equal(await utilities.getByRole('link',{name:'GitHub',exact:false}).count(),1);assert.equal(await utilities.getByRole('link',{name:'Buy me a coffee',exact:false}).count(),1);assert.equal(await utilities.locator('.footer-cleanup').count(),1);
   for(const width of [1280,390,320]){
-   await page.setViewportSize({width,height:900});await page.evaluate(()=>scrollTo(0,0));const before=await utilities.boundingBox();await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));const after=await utilities.boundingBox();assert(Math.abs(after.y-before.y)<1,'utilities stay fixed during page scrolling');assert(after.x>=0&&after.x+after.width<=width,'utilities fit the viewport');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-   const rail=await page.locator('.rail').boundingBox(),nav=await page.locator('.workspace-toolbar').boundingBox();assert.equal(rail.y,0,'rail stays flush with the viewport top');assert(nav.y>=rail.y+rail.height-1,'sticky section navigation clears the rail');
+   await page.setViewportSize({width,height:900});await page.evaluate(()=>scrollTo(0,0));const before=await utilities.boundingBox();
+   await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));const after=await utilities.boundingBox();
+   assert(width>640?Math.abs(after.y-before.y)<1:after.y<0,'compact viewports let the top bar scroll away');
+   assert(after.x>=0&&after.x+after.width<=width,'utilities fit the viewport');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+   const rail=await page.locator('.rail').boundingBox(),nav=await page.locator('.workspace-toolbar').boundingBox();
+   assert(nav.y>=Math.max(0,rail.y+rail.height)-1,'sticky section navigation clears the rail');
    const help=await page.getByRole('navigation',{name:'Chopper help'}).boundingBox();
-   assert(help.x>=0&&Math.abs(help.x+help.width-after.x-after.width)<1&&help.y+help.height<=rail.height,'top-bar help is right-aligned inside the visible rail');
+   assert(help.x>=0&&Math.abs(help.x+help.width-after.x-after.width)<1&&help.y+help.height<=rail.y+rail.height,'top-bar help is right-aligned inside the rail');
   }
   await setTheme(page,'dark');assert.equal(await page.locator('meta[name="color-scheme"]').getAttribute('content'),'dark');
   assert.equal(await utilities.locator('select').count(),0,'theme is a button rather than a dropdown');

@@ -175,6 +175,7 @@ For a native CLI build include `Cargo.toml`, `Cargo.lock`, `crates/**/*`,
 `vendor/**/*`, any build configuration and externally selected tools. Native
 builds do not embed UI assets. Hosted builds additionally declare `ui/src/**/*`,
 UI package/lock files, HTML/styles, hosted build scripts and their shared helpers,
+the bundled sample inputs `examples/customers.csv` and `examples/quickstart-job.json`,
 plus the WASI engine and toolchain inputs. Exclude output/cache paths
 from input patterns; list required built files in `artifacts`. Record actual
 toolchain versions, features, fixture identities, dependencies, expected disk/time

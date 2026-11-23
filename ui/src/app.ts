@@ -451,6 +451,7 @@ async function startJob(){
 function updateRunControl() {
   const button=$<HTMLButtonElement>('run-direct');
   button.disabled=['profiling','running'].includes(status);
+  $<HTMLButtonElement>('try-sample').disabled=button.disabled||!job||!$('try-sample').dataset.csv;
   button.textContent='Run →';
 }
 $('job-form').onsubmit=async e=>{
@@ -465,6 +466,29 @@ $<HTMLInputElement>('import-file').onchange=async e=>{try{const file=(e.target a
 const manual=typeof config.resources?.memory_mb==='number'||job.resources.workers!==0||job.resources.grouping==='sort'
   ||job.operations.some(op=>op.type==='shuffle'&&op.strategy&&op.strategy!=='auto');
 $<HTMLInputElement>('execution-mode').checked=manual;populate();}catch(e){error(e);}};
+function updateSelectedPath(mode:string,path:string){
+  if(mode==='input')inputSelectionRevision++;
+  setValue(mode,path);markDirty();
+  if(mode==='input')void loadColumns();
+}
+const sampleButton=$<HTMLButtonElement>('try-sample');
+sampleButton.onclick=async()=>{
+  if(sampleButton.disabled||activeCommands||$<HTMLButtonElement>('browse-input').disabled)return;
+  if((value('input')||value('zip-member')||value('max-rows'))&&!window.confirm('Load the sample CSV and replace the current input and row limit? Your other job settings will stay in place.'))return;
+  try{
+    const rows=Number(sampleButton.dataset.rows);
+    const bytes=Uint8Array.from(atob(sampleButton.dataset.csv!),char=>char.charCodeAt(0));
+    const {path}=await api<{path:string}>('pick-path',{mode:'sample',bytes});
+    setValue('max-rows',rows);
+    setValue('zip-member','');
+    updateSelectedPath('input',path);
+    $('sample-status').textContent=value('output')
+      ? `Loaded ${path} with a ${rows}-row cap. Select Run when ready.`
+      : `Loaded ${path} with a ${rows}-row cap. Choose an output folder, then select Run.`;
+    document.dispatchEvent(new Event('chopper-edit-configuration'));
+    $('source').focus();
+  }catch(e){$('sample-status').textContent=e instanceof Error?e.message:String(e);}
+};
 for(const mode of ['input','output']) $('browse-'+mode).onclick=async()=>{
   const buttons=['input','output'].map(m=>$<HTMLButtonElement>('browse-'+m));
   buttons.forEach(b=>b.disabled=true);
@@ -473,7 +497,7 @@ for(const mode of ['input','output']) $('browse-'+mode).onclick=async()=>{
   if(pickerStatus)pickerStatus.textContent='';
   try {
     const result=await api<{path:string|null}>('pick-path',{mode,path:value(mode)});
-    if(result.path!==null){if(mode==='input')inputSelectionRevision++;setValue(mode,result.path);markDirty();if(mode==='input')void loadColumns();}
+    if(result.path!==null){$('sample-status').textContent='';updateSelectedPath(mode,result.path);}
     else if(pickerStatus)pickerStatus.textContent='No folder selected in the picker. Choose Browse to try again.';
   } catch(e){
     if(pickerStatus)pickerStatus.textContent=`Could not open the output folder. ${e instanceof Error?e.message:String(e)}`;

@@ -22,10 +22,15 @@ assertProductionWasm(await readFile(ui+'dist/engine.wasm'));
 await build({entryPoints:[ui+'src/app.ts'],bundle:true,minify:true,outfile:ui+'dist/app.js'});
 await build({entryPoints:[ui+'src/browser/engine-worker.ts',ui+'src/browser/storage-worker.ts'],bundle:true,minify:true,format:'esm',outdir:ui+'dist'});
 let html=await readFile(ui+'index.html','utf8');
+const sampleMarker='id="try-sample"';
+if(!html.includes(sampleMarker))throw new Error('Missing hosted sample button in index.html.');
+const sample=await readFile(new URL('../examples/customers.csv',import.meta.url));
+const {limits}=JSON.parse(await readFile(new URL('../examples/quickstart-job.json',import.meta.url),'utf8'));
+if(!sample.length||!Number.isSafeInteger(limits.rows)||limits.rows<1)throw new Error('Invalid hosted sample CSV or row cap.');
+html=html.replace(sampleMarker,`${sampleMarker} data-csv="${sample.toString('base64')}" data-rows="${limits.rows}"`);
 if(releaseDocs){
   const links=[
     ['data-docs-link',releaseDocs],
-    ['data-sample-docs-link',new URL('browser#try-a-sample-export',releaseDocs).href],
     ['data-folder-docs-link',new URL('browser#choosing-an-output-folder',releaseDocs).href],
   ];
   for(const [attribute,href] of links){

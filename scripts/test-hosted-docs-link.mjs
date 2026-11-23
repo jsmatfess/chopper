@@ -16,13 +16,11 @@ try {
   assert.equal((await page.goto(app.href))?.status(), 200);
   const help = page.getByRole('navigation', { name: 'Chopper help' });
   const docs = help.getByRole('link', { name: 'Docs (opens in a new tab)', exact: true });
-  const sample = help.getByRole('link', { name: 'Try a sample (opens in a new tab)', exact: true });
+  const sample = help.getByRole('button', { name: 'Try a sample', exact: true });
   const folder = page.getByRole('link', { name: 'Folder and export help (opens in a new tab)', exact: true });
   await docs.waitFor();
   assert.equal(await docs.getAttribute('href'), target);
-  assert.equal(await sample.getAttribute('href'), docsOrigin
-    ? new URL('browser#try-a-sample-export', target).href
-    : 'https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#try-a-sample-export');
+  await sample.waitFor();
   assert.equal(await folder.getAttribute('href'), docsOrigin
     ? new URL('browser#choosing-an-output-folder', target).href
     : 'https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#choosing-an-output-folder');
@@ -34,7 +32,7 @@ try {
       'index.html', 'storage-worker.js', 'style.css',
     ]);
   } else if (docsOrigin) {
-    for (const [link, heading] of [[docs, 'h1#user-guide'], [sample, 'h2#try-a-sample-export'], [folder, 'h2#choosing-an-output-folder']]) {
+    for (const [link, heading] of [[docs, 'h1#user-guide'], [folder, 'h2#choosing-an-output-folder']]) {
       const popup = page.waitForEvent('popup');
       await link.click();
       const opened = await popup;

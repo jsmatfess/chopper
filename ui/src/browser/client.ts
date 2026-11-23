@@ -22,13 +22,22 @@ const lifecycle=new BrowserLifecycle({
 export const browserDiagnostics=lifecycle.diagnostics;
 export function enableBrowserProfiling(){lifecycle.enableProfiling();}
 export function invalidateBrowserDraft(source:string){lifecycle.invalidateDraft(source);}
+function selectInputFile(input:File, estimate=true){
+  const control=document.getElementById('input');
+  if(control){control.dataset.fileName=input.name;control.dataset.fileBytes=String(input.size);}
+  lifecycle.selectInput(input);
+  if(estimate)showTemporaryEstimate(input);
+  else document.getElementById('temporary-space-estimate')?.remove();
+  return {path:input.name};
+}
 export async function browserApi<T>(path:string,data?:any):Promise<T>{
   if(path==='pick-path'){
     supported();
     try{
+      if(data.mode==='sample')return selectInputFile(new File([data.bytes],'customers.csv',{type:'text/csv'}),false) as T;
       if(data.mode==='input'){
         const [handle]=await(window as unknown as PickerWindow).showOpenFilePicker({types:[{description:'CSV and compressed files',accept:{'text/csv':['.csv','.tsv','.txt'], 'application/octet-stream':['.gz','.gzip','.zip']}}]});
-        const input=await handle.getFile();const control=document.getElementById('input') as HTMLInputElement|null;if(control){control.dataset.fileName=input.name;control.dataset.fileBytes=String(input.size);}lifecycle.selectInput(input);showTemporaryEstimate(input);return {path:input.name} as T;
+        return selectInputFile(await handle.getFile()) as T;
       }
       const output=await(window as unknown as PickerWindow).showDirectoryPicker({mode:'readwrite'});
       lifecycle.selectOutput(output);return {path:output.name} as T;

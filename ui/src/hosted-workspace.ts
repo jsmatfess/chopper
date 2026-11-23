@@ -67,19 +67,24 @@ export function configureHostedWorkspace() {
   const navLinks=[...nav.querySelectorAll<HTMLAnchorElement>('a')];
 
   const nativeScrollspy=CSS.supports('scroll-target-group: auto'),wideNavigation=matchMedia('(min-width:1600px)');
+  const compactNavigation=matchMedia('(max-width:640px), (max-height:700px)');
+  const rail=document.querySelector<HTMLElement>('.rail')!;
+  const pinnedRailHeight=()=>compactNavigation.matches?0:rail.offsetHeight;
   let selectedNavigation:HTMLAnchorElement|null=null,selectedScrollY=scrollY;
   function syncNavigation(){
     if(document.body.dataset.workspaceView==='execution')return;
     if(selectedNavigation&&scrollY!==selectedScrollY){selectedNavigation=null;delete nav.dataset.selected;}
     let current:Element|null=selectedNavigation??(nativeScrollspy?nav.querySelector('a:target-current'):null);
-    if(!current){const edge=wideNavigation.matches?document.querySelector('.rail')!.getBoundingClientRect().bottom+40:toolbar.getBoundingClientRect().bottom+40;current=navLinks.filter(link=>get(link.hash.slice(1)).getBoundingClientRect().top<=edge).at(-1)??navLinks[0];if(scrollY+innerHeight>=document.documentElement.scrollHeight-2)current=navLinks.at(-1)!;}
+    if(!current){const edge=wideNavigation.matches?pinnedRailHeight()+40:toolbar.getBoundingClientRect().bottom+40;current=navLinks.filter(link=>get(link.hash.slice(1)).getBoundingClientRect().top<=edge).at(-1)??navLinks[0];if(scrollY+innerHeight>=document.documentElement.scrollHeight-2)current=navLinks.at(-1)!;}
     for(const link of navLinks){if(link===current)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');}
   }
   let navigationFrame=0;
   const scheduleNavigation=()=>{if(!navigationFrame)navigationFrame=requestAnimationFrame(()=>{navigationFrame=0;syncNavigation();});};
   document.addEventListener('scroll',scheduleNavigation,{passive:true});document.addEventListener('scrollend',syncNavigation);
-  const updateNavigationSize=()=>{document.documentElement.style.setProperty('--workspace-rail-height',`${(document.querySelector('.rail') as HTMLElement).offsetHeight}px`);document.documentElement.style.setProperty('--workspace-toolbar-height',`${wideNavigation.matches?16:toolbar.offsetHeight+24}px`);scheduleNavigation();};
-  const toolbarSize=new ResizeObserver(updateNavigationSize);toolbarSize.observe(toolbar);toolbarSize.observe(document.querySelector('.rail')!);wideNavigation.addEventListener('change',updateNavigationSize);
+  const updateNavigationSize=()=>{document.documentElement.style.setProperty('--workspace-rail-height',`${pinnedRailHeight()}px`);document.documentElement.style.setProperty('--workspace-toolbar-height',`${wideNavigation.matches?16:toolbar.offsetHeight+24}px`);scheduleNavigation();};
+  const toolbarSize=new ResizeObserver(updateNavigationSize);toolbarSize.observe(toolbar);toolbarSize.observe(rail);
+  wideNavigation.addEventListener('change',updateNavigationSize);
+  compactNavigation.addEventListener('change',updateNavigationSize);
   const processingSize=new ResizeObserver(()=>document.documentElement.style.setProperty('--processing-strip-height',`${dock.offsetHeight}px`));processingSize.observe(dock);
   const sectionObserver=new IntersectionObserver(scheduleNavigation,{threshold:[0,1]});
 

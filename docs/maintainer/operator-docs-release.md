@@ -36,8 +36,8 @@ CHOPPER_DOCS_ORIGIN=https://chopper-docs.pages.dev npm --prefix ui run build:hos
 npm --prefix ui run serve:hosted
 ```
 
-In another terminal, check the app's **Docs** and **Try a sample** links and
-the seven-file build inventory.
+In another terminal, check the app's docs links, **Try a sample** button,
+and seven-file build inventory.
 
 ```sh
 node scripts/test-hosted-docs-link.mjs http://127.0.0.1:8421 https://chopper-docs.pages.dev

@@ -84,13 +84,17 @@ test('production restore removes both reactors and export guard still rejects a 
   assert.ok(testAssets.includes(base)&&testAssets.includes(partition));
   const root=await mkdtemp(join(tmpdir(),'chopper-resource-routing-'));
   try{
-    for(const folder of ['scripts','ui/dist','ui/src/browser','docs/releases'])await mkdir(join(root,folder),{recursive:true});
+    for(const folder of ['scripts','ui/dist','ui/src/browser','docs/releases','examples'])await mkdir(join(root,folder),{recursive:true});
     const noticePath=join(root,'docs/releases/native-usage.txt'),notices='Synthetic dependency notice\n';
     await writeFile(noticePath,notices);
     for(const name of ['build-hosted.mjs','browser-artifacts.mjs','hosted-theme.mjs'])await copyFile(new URL(name,import.meta.url),join(root,'scripts',name));
     await symlink(resolve('ui/node_modules'),join(root,'ui/node_modules'),'dir');
     for(const name of ['app.ts','browser/engine-worker.ts','browser/storage-worker.ts'])await writeFile(join(root,'ui/src',name),'export {};');
     for(const name of ['index.html','style.css'])await writeFile(join(root,'ui',name),'fixture');
+    const sample=Buffer.from('id\r\n1\r\n');
+    await writeFile(join(root,'examples/customers.csv'),sample);
+    await writeFile(join(root,'examples/quickstart-job.json'),'{"limits":{"rows":5}}');
+    await writeFile(join(root,'ui/index.html'),'<button id="try-sample">Try a sample</button>');
     const wasm=Buffer.from([0,97,115,109,1,0,0,0]);
     assertProductionWasm(wasm);
     await writeFile(join(root,'ui/dist/engine.wasm'),wasm);
@@ -98,7 +102,9 @@ test('production restore removes both reactors and export guard still rejects a 
     const run=spawnSync(process.execPath,[join(root,'scripts/build-hosted.mjs')],{encoding:'utf8'});
     assert.equal(run.status,0,run.stderr);
     assert.deepEqual((await readdir(join(root,'ui/dist'))).sort(),['_headers','app.js','engine-worker.js','engine.wasm','index.html','storage-worker.js','style.css']);
-    assert.ok((await readFile(join(root,'ui/dist/index.html'),'utf8')).includes(`<!-- Chopper distribution notices\n${notices}\n-->`));
+    const html=await readFile(join(root,'ui/dist/index.html'),'utf8');
+    assert.ok(html.includes(`<!-- Chopper distribution notices\n${notices}\n-->`));
+    assert.ok(html.includes(`data-csv="${sample.toString('base64')}" data-rows="5"`));
     await writeFile(noticePath,'Invalid --> notice');
     const invalidNotice=spawnSync(process.execPath,[join(root,'scripts/build-hosted.mjs')],{encoding:'utf8'});
     assert.notEqual(invalidNotice.status,0);assert.match(invalidNotice.stderr,/HTML comment delimiters/);

@@ -729,9 +729,11 @@ input:disabled,select:disabled{background:#edf0ec;color:#66736b;opacity:.7;curso
 .hosted-workspace .workspace-utilities{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:4px 14px;margin-inline-start:auto;max-inline-size:100%;min-inline-size:0;color:var(--ink)}
 .hosted-workspace .workspace-utilities .theme-control{margin:0}
 .hosted-workspace :is(.workspace-help,.workspace-utilities nav){display:flex;align-items:center;flex-wrap:wrap;gap:4px 14px}
-.hosted-workspace :is(.workspace-help,.workspace-utilities) a{display:inline-flex;align-items:center;min-block-size:34px;color:var(--ink);font-size:.8125rem;text-decoration:underline;text-decoration-color:var(--input-line);text-underline-offset:4px}
-.hosted-workspace :is(.workspace-help,.workspace-utilities) a:hover{color:var(--green);text-decoration-color:currentColor}
-.hosted-workspace :is(.workspace-help,.workspace-utilities) a:focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:2px}
+.hosted-workspace :is(.workspace-help a,.workspace-help button,.workspace-utilities a){display:inline-flex;align-items:center;min-block-size:34px;color:var(--ink);font-size:.8125rem;text-decoration:underline;text-decoration-color:var(--input-line);text-underline-offset:4px}
+.hosted-workspace :is(.workspace-help a,.workspace-help button,.workspace-utilities a):hover{color:var(--green);text-decoration-color:currentColor}
+.hosted-workspace :is(.workspace-help a,.workspace-help button,.workspace-utilities a):focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:2px}
+.hosted-workspace .workspace-help button{padding:0;font-weight:500}
+.hosted-workspace #sample-status:empty{margin:0}
 .hosted-workspace .workspace-help a[data-docs-link]{font-weight:650}
 .hosted-workspace .workspace-utilities .sr-only{display:block}
 .hosted-workspace .workspace-utilities .footer-cleanup{flex-basis:100%;padding-block-start:6px;border-block-start:1px solid var(--line);text-align:end}
@@ -739,7 +741,8 @@ input:disabled,select:disabled{background:#edf0ec;color:#66736b;opacity:.7;curso
 .hosted-workspace .workspace-utilities [role=status]:not(.sr-only){flex-basis:100%;max-inline-size:280px;color:var(--muted);font-size:.8125rem;text-align:end}
 .hosted-workspace main{padding-block-end:calc(24px + env(safe-area-inset-bottom,0px))}
 :root:has(.hosted-workspace){scroll-padding-block-end:calc(24px + env(safe-area-inset-bottom,0px))}
-@media(pointer:coarse){.hosted-workspace :is(.workspace-help,.workspace-utilities) a{min-block-size:44px}}
+@media(pointer:coarse){.hosted-workspace :is(.workspace-help a,.workspace-help button,.workspace-utilities a){min-block-size:44px}}
+@media(max-width:640px),(max-height:700px){.hosted-workspace .rail{position:static}}
 @media(forced-colors:active){.hosted-workspace .workspace-utilities{background:Canvas;border-color:CanvasText;box-shadow:none}}
 
 

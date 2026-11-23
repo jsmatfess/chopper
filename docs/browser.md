@@ -80,19 +80,19 @@ Open **http://127.0.0.1:8421/**. Browse for an input and an output parent folder
 In about five minutes, you can split a synthetic CSV into three files.
 Your CSV is processed locally in your browser.
 
-1. [Download the sample customers.csv](../examples/customers.csv) and open the
-   [hosted app](https://chopper-1rx.pages.dev/) in desktop Chrome or Edge.
-2. Under **Input file**, select **Browse** and open `customers.csv`. Under
-   **Output directory**, select **Browse**, choose a writable folder or
-   subfolder, and grant access when prompted.
-3. Choose **CSV · uncompressed** as the output format. Leave the pipeline empty
-   and set **Maximum rows per CSV** to `5`.
-4. Select **Run**. Open the new `chopper-results-<UUID>` subfolder. It has
+1. Open a fresh [hosted app](https://chopper-1rx.pages.dev/) tab in desktop
+   Chrome or Edge. Select **Try a sample** in the top bar to load
+   `customers.csv` and set **Maximum rows per CSV** to `5`.
+2. Under **Output directory**, select **Browse**, choose a writable folder
+   or subfolder, and grant access when prompted.
+3. Select **Run**. Open the new `chopper-results-<UUID>` subfolder. It has
    three CSVs with **5, 5, and 2 data rows** in order, plus a header in each.
    Open `CHOPPER-COMPLETE.json` and confirm it says `"complete": true`.
    The marker counts the three CSVs and `manifest.jsonl`, so `"files"` is `4`.
 
-If the picker blocks your folder, see [choosing an output folder](#choosing-an-output-folder).
+You can also [download the sample customers.csv](../examples/customers.csv)
+to select it with **Browse** or try it with the CLI. If the picker blocks
+your folder, see [choosing an output folder](#choosing-an-output-folder).
 
 ## Browser requirements and storage
 

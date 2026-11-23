@@ -31,7 +31,7 @@ def classify(paths, full=False, platform='all'):
     selected = set(JOBS) if full else set()
     for path in paths:
         if path == 'examples/quickstart-job.json':
-            selected.add('native')
+            selected.update(('native', 'browser'))
         if path == 'docs/releases/native-usage.txt':
             selected.add('browser')
         if path.startswith('scripts/hosted_picker/') or path in {

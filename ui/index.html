@@ -5,7 +5,7 @@
   <aside class="rail"><a class="brand" href="/" aria-label="Chopper home"><span class="mark">⫽</span> chopper<span class="version">0.2</span></a>
     <nav class="workspace-help" aria-label="Chopper help">
       <a data-docs-link href="https://github.com/jsmatfess/chopper/blob/main/docs/user/README.md" target="_blank" rel="noopener noreferrer">Docs<span class="sr-only"> (opens in a new tab)</span></a>
-      <a data-sample-docs-link href="https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#try-a-sample-export" target="_blank" rel="noopener noreferrer">Try a sample<span class="sr-only"> (opens in a new tab)</span></a>
+      <button type="button" id="try-sample" class="text-button" disabled>Try a sample</button>
     </nav>
     <div class="rail-label">WORKSPACE</div><div class="rail-active"><span>▥</span> CSV workbench</div><div class="rail-note"><span class="dot"></span> Running in your browser<p>Your files stay on this machine.<br>No uploads. No cloud compute.</p></div></aside>
   <main><header><div class="eyebrow">THE CSV WORKBENCH</div><h1>Big files. Smaller pieces.</h1><p class="intro">Build your pipeline, inspect the plan, then Chop.</p><span class="local-badge"><span class="dot"></span> BROWSER ENGINE</span></header>
@@ -16,6 +16,7 @@
           <label for="input">Input file</label>
           <div class="input-action"><input id="input" required placeholder="Path to a CSV, gzip or ZIP file"><button type="button" id="browse-input" class="secondary" aria-label="Browse for input file">Browse</button></div>
         </div>
+        <p id="sample-status" class="hint" role="status"></p>
         <div id="output-picker">
           <label for="output">Output directory</label>
           <div class="input-action"><input id="output" required aria-describedby="output-picker-help"><button type="button" id="browse-output" class="secondary" aria-label="Browse for output folder" aria-describedby="output-picker-help">Browse</button></div>
