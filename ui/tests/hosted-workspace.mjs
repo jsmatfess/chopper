@@ -88,13 +88,17 @@ test('hosted workspace preserves configuration and real app action wiring throug
     }
     assert.equal(await page.locator('.workspace-utilities').isVisible(),true,'project utilities remain visible');
     assert.equal(await page.locator('.footer-cleanup').isHidden(),true,'no cleanup link without detected abandoned data');
-    const docs=page.getByRole('link',{name:'Docs',exact:true});
+    const help=page.getByRole('navigation',{name:'Chopper help'});
+    const docs=help.getByRole('link',{name:'Docs (opens in a new tab)',exact:true});
     assert.equal(await docs.isVisible(),true);
     assert.equal(await docs.getAttribute('href'),'https://github.com/jsmatfess/chopper/blob/main/docs/user/README.md');
     await page.getByRole('link',{name:'Chopper home'}).focus();
-    await page.keyboard.press('Tab'); // Theme control.
     await page.keyboard.press('Tab');
     assert.equal(await docs.evaluate(link=>link===document.activeElement),true);
+    await page.keyboard.press('Tab');
+    const sample=help.getByRole('link',{name:'Try a sample (opens in a new tab)',exact:true});
+    assert.equal(await sample.evaluate(link=>link===document.activeElement),true);
+    assert.equal(await sample.getAttribute('href'),'https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#try-a-sample-export');
     assert.equal(await page.getByRole('link',{name:'GitHub',exact:false}).last().getAttribute('href'),'https://github.com/jsmatfess/chopper');
     const support=page.getByRole('link',{name:'Buy me a coffee',exact:false});
     assert.equal(await support.getAttribute('href'),'https://buymeacoffee.com/tblflip');
@@ -1545,6 +1549,8 @@ test('rail utilities stay sticky and clear the navigation and processing strip',
   for(const width of [1280,390,320]){
    await page.setViewportSize({width,height:900});await page.evaluate(()=>scrollTo(0,0));const before=await utilities.boundingBox();await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));const after=await utilities.boundingBox();assert(Math.abs(after.y-before.y)<1,'utilities stay fixed during page scrolling');assert(after.x>=0&&after.x+after.width<=width,'utilities fit the viewport');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
    const rail=await page.locator('.rail').boundingBox(),nav=await page.locator('.workspace-toolbar').boundingBox();assert.equal(rail.y,0,'rail stays flush with the viewport top');assert(nav.y>=rail.y+rail.height-1,'sticky section navigation clears the rail');
+   const help=await page.getByRole('navigation',{name:'Chopper help'}).boundingBox();
+   assert(help.x>=0&&help.x+help.width<=width&&help.y+help.height<=rail.height,'top-bar help fits inside the visible rail');
   }
   await setTheme(page,'dark');assert.equal(await page.locator('meta[name="color-scheme"]').getAttribute('content'),'dark');
   assert.equal(await utilities.locator('select').count(),0,'theme is a button rather than a dropdown');

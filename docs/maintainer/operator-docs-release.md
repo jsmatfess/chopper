@@ -36,14 +36,17 @@ CHOPPER_DOCS_ORIGIN=https://chopper-docs.pages.dev npm --prefix ui run build:hos
 npm --prefix ui run serve:hosted
 ```
 
-In another terminal, check the app link and seven-file build inventory.
+In another terminal, check the app's **Docs** and **Try a sample** links and
+the seven-file build inventory.
 
 ```sh
 node scripts/test-hosted-docs-link.mjs http://127.0.0.1:8421 https://chopper-docs.pages.dev
 ```
 
-Development builds use the repository user guide when `CHOPPER_DOCS_ORIGIN`
-is unset. The release build must set the origin explicitly. Retain existing
+Development builds link to the repository guides when `CHOPPER_DOCS_ORIGIN`
+is unset. For a private preview, set it to the docs preview's HTTPS origin
+including its port, if any. The release build must set the public origin
+explicitly. Retain existing
 source, platform, package and publication approvals. The docs candidate smoke
 is part of pre-tag qualification. The live site and app link are part of
 post-publication acceptance.

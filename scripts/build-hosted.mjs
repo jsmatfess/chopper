@@ -9,7 +9,7 @@ let releaseDocs;
 if(docsOrigin!==undefined){
   const {version}=JSON.parse(await readFile(ui+'package.json','utf8'));
   const url=new URL(docsOrigin);
-  if(!/^https:\/\/[a-z0-9.-]+\/?$/i.test(docsOrigin)||!/^\d+\.\d+\.\d+$/.test(version)){
+  if(!/^https:\/\/[a-z0-9.-]+(?::\d+)?\/?$/i.test(docsOrigin)||!/^\d+\.\d+\.\d+$/.test(version)){
     throw new Error('CHOPPER_DOCS_ORIGIN requires a bare HTTPS origin and a stable app version.');
   }
   releaseDocs=new URL(`/versions/${version}/`,url).href;
@@ -23,9 +23,15 @@ await build({entryPoints:[ui+'src/app.ts'],bundle:true,minify:true,outfile:ui+'d
 await build({entryPoints:[ui+'src/browser/engine-worker.ts',ui+'src/browser/storage-worker.ts'],bundle:true,minify:true,format:'esm',outdir:ui+'dist'});
 let html=await readFile(ui+'index.html','utf8');
 if(releaseDocs){
-  const marker=/data-docs-link href="[^"]+"/;
-  if(!marker.test(html))throw new Error('Missing hosted Docs link in index.html.');
-  html=html.replace(marker,`data-docs-link href="${releaseDocs}"`);
+  const links=[
+    ['data-docs-link',releaseDocs],
+    ['data-sample-docs-link',new URL('browser#try-a-sample-export',releaseDocs).href],
+  ];
+  for(const [attribute,href] of links){
+    const marker=new RegExp(`${attribute} href="[^"]+"`);
+    if(!marker.test(html))throw new Error(`Missing hosted link with ${attribute} in index.html.`);
+    html=html.replace(marker,`${attribute} href="${href}"`);
+  }
 }
 html=html.replace('<link rel="stylesheet"',`<meta name="color-scheme" content="light dark"><script>${themeBootstrap}</script><link rel="stylesheet"`);
 const notices=await readFile(new URL('../docs/releases/native-usage.txt',import.meta.url),'utf8');
