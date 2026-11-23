@@ -17,6 +17,7 @@ def render(binary):
             [binary, *args], encoding='utf-8', timeout=30,
             env={**os.environ, 'NO_COLOR': '1'},
         )
+        output = re.sub(r'^Usage: chopper\.exe(?=\s|$)', 'Usage: chopper', output, flags=re.M)
         return '\n'.join(line.rstrip() for line in output.splitlines()).rstrip()
 
     def sections(path=()):
