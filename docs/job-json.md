@@ -9,12 +9,13 @@ configuration format, currently `1`.
 
 Check the installed version with `chopper --version`. For 0.5.0, use the
 [release-pinned Job schema](https://raw.githubusercontent.com/jsmatfess/chopper/v0.5.0/schemas/0.5.0/job.schema.json).
-For offline use, save that file locally or copy it from the
+Both native archives include the same `job.schema.json` at their root.
+For offline use, use the included copy, save the download, or copy it from the
 [matching source checkout](../schemas/0.5.0/job.schema.json).
 
 To associate the schema in VS Code, open the repository folder and add this
 entry to its `.vscode/settings.json`. Change `fileMatch` for your own Job files.
-If you downloaded the schema to the workspace root, set `url` to
+If the schema is at the workspace root, set `url` to
 `"./job.schema.json"`. See the
 [VS Code schema association documentation](https://code.visualstudio.com/docs/languages/json#json-schemas-and-settings).
 

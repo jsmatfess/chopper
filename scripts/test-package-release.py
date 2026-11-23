@@ -34,6 +34,7 @@ class PackagingTests(unittest.TestCase):
         write('ui/package.json', '{"version":"0.2.0"}')
         write('ui/package-lock.json', '{"version":"0.2.0","packages":{"":{"version":"0.2.0"}}}')
         for path in pkg.PAYLOADS.values():
+            path = path.format(version='0.2.0')
             write(path, f'Synthetic fixture: {path}\n')
         write('docs/releases/native-quickstart.txt', 'Chopper @VERSION@\nhttps://github.com/jsmatfess/chopper/blob/v@VERSION@/README.md#native-quickstart\n')
         (self.source / 'scripts').mkdir()
@@ -97,6 +98,8 @@ class PackagingTests(unittest.TestCase):
                                  (self.source / 'examples/customers.csv').read_bytes())
                 self.assertEqual(archive.read('quickstart/job.json'),
                                  (self.source / 'examples/quickstart-job.json').read_bytes())
+                self.assertEqual(archive.read('job.schema.json'),
+                                 (self.source / 'schemas/0.2.0/job.schema.json').read_bytes())
 
     def test_smoke_rejects_unverified_bytes_before_extraction(self):
         self.assemble()

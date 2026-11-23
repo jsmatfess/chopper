@@ -25,6 +25,7 @@ LICENSES = {'LICENSE': 'LICENSE',
 PAYLOADS = {**LICENSES,
             'README.txt': 'docs/releases/native-quickstart.txt',
             'THIRD-PARTY-NOTICES.txt': 'docs/releases/native-usage.txt',
+            'job.schema.json': 'schemas/{version}/job.schema.json',
             'quickstart/customers.csv': 'examples/customers.csv',
             'quickstart/job.json': 'examples/quickstart-job.json'}
 
@@ -74,14 +75,6 @@ def frozen_source(source, manifest):
     require(git(source, 'rev-parse', 'HEAD') == manifest['release_source_commit'], 'Source commit mismatch')
     require(git(source, 'rev-parse', 'HEAD^{tree}') == manifest['release_source_tree'], 'Source tree mismatch')
     require(manifest['dirty_source'] is False, 'Frozen source must declare dirty_source false')
-    required_paths = set(PAYLOADS.values()) | {'Cargo.toml', 'Cargo.lock',
-                                              'ui/package.json', 'ui/package-lock.json',
-                                              'scripts/package-release.py', 'scripts/browser-artifacts.mjs'}
-    tracked = set(git(source, 'ls-files', '-z').split('\0'))
-    require(required_paths <= tracked, 'Source payload/version/tool files must be tracked')
-    for name in ('package-release.py', 'browser-artifacts.mjs'):
-        require(read_regular(source / 'scripts' / name) == read_regular(Path(__file__).with_name(name)),
-                'Packaging tools must match frozen source')
     version = manifest['version']
     require(re.fullmatch(r'\d+\.\d+\.\d+', version) is not None, 'Invalid version')
     cargo = tomllib.loads((source / 'Cargo.toml').read_text())
@@ -93,6 +86,15 @@ def frozen_source(source, manifest):
     versions += [p['version'] for p in lock['package'] if p['name'] in
                  ('chopper', 'chopper-core', 'chopper-browser')]
     require(len(versions) == 7 and all(v == version for v in versions), 'Version metadata mismatch')
+    required_paths = {path.format(version=version) for path in PAYLOADS.values()}
+    required_paths.update({'Cargo.toml', 'Cargo.lock', 'ui/package.json',
+                           'ui/package-lock.json', 'scripts/package-release.py',
+                           'scripts/browser-artifacts.mjs'})
+    tracked = set(git(source, 'ls-files', '-z').split('\0'))
+    require(required_paths <= tracked, 'Source payload/version/tool files must be tracked')
+    for name in ('package-release.py', 'browser-artifacts.mjs'):
+        require(read_regular(source / 'scripts' / name) == read_regular(Path(__file__).with_name(name)),
+                'Packaging tools must match frozen source')
 
 
 def archive_name(version, kind):
@@ -193,7 +195,8 @@ def assemble(source, manifest_path, output):
     for name, data in hosted.items():
         match(data, manifest['hosted'][name])
     production_wasm(hosted['engine.wasm'])
-    payloads = {name: read_regular(source / path) for name, path in PAYLOADS.items()}
+    payloads = {name: read_regular(source / path.format(version=version))
+                for name, path in PAYLOADS.items()}
     payloads['README.txt'] = payloads['README.txt'].replace(b'@VERSION@', version.encode('ascii'))
     bundles = {'hosted': hosted}
     for kind, (_, executable, target) in PLATFORMS.items():

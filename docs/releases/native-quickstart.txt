@@ -30,6 +30,10 @@ To rerun, copy quickstart/job.json to quickstart/rerun-job.json, edit its
 Release documentation with prerequisites, checksum verification and rerun steps:
 https://github.com/jsmatfess/chopper/blob/v@VERSION@/README.md#native-quickstart
 
+For editor completions, associate the included job.schema.json in your editor
+settings. Example setup:
+https://github.com/jsmatfess/chopper/blob/v@VERSION@/docs/job-json.md#editor-setup
+
 See LICENSE, THIRD-PARTY-NOTICES.txt and licenses/zip-2.4.2/LICENSE for
 licensing and attribution. The patched ZIP component's source and patch notes:
 https://github.com/jsmatfess/chopper/blob/v@VERSION@/vendor/zip-2.4.2/CHOPPER.md
