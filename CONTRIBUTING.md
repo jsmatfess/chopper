@@ -38,6 +38,7 @@ contracts. Review success and failure branches and current-versus-designed statu
 | Browser scale acceptance orchestration | Run `python3 scripts/test-scale-acceptance-browser-scale.py` and `node scripts/test-scale-acceptance-browser-scale.mjs scratch/new-scale-controls` with a fresh owned evidence directory. These fake controls run in the tooling job; actual installed-browser and scale execution require their separate frozen plan and approval. |
 | Evidence, audit scripts or evidence links | Run the [read-only evidence checks](docs/benchmarks/README.md#evidence-checks). Refresh derived outputs only after reviewing intended source changes; preserve raw evidence/source snapshots byte-for-byte. |
 | Local release packaging | `python3 scripts/test-package-release.py`; Python 3.11+ and Node required. For actual native archives, run the [extracted-package smoke](docs/release-packaging.md#extracted-native-smoke) on each supported host. |
+| Saved Job schema or decoder | After building the native CLI, install `scripts/requirements-job-schema.txt` and run `python3 scripts/test-job-schema.py target/debug/chopper` (use the actual binary path). The [Job guide](docs/job-json.md#verify-the-release-schema) covers tagged-download verification. |
 | Documentation or CI routing | Review links, actual command options and workflow syntax; execute newly routed checks. Documentation alone does not require a full engine rebuild. |
 
 Run the applicable checks above while developing; the [CI policy](docs/ci.md)

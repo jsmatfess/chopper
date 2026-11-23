@@ -49,6 +49,9 @@ def classify(paths, full=False, platform='all'):
             selected.add('tooling')
         elif path in EVIDENCE_SCRIPTS:
             selected.add('evidence')
+        elif path.startswith('schemas/') or path in {
+                'docs/job-json.md', 'scripts/test-job-schema.py', 'scripts/requirements-job-schema.txt'}:
+            selected.add('native')
         elif path.endswith('.md') and not path.startswith('docs/'):
             pass
         elif path.startswith(('crates/', 'vendor/')):
