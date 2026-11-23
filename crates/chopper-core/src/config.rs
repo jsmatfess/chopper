@@ -101,11 +101,35 @@ impl Default for CsvSettings {
     }
 }
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "snake_case", try_from = "CompressionSetting")]
 pub enum Compression {
     None,
     Gzip,
     Zip,
+}
+
+#[derive(Deserialize)]
+#[serde(rename = "Compression", rename_all = "snake_case")]
+enum CompressionSetting {
+    None,
+    Gzip,
+    Zip,
+    Zstd,
+}
+
+impl TryFrom<CompressionSetting> for Compression {
+    type Error = &'static str;
+
+    fn try_from(setting: CompressionSetting) -> std::result::Result<Self, Self::Error> {
+        match setting {
+            CompressionSetting::None => Ok(Self::None),
+            CompressionSetting::Gzip => Ok(Self::Gzip),
+            CompressionSetting::Zip => Ok(Self::Zip),
+            CompressionSetting::Zstd => Err(
+                "Zstandard output compression \"zstd\" was removed in 0.4.0; set \"compression\" to \"gzip\", \"zip\", or \"none\"",
+            ),
+        }
+    }
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]

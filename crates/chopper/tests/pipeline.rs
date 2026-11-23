@@ -852,7 +852,7 @@ fn removed_compression_is_rejected_before_parsing_csv() {
         assert!(!std::path::Path::new(&job.output).exists());
     }
     let error = serde_json::from_str::<Compression>(r#""zstd""#).unwrap_err();
-    assert!(error.to_string().contains("unknown variant"));
+    assert!(error.to_string().contains("Zstandard output compression"));
 }
 
 #[test]

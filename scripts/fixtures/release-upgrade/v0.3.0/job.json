@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "input": "input.csv",
+  "output": "result",
+  "compression": "zstd",
+  "operations": []
+}

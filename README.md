@@ -6,6 +6,9 @@ Both use the Rust engine for ordered pipelines, strict validation, full random
 shuffles and disk-backed processing. macOS source builds are unqualified and
 not a supported release target. There is no native server or native UI.
 
+See the [compatibility policy](docs/compatibility.md) before upgrading saved
+Jobs or scripts.
+
 ## Native quickstart
 
 Download your platform ZIP and **SHA256SUMS** from the same

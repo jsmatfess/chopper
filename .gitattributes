@@ -4,6 +4,8 @@
 *.cmd text eol=crlf
 # CSV fixture bytes (including line endings) are part of their input contract.
 *.csv -text
+# The archived v0.4.0 example includes CRLF record endings.
+scripts/fixtures/release-upgrade/v0.4.0/examples/customers.csv whitespace=cr-at-eol
 
 # Evidence hashes and catalog validation must survive Windows text checkouts.
 docs/benchmarks/** -text

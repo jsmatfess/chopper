@@ -1,0 +1,13 @@
+id,country,segment,note
+1,US,new,First order
+2,GB,returning,"Two orders, one customer"
+3,US,returning,Repeat visit
+4,DE,new,First order
+5,GB,new,Newsletter
+6,US,new,Referral
+7,DE,returning,Repeat visit
+8,GB,returning,Subscriber
+9,US,returning,Renewal
+10,DE,new,Walk-in
+11,GB,new,Referral
+12,US,new,Organic
