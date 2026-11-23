@@ -110,7 +110,7 @@ mod tests {
             None,
             false,
             None,
-            false,
+            output::RunDestination::Unchecked,
             |job, ctx, partitions, balanced, streaming| {
                 visits += 1;
                 with_input(job, Reservation::new(ctx), |mut source| {

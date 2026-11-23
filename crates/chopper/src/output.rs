@@ -18,6 +18,9 @@ pub use deflate::{BlockEncoder, BLOCK_BYTES, COMPRESSED_BLOCK_BYTES};
 pub(crate) use parallel_deflate::direct_candidate as parallel_direct_compression;
 #[cfg(target_os = "wasi")]
 pub(crate) use parallel_deflate::hosted::Lease as HostedDeflateLease;
+mod destination;
+use destination::staging_destination;
+pub(crate) use destination::RunDestination;
 mod direct;
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(crate) use deflate::resource_contracts as deflate_contracts;
@@ -924,10 +927,8 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
         ..
     } = prepared;
     ctx.pressure_boundary();
-    let destination = std::path::absolute(&job.output)?;
-    let existing_empty = empty_destination(&destination, ctx.destination_was_absent())?;
-    let parent = destination.parent().context("invalid output directory")?;
-    ensure!(parent.is_dir(), "output parent directory does not exist");
+    let (destination, existing_empty) = staging_destination(job, ctx)?;
+    let parent = destination.parent().expect("checked output parent");
     let available = available_space(parent)?;
     ensure!(
         available
@@ -1190,10 +1191,13 @@ fn commit_directory(
 ) -> Result<()> {
     ctx.check()?;
     if existing_empty {
-        empty_destination(destination, false)?;
+        let mut witness = ctx.run_destination();
+        witness.check(destination)?;
         // Non-recursive removal fails if any files appeared while the job ran.
         std::fs::remove_dir(destination)
             .context("remove empty output folder before publication")?;
+        // Windows finishes removing a directory when the last handle closes.
+        *witness = RunDestination::Unchecked;
     }
     publish_directory(stage.path(), destination, ctx)
         .context("publish completed result directory")?;
@@ -1201,45 +1205,6 @@ fn commit_directory(
     #[cfg(any(test, feature = "resource-contract-tests"))]
     commit_test_hook::committed(ctx);
     Ok(())
-}
-
-#[cfg(not(target_os = "wasi"))]
-pub(crate) fn preflight_destination(job: &Job) -> Result<bool> {
-    let output = &job.output;
-    let check = || {
-        job.validate_output()?;
-        let destination = std::path::absolute(output)?;
-        let existing_empty = empty_destination(&destination, false)?;
-        let parent = destination.parent().context("invalid output directory")?;
-        ensure!(parent.is_dir(), "output parent directory does not exist");
-        Ok(existing_empty)
-    };
-    check().with_context(|| format!("choose a new or empty output directory instead of {output:?}"))
-}
-
-fn empty_destination(path: &Path, must_be_absent: bool) -> Result<bool> {
-    // On Unix a trailing separator would make symlink_metadata follow the leaf.
-    #[cfg(unix)]
-    let path = path.components().as_path();
-    match std::fs::symlink_metadata(path) {
-        Ok(metadata) => {
-            ensure!(
-                !must_be_absent,
-                "output destination appeared during Run; choose a different output directory and retry"
-            );
-            ensure!(
-                metadata.is_dir() && !metadata.file_type().is_symlink(),
-                "output destination must be a new or empty directory, not a file or link"
-            );
-            ensure!(
-                std::fs::read_dir(path)?.next().is_none(),
-                "output destination already exists and is not empty"
-            );
-            Ok(true)
-        }
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(false),
-        Err(error) => Err(error.into()),
-    }
 }
 
 #[cfg(windows)]

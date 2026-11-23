@@ -158,6 +158,26 @@ fn rejects_invalid_config_values_at_their_field_paths() {
             "/operations/0/columns",
             "partition requires columns",
         ),
+        (
+            r#""output_csv":{"encoding":"windows-1252","bom":true}"#,
+            "/output_csv/bom",
+            "BOM is only supported for UTF encodings",
+        ),
+        (
+            r#""input_csv":{"headers":false},"output_csv":{"headers":false},"operations":[{"type":"partition","columns":[0,"1"]}]"#,
+            "/operations/0/columns/1",
+            "name selection requires headers",
+        ),
+        (
+            r#""input_csv":{"headers":false},"output_csv":{"headers":false},"operations":[{"type":"assign","groups":[{"name":"a","percent":"100"}],"strata":["region"]}]"#,
+            "/operations/0/strata/0",
+            "name selection requires headers",
+        ),
+        (
+            r#""input_csv":{"headers":false},"output_csv":{"headers":false},"operations":[{"type":"assign_probabilistic","groups":[{"name":"a","percent":"100"}],"strata":["region"]}]"#,
+            "/operations/0/strata/0",
+            "name selection requires headers",
+        ),
     ] {
         fs::write(
             dir.path().join("job.json"),
@@ -177,5 +197,18 @@ fn rejects_invalid_config_values_at_their_field_paths() {
             .unwrap()
             .contains(message));
     }
+    assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 1);
+}
+
+#[test]
+fn accepts_headerless_indices_and_utf_bom_aliases() {
+    let dir = tempfile::tempdir().unwrap();
+    fs::write(
+        dir.path().join("job.json"),
+        r#"{"input":"missing.csv","output":"out","input_csv":{"headers":false},"output_csv":{"headers":false,"encoding":"utf8","bom":true},"operations":[{"type":"partition","columns":[0]},{"type":"assign","groups":[{"name":"a","percent":"100"}],"strata":[1]}]}"#,
+    )
+    .unwrap();
+    let result = validate(dir.path(), &["--json"]);
+    assert_eq!(result.status.code(), Some(0), "{result:?}");
     assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 1);
 }

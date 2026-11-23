@@ -250,10 +250,8 @@ impl DirectPublication {
         Self::with_records(job, ctx, Some(capacity))
     }
     fn with_records(job: &Job, ctx: &Context, capacity: Option<usize>) -> Result<Self> {
-        let destination = std::path::absolute(&job.output)?;
-        let existing_empty = empty_destination(&destination, ctx.destination_was_absent())?;
-        let parent = destination.parent().context("invalid output directory")?;
-        ensure!(parent.is_dir(), "output parent directory does not exist");
+        let (destination, existing_empty) = staging_destination(job, ctx)?;
+        let parent = destination.parent().expect("checked output parent");
         let stage = ctx.staging_directory(parent)?;
         let mut buffer = Reservation::new(ctx);
         let records = if let Some(capacity) = capacity {

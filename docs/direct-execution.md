@@ -287,10 +287,20 @@ Memory accounting remains a working-allocation budget rather than an RSS cap.
 
 Before route selection can open the source, native Run checks the proposed
 destination and its parent without creating files or allocating a job context.
-If the destination was absent, a directory that appears before staging cannot
-be treated as an approved empty destination. Explicit snapshot preparation
-keeps its destination check at publication. The preflight retains only a flag
-and uses transient absolute-path discovery, as at the existing staging check.
+For an existing empty directory, it holds an open handle and records the
+device and inode on Unix or volume serial number and 128-bit file ID on Windows.
+The identity lives in the shared job budget across direct and prepared routes.
+At staging and again before removal at commit, the path must identify that same
+empty directory. Leaf symlinks and Windows reparse points are refused.
+Windows opens the witness with delete sharing so a rename can proceed, and
+closes it after non-recursive removal and before publication. An initially absent
+destination must still be available at staging and at the no-replace rename.
+Explicit snapshot preparation keeps its destination check at publication.
+Absolute-path discovery remains transient at preflight.
+
+The identity check and removal are separate filesystem calls. A concurrent
+replacement between those calls can still be removed if it is empty. A
+replacement after removal is protected by the native no-replace rename.
 
 Windows uses admitted verbatim UTF-16 paths and `MoveFileExW` without replacement
 or copy flags; a competing empty destination is rejected as on Linux. Native
