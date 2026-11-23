@@ -25,7 +25,7 @@ operations. Historical checklists and research do not create additional work.
 
 | Question | Start here |
 | --- | --- |
-| Where are current releases and scope? | [GitHub Releases](https://github.com/jsmatfess/chopper/releases), [current state](current-state.md) |
+| Where are current releases and scope? | [0.5.0 notes](releases/0.5.0.md), [GitHub Releases](https://github.com/jsmatfess/chopper/releases), [current state](current-state.md) |
 | How do I package and restore exact release bytes? | [Local packaging](release-packaging.md), [rollback](release-rollback.md) |
 | Which previous release and candidate records exist? | [0.4.0](releases/0.4.0.md), [0.3.0](releases/0.3.0.md), [0.2.0](releases/0.2.0.md), [0.1.0](releases/0.1.0.md), [prior focused 0.2 candidate](releases/0.2.0-review.md) and [its acceptance plan](release-acceptance-plan.md) |
 | Which goals describe future work? | [Product direction](product-direction.md), [workload investigation](workload-investigation.md); these supersede conflicting priorities in the [earlier Auto brief](auto-mode-and-maintainability.md) |
