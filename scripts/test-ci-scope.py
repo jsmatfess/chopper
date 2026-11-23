@@ -37,6 +37,9 @@ class ScopeTests(unittest.TestCase):
                      'scripts/fixtures/release-upgrade/v0.3.0/input.csv.zst'):
             self.assertEqual(self.selected(path), {'native'}, path)
 
+    def test_packaged_job_selects_live_native_checks_as_well_as_packaging(self):
+        self.assertEqual(self.selected('examples/quickstart-job.json'), {'native', 'tooling'})
+
     def test_native_engine_and_vendored_code_also_reach_browser(self):
         for path in ('crates/chopper/src/storage.rs', 'vendor/zip-2.4.2/src/lib.rs'):
             self.assertEqual(self.selected(path), {'native', 'features', 'browser'})
@@ -47,7 +50,7 @@ class ScopeTests(unittest.TestCase):
     def test_ownership_boundaries_select_their_own_checks(self):
         self.assertEqual(self.selected('scripts/windows-native.py'), {'tooling'})
         for path in ('scripts/package-release.py', 'scripts/test-package-release.py',
-                     'docs/releases/native-quickstart.txt', 'examples/quickstart-job.json'):
+                     'docs/releases/native-quickstart.txt'):
             self.assertEqual(self.selected(path), {'tooling'})
         self.assertEqual(self.selected('docs/releases/native-usage.txt'), {'browser', 'tooling'})
         self.assertEqual(self.selected('scripts/browser-artifacts.mjs'), {'browser', 'tooling'})

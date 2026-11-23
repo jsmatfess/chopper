@@ -32,6 +32,21 @@ class JobRecipes(unittest.TestCase):
         self.header, *self.source = csv_rows(fixture)
         self.assertEqual(len(self.source), 12)
 
+    def test_saved_quickstart_job_produces_the_documented_files(self):
+        shutil.copyfile(QUICKSTART_JOB, self.root / 'quickstart/job.json')
+        result = subprocess.run(
+            [BINARY, 'run', '--config', 'quickstart/job.json', '--yes'],
+            cwd=self.root, capture_output=True, encoding='utf-8', timeout=60,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        output = self.root / 'quickstart-output'
+        job, *chunks = map(json.loads, (output / 'manifest.jsonl').read_text(encoding='utf-8').splitlines())
+        self.assertEqual(job['config']['limits']['rows'], 5)
+        self.assertEqual([(chunk['path'], chunk['rows']) for chunk in chunks],
+                         [(f'part-{index:08}.csv', rows) for index, rows in enumerate((5, 5, 2), 1)])
+        self.assertEqual([row for chunk in chunks for row in csv_rows(output / chunk['path'])[1:]],
+                         self.source)
+
     def run_recipe(self, destination, groups):
         commands = [shlex.split(line) for line in re.findall(
             r'^```sh\n(\./chopper run [^\n]+)\n```$',
@@ -104,4 +119,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     BINARY = args.binary.resolve(strict=True)
     FIXTURE = (args.quickstart or ROOT / 'examples') / 'customers.csv'
+    QUICKSTART_JOB = args.quickstart / 'job.json' if args.quickstart else ROOT / 'examples/quickstart-job.json'
     unittest.main(argv=[__file__])

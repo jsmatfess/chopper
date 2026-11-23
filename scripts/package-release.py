@@ -143,6 +143,7 @@ def verify(directory, receipt_sha256):
     require(identity(receipt_bytes)['sha256'] == receipt_sha256, 'Receipt identity mismatch')
     receipt = json.loads(receipt_bytes)
     version = receipt['version']
+    require(re.fullmatch(r'\d+\.\d+\.\d+', version) is not None, 'Invalid version')
     require(receipts[0].name == f'chopper-{version}-artifact-receipt.json', 'Receipt name mismatch')
     require(receipt['schema_version'] == 1 and receipt['packaging_schema_version'] == 1,
             'Unsupported receipt schema')
@@ -152,8 +153,10 @@ def verify(directory, receipt_sha256):
     require(set(receipt['package_members']) == set(packages), 'Member receipt inventory mismatch')
     require(set(p.name for p in directory.iterdir()) == set(packages) | {receipts[0].name, 'SHA256SUMS'},
             'Unexpected package output')
-    legacy = all(set(receipt['package_members'][name]) == expected_members(kind, legacy=True)
-                 for name, kind in packages.items() if kind != 'hosted')
+    legacy = tuple(map(int, version.split('.'))) < (0, 5, 0) and all(
+        set(receipt['package_members'][name]) == expected_members(kind, legacy=True)
+        for name, kind in packages.items() if kind != 'hosted'
+    )
     checksums = {}
     for name, kind in packages.items():
         path = directory / name

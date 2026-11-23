@@ -94,6 +94,20 @@ class NativeManifest(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout)
         self.assertIn("manifest.jsonl", result.stderr)
 
+    def test_rejects_malformed_header_and_dialect_flags(self):
+        output = self.run_job("none")
+        manifest = output / "manifest.jsonl"
+        job_line, outputs = manifest.read_bytes().split(b"\n", 1)
+        for field, value in (("header", {}), ("headers", "true"), ("bom", 1)):
+            with self.subTest(field=field):
+                job = json.loads(job_line)
+                record = job["analysis"] if field == "header" else job["config"]["output_csv"]
+                record[field] = value
+                manifest.write_bytes(json.dumps(job).encode() + b"\n" + outputs)
+                result = self.verify(output)
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn(f"invalid {field}", result.stderr)
+
     def test_rejects_present_csv_with_correct_bytes_and_wrong_row_count(self):
         output = self.run_job("none")
         manifest = (output / "manifest.jsonl").read_text(encoding="utf-8")
