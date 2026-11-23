@@ -21,6 +21,21 @@ After serde unwinds, the explicit shared error gets the original JSON context.
 Genuine admission failure may preempt later parse errors. EOF changes no counters
 and invents no next-byte grant. Arithmetic overflow is terminal accounting failure.
 
+The native [Validate command](validate-cli.md) uses the same owner and reader
+with optional field-path tracking. Its decoder wraps the same serde_json
+stream deserializer in pinned serde_path_to_error 0.1.20 and still requires
+end of stream on success. Analyze and Run use the direct typed decoder.
+
+Validate adds an allowance of `2Q` (twice the consumed byte count on fallback)
+before delivering each byte. JSON map keys and enum tags reach `CaptureKey` as
+strings. It copies the decoded text, and `TrackedSeed` can clone the current
+chain node before visiting the value. Each active key or tag therefore needs
+at most two copies bounded by its raw string interior. The finite parent links
+and sequence indices are inline. The pinned adapter materializes a path vector
+and clones its keys only on error. Those diagnostics are error carriers outside
+the payload envelope. For successful decodes, the allocation census also
+checks the tracked decoder's construction and release ordering.
+
 ## Construction envelope
 
 All terms count requested allocation layouts, including old plus new during

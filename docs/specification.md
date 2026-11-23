@@ -167,6 +167,9 @@ Duplicate header names are allowed but name selection must reject ambiguity and 
 
 ## Analyze and Run
 
+The native [Validate command](validate-cli.md) checks a saved Job configuration
+without opening its input, resolving Run resources or creating job directories.
+
 Run validates input while processing. Limits-only jobs and a single uncompressed Balanced step write directly
 to private publication output; other jobs select exact preparation internally
 before consuming input. Direct parsing, codec, admission, storage and cancellation

@@ -11,6 +11,8 @@ use std::{
     path::Path,
     sync::{atomic::AtomicBool, Arc},
 };
+mod diagnostics;
+pub use diagnostics::JobJsonPath;
 mod prefix;
 #[cfg(test)]
 mod tests;
@@ -55,6 +57,7 @@ struct AdmittedReader<'a, R> {
     prefix: prefix::Prefix,
     grant: &'a mut Grant,
     denial: Option<Denial>,
+    track_paths: bool,
 }
 impl<R: Read> Read for AdmittedReader<'_, R> {
     fn read(&mut self, output: &mut [u8]) -> io::Result<usize> {
@@ -68,7 +71,20 @@ impl<R: Read> Read for AdmittedReader<'_, R> {
         if self.source.read(&mut byte)? == 0 {
             return Ok(0);
         }
-        match self.prefix.advance(byte[0]) {
+        let allowance = self.prefix.advance(byte[0]).and_then(|required| {
+            if self.track_paths {
+                // A tracked seed can retain an active key and clone it into the deserializer.
+                let text_bound = if self.prefix.fallback {
+                    self.prefix.bytes
+                } else {
+                    self.prefix.text
+                };
+                required.checked_add(text_bound.checked_mul(2)?)
+            } else {
+                Some(required)
+            }
+        });
+        match allowance {
             None => self.denial = Some(Denial::Overflow),
             Some(required) => {
                 if let Err(error) = self.grant.grow(required) {
@@ -100,20 +116,34 @@ pub struct DecodedJob {
 impl DecodedJob {
     /// Preserve metadata-only 1 MiB rejection and metadata/open error ordering.
     pub fn read(path: impl AsRef<Path>) -> Result<Self> {
-        let path = path.as_ref();
+        Self::read_path(path.as_ref(), false)
+    }
+
+    /// Decode the same Job with field-path context for JSON data errors.
+    pub fn read_with_diagnostics(path: impl AsRef<Path>) -> Result<Self> {
+        Self::read_path(path.as_ref(), true)
+    }
+
+    fn read_path(path: &Path, track_paths: bool) -> Result<Self> {
         let metadata = std::fs::metadata(path)?;
-        Self::open_after_metadata(metadata.len(), || std::fs::File::open(path), process_memory)
+        Self::open_after_metadata(
+            metadata.len(),
+            || std::fs::File::open(path),
+            process_memory,
+            track_paths,
+        )
     }
     fn open_after_metadata<R: Read>(
         length: u64,
         open: impl FnOnce() -> io::Result<R>,
         pool: impl FnOnce() -> Result<Arc<MemoryPool>>,
+        track_paths: bool,
     ) -> Result<Self> {
         ensure!(length <= 1024 * 1024, "configuration exceeds 1 MiB");
         let file = open()?;
-        Self::decode(file, pool()?)
+        Self::decode(file, pool()?, track_paths)
     }
-    fn decode(source: impl Read, pool: Arc<MemoryPool>) -> Result<Self> {
+    fn decode(source: impl Read, pool: Arc<MemoryPool>, track_paths: bool) -> Result<Self> {
         let mut grant = Grant::new(pool);
         grant.grow(prefix::DEFAULTS).context("read job JSON")?;
         let mut reader = AdmittedReader {
@@ -121,8 +151,13 @@ impl DecodedJob {
             prefix: prefix::Prefix::default(),
             grant: &mut grant,
             denial: None,
+            track_paths,
         };
-        let result = serde_json::from_reader::<_, Job>(&mut reader);
+        let (result, path) = if track_paths {
+            diagnostics::decode(&mut reader)
+        } else {
+            (serde_json::from_reader::<_, Job>(&mut reader), None)
+        };
         let denial = reader.denial.take();
         drop(reader);
         if let Some(denial) = denial {
@@ -135,7 +170,10 @@ impl DecodedJob {
             }
             .context("read job JSON");
         }
-        let job = result.context("read job JSON")?;
+        let job = match path {
+            Some(path) => result.context(JobJsonPath::from_serde(path)),
+            None => result.context("read job JSON"),
+        }?;
         let retained = engine::job_capacity(&job)?;
         ensure!(
             retained <= grant.bytes,

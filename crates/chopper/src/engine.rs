@@ -290,7 +290,7 @@ fn run_using(
     let proposed_direct = direct_plan.is_some();
     let direct_context = if let Some(mode) = direct_plan {
         job.validate()?;
-        ensure!(!job.output.is_empty(), "output path is required");
+        job.validate_output()?;
         let ctx = Context::with_run_limits(
             &job.resources,
             cancel.clone(),
@@ -2950,7 +2950,7 @@ impl Prepared {
             .map(output::PublishedAnalysis::into_analysis)
     }
     pub(crate) fn execute_published(self) -> Result<output::PublishedAnalysis> {
-        ensure!(!self.job.output.is_empty(), "output path is required");
+        self.job.validate_output()?;
         let mut observation = self.ctx.physical_scope([0, 0]);
         observation.physical_source = crate::observation::physical::identity(
             self.job.operations.len() + 1,
