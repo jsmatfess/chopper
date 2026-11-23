@@ -108,9 +108,9 @@ The three upload-ready CSV files keep the input order, with one header per file.
 | `part-00000003.csv` | 2 |
 
 `manifest.jsonl` contains one Job record and three output records with the
-same filenames and row counts. Upload the CSVs and keep the manifest for
-verification. Use a different output directory for each rerun. Chopper
-protects existing results.
+same filenames and row counts. Upload the CSVs and keep the
+[manifest](docs/native-manifest.md) for verification. Use a different output
+directory for each rerun. Chopper protects existing results.
 
 ![Chopper hosted workbench showing CSV configuration and execution views](docs/images/workbench.png)
 
