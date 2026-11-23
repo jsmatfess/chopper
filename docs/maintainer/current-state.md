@@ -1,7 +1,7 @@
 # Current state
 
 Chopper provides a native CLI on x86-64 Windows and Linux, plus a separate
-hosted browser UI. Start with the [native quickstart](../README.md#native-quickstart)
+hosted browser UI. Start with the [native quickstart](../../README.md#native-quickstart)
 and the [release page](https://github.com/jsmatfess/chopper/releases).
 Look to the release's receipts for package, source and validation identities.
 macOS is source-only; current release acceptance does not cover it.
@@ -9,7 +9,7 @@ macOS is source-only; current release acceptance does not cover it.
 [GitHub Issues](https://github.com/jsmatfess/chopper/issues) owns the active
 backlog, specs, dependencies and acceptance criteria. The
 [product direction](product-direction.md) owns future goals; the
-[specification](specification.md) and [rewrite rules](pipeline-rewrites.md) own
+[specification](../specification.md) and [rewrite rules](../pipeline-rewrites.md) own
 current behavior. Historical plans do not add tasks or authorize experiments.
 
 ## Current behavior
@@ -27,11 +27,11 @@ current behavior. Historical plans do not add tasks or authorize experiments.
 
 ## Evidence and delivery
 
-[Validation](validation.md) owns supported claims, each limited to its exact
-source, artifacts, workload and host. The [prior focused 0.2 review](releases/0.2.0-review.md)
+[Validation](../validation.md) owns supported claims, each limited to its exact
+source, artifacts, workload and host. The [prior focused 0.2 review](../releases/0.2.0-review.md)
 records a selected candidate that excludes later main changes; its acceptance
 must not be transferred to the final release without a documented identity and
-coverage assessment. The [packaging guide](release-packaging.md) describes local
+coverage assessment. The [packaging guide](../release-packaging.md) describes local
 assembly, and [rollback](release-rollback.md) describes restoration records.
 The final release must identify its own source, packages, checksums, acceptance
 and publication records.
@@ -42,5 +42,5 @@ latest source. Use a deployment receipt and served-asset verification for that c
 The former native server/UI and separate evidence-site are retired from current
 product scope; references to their validation belong to historical records.
 
-The [earlier handoff](history/current-state-through-2026-10-28.md) preserves dated
+The [earlier handoff](../history/current-state-through-2026-10-28.md) preserves dated
 ownership work, test counts and operational context. It is historical reference.

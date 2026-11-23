@@ -4,7 +4,7 @@ Updated 2026-10-20. The [GitHub Issues](https://github.com/jsmatfess/chopper/iss
 
 ## Already delivered
 
-The [2026-10-23 agreed direction](auto-mode-and-maintainability.md) adds a full
+The [2026-10-23 agreed direction](maintainer/auto-mode-and-maintainability.md) adds a full
 strategy-retention review, future default auto execution and complete buffer-shuffle
 removal. It supersedes blanket retention of experimental implementations below;
 historical measurements and stop/reopen criteria remain evidence inputs. Current
@@ -33,7 +33,7 @@ The dated decisions below remove pending work, not evidence. The subsequent stra
 
 | Item | Reason | Reopen only if |
 | --- | --- | --- |
-| Repeat parsed-snapshot comparisons through a CSV adapter | The [162-job prototype](performance.md#text-snapshot-and-compact-block-prototype-evaluation-2026-10-16) already compares compact blocks, IPC/Feather and Parquet, including first/repeated jobs; every measured adapter path regresses against direct CSV. | A direct bounded consumer or real repeated-input workload can avoid the measured adapter costs. See the historical [adapter design](columnar-input-followup.md). |
+| Repeat parsed-snapshot comparisons through a CSV adapter | The [162-job prototype](performance.md#text-snapshot-and-compact-block-prototype-evaluation-2026-10-16) already compares compact blocks, IPC/Feather and Parquet, including first/repeated jobs; every measured adapter path regresses against direct CSV. | A direct bounded consumer or real repeated-input workload can avoid the measured adapter costs. See the historical [adapter design](maintainer/research/columnar-input-followup.md). |
 | Parquet support as a throughput optimization | Existing-dataset interoperability is a feature decision; no complete-job gain is established for Chopper's whole-row CSV workloads. | A concrete input-support requirement or profile justifies direct decoding. Preserve exact field text; conversion cannot silently infer types. |
 | More radix, Fisher–Yates permutation machinery, RNG or bucket variants without a bottleneck | [Radix](performance.md#radix-sort-experiment-2026-10-13), [resident algorithms](performance.md#resident-full-shuffle-native-and-wasi-comparison-2026-10-15), [XOF](performance.md#versioned-buffered-blake3-shuffle-source-2026-10-18) and [buckets](performance.md#independent-random-bucket-full-shuffle-experiment-2026-10-19) show regressions or inconsistent whole-job gains. The [profile](performance.md#whole-job-profiling-2026-10-13) puts sorting at only 1–2% on its many-column spill fixtures. | A target workload profile attributes material cost to the proposed change and a complete-job experiment can test it. These results do not imply no workload can benefit. |
 | Spill compression or GPU | Compression adds CPU/decoder memory without controlled storage evidence; [GPU feasibility](performance.md#gpu-assessment) does not justify a backend; full permutations remain the priority over approximate mixing. | A measured bottleneck and relevant workload justify the added complexity. |

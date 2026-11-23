@@ -9,7 +9,7 @@ This revision combines the optimization head
 Ordinary builds retain adjacent unstratified exact-assignment range fusion and
 narrow Auto/Uniform → Fisher–Yates elision together. The adaptive-ingestion pilot
 remains rejected, and direct shuffled balanced parts remains deferred. Their
-[dated investigation](performance/investigations/shuffle-swarm-decisions-2026-11-15.md),
+[dated investigation](../../performance/investigations/shuffle-swarm-decisions-2026-11-15.md),
 proofs, measurements, exclusions and private originals remain unchanged. The
 current decision registry records default delivery in this revision; the dated
 investigation preserves its earlier awaiting-delivery context. No new performance
@@ -31,5 +31,5 @@ Final packaging uses the default production WASM and test-free hosted bundle.
 Native Windows correctness does not establish Windows performance or ordinary
 runner whole-tree completion. No macOS, additional browser/device, new scale or
 release qualification is added. The inherited parser shrink-overlap accounting
-gap remains in [TODO](../TODO.md). Frozen acceptance sources/services and private
+gap remains in [TODO](../../../TODO.md). Frozen acceptance sources/services and private
 raw evidence remain unchanged; public deployment is separate from main delivery.

@@ -1,7 +1,7 @@
 # Contributing to Chopper
 
 Start with the [README setup](README.md#build-the-cli-from-source), [architecture and development entry
-points](docs/architecture.md) and [documentation guide](docs/README.md). Run commands
+points](docs/architecture.md) and [maintainer guide](docs/maintainer/README.md). Run commands
 from the repository root. [AGENTS.md](AGENTS.md#build-and-verification) routes the
 standard checks; command definitions live in `Cargo.toml`, `ui/package.json`,
 `scripts/` and [CI](.github/workflows/ci.yml).
@@ -9,7 +9,7 @@ standard checks; command definitions live in `Cargo.toml`, `ui/package.json`,
 The [specification](docs/specification.md) and [rewrite rules](docs/pipeline-rewrites.md)
 describe current contracts. Preserve pipeline semantics, exact membership, serialized CSV
 caps and admitted ownership; native atomic publication and browser completion
-markers have distinct failure/cancellation contracts. The [Auto brief](docs/auto-mode-and-maintainability.md)
+markers have distinct failure/cancellation contracts. The [Auto brief](docs/maintainer/auto-mode-and-maintainability.md)
 describes future work, not delivered behavior. [GitHub Issues](https://github.com/jsmatfess/chopper/issues) owns the active
 backlog and specs; [tracker guidance](docs/agents/issue-tracker.md) covers issue
 operations. Dated research and external handoffs do not add tasks.

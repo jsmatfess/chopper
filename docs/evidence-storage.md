@@ -518,7 +518,7 @@ when their integration inputs are preserved and verified too. Existing replay
 instructions reference ignored `.tools` baselines, drivers, binaries and lockfiles;
 archiving only the visible source fragments would leave replay incomplete.
 
-`docs/current-state.md` contains dated operational handoffs, and portions of
+`docs/maintainer/current-state.md` contains dated operational handoffs, and portions of
 `docs/performance.md` contain detailed execution/review chronology. Keep current
 behavior, limitations, methodology and compact decision rationale public in Git.
 Move redundant handoffs and raw review transcripts to public R2 if suitable, or

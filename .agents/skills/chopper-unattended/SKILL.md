@@ -51,7 +51,7 @@ Operational records reference the owning GitHub issue. GitHub Issues for
 2. Choose the smallest useful authorized action that can close that gap. Make
    routine design choices from the current contracts and available evidence.
 3. Prepare and self-review concrete manifests using
-   [the experiment cycle](../../../docs/experiment-cycle.md) and
+   [the experiment cycle](../../../docs/maintainer/experiment-cycle.md) and
    [validation runner](../../../docs/validation-runner.md). Declare prerequisites,
    source/build/toolchain identities, commands/dependencies, verification, timing
    scopes, duration/storage estimates, deadlines, falsifiers and stop criteria.

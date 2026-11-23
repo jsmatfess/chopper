@@ -6,16 +6,17 @@ worker; native builds contain the CLI only.
 
 ## Find the current source of truth
 
-- Start with [README.md](README.md) for setup and [docs/README.md](docs/README.md)
-  for documentation routing; [docs/architecture.md](docs/architecture.md) follows
-  a job through the current modules and development entry points.
+- Use [README.md](README.md) for setup and the [maintainer guide](docs/maintainer/README.md)
+  to find development, release and evidence contracts. [Architecture](docs/architecture.md)
+  follows a job through the current modules. Route operator docs through the
+  [user guide](docs/user/README.md) and preserve release and evidence paths.
 - [CONTRIBUTING.md](CONTRIBUTING.md) routes changes to applicable checks and
   explains native/generated/hosted output boundaries.
 - [GitHub Issues](https://github.com/jsmatfess/chopper/issues) is the active backlog and spec tracker.
   Read [issue operations](docs/agents/issue-tracker.md) before tracker changes.
   Historical checklists and dated research do not create additional work.
-- [Product direction](docs/product-direction.md) owns future goals and supersedes
-  conflicting priorities in the [earlier Auto brief](docs/auto-mode-and-maintainability.md).
+- [Product direction](docs/maintainer/product-direction.md) owns future goals and supersedes
+  conflicting priorities in the [earlier Auto brief](docs/maintainer/auto-mode-and-maintainability.md).
   Distinguish proposals from current behavior; use issue dependencies for work order.
 - [docs/specification.md](docs/specification.md) defines behavior;
   [docs/pipeline-rewrites.md](docs/pipeline-rewrites.md) defines rewrite eligibility.
@@ -192,7 +193,7 @@ matching relevant identities; retain incomplete/failed attempts and full logs.
 
 ## Performance evidence
 
-For repeated experiments, follow the [coded experiment cycle](docs/experiment-cycle.md)
+For repeated experiments, follow the [coded experiment cycle](docs/maintainer/experiment-cycle.md)
 for reasoning routing, declared command pipelines and compact evidence handoffs.
 For an authorized end-to-end unattended investigation, use the repository
 [chopper-unattended skill](.agents/skills/chopper-unattended/SKILL.md) to retain the
@@ -274,7 +275,7 @@ recorded savings with `rtk gain`.
 
 ## Context Mode
 
-Context Mode is optional local MCP tooling; see [setup and verification](docs/context-mode.md).
+Context Mode is optional local MCP tooling; see [setup and verification](docs/maintainer/context-mode.md).
 When its `ctx_*` tools are available, use `ctx_execute` / `ctx_execute_file` to
 filter or aggregate large logs and data, and `ctx_index` / `ctx_search` for
 repeated queries over long documents or captured output. Return focused findings

@@ -13,9 +13,9 @@ restoration attempt to the published native archive and deployed hosted assets.
 
 ## Historical 0.2.0 predecessor: 0.1.0
 
-For [the 0.2 release](releases/0.2.0.md), restore **released
-0.1.0** using [its publication record](releases/0.1.0-publication.json) and
-[artifact receipt](releases/0.1.0-candidate.json). The receipt's historical
+For [the 0.2 release](../releases/0.2.0.md), restore **released
+0.1.0** using [its publication record](../releases/0.1.0-publication.json) and
+[artifact receipt](../releases/0.1.0-candidate.json). The receipt's historical
 candidate status is superseded by the publication record. The sections below
 about the first native release and older hosted package describe the completed
 0.1.0 rehearsal; they do not waive next-release predecessor acceptance.
@@ -42,7 +42,7 @@ readback. On 2026-11-12, a fresh private scoped reader downloaded and safely
 restored that existing archive. Outer identity and all 98 members verified; the
 four release assets match the retained GitHub identities, both ZIPs pass CRC and
 exact member checks, and the receipt and SHA256SUMS agree. The
-[sanitized readback record](releases/0.1.0-private-readback-2026-11-12.json) omits
+[sanitized readback record](../releases/0.1.0-private-readback-2026-11-12.json) omits
 private locators and credentials. No remote objects changed. Do not create a
 replacement archive or repeat uploads.
 The isolated native Windows two-row strict-cap runtime rehearsal passed with
@@ -51,7 +51,7 @@ that executable, exact CSV parity and three manifest records; local receipt is
 This is a narrow native runtime check, not real-dialog, Linux or device-fault
 recovery.
 
-The [isolated hosted rehearsal](releases/0.1.0-hosted-rollback-2026-11-07.json)
+The [isolated hosted rehearsal](../releases/0.1.0-hosted-rollback-2026-11-07.json)
 subsequently passed on Linux/WSL with bundled Chromium 156.0.8078.4. It served all
 seven exact retained GitHub assets with verified hashes and COOP/COEP, then used
 the public Run action to export two exact 33-byte CSVs under a 40-byte cap and
@@ -69,7 +69,7 @@ production restoration or approval to deploy.
 
 Before replacing 0.1.0, recover those exact four assets and required restoration
 metadata from the existing approved private R2 archive under the existing
-[storage policy](evidence-storage.md#no-domain-reader-and-retention-decision).
+[storage policy](../evidence-storage.md#no-domain-reader-and-retention-decision).
 Use a separate scoped reader to download into a fresh owned directory; verify
 outer SHA-256, ZIP CRC, safe expected member names, sizes/hashes and receipt/
 SHA256SUMS consistency. Keep private locators and credentials in private
@@ -106,7 +106,7 @@ The retained predecessor is Pages project `chopper`, production branch
 alone cannot rebuild the deployed package.
 
 The seven-file package identities are retained in
-[the deployment record](evidence-originals.md#sha256-554746247a9c6f78a9a76095e31f95c4e67f98f765151e550d2f1bec68adab64 "Original: docs/benchmarks/current-build-pages-deployment-2026-10-22.json").
+[the deployment record](../evidence-originals.md#sha256-554746247a9c6f78a9a76095e31f95c4e67f98f765151e550d2f1bec68adab64 "Original: docs/benchmarks/current-build-pages-deployment-2026-10-22.json").
 Preparation downloaded the six served files from the pinned deployment and
 verified their full sizes and SHA-256 hashes. `_headers` was reconstructed from
 the retained build recipe and matched its pinned hash. The private operations
@@ -147,5 +147,5 @@ ownership work. Preserve its recorded limitations and test scope. A rollback
 does not undo saved-configuration changes or CSV/output changes. Do not claim
 device-fault, power-loss or other-platform recovery from an isolated rehearsal.
 The owner completed real-picker acceptance and approved 0.1.0. Its verified
-[publication record](releases/0.1.0-publication.json) identifies the current release.
+[publication record](../releases/0.1.0-publication.json) identifies the current release.
 Repeat acceptance/review for later releases; retain this predecessor archive.

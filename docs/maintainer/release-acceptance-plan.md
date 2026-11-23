@@ -4,11 +4,11 @@
 > acceptance scope. The current 0.2 product scope is CLI-only on Windows/Linux
 > plus the hosted browser UI, with no native server or UI. Its native-picker,
 > server-retirement, and selected native UI smoke steps below are historical and
-> are not current release requirements. Use [current release notes](releases/0.2.0.md)
-> and [validation claims](validation.md) for current scope. This document is
+> are not current release requirements. Use [current release notes](../releases/0.2.0.md)
+> and [validation claims](../validation.md) for current scope. This document is
 > preserved as a record, not as a second backlog or authorization to run work.
 
-Planning for [#87](history/prior-issues.md#issue-87), coordinated
+Planning for [#87](../history/prior-issues.md#issue-87), coordinated
 with release [#10](https://github.com/jsmatfess/chopper/issues/10).
 This is a proposed bounded execution specification, not a validation receipt or
 permission to start costly runs. [GitHub Issues](https://github.com/jsmatfess/chopper/issues) owns the active backlog and specs. Execution
@@ -26,21 +26,21 @@ purchase, infrastructure rental or physical fault injection is authorized here.
 
 ## Existing evidence and the remaining claim
 
-Use [validation](validation.md), its [index](validation-index.md),
-[0.1 review](releases/0.1.0-review.md) and
-[publication receipt](releases/0.1.0-publication.json) as the source records.
+Use [validation](../validation.md), its [index](../validation-index.md),
+[0.1 review](../releases/0.1.0-review.md) and
+[publication receipt](../releases/0.1.0-publication.json) as the source records.
 Historical evidence retains its original build, fixture and environment scope.
 
 Concrete reuse candidates (inspect the referenced attempts, not just summaries):
-the [0.1 publication receipt](releases/0.1.0-publication.json) records release
+the [0.1 publication receipt](../releases/0.1.0-publication.json) records release
 source `7d78706c432f34742bbc29c17be9261002a6816a`, with native/hosted, CI,
 human-acceptance and rollback identities in their respective JSON fields. The
-[merged graph receipt](evidence-originals.md#sha256-c1bd573196f9b3cc545246f760b9609606dc4485ec39b9f3984fec29bc19f055)
+[merged graph receipt](../evidence-originals.md#sha256-c1bd573196f9b3cc545246f760b9609606dc4485ec39b9f3984fec29bc19f055)
 records source base `db1ae5041fe3a675391037b366c0d1b4b6777e56`; `/checks/11`
 through `/checks/15` bind graph parity/lifecycle/inspection/bounds/composed checks,
 and `/checks/26` and `/checks/30` bind the two resource variants in the validation
 index. Its `/batches` and per-attempt status records own full input identities.
-The [integrated graph summary](benchmarks/execution-graph-validation-summary-2026-11-05.json)
+The [integrated graph summary](../benchmarks/execution-graph-validation-summary-2026-11-05.json)
 separately owns production asset hashes, source-matched batch locators and the
 limited earlier all-feature/core reuse rationale. These are candidate historical
 receipts, not certification of current main or the future release. Neither graph
@@ -62,7 +62,7 @@ hardware, disk deletion faults and power loss remain untested unless a specific
 future claim selects them. No universal current-build billion-row, complete RSS,
 device durability, throughput or exhaustive pipeline claim follows from this plan.
 
-The graph's [accepted path inventory](execution-graph-acceptance.md) already covers
+The graph's [accepted path inventory](../execution-graph-acceptance.md) already covers
 codecs, strata, probabilistic assignment, interleaving, resident shuffle and
 inspection with small fixtures. Reuse matching identity receipts or run the owning
 checks on changed inputs. Do not multiply each path by both large shapes. The
@@ -80,7 +80,7 @@ closure/publication is not a prerequisite for testing. Record:
   product builds), source-input digests including complete vendor directories,
   and build scripts/configuration. Native CLI builds have no embedded UI asset.
   Follow the
-  [runner input contract](validation-runner.md); a commit alone is insufficient.
+  [runner input contract](../validation-runner.md); a commit alone is insufficient.
 - Native executable and proposed archive hashes; hosted file inventory/hashes,
   production WASM exports and absence of test assets. Test reactors have separate
   identities. Restore the default engine and test-free hosted build after tests;
@@ -106,7 +106,7 @@ identities. A passed small graph fixture is reusable for that contract, never
 for a new large shape. CI path selection alone is not a final-release coverage
 ledger: applicable final checks must be present or explicitly blocked. Parent
 serializes real local CI and delivery using the host lock; this planning slice
-runs neither. Under the later [owner-selected local-only CI policy](ci.md),
+runs neither. Under the later [owner-selected local-only CI policy](../ci.md),
 GitHub CI is disabled and #79 restoration is deferred rather than a #91 release
 gate. Re-enablement or hosted dispatch requires a new owner instruction; product,
 platform, browser, package and release acceptance remain required.
@@ -214,7 +214,7 @@ do not start if #80 or CI owns the host, or any required identity is unfilled.
 | Small installed-browser contracts | 30–90 minutes per channel | ≤2 hours/channel, ≤64 GiB owned tree with 56 GiB sampled stop; prior charges retained; build capacity separate |
 | Real-user smoke | 30–60 minutes total | ≤90 minutes; selected Windows campaign ≤1 MiB combined synthetic inputs and ≤32 GiB owned artifacts, with 24 GiB sampled stop |
 
-The [owner's disk-monitor/storage amendment](history/prior-issues.md#issue-105)
+The [owner's disk-monitor/storage amendment](../history/prior-issues.md#issue-105)
 supersedes the earlier 672 MiB/32 MiB smoke allowances. Windows smoke now permits
 4 GiB hosted per-attempt growth, 2 GiB profiles and a 512 MiB harness temporary-disk
 guard; native smoke reserves 4 GiB future growth separately. SMALL preparation
@@ -260,7 +260,7 @@ temp-cap denial and cancellation during processing and private publication;
 require no successful destination, no overwrite and owned staging cleanup where
 the filesystem permits. Reuse matching contract fixtures/receipts rather than
 invent timing sleeps. Hosted installed-browser checks reuse the
-[browser acceptance sequence](../AGENTS.md#build-and-verification): standard,
+[browser acceptance sequence](../../AGENTS.md#build-and-verification): standard,
 graph parity/inspection/bounds, direct and composed lifecycle, bridge/peer cleanup,
 temporary/persistent termination, persistent process-kill prepared/direct/composed,
 both resource variants and default production restoration. Use declared runner
@@ -288,10 +288,10 @@ do not add a circular dependency on its closure.
 
 | Child | Deliverable and completion evidence |
 | --- | --- |
-| [#102 tooling preparation](history/prior-issues.md#issue-102) | Tiny verified generator, streaming independent verifier, bounded browser export adapter and concrete runner manifests; negative controls and explicit remaining integration prerequisites |
-| [#103 native acceptance](history/prior-issues.md#issue-103) | Frozen Linux/Windows receipts, D/G output verification/parity and small cleanup controls, or explicit unmet platform/shape claim; blocked by #102 |
-| [#104 Windows hosted acceptance](history/prior-issues.md#issue-104) | Installed Chrome/Edge final-build contracts, D/G verification/parity, graph/spill facts and valid markers; separately label injected handles; blocked by #102 |
-| [#105 actual filesystem smoke](history/prior-issues.md#issue-105) | New-package real dialog/ordinary destination steps, exact package/OS/browser identities, success/cancel/malformed outcomes; distinguish owner reports from automated receipts |
+| [#102 tooling preparation](../history/prior-issues.md#issue-102) | Tiny verified generator, streaming independent verifier, bounded browser export adapter and concrete runner manifests; negative controls and explicit remaining integration prerequisites |
+| [#103 native acceptance](../history/prior-issues.md#issue-103) | Frozen Linux/Windows receipts, D/G output verification/parity and small cleanup controls, or explicit unmet platform/shape claim; blocked by #102 |
+| [#104 Windows hosted acceptance](../history/prior-issues.md#issue-104) | Installed Chrome/Edge final-build contracts, D/G verification/parity, graph/spill facts and valid markers; separately label injected handles; blocked by #102 |
+| [#105 actual filesystem smoke](../history/prior-issues.md#issue-105) | New-package real dialog/ordinary destination steps, exact package/OS/browser identities, success/cancel/malformed outcomes; distinguish owner reports from automated receipts |
 
 At handoff, #87 records child links and selected completed/blocked/deferred claims.
 #91 consumes the claim ledger, exact source/package identities, failed attempts

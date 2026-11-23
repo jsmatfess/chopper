@@ -43,7 +43,7 @@ errors after input consumption never trigger raw-input replay.
 
 The distribution statement is a mathematical model, not a new generator-quality
 or finite-seed-space guarantee. Its derivation and restrictions are in
-[randomization/planning research](randomization-planning-research.md). Flexible
+[randomization/planning research](maintainer/research/randomization-planning-research.md). Flexible
 rewrites require their own eligibility and evidence; the ordinary exact-range and mixed-elision rules above are enabled without a policy selector. Buffered XOF and independent random
 buckets have been removed; historical experiment records do not enable them.
 

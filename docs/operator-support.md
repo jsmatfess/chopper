@@ -1,7 +1,7 @@
 # Operator support
 
 Start with the [native quickstart and support matrix](../README.md#native-quickstart)
-or the [hosted browser requirements](browser.md#local-development).
+or the [hosted user guide](user/README.md#use-chopper-in-your-browser).
 
 | Symptom | What to check |
 | --- | --- |

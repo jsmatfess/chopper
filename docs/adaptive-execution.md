@@ -1,6 +1,6 @@
 # Adaptive execution: delivered foundation and remaining roadmap
 
-The [agreed auto-mode and maintainability direction](auto-mode-and-maintainability.md)
+The [agreed auto-mode and maintainability direction](maintainer/auto-mode-and-maintainability.md)
 now governs future product policy, including direct execution, default auto with
 no reproducibility guarantee, an explicit reproducible mode and automatic resource
 sizing. Reconcile the designs below with that brief before implementation; existing
@@ -255,7 +255,7 @@ See the [implementation evidence and limits](performance.md#bounded-retained-par
 
 ## Auto policy reconciliation (2026-10-28)
 
-This completes the design reconciliation with the [Auto brief](auto-mode-and-maintainability.md).
+This completes the design reconciliation with the [Auto brief](maintainer/auto-mode-and-maintainability.md).
 It specifies future selection; it does not enable a selector, change omission
 defaults, or promote a Cargo experiment. The [specification](specification.md)
 continues to own delivered behavior. The retained-parent design above supplies

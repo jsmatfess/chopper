@@ -71,7 +71,7 @@ Recreate the local [Graphify environment and graph](graphify.md#install-on-linux
 in the new checkout, then re-register its MCP server with the new absolute paths.
 User-level RTK, Context Mode and Matt Pocock's plugin remain installed in the same
 WSL user. Run `rtk init --codex --show`, `codex mcp list` and
-`context-mode doctor`; follow the [Context Mode policy](context-mode.md) for its
+`context-mode doctor`; follow the [Context Mode policy](maintainer/context-mode.md) for its
 intentional missing-hook diagnostics. The repository's `.agents/skills` carries
 the benchmark skill once that revision is checked out; avoid installing duplicate
 copies if the client already discovers it. Restart the assistant in the new WSL

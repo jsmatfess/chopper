@@ -1,6 +1,6 @@
 # Execution decisions, visually
 
-The [product direction](product-direction.md) owns workload-led Auto policy.
+The [product direction](maintainer/product-direction.md) owns workload-led Auto policy.
 These diagrams cover Run dispatch, working-budget admission and the current
 Auto planner. The [specification](specification.md), [rewrite rules](pipeline-rewrites.md)
 and [GitHub Issues](https://github.com/jsmatfess/chopper/issues) own contracts and delivery status.
@@ -259,7 +259,7 @@ flowchart TD
     Stop --> Wait[Wait for worker result, picker cleanup and body handlers]
 ```
 
-The [native HTTP contract](native-http-requests.md) defines handler, connection,
+The [native HTTP contract](maintainer/research/native-http-requests.md) defines handler, connection,
 deadline and controlled-fixture response/shutdown bounds. Control routes bypass
 body handlers; authentication and typed admission still precede Jobs transitions.
 

@@ -20,7 +20,7 @@ Current acceptance and remaining limitations are recorded in [validation](valida
 
 Phase one, 2026-10-23. This is a decision report, not an implementation change or
 another checklist. [GitHub Issues](https://github.com/jsmatfess/chopper/issues) owns
-the active backlog and dependencies. The [agreed brief](auto-mode-and-maintainability.md) fixes the
+the active backlog and dependencies. The [agreed brief](maintainer/auto-mode-and-maintainability.md) fixes the
 product direction; [specification](specification.md) and
 [rewrite eligibility](pipeline-rewrites.md) still describe current behavior.
 

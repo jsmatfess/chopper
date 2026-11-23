@@ -7,7 +7,7 @@ intermediate batching remain separate implementation work.
 
 ## Generator and recipes
 
-[workload_entities.py](../scripts/workload_entities.py) defines `entity-list-v1`.
+[workload_entities.py](../../scripts/workload_entities.py) defines `entity-list-v1`.
 SHA-256 draws are addressed by version, seed, original row index and field label;
 increasing row count preserves earlier rows. It streams UTF-8 comma/LF CSV with
 headers, unique ordinal IDs, region/locality/segment categories, synthetic names,
@@ -15,7 +15,7 @@ addresses and variable-width notes. Notes include quoted multiline values;
 addresses include quotes, commas and empty fields; names exercise Unicode.
 All records are simulated and contain no source voter/customer records.
 
-The [baseline driver](../scripts/workload-baselines.py) prepares complete Job JSON:
+The [baseline driver](../../scripts/workload-baselines.py) prepares complete Job JSON:
 
 - `ordered.json`: preserve order and enforce a strict serialized-byte cap.
 - `campaign.json`: partition `region`, independently allocate treatment/control
@@ -48,7 +48,7 @@ attempt retries. Completed matching steps can resume through the coded runner.
 ## Concrete build and run plans
 
 Prerequisites: native Rust/C++ build tools, Node/UI dependencies and WASI SDK 33,
-as routed by the [browser guide](browser.md). Install UI dependencies with
+as routed by the [browser guide](../browser.md). Install UI dependencies with
 `npm.cmd --prefix ui ci` on Windows. The compiled native artifact must be inside
 the checkout so the runner can pin it. Choose an installed browser channel or
 install the supported bundled Chromium before execution.
@@ -82,7 +82,7 @@ measured bounds; a cold build or browser profile can exceed an estimate.
 
 Raw output, failure records, build manifests, compact decision packets and native
 stdout/stderr remain in the declared scratch tree. Do not edit active inputs.
-Store selected evidence under the [archive policy](evidence-storage.md) before
+Store selected evidence under the [archive policy](../evidence-storage.md) before
 cleanup; no archive upload is performed by these commands. No private credentials
 or raw run artifacts are committed by this slice.
 
@@ -95,7 +95,7 @@ including the client worker lifecycle and completion acknowledgement. It never
 explicitly calls Prepare. Fixture selection, initial setup, host extraction and
 verification are excluded and identified separately.
 
-[run-workload-browser.mjs](../scripts/run-workload-browser.mjs) serves an allowlist
+[run-workload-browser.mjs](../../scripts/run-workload-browser.mjs) serves an allowlist
 from existing default production assets and bundles its test entry in memory;
 it does not modify `ui/dist`. It uses a fresh task-owned persistent profile,
 Playwright-selected local File and an OPFS-backed output picker. It retains

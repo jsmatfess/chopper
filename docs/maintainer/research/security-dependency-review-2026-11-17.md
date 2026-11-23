@@ -14,7 +14,7 @@ backport. The final hosted runtime gate is pending.
 | --- | --- | --- |
 | `zstd` | 0.13.3 → 0.13.4 | Each output encoder owns a fresh context. The input adapter creates its own C context per reader. Neither path uses the borrowed `with_context` constructors that now reset the session. [RUSTSEC-2026-0391](https://rustsec.org/advisories/RUSTSEC-2026-0391), [upstream fix](https://github.com/gyscos/zstd-rs/commit/74ace2dcdca62a2ce0f034895d6079458311e003) |
 | `zstd-safe` | 7.3.0 → 7.4.0 | Production input drives the custom C context through the pull reader with initialized `&mut [u8]` output. Reader errors propagate before a byte count is returned. It bypasses `DCtx::decompress_stream` and the write-side decoder that could expose unwritten `Vec` bytes. Seekable support is disabled. [RUSTSEC-2026-0398](https://rustsec.org/advisories/RUSTSEC-2026-0398), [RUSTSEC-2026-0403](https://rustsec.org/advisories/RUSTSEC-2026-0403) |
-| `rustix` | 1.1.5 → 1.1.6 | Unix and WASI reopen use `fstat` for identity checks. These paths use no extended-attribute calls. Windows uses `ReOpenFile`. [Temporary reopen](../crates/chopper/src/storage/temp_path.rs), [RUSTSEC-2026-0486](https://rustsec.org/advisories/RUSTSEC-2026-0486) |
+| `rustix` | 1.1.5 → 1.1.6 | Unix and WASI reopen use `fstat` for identity checks. These paths use no extended-attribute calls. Windows uses `ReOpenFile`. [Temporary reopen](../../../crates/chopper/src/storage/temp_path.rs), [RUSTSEC-2026-0486](https://rustsec.org/advisories/RUSTSEC-2026-0486) |
 | `tokio` | 1.53.2 → 1.53.3, then removed | The intermediate update cleared the advisory. Retiring the native browser server and its `rfd` picker then removed Tokio and the picker dependency graph from the final lockfile. [RUSTSEC-2026-0386](https://rustsec.org/advisories/RUSTSEC-2026-0386) |
 
 The ten `zstd-safe` unsoundness warnings cover APIs or states absent from the
@@ -44,7 +44,7 @@ modern context and legacy 0.4–0.7 children release their payload and layout
 header grants after deallocation, including on version-switch failure. The
 source buffer and reader/controller boxes retain their separate grants.
 [Input adapter and controller](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/crates/chopper/src/engine/input_zstandard.rs),
-[Input ownership contract](resource-policy-research.md#zstandard-input-streaming-allocation-ownership-2026-10-23)
+[Input ownership contract](../../resource-policy-research.md#zstandard-input-streaming-allocation-ownership-2026-10-23)
 
 Output still uses level 3, window log 21, a checksum and unknown source size.
 The owning write encoder creates one `CCtx`, uses the same pinned C
@@ -58,7 +58,7 @@ through destruction on finish, error or abandonment. The allowance covers
 requested codec storage and the writer buffer. Process RSS, stacks and
 allocator overhead are outside that estimate.
 [Output adapter](https://github.com/jsmatfess/chopper/blob/87df5c047a05eafc0e886da8524a69494329925d/crates/chopper/src/output/zstandard.rs),
-[Output ownership contract](resource-policy-research.md#zstandard-output-context-admission-2026-10-23),
+[Output ownership contract](../../resource-policy-research.md#zstandard-output-context-admission-2026-10-23),
 [Released wrapper source](https://github.com/gyscos/zstd-rs/blob/357eb72b038676f8609dcb9e3f727e7da050e055/src/stream/zio/writer.rs),
 [Released binding source](https://github.com/gyscos/zstd-rs/blob/357eb72b038676f8609dcb9e3f727e7da050e055/zstd-safe/src/lib.rs)
 
@@ -83,7 +83,7 @@ archive extraction, local-header streaming reader, AES password flow or legacy
 ZIP decoder. These checks cover the published advisory preconditions reviewed
 here. The retired native HTTP server, its `tiny_http` vendor package and the
 native picker dependency graph are absent from the final product source.
-[ZIP input](../crates/chopper/src/engine/input_zip.rs),
+[ZIP input](../../../crates/chopper/src/engine/input_zip.rs),
 [ZIP advisories](https://rustsec.org/packages/zip.html)
 
 ## Verification

@@ -1,7 +1,7 @@
 # Guided native CLI implementation specification
 
-Status: slice A [#106](history/prior-issues.md#issue-106) is delivered and
-included in the current [0.2 scope](releases/0.2.0.md).
+Status: slice A [#106](../history/prior-issues.md#issue-106) is delivered and
+included in the current [0.2 scope](../releases/0.2.0.md).
 [Validation entry points](guided-cli-validation.md) record the scoped Linux and
 native Windows evidence and distinguish real terminal coverage from injected
 transcripts. Slices B/C remain future work in
@@ -17,8 +17,8 @@ All of #81/#82/#83 need not close first. This document consumes those decisions;
 it does not promote any experimental implementation.
 
 [Product direction](product-direction.md) owns future scope;
-[behavior](specification.md), [rewrites](pipeline-rewrites.md),
-[direct execution](direct-execution.md) and [resource controls](specification.md#resources-publication-and-interfaces)
+[behavior](../specification.md), [rewrites](../pipeline-rewrites.md),
+[direct execution](../direct-execution.md) and [resource controls](../specification.md#resources-publication-and-interfaces)
 own current engine contracts. [GitHub Issues](https://github.com/jsmatfess/chopper/issues) owns the active backlog and specs.
 The sections below define the complete journey. Slice A implements only its
 bounded subset; B/C behavior remains proposed and creates no validation claim.
@@ -311,11 +311,11 @@ linked below. The picker proposal was superseded by native-server retirement:
 
 | Responsibility | Reuse / proposed narrow change |
 | --- | --- |
-| Command parsing, Job import, confirmation, signal and progress | [main.rs](../crates/chopper/src/main.rs); add a private guided module and shared orchestration only where required |
-| Stream final Analysis | [cli_json.rs](../crates/chopper/src/cli_json.rs); retain short-write/error propagation and bounded buffering |
-| Input observations | [profile.rs](../crates/chopper/src/profile.rs), ProfileCache::profile/clear and InputProfile accuracy fields; no new parser or profiler backend |
+| Command parsing, Job import, confirmation, signal and progress | [main.rs](../../crates/chopper/src/main.rs); add a private guided module and shared orchestration only where required |
+| Stream final Analysis | [cli_json.rs](../../crates/chopper/src/cli_json.rs); retain short-write/error propagation and bounded buffering |
+| Input observations | [profile.rs](../../crates/chopper/src/profile.rs), ProfileCache::profile/clear and InputProfile accuracy fields; no new parser or profiler backend |
 | Native picker | Deferred; the former picker/helper-session implementation is retired. Any new implementation needs its own ownership and acceptance contract. |
-| Job/column validation | [config.rs](../crates/chopper-core/src/config.rs) and existing resolve_column; no new schema, defaults, operation semantics or core changes needed |
+| Job/column validation | [config.rs](../../crates/chopper-core/src/config.rs) and existing resolve_column; no new schema, defaults, operation semantics or core changes needed |
 | Run and publication | engine::run, existing direct/prepared dispatch, output/storage owners; no new engine plan, retry or publication implementation |
 
 Keep interactive presentation private to the binary; do not spread prompt state
@@ -334,7 +334,7 @@ Run, large generated input, new default, or release/deployment work is included.
 
 | Slice | Complete journey and limit |
 | --- | --- |
-| [A: initial journey](history/prior-issues.md#issue-106) | Explicit guide, typed UTF-8 headered CSV, optional full-scan preview, no operations, plain CSV with final row/byte caps, resources/reproducibility, back/edit/save/reload, confirmation, Run/progress/cancel and summary |
+| [A: initial journey](../history/prior-issues.md#issue-106) | Explicit guide, typed UTF-8 headered CSV, optional full-scan preview, no operations, plain CSV with final row/byte caps, resources/reproducibility, back/edit/save/reload, confirmation, Run/progress/cancel and summary |
 | [B: ordered pipelines](https://github.com/jsmatfess/chopper/issues/8) | Add all six existing Operation variants, named/index selectors, reorder, strata, bounded value/tuple exploration and exact/approximate explanations; same save/run journey |
 | [C: format and picker completion](https://github.com/jsmatfess/chopper/issues/7) | Add input/output dialect/encoding/header controls, compressed sources/member entry, output packaging/advisory targets and optional owned native pickers; same save/run journey |
 

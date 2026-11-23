@@ -1,12 +1,15 @@
 # Browser engine
 
-See the [documentation guide](README.md), [latest recorded validation](validation.md#latest-recorded-coverage) and [GitHub Issues](https://github.com/jsmatfess/chopper/issues). This page owns browser setup and runtime/export limits.
+For browser use, start with the [user guide](user/README.md#use-chopper-in-your-browser).
+This page owns local development, runtime and export limits, and browser validation.
+See the [latest recorded validation](validation.md#latest-recorded-coverage) and
+[GitHub Issues](https://github.com/jsmatfess/chopper/issues) for tested scope and active work.
 
 Release acceptance follows the [preparation, complete tiny journey
 and frozen-batch prerequisites](validation-runner.md#actual-host-acceptance-preflight).
 Keep existing browser receipts within their recorded host/channel/path scope;
 neither preparation nor tiny qualification establishes scale acceptance.
-The [complete hosted tiny guide](hosted-tiny-qualification.md) defines hosted
+The [complete hosted tiny guide](maintainer/hosted-tiny-qualification.md) defines hosted
 actual-picker, SMALL and scale-controller qualification modes. References there
 to native UI/picker acceptance belong to historical 0.1 work; the current native
 product is CLI-only.

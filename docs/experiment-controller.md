@@ -51,7 +51,7 @@ question/hypothesis, falsifier/stop rule and dependent correctness checks. Each
 measurement must have a dependent verifier. Only development cohorts are accepted.
 Held-out correlated wide/dominant groups, late new keys/high fanout and nearly
 sorted scores/ties crossing batches remain reserved under the
-[investigation rules](workload-investigation.md). New seeds alone do not establish
+[investigation rules](maintainer/workload-investigation.md). New seeds alone do not establish
 generalization. Queue a named fanout or working-set question, not kernel rankings.
 Account for all complete-job work and separately identify candidate-added work.
 
@@ -192,7 +192,7 @@ of reported usage; packet size is not a token-savings measurement.
 The predeclared queue is fully unattended within its frozen schedule; file mode is
 **not** fully unattended adaptive execution. Codex mode makes at most one model
 request per meaningful batch and validates each answer before continuing. Retain the
-[existing reasoning recommendations](experiment-cycle.md#reasoning-policy): Sol
+[existing reasoning recommendations](maintainer/experiment-cycle.md#reasoning-policy): Sol
 high for design/interpretation, medium for routine harness work/initial diagnosis,
 xhigh only by explicit escalation. Recommendations never change runtime settings.
 

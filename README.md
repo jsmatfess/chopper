@@ -6,8 +6,8 @@ Both use the Rust engine for ordered pipelines, strict validation, full random
 shuffles and disk-backed processing. macOS source builds are unqualified and
 not a supported release target. There is no native server or native UI.
 
-See the [compatibility policy](docs/compatibility.md) before upgrading saved
-Jobs or scripts.
+Start with the [user guide](docs/user/README.md) for installation, saved Jobs,
+browser exports, and upgrades.
 
 ## Native quickstart
 
@@ -20,7 +20,7 @@ Open a terminal in the download directory.
 | --- | --- |
 | Windows x86-64 | `chopper-0.5.0-windows-x86_64.zip`. Use PowerShell. If Windows reports missing MSVC runtime DLLs, install or repair the [Microsoft Visual C++ v14 Redistributable for x64](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist/). |
 | Linux x86-64 | `chopper-0.5.0-linux-x86_64.zip`. Requires glibc 2.34 or later and shell tools including `unzip` and `sha256sum`. Check the host with `uname -m` and `getconf GNU_LIBC_VERSION`. |
-| Hosted | [Desktop Chrome or Edge](docs/browser.md#local-development) with a secure, cross-origin-isolated page, File System Access, OPFS and Web Locks. Open the [hosted app](https://chopper-1rx.pages.dev/) directly. |
+| Hosted | [Desktop Chrome or Edge](docs/user/README.md#use-chopper-in-your-browser) with a secure, cross-origin-isolated page, File System Access, OPFS and Web Locks. Open the [hosted app](https://chopper-1rx.pages.dev/) directly. |
 | Other native platforms | macOS is source-only and unqualified. Native release packages are x86-64. |
 
 See [operator support](docs/operator-support.md) for runtime errors, memory and
@@ -193,8 +193,8 @@ static development server is `npm run serve:hosted`. Hosted output is `ui/dist`.
 The browser uses local file APIs and OPFS for input and working data, then
 exports results with a completion marker; see [browser limits](docs/browser.md).
 
-For change-specific checks, see [CONTRIBUTING.md](CONTRIBUTING.md),
-[architecture](docs/architecture.md), and the [documentation guide](docs/README.md).
+For development, validation, and release work, see the
+[maintainer guide](docs/maintainer/README.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Feedback and support
 

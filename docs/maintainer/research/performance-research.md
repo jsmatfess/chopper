@@ -2,11 +2,11 @@
 
 Historical design/research: buffer-shuffle descriptions and negative controls below
 refer to pre-removal builds. The current engine rejects that strategy and its
-configuration fields; see [current specification](specification.md#shuffling-and-seeds).
+configuration fields; see [current specification](../../specification.md#shuffling-and-seeds).
 
 Historical assessment before the parser/merge, inline-key and explicit-option implementations. Recommendations and numerical estimates below are preserved as hypotheses from that review, not current TODOs or measured gains. In particular, later measurements found no clear Fisher–Yates speedup and slower interleaved splitting on the tested fixture.
 
-Use [current opportunities](performance-opportunities.md), [measured results](performance.md), and the [GitHub Issues](https://github.com/jsmatfess/chopper/issues) for current status. Primary-source links below are the original research references; this documentation reorganization did not reverify them.
+Use [current opportunities](../../performance-opportunities.md), [measured results](../../performance.md), and the [GitHub Issues](https://github.com/jsmatfess/chopper/issues) for current status. Primary-source links below are the original research references; this documentation reorganization did not reverify them.
 
 ## Recommendation
 
@@ -24,12 +24,12 @@ remain useful, but they cannot remove this repeated work.
 
 ## 1. Reusable compact records and chunk scanning
 
-The [parser](../crates/chopper-core/src/csv.rs) calls `fill_buf`/`consume` for each
+The [parser](../../../crates/chopper-core/src/csv.rs) calls `fill_buf`/`consume` for each
 byte, grows a fresh field allocation, transfers it to a String, and returns a
-new `Vec<String>`. The [adaptive row representation](../crates/chopper/src/storage/adaptive.rs)
+new `Vec<String>`. The [adaptive row representation](../../../crates/chopper/src/storage/adaptive.rs)
 then packs short fields into another allocation and later unpacks them into
 individual strings again. Packing reduces retained memory but does not eliminate
-the initial allocations. [Output serialization](../crates/chopper/src/output.rs)
+the initial allocations. [Output serialization](../../../crates/chopper/src/output.rs)
 also requests a fresh serialized vector for each record.
 
 Start with reusable parser and output scratch buffers for profiling and plain
@@ -50,7 +50,7 @@ is not automatically a semantics-compatible replacement.
 
 ## 2. Merge encoded payloads without reconstructing fields
 
-In [storage.rs](../crates/chopper/src/storage.rs), `read_row` allocates every field
+In [storage.rs](../../../crates/chopper/src/storage.rs), `read_row` allocates every field
 and validates each as UTF-8. `MergeRows` holds these fully decoded rows. Every
 intermediate `Sorter::merge` writes them back through `write_row`, although
 `SortOrder::compare_parts` needs only the key, ID and ordinal.
@@ -76,7 +76,7 @@ with a percentile without a safe oversized-row path.
 
 ## 3. Batch logical digest updates
 
-[Ingestion](../crates/chopper/src/engine.rs) currently calls BLAKE3 `update` for
+[Ingestion](../../../crates/chopper/src/engine.rs) currently calls BLAKE3 `update` for
 the field count, each field length and each field's bytes. With C columns this is
 1 + 2C calls per record. Accumulate exactly that byte stream in a bounded reusable
 buffer and feed larger slices to the same hasher, flushing the final partial
@@ -110,7 +110,7 @@ with `SortOrder::Random`, leaving variable-width group keys on the current path.
 
 ## 5. Reduce spill-format overhead
 
-The current [row format](../crates/chopper/src/storage.rs) costs
+The current [row format](../../../crates/chopper/src/storage.rs) costs
 `32 + key_bytes + 8 * field_count + payload_bytes`. A one-field, one-byte row with
 a 16-byte shuffle key therefore takes 57 bytes before filesystem overhead, versus
 2 source CSV bytes without a header. Not all temporary/output bytes use this
@@ -132,7 +132,7 @@ historical gaps subsequently closed by its newest sections.
 
 Higher-cardinality bounded routing, direct exact-allocation routing, memory-backed
 snapshots, host-aware budgets and independent group parallelism are already in
-[adaptive-execution.md](adaptive-execution.md). They remain worthwhile follow-ups,
+[adaptive-execution.md](../../adaptive-execution.md). They remain worthwhile follow-ups,
 but are not discoveries from this review. GPU acceleration and indiscriminate
 read-ahead already have assessments; current evidence does not raise their priority.
 

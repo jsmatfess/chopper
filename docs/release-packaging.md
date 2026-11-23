@@ -7,8 +7,8 @@ export guard in `scripts/browser-artifacts.mjs`. Final release readiness belongs
 [release record](https://github.com/jsmatfess/chopper/releases), exact-source validation/publication receipts
 and [GitHub Issues](https://github.com/jsmatfess/chopper/issues). The
 [focused candidate review](releases/0.2.0-review.md) and
-[its acceptance plan](release-acceptance-plan.md) are historical records, not
-approval for current-source builds. [Rollback](release-rollback.md) and
+[its acceptance plan](maintainer/release-acceptance-plan.md) are historical records, not
+approval for current-source builds. [Rollback](maintainer/release-rollback.md) and
 [evidence access](evidence-storage.md) remain separate contracts.
 
 ## Inputs and source identity

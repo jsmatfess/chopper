@@ -2,9 +2,9 @@
 
 > Historical contract: the native server and vendored HTTP transport are retired
 > from the current CLI/hosted product. Source references below identify the old
-> implementation, retained only in the [private archive boundary](history/public-source-boundary.md).
+> implementation, retained only in the [private archive boundary](../../history/public-source-boundary.md).
 
-Issue [#154](history/prior-issues.md#issue-154) changes native server
+Issue [#154](../../history/prior-issues.md#issue-154) changes native server
 transport/dispatch only. Hosted workers and native engine/publication policy keep
 their separate contracts. Implementation:
 `crates/chopper/src/server.rs` and `vendor/tiny_http-0.12.0/CHOPPER.md`

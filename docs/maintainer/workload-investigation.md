@@ -2,30 +2,30 @@
 
 Planning completed 2026-10-31. [Product direction](product-direction.md) owns
 future intent; [GitHub Issues](https://github.com/jsmatfess/chopper/issues) owns the active implementation backlog.
-The [specification](specification.md), [rewrite rules](pipeline-rewrites.md) and
-[validation](validation.md) still own current behavior and supported claims.
+The [specification](../specification.md), [rewrite rules](../pipeline-rewrites.md) and
+[validation](../validation.md) still own current behavior and supported claims.
 No engine implementation, dataset acquisition or experiments were performed
 by this planning phase.
 
 ## Decision sources
 
-- [Workload corpus map](history/prior-issues.md#issue-1):
-  [coverage](history/prior-issues.md#issue-2),
-  [scale/browser](history/prior-issues.md#issue-3),
-  [simulation](history/prior-issues.md#issue-5),
-  [identity/correctness](history/prior-issues.md#issue-6),
-  [panel selection](history/prior-issues.md#issue-7) and
-  [concrete recipes](history/prior-issues.md#issue-20).
-- [Execution candidates map](history/prior-issues.md#issue-8):
-  [eligibility](history/prior-issues.md#issue-12),
-  [shortlist](history/prior-issues.md#issue-13) and
-  [sorting/batching](history/prior-issues.md#issue-21).
-- [First comparison map](history/prior-issues.md#issue-9):
-  [measurement](history/prior-issues.md#issue-14),
-  [budgets](history/prior-issues.md#issue-15),
-  [holdouts](history/prior-issues.md#issue-16),
-  [decision/stop criteria](history/prior-issues.md#issue-17) and
-  [staged comparisons](history/prior-issues.md#issue-18).
+- [Workload corpus map](../history/prior-issues.md#issue-1):
+  [coverage](../history/prior-issues.md#issue-2),
+  [scale/browser](../history/prior-issues.md#issue-3),
+  [simulation](../history/prior-issues.md#issue-5),
+  [identity/correctness](../history/prior-issues.md#issue-6),
+  [panel selection](../history/prior-issues.md#issue-7) and
+  [concrete recipes](../history/prior-issues.md#issue-20).
+- [Execution candidates map](../history/prior-issues.md#issue-8):
+  [eligibility](../history/prior-issues.md#issue-12),
+  [shortlist](../history/prior-issues.md#issue-13) and
+  [sorting/batching](../history/prior-issues.md#issue-21).
+- [First comparison map](../history/prior-issues.md#issue-9):
+  [measurement](../history/prior-issues.md#issue-14),
+  [budgets](../history/prior-issues.md#issue-15),
+  [holdouts](../history/prior-issues.md#issue-16),
+  [decision/stop criteria](../history/prior-issues.md#issue-17) and
+  [staged comparisons](../history/prior-issues.md#issue-18).
 
 Resolution comments contain the decisions, including later clarifications;
 original question bodies and dated research may reflect earlier assumptions.
@@ -88,14 +88,14 @@ adjustable planning limits, not measured cost estimates or resource-fit claims.
 Concrete manifests must pin inputs/builds/toolchains, starting knowledge,
 resource bounds, verification/timing scope, owned artifacts and locations,
 estimates and deadlines. Recheck current capacity and prerequisites before runs;
-use the [validation runner](validation-runner.md) for unattended sequential batches.
+use the [validation runner](../validation-runner.md) for unattended sequential batches.
 
 Measure Run-to-usable-output, including planning, retries, decoding, processing
 and publication/export. Report separate verification overhead, actual reuse,
 uncertainty and distinct resource measures. Prefer known, simple, safe approaches
 unless benefit and resolved risk justify complexity. Retain regime-specific
 outcomes and rejected ideas with their assumptions and evidence pointers, using
-the [separate archive policy](evidence-storage.md); do not keep unused strategy
+the [separate archive policy](../evidence-storage.md); do not keep unused strategy
 code as an archive.
 
 Reserve these combinations from performance tuning initially: dominant groups

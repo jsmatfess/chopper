@@ -1,6 +1,6 @@
 > Historical handoff, retained for context. Statements about defaults, open work,
 > publication and the working tree below describe their dated snapshots. For
-> current routing, use [current state](../current-state.md); GitHub Issues owns
+> current routing, use [current state](../maintainer/current-state.md); GitHub Issues owns
 > the active backlog.
 
 # Chopper: current state and recommended next steps
@@ -115,7 +115,7 @@ Raw failed/interrupted validation records are intentional evidence.
 
 ## Recommended order of work
 
-The owner has since agreed the [auto-mode and maintainability program](../auto-mode-and-maintainability.md).
+The owner has since agreed the [auto-mode and maintainability program](../maintainer/auto-mode-and-maintainability.md).
 Start with its evidence/strategy inventory and incremental repository cleanup;
 [TODO.md](../../TODO.md) owns the current sequence. The release/ownership guidance
 below remains context, not a competing instruction to finish every historical

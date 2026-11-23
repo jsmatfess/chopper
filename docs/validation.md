@@ -583,7 +583,7 @@ public working tree.
 
 ## First workload baseline harness (2026-10-31)
 
-The [baseline slice](workload-baselines.md) passes 14 small Python controls for
+The [baseline slice](maintainer/workload-baselines.md) passes 14 small Python controls for
 deterministic generation, CSV edge fields, field/order/lineage corruption, missing
 empty arms, browser markers, caps/chunk boundaries, isolated runtime plans,
 artifact/build matching and seeded parity. UI source and the new browser test
@@ -2073,7 +2073,7 @@ match all seven pinned hashes. Isolated read-only restoration verifies served
 bytes, COOP/COEP and production WASM exports. Its private archive passed separate
 scoped-reader download, outer/member hashes and nested restoration checks. The
 owner confirmed there is no previous native release. See
-[rollback readiness](release-rollback.md) for known limits and restoration steps.
+[rollback readiness](maintainer/release-rollback.md) for known limits and restoration steps.
 
 Installed Chrome 156.0.8078.48 and Edge 156.0.4314.50 each pass the 19 declared
 hosted standard/bridge/cleanup/interruption/resource/package checks against the

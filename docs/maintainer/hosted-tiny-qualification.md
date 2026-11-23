@@ -1,9 +1,9 @@
 # Complete hosted tiny qualification
 
-Issue [#179](history/prior-issues.md#issue-179) was delivered at
+Issue [#179](../history/prior-issues.md#issue-179) was delivered at
 `217dff6a52446417a79fa87581f3c03e5ada4aa6`. Its actual picker, Chrome/Edge SMALL
 and BrowserScale Tiny proofs retain their separate runtime identities. This guide
-also owns the frozen batch consumer for [#180](history/prior-issues.md#issue-180);
+also owns the frozen batch consumer for [#180](../history/prior-issues.md#issue-180);
 it grants no scheduling, scale or publication authority.
 
 Preparation packets carry absolute native drive/UNC proof bindings, including
@@ -16,7 +16,7 @@ Tiny proof; that still requires a fresh complete qualification.
 
 ## Frozen acceptance batches
 
-[#180](history/prior-issues.md#issue-180) uses the existing packet
+[#180](../history/prior-issues.md#issue-180) uses the existing packet
 producer and launchers. A reviewed `chopper-frozen-batch-selection-v1` names one
 `profile` (`native`, `small`, `browser-scale`, or `actual-picker`), its `channel` (null for native),
 and absolute path/SHA bindings for `configuration`, `preflight`, complete `tiny`,
@@ -79,7 +79,7 @@ Tiny receipt SHA-256 is
 with independent audit
 `169190a4b9543c460dc85ebcae2e1dd5ee818d77ab3aecd4bd46ad3bb66f608f`.
 It reused 12,800 already-debited input bytes and generated none. The separate
-[maintained Linux journey](../scripts/scale_acceptance/NATIVE.md#maintained-linux-qualification)
+[maintained Linux journey](../../scripts/scale_acceptance/NATIVE.md#maintained-linux-qualification)
 passed at its own frozen `27a8466` identity. These proofs establish the bounded
 preparation/execution path, not #103/#104 scale or #105 final-package acceptance.
 
@@ -88,7 +88,7 @@ preparation/execution path, not #103/#104 scale or #105 final-package acceptance
 The selected packaged Product639 assets have separate installed-channel Tiny
 receipts below. Full BrowserScale Tiny uses harness `ce245d2`; actual-picker and
 SMALL receipts keep their own frozen harness identities. Matched final Linux/Windows local gates delivered #179 at `217dff6`;
-[the completion record](history/prior-issues.md#issue-179)
+[the completion record](../history/prior-issues.md#issue-179)
 retains the distinct qualified runtime and checker identities. These are not 1 GB scale, #105 completion,
 publication or cross-profile receipts.
 
@@ -118,7 +118,7 @@ it cannot qualify any of these complete paths.
 
 ### Actual pickers
 
-[`hosted_picker`](../scripts/hosted_picker/control.py) is the maintained form of the
+[`hosted_picker`](../../scripts/hosted_picker/control.py) is the maintained form of the
 reviewed R31 controller and helpers. It retains the actual native input/output
 picker controls, held process/birth/session/Job/HWND checks, fresh permission-phase
 forest, `Automation.Compare(AutomationElement, AutomationElement)`, single exact
@@ -225,10 +225,10 @@ The definition/config schema is `chopper-hosted-picker-qualification-v1`:
 - `seconds: 180` and `input_cap_bytes: 1048576` remain fixed. Original definitions
   use `owned_cap_bytes: 268435456` with positive `growth_bytes` at most 10 MiB.
   The separately owner-approved storage choice is 672 MiB owned with at most
-  32 MiB growth; see [the explicit #105 authority](history/prior-issues.md#issue-105).
+  32 MiB growth; see [the explicit #105 authority](../history/prior-issues.md#issue-105).
   It still requires a new reviewed definition; source support alone grants no
   larger allowance, and original 256/10 MiB definitions retain their limits.
-  The [later owner-selected disk envelope](history/prior-issues.md#issue-105) is 32 GiB owned, a 24 GiB sampled
+  The [later owner-selected disk envelope](../history/prior-issues.md#issue-105) is 32 GiB owned, a 24 GiB sampled
   stop (8 GiB headroom), up to 4 GiB post-custody growth, a 2 GiB profile and
   512 MiB harness temporary storage. Historical definitions keep their original
   limits and charges. New writes/launches require explicitly selected shared C:
@@ -868,7 +868,7 @@ lock; it does not manufacture clean qualification or retire the campaign claim.
 
 ## Admission and evidence reuse
 
-[`hosted_qualification.py`](../scripts/scale_acceptance/hosted_qualification.py)
+[`hosted_qualification.py`](../../scripts/scale_acceptance/hosted_qualification.py)
 requires a supervised passed preflight for the exact selected config/packet,
 actual host/profile, unchanged checker files and original worker receipt.
 Parent/worker binding mismatches deny before controller launch. Each existing
@@ -898,7 +898,7 @@ python3 -B scripts/test-scale-acceptance-browser-scale.py
 
 These use controlled effects and tiny task-owned Linux/Windows scratch, with no
 browser/product launch, large fixtures, scale slots or product build. Run the
-other applicable [tooling checks](../CONTRIBUTING.md#choose-the-checks-for-your-change)
+other applicable [tooling checks](../../CONTRIBUTING.md#choose-the-checks-for-your-change)
 for shared runner/bootstrap/CI changes. Root performs actual installed-browser
 qualification and matching local CI separately. Do not close #179 on source-only
 results or remove the release hold.

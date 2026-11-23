@@ -7,7 +7,7 @@ require matching pre-removal artifacts; they are not current usage guidance.
 Researched 2026-10-18 against primary sources. The keyed XOF experiment is now implemented behind `experimental-fast-rng`;
 [complete-job results](performance.md#versioned-buffered-blake3-shuffle-source-2026-10-18)
 keep it opt-in. This report records its primary-source design and limits. It extends the RNG discussion in
-[randomization planning](randomization-planning-research.md); it does not repeat
+[randomization planning](maintainer/research/randomization-planning-research.md); it does not repeat
 the completed shuffle diagnostics or establish statistical uniformity.
 
 ## Recommendation

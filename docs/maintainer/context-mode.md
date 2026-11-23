@@ -2,7 +2,7 @@
 
 [Context Mode](https://github.com/mksglu/context-mode) is optional developer
 tooling for executing analysis outside the model context and searching indexed
-output. It complements [Graphify](graphify.md) navigation and [RTK](../RTK.md)
+output. It complements [Graphify](../graphify.md) navigation and [RTK](../../RTK.md)
 command-output compression. It is not a Chopper build dependency.
 
 ## Install and register on Windows
@@ -24,7 +24,7 @@ after registration so it reloads its MCP tool catalog. Check for `ctx_execute`,
 not load Codex's configuration need an equivalent stdio MCP registration using
 the same Node command, entry-point argument and environment variable.
 
-This setup uses explicit MCP calls and the repository's [agent instructions](../AGENTS.md),
+This setup uses explicit MCP calls and the repository's [agent instructions](../../AGENTS.md),
 without Context Mode hooks or its default mandatory routing block. Existing RTK
 hooks are retained. Doctor reports missing Context Mode hooks / hooks feature
 flag in this mode; these are intentional, while server initialization and

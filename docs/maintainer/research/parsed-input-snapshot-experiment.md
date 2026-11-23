@@ -4,7 +4,7 @@ Direct compact and IPC integrations were separately rejected and removed on
 2026-10-26. `experimental-input-snapshots` is invalid and `engine::snapshots`
 is no longer available. Migrate callers to direct CSV through the ordinary Job
 input and preparation API. The dated design/checkpoint below is historical;
-replay requires the [archived source and original build inputs](history/rejected-input-snapshots-2026-10-26/README.md).
+replay requires the [archived source and original build inputs](../../history/rejected-input-snapshots-2026-10-26/README.md).
 
 # Direct parsed-input experiment
 

@@ -2,9 +2,9 @@
 
 Historical design/research: buffer-shuffle descriptions and negative controls below
 refer to pre-removal builds. The current engine rejects that strategy and its
-configuration fields; see [current specification](specification.md#shuffling-and-seeds).
+configuration fields; see [current specification](../../specification.md#shuffling-and-seeds).
 
-Status: historical architecture/research plan, retained for rationale. Native CLI/local UI and the hosted WASI browser engine are now implemented, along with later profiling and performance work. Future-tense recommendations below reflect the original plan. Use [GitHub Issues](https://github.com/jsmatfess/chopper/issues) for current delivery status, [validation](validation.md) for evidence, [performance](performance.md) for implementation follow-ups, and [adaptive execution](adaptive-execution.md) for the remaining resource-planning design.
+Status: historical architecture/research plan, retained for rationale. Native CLI/local UI and the hosted WASI browser engine are now implemented, along with later profiling and performance work. Future-tense recommendations below reflect the original plan. Use [GitHub Issues](https://github.com/jsmatfess/chopper/issues) for current delivery status, [validation](../../validation.md) for evidence, [performance](../../performance.md) for implementation follow-ups, and [adaptive execution](../../adaptive-execution.md) for the remaining resource-planning design.
 
 ## Stack and boundaries
 

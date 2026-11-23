@@ -96,7 +96,7 @@ using identical checker source contents. Windows checks all 3,270 declared files
 an owned preparation Job with no remaining child processes. No browser, product
 workload, acceptance window or scale slot was started. Complete native/hosted
 tiny journeys and the full cold guard remain prerequisites under #178/#179.
-The [hosted qualification guide](hosted-tiny-qualification.md) routes #179's
+The [hosted qualification guide](maintainer/hosted-tiny-qualification.md) routes #179's
 explicit modes through their existing controllers and records the common
 actual-picker preflight integration hook. Source controls do not establish
 actual-host qualification.
@@ -104,7 +104,7 @@ actual-host qualification.
 ## Local batch execution
 
 For experiment hypotheses, reasoning routing and compact evidence handoffs, use
-the [coded experiment cycle](experiment-cycle.md). It wraps this runner without
+the [coded experiment cycle](maintainer/experiment-cycle.md). It wraps this runner without
 adding model calls or replacing harness measurement/verification.
 The [native experiment controller](experiment-controller.md) adds cumulative session
 budgets and decision boundaries through this runner's optional guard callback.

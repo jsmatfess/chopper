@@ -2,7 +2,7 @@
 
 ## Delivered slice A
 
-PR [#128](history/prior-issues.md#issue-128) delivered slice A at
+PR [#128](../history/prior-issues.md#issue-128) delivered slice A at
 `9a2db1a0438dd82ad549fe7235e893215a67e7b2`. Exact Linux `a9iibucl` and native
 Windows `g_7mduax` local gates passed against `41dc4ae`. A default native Windows
 build passed ten focused controls and 24 actual Win32-console journeys, including
@@ -15,8 +15,8 @@ This is slice A acceptance, not #88 completion or selected606 release acceptance
 The commands below describe reproduction and future changed-source validation.
 
 
-[#106](history/prior-issues.md#issue-106) originally authorized slice A outside
-the historical focused release. The current [0.2 scope](releases/0.2.0.md)
+[#106](../history/prior-issues.md#issue-106) originally authorized slice A outside
+the historical focused release. The current [0.2 scope](../releases/0.2.0.md)
 includes the delivered Guide. The [guided specification](guided-cli-specification.md)
 owns behavior; fresh release-source gates remain separate from the historical
 acceptance above. This document is a test entry point, not another active
@@ -25,7 +25,7 @@ checklist or a coverage waiver.
 ## Linux controls
 
 Run from the repository root under the existing
-[host validation lock](ci.md#local-development-and-transitional-delivery-gate), with bounded Cargo jobs.
+[host validation lock](../ci.md#local-development-and-transitional-delivery-gate), with bounded Cargo jobs.
 Build the ordinary binary and retain a copy before building the fault binary:
 
 ```sh
@@ -68,7 +68,7 @@ fmt/Clippy/workspace tests remain applicable.
 No Windows build, dispatcher, actual PTY journey or local CI gate was executed by
 the implementation worker. Windows acceptance is pending, including console
 input/cancellation, atomic replacement and PowerShell command quoting. WSL PTYs
-are Linux coverage only. Follow the [two-checkout workflow](windows-wsl-workflow.md)
+are Linux coverage only. Follow the [two-checkout workflow](../windows-wsl-workflow.md)
 and use the exact PR head in a clean native checkout; parent owns dispatch/gates.
 
 The portable part of the binary harness can run on Windows:

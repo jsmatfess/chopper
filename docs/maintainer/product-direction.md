@@ -3,8 +3,8 @@
 Agreed with the owner, 2026-10-29. This is the authoritative future product
 brief. It supersedes conflicting priorities and product assumptions in the
 [earlier Auto brief](auto-mode-and-maintainability.md) and older delivery plans.
-It does not describe delivered behavior: the [specification](specification.md),
-[rewrite rules](pipeline-rewrites.md) and [validation record](validation.md)
+It does not describe delivered behavior: the [specification](../specification.md),
+[rewrite rules](../pipeline-rewrites.md) and [validation record](../validation.md)
 continue to own current contracts and supported claims. [GitHub Issues](https://github.com/jsmatfess/chopper/issues)
 owns the active backlog and specs.
 
@@ -166,7 +166,7 @@ Existing evidence remains useful within its recorded coverage.
 Do not retain unused or rejected strategy implementations merely as an archive.
 Keep concise public rationale, provenance and evidence pointers; preserve private
 tests, results and necessary replay material through the existing
-[separate repository and archive policy](evidence-storage.md). Remove unused
+[separate repository and archive policy](../evidence-storage.md). Remove unused
 strategy code after required preservation and reference checks, without rewriting
 historical evidence. Conditional candidates need not be implemented unless a
 workload-specific question justifies testing them.
@@ -203,9 +203,9 @@ is reference material until reconciled with the new investigation, except checks
 needed to preserve correctness when changing code.
 
 Wayfinder planning is complete in the
-[workload corpus](history/prior-issues.md#issue-1),
-[execution candidates](history/prior-issues.md#issue-8) and
-[first comparison panel](history/prior-issues.md#issue-9) maps.
+[workload corpus](../history/prior-issues.md#issue-1),
+[execution candidates](../history/prior-issues.md#issue-8) and
+[first comparison panel](../history/prior-issues.md#issue-9) maps.
 Their resolution tickets hold the detailed decisions, staged comparisons,
 held-out policy and execution prerequisites; no experiments or implementation
 were performed by this planning phase. Prepare concrete run manifests and cost

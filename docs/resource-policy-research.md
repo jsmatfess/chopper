@@ -1307,7 +1307,7 @@ then returns the original typed admission error. This permits a valid JSON
 rejection for a still-uploading chunked client instead of closing over unread
 bytes and losing the response to a socket reset. Drain failures do not replace
 the primary error. This is a byte bound. The later
-[native HTTP deadline contract](native-http-requests.md) adds an absolute socket
+[native HTTP deadline contract](maintainer/research/native-http-requests.md) adds an absolute socket
 read deadline and shutdown interruption to this same drain without changing its
 byte allowance or original-error precedence. Header/size validation behavior is unchanged.
 

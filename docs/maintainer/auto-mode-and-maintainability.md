@@ -10,9 +10,9 @@ leads large-job acceptance; seeded-output policy is removed; and workload-led ca
 promotion. The old handoff sequence below is historical planning context, not
 the next-work instruction. Current behavior and evidence remain as documented.
 
-Buffer-shuffle removal, the first [direct-Run slice](direct-execution.md), opt-in
+Buffer-shuffle removal, the first [direct-Run slice](../direct-execution.md), opt-in
 automatic memory selection is implemented locally. The former reproducibility
-controls have been removed. [Current behavior](specification.md) keeps omitted
+controls have been removed. [Current behavior](../specification.md) keeps omitted
 memory at numeric 256 MiB and provides no seeded-output policy. E5 and default promotions remain pending;
 [GitHub Issues](https://github.com/jsmatfess/chopper/issues) owns status and validation sequencing.
 
@@ -22,7 +22,7 @@ already exist. [GitHub Issues](https://github.com/jsmatfess/chopper/issues) owns
 
 ## Status and precedence
 
-The current [specification](specification.md) and [rewrite rules](pipeline-rewrites.md)
+The current [specification](../specification.md) and [rewrite rules](../pipeline-rewrites.md)
 describe the implementation baseline. This brief explicitly authorizes future
 changes to the default execution policy, preparation workflow and buffer-shuffle
 support. Update those contracts alongside implementation; do not silently treat
@@ -105,7 +105,7 @@ more memory, disk use or code complexity.
 
 The delivered opt-in `memory_mb: "auto"` slice uses current shared admission
 headroom; existing `workers: 0` selection remains unchanged. The
-[resource contract](specification.md#resources-publication-and-interfaces) owns
+[resource contract](../specification.md#resources-publication-and-interfaces) owns
 its resolution, validation and prepared-result behavior. Broader automatic policy
 and default promotion remain future work. Explicit user limits take precedence.
 Uncertain availability requires conservative fallback. Stage this around actual
@@ -120,9 +120,9 @@ Defer persistent device-specific learning until its incremental benefit is shown
 
 ## Evidence review and strategy decisions
 
-Start from the [benchmark guide](benchmarks/README.md), generated index/catalog,
-[existing synthesis](performance-decisions.md), dated [performance notes](performance.md)
-and [experiment criteria](performance-opportunities.md). The existing 38 selected
+Start from the [benchmark guide](../benchmarks/README.md), generated index/catalog,
+[existing synthesis](../performance-decisions.md), dated [performance notes](../performance.md)
+and [experiment criteria](../performance-opportunities.md). The existing 38 selected
 contrasts are a starting point, not an exhaustive review. Inventory the full
 corpus and explicitly classify evidence that cannot support speed comparisons.
 

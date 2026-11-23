@@ -1,6 +1,6 @@
 # Architecture and development entry points
 
-This describes the current implementation. The [product direction](product-direction.md)
+This describes the current implementation. The [product direction](maintainer/product-direction.md)
 describes future behavior; [GitHub Issues](https://github.com/jsmatfess/chopper/issues) orders changes. Start with the
 [README](../README.md) for setup and [AGENTS.md](../AGENTS.md) for applicable checks.
 

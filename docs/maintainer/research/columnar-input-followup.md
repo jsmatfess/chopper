@@ -7,13 +7,13 @@ The direct compact/Arrow IPC experiment was subsequently rejected and removed
 on 2026-10-26; use direct CSV input. The dated proposal below is historical.
 Current work belongs in [GitHub Issues](https://github.com/jsmatfess/chopper/issues).
 
-Researched 2026-10-18. This supplements [input-format research](input-format-research.md)
+Researched 2026-10-18. This supplements [input-format research](../../input-format-research.md)
 with a concrete dependency/adapter proposal and acceptance boundaries. No adapter
 was implemented, compiled or benchmarked for this note.
 
 ## What the existing experiment establishes
 
-Repository inspection: [benchmark-input-formats.py](../scripts/benchmark-input-formats.py)
+Repository inspection: [benchmark-input-formats.py](../../../scripts/benchmark-input-formats.py)
 uses Python CSV parsing to create snapshots, then decodes each snapshot into a
 complete `adapted.csv` before invoking the unchanged CLI. IPC is uncompressed;
 Parquet uses Snappy and explicit string arrays. Replays hash the original CSV
@@ -58,7 +58,7 @@ compile and execute a tiny round trip using this repository's actual
 `wasm32-wasip1` target and Chromium filesystem bridge. Test seeking, supported
 codecs, descriptor lifetimes, cancellation and malformed inputs before a larger
 matrix. Browser `File.slice`, `fd_seek` and `fd_pread` already exist in
-[fs.ts](../ui/src/browser/fs.ts); native mmap or a JS/Wasm-only upstream example
+[fs.ts](../../../ui/src/browser/fs.ts); native mmap or a JS/Wasm-only upstream example
 does not establish compatibility with that bridge.
 
 ## Exact text and stable identity

@@ -15161,7 +15161,7 @@
     {
       "section": "docs/validation.md#first-workload-baseline-harness-2026-10-31",
       "title": "First workload baseline harness (2026-10-31)",
-      "section_sha256": "8d2d1a9c90f15b5a615ca75644c0eb436e70927d5360bd78e3865a455258a337",
+      "section_sha256": "e818de629822f1388a4ceb66148cf56dfbd31c515b701462f6d85dc4d6cf7059",
       "status": "not-inferred-from-prose"
     },
     {
@@ -15305,7 +15305,7 @@
     {
       "section": "docs/validation.md#release-candidate-preparation-2026-10-28",
       "title": "Release candidate preparation (2026-10-28)",
-      "section_sha256": "12c512ce2f975a6c3c85fe7ce40077c80e730ce6cc403cd1d57d2427a0c8078e",
+      "section_sha256": "fdc934d857e7e104181ad98c060266cb40490055b6029c1d103d28345d7968f7",
       "status": "not-inferred-from-prose"
     },
     {

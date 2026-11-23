@@ -8,7 +8,7 @@ Validation and delivered eligibility are recorded in [validation.md](validation.
 
 ## Reconcile the policy and execution designs
 
-The [Auto brief](auto-mode-and-maintainability.md) authorizes configure → Run
+The [Auto brief](maintainer/auto-mode-and-maintainability.md) authorizes configure → Run
 without mandatory exact preparation. The existing
 [stage/parent design](adaptive-execution.md#evidence-based-stage-and-parent-policy-design-2026-10-20)
 remains the proposal for choosing physical implementations of operation spans.

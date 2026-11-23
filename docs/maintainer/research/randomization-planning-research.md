@@ -2,13 +2,13 @@
 
 Historical design/research: buffer-shuffle descriptions and negative controls below
 refer to pre-removal builds. The current engine rejects that strategy and its
-configuration fields; see [current specification](specification.md#shuffling-and-seeds).
+configuration fields; see [current specification](../../specification.md#shuffling-and-seeds).
 
 Researched 2026-10-16. These are proposed experiments, not implemented features or
 measured speedups. The user permits optional execution that changes reproducible
 random order and logically equivalent pipeline reorderings. Existing seeded
-contracts remain useful defaults. See [shuffle diagnostics](shuffling-research.md),
-[remaining opportunities](performance-opportunities.md) and [GitHub Issues](https://github.com/jsmatfess/chopper/issues).
+contracts remain useful defaults. See [shuffle diagnostics](../../shuffling-research.md),
+[remaining opportunities](../../performance-opportunities.md) and [GitHub Issues](https://github.com/jsmatfess/chopper/issues).
 
 ## Existing behavior and the opportunity
 
@@ -20,9 +20,9 @@ currently derives BLAKE3 domains from the seed, original operation index and par
 lineage. Random-key v1 hashes each source row ID; resident Fisher–Yates v1 hashes
 a counter for each bounded draw. Collision refinement extends the random key
 rather than breaking ties by source ID. See
-[random.rs](../crates/chopper-core/src/random.rs),
-[engine.rs](../crates/chopper/src/engine.rs) and
-[the specification](specification.md#shuffling-and-seeds).
+[random.rs](../../../crates/chopper-core/src/random.rs),
+[engine.rs](../../../crates/chopper/src/engine.rs) and
+[the specification](../../specification.md#shuffling-and-seeds).
 
 Partition followed by random-key shuffle is already fused, including during
 initial ingestion: partition tuple, per-child random key and collision domain
@@ -31,9 +31,9 @@ using the last shuffle's original domain. Shuffle followed by balanced splitting
 also has a fused path. Research items should target the reverse direction and
 algorithm selection, rather than repeat these delivered optimizations.
 
-The [existing resident comparisons](performance.md#resident-full-shuffle-native-and-wasi-comparison-2026-10-15)
+The [existing resident comparisons](../../performance.md#resident-full-shuffle-native-and-wasi-comparison-2026-10-15)
 show no consistent whole-job Fisher–Yates advantage. The
-[external prefix experiment](performance.md#external-shuffle-nativebrowser-follow-up-2026-10-15)
+[external prefix experiment](../../performance.md#external-shuffle-nativebrowser-follow-up-2026-10-15)
 regresses and adds leaf materialization/decode/repack work. Neither result rules
 out a different RNG, direct distribution ingestion, smaller-group execution or
 avoiding a whole intermediate stage.

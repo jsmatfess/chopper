@@ -25,7 +25,7 @@ inherited alternate settings and repository configuration with a stale engine.
 
 The Bash entry point delegates to the Node builder, including SDK/toolchain
 selection, flags, exit status and resource-test asset routing. It now requires
-Node; [browser setup](browser.md#local-development) records that change.
+Node; [browser setup](../../browser.md#local-development) records that change.
 `browser-build.test.mjs` exercises stale sources, redirected arguments, selected
 environment target, Cargo failure, resource assets and the Linux Bash alias.
 The production export guard remains in force. Historical build source versions
@@ -67,7 +67,7 @@ completion retains its prior immediate-child scope. Detached/group-escaping
 commands remain unsupported; `on_process` observers must not reap the child.
 Specialized Job/cgroup custody, retained Original locks, watchdogs and release
 verification are unchanged and still required for their profiles. See the
-[runner contract](validation-runner.md#local-batch-execution).
+[runner contract](../../validation-runner.md#local-batch-execution).
 
 ## Campaign data and legacy observation reuse
 
@@ -94,7 +94,7 @@ is authorized by this reorganization.
 ## Historical harness source archive
 
 Nine harnesses (1,038 lines) move unchanged to
-[the historical source archive](history/shuffle-harnesses-2026-11-16/README.md).
+[the historical source archive](../../history/shuffle-harnesses-2026-11-16/README.md).
 Two unchanged dependency copies preserve sibling imports. The source inventory
 records original and archived paths, exact bytes and hashes. New controls verify
 those identities, bounded `--help` imports and current command routing without
@@ -103,7 +103,7 @@ running any workload. This is not a net line-count saving.
 Three narrative source-link relocations use the existing reversible metadata.
 Their original section identities, prose, fenced commands and all raw artifacts
 remain unchanged; whole-corpus reconstruction verifies this. The catalog maps
-historical command mentions to the archive. [Current commands](../scripts/README.md)
+historical command mentions to the archive. [Current commands](../../../scripts/README.md)
 remain distinct from old `full_shuffle_policy` / `flexible_v1` recipes.
 
 ## Validation and delivery boundary
