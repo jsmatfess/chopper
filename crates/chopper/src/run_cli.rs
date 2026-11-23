@@ -43,7 +43,7 @@ const LOCAL: &[(&str, &str)] = &[
 ];
 const GLOBAL: &[(&str, &str)] = &[
     ("input", "Input file path"),
-    ("output", "New output directory path"),
+    ("output", "New or empty output directory path"),
     ("job-version", "Job schema version (default 1)"),
     ("zip-member", "Input ZIP member"),
     ("compression", "none, gzip or zip"),
@@ -71,10 +71,13 @@ const CSV: &[(&str, &str)] = &[
     ("headers", "true or false"),
     (
         "delimiter",
-        "Exactly one literal character (quote tabs in your shell)",
+        "One ASCII character (pass a literal tab for tab-separated CSV)",
     ),
-    ("quote", "Exactly one literal character"),
-    ("escape", "Exactly one literal character"),
+    ("quote", "One ASCII character distinct from the delimiter"),
+    (
+        "escape",
+        "One ASCII character distinct from delimiter and quote; omit for doubled quotes",
+    ),
     ("line-ending", "lf or crlf"),
     ("bom", "true or false"),
     ("skip-empty-lines", "true or false"),
@@ -83,13 +86,14 @@ const CSV: &[(&str, &str)] = &[
 pub fn command() -> Command {
     let mut command = Command::new("run")
         .about("Run a JSON job (--config) or ordered --step operations")
-        .after_help("Each operation option belongs to the preceding --step. Job-wide settings may appear anywhere.\nUse --flag=value for values beginning with '-'. Names and indices have separate flags.\nExample: chopper run --input input.csv --output results --step shuffle --strategy auto --step partition --by country --yes");
+        .after_help("Each --step appends an operation. Step options belong to the preceding --step. Job-wide settings may appear anywhere.\nUse --flag=value for values beginning with '-'. Names and indices have separate flags.\nExample: chopper run --input input.csv --output results --step shuffle --strategy auto --step partition --by country --yes");
     let mut config_conflicts = Vec::new();
     for &(id, help) in GLOBAL {
+        let mut argument = Arg::new(id).long(id).help(help);
         if !matches!(id, "memory-mb" | "workers") {
             config_conflicts.push(id);
+            argument = argument.help_heading("Flag-built Jobs");
         }
-        let mut argument = Arg::new(id).long(id).help(help);
         if matches!(id, "input" | "output") {
             argument = argument.required_unless_present("config");
         }
@@ -97,7 +101,13 @@ pub fn command() -> Command {
     }
     for &(id, help) in LOCAL {
         config_conflicts.push(id);
-        command = command.arg(Arg::new(id).long(id).help(help).action(ArgAction::Append));
+        command = command.arg(
+            Arg::new(id)
+                .long(id)
+                .help(help)
+                .help_heading("Ordered steps")
+                .action(ArgAction::Append),
+        );
     }
     // Static names keep clap's owned-string feature unnecessary.
     for (ids, prefix) in [
@@ -112,7 +122,7 @@ pub fn command() -> Command {
                 "input-bom",
                 "input-skip-empty-lines",
             ],
-            "Input",
+            "Flag-built input CSV",
         ),
         (
             [
@@ -125,7 +135,7 @@ pub fn command() -> Command {
                 "output-bom",
                 "output-skip-empty-lines",
             ],
-            "Output",
+            "Flag-built output CSV",
         ),
     ] {
         for (id, &(_, help)) in ids.into_iter().zip(CSV) {

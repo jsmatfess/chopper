@@ -39,6 +39,7 @@ contracts. Review success and failure branches and current-versus-designed statu
 | Evidence, audit scripts or evidence links | Run the [read-only evidence checks](docs/benchmarks/README.md#evidence-checks). Refresh derived outputs only after reviewing intended source changes; preserve raw evidence/source snapshots byte-for-byte. |
 | Local release packaging | `python3 scripts/test-package-release.py`; Python 3.11+ and Node required. For actual native archives, run the [extracted-package smoke](docs/release-packaging.md#extracted-native-smoke) on each supported host. |
 | Saved Job schema or decoder | After building the native CLI, install `scripts/requirements-job-schema.txt` and run `python3 scripts/test-job-schema.py target/debug/chopper` (use the actual binary path). The [Job guide](docs/job-json.md#verify-the-release-schema) covers tagged-download verification. |
+| Native CLI help or Job recipes | Build with `cargo build --release --locked -p chopper`, then run `python3 scripts/cli-reference.py target/release/chopper --check` and `python3 scripts/test-job-recipes.py target/release/chopper`. Omit `--check` to regenerate the reference. On Windows, use `python` and `target/release/chopper.exe`. |
 | Documentation or CI routing | Review links, actual command options and workflow syntax; execute newly routed checks. Documentation alone does not require a full engine rebuild. |
 
 Run the applicable checks above while developing; the [CI policy](docs/ci.md)

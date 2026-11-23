@@ -9,7 +9,8 @@ operations. Historical checklists and research do not create additional work.
 
 | Question | Start here |
 | --- | --- |
-| How do I download and use Chopper? | [Native quickstart](../README.md#native-quickstart), [operator support](operator-support.md), [ordered Run CLI](run-cli.md) |
+| How do I download and use Chopper? | [Native quickstart](../README.md#native-quickstart), [operator support](operator-support.md), [runnable Job recipes](job-recipes.md) |
+| What commands ship and how do I automate them? | [CLI reference](cli-reference.md), [Run modes and automation](run-cli.md) |
 | How do I write a saved Job? | [Job JSON field reference and editor schema](job-json.md) |
 | How do I check a saved Job before running it? | [Validate CLI](validate-cli.md) |
 | How do I verify a completed native Job? | [Native manifest](native-manifest.md) |

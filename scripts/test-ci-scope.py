@@ -29,7 +29,9 @@ class ScopeTests(unittest.TestCase):
 
     def test_job_authoring_artifact_and_guide_select_native_checks(self):
         for path in ('schemas/0.5.0/job.schema.json', 'docs/job-json.md',
-                     'scripts/test-job-schema.py', 'scripts/requirements-job-schema.txt'):
+                     'scripts/test-job-schema.py', 'scripts/requirements-job-schema.txt',
+                     'docs/cli-reference.md', 'docs/job-recipes.md',
+                     'scripts/cli-reference.py', 'scripts/test-job-recipes.py'):
             self.assertEqual(self.selected(path), {'native'}, path)
 
     def test_native_engine_and_vendored_code_also_reach_browser(self):

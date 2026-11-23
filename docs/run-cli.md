@@ -1,4 +1,7 @@
-# Unified Run CLI
+# Run modes and automation
+
+Use `chopper run --help` for the installed options, or see the
+[CLI reference for this release](cli-reference.md) and [Job recipes](job-recipes.md).
 
 `chopper run` accepts either a JSON config or ordered flag-built operations:
 
@@ -8,10 +11,11 @@ chopper run --config job.json --yes
 
 The forms are mutually exclusive. `--config` permits the `--memory-mb` and
 `--workers` overrides and the `--analysis`, `--summary` and `--yes` options.
-It rejects job-building flags before opening the config. Current native packages
-support ordered Run flags. The v0.1.0 Windows executable supports only the JSON
-Run form. Existing `split` commands
-retain their fixed partition → assign → shuffle → balanced/interleaved → limits order.
+It rejects job-building flags before opening the config. Chopper resolves relative
+paths from the process's working directory, including paths inside a saved Job.
+For example, run a Job with `input: "quickstart/customers.csv"` from the directory
+that contains `quickstart/`. The `split` convenience command uses the fixed
+partition → assign → shuffle → balanced/interleaved → limits order.
 
 ```sh
 chopper run --input input.csv --output results \
@@ -21,8 +25,9 @@ chopper run --input input.csv --output results \
   --memory-mb 256 --yes
 ```
 
-Each `--step` appends an operation. Repeated operations remain separate, with the
-same parent-group semantics as the JSON operations array. Step-specific options
+Each `--step` appends an operation, applied in order within every group produced
+by the preceding operation. Repeated operations remain separate, with the same
+parent-group semantics as the JSON operations array. Step-specific options
 belong to the preceding step, even when job-wide flags occur between them.
 Wrong-scope options, duplicate scalar step settings and unknown options fail;
 they never leak forward or change another step. Repeated global settings fail.
@@ -49,21 +54,19 @@ The comma shorthands split names; use literal selectors for names containing
 commas. `--group` splits at the last `=` so names can contain commas and `=`.
 Percentages remain strings and pass through the existing exact validation.
 
-Job-wide flags may occur anywhere and do not start or end a step:
+Job-wide flags may occur anywhere and do not start or end a step. Flag-built Run
+requires `--input` and `--output`. The [generated Run help](cli-reference.md#chopper-run)
+lists all Job-wide flags, including resources, compression and CSV dialects.
 
-| Job fields | Flags |
-| --- | --- |
-| Paths / schema | Required `--input`, `--output`; optional `--zip-member`, `--job-version` (only 1 supported) |
-| Output format / caps | `--compression none\|gzip\|zip`, `--rows`, `--bytes`, `--compressed-bytes` |
-| Resources | `--memory-mb N\|auto`, `--workers`, `--grouping auto\|sort`, `--max-files`, `--max-record-bytes`, `--temp-dir`, `--temp-bytes` |
-| Input CSV | `--input-encoding`, `--input-headers`, `--input-delimiter`, `--input-quote`, `--input-escape`, `--input-line-ending`, `--input-bom`, `--input-skip-empty-lines` |
-| Output CSV | The same eight options with `--output-` prefix |
-| Versioned shuffle contracts | `--full-shuffle-rng blake3_counter_v1`, `--full-shuffle-algorithm adaptive_v1` |
+Boolean CSV options take `true` or `false`. For each dialect, delimiter, quote
+and escape must be distinct single ASCII characters and cannot be NUL, CR or LF.
+Pass a tab as a literal tab. Omit escape to use doubled quotes.
 
-Boolean CSV options take `true` or `false`. Delimiter, quote and escape take
-exactly one literal Unicode character; a tab must be passed as an actual tab,
-not the two characters `\t`. Omitted escape is null (doubled-quote behavior).
-Byte caps accept the existing byte-size syntax, such as `100MB` or `64MiB`.
+`--rows` strictly caps data records per CSV. `--bytes` strictly caps serialized
+CSV bytes, including any header, quoting, line terminators and BOM, before
+compression. A record and its required header must fit together. With gzip or
+ZIP, `--compressed-bytes` is an advisory target and stored output may exceed it.
+Byte sizes accept units such as `100MB` or `64MiB`.
 `--max-record-bytes` takes an integer byte count. Omitted resources match Job
 JSON defaults, including automatic memory and workers, an 8 MiB record size and no temporary-space cap;
 there is no seed flag or public replay guarantee. Use `--help` for the full list.
