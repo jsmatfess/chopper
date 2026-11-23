@@ -209,17 +209,26 @@ pub fn source(matches: &ArgMatches) -> Result<super::CliJob> {
         let memory = matches
             .get_one::<String>("memory-mb")
             .map(|value| number(value, "memory-mb"))
-            .transpose()?;
+            .transpose()
+            .map_err(usage_error)?;
         let workers = matches
             .get_one::<String>("workers")
             .map(|value| number(value, "workers"))
-            .transpose()?;
+            .transpose()
+            .map_err(usage_error)?;
         Ok(super::CliJob::Decoded(
             chopper::cli_job::DecodedJob::read(config)?.resource_overrides(memory, workers),
         ))
     } else {
-        Ok(super::CliJob::Ordinary(parse(matches)?.0))
+        Ok(super::CliJob::Ordinary(
+            parse(matches).map_err(usage_error)?.0,
+        ))
     }
+}
+
+fn usage_error(error: anyhow::Error) -> clap::Error {
+    clap::Error::raw(clap::error::ErrorKind::InvalidValue, format!("{error:#}"))
+        .with_cmd(&command())
 }
 
 pub fn parse(matches: &ArgMatches) -> Result<(Job, bool)> {

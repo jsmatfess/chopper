@@ -72,6 +72,54 @@ On Linux, run `rustup target add wasm32-wasip1`, then run `node scripts/build-br
 
 Open **http://127.0.0.1:8421/**. Browse for an input and an output parent folder, configure the pipeline and choose Run. Analyze is optional and returns input statistics and estimates; Run validates the current configuration independently. Results go into a new `chopper-results-<UUID>` subdirectory. A `CHOPPER-COMPLETE.json` marker is written only after every result file has closed successfully.
 
+## Choosing an output folder
+
+Use desktop Chrome or Edge with file and folder access enabled. Open the app
+over HTTPS or localhost. The browser may block protected locations, including
+Desktop or Downloads on some systems. If the browser says it can't open a
+folder, try a new subfolder such as `Chopper exports`, or choose a different
+writable folder and grant access when prompted. If the picker stays open, choose
+the new location there. If it closes, select **Browse** again. The browser can
+report a blocked choice and a cancellation the same way. Chopper reports that
+the picker returned no folder and keeps any previous selection. Check the
+**Output directory** field before running.
+
+For a desktop picker check, open the local hosted build in Chrome or Edge and
+select **Browse** under **Output directory**. Try Desktop or Downloads and
+record the OS, browser version, and what the dialog does. If the picker remains
+open, cancel it. If it closes, open it again and cancel to check Chopper's
+message. Open **Browse** again and select a writable folder or subfolder
+through the actual dialog. Select
+[the sample CSV](../examples/customers.csv), run the job and verify the results
+using the completion checks below.
+
+## Checking a hosted export after interruption
+
+The native CLI publishes its results directory atomically. During a hosted Run,
+files can appear in the results folder while the browser is still writing.
+A failed or cancelled export attempts to remove its own incomplete folder.
+Closing or losing the tab or browser during export can leave files behind.
+
+1. Open the parent folder chosen for the Run and look for its
+   `chopper-results-<UUID>` subfolder. Open `CHOPPER-COMPLETE.json` in a text
+   editor. A valid v1 marker is JSON with `complete: true`,
+   `engine: "chopper-browser"`, `version: 1`, and a positive integer
+   `files` count matching the exported files in that folder, excluding the
+   marker itself. Count a separately exported manifest if present.
+2. Keep the export if the marker is valid. A committed export can survive an
+   interruption before the app displays success. Treat a folder with a missing,
+   empty, malformed, or mismatched marker as incomplete. Once the Run has
+   stopped, remove its leftover folder if you no longer need those files.
+3. Retry with **Run**. You can use the same writable parent folder. Chopper
+   creates a fresh results subfolder on every Run.
+
+Reopening the app also checks for abandoned browser-managed temporary data.
+Use **Clear temporary data** if it appears. This control only affects Chopper's
+temporary browser storage. Check the chosen output parent separately for
+leftover exports.
+
+## Processing and limits
+
 A hosted Run with a selected `.csv` file and plain output can prefetch
 one 256 KiB source window for an empty pipeline or a single Partition. With
 an empty pipeline, the storage worker also batches adjacent writes to the
@@ -91,8 +139,6 @@ validated before crossing WASI, and delayed notifications are checked against
 the current request's completion flag. These checks fail the job cleanly rather
 than passing invalid counts into Rust. This observation does not establish a
 universal browser storage limit. See the [recorded diagnostic](benchmarks/browser-opfs-contexts-2026-10-17.jsonl).
-
-## Processing and limits
 
 The rejected independent-parent batching/replay adapter and its browser feature
 forwarding are removed. `experimental-parallel-groups` fails in Cargo, including
@@ -167,11 +213,9 @@ finalization reopens the manifest. The storage worker forwards one bounded write
 at a time and closes each destination stream before acknowledging its close. Run starts from the current
 configuration and validates its input independently of earlier Analyze results.
 
-Browser APIs cannot atomically publish a directory. An active direct Run can
-have files visible in its results folder before it finishes. A failed or
-cancelled direct Run aborts open destination streams and attempts to remove its
-own incomplete folder. Failed staged exports attempt the same removal.
-If the browser process or tab is lost, manual destination cleanup may be needed. Completion requires a valid `CHOPPER-COMPLETE.json` record, not just a file with that name. The v1 JSON record contains `complete: true`, `engine: "chopper-browser"`, `version: 1`, and `files` counting every exported result file including the manifest, excluding the marker itself. An empty or unparseable entry is incomplete. Cancellation or tab close after the marker commits does not roll back that completed folder, even if the client has not received the success reply. The native CLI retains its native publication behavior.
+Failed or cancelled direct Runs abort open destination streams. See
+[Checking a hosted export after interruption](#checking-a-hosted-export-after-interruption)
+for marker validation and destination cleanup.
 
 Keep the tab open. Cancellation stops the engine and deletes its OPFS workspace. Closing/crashing the tab can leave temporary data behind. Opening the hosted app starts a background sweep of unlocked Chopper workspaces, skipping jobs active in other tabs or workers. Returning to the tab checks for abandoned data without deleting it. **Clear temporary data** appears only when an unlocked workspace remains, including when automatic deletion fails; successful cleanup hides the control. Checks and sweeps do not overlap within a tab. Storage-access failures alone do not expose the link. It never deletes exported results. Browser storage is origin-specific, so localhost and the hosted site have separate workspaces.
 

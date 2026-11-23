@@ -10,6 +10,7 @@ operations. Historical checklists and research do not create additional work.
 | Question | Start here |
 | --- | --- |
 | How do I build and use Chopper? | [README](../README.md), [ordered Run CLI](run-cli.md) |
+| How do I write a saved Job? | [Job JSON field reference and editor schema](job-json.md) |
 | How do I check a saved Job before running it? | [Validate CLI](validate-cli.md) |
 | How do I verify a completed native Job? | [Native manifest](native-manifest.md) |
 | What behavior and limits are supported? | [Specification](specification.md), [pipeline rewrites](pipeline-rewrites.md), [validation](validation.md) |

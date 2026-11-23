@@ -280,6 +280,11 @@ fn run_using(
     use auto::Route;
     let observed = snapshot.is_some() || physical.is_some();
     let started = std::time::Instant::now();
+    job.validate()?;
+    #[cfg(not(target_os = "wasi"))]
+    let destination_was_absent = !output::preflight_destination(&job)?;
+    #[cfg(target_os = "wasi")]
+    let destination_was_absent = false;
     let mut direct_plan = if job.operations.is_empty() {
         Some(direct::Plan::Streaming)
     } else if observed {
@@ -289,9 +294,9 @@ fn run_using(
     };
     let proposed_direct = direct_plan.is_some();
     let direct_context = if let Some(mode) = direct_plan {
-        job.validate()?;
+        #[cfg(target_os = "wasi")]
         job.validate_output()?;
-        let ctx = Context::with_run_limits(
+        let mut ctx = Context::with_run_limits(
             &job.resources,
             cancel.clone(),
             notify.clone(),
@@ -303,6 +308,7 @@ fn run_using(
             },
             mode.memory_targets(),
         )?;
+        ctx.destination_was_absent = destination_was_absent;
         if mode.ready(&ctx) {
             Some(ctx)
         } else {
@@ -353,6 +359,7 @@ fn run_using(
                 physical,
                 matches!(route, Route::PrivateTerminal),
                 Some(&plan),
+                destination_was_absent,
                 |job, ctx, p, b, s| {
                     if observe_input {
                         with_input_observed(job, Reservation::new(ctx), ctx, |source, input_ctx| {
@@ -482,7 +489,10 @@ fn prepare_using(
     physical: Option<crate::observation::physical::Sink>,
     read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
 ) -> Result<Prepared> {
-    match process_using(job, cancel, notify, pool, physical, false, None, read_input)? {
+    job.validate()?;
+    match process_using(
+        job, cancel, notify, pool, physical, false, None, false, read_input,
+    )? {
         Processed::Snapshot(prepared) => Ok(prepared),
         Processed::Direct { .. } => anyhow::bail!("explicit preparation requires a snapshot"),
     }
@@ -551,10 +561,10 @@ fn process_using(
     physical: Option<crate::observation::physical::Sink>,
     direct_terminal: bool,
     auto_plan: Option<&AutoPlan>,
+    destination_was_absent: bool,
     mut read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
 ) -> Result<Processed> {
     let started = std::time::Instant::now();
-    job.validate()?;
     let mut ctx = Context::with_run_limits(
         &job.resources,
         cancel,
@@ -564,6 +574,7 @@ fn process_using(
         auto_plan.map_or([256, 256], AutoPlan::memory_targets_mb),
     )?;
     ctx.physical = physical;
+    ctx.destination_was_absent = destination_was_absent;
     ctx.direct_terminal_output = direct_terminal;
     ctx.auto_run = auto_plan.is_some();
     ctx.auto_quota_index = ctx.auto_run

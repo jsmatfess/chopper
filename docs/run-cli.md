@@ -70,8 +70,13 @@ there is no seed flag or public replay guarantee. Use `--help` for the full list
 
 Parsing and Job validation do not read the input. Execution uses the existing
 confirmation path (`--yes` for noninteractive runs), engine dispatch, cancellation
-and native atomic publication. The output path must be a new directory. CLI
-ordering changes requested logical operations, not the rewrite eligibility rules.
+and native atomic publication. Choose a new directory path or an existing empty
+directory, with an existing parent directory. Run checks the destination before
+reading the CSV or staging output. If Run reports `choose a new or empty output
+directory`, set `--output` (or `output` in the JSON job) to a fresh path and
+rerun the same job. Files, links and nonempty directories are refused. Run rechecks
+the destination when staging and commits atomically. CLI ordering changes
+requested logical operations, not the rewrite eligibility rules.
 
 Run includes an `auto_plan` in its stdout report with the effective memory and
 workers, publication route and strategy, peak writer slots and merge reader
@@ -100,6 +105,22 @@ Analyze behavior and the former `profile` command. Run always processes its own
 submitted configuration and validates the input it consumes; no prepared-result
 approval command remains. Run's normal path confirmation still precedes input
 consumption (`--yes` for noninteractive use).
+
+## Run exit statuses
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| `0` | Run published the destination and delivered one complete Analysis JSON document to stdout. Help and version requests also exit successfully. | Read stdout for the report. |
+| `1` | Run stopped before publication, including config read errors, declined confirmation, invalid input, and cancellation before commit. | Read the error on stderr. Resolve the cause before retrying. |
+| `2` | Invalid command syntax or ordered Run arguments. | Correct the invocation using the diagnostic and `chopper run --help`. |
+| `3` | Run committed the destination, but writing or flushing its stdout report failed. Stdout may contain an incomplete JSON document. | Check the configured destination before retrying. |
+
+For status `3`, stderr identifies the report failure after commit. Open
+`manifest.jsonl` in the output directory and check its job/config record.
+Verify the files listed by the manifest. For ZIP output, check the members of
+`outputs.zip`, which also contains the manifest. Keep the published result if
+it matches the job. A separate Run requires a fresh destination. Progress lines
+on stderr are advisory. Use the exit status for automation.
 
 ## Hosted command export and quoting
 
@@ -145,3 +166,12 @@ confirmation and check malformed-input cleanup. UI tests cover draft refresh,
 clipboard success/denial/fallback and oversized-command JSON fallback. Coverage
 is build/platform-specific; these checks do not establish native Windows
 execution or PowerShell 7 argument-marshalling acceptance.
+
+The native CLI publication suite checks exit statuses and destination contents.
+On Linux it uses `/dev/full` to fail the stdout report and a gated row checkpoint
+to deliver SIGINT before commit.
+
+```sh
+cargo test --locked -p chopper --test cli_publication
+cargo test --locked -p chopper --test cli_publication --features resource-contract-tests
+```
