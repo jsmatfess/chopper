@@ -4,8 +4,9 @@ THIRD-PARTY COMPONENTS AND UPSTREAM NOTICES
 
 Distribution notices for the Windows/Linux CLI and hosted WASI/browser app.
 The inventory and source pins below record the Chopper 0.3.0 provenance
-for these retained dependency and runtime notices. Upstream notice texts below are preserved byte for byte. Identical
-texts appear once with all source files identified.
+for these retained dependency and runtime notices. Upstream notice texts below
+are preserved byte for byte. Identical texts appear once with all source files
+identified.
 
 Scope: default normal-dependency closures for chopper on x86_64-unknown-linux-gnu
 and x86_64-pc-windows-msvc; chopper-browser on wasm32-wasip1; and the bundled

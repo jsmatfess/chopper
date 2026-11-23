@@ -31,4 +31,5 @@ Release documentation with prerequisites, checksum verification and rerun steps:
 https://github.com/jsmatfess/chopper/blob/v@VERSION@/README.md#native-quickstart
 
 See LICENSE, THIRD-PARTY-NOTICES.txt and licenses/zip-2.4.2/LICENSE for
-licensing and attribution.
+licensing and attribution. The patched ZIP component's source and patch notes:
+https://github.com/jsmatfess/chopper/blob/v@VERSION@/vendor/zip-2.4.2/CHOPPER.md
