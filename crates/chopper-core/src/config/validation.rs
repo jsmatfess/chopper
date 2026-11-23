@@ -44,6 +44,16 @@ macro_rules! ensure_field {
 }
 
 impl Resources {
+    /// Check the configured cap before comparing it with actual storage.
+    pub fn validate_temp_bytes(&self) -> Result<()> {
+        ensure_field!(
+            self.temp_bytes != Some(0),
+            "/resources/temp_bytes",
+            "temp_bytes must be positive"
+        );
+        Ok(())
+    }
+
     /// Validate a resolved budget without changing the requested configuration.
     pub fn validate_effective_memory(&self, memory_mb: u64) -> Result<()> {
         ensure_field!(
@@ -93,6 +103,7 @@ impl Job {
             "/resources/max_files",
             "max_files must be positive"
         );
+        self.resources.validate_temp_bytes()?;
         ensure_field!(
             self.operations.len() <= 64,
             "/operations",

@@ -300,8 +300,9 @@ impl Context {
             directory_path_bytes.clone(),
         )?;
         let maximum = if let Some(maximum) = resources.temp_bytes {
+            resources.validate_temp_bytes()?;
             ensure!(
-                maximum > 0 && maximum <= available_space(dir.path())?,
+                maximum <= available_space(dir.path())?,
                 "temporary-space budget exceeds available disk space"
             );
             maximum

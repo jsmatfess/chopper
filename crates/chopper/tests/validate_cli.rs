@@ -149,6 +149,11 @@ fn rejects_invalid_config_values_at_their_field_paths() {
             "requires output compression",
         ),
         (
+            r#""resources":{"temp_bytes":0}"#,
+            "/resources/temp_bytes",
+            "temp_bytes must be positive",
+        ),
+        (
             r#""operations":[{"type":"partition","columns":[]}]"#,
             "/operations/0/columns",
             "partition requires columns",

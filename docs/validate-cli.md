@@ -6,8 +6,8 @@ chopper validate --config job.json --json
 ```
 
 Validate uses the same admitted JSON decoder as scripted Run and Analyze. It
-checks the Job schema, version, operation invariants, configuration relationships
-and the presence of both input and output paths. It reads the config file and
+checks the [Job schema](job-json.md), version, operation invariants, configuration
+relationships and the presence of both input and output paths. It reads the config file and
 leaves the CSV or archive, output destination and temporary directory untouched.
 A valid Job can refer to an input that does not exist yet.
 
