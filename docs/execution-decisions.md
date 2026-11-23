@@ -223,9 +223,9 @@ Analyze never retains an executable result or authorizes publication.
 
 ### Historical native server job lifecycle
 
-The retired native server [job module](../crates/chopper/src/server/jobs.rs) owns the lifecycle
-around these engine calls. HTTP handlers decode requests and return literal
-transition acknowledgements; they do not decide job-state changes.
+The retired native server's job module owned the lifecycle around these engine
+calls. HTTP handlers decoded requests and returned transition acknowledgements.
+The job module decided state changes.
 
 ```mermaid
 flowchart TD
