@@ -5,7 +5,9 @@ VitePress reads the explicit source allowlist in [the site builder](../../docs-s
 Quickstart and browser guidance come from designated sections of the existing
 Markdown. Links outside the site point to the matching release tag in GitHub.
 The generated [CLI reference](../cli-reference.md) still has its native drift
-check. The site build needs Node.js 22, Git and Chromium for smoke tests.
+check. The site renders its generated help as tables and keeps the original
+terminal output under each command. The site build needs Node.js 22, Git and
+Chromium for smoke tests.
 
 ## Qualify the candidate
 

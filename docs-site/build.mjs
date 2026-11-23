@@ -2,8 +2,9 @@ import { execFileSync } from 'node:child_process';
 import { cp, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join, posix } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { build } from 'vitepress';
+import { build, createMarkdownRenderer, disposeMdItInstance } from 'vitepress';
 import { checkSite } from './check.mjs';
+import { renderCliReference } from './cli-reference.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const out = fileURLToPath(new URL('./dist', import.meta.url));
@@ -29,6 +30,8 @@ const pages = [
   ['docs/compatibility.md', 'compatibility', 'Compatibility and migration'],
 ];
 const imagePath = 'docs/images/workbench.png';
+const supportUrl = 'https://buymeacoffee.com/tblflip';
+const stylesheet = fileURLToPath(new URL('./chopper.css', import.meta.url));
 const pageMap = new Map(pages.map(([source, name]) => [source, name]));
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 5 * 1024 * 1024 });
 
@@ -40,6 +43,7 @@ function section(markdown, heading) {
 }
 
 function content(source, name) {
+  if (name === 'cli-reference') return renderCliReference(source);
   if (name === 'quickstart') {
     return section(source, 'Native quickstart')
       .replace(/^## (Native quickstart)$/m, '# $1');
@@ -80,6 +84,34 @@ function rewriteLinks(md, tag) {
   }
 }
 
+async function buildSidebar(source, documents) {
+  const renderer = await createMarkdownRenderer(source, {
+    headers: { level: [2, 3] },
+    highlight: () => '',
+  });
+  try {
+    const navigation = documents.map(({ name, text, markdown }) => {
+      const link = name === 'index' ? '/' : `/${name}`;
+      const env = { path: join(source, `${name}.md`) };
+      renderer.render(markdown, env);
+      const items = env.headers.map(heading => ({
+        text: renderer.utils.escapeHtml(heading.title),
+        link: link + heading.link,
+      }));
+      return { name, text, link, items };
+    });
+    // VitePress selects a sidebar by source path on each route change.
+    return Object.fromEntries(navigation.map(current => {
+      const items = navigation.map(({ name, text, link, items }) => (
+        items.length ? { text, link, items, collapsed: name !== current.name } : { text, link }
+      ));
+      return [`/${current.name}.md`, [{ items }]];
+    }));
+  } finally {
+    disposeMdItInstance();
+  }
+}
+
 const releases = versions.map(arg => {
   const [version, ref = `v${version}`, extra] = arg.split('=');
   if (!ref || extra !== undefined) throw new Error(`Invalid source revision for ${version}`);
@@ -98,11 +130,16 @@ try {
   for (const { version, read } of releases) {
     const source = join(staging, version);
     const base = `/versions/${version}/`;
-    await mkdir(source, { recursive: true });
-    for (const [path, name] of pages) {
-      await writeFile(join(source, `${name}.md`), content(read(path).toString(), name));
+    await mkdir(join(source, 'public'), { recursive: true });
+    await cp(stylesheet, join(source, 'public/chopper.css'));
+    const documents = pages.map(([path, name, text]) => ({
+      name, text, markdown: content(read(path).toString(), name),
+    }));
+    for (const { name, markdown } of documents) {
+      await writeFile(join(source, `${name}.md`), markdown);
     }
     await writeFile(join(source, 'workbench.png'), read(imagePath));
+    const sidebar = await buildSidebar(source, documents);
 
     await build(source, {
       onAfterConfigResolve(config) {
@@ -111,10 +148,15 @@ try {
         config.outDir = join(site, base);
         config.site.title = `Chopper ${version}`;
         config.site.description = `Operator documentation for Chopper ${version}`;
+        config.site.head.push(['link', { rel: 'stylesheet', href: base + 'chopper.css' }]);
         config.markdown = { config: md => rewriteLinks(md, `v${version}`) };
         config.site.themeConfig = {
-          nav: [{ text: 'Release notes', link: `${repo}/releases/tag/v${version}` }, { text: 'All versions', link: '../../' }],
-          sidebar: pages.map(([, name, text]) => ({ text, link: name === 'index' ? '/' : `/${name}` })),
+          nav: [
+            { text: 'Release notes', link: `${repo}/releases/tag/v${version}` },
+            { text: 'All versions', link: '../../' },
+            { text: 'Buy me a coffee', link: supportUrl },
+          ],
+          sidebar,
           search: { provider: 'local' },
         };
       },
@@ -122,17 +164,22 @@ try {
   }
 
   const [latest] = releases;
+  await cp(stylesheet, join(site, 'chopper.css'));
   await writeFile(join(site, 'index.html'), `<!doctype html>
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chopper documentation</title>
+<link rel="stylesheet" href="/chopper.css">
+<body class="version-index">
+<header><a class="version-brand" href="/">Chopper</a><a href="${supportUrl}">Buy me a coffee</a></header>
 <main>
 <h1>Chopper documentation</h1>
 <p><a href="/versions/${latest.version}/">Latest stable release (${latest.version})</a></p>
 <h2>All versions</h2>
 <ul>${releases.map(({ version }) => `<li><a href="/versions/${version}/">${version}</a></li>`).join('')}</ul>
 </main>
+</body>
 </html>
 `);
   await writeFile(join(site, '404.html'), '<!doctype html><html lang="en"><meta charset="utf-8"><title>Page not found</title><main><h1>Page not found</h1><a href="/">Browse Chopper documentation versions</a></main></html>\n');
