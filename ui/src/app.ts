@@ -446,11 +446,17 @@ $<HTMLInputElement>('execution-mode').checked=manual;populate();}catch(e){error(
 for(const mode of ['input','output']) $('browse-'+mode).onclick=async()=>{
   const buttons=['input','output'].map(m=>$<HTMLButtonElement>('browse-'+m));
   buttons.forEach(b=>b.disabled=true);
-  const button=$<HTMLButtonElement>('browse-'+mode);button.textContent='Picker open?';
+  const button=$<HTMLButtonElement>('browse-'+mode);button.textContent='Picker open…';
+  const pickerStatus=mode==='output'?$('output-picker-status'):null;
+  if(pickerStatus)pickerStatus.textContent='';
   try {
     const result=await api<{path:string|null}>('pick-path',{mode,path:value(mode)});
     if(result.path!==null){if(mode==='input')inputSelectionRevision++;setValue(mode,result.path);markDirty();if(mode==='input')void loadColumns();}
-  } catch(e){error(e);} finally {buttons.forEach(b=>b.disabled=false);button.textContent='Browse';}
+    else if(pickerStatus)pickerStatus.textContent='No folder selected in the picker. Choose Browse to try again.';
+  } catch(e){
+    if(pickerStatus)pickerStatus.textContent=`Could not open the output folder. ${e instanceof Error?e.message:String(e)}`;
+    else error(e);
+  } finally {buttons.forEach(b=>b.disabled=false);button.textContent='Browse';}
 };
 async function start(){try{job=await api<Job>('defaults');populate();await poll();setInterval(()=>void poll(),1000);}catch(e){$('connection').hidden=false;$('connection').textContent=`${e instanceof Error?e.message:e}. Open the browser app in desktop Chrome or Edge.`;}}
 const planLinks=configurePlanLinks();
