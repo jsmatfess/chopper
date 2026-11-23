@@ -251,7 +251,7 @@ impl DirectPublication {
     }
     fn with_records(job: &Job, ctx: &Context, capacity: Option<usize>) -> Result<Self> {
         let destination = std::path::absolute(&job.output)?;
-        let existing_empty = empty_destination(&destination, ctx.destination_was_absent)?;
+        let existing_empty = empty_destination(&destination, ctx.destination_was_absent())?;
         let parent = destination.parent().context("invalid output directory")?;
         ensure!(parent.is_dir(), "output parent directory does not exist");
         let stage = ctx.staging_directory(parent)?;

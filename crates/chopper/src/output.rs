@@ -925,7 +925,7 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
     } = prepared;
     ctx.pressure_boundary();
     let destination = std::path::absolute(&job.output)?;
-    let existing_empty = empty_destination(&destination, ctx.destination_was_absent)?;
+    let existing_empty = empty_destination(&destination, ctx.destination_was_absent())?;
     let parent = destination.parent().context("invalid output directory")?;
     ensure!(parent.is_dir(), "output parent directory does not exist");
     let available = available_space(parent)?;

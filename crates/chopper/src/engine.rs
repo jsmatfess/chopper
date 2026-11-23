@@ -296,7 +296,7 @@ fn run_using(
     let direct_context = if let Some(mode) = direct_plan {
         #[cfg(target_os = "wasi")]
         job.validate_output()?;
-        let mut ctx = Context::with_run_limits(
+        let ctx = Context::with_run_limits(
             &job.resources,
             cancel.clone(),
             notify.clone(),
@@ -307,8 +307,8 @@ fn run_using(
                 1
             },
             mode.memory_targets(),
+            destination_was_absent,
         )?;
-        ctx.destination_was_absent = destination_was_absent;
         if mode.ready(&ctx) {
             Some(ctx)
         } else {
@@ -572,9 +572,9 @@ fn process_using(
         pool,
         auto_plan.map_or(usize::MAX, AutoPlan::automatic_worker_limit),
         auto_plan.map_or([256, 256], AutoPlan::memory_targets_mb),
+        destination_was_absent,
     )?;
     ctx.physical = physical;
-    ctx.destination_was_absent = destination_was_absent;
     ctx.direct_terminal_output = direct_terminal;
     ctx.auto_run = auto_plan.is_some();
     ctx.auto_quota_index = ctx.auto_run
