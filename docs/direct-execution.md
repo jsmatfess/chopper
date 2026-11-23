@@ -285,6 +285,13 @@ execution or publication policy from it. Serialized output and codec allocations
 finalization and destruction. No direct path may bypass shared process admission.
 Memory accounting remains a working-allocation budget rather than an RSS cap.
 
+Before route selection can open the source, native Run checks the proposed
+destination and its parent without creating files or allocating a job context.
+If the destination was absent, a directory that appears before staging cannot
+be treated as an approved empty destination. Explicit snapshot preparation
+keeps its destination check at publication. The preflight retains only a flag
+and uses transient absolute-path discovery, as at the existing staging check.
+
 Windows uses admitted verbatim UTF-16 paths and `MoveFileExW` without replacement
 or copy flags; a competing empty destination is rejected as on Linux. Native
 output remains private on the destination filesystem until complete

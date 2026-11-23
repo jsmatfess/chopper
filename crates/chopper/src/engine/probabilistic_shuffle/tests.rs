@@ -53,6 +53,7 @@ fn execute(
     pool: Arc<MemoryPool>,
     physical: Option<physical::Sink>,
 ) -> Result<(Analysis, serde_json::Value)> {
+    job.validate()?;
     let mut input_reads = 0;
     let result = process_using(
         job,
@@ -62,6 +63,7 @@ fn execute(
         physical,
         false,
         None,
+        false,
         |job, ctx, p, b, s| {
             input_reads += 1;
             with_input(job, Reservation::new(ctx), |mut source| {
