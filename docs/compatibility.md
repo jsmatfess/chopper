@@ -1,8 +1,10 @@
 # Native CLI and Job compatibility
 
 Before upgrading, keep a copy of saved Jobs and scripts and review the release
-notes for every version you are crossing. Run a representative Job with the
-candidate binary in a fresh destination before switching automation.
+notes for every version you are crossing. If the candidate provides
+[`validate-config`](validate-cli.md), use `chopper validate-config --config job.json`
+to check the saved settings without opening the input. Run a representative
+Job in a fresh destination before switching automation.
 
 | Interface | What scripts can rely on |
 | --- | --- |
