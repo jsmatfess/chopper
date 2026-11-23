@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "input": "quickstart/customers.csv",
+  "output": "quickstart-output",
+  "compression": "none",
+  "limits": { "rows": 5 }
+}

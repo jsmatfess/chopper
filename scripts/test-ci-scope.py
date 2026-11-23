@@ -36,7 +36,8 @@ class ScopeTests(unittest.TestCase):
 
     def test_ownership_boundaries_select_their_own_checks(self):
         self.assertEqual(self.selected('scripts/windows-native.py'), {'tooling'})
-        for path in ('scripts/package-release.py', 'scripts/test-package-release.py'):
+        for path in ('scripts/package-release.py', 'scripts/test-package-release.py',
+                     'docs/releases/native-quickstart.txt', 'examples/quickstart-job.json'):
             self.assertEqual(self.selected(path), {'tooling'})
         self.assertEqual(self.selected('docs/releases/native-usage.txt'), {'browser', 'tooling'})
         self.assertEqual(self.selected('scripts/browser-artifacts.mjs'), {'browser', 'tooling'})

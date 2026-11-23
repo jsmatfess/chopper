@@ -14,6 +14,7 @@ PLATFORM_JOBS = {'all': JOBS, 'linux': JOBS, 'windows': ('native', 'tooling'), '
 TOOLS = {'scripts/windows-native.py', 'scripts/test-windows-native.py',
          'scripts/package-release.py', 'scripts/test-package-release.py',
          'docs/releases/native-usage.txt',
+         'docs/releases/native-quickstart.txt', 'examples/quickstart-job.json',
          'scripts/graphify.sh', 'scripts/graphify.ps1', 'RTK.md', '.codex/hooks.json'}
 EVIDENCE_SCRIPTS = {'scripts/benchmark-catalog.py', 'scripts/test-benchmark-catalog.py',
                     'scripts/performance-registry.py', 'scripts/test-performance-registry.py',

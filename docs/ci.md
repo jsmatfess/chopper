@@ -395,10 +395,11 @@ that runs their Python controls; their browser coverage is retained. The macOS
 profile selects neither job for these paths.
 
 Local release-packaging fixture controls run in the tooling job with Python and
-Node (no product builds). The shared browser artifact guard selects both browser
+Node. Changes to the archive's quickstart template or saved Job select tooling.
+The shared browser artifact guard selects both browser
 and tooling checks. Packaging controls cover hashes, ZIP inventories/CRC/modes,
-source cleanliness and production WASM; they do not establish platform builds
-or acceptance. See [local release packaging](release-packaging.md).
+source cleanliness and production WASM. Run the [extracted native smoke](release-packaging.md#extracted-native-smoke)
+with actual release builds for platform acceptance.
 
 ## Current owner-selected local-only operation
 

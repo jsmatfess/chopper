@@ -2,12 +2,17 @@
 """Assemble supplied release bytes locally; never build, publish or certify builds."""
 import argparse
 import copy
+import csv
 import hashlib
+import io
 import json
 from pathlib import Path
+import platform
 import re
 import stat
 import subprocess
+import sys
+import time
 import tomllib
 import zipfile
 
@@ -15,9 +20,13 @@ HOSTED = ('_headers', 'app.js', 'engine-worker.js', 'engine.wasm', 'index.html',
           'storage-worker.js', 'style.css')
 PLATFORMS = {'windows_x86_64': ('windows-x86_64', 'chopper.exe', 'x86_64-pc-windows-msvc'),
              'linux_x86_64': ('linux-x86_64', 'chopper', 'x86_64-unknown-linux-gnu')}
-PAYLOADS = {'LICENSE': 'LICENSE',
-            'licenses/zip-2.4.2/LICENSE': 'vendor/zip-2.4.2/LICENSE',
-            'README.txt': 'docs/releases/native-usage.txt'}
+LICENSES = {'LICENSE': 'LICENSE',
+            'licenses/zip-2.4.2/LICENSE': 'vendor/zip-2.4.2/LICENSE'}
+PAYLOADS = {**LICENSES,
+            'README.txt': 'docs/releases/native-quickstart.txt',
+            'THIRD-PARTY-NOTICES.txt': 'docs/releases/native-usage.txt',
+            'quickstart/customers.csv': 'examples/customers.csv',
+            'quickstart/job.json': 'examples/quickstart-job.json'}
 
 
 def require(ok, message):
@@ -90,10 +99,11 @@ def archive_name(version, kind):
     return f'chopper-{version}-{kind}.zip'
 
 
-def expected_members(kind):
+def expected_members(kind, legacy=False):
     if kind == 'hosted':
         return set(HOSTED)
-    return set(PAYLOADS) | {PLATFORMS[kind][1]}
+    payloads = {*LICENSES, 'README.txt'} if legacy else set(PAYLOADS)
+    return payloads | {PLATFORMS[kind][1]}
 
 
 def write_zip(path, members, executable=None):
@@ -106,8 +116,8 @@ def write_zip(path, members, executable=None):
             archive.writestr(info, data)
 
 
-def inspect_zip(path, kind, expected):
-    require(set(expected) == expected_members(kind), 'Receipt member inventory mismatch')
+def inspect_zip(path, kind, expected, legacy=False):
+    require(set(expected) == expected_members(kind, legacy), 'Receipt member inventory mismatch')
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
         require(len(names) == len(set(names)) and set(names) == set(expected), 'ZIP member inventory mismatch')
@@ -140,11 +150,13 @@ def verify(directory, receipt_sha256):
     require(set(receipt['package_members']) == set(packages), 'Member receipt inventory mismatch')
     require(set(p.name for p in directory.iterdir()) == set(packages) | {receipts[0].name, 'SHA256SUMS'},
             'Unexpected package output')
+    legacy = all(set(receipt['package_members'][name]) == expected_members(kind, legacy=True)
+                 for name, kind in packages.items() if kind != 'hosted')
     checksums = {}
     for name, kind in packages.items():
         path = directory / name
         match(read_regular(path), receipt['packages'][name])
-        inspect_zip(path, kind, receipt['package_members'][name])
+        inspect_zip(path, kind, receipt['package_members'][name], legacy)
         checksums[name] = receipt['packages'][name]['sha256']
         members = receipt['package_members'][name]
         if kind == 'hosted':
@@ -182,6 +194,7 @@ def assemble(source, manifest_path, output):
         match(data, manifest['hosted'][name])
     production_wasm(hosted['engine.wasm'])
     payloads = {name: read_regular(source / path) for name, path in PAYLOADS.items()}
+    payloads['README.txt'] = payloads['README.txt'].replace(b'@VERSION@', version.encode('ascii'))
     bundles = {'hosted': hosted}
     for kind, (_, executable, target) in PLATFORMS.items():
         entry = manifest['native'][kind]
@@ -224,6 +237,75 @@ def assemble(source, manifest_path, output):
     return verify(output, sums[receipt_name])
 
 
+def verify_quickstart(output, version, source_rows):
+    parts = {f'part-{i:08}.csv': count for i, count in enumerate((5, 5, 2), 1)}
+    require({p.name for p in output.iterdir()} == {*parts, 'manifest.jsonl'},
+            'Quickstart output inventory mismatch')
+    manifest = [json.loads(line) for line in
+                (output / 'manifest.jsonl').read_text(encoding='utf-8').splitlines()]
+    job, *files = manifest
+    require(job['type'] == 'job' and job['application_version'] == version
+            and job['analysis']['rows'] == 12 and job['config']['limits']['rows'] == 5,
+            'Quickstart job record mismatch')
+    require([(f['path'], f['rows']) for f in files] == list(parts.items()),
+            'Quickstart manifest filenames or row counts mismatch')
+    all_rows = []
+    for entry in files:
+        path = output / entry['path']
+        size = path.stat().st_size
+        require(entry['type'] == 'output' and entry['csv_bytes'] == entry['stored_bytes'] == size,
+                f'Quickstart manifest size mismatch: {path.name}')
+        with path.open(encoding='utf-8', newline='') as file:
+            header, *rows = csv.reader(file)
+        require(header == source_rows[0] and len(rows) == parts[path.name],
+                f'Quickstart header or row count mismatch: {path.name}')
+        all_rows.extend(rows)
+    require(all_rows == source_rows[1:], 'Quickstart CSV records or order mismatch')
+    return parts
+
+
+def smoke(archive_path, sha256, output):
+    started = time.monotonic()
+    data = read_regular(archive_path)
+    require(identity(data)['sha256'] == sha256.lower(), 'Archive SHA-256 mismatch')
+    kinds = {'win32': 'windows_x86_64', 'linux': 'linux_x86_64'}
+    require(sys.platform in kinds and platform.machine().lower() in ('amd64', 'x86_64'),
+            'Quickstart smoke requires x86-64 Windows or Linux')
+    kind = kinds[sys.platform]
+    suffix, executable, _ = PLATFORMS[kind]
+    filename = re.fullmatch(rf'chopper-([0-9]+\.[0-9]+\.[0-9]+)-{suffix}\.zip', archive_path.name)
+    require(filename, f'Expected a native {suffix} release archive')
+    version = filename[1]
+    with zipfile.ZipFile(io.BytesIO(data)) as archive:
+        names = archive.namelist()
+        require(len(names) == len(set(names)) and set(names) == expected_members(kind),
+                'Quickstart archive inventory mismatch')
+        output.mkdir()
+        archive.extractall(output)
+    binary = output / executable
+    if sys.platform == 'linux':
+        binary.chmod(0o755)
+    actual_version = subprocess.check_output([binary, '--version'], cwd=output, text=True, timeout=60)
+    require(actual_version.strip() == f'chopper {version}', 'Packaged executable version mismatch')
+    with (output / 'quickstart/customers.csv').open(encoding='utf-8', newline='') as file:
+        source_rows = list(csv.reader(file))
+    config = output / 'quickstart/job.json'
+    job = json.loads(config.read_text(encoding='utf-8'))
+    with (output / 'quickstart/run-report.json').open('wb') as report:
+        subprocess.run([binary, 'run', '--config', 'quickstart/job.json', '--yes'],
+                       cwd=output, stdout=report, check=True, timeout=60)
+    parts = verify_quickstart(output / 'quickstart-output', version, source_rows)
+    job['output'] = 'quickstart-output-rerun'
+    (output / 'quickstart/rerun-job.json').write_text(json.dumps(job) + '\n', encoding='utf-8')
+    with (output / 'quickstart/rerun-report.json').open('wb') as report:
+        subprocess.run([binary, 'run', '--config', 'quickstart/rerun-job.json', '--yes'],
+                       cwd=output, stdout=report, check=True, timeout=60)
+    verify_quickstart(output / 'quickstart-output-rerun', version, source_rows)
+    return {'archive': str(archive_path), 'sha256': sha256.lower(), 'version': version,
+            'extracted': str(output), 'parts': parts, 'manifest': 'manifest.jsonl',
+            'elapsed_seconds': round(time.monotonic() - started, 3)}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
@@ -234,12 +316,20 @@ def main():
     check = commands.add_parser('verify')
     check.add_argument('--directory', type=Path, required=True)
     check.add_argument('--receipt-sha256', required=True, help='Trusted receipt hash retained outside package')
+    quickstart = commands.add_parser('smoke', help='Run the bundled Job from a verified native archive')
+    quickstart.add_argument('--archive', type=Path, required=True)
+    quickstart.add_argument('--sha256', required=True, help='Trusted archive hash from SHA256SUMS')
+    quickstart.add_argument('--output', type=Path, required=True, help='New extraction directory')
     args = parser.parse_args()
     try:
-        result = (assemble(args.source.resolve(), args.manifest.resolve(), args.output.resolve())
-                  if args.command == 'assemble' else verify(args.directory.resolve(), args.receipt_sha256))
+        if args.command == 'assemble':
+            result = assemble(args.source.resolve(), args.manifest.resolve(), args.output.resolve())
+        elif args.command == 'verify':
+            result = verify(args.directory.resolve(), args.receipt_sha256)
+        else:
+            result = smoke(args.archive.resolve(), args.sha256, args.output.resolve())
         print(json.dumps(result, indent=2))
-    except (ValueError, KeyError, TypeError, OSError, zipfile.BadZipFile, subprocess.CalledProcessError) as error:
+    except (ValueError, KeyError, TypeError, OSError, zipfile.BadZipFile, subprocess.SubprocessError) as error:
         parser.exit(1, f'Packaging failed: {error}\n')
 
 
