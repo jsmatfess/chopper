@@ -49,10 +49,11 @@ def classify(paths, full=False, platform='all'):
             selected.add('tooling')
         elif path in EVIDENCE_SCRIPTS:
             selected.add('evidence')
-        elif path.startswith('schemas/') or path in {
+        elif path.startswith(('schemas/', 'scripts/fixtures/release-upgrade/')) or path in {
                 'docs/job-json.md', 'scripts/test-job-schema.py', 'scripts/requirements-job-schema.txt',
                 'docs/cli-reference.md', 'docs/job-recipes.md', 'scripts/cli-reference.py',
-                'scripts/test-job-recipes.py'}:
+                'scripts/test-job-recipes.py', 'docs/native-manifest.md', 'examples/verify_manifest.py',
+                'scripts/test-native-manifest.py', 'docs/compatibility.md', 'scripts/test-release-upgrade.py'}:
             selected.add('native')
         elif path.endswith('.md') and not path.startswith('docs/'):
             pass

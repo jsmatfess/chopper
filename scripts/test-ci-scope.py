@@ -31,7 +31,10 @@ class ScopeTests(unittest.TestCase):
         for path in ('schemas/0.5.0/job.schema.json', 'docs/job-json.md',
                      'scripts/test-job-schema.py', 'scripts/requirements-job-schema.txt',
                      'docs/cli-reference.md', 'docs/job-recipes.md',
-                     'scripts/cli-reference.py', 'scripts/test-job-recipes.py'):
+                     'scripts/cli-reference.py', 'scripts/test-job-recipes.py', 'docs/native-manifest.md',
+                     'examples/verify_manifest.py', 'scripts/test-native-manifest.py',
+                     'docs/compatibility.md', 'scripts/test-release-upgrade.py',
+                     'scripts/fixtures/release-upgrade/v0.3.0/input.csv.zst'):
             self.assertEqual(self.selected(path), {'native'}, path)
 
     def test_native_engine_and_vendored_code_also_reach_browser(self):

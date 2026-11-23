@@ -75,7 +75,7 @@ jobs:
       - run: cargo test --workspace --locked
       - run: cargo build --release --locked
       - uses: actions/setup-python@v7
-        if: runner.os == 'Linux'
+        if: ${{ runner.os == 'Linux' || (runner.os == 'Windows' && !env.ACT) }}
         with:
           python-version: '3.13'
       - name: Check generated CLI reference
@@ -84,6 +84,12 @@ jobs:
       - name: Test native Job recipes
         if: runner.os == 'Linux' || runner.os == 'Windows'
         run: python scripts/test-job-recipes.py target/release/chopper${{ runner.os == 'Windows' && '.exe' || '' }}
+      - name: Test native manifest verification
+        if: runner.os == 'Linux' || runner.os == 'Windows'
+        run: python scripts/test-native-manifest.py target/release/chopper${{ runner.os == 'Windows' && '.exe' || '' }}
+      - name: Test saved Job upgrades
+        if: runner.os == 'Linux' || runner.os == 'Windows'
+        run: python scripts/test-release-upgrade.py target/release/chopper${{ runner.os == 'Windows' && '.exe' || '' }}
       - run: python -m pip install -r scripts/requirements-job-schema.txt
         if: runner.os == 'Linux'
       - run: python scripts/test-job-schema.py target/release/chopper
