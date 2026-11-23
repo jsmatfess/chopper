@@ -46,7 +46,9 @@ checks source identity but does not derive transitive build provenance.
 
 Each native ZIP includes `LICENSE`, `licenses/zip-2.4.2/LICENSE`, a versioned
 `README.txt` from the [quickstart template](releases/native-quickstart.txt),
-`THIRD-PARTY-NOTICES.txt`, `quickstart/customers.csv` and `quickstart/job.json`.
+`THIRD-PARTY-NOTICES.txt`, `quickstart/customers.csv`, `quickstart/job.json` and
+`job.schema.json`. Both native archives contain an exact copy of the schema
+tracked at `schemas/VERSION/job.schema.json` in the frozen source.
 The assembler renders the README version and documentation tag from the release
 manifest's version, after checking the source version metadata. Windows adds
 `chopper.exe`. Linux adds `chopper` with Unix mode 0755.
