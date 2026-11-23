@@ -4,10 +4,10 @@ import {fileURLToPath} from 'node:url';
 import {assertProductionWasm, testAssets} from './browser-artifacts.mjs';
 import {themeBootstrap,hostedCsp} from './hosted-theme.mjs';
 const ui=fileURLToPath(new URL('../ui/',import.meta.url));
-const {version}=JSON.parse(await readFile(ui+'package.json','utf8'));
 const docsOrigin=process.env.CHOPPER_DOCS_ORIGIN;
 let releaseDocs;
 if(docsOrigin!==undefined){
+  const {version}=JSON.parse(await readFile(ui+'package.json','utf8'));
   const url=new URL(docsOrigin);
   if(!/^https:\/\/[a-z0-9.-]+\/?$/i.test(docsOrigin)||!/^\d+\.\d+\.\d+$/.test(version)){
     throw new Error('CHOPPER_DOCS_ORIGIN requires a bare HTTPS origin and a stable app version.');
