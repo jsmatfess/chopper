@@ -16,6 +16,10 @@ spec = importlib.util.spec_from_file_location('packaging', Path(__file__).with_n
 pkg = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pkg)
 
+LEGACY_PAYLOADS = {'LICENSE': 'LICENSE',
+                   'licenses/zip-2.4.2/LICENSE': 'vendor/zip-2.4.2/LICENSE',
+                   'README.txt': 'docs/releases/native-usage.txt'}
+
 
 class PackagingTests(unittest.TestCase):
     def setUp(self):
@@ -111,12 +115,24 @@ class PackagingTests(unittest.TestCase):
         self.assertFalse(extracted.exists())
 
     def test_legacy_four_member_native_archives_still_verify(self):
-        legacy = {'LICENSE': 'LICENSE',
-                  'licenses/zip-2.4.2/LICENSE': 'vendor/zip-2.4.2/LICENSE',
-                  'README.txt': 'docs/releases/native-usage.txt'}
-        with patch.object(pkg, 'PAYLOADS', legacy):
+        with patch.object(pkg, 'PAYLOADS', LEGACY_PAYLOADS):
             result = self.assemble()
         self.assertEqual(pkg.verify(self.output, result['artifact_receipt']['sha256']), result)
+
+    def test_current_release_rejects_legacy_inventory(self):
+        for name in ('Cargo.toml', 'Cargo.lock', 'ui/package.json', 'ui/package-lock.json'):
+            path = self.source / name
+            path.write_text(path.read_text().replace('0.2.0', '0.5.0'))
+        pkg.git(self.source, 'add', '.')
+        pkg.git(self.source, '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+                '-c', 'commit.gpgsign=false', 'commit', '-qm', 'candidate version')
+        self.manifest.update(version='0.5.0',
+                             release_source_commit=pkg.git(self.source, 'rev-parse', 'HEAD'),
+                             release_source_tree=pkg.git(self.source, 'rev-parse', 'HEAD^{tree}'))
+        with patch.object(pkg, 'PAYLOADS', LEGACY_PAYLOADS):
+            result = self.assemble()
+        with self.assertRaisesRegex(ValueError, 'Receipt member inventory mismatch'):
+            pkg.verify(self.output, result['artifact_receipt']['sha256'])
 
     def test_output_cannot_dirty_source(self):
         self.output = self.source / 'packages'

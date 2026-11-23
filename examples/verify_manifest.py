@@ -84,7 +84,12 @@ def verify(directory):
         require(isinstance(encoding, str) and encoding.lower() == "utf-8"
                 and dialect["escape"] is None,
                 "this example requires UTF-8 and doubled-quote escaping")
-        have_header = dialect["headers"] and analysis["header"] is not None
+        header = analysis["header"]
+        require(header is None or isinstance(header, list)
+                and all(isinstance(field, str) for field in header), "invalid header")
+        for flag in ("headers", "bom"):
+            require(type(dialect[flag]) is bool, f"invalid {flag}")
+        have_header = dialect["headers"] and header is not None
 
         archive = None
         embedded = None
