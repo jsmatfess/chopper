@@ -177,8 +177,9 @@ chopper run --input input.csv --output experiment --step partition --by country 
 chopper analyze --config examples/job.json
 ```
 
-`run --step` preserves operation order. `split` is a convenience command with a
-fixed operation order. Use `--yes` to skip confirmation in automation. Run
+`run --step` preserves operation order. To update a script that calls
+`chopper split`, follow the [migration guide](docs/compatibility.md#replace-split-with-run-in-05).
+Use `--yes` to skip confirmation in automation. Run
 validates the input and publishes atomically to a new or empty directory. It
 prints the final Analysis JSON to stdout by default and sends progress and errors
 to stderr. See the [Run CLI guide](docs/run-cli.md) and
