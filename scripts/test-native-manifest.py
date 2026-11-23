@@ -97,13 +97,16 @@ class NativeManifest(unittest.TestCase):
     def test_rejects_present_csv_with_correct_bytes_and_wrong_row_count(self):
         output = self.run_job("none")
         manifest = (output / "manifest.jsonl").read_text(encoding="utf-8")
-        record = json.loads(manifest.splitlines()[1])
+        _, *chunks = map(json.loads, manifest.splitlines())
+        record = max(chunks, key=lambda chunk: chunk["csv_bytes"])
         csv_file = output / record["path"]
         contents = csv_file.read_bytes()
         header, row = contents.split(b"\r\n", 1)
         # Replace one data record with two records occupying the same bytes.
         two_rows = b"1,,\r\n2,,"
-        csv_file.write_bytes(header + b"\r\n" + two_rows + b"x" * (len(row) - 10) + b"\r\n")
+        replacement = two_rows + b"x" * (len(row) - len(two_rows) - 2) + b"\r\n"
+        self.assertEqual(len(replacement), len(row))
+        csv_file.write_bytes(header + b"\r\n" + replacement)
         result = self.verify(output)
         self.assertEqual(result.returncode, 1, result.stdout)
         self.assertIn("row count mismatch", result.stderr)
