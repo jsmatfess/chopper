@@ -112,6 +112,18 @@ same filenames and row counts. Upload the CSVs and keep the
 [manifest](docs/native-manifest.md) for verification. Use a different output
 directory for each rerun. Chopper protects existing results.
 
+### CLI and automation guides
+
+Use `chopper --version` to match your executable to its release documentation.
+Run `chopper --help` or `chopper help run` for help from the installed binary.
+Use `./chopper` on Linux or `.\chopper.exe` in PowerShell from the extracted package.
+
+- [CLI reference](docs/cli-reference.md) for commands and options in this release.
+- [Saved Job format and schema](docs/job-json.md) for `--config`.
+- [Runnable recipes](docs/job-recipes.md) for upload chunks, country partitions and exact allocation.
+- [Validate](docs/validate-cli.md), [Run automation](docs/run-cli.md#summary-json-for-automation) and
+  [native manifests](docs/native-manifest.md) for exit status, structured reports and output verification.
+
 ![Chopper hosted workbench showing CSV configuration and execution views](docs/images/workbench.png)
 
 ## Build the CLI from source
@@ -162,11 +174,11 @@ chopper run --input input.csv --output experiment --step partition --by country 
 chopper analyze --config examples/job.json
 ```
 
-`run --step` preserves operation order; `split` is a convenience command with a
-fixed operation order. `--yes` skips confirmation, not validation. Run prompts
-before processing, prints final Analysis JSON to stdout, and sends progress and
-errors to stderr. Native publication is atomic and does not replace an existing
-destination. See the [Run CLI reference](docs/run-cli.md) and
+`run --step` preserves operation order. `split` is a convenience command with a
+fixed operation order. Use `--yes` to skip confirmation in automation. Run
+validates the input and publishes atomically to a new or empty directory. It
+prints the final Analysis JSON to stdout by default and sends progress and errors
+to stderr. See the [Run CLI guide](docs/run-cli.md) and
 [behavior specification](docs/specification.md) for the full contract.
 
 ## Build the hosted app

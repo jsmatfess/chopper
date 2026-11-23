@@ -320,11 +320,9 @@ command copying. Jobs over 24,000 UTF-16 code units or containing NUL characters
 export and `run --config` command instead, leaving headroom under Windows' native
 command-line limit. This is a conservative UI threshold, not an OS size guarantee.
 
-Native package availability is listed on the
-[releases page](https://github.com/jsmatfess/chopper/releases); macOS remains
-source-only for 0.2. See the [0.2 notes](releases/0.2.0.md) and
-[Run CLI reference](run-cli.md). Older v0.1.0 executables accept JSON Run with
-`--config`, while current source also supports ordered Run flags.
+The [native quickstart](../README.md#native-quickstart) lists supported packages.
+Use the [release CLI reference](cli-reference.md) to check command availability
+and [Run modes](run-cli.md) for ordered flags and saved Jobs.
 
 Graph, List and Timeline share step selection and the inspector. Timeline uses
 worker-observed elapsed time since processing began, captured before delivery

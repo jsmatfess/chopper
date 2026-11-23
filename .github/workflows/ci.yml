@@ -78,6 +78,12 @@ jobs:
         if: runner.os == 'Linux'
         with:
           python-version: '3.13'
+      - name: Check generated CLI reference
+        if: runner.os == 'Linux' || runner.os == 'Windows'
+        run: python scripts/cli-reference.py target/release/chopper${{ runner.os == 'Windows' && '.exe' || '' }} --check
+      - name: Test native Job recipes
+        if: runner.os == 'Linux' || runner.os == 'Windows'
+        run: python scripts/test-job-recipes.py target/release/chopper${{ runner.os == 'Windows' && '.exe' || '' }}
       - run: python -m pip install -r scripts/requirements-job-schema.txt
         if: runner.os == 'Linux'
       - run: python scripts/test-job-schema.py target/release/chopper

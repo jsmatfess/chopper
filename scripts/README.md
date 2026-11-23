@@ -6,6 +6,7 @@ source trees; they are not a list of current engine capabilities.
 
 | Purpose | Current entry point and contract |
 | --- | --- |
+| Native CLI reference and Job recipes | `python3 scripts/cli-reference.py target/release/chopper --check` and `python3 scripts/test-job-recipes.py target/release/chopper`. Use the native release binary path and omit `--check` to regenerate the [CLI reference](../docs/cli-reference.md). To check actual package bytes, pass the extracted executable and `--quickstart PATH/quickstart` to the [recipe harness](test-job-recipes.py). |
 | Browser engine | `node scripts/build-browser.mjs`; the Bash alias uses the same Node implementation. Feature flags are supported; use `CARGO_TARGET_DIR` for output placement. [Browser build contract](../docs/browser.md#local-development). |
 | Hosted package | `npm --prefix ui run build:hosted`, after restoring the default production engine. [Packaging and test boundaries](../docs/browser.md). |
 | Native release package | `python3 scripts/package-release.py` to assemble, verify and smoke-test release archives. [Packaging and exact-binary smoke](../docs/release-packaging.md). |
