@@ -16,7 +16,8 @@ flowchart TD
     Profile --> Report[Return bounded observations and source binding]
     Action -->|Native Run| NativeDestination{New or empty destination with an existing parent?}
     NativeDestination -->|No| DestinationError[Reject before CSV intake or staging]
-    NativeDestination -->|Yes| Advice[Read cheap metadata and check optional Analyze binding]
+    NativeDestination -->|Yes| Witness[Record absence or retain the empty directory identity]
+    Witness --> Advice[Read cheap metadata and check optional Analyze binding]
     Action -->|Hosted Run| Advice
     Report -.->|Optional| Advice
     Advice --> Counted{Native counted Auto or opt-in, eligible UTF-8 source and Balanced shape?}
@@ -59,7 +60,7 @@ flowchart TD
     Internal --> Publish
     Publish --> Native{Linux or Windows Run at snapshot publication, one plain Partition, at least 2 GiB and 1,152 files, and four workers?}
     Native -->|Yes| NativeBatch[Choose up to four writers per batch using live memory, descriptors and remaining files]
-    Native -->|Other native publication| NativeCommit[Atomic destination directory commit without replacement]
+    Native -->|Other native publication| NativeCommit[Recheck the empty directory identity before removal and rename without replacement]
     NativeBatch --> NativeCommit --> NativeReceipt[Engine publication receipt]
     NativeCommit -->|Commit failure| NativeCleanup[Clean owned staging and temporary files]
     Publish --> Browser[Browser destination publication]
@@ -85,7 +86,10 @@ Job from ordered `--step` blocks, then uses the same confirmation and
 existing JSON memory/worker overrides remain supported.
 Native publication checks the path again before creating staging. A directory
 that appears after an absent preflight is refused, even if it is empty. A
-permitted empty destination is checked again before non-recursive removal.
+permitted empty destination must have the preflight identity at staging and at
+the final check before non-recursive removal. The
+[native publication contract](direct-execution.md) describes the race between
+the identity check and removal.
 [Native Auto paths](direct-execution.md#native-auto-paths) lists the measured
 route bounds. Native direct dispatch checks live working headroom after building
 the context. It may return to the ordinary plan before opening the destination.

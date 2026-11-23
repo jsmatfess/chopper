@@ -129,7 +129,7 @@ pub struct Budget {
     maximum: u64,
     cancel: Arc<AtomicBool>,
     // Keep publication admission in the shared job state so it does not enlarge each sorter.
-    destination_was_absent: bool,
+    run_destination: Mutex<crate::output::RunDestination>,
 }
 // Move the existing TempPath and its reservation here on the first failed
 // unlink. No new path allocation is needed on an already-denied resource path.
@@ -238,8 +238,13 @@ impl Context {
         )
     }
 
-    pub(crate) fn destination_was_absent(&self) -> bool {
-        self.budget.destination_was_absent
+    pub(crate) fn run_destination(
+        &self,
+    ) -> std::sync::MutexGuard<'_, crate::output::RunDestination> {
+        self.budget
+            .run_destination
+            .lock()
+            .expect("Run destination lock")
     }
 
     pub fn new(
@@ -277,7 +282,6 @@ impl Context {
             memory_pool,
             automatic_worker_limit,
             [256, 256],
-            false,
         )
     }
 
@@ -288,7 +292,6 @@ impl Context {
         memory_pool: Arc<crate::resources::MemoryPool>,
         automatic_worker_limit: usize,
         auto_memory_targets_mb: [u64; 2],
-        destination_was_absent: bool,
     ) -> Result<Self> {
         #[cfg(target_os = "wasi")]
         let _ = automatic_worker_limit;
@@ -387,7 +390,7 @@ impl Context {
                 peak: AtomicU64::new(0),
                 maximum,
                 cancel,
-                destination_was_absent,
+                run_destination: Mutex::new(crate::output::RunDestination::Unchecked),
             }),
             memory: (memory_mb * 1024 * 1024) as usize,
             max_record: resources.max_record_bytes,

@@ -6,7 +6,7 @@
     "zip_member": "nested/å.csv",
     "input_csv": {
       "encoding": "utf-16le",
-      "headers": false,
+      "headers": true,
       "delimiter": "\t",
       "quote": "'",
       "escape": "\\",
@@ -125,7 +125,6 @@
     "--full-shuffle-rng=blake3_counter_v1",
     "--full-shuffle-algorithm=adaptive_v1",
     "--input-encoding=utf-16le",
-    "--input-headers=false",
     "--input-delimiter=\t",
     "--input-quote='",
     "--input-escape=\\",

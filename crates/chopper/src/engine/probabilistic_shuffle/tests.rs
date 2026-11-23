@@ -63,7 +63,7 @@ fn execute(
         physical,
         false,
         None,
-        false,
+        output::RunDestination::Unchecked,
         |job, ctx, p, b, s| {
             input_reads += 1;
             with_input(job, Reservation::new(ctx), |mut source| {

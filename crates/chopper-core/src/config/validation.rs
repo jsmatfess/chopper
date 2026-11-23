@@ -1,4 +1,4 @@
-use super::{percentage_weight, Compression, Job, Operation, Resources};
+use super::{percentage_weight, Column, Compression, Job, Operation, Resources};
 use anyhow::Result;
 use std::{borrow::Cow, error::Error, fmt};
 
@@ -154,8 +154,12 @@ impl Job {
                 format!("{path}/line_ending"),
                 "line_ending must be lf or crlf"
             );
-            crate::csv::encoding(&settings.encoding)
+            let encoding = crate::csv::encoding(&settings.encoding)
                 .map_err(|cause| JobValidationError::new(format!("{path}/encoding"), cause))?;
+            if path == "/output_csv" && settings.bom {
+                crate::csv::bom_bytes(encoding)
+                    .map_err(|cause| JobValidationError::new("/output_csv/bom", cause))?;
+            }
         }
         ensure_field!(
             !self.output_csv.headers || self.input_csv.headers,
@@ -209,6 +213,21 @@ impl Job {
                     );
                 }
                 Operation::Shuffle { .. } => {}
+            }
+            if !self.input_csv.headers {
+                let (field, selectors) = match op {
+                    Operation::Partition { columns } => ("columns", columns),
+                    Operation::Assign { strata, .. }
+                    | Operation::AssignProbabilistic { strata, .. } => ("strata", strata),
+                    _ => continue,
+                };
+                for (selector, column) in selectors.iter().enumerate() {
+                    ensure_field!(
+                        matches!(column, Column::Index(_)),
+                        format!("/operations/{index}/{field}/{selector}"),
+                        "name selection requires headers"
+                    );
+                }
             }
         }
         Ok(())

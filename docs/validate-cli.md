@@ -11,6 +11,11 @@ relationships and the presence of both input and output paths. It reads the conf
 leaves the CSV or archive, output destination and temporary directory untouched.
 A valid Job can refer to an input that does not exist yet.
 
+Output BOMs require a supported UTF encoding. Headerless input requires numeric
+column indices wherever an operation selects columns, including allocation
+strata. A name lookup and an index bounds check against actual columns require
+reading the input.
+
 [Analyze](specification.md#analyze-and-run) scans the configured input for
 statistics such as row counts and column cardinality. It provides advisory
 estimates for the pipeline. [Run](run-cli.md) independently validates the

@@ -137,7 +137,9 @@ observed requests. Error fixtures compare legacy values/errors/positions and
 source read traces; they do not claim that error objects fit the payload grant.
 Denial probes stop recording new allocations at the withheld byte and continue
 tracking prior payloads through unwinding and source-grant release, excluding
-later error carriers explicitly. The independent event oracle recomputes prefix
+later error carriers explicitly. The tracked controls check the lexical and
+fallback allowance boundaries at the reader, then check partial payload teardown
+with the tracked decoder on the lexical path. The independent event oracle recomputes prefix
 allowances from generated lexical events rather than scanning with a second copy
 of the production lexer. Decline is modeled by dropping the prompt-owned source;
 terminal interaction and actual native Windows qualification remain separate.

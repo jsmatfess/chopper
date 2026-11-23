@@ -652,22 +652,23 @@ fn source_lifetime_profile_run_prepare_cancel_and_unwind() -> Result<()> {
     let dir = tempfile::tempdir()?;
     let input = dir.path().join("input.csv");
     std::fs::write(&input, b"a\n1\n2\n")?;
-    for mode in [
-        "profile",
-        "run",
-        "prepare",
-        "cancel",
-        "unwind",
-        "decline",
-        "denied",
-        "prepare-denied",
+    for (mode, track_paths) in [
+        ("profile", false),
+        ("run", false),
+        ("prepare", false),
+        ("cancel", false),
+        ("unwind", false),
+        ("unwind", true),
+        ("decline", false),
+        ("denied", false),
+        ("prepare-denied", false),
     ] {
         let output = dir.path().join(mode);
         let wire = serde_json::to_vec(
             &serde_json::json!({"input":input,"output":output,"resources":{"memory_mb":32,"max_record_bytes":1024,"workers":1},"operations":if mode=="prepare" {serde_json::json!([{"type":"balanced","files":1}])} else {serde_json::json!([])}}),
         )?;
         let pool = ample();
-        let owner = DecodedJob::decode(Cursor::new(&wire), pool.clone(), false)?;
+        let owner = DecodedJob::decode(Cursor::new(&wire), pool.clone(), track_paths)?;
         let source = owner.grant.bytes as u64;
         let minimum = Arc::new(AtomicU64::new(u64::MAX));
         let progress_min = minimum.clone();
@@ -789,6 +790,54 @@ fn every_enabling_prefix_boundary_and_no_denial_allocation() -> Result<()> {
 }
 
 #[test]
+fn tracked_paths_require_the_extra_allowance_before_delivering_a_byte() -> Result<()> {
+    let map = br#"{"input":"retain","resources":{"workers"#;
+    // The last byte raises Q to 27: input (5), retain (6), resources (9), workers (7).
+    // Deep inputs reach the reader's fallback even though serde can reject their depth.
+    let deep = [b'['; 129];
+    for (wire, extra) in [(&map[..], 2 * 27), (&deep[..], 2 * deep.len())] {
+        let mut prefix = prefix::Prefix::default();
+        let untracked = wire
+            .iter()
+            .fold(prefix::DEFAULTS, |_, byte| prefix.advance(*byte).unwrap());
+        let required = untracked + extra;
+        for limit in [required - 1, required, required + 1] {
+            let pool = Arc::new(MemoryPool::new(limit as u64));
+            let mut grant = Grant::new(pool.clone());
+            grant.grow(prefix::DEFAULTS)?;
+            let mut source = Cursor::new(wire);
+            let mut reader = AdmittedReader {
+                source: &mut source,
+                prefix: prefix::Prefix::default(),
+                grant: &mut grant,
+                denial: None,
+                track_paths: true,
+            };
+            let mut out = [0];
+            for _ in 1..wire.len() {
+                assert_eq!(reader.read(&mut out)?, 1);
+            }
+            begin();
+            observe_grant(usize::MAX);
+            let next = reader.read(&mut out);
+            let (_, peak, _) = end();
+            assert_eq!(peak, 0, "tracked denial transport must allocate no carrier");
+            assert_eq!(next.is_ok(), limit >= required);
+            if limit < required {
+                assert!(matches!(reader.denial, Some(Denial::Shared(_))));
+                assert!(reader.read(&mut out).is_err());
+            } else {
+                assert_eq!(grant.bytes, required);
+            }
+            assert_eq!(source.position(), wire.len() as u64);
+            drop(grant);
+            assert_eq!(pool.usage().reserved_bytes, 0);
+        }
+    }
+    Ok(())
+}
+
+#[test]
 fn partial_payloads_destroy_before_denied_grant_release() -> Result<()> {
     // Stop recording new allocations at the byte withheld on denial. All
     // existing payload allocations remain in the pointer census until freed;
@@ -807,11 +856,18 @@ fn partial_payloads_destroy_before_denied_grant_release() -> Result<()> {
             Ok(n)
         }
     }
-    for wire in wire_cases() {
+    for (wire, track_paths) in wire_cases()
+        .into_iter()
+        .flat_map(|wire| [(wire.clone(), false), (wire, true)])
+    {
         let mut prefix = prefix::Prefix::default();
         let mut previous = 28;
         for (index, b) in wire.iter().enumerate() {
-            let required = prefix.advance(*b).unwrap();
+            let mut required = prefix.advance(*b).unwrap();
+            if track_paths {
+                assert!(!prefix.fallback, "control must use the lexical bound");
+                required += 2 * prefix.text;
+            }
             if required == previous {
                 continue;
             }
@@ -821,11 +877,14 @@ fn partial_payloads_destroy_before_denied_grant_release() -> Result<()> {
                 withheld: index,
             };
             begin();
-            let error = DecodedJob::decode(source, pool.clone(), false)
-                .err()
-                .context("denial expected")?;
+            let result = DecodedJob::decode(source, pool.clone(), track_paths);
             let (live, _, violations) = end();
-            assert_eq!((live, violations), (0, 0), "partial drop byte {index}");
+            let error = result.err().context("denial expected")?;
+            assert_eq!(
+                (live, violations),
+                (0, 0),
+                "partial drop byte {index}, tracked {track_paths}"
+            );
             assert!(error.downcast_ref::<MemoryAdmission>().is_some());
             assert_eq!(pool.usage().reserved_bytes, 0);
             previous = required;

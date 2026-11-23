@@ -126,15 +126,21 @@ fn destination_link_is_rejected_before_input_even_with_trailing_separator() -> R
 
 #[test]
 fn competing_empty_destination_survives_intake_and_publication_races() -> Result<()> {
-    for (prepared, phase, rows) in [
-        (false, "Reading and writing CSV", 0),
-        (true, "Reading and validating CSV", 0),
-        (false, "Serializing output", 65_536),
-        (true, "Writing output", 65_536),
-    ] {
+    for (initially_empty, prepared, phase, rows) in [false, true].into_iter().flat_map(|empty| {
+        [
+            (empty, false, "Reading and writing CSV", 0),
+            (empty, true, "Reading and validating CSV", 0),
+            (empty, false, "Serializing output", 65_536),
+            (empty, true, "Writing output", 65_536),
+        ]
+    }) {
         let dir = tempfile::tempdir()?;
         let root = dir.path();
         let output = root.join("results");
+        let original = root.join("original");
+        if initially_empty {
+            fs::create_dir(&output)?;
+        }
         let temp = root.join("temp");
         fs::create_dir(&temp)?;
         let input = root.join("input.csv");
@@ -161,22 +167,39 @@ fn competing_empty_destination_survives_intake_and_publication_races() -> Result
             job.compression = Compression::Gzip;
         }
         let competing = output.clone();
+        let moved = original.clone();
         let result = engine::run(
             job,
             Arc::new(AtomicBool::new(false)),
             Arc::new(move |progress| {
                 if progress.phase == phase && progress.rows == rows {
+                    if initially_empty {
+                        fs::rename(&competing, &moved).unwrap();
+                    }
                     fs::create_dir(&competing).unwrap();
                 }
             }),
         );
-        assert!(
-            result.is_err(),
-            "Run accepted a competing directory at {phase}"
-        );
+        let error = result.expect_err("Run accepted a competing directory");
+        let diagnostic = format!("{error:#}");
+        let expected = if initially_empty {
+            "output destination changed during Run"
+        } else if rows == 0 {
+            "output destination appeared during Run"
+        } else {
+            "publish completed result directory"
+        };
+        assert!(diagnostic.contains(expected), "{phase}: {diagnostic}");
         assert_eq!(fs::read_dir(output)?.count(), 0, "{phase}");
         assert_eq!(fs::read_dir(temp)?.count(), 0, "{phase}");
-        assert_eq!(fs::read_dir(root)?.count(), 3, "{phase}");
+        if initially_empty {
+            assert_eq!(fs::read_dir(original)?.count(), 0, "{phase}");
+        }
+        assert_eq!(
+            fs::read_dir(root)?.count(),
+            3 + usize::from(initially_empty),
+            "{phase}"
+        );
     }
     Ok(())
 }

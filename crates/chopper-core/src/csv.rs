@@ -1272,13 +1272,16 @@ pub fn bom(settings: &CsvSettings) -> Result<Vec<u8>> {
     if !settings.bom {
         return Ok(vec![]);
     }
-    let enc = encoding(&settings.encoding)?;
+    Ok(bom_bytes(encoding(&settings.encoding)?)?.to_vec())
+}
+
+pub(crate) fn bom_bytes(enc: &Encoding) -> Result<&'static [u8]> {
     if enc == UTF_8 {
-        Ok(vec![0xef, 0xbb, 0xbf])
+        Ok(&[0xef, 0xbb, 0xbf])
     } else if enc == UTF_16LE {
-        Ok(vec![0xff, 0xfe])
+        Ok(&[0xff, 0xfe])
     } else if enc == UTF_16BE {
-        Ok(vec![0xfe, 0xff])
+        Ok(&[0xfe, 0xff])
     } else {
         bail!("BOM is only supported for UTF encodings")
     }

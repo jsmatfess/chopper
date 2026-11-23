@@ -282,9 +282,9 @@ fn run_using(
     let started = std::time::Instant::now();
     job.validate()?;
     #[cfg(not(target_os = "wasi"))]
-    let destination_was_absent = !output::preflight_destination(&job)?;
+    let mut destination = output::RunDestination::preflight(&job)?;
     #[cfg(target_os = "wasi")]
-    let destination_was_absent = false;
+    let mut destination = output::RunDestination::Unchecked;
     let mut direct_plan = if job.operations.is_empty() {
         Some(direct::Plan::Streaming)
     } else if observed {
@@ -307,9 +307,9 @@ fn run_using(
                 1
             },
             mode.memory_targets(),
-            destination_was_absent,
         )?;
         if mode.ready(&ctx) {
+            *ctx.run_destination() = std::mem::take(&mut destination);
             Some(ctx)
         } else {
             // No destination or parser has started. Reuse the ordinary plan.
@@ -359,7 +359,7 @@ fn run_using(
                 physical,
                 matches!(route, Route::PrivateTerminal),
                 Some(&plan),
-                destination_was_absent,
+                destination,
                 |job, ctx, p, b, s| {
                     if observe_input {
                         with_input_observed(job, Reservation::new(ctx), ctx, |source, input_ctx| {
@@ -491,7 +491,15 @@ fn prepare_using(
 ) -> Result<Prepared> {
     job.validate()?;
     match process_using(
-        job, cancel, notify, pool, physical, false, None, false, read_input,
+        job,
+        cancel,
+        notify,
+        pool,
+        physical,
+        false,
+        None,
+        output::RunDestination::Unchecked,
+        read_input,
     )? {
         Processed::Snapshot(prepared) => Ok(prepared),
         Processed::Direct { .. } => anyhow::bail!("explicit preparation requires a snapshot"),
@@ -561,7 +569,7 @@ fn process_using(
     physical: Option<crate::observation::physical::Sink>,
     direct_terminal: bool,
     auto_plan: Option<&AutoPlan>,
-    destination_was_absent: bool,
+    destination: output::RunDestination,
     mut read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
 ) -> Result<Processed> {
     let started = std::time::Instant::now();
@@ -572,8 +580,8 @@ fn process_using(
         pool,
         auto_plan.map_or(usize::MAX, AutoPlan::automatic_worker_limit),
         auto_plan.map_or([256, 256], AutoPlan::memory_targets_mb),
-        destination_was_absent,
     )?;
+    *ctx.run_destination() = destination;
     ctx.physical = physical;
     ctx.direct_terminal_output = direct_terminal;
     ctx.auto_run = auto_plan.is_some();
