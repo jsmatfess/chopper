@@ -70,8 +70,13 @@ there is no seed flag or public replay guarantee. Use `--help` for the full list
 
 Parsing and Job validation do not read the input. Execution uses the existing
 confirmation path (`--yes` for noninteractive runs), engine dispatch, cancellation
-and native atomic publication. The output path must be a new directory. CLI
-ordering changes requested logical operations, not the rewrite eligibility rules.
+and native atomic publication. Choose a new directory path or an existing empty
+directory, with an existing parent directory. Run checks the destination before
+reading the CSV or staging output. If Run reports `choose a new or empty output
+directory`, set `--output` (or `output` in the JSON job) to a fresh path and
+rerun the same job. Files, links and nonempty directories are refused. Run rechecks
+the destination when staging and commits atomically. CLI ordering changes
+requested logical operations, not the rewrite eligibility rules.
 
 Run includes an `auto_plan` in its stdout report with the effective memory and
 workers, publication route and strategy, peak writer slots and merge reader

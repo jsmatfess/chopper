@@ -157,6 +157,8 @@ pub struct Context {
     pub(crate) physical_source: Option<u32>,
     pub(crate) physical_role: u8,
     pub(crate) direct_terminal_output: bool,
+    // An empty directory appearing after native Run preflight belongs to someone else.
+    pub(crate) destination_was_absent: bool,
     pub(crate) auto_run: bool,
     pub(crate) auto_final_writers: bool,
     pub(crate) auto_final_sync: bool,
@@ -388,6 +390,7 @@ impl Context {
             physical_source: None,
             physical_role: 0,
             direct_terminal_output: false,
+            destination_was_absent: false,
             auto_run: false,
             auto_final_writers: false,
             auto_final_sync: false,

@@ -100,6 +100,7 @@ mod tests {
             std::env::var("CHOPPER_EXACT_QUOTA_SHARED_BYTES")?.parse()?,
         ));
         let start = std::time::Instant::now();
+        job.validate()?;
         let mut visits = 0;
         let result = process_using(
             job,
@@ -109,6 +110,7 @@ mod tests {
             None,
             false,
             None,
+            false,
             |job, ctx, partitions, balanced, streaming| {
                 visits += 1;
                 with_input(job, Reservation::new(ctx), |mut source| {
