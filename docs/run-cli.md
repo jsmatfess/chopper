@@ -6,10 +6,11 @@
 chopper run --config job.json --yes
 ```
 
-The forms are mutually exclusive. `--config` permits the existing `--memory-mb`
-and `--workers` overrides plus `--yes`; it rejects all job-building flags before
-opening the config. Ordered Run flags require the current source build: the
-published v0.1.0 Windows executable supports only the JSON Run form. The separate
+The forms are mutually exclusive. `--config` permits the `--memory-mb` and
+`--workers` overrides and the `--analysis`, `--summary` and `--yes` options.
+It rejects job-building flags before opening the config. Ordered Run flags
+require the current source build: the published v0.1.0 Windows executable
+supports only the JSON Run form. The separate
 `pipeline` subcommand has been removed, with no alias. Existing `split` commands
 retain their fixed partition → assign → shuffle → balanced/interleaved → limits order.
 
@@ -73,8 +74,8 @@ confirmation path (`--yes` for noninteractive runs), engine dispatch, cancellati
 and native atomic publication. The output path must be a new directory. CLI
 ordering changes requested logical operations, not the rewrite eligibility rules.
 
-Run includes an `auto_plan` in its stdout report with the effective memory and
-workers, publication route and strategy, peak writer slots and merge reader
+Run includes an `auto_plan` in its default stdout report with the effective
+memory and workers, publication route and strategy, peak writer slots and merge reader
 fan-in, validated facts, and fallback counts. For an eligible uncapped native
 Partition, Analyze can report `writer_estimate.suggested_max_files` using the
 exact key count. A matching Run can include that recommendation in
@@ -100,6 +101,35 @@ Analyze behavior and the former `profile` command. Run always processes its own
 submitted configuration and validates the input it consumes; no prepared-result
 approval command remains. Run's normal path confirmation still precedes input
 consumption (`--yes` for noninteractive use).
+
+## Summary JSON for automation
+
+Use `--summary` on Analyze, either form of Run, or Split to print a small
+success report to stdout. The default detailed JSON remains available by
+omitting the flag.
+
+```sh
+chopper analyze --config job.json --summary > analyze-summary.json
+chopper run --config job.json --yes --summary > run-summary.json
+```
+
+Analyze reports `status: "analyzed"`, `rows` (data rows scanned) and `columns`
+(input columns). Run and Split report `status: "published"`, `rows`, `columns`,
+`groups` (final pipeline groups), `output_files` (CSV chunks, including members
+inside ZIP output), and `output_csv_bytes` (total serialized CSV bytes before
+compression, including any emitted headers). Automation should check the command's
+exit status before consuming stdout.
+
+The summary omits preview rows, headers, column and partition values, paths,
+the job configuration, and diagnostic text. The flag applies only to the
+successful stdout report. Prompts, progress and errors on stderr, command
+arguments, output CSVs and full manifests can contain sensitive information.
+Review them separately before sharing. Run and Split still publish the full
+results and manifest through native atomic publication.
+
+Keep the default Analyze JSON if you plan to use `run --analysis`. A summary has
+no advisory observations, so passing one to `--analysis` has the same effect
+on planning as omitting the advice file.
 
 ## Hosted command export and quoting
 

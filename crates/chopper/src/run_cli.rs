@@ -139,13 +139,19 @@ pub fn command() -> Command {
             .short('c')
             .value_parser(clap::value_parser!(PathBuf))
             .conflicts_with_all(config_conflicts)
-            .help("JSON job file; allows --memory-mb, --workers, --analysis and --yes"),
+            .help("JSON job file; allows --memory-mb, --workers, --analysis, --summary and --yes"),
     );
     command = command.arg(
         Arg::new("analysis")
             .long("analysis")
             .value_parser(clap::value_parser!(PathBuf))
-            .help("Optional JSON report from chopper analyze"),
+            .help("Optional full JSON report from chopper analyze"),
+    );
+    command = command.arg(
+        Arg::new("summary")
+            .long("summary")
+            .action(ArgAction::SetTrue)
+            .help(super::cli_summary::HELP),
     );
     command.arg(
         Arg::new("yes")
