@@ -133,7 +133,7 @@ test('hosted workspace preserves configuration and real app action wiring throug
     assert.equal(await support.getAttribute('rel'),'noopener noreferrer');
     assert.equal(await page.locator('#pipeline-editor > summary').count(),0);
     assert.equal(await page.locator('#add-operation').isVisible(),true);
-    assert.equal(await page.locator('#memory').inputValue(),'256');
+    assert.equal(await page.locator('#memory').inputValue(),'');
     await choose(page);
     const imported={...defaults,input:'source.csv',output:'destination',zip_member:'nested/data.csv',compression:'zip',full_shuffle_rng:'blake3_counter_v1',full_shuffle_algorithm:'adaptive_v1',input_csv:{...csv,encoding:'utf-16le',delimiter:'\t',headers:false,skip_empty_lines:true},output_csv:{...csv,encoding:'windows-1252',headers:false,bom:false,line_ending:'crlf'},resources:{...defaults.resources,memory_mb:257,max_record_bytes:123456,temp_bytes:876543,max_files:1234},limits:{rows:12,bytes:12345,compressed_bytes:6789},operations:[{type:'partition',columns:[0]},{type:'assign',groups:[{name:'a',percent:'12.345678'},{name:'b',percent:'87.654322'}],strata:[1]},{type:'assign_probabilistic',groups:[{name:'x',percent:'100'}],strata:[]},{type:'interleaved',files:2},{type:'shuffle',strategy:'fisher_yates'},{type:'balanced',files:3}]};
     await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(imported))});
@@ -142,7 +142,6 @@ test('hosted workspace preserves configuration and real app action wiring throug
     assert.equal(await page.locator('#require-reproducible').count(),0);
     const seeded=imported;
     assert.deepEqual(await exported(page),seeded);
-    await page.locator('#resource-settings > summary').click();
     await page.locator('[data-step="0"] [data-action="down"]').click();
     assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute('aria-label')),'Move step 2 down');
     const reordered=await exported(page);assert.deepEqual(reordered.operations,[seeded.operations[1],seeded.operations[0],...seeded.operations.slice(2)]);
@@ -188,9 +187,8 @@ test('keyboard validation, column picker, seed-free submission and mobile reacha
     assert.deepEqual((await exported(page)).operations,[{type:'partition',columns:['country']}]);
     await page.locator('[data-action="remove"]').click();
     assert.equal(await page.evaluate(()=>document.activeElement.id),'add-operation');
-    await page.locator('#resource-settings > summary').click();await page.locator('#max-files').fill('0');await page.locator('#resource-settings > summary').click();
+    await page.locator('#max-files').fill('0');
     await page.locator('#run-direct').click();
-    assert.equal(await page.locator('#resource-settings').getAttribute('open'),'');
     assert.equal(await page.evaluate(()=>document.activeElement.id),'max-files');
     await page.locator('#max-files').fill('100000');await page.locator('#run-direct').click();
     assert.equal(await page.locator('#seed').count(),0);
@@ -611,7 +609,6 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} linked plan text hi
       await page.locator('#draft-source .plan-link').click();assert.equal(await page.evaluate(()=>document.activeElement.id),'browse-input');
       await page.locator('#draft-output .plan-link').click();assert.equal(await page.evaluate(()=>document.activeElement.id),'browse-output');
       await page.locator('#draft-resources .plan-link').hover();
-      assert.equal(await page.locator('#resource-settings').getAttribute('open'),null,'hover highlights collapsed resources without expanding them');
       assert.equal(await page.locator('#resource-settings').evaluate(el=>el.classList.contains('plan-config-highlight')),true);
       await page.locator('#draft-resources .plan-link').click();assert.equal(await page.evaluate(()=>document.activeElement.id),'memory-mode');
     }
@@ -756,13 +753,13 @@ test('execution view opens beside the plan once per Run and preserves inspection
 });
 
 
-test('seeded saved jobs are rejected and resource details are disclosed separately',async()=>{
+test('seeded saved jobs are rejected and resource controls are visible inline',async()=>{
  const browser=await chromium.launch({headless:true});
  try{
   const {page,errors}=await harness(browser);await choose(page);
   assert.equal(await page.locator('#seed').count(),0);
-  assert.equal(await page.locator('#review details').count(),2);
-  assert.equal(await page.locator('#resource-settings > summary').innerText(),'Resource budget');
+  assert.equal(await page.locator('#review details').count(),0);
+  assert.equal(await page.locator('#max-files').isVisible(),true);
   for(const field of ['seed','random_seed']){
    await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({...defaults,[field]:'obsolete'}))});
    await page.waitForFunction(()=>document.getElementById('error').textContent.includes('no longer supported'));
@@ -908,27 +905,37 @@ test('hosted visible text is readable and technical result metadata is disclosed
 for(const hosted of [true])test(`${hosted?'hosted':'native'} friendly units preserve defaults, exact imports and canonical submissions`,async()=>{
  const browser=await chromium.launch({headless:true});
  try{
-  const {page,errors}=await harness(browser,hosted);await choose(page);await page.locator('#memory').evaluate(el=>el.closest('details').open=true);
-  assert.equal(await page.locator('#memory').inputValue(),'256');assert.equal(await page.locator('#memory-unit').inputValue(),'MiB');assert.equal(await page.locator('#max-record').inputValue(),'8');assert.equal(await page.locator('#max-record-unit').inputValue(),'MiB');
+  const {page,errors}=await harness(browser,hosted);await choose(page);
+  assert.equal(await page.locator('#memory').inputValue(),'');assert.equal(await page.locator('#memory').getAttribute('placeholder'),'At Run');assert.equal(await page.locator('#memory-unit').inputValue(),'MiB');assert.equal(await page.locator('#max-record').inputValue(),'8');assert.equal(await page.locator('#max-record-unit').inputValue(),'MiB');
   assert.equal((await exported(page)).resources.memory_mb,'auto');
-  assert.equal(await page.locator('#memory-mode').isVisible(),false);
-  assert.match(await page.locator('#auto-summary').innerText(),/Memory and writers sized at Run · 1 browser worker/);
-  await page.locator('#auto-processing summary').click();
-  assert.match(await page.locator('#auto-processing').innerText(),/View Auto decisions.*Working memory.*256 MiB.*Processing workers.*1 in the browser.*Grouping strategy.*Writer concurrency/s);
+  for(const id of ['memory-mode','memory','memory-unit','workers','grouping']){
+    assert.equal(await page.locator('#'+id).isVisible(),true);
+    assert.equal(await page.locator('#'+id).isDisabled(),true);
+  }
+  assert.equal(await page.locator('#memory-mode').inputValue(),'auto');
+  assert.equal(await page.locator('#grouping').inputValue(),'auto');
+  assert.equal(await page.locator('#workers').inputValue(),'0');
   assert.equal(await page.locator('#max-files').isEnabled(),true);
   const mode=page.getByRole('switch',{name:'Advanced execution mode'});
   assert.equal(await mode.isChecked(),false);
   await mode.focus();await page.keyboard.press('Space');
   assert.equal(await mode.isChecked(),true);
-  assert.equal(await page.locator('#auto-processing').isVisible(),false);
+  assert.equal(await page.locator('#memory').isEnabled(),true);
   assert.deepEqual((await exported(page)).resources,defaults.resources);
   await page.locator('#memory-unit').selectOption('GiB');assert.equal(await page.locator('#memory').inputValue(),'0.25');assert.equal((await exported(page)).resources.memory_mb,256);assert.match(await page.locator('#draft-resources').textContent(),/0.25 GiB/);
   assert.equal(await page.locator('#memory').getAttribute('max'),hosted?'2':'1024');
+  await page.locator('#workers').fill('2');
+  await page.locator('#grouping').selectOption('sort');
   await page.locator('#execution-mode').uncheck();
-  assert.equal(await page.locator('#memory-unit').isVisible(),false);
+  assert.equal(await page.locator('#memory-unit').isDisabled(),true);
+  assert.equal(await page.locator('#memory').inputValue(),'');
+  assert.equal(await page.locator('#workers').inputValue(),'0');
+  assert.equal(await page.locator('#grouping').inputValue(),'auto');
   assert.equal((await exported(page)).resources.memory_mb,'auto');
   await page.locator('#execution-mode').check();
   assert.equal(await page.locator('#memory').inputValue(),'0.25');
+  assert.equal(await page.locator('#workers').inputValue(),'2');
+  assert.equal(await page.locator('#grouping').inputValue(),'sort');
   assert.equal((await exported(page)).resources.memory_mb,256);
 
   if(hosted){await page.locator('#memory').fill('2');assert.equal((await exported(page)).resources.memory_mb,2048);await page.locator('#memory').fill('0.25');}
@@ -1068,10 +1075,9 @@ test('CLI handoff exports the current draft and copies a shell-safe command with
   await page.locator('#operations [data-step="1"] [data-action="up"]').click();
   command=await cli.locator('#cli-command').textContent();assert.ok(command.indexOf('--step=partition')<command.indexOf('--step=shuffle'));
   await page.locator('#execution-mode').check();
-  await page.locator('#memory').evaluate(el=>el.closest('details').open=true);await page.locator('#memory').fill('0');
+  await page.locator('#memory').fill('0');
   assert.equal(await cli.getByRole('button',{name:'Copy command'}).isDisabled(),true);
   await page.locator('#memory').fill('256');assert.equal(await cli.getByRole('button',{name:'Copy command'}).isEnabled(),true);
-  await page.locator('#memory').evaluate(el=>el.closest('details').open=false);
   const {version}=JSON.parse(await readFile('package.json','utf8'));
   assert.ok((await cli.innerText()).includes(`Use Chopper ${version.split('.').slice(0,2).join('.')} with PowerShell`));
   assert.equal(await cli.getByRole('link').getAttribute('href'),'https://github.com/jsmatfess/chopper/releases');
@@ -1160,7 +1166,6 @@ test('config controls keep theme contrast, keyboard choices and resource default
  try{
   const {page,errors}=await harness(browser);await choose(page);
   const original=await exported(page);
-  await page.locator('#resource-settings>summary').click();
   assert.deepEqual(await page.locator('#resource-settings .config-group legend').allTextContents(),['Processing','Safety limits · independent of Auto']);
   assert.equal(await page.locator('#temp-dir').isVisible(),false);
   assert.deepEqual((await exported(page)).resources,original.resources,'presentation preserves resource defaults');

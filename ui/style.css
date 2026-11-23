@@ -172,9 +172,6 @@ input:disabled,select:disabled{background:#edf0ec;color:#66736b;opacity:.7;curso
 .hosted-workspace #execution-mode:checked{background:var(--green);border-color:var(--green);color:var(--surface)}
 .hosted-workspace #execution-mode:checked::before{margin-inline-start:auto}
 .hosted-workspace .execution-mode-switch:has(#execution-mode:not(:checked))>span:first-child,.hosted-workspace #execution-mode:checked+span{font-weight:700}
-.hosted-workspace #auto-processing{padding:12px;margin-block:0 16px;border:1px solid var(--divider);border-radius:8px}
-.hosted-workspace #auto-processing h3{margin:0;font-size:.875rem}
-.hosted-workspace #auto-processing .analysis-facts{margin-block-start:8px}
 @media(forced-colors:active){.hosted-workspace #execution-mode{forced-color-adjust:none;background:Canvas;border-color:ButtonText;color:ButtonText}.hosted-workspace #execution-mode:checked{background:Highlight;border-color:Highlight;color:HighlightText}}
 
 .hosted-workspace .plan-section-index{background:#eef2f8;border-color:var(--line);color:#42516a}
@@ -960,7 +957,8 @@ input:disabled,select:disabled{background:#edf0ec;color:#66736b;opacity:.7;curso
 .hosted-workspace .source-analysis-action :is(#profile,p){margin:0}
 .hosted-workspace .source-analysis-action #profile{min-block-size:38px}
 .hosted-workspace #auto-summary{margin:0 0 5px;line-height:1.5}
-.hosted-workspace #auto-processing details{margin:0;padding-block:6px 0}
+.hosted-workspace #processing-settings :is(input,select):disabled{background:color-mix(in srgb,var(--surface),var(--muted) 10%);color:var(--muted);opacity:1}
+.hosted-workspace #processing-settings input:disabled::placeholder{color:var(--muted);opacity:1}
 .hosted-workspace .execution-live{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;padding:8px 12px;margin-block-end:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
 .hosted-workspace #execution-counters{min-inline-size:0;overflow-wrap:anywhere;color:var(--muted);font-size:.875rem}
 .hosted-workspace #execution-results-link{margin-inline-start:auto;padding:5px}

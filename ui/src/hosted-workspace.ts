@@ -129,28 +129,8 @@ export function configureHostedWorkspace() {
   title(limits,'review','04','Resources');
   for(const [card,key] of [[source,'source'],[pipeline,'pipeline'],[output,'output'],[limits,'resources']] as const)decorate(card,key);
   const reviewBody = limits.querySelector('.section-body')!;
-  const resources = limits.querySelector('details')!;
-  resources.id = 'resource-settings';
-  resources.querySelector('summary')!.textContent = 'Resource budget';
-  const autoSettings=document.createElement('div');
-  autoSettings.id='auto-processing';autoSettings.hidden=true;
-  autoSettings.innerHTML='<p id="auto-summary"></p><details><summary>View Auto decisions</summary><p id="auto-reason" class="hint"></p><dl class="analysis-facts"><div><dt>Working memory</dt><dd id="auto-memory"></dd></div><div><dt>Processing workers</dt><dd id="auto-workers"></dd></div><div><dt>Grouping strategy</dt><dd>Automatic</dd></div><div><dt>Writer concurrency</dt><dd id="auto-writers"></dd></div><div id="auto-codec-fact" hidden><dt>Peak parallel compression workers</dt><dd id="auto-codec-workers"></dd></div></dl></details>';
-  function showAutoSettings(plan?:NonNullable<State['analysis']>['auto_plan']){
-    const mib=(bytes:number)=>(bytes/(2**20)).toLocaleString(undefined,{maximumFractionDigits:1})+' MiB';
-    get('auto-summary').textContent=plan?`Auto · ${mib(plan.effective_memory_bytes)} · ${plan.effective_workers} worker${plan.effective_workers===1?'':'s'} · automatic grouping`:'Auto · Memory and writers sized at Run · 1 browser worker';
-    const memory=plan?.memory_plan;
-    get('auto-reason').textContent=plan
-      ?memory?.from_analyze?'Analyze informed the starting memory target.':memory?.preview_tier_mb?'The input preview informed the starting memory target.':'The engine sized execution using the job and available working capacity.'
-      :'Auto uses the input and pipeline to size working memory and writers. Safety limits apply in both modes.';
-    get('auto-memory').textContent=plan?`${mib(plan.effective_memory_bytes)} budget for this Run`:'Chosen at Run · usually up to 256 MiB';
-    get('auto-workers').textContent=plan?plan.effective_workers.toLocaleString():'1 in the browser';
-    get('auto-writers').textContent=plan?`${plan.measurements.peak_writer_slots.toLocaleString()} peak slots used`:'Sized during Run';
-    const codecWorkers=plan?.measurements.peak_deflate_workers??0;
-    get('auto-codec-fact').hidden=codecWorkers===0;
-    get('auto-codec-workers').textContent=codecWorkers.toLocaleString();
-  }
-  reviewBody.replaceChildren(label('execution-mode'),get('execution-mode-help'),autoSettings,resources);
-  showAutoSettings();
+  const resources=get('resource-settings');
+  reviewBody.replaceChildren(label('execution-mode'),get('execution-mode-help'),resources);
   const resourceGrid=resources.querySelector('.grid2')!;
   function resourceGroup(heading:string,ids:string[]){
     const group=document.createElement('fieldset');group.className='config-group';
@@ -160,16 +140,16 @@ export function configureHostedWorkspace() {
     return group;
   }
   const processingFields=resourceGroup('Processing',['memory-mode','memory','workers','grouping']);
-  processingFields.id='advanced-processing';
+  processingFields.id='processing-settings';
   processingFields.append(get('memory-help'));
   const safety=resourceGroup('Safety limits · independent of Auto',['max-files','max-record','temp-bytes']);
   // Browser storage has no configurable directory; retain the disabled field for import/export.
   const temporary=label('temp-dir');temporary.setAttribute('hidden','');
   resources.append(processingFields,safety,temporary);resourceGrid.remove();
   const workerLabel=label('workers');workerLabel.firstChild!.textContent='Compression workers';
-  const workerHelp=document.createElement('small');workerHelp.textContent='0 lets Auto choose. Use 1 for serial compression. Gzip and ZIP use up to four workers.';workerLabel.append(workerHelp);
+  const workerHelp=document.createElement('small');workerHelp.textContent='0 lets Chopper choose. Use 1 for serial compression. Gzip and ZIP use up to four workers.';workerLabel.append(workerHelp);
   get('workers').setAttribute('aria-describedby','workers-help');workerHelp.id='workers-help';
-  get('memory-help').textContent='Automatic normally uses up to 256 MiB and can choose a larger budget for eligible shuffles. Manual uses 1 MiB increments. This budget covers working allocations, not total browser memory.';
+  get('memory-help').textContent='Automatic chooses a budget at Run, usually up to 256 MiB. Manual uses 1 MiB increments. This budget covers working allocations, not total browser memory.';
   for(const id of ['zip-member']){const input=get(id) as HTMLInputElement;input.spellcheck=false;input.setAttribute('autocapitalize','none');}
 
   for(const card of [source,output,pipeline,limits]){
@@ -354,8 +334,7 @@ export function configureHostedWorkspace() {
       }
       filterValues();
     },
-    draft(job: Job | null, operations: number, dirty: boolean) {
-      if(dirty)showAutoSettings();
+    draft(job: Job | null, operations: number) {
       cliJob=job;renderCommand();
       get('pipeline-count').textContent = operations ? `${operations} step${operations===1?'':'s'}` : 'Optional';
       get('draft-source').textContent = job?.input ? `Read ${job.input}${job.zip_member?` → ${job.zip_member}`:''}.` : 'Choose a source file to begin.';
@@ -370,7 +349,6 @@ export function configureHostedWorkspace() {
       get('draft-resources').textContent = job ? !(get('execution-mode') as HTMLInputElement).checked ? 'Auto sets working memory, workers, grouping and writers.' : `${job.resources.memory_mb==='auto'?'Auto budget · chosen at Run':`${(get('memory') as HTMLInputElement).value} ${(get('memory-unit') as HTMLSelectElement).value} working budget`} · ${job.resources.workers===0?'auto workers':`${job.resources.workers} worker(s)`}.` : 'Finish the highlighted configuration fields to review the draft.';
     },
     state(state: State, dirty: boolean) {
-      if(state.status==='complete'&&!dirty)showAutoSettings(state.analysis?.auto_plan);
       const busy=['profiling','running'].includes(state.status),finished=processingStarted!==null&&!busy;
       const completed=state.status==='complete'?state.analysis:null;
       const files=completed?`${completed.output_files.toLocaleString()} CSV ${completed.output_files===1?'file':'files'}`:'';

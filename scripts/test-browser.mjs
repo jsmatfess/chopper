@@ -58,9 +58,11 @@ try {
       assert.equal(await app.locator('#profile').getAttribute('type'),'button');
       assert.equal(await app.locator('#require-reproducible').count(),0);
       assert.equal(await app.locator('#memory-mode').inputValue(),'auto');
-      assert.equal(await app.locator('#memory').inputValue(),'256');
+      assert.equal(await app.locator('#memory').inputValue(),'');
       assert.equal(await app.getByRole('switch',{name:'Advanced execution mode'}).isChecked(),false);
-      assert.equal(await app.locator('#memory-mode').isVisible(),false);
+      assert.equal(await app.locator('#memory-mode').isVisible(),true);
+      assert.equal(await app.locator('#memory-mode').isDisabled(),true);
+      assert.equal(await app.locator('#max-files').isEnabled(),true);
       await app.locator('#execution-mode').check();
       await revealFormControl(app,'#memory-mode');
       await app.locator('#memory-mode').selectOption('auto');
@@ -172,13 +174,13 @@ try {
       assert.match(await auto.textContent(),/Analyze observationsMatched this input/);
       assert.match(await auto.textContent(),/Analyzed rows2 · exact/);
       assert.match(await auto.textContent(),/Physical planstreaming/);
+      assert.match(await auto.textContent(),/Working memory.*MiB/);
+      assert.match(await auto.textContent(),/Peak writer slots used\d+/);
       await app.locator('.workspace-view-controls [data-workspace-view=configuration]').click();
       await app.waitForFunction(()=>document.body.dataset.workspaceView==='configuration');
-      await app.locator('#auto-processing summary').click();
-      assert.match(await app.locator('#auto-memory').innerText(),/MiB budget for this Run/);
-      assert.match(await app.locator('#auto-writers').innerText(),/peak slots used/);
+      assert.equal(await app.locator('#memory').isDisabled(),true);
       await app.locator('#max-rows').fill('2');
-      assert.match(await app.locator('#auto-memory').innerText(),/Chosen at Run/);
+      assert.equal(await app.locator('#memory').getAttribute('placeholder'),'At Run');
       await app.evaluate(async()=>{
         const root=await navigator.storage.getDirectory();
         await root.removeEntry(window.directSmokeParent,{recursive:true});

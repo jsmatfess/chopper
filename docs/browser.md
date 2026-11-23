@@ -24,11 +24,12 @@ The link is a user entry point; this documentation does not assert a current
 deployment identity. Historical deployment evidence is scoped to its recorded
 source, browser and fixtures.
 
-The hosted form starts in **Auto**. Open **Advanced** to change working memory,
-workers, grouping, or the shuffle algorithm. Switching to Auto asks the engine
-to choose these settings. Switching back restores the advanced draft. Output
-caps and safety limits apply in both modes. Importing a job with explicit
-execution settings opens Advanced.
+The hosted form starts in **Auto**. Under **Resources**, the working memory,
+compression workers, and grouping controls are visible and disabled while
+Chopper manages them. Turn on **Advanced** to edit those controls or change
+the shuffle algorithm in the pipeline. Switching back to Advanced restores
+your choices. Output caps and safety limits remain editable in both modes.
+Importing a job with explicit execution settings opens Advanced.
 
 **Results → Auto plan** shows the resource settings, actual strategy,
 writer slots and retries. Run validates its current input and can use the
@@ -1523,7 +1524,7 @@ opening a disclosure. Split/allocation modes use compact native radio choices;
 long allocation and shuffle explanations are disclosed beside their settings.
 Path/Browse and amount/unit controls share a joined outline. Parsing controls that
 do not apply to that direction are hidden while their configuration values remain
-intact. Resource budget groups Processing and Safety limits separately; the
+intact. Resources shows Processing and Safety limits inline. The
 browser-managed temporary directory is retained in configuration but hidden.
 `CHOPPER_CONFIG_SCREENSHOTS=DIR npm --prefix ui run test:workspace` optionally
 captures the expanded editor in both themes at desktop and mobile widths. The

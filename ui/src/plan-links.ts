@@ -144,7 +144,7 @@ export function configurePlanLinks() {
       return {region,control:get('add-operation')!};
     }
     if(target==='resources'){
-      const memory=get('memory-mode') as HTMLSelectElement,region=memory.closest('details')!;
+      const memory=get('memory-mode') as HTMLSelectElement,region=get('resource-settings')!;
       return {region,control:memory.disabled?get('execution-mode')!:memory};
     }
     const field=get(target);

@@ -151,10 +151,13 @@ function renderOps() {
 }
 const unitFields=new Map(['max-bytes','compressed-bytes','temp-bytes','max-record','memory'].map(id=>[id,createSizeControl($<HTMLInputElement>(id),id==='memory'?['MiB','GiB']:['B','KB','MB','GB','TB','KiB','MiB','GiB','TiB'] as SizeUnit[])]));
 const memoryControls={mode:$<HTMLSelectElement>('memory-mode'),manual:$<HTMLInputElement>('memory'),unit:unitFields.get('memory')!.unit};
+const processingControls=[memoryControls.mode,memoryControls.manual,memoryControls.unit,$<HTMLInputElement>('workers'),$<HTMLSelectElement>('grouping')];
+let advancedResourceDraft:string[]|null=null;
 const readSizeField=(id:string)=>readSize(unitFields.get(id)!);
 const sizeText=(id:string)=>value(id)?`${value(id)} ${unitFields.get(id)!.unit.value}`:'';
 function populate() {
   validation.reset();
+  advancedResourceDraft=null;
   setValue('input',job.input);setValue('output',job.output);setValue('zip-member',job.zip_member);setValue('compression',job.compression);
   setValue('max-rows',job.limits.rows);populateSize(unitFields.get('max-bytes')!,job.limits.bytes);populateSize(unitFields.get('compressed-bytes')!,job.limits.compressed_bytes);
   setValue('grouping',job.resources.grouping || 'auto');setValue('workers',job.resources.workers);populateMemory(memoryControls,job.resources.memory_mb);setValue('max-files',job.resources.max_files);populateSize(unitFields.get('max-record')!,job.resources.max_record_bytes);setValue('temp-dir',job.resources.temp_dir);populateSize(unitFields.get('temp-bytes')!,job.resources.temp_bytes);
@@ -169,12 +172,20 @@ function readJob(): Job {
     resources:{...job.resources,grouping:advanced?value('grouping') as 'auto' | 'sort':'auto',workers:advanced?Number(value('workers')):0,memory_mb:advanced?readMemory(memoryControls):'auto',max_files:Number(value('max-files')),max_record_bytes:readSizeField('max-record')!,temp_dir:value('temp-dir')||null,temp_bytes:readSizeField('temp-bytes')}};
 }
 function updateFields() {
-  updateMemory(memoryControls);
   const advanced = advancedExecution();
-  $('advanced-processing').hidden = !advanced;
-  $('auto-processing').hidden = advanced;
+  if(!advanced&&!advancedResourceDraft){
+    advancedResourceDraft=processingControls.map(control=>control.value);
+    const automaticValues=['auto','','MiB','0','auto'];
+    processingControls.forEach((control,index)=>control.value=automaticValues[index]);
+  }else if(advanced&&advancedResourceDraft){
+    const draft=advancedResourceDraft;
+    processingControls.forEach((control,index)=>control.value=draft[index]);
+    memoryControls.unit.dataset.currentUnit=memoryControls.unit.value;
+    advancedResourceDraft=null;
+  }
+  updateMemory(memoryControls);
+  memoryControls.manual.placeholder=advanced?'':'At Run';
   for(const id of ['memory-mode','workers','grouping']) $<HTMLInputElement>(id).disabled = !advanced;
-  if(!advanced) memoryControls.manual.disabled=memoryControls.unit.disabled=true;
   const zip = columnSchema?.input_is_zip ?? (/\.zip$/i.test(value('input')) || !!value('zip-member'));
   $('zip-member').closest('label')!.hidden = !zip;
   $<HTMLInputElement>('zip-member').disabled=!zip;
@@ -183,8 +194,8 @@ function updateFields() {
   unitFields.get('compressed-bytes')!.unit.disabled=uncompressed;
   $<HTMLInputElement>('compressed-bytes').disabled=uncompressed;
   const automaticMemory=value('memory-mode')==='auto';
-  $('manual-memory-help').hidden=!automaticMemory;
-  $('memory').setAttribute('aria-describedby',automaticMemory?'memory-help manual-memory-help':'memory-help');
+  $('manual-memory-help').hidden=!advanced||!automaticMemory;
+  $('memory').setAttribute('aria-describedby',advanced&&automaticMemory?'memory-help manual-memory-help':'memory-help');
   $<HTMLButtonElement>('add-operation').disabled=(job?.operations.length||0)>=64;
 }
 function markDirty() {
@@ -203,7 +214,7 @@ function updateDraft() {
   if(!job)return;
   let draft: Job | null = null;
   try { draft=readJob(); } catch { /* Keep invalid intermediate input editable. */ }
-  hostedWorkspace?.draft(draft,job.operations.length,dirty);
+  hostedWorkspace?.draft(draft,job.operations.length);
   planLinks.summary();
 }
 function renderProfile(p:InputProfile,showValues=true){
