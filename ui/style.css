@@ -731,7 +731,6 @@ input:disabled,select:disabled{background:#edf0ec;color:#66736b;opacity:.7;curso
 .hosted-workspace :is(.workspace-help a,.workspace-help button,.workspace-utilities a):focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:2px}
 .hosted-workspace .workspace-help button{padding:0;font-weight:500}
 .hosted-workspace #sample-status:empty{margin:0}
-.hosted-workspace .workspace-help a[data-docs-link]{font-weight:650}
 .hosted-workspace .workspace-utilities .sr-only{display:block}
 .hosted-workspace .workspace-utilities .footer-cleanup{flex-basis:100%;padding-block-start:6px;border-block-start:1px solid var(--line);text-align:end}
 .hosted-workspace .workspace-utilities .footer-cleanup button{min-height:34px;padding:0;color:var(--ink);font-size:.8125rem}
