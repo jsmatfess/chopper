@@ -2,7 +2,9 @@ use anyhow::{bail, ensure, Result};
 use serde::{Deserialize, Serialize};
 mod column;
 mod memory_budget;
+mod validation;
 pub use memory_budget::MemoryBudget;
+pub use validation::JobValidationError;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
@@ -225,127 +227,6 @@ impl Resources {
             memory_mb: MemoryBudget::Auto,
             ..Self::default()
         }
-    }
-
-    /// Validate a resolved budget without changing the requested configuration.
-    pub fn validate_effective_memory(&self, memory_mb: u64) -> Result<()> {
-        ensure!(
-            (32..=1_048_576).contains(&memory_mb),
-            "memory_mb must be between 32 and 1048576"
-        );
-        ensure!(
-            self.max_record_bytes > 0
-                && self.max_record_bytes as u64 <= memory_mb * 1024 * 1024 / 16,
-            "max_record_bytes must fit within 1/16 of memory budget"
-        );
-        ensure!(
-            self.workers <= 64 && self.workers as u64 <= memory_mb / 8,
-            "workers must be 0 (automatic) or at most min(64, memory_mb/8)"
-        );
-        Ok(())
-    }
-}
-impl Job {
-    pub fn validate(&self) -> Result<()> {
-        ensure!(self.version == 1, "unsupported configuration version");
-        ensure!(!self.input.is_empty(), "input path is required");
-        if let Some(memory_mb) = self.resources.memory_mb.as_mib() {
-            self.resources.validate_effective_memory(memory_mb)?;
-        } else {
-            ensure!(
-                self.resources.max_record_bytes > 0,
-                "max_record_bytes must fit within 1/16 of memory budget"
-            );
-            ensure!(
-                self.resources.workers <= 64,
-                "workers must be 0 (automatic) or at most min(64, memory_mb/8)"
-            );
-        }
-        ensure!(self.resources.max_files > 0, "max_files must be positive");
-        ensure!(
-            self.operations.len() <= 64,
-            "at most 64 operations are supported per job"
-        );
-        for cap in [
-            self.limits.rows,
-            self.limits.bytes,
-            self.limits.compressed_bytes,
-        ]
-        .into_iter()
-        .flatten()
-        {
-            ensure!(cap > 0, "limits must be positive");
-        }
-        if self.limits.compressed_bytes.is_some() {
-            ensure!(
-                self.compression != Compression::None,
-                "compressed_bytes requires output compression"
-            );
-        }
-        for settings in [&self.input_csv, &self.output_csv] {
-            for c in [
-                Some(settings.delimiter),
-                Some(settings.quote),
-                settings.escape,
-            ]
-            .into_iter()
-            .flatten()
-            {
-                ensure!(
-                    c.is_ascii() && !matches!(c, '\r' | '\n' | '\0'),
-                    "CSV delimiter, quote and escape must be non-newline ASCII characters"
-                );
-            }
-            ensure!(
-                settings.delimiter != settings.quote,
-                "delimiter and quote must differ"
-            );
-            ensure!(
-                settings.escape != Some(settings.delimiter)
-                    && settings.escape != Some(settings.quote),
-                "escape must differ from delimiter and quote; omit escape for doubled quotes"
-            );
-            ensure!(
-                matches!(settings.line_ending.as_str(), "lf" | "crlf"),
-                "line_ending must be lf or crlf"
-            );
-            crate::csv::encoding(&settings.encoding)?;
-        }
-        ensure!(
-            !self.output_csv.headers || self.input_csv.headers,
-            "cannot copy a header from headerless input; disable output headers"
-        );
-        for op in &self.operations {
-            match op {
-                Operation::Balanced { files } | Operation::Interleaved { files } => ensure!(
-                    *files > 0 && *files <= self.resources.max_files,
-                    "balanced file count must be positive and at most max_files"
-                ),
-                Operation::Partition { columns } => {
-                    ensure!(!columns.is_empty(), "partition requires columns")
-                }
-                Operation::Assign { groups, .. }
-                | Operation::AssignProbabilistic { groups, .. } => {
-                    ensure!(
-                        !groups.is_empty() && groups.len() <= 1024,
-                        "allocation needs 1 to 1024 groups"
-                    );
-                    for (i, g) in groups.iter().enumerate() {
-                        ensure!(
-                            !g.name.is_empty() && !groups[..i].iter().any(|p| p.name == g.name),
-                            "allocation names must be nonempty and unique"
-                        );
-                    }
-                    let mut total = 0;
-                    for group in groups {
-                        total += percentage_weight(&group.percent)?;
-                    }
-                    ensure!(total == 100_000_000, "percentages must sum exactly to 100");
-                }
-                Operation::Shuffle { .. } => {}
-            }
-        }
-        Ok(())
     }
 }
 pub fn resolve_columns(

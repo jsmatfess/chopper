@@ -2,6 +2,7 @@ mod cli_json;
 mod cli_summary;
 mod guide;
 mod run_cli;
+mod validate_cli;
 
 use anyhow::{ensure, Context, Result};
 use chopper::{core::*, engine, storage::Notify};
@@ -35,6 +36,14 @@ enum Command {
     },
     /// Print a complete example job configuration.
     Example,
+    /// Check a saved job without opening its input or creating output.
+    Validate {
+        #[arg(short, long)]
+        config: PathBuf,
+        /// Write a machine-readable validation result to stdout.
+        #[arg(long)]
+        json: bool,
+    },
     /// Inspect all input rows and report bounded statistics and pipeline estimates.
     Analyze {
         #[arg(short, long)]
@@ -231,6 +240,11 @@ fn main_result() -> Result<()> {
     }
     match Cli::from_arg_matches(&matches)?.command {
         Command::Guide { config } => guide::run(config)?,
+        Command::Validate { config, json } => {
+            if !validate_cli::run(&config, json)? {
+                std::process::exit(1);
+            }
+        }
         Command::Example => {
             let mut job = Job {
                 input: "input.csv".into(),

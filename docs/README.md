@@ -11,6 +11,7 @@ operations. Historical checklists and research do not create additional work.
 | --- | --- |
 | How do I download and use Chopper? | [Native quickstart](../README.md#native-quickstart), [operator support](operator-support.md), [ordered Run CLI](run-cli.md) |
 | How do I write a saved Job? | [Job JSON field reference and editor schema](job-json.md) |
+| How do I check a saved Job before running it? | [Validate CLI](validate-cli.md) |
 | How do I verify a completed native Job? | [Native manifest](native-manifest.md) |
 | Will my scripts and saved Jobs work after an upgrade? | [Compatibility and migration](compatibility.md) |
 | What behavior and limits are supported? | [Specification](specification.md), [pipeline rewrites](pipeline-rewrites.md), [validation](validation.md) |

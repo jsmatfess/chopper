@@ -282,7 +282,7 @@ fn run_using(
     let started = std::time::Instant::now();
     job.validate()?;
     #[cfg(not(target_os = "wasi"))]
-    let destination_was_absent = !output::preflight_destination(&job.output)?;
+    let destination_was_absent = !output::preflight_destination(&job)?;
     #[cfg(target_os = "wasi")]
     let destination_was_absent = false;
     let mut direct_plan = if job.operations.is_empty() {
@@ -295,7 +295,7 @@ fn run_using(
     let proposed_direct = direct_plan.is_some();
     let direct_context = if let Some(mode) = direct_plan {
         #[cfg(target_os = "wasi")]
-        ensure!(!job.output.is_empty(), "output path is required");
+        job.validate_output()?;
         let mut ctx = Context::with_run_limits(
             &job.resources,
             cancel.clone(),
@@ -2961,7 +2961,7 @@ impl Prepared {
             .map(output::PublishedAnalysis::into_analysis)
     }
     pub(crate) fn execute_published(self) -> Result<output::PublishedAnalysis> {
-        ensure!(!self.job.output.is_empty(), "output path is required");
+        self.job.validate_output()?;
         let mut observation = self.ctx.physical_scope([0, 0]);
         observation.physical_source = crate::observation::physical::identity(
             self.job.operations.len() + 1,
