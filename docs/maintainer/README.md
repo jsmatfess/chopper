@@ -21,6 +21,8 @@ For installation and operator workflows, see the [user guide](../user/README.md)
   covers reproducible batches. [Validation](../validation.md) records supported scope.
 - [Packaging](../release-packaging.md), [hosted qualification](hosted-tiny-qualification.md),
   and [rollback](release-rollback.md) cover release operations.
+- [Operator docs release](operator-docs-release.md) covers candidate checks and
+  publishing the versioned site.
 - [Current state](current-state.md) routes current behavior, evidence, and delivery records.
   [Release records](../releases/) hold version notes and acceptance receipts.
 

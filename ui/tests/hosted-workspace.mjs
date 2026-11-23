@@ -78,6 +78,13 @@ test('hosted workspace preserves configuration and real app action wiring throug
     }
     assert.equal(await page.locator('.workspace-utilities').isVisible(),true,'project utilities remain visible');
     assert.equal(await page.locator('.footer-cleanup').isHidden(),true,'no cleanup link without detected abandoned data');
+    const docs=page.getByRole('link',{name:'Docs',exact:true});
+    assert.equal(await docs.isVisible(),true);
+    assert.equal(await docs.getAttribute('href'),'https://github.com/jsmatfess/chopper/blob/main/docs/user/README.md');
+    await page.getByRole('link',{name:'Chopper home'}).focus();
+    await page.keyboard.press('Tab'); // Theme control.
+    await page.keyboard.press('Tab');
+    assert.equal(await docs.evaluate(link=>link===document.activeElement),true);
     assert.equal(await page.getByRole('link',{name:'GitHub',exact:false}).last().getAttribute('href'),'https://github.com/jsmatfess/chopper');
     const support=page.getByRole('link',{name:'Buy me a coffee',exact:false});
     assert.equal(await support.getAttribute('href'),'https://buymeacoffee.com/tblflip');

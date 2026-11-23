@@ -75,6 +75,18 @@ On Linux, run `rustup target add wasm32-wasip1`, then run `node scripts/build-br
 
 Open **http://127.0.0.1:8421/**. Browse for an input and an output parent folder, configure the pipeline and choose Run. Analyze is optional and returns input statistics and estimates; Run validates the current configuration independently. Results go into a new `chopper-results-<UUID>` subdirectory. A `CHOPPER-COMPLETE.json` marker is written only after every result file has closed successfully.
 
+## Browser requirements and storage
+
+Use desktop Chrome or Edge over HTTPS or localhost with file and folder
+access enabled. The app also needs browser-managed storage and Web Locks.
+Your CSV stays on your device during processing.
+
+Large jobs can make several passes and require temporary space in
+browser-managed storage as well as free space in the destination folder.
+Browser storage quotas depend on the browser and profile. If you run out
+of space, check both locations and retry after freeing space or choose the
+[native CLI](../README.md#native-quickstart) for jobs that exceed browser capacity.
+
 ## Choosing an output folder
 
 Use desktop Chrome or Edge with file and folder access enabled. Open the app

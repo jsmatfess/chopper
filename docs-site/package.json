@@ -1,0 +1,20 @@
+{
+  "name": "chopper-operator-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "check": "node check.mjs dist",
+    "smoke": "node smoke.mjs",
+    "build:published": "node published.mjs"
+  },
+  "devDependencies": {
+    "parse5": "7.3.0",
+    "playwright": "1.64.0",
+    "vitepress": "1.6.4",
+    "wrangler": "4.162.0"
+  },
+  "overrides": {
+    "vite": "6.4.6"
+  }
+}

@@ -32,6 +32,7 @@ export function configureHostedWorkspace() {
   footer.classList.add('project-footer');
   footer.innerHTML='<nav aria-label="Chopper project"><a href="https://github.com/jsmatfess/chopper" target="_blank" rel="noopener noreferrer">GitHub<span class="sr-only"> (opens in a new tab)</span></a><a href="https://buymeacoffee.com/tblflip" target="_blank" rel="noopener noreferrer">Buy me a coffee<span class="sr-only"> (opens in a new tab)</span></a></nav><div class="footer-cleanup" hidden></div>';
   const utilities=document.createElement('div');utilities.className='workspace-utilities';utilities.setAttribute('role','region');utilities.setAttribute('aria-label','Appearance and project links');
+  footer.querySelector('nav')!.prepend(document.querySelector('[data-docs-link]')!);
   utilities.append(document.querySelector('.theme-control')!,footer.querySelector('nav')!,footer.querySelector('.footer-cleanup')!);document.querySelector('.rail')!.append(utilities);
   document.querySelector('h1')!.textContent = 'CSV workbench';
   document.querySelector('.eyebrow')!.remove();

@@ -152,3 +152,11 @@ with migration guidance and no retained result or temporary files. It verifies
 that the migrated Jobs work and removes its isolated test workspace.
 Record the tested executable's SHA-256 and the result with each platform's
 release evidence.
+
+## Operator documentation
+
+Qualify the versioned [operator site and hosted Docs link](maintainer/operator-docs-release.md)
+against the frozen candidate before cutting the tag. Keep the docs output in its
+own directory and package the hosted app with the explicit release docs origin.
+After the approved GitHub release is public, publish the tagged docs and verify
+the live deep links, search and app link before recording release completion.

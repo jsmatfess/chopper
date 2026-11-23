@@ -1,0 +1,36 @@
+name: Operator docs check
+
+on:
+  pull_request:
+    paths:
+      - README.md
+      - 'docs/**'
+      - 'docs-site/**'
+      - ui/package.json
+      - '.github/workflows/docs-*.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: docs-site/package-lock.json
+      - run: npm ci
+        working-directory: docs-site
+      - name: Build docs from the checked-out revision
+        working-directory: docs-site
+        run: |
+          version=$(node -p "require('../ui/package.json').version")
+          npm run build -- "${version}=HEAD"
+      - run: npx playwright install --with-deps chromium
+        working-directory: docs-site
+      - run: npm run smoke
+        working-directory: docs-site

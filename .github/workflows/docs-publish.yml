@@ -1,0 +1,111 @@
+name: Publish stable operator docs
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing published stable release tag (for example, v0.5.0)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+# Discover all stable releases after acquiring the publication slot. A retry of
+# an older release still ships every version and points latest to the newest.
+concurrency:
+  group: chopper-operator-docs-production
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: >-
+      (github.event_name == 'release' && !github.event.release.prerelease && !github.event.release.draft) ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: docs-site/package-lock.json
+      - run: npm ci
+        working-directory: docs-site
+      - name: Build all supported published stable versions
+        working-directory: docs-site
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REQUESTED_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: npm run build:published -- "$REQUESTED_TAG"
+      - run: npx playwright install --with-deps chromium
+        working-directory: docs-site
+      - run: npm run smoke
+        working-directory: docs-site
+      - uses: actions/upload-artifact@v7
+        with:
+          name: chopper-operator-docs
+          path: docs-site/dist/
+          if-no-files-found: error
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: docs-site/package-lock.json
+      - run: npm ci
+        working-directory: docs-site
+      - uses: actions/download-artifact@v8
+        with:
+          name: chopper-operator-docs
+          path: docs-site/dist
+      - name: Deploy docs to production
+        working-directory: docs-site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_DOCS_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_DOCS_ACCOUNT_ID }}
+          PAGES_PROJECT: ${{ vars.CLOUDFLARE_DOCS_PROJECT }}
+        run: |
+          : "${CLOUDFLARE_API_TOKEN:?Cloudflare docs token is required}"
+          : "${CLOUDFLARE_ACCOUNT_ID:?Cloudflare docs account is required}"
+          : "${PAGES_PROJECT:?Cloudflare docs project is required}"
+          ./node_modules/.bin/wrangler pages deploy dist --project-name "$PAGES_PROJECT" --branch main
+
+  smoke:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: npm ci
+        working-directory: docs-site
+      - uses: actions/download-artifact@v8
+        with:
+          name: chopper-operator-docs
+          path: docs-site/dist
+      - run: npx playwright install --with-deps chromium
+        working-directory: docs-site
+      - name: Check live docs provenance, deep links and search
+        working-directory: docs-site
+        env:
+          DOCS_ORIGIN: https://chopper-docs.pages.dev
+        run: |
+          curl --fail --silent --show-error --retry 8 --retry-all-errors "$DOCS_ORIGIN/versions.json" --output "$RUNNER_TEMP/docs-live.json"
+          cmp dist/versions.json "$RUNNER_TEMP/docs-live.json"
+          npm run smoke -- "$DOCS_ORIGIN"
