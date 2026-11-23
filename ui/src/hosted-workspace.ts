@@ -100,12 +100,10 @@ export function configureHostedWorkspace() {
   output.innerHTML = '<div class="section-title"><span class="number"></span><h2></h2></div><div class="section-body"></div>';
   title(output,'output-settings','02','Output');
   const outputBody = output.querySelector('.section-body')!;
-  const destination = label('output');
-  destination.querySelector('small')!.textContent = 'Saves to a new results folder. Keep this tab open until finished.';
   const caps = document.createElement('div'); caps.className = 'grid2';
   caps.append(label('max-rows'),label('max-bytes'));
   caps.classList.add('file-limits');
-  outputBody.append(destination,label('compression'),caps);
+  outputBody.append(get('output-picker'),label('compression'),caps);
   const capHelp = document.createElement('p'); capHelp.className = 'hint';
   capHelp.textContent = 'Per CSV: rows or encoded bytes, including headers. Records stay whole.';
   outputBody.append(capHelp);
