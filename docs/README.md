@@ -9,7 +9,7 @@ operations. Historical checklists and research do not create additional work.
 
 | Question | Start here |
 | --- | --- |
-| How do I build and use Chopper? | [README](../README.md), [ordered Run CLI](run-cli.md) |
+| How do I download and use Chopper? | [Native quickstart](../README.md#native-quickstart), [operator support](operator-support.md), [ordered Run CLI](run-cli.md) |
 | How do I write a saved Job? | [Job JSON field reference and editor schema](job-json.md) |
 | How do I check a saved Job before running it? | [Validate CLI](validate-cli.md) |
 | How do I verify a completed native Job? | [Native manifest](native-manifest.md) |
@@ -24,9 +24,9 @@ operations. Historical checklists and research do not create additional work.
 
 | Question | Start here |
 | --- | --- |
-| What is being prepared for 0.2? | [0.2.0 preparation notes](releases/0.2.0.md), [current state](current-state.md) |
+| Where are current releases and scope? | [GitHub Releases](https://github.com/jsmatfess/chopper/releases), [current state](current-state.md) |
 | How do I package and restore exact release bytes? | [Local packaging](release-packaging.md), [rollback](release-rollback.md) |
-| Which previous release and candidate records exist? | [0.1.0 notes](releases/0.1.0.md), [prior focused 0.2 candidate](releases/0.2.0-review.md), [its acceptance plan](release-acceptance-plan.md) |
+| Which previous release and candidate records exist? | [0.4.0](releases/0.4.0.md), [0.3.0](releases/0.3.0.md), [0.2.0](releases/0.2.0.md), [0.1.0](releases/0.1.0.md), [prior focused 0.2 candidate](releases/0.2.0-review.md) and [its acceptance plan](release-acceptance-plan.md) |
 | Which goals describe future work? | [Product direction](product-direction.md), [workload investigation](workload-investigation.md); these supersede conflicting priorities in the [earlier Auto brief](auto-mode-and-maintainability.md) |
 | What does guided CLI support? | [Guided contract](guided-cli-specification.md), [scoped validation](guided-cli-validation.md) |
 | How do execution choices and observations work? | [Decision diagrams](execution-decisions.md), [hosted observations](execution-observation.md), [configuration-only output plan](output-plan-examples.md) |

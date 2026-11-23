@@ -53,6 +53,12 @@ fn malformed_input_reports_prepublication_failure_and_cleans_staging() {
 #[cfg(target_os = "linux")]
 #[test]
 fn stdout_failure_reports_committed_run_and_preserves_results() {
+    check_stdout_failure(&[]);
+    check_stdout_failure(&["--summary"]);
+}
+
+#[cfg(target_os = "linux")]
+fn check_stdout_failure(args: &[&str]) {
     let dir = tempfile::tempdir().unwrap();
     let input = dir.path().join("input.csv");
     let destination = dir.path().join("result");
@@ -61,7 +67,11 @@ fn stdout_failure_reports_committed_run_and_preserves_results() {
         .write(true)
         .open("/dev/full")
         .unwrap();
-    let failed = run(&input, &destination).stdout(full).output().unwrap();
+    let failed = run(&input, &destination)
+        .args(args)
+        .stdout(full)
+        .output()
+        .unwrap();
 
     let diagnostic = String::from_utf8_lossy(&failed.stderr);
     assert_eq!(failed.status.code(), Some(3), "{diagnostic}");

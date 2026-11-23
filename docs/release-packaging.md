@@ -3,8 +3,8 @@
 `scripts/package-release.py` assembles supplied artifacts without building,
 launching Chopper, using the network, publishing or changing archive storage.
 It requires Python 3.11+, Git and Node; Node runs the existing production WASM
-export guard in `scripts/browser-artifacts.mjs`. Final release readiness belongs to the current
-[release notes](releases/0.2.0.md), exact-source validation/publication receipts
+export guard in `scripts/browser-artifacts.mjs`. Final release readiness belongs to the
+[release record](https://github.com/jsmatfess/chopper/releases), exact-source validation/publication receipts
 and [GitHub Issues](https://github.com/jsmatfess/chopper/issues). The
 [focused candidate review](releases/0.2.0-review.md) and
 [its acceptance plan](release-acceptance-plan.md) are historical records, not
@@ -44,14 +44,16 @@ files in the frozen source; their hashes are recorded as `packaging_tools`.
 Source/vendor assets require complete inventories there. The assembler
 checks source identity but does not derive transitive build provenance.
 
-Native payloads include `LICENSE`, the retained ZIP license and
-[usage and attribution text](releases/native-usage.txt) as `README.txt`. Windows
-adds `chopper.exe`. Linux adds `chopper` with Unix mode 0755. Each native ZIP
-has four members, and the hosted ZIP has seven. No native UI bundle or HTTP transport license files are packaged.
-The native README includes production dependency license texts and notices.
-The hosted build carries the same notices in its HTML source.
-Refresh these notices when changing production dependencies or the release Rust/WASI
-toolchains. Preserve upstream texts, including their original whitespace.
+Each native ZIP includes `LICENSE`, `licenses/zip-2.4.2/LICENSE`, a versioned
+`README.txt` from the [quickstart template](releases/native-quickstart.txt),
+`THIRD-PARTY-NOTICES.txt`, `quickstart/customers.csv` and `quickstart/job.json`.
+The assembler renders the README version and documentation tag from the release
+manifest's version, after checking the source version metadata. Windows adds
+`chopper.exe`. Linux adds `chopper` with Unix mode 0755.
+The hosted build carries the same [retained notices](releases/native-usage.txt) in
+its HTML source. The historical dependency inventory and source pins describe
+the recorded 0.3.0 source. When refreshing dependency or toolchain notices,
+preserve upstream texts, including their original whitespace.
 Other files use mode 0644. ZIP paths match the predecessor root layout; no wrapper
 directory is added. Hosted members are exactly `_headers`, `app.js`,
 `engine-worker.js`, `engine.wasm`, `index.html`, `storage-worker.js`, `style.css`.
@@ -101,8 +103,25 @@ python3 scripts/package-release.py verify --directory /absolute/package-director
 
 Verification fails on extra output files, stale checksums, changed packages,
 member/permission/CRC mismatches or forbidden production exports. It reads ZIP
-members without extraction. It does not execute packaged binaries or establish
-successful extraction/runtime/platform/scale acceptance. Parent still owns real
-builds, exact local CI gates, extracted-package smoke, provenance review and
-approval; unknown fields in the candidate stay null until their actual evidence
-is recorded. No local assembly is publication authorization.
+members in place and supports earlier schema 1 receipts with two four-member
+native archives.
+
+## Extracted native smoke
+
+On x86-64 Linux and native x86-64 Windows, run the actual release ZIP through
+the [documented quickstart](../README.md#native-quickstart). Save each platform's
+commands and results against the exact archive SHA-256. For a repeatable check
+from the source checkout, give the smoke command the platform ZIP, its trusted
+hash from `SHA256SUMS` and a fresh extraction path with an existing parent.
+On Windows, use `python` and the Windows ZIP.
+
+```sh
+python3 scripts/package-release.py smoke --archive chopper-0.5.0-linux-x86_64.zip --sha256 FULL_TRUSTED_ARCHIVE_SHA256 --output /absolute/fresh-extraction
+```
+
+Smoke checks the checksum, archive inventory, executable version, exact CSV
+records and order, and manifest counts and sizes. It also runs the saved Job
+again with a fresh destination. The extraction and both Run reports stay on
+disk for review. Record build provenance and actual host validation separately.
+This small fixture establishes the quickstart journey. Scale acceptance and
+publication approval require their own records.

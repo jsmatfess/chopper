@@ -1,9 +1,9 @@
 # Current state
 
-Chopper 0.2.0 scope is the native CLI on 64-bit Windows and Linux, plus a separate
-hosted browser UI. Start with the [0.2.0 release notes](releases/0.2.0.md) for
-behavior and limits. The release page and final receipts own package, source and
-validation identities; this router is not an acceptance receipt.
+Chopper provides a native CLI on x86-64 Windows and Linux, plus a separate
+hosted browser UI. Start with the [native quickstart](../README.md#native-quickstart)
+and the [release page](https://github.com/jsmatfess/chopper/releases).
+Look to the release's receipts for package, source and validation identities.
 macOS is source-only; current release acceptance does not cover it.
 
 [GitHub Issues](https://github.com/jsmatfess/chopper/issues) owns the active
@@ -14,13 +14,12 @@ current behavior. Historical plans do not add tasks or authorize experiments.
 
 ## Current behavior
 
-- The current product interfaces are the Windows/Linux CLI and the hosted
-  browser UI. There is no native server or native UI in the 0.2 scope. Ordered
-  `run --step` flags and JSON Run share the engine; `split` keeps its fixed order.
+- Ordered `run --step` flags and JSON Run share the engine. `split` keeps its
+  fixed operation order.
 - Randomization has no public seed or replay setting. Prepared confirmation
   executes the retained encoded snapshot; a new Run can produce a different order.
-- Omitted working memory is 256 MiB; `auto` is explicit. Reservations account for
-  working allocations and do not cap total process/RSS memory.
+- Omitted working memory resolves automatically. Reservations account for
+  engine working allocations. Total process RSS can be higher.
 - Native publication is atomic without replacement. Hosted export uses a final
   completion marker and can leave partial output when interrupted.
 - Experimental features remain opt-in. Source availability and a local pass do
