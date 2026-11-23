@@ -44,7 +44,10 @@ try {
         };
         const input=new File(['id,key\n1,a\n2,b\n'],'fixture.csv');
         window.showOpenFilePicker=async()=>[{getFile:async()=>input}];
-        window.showDirectoryPicker=async()=>{
+        window.destinationPickerError='AbortError';
+        window.showDirectoryPicker=async({mode})=>{
+          if(mode!=='readwrite')throw new Error('Expected a writable destination');
+          if(window.destinationPickerError)throw new DOMException('Picker fixture',window.destinationPickerError);
           const root=await navigator.storage.getDirectory();
           return root.getDirectoryHandle(window.directSmokeParent,{create:true});
         };
@@ -64,8 +67,29 @@ try {
       assert.equal(await app.locator('#memory').isDisabled(),true);
       await app.locator('#browse-input').click();
       await app.waitForFunction(()=>document.getElementById('input').value==='fixture.csv');
+      const destinationPicker=app.locator('#browse-output'),pickerStatus=app.locator('#output-picker-status');
+      await destinationPicker.click();
+      await pickerStatus.filter({hasText:'No folder selected'}).waitFor({timeout:3000});
+      assert.equal(await app.locator('#output').inputValue(),'');
+      assert.equal(await destinationPicker.isEnabled(),true);
+      assert.match(await destinationPicker.getAttribute('aria-describedby'),/output-picker-help/);
+      assert.match(await app.locator('#output-picker-help').innerText(),/desktop Chrome or Edge.*subfolder/);
+      await app.evaluate(()=>{window.destinationPickerError=null;});
       await app.locator('#browse-output').click();
       await app.waitForFunction(()=>document.getElementById('output').value.startsWith('direct-ui-'));
+      assert.equal(await pickerStatus.textContent(),'');
+      const selectedDestination=await app.locator('#output').inputValue();
+      for(const pickerError of ['AbortError','NotAllowedError']){
+        await app.evaluate(error=>{window.destinationPickerError=error;},pickerError);
+        await destinationPicker.click();
+        await pickerStatus.filter({hasText:pickerError==='AbortError'?/No folder selected/:/Could not open the output folder.*Picker fixture/}).waitFor();
+        assert.equal(await app.locator('#output').inputValue(),selectedDestination);
+        assert.equal(await destinationPicker.isEnabled(),true);
+      }
+      await app.evaluate(()=>{window.destinationPickerError=null;});
+      await destinationPicker.click();
+      await app.waitForFunction(()=>!document.getElementById('browse-output').disabled);
+      assert.equal(await pickerStatus.textContent(),'');
       await app.locator('#max-rows').fill('1');
       await app.locator('#max-bytes').fill('11');
       await app.locator('#run-direct').click();
