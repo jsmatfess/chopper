@@ -14,11 +14,21 @@ chunks, partitioning, or treatment/control allocation.
 ## Use Chopper in your browser
 
 Open the [hosted app](https://chopper-1rx.pages.dev/) in desktop Chrome or Edge
-with file and folder access enabled. Choose a CSV and a writable output folder,
-set your pipeline and limits, then select **Run**. **Analyze** is optional.
+with file and folder access enabled. Your CSV is processed locally in your
+browser. [Try a sample export](../browser.md#try-a-sample-export) to practice
+with synthetic data and check the results.
 
 - [Choose an output folder and recover from a blocked selection](../browser.md#choosing-an-output-folder).
 - [Verify an export or recover after an interruption](../browser.md#checking-a-hosted-export-after-interruption).
+
+## Choose a recipe by outcome
+
+- [Keep each upload under a limit](../job-recipes.md#make-upload-sized-chunks)
+  with a maximum row count or CSV size.
+- [Make exactly N files](../job-recipes.md#make-exactly-n-files) with an even
+  split that keeps rows in order.
+- [Make one set per country](../job-recipes.md#partition-by-a-business-column)
+  by routing each row according to its country column.
 
 ## Save, automate, and verify Jobs
 

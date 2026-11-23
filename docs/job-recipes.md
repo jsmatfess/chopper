@@ -27,6 +27,18 @@ fit. For uploads, substitute the receiver's actual limit. `--compressed-bytes`
 is an advisory target for gzip or ZIP and can be exceeded. Use `--bytes` to
 enforce a strict limit on the serialized CSV before compression.
 
+## Make exactly N files
+
+Use a Balanced step to divide one CSV into a fixed number of consecutive files.
+
+```sh
+./chopper run --input quickstart/customers.csv --output recipe-balanced --step balanced --files 3 --yes --summary
+```
+
+Expect three CSVs of four data rows each, in input order. The input needs at
+least as many data rows as requested files. If you also set a row or byte cap,
+Run fails when the balanced files would exceed it.
+
 ## Partition by a business column
 
 ```sh

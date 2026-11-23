@@ -30,6 +30,7 @@ const pages = [
   ['docs/compatibility.md', 'compatibility', 'Compatibility and migration'],
 ];
 const imagePath = 'docs/images/workbench.png';
+const samplePath = 'examples/customers.csv';
 const supportUrl = 'https://buymeacoffee.com/tblflip';
 const stylesheet = fileURLToPath(new URL('./chopper.css', import.meta.url));
 const pageMap = new Map(pages.map(([source, name]) => [source, name]));
@@ -48,10 +49,13 @@ function content(source, name) {
       .replace(/^## (Native quickstart)$/m, '# $1');
   }
   if (name === 'browser') {
+    const quickstart = source.includes('\n## Try a sample export\n')
+      ? section(source, 'Try a sample export')
+      : 'Open the [hosted app](https://chopper-1rx.pages.dev/) in desktop Chrome or Edge.';
     const requirements = section(source, 'Browser requirements and storage');
     const picker = section(source, 'Choosing an output folder').split('\n\nFor a desktop picker check,')[0];
     const recovery = section(source, 'Checking a hosted export after interruption');
-    return `# Browser exports\n\nOpen the [hosted app](https://chopper-1rx.pages.dev/) in desktop Chrome or Edge.\n\n${requirements}\n\n${picker}\n\n${recovery}`;
+    return `# Browser exports\n\n${quickstart}\n\n${requirements}\n\n${picker}\n\n${recovery}`;
   }
   return source;
 }
@@ -71,6 +75,9 @@ function rewriteLinks(md, tag) {
         const local = pageMap.get(resolved);
         if (resolved === imagePath) {
           token.attrSet(attribute, './workbench.png');
+        } else if (resolved === samplePath && rule === 'link_open') {
+          token.attrSet(attribute, './customers.csv');
+          token.attrSet('download', 'customers.csv');
         } else if (local && !(local === 'browser' && hash === 'result-ownership-and-publication-contracts')) {
           token.attrSet(attribute, `./${local}.md${suffix}`);
         } else {
@@ -140,6 +147,7 @@ try {
       await writeFile(join(source, `${name}.md`), markdown);
     }
     await writeFile(join(source, 'workbench.png'), read(imagePath));
+    await writeFile(join(source, 'public/customers.csv'), read(samplePath));
     const sidebar = await buildSidebar(source, documents);
 
     await build(source, {

@@ -11,6 +11,7 @@ const types = {
   '.js': 'text/javascript',
   '.json': 'application/json',
   '.png': 'image/png',
+  '.csv': 'text/csv; charset=utf-8',
 };
 let server;
 let browser;
@@ -51,6 +52,24 @@ try {
     assert.equal((await page.goto(origin + base))?.status(), 200);
     await page.locator('h1#user-guide').waitFor();
     assert.equal(await support.getAttribute('href'), 'https://buymeacoffee.com/tblflip');
+    const guide = page.locator('.vp-doc');
+    for (const [name, anchor] of [
+      ['Keep each upload under a limit', 'make-upload-sized-chunks'],
+      ['Make exactly N files', 'make-exactly-n-files'],
+      ['Make one set per country', 'partition-by-a-business-column'],
+    ]) {
+      assert.equal(await guide.getByRole('link', { name }).evaluate(link => link.href),
+        origin + base + 'job-recipes#' + anchor);
+    }
+    await guide.getByRole('link', { name: 'Try a sample export' }).click();
+    await page.waitForURL(origin + base + 'browser#try-a-sample-export');
+    const sample = guide.getByRole('link', { name: 'Download the sample customers.csv' });
+    assert.equal(await sample.evaluate(link => link.href), origin + base + 'customers.csv');
+    const pendingDownload = page.waitForEvent('download');
+    await sample.press('Enter');
+    const download = await pendingDownload;
+    assert.equal(download.suggestedFilename(), 'customers.csv');
+    assert.equal(await download.failure(), null);
     await page.getByRole('link', { name: 'All versions' }).click();
     await page.waitForURL(origin + '/');
     assert.equal((await page.goto(origin + base + 'cli-reference#chopper-run'))?.status(), 200);

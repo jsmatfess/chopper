@@ -89,6 +89,12 @@ class JobRecipes(unittest.TestCase):
         self.assertEqual([row for chunk in chunks for row in csv_rows(output / chunk['path'])[1:]],
                          self.source)
 
+    def test_balanced_export_has_exact_file_count_and_preserves_order(self):
+        output, _, chunks = self.run_recipe('recipe-balanced', groups=3)
+        self.assertEqual([chunk['rows'] for chunk in chunks], [4, 4, 4])
+        self.assertEqual([row for chunk in chunks for row in csv_rows(output / chunk['path'])[1:]],
+                         self.source)
+
     def test_partition_preserves_exact_country_membership(self):
         output, _, chunks = self.run_recipe('recipe-country', groups=3)
         self.assertEqual(len(chunks), 3)

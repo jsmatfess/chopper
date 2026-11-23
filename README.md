@@ -6,8 +6,14 @@ Both use the Rust engine for ordered pipelines, strict validation, full random
 shuffles and disk-backed processing. macOS source builds are unqualified and
 not a supported release target. There is no native server or native UI.
 
-Start with the [user guide](docs/user/README.md) for installation, saved Jobs,
-browser exports, and upgrades.
+- [Try in browser](https://chopper-1rx.pages.dev/) with desktop Chrome or Edge.
+  Follow the [browser sample walkthrough](docs/browser.md#try-a-sample-export)
+  to make and verify your first export.
+- [Download the CLI for Windows or Linux](https://github.com/jsmatfess/chopper/releases/tag/v0.5.0).
+  The [native quickstart](#native-quickstart) walks through verifying the ZIP
+  and running the bundled sample.
+
+The [user guide](docs/user/README.md) covers saved Jobs, recipes, and upgrades.
 
 ## Native quickstart
 

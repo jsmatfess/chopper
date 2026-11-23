@@ -75,6 +75,25 @@ On Linux, run `rustup target add wasm32-wasip1`, then run `node scripts/build-br
 
 Open **http://127.0.0.1:8421/**. Browse for an input and an output parent folder, configure the pipeline and choose Run. Analyze is optional and returns input statistics and estimates; Run validates the current configuration independently. Results go into a new `chopper-results-<UUID>` subdirectory. A `CHOPPER-COMPLETE.json` marker is written only after every result file has closed successfully.
 
+## Try a sample export
+
+In about five minutes, you can split a synthetic CSV into three files.
+Your CSV is processed locally in your browser.
+
+1. [Download the sample customers.csv](../examples/customers.csv) and open the
+   [hosted app](https://chopper-1rx.pages.dev/) in desktop Chrome or Edge.
+2. Under **Input file**, select **Browse** and open `customers.csv`. Under
+   **Output directory**, select **Browse**, choose a writable folder or
+   subfolder, and grant access when prompted.
+3. Choose **CSV · uncompressed** as the output format. Leave the pipeline empty
+   and set **Maximum rows per CSV** to `5`.
+4. Select **Run**. Open the new `chopper-results-<UUID>` subfolder. It has
+   three CSVs with **5, 5, and 2 data rows** in order, plus a header in each.
+   Open `CHOPPER-COMPLETE.json` and confirm it says `"complete": true`.
+   The marker counts the three CSVs and `manifest.jsonl`, so `"files"` is `4`.
+
+If the picker blocks your folder, see [choosing an output folder](#choosing-an-output-folder).
+
 ## Browser requirements and storage
 
 Use desktop Chrome or Edge over HTTPS or localhost with file and folder
