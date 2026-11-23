@@ -131,6 +131,22 @@ Keep the default Analyze JSON if you plan to use `run --analysis`. A summary has
 no advisory observations, so passing one to `--analysis` has the same effect
 on planning as omitting the advice file.
 
+## Run exit statuses
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| `0` | Run published the destination and delivered one complete JSON report to stdout, in the requested format. Help and version requests also exit successfully. | Read stdout for the report. |
+| `1` | Run stopped before publication, including config read errors, declined confirmation, invalid input, and cancellation before commit. | Read the error on stderr. Resolve the cause before retrying. |
+| `2` | Invalid command syntax or ordered Run arguments. | Correct the invocation using the diagnostic and `chopper run --help`. |
+| `3` | Run committed the destination, but writing or flushing its stdout report failed. Stdout may contain an incomplete JSON document. | Check the configured destination before retrying. |
+
+For status `3`, stderr identifies the report failure after commit. Open
+`manifest.jsonl` in the output directory and check its job/config record.
+Verify the files listed by the manifest. For ZIP output, check the members of
+`outputs.zip`, which also contains the manifest. Keep the published result if
+it matches the job. A separate Run requires a fresh destination. Progress lines
+on stderr are advisory. Use the exit status for automation.
+
 ## Hosted command export and quoting
 
 The hosted output plan generates an equivalent command, using `--flag=value`
@@ -175,3 +191,12 @@ confirmation and check malformed-input cleanup. UI tests cover draft refresh,
 clipboard success/denial/fallback and oversized-command JSON fallback. Coverage
 is build/platform-specific; these checks do not establish native Windows
 execution or PowerShell 7 argument-marshalling acceptance.
+
+The native CLI publication suite checks exit statuses and destination contents.
+On Linux it uses `/dev/full` to fail the stdout report and a gated row checkpoint
+to deliver SIGINT before commit.
+
+```sh
+cargo test --locked -p chopper --test cli_publication
+cargo test --locked -p chopper --test cli_publication --features resource-contract-tests
+```

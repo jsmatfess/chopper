@@ -1,9 +1,26 @@
 use anyhow::{Context, Result};
 use serde::Serialize;
-use std::io::Write;
+use std::{
+    fmt,
+    io::{self, Write},
+};
+
+#[derive(Debug)]
+pub(super) struct PublishedReportFailure;
+
+impl fmt::Display for PublishedReportFailure {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str("output committed, but delivery of the stdout report failed. Check the manifest and result files in the configured destination before retrying")
+    }
+}
+
+/// Use only after the engine has committed the native destination.
+pub(super) fn write_published<T: Serialize + ?Sized>(response: &T) -> Result<()> {
+    write_pretty(&mut io::stdout().lock(), response).context(PublishedReportFailure)
+}
 
 /// Borrow the response so its payload owners remain alive throughout output.
-/// Engine publication has already completed; a stdout failure can leave a JSON prefix.
+/// A stdout failure can leave a JSON prefix.
 pub(super) fn write_pretty<W: Write, T: Serialize + ?Sized>(
     writer: &mut W,
     response: &T,
