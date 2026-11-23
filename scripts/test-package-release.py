@@ -31,7 +31,7 @@ class PackagingTests(unittest.TestCase):
         def write(name, value):
             path = self.source / name
             path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(value)
+            path.write_text(value, encoding='utf-8', newline='\n')
         write('Cargo.toml', '[workspace.package]\nversion="0.2.0"\n')
         write('Cargo.lock', ''.join(f'[[package]]\nname="{n}"\nversion="0.2.0"\n'
                                   for n in ('chopper', 'chopper-core', 'chopper-browser')))
@@ -47,6 +47,7 @@ class PackagingTests(unittest.TestCase):
         def git(*args):
             return subprocess.check_output(['git', '-C', str(self.source), *args], stderr=subprocess.DEVNULL).decode().strip()
         git('init', '-q')
+        git('config', 'core.autocrlf', 'false')
         git('add', '.')
         git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
             '-c', 'commit.gpgsign=false', 'commit', '-qm', 'fixture')
