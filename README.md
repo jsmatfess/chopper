@@ -7,9 +7,10 @@ shuffles and disk-backed processing. macOS source builds are unqualified and
 not a supported release target. There is no native server or native UI.
 
 Get CLI packages from the [releases page](https://github.com/jsmatfess/chopper/releases)
-and read the [0.2.0 release notes](docs/releases/0.2.0.md) for current scope and
-validation limits. This README describes current source; consult older release
-notes for older package behavior.
+and read the [0.4.0 release notes](docs/releases/0.4.0.md) for the latest
+published changes. This README describes current source. Consult the
+[compatibility policy](docs/compatibility.md) before upgrading saved Jobs or
+scripts.
 
 ![Chopper hosted workbench showing CSV configuration and execution views](docs/images/workbench.png)
 

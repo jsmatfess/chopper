@@ -106,3 +106,27 @@ successful extraction/runtime/platform/scale acceptance. Parent still owns real
 builds, exact local CI gates, extracted-package smoke, provenance review and
 approval; unknown fields in the candidate stay null until their actual evidence
 is recorded. No local assembly is publication authorization.
+
+## Native candidate upgrade check
+
+After archive verification, extract each candidate native ZIP and run the
+[upgrade checker](../scripts/test-release-upgrade.py) on its native platform
+from the repository root. Pass the extracted executable to the corresponding
+CI or local release-qualification job.
+
+```sh
+python3 scripts/test-release-upgrade.py /absolute/extracted/linux/chopper
+```
+
+```powershell
+python scripts/test-release-upgrade.py C:\absolute\extracted\windows\chopper.exe
+```
+
+The check requires Python 3 and uses the
+[retained prior-release fixtures](../scripts/fixtures/release-upgrade/README.md).
+It runs without downloads or a Zstandard tool. It verifies the saved 0.4.0
+Job's outputs and checks that retired 0.3.0 Zstandard settings and inputs fail
+with migration guidance and no retained result or temporary files. It verifies
+that the migrated Jobs work and removes its isolated test workspace.
+Record the tested executable's SHA-256 and the result with each platform's
+release evidence.
