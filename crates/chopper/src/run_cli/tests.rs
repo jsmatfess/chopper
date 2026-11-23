@@ -83,7 +83,7 @@ fn ordered_steps_preserve_all_public_job_fields() {
         "--input-encoding",
         "utf-16le",
         "--input-headers",
-        "false",
+        "true",
         "--input-delimiter",
         "\t",
         "--input-quote",
@@ -122,7 +122,7 @@ fn ordered_steps_preserve_all_public_job_fields() {
             {"type":"shuffle","strategy":"fisher_yates"},{"type":"partition","columns":["country","segment"]},
             {"type":"assign_probabilistic","groups":[{"name":"yes","percent":"25"},{"name":"no","percent":"75"}],"strata":["country","segment"]},
             {"type":"balanced","files":3},{"type":"interleaved","files":2}],
-        "input_csv":{"encoding":"utf-16le","headers":false,"delimiter":"\t","quote":"'","escape":"\\","line_ending":"crlf","bom":true,"skip_empty_lines":true},
+        "input_csv":{"encoding":"utf-16le","headers":true,"delimiter":"\t","quote":"'","escape":"\\","line_ending":"crlf","bom":true,"skip_empty_lines":true},
         "output_csv":{"encoding":"windows-1252","headers":false,"delimiter":";","quote":"'","escape":"\\","line_ending":"crlf","bom":false,"skip_empty_lines":true},
         "limits":{"rows":100,"bytes":1048576,"compressed_bytes":512000},
         "resources":{"memory_mb":512,"workers":2,"grouping":"sort","max_files":2000,"max_record_bytes":1048576,"temp_dir":"temporary files","temp_bytes":2000000000u64}
