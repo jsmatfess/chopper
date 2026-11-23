@@ -1,4 +1,5 @@
 mod cli_json;
+mod cli_summary;
 mod guide;
 mod run_cli;
 
@@ -42,6 +43,8 @@ enum Command {
         memory_mb: Option<MemoryBudget>,
         #[arg(long)]
         workers: Option<usize>,
+        #[arg(long, help = cli_summary::HELP)]
+        summary: bool,
     },
     /// Convenience form: partition, assign, shuffle, balanced split, then final limits.
     Split {
@@ -90,6 +93,8 @@ enum Command {
         no_headers: bool,
         #[arg(short, long)]
         yes: bool,
+        #[arg(long, help = cli_summary::HELP)]
+        summary: bool,
     },
 }
 // Keep flag-built Jobs separate from admitted scripted JSON decoding.
@@ -117,7 +122,12 @@ impl CliJob {
         }
     }
 }
-fn run_job(source: CliJob, yes: bool, advice: Option<&std::path::Path>) -> Result<()> {
+fn run_job(
+    source: CliJob,
+    yes: bool,
+    advice: Option<&std::path::Path>,
+    summary: bool,
+) -> Result<()> {
     let job = source.job();
     if !yes {
         ensure!(
@@ -167,7 +177,11 @@ fn run_job(source: CliJob, yes: bool, advice: Option<&std::path::Path>) -> Resul
     let analysis = source
         .execute(cancelled, notify, hint)
         .context("Run stopped before publication")?;
-    cli_json::write_published(&analysis)
+    if summary {
+        cli_json::write_published(&cli_summary::RunSummary::from(&analysis))
+    } else {
+        cli_json::write_published(&analysis)
+    }
 }
 
 fn read_advice(path: &std::path::Path) -> Result<Option<engine::AutoObservations>> {
@@ -212,6 +226,7 @@ fn main_result() -> Result<()> {
             arguments
                 .get_one::<PathBuf>("analysis")
                 .map(PathBuf::as_path),
+            arguments.get_flag("summary"),
         );
     }
     match Cli::from_arg_matches(&matches)?.command {
@@ -248,6 +263,7 @@ fn main_result() -> Result<()> {
             config,
             memory_mb,
             workers,
+            summary,
         } => {
             let cancelled = Arc::new(AtomicBool::new(false));
             let signal = cancelled.clone();
@@ -258,7 +274,12 @@ fn main_result() -> Result<()> {
                     cancelled,
                     Arc::new(|p| eprintln!("{} | {} rows", p.phase, p.rows)),
                 )?;
-            cli_json::write_pretty(&mut io::stdout().lock(), &profile)?;
+            let mut stdout = io::stdout().lock();
+            if summary {
+                cli_json::write_pretty(&mut stdout, &cli_summary::AnalyzeSummary::from(&profile))?;
+            } else {
+                cli_json::write_pretty(&mut stdout, &profile)?;
+            }
         }
         Command::Split {
             input,
@@ -283,6 +304,7 @@ fn main_result() -> Result<()> {
             max_files,
             no_headers,
             yes,
+            summary,
         } => {
             let mut job = Job {
                 input,
@@ -352,7 +374,7 @@ fn main_result() -> Result<()> {
                     Operation::Balanced { files }
                 });
             }
-            run_job(CliJob::Ordinary(job), yes, None)?;
+            run_job(CliJob::Ordinary(job), yes, None, summary)?;
         }
     }
     Ok(())
