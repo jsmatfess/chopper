@@ -6,10 +6,111 @@ Both use the Rust engine for ordered pipelines, strict validation, full random
 shuffles and disk-backed processing. macOS source builds are unqualified and
 not a supported release target. There is no native server or native UI.
 
-Get CLI packages from the [releases page](https://github.com/jsmatfess/chopper/releases)
-and read the [0.2.0 release notes](docs/releases/0.2.0.md) for current scope and
-validation limits. This README describes current source; consult older release
-notes for older package behavior.
+## Native quickstart
+
+Download your platform ZIP and **SHA256SUMS** from the same
+[Chopper 0.5.0 release](https://github.com/jsmatfess/chopper/releases/tag/v0.5.0).
+Allow about five minutes to download and verify the bundled synthetic example.
+Open a terminal in the download directory.
+
+| Environment | Package and requirements |
+| --- | --- |
+| Windows x86-64 | `chopper-0.5.0-windows-x86_64.zip`. Use PowerShell. If Windows reports missing MSVC runtime DLLs, install or repair the [Microsoft Visual C++ v14 Redistributable for x64](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist/). |
+| Linux x86-64 | `chopper-0.5.0-linux-x86_64.zip`. Requires glibc 2.34 or later and shell tools including `unzip` and `sha256sum`. Check the host with `uname -m` and `getconf GNU_LIBC_VERSION`. |
+| Hosted | [Desktop Chrome or Edge](docs/browser.md#local-development) with a secure, cross-origin-isolated page, File System Access, OPFS and Web Locks. Open the [hosted app](https://chopper-1rx.pages.dev/) directly. |
+| Other native platforms | macOS is source-only and unqualified. Native release packages are x86-64. |
+
+See [operator support](docs/operator-support.md) for runtime errors, memory and
+disk guidance, and what to redact before sharing a report.
+
+### Windows PowerShell
+
+Verify the downloaded ZIP, then extract it into a fresh directory. Change
+`$destination` if the directory already exists.
+
+```powershell
+$archive = 'chopper-0.5.0-windows-x86_64.zip'
+$destination = 'chopper-0.5.0-windows-x86_64'
+$pattern = '^([0-9a-f]{64})  ' + [regex]::Escape($archive) + '$'
+$record = @(Get-Content -LiteralPath SHA256SUMS | Where-Object { $_ -match $pattern })
+if ($record.Count -ne 1 -or (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne $record[0].Substring(0, 64)) {
+    throw 'Archive SHA-256 does not match SHA256SUMS'
+}
+if (Test-Path -LiteralPath $destination) { throw 'Choose a fresh extraction directory' }
+Expand-Archive -LiteralPath $archive -DestinationPath $destination -ErrorAction Stop
+Set-Location -LiteralPath $destination -ErrorAction Stop
+.\chopper.exe --version
+```
+
+Confirm the version is `chopper 0.5.0`. From that same directory, run the Job
+and inspect the CSVs and manifest.
+
+```powershell
+.\chopper.exe run --config quickstart/job.json --yes
+if ($LASTEXITCODE -ne 0) { throw 'Quickstart Run failed' }
+Get-ChildItem quickstart-output -Filter *.csv | Sort-Object Name | ForEach-Object {
+    '{0} {1}' -f $_.Name, @(Import-Csv -LiteralPath $_.FullName).Count
+}
+Get-Content quickstart-output/manifest.jsonl
+```
+
+To rerun, save a copy of the supplied Job with a fresh output directory.
+
+```powershell
+(Get-Content -Raw quickstart/job.json).Replace('"quickstart-output"', '"quickstart-output-rerun"') |
+    Set-Content -Encoding ascii quickstart/rerun-job.json
+.\chopper.exe run --config quickstart/rerun-job.json --yes
+```
+
+### Linux shell
+
+Verify the downloaded ZIP and extract it into a fresh directory. Change
+`destination` if the directory already exists.
+
+```sh
+archive=chopper-0.5.0-linux-x86_64.zip
+destination=chopper-0.5.0-linux-x86_64
+awk -v file="$archive" '$2 == file' SHA256SUMS | sha256sum --check &&
+  mkdir "$destination" &&
+  unzip "$archive" -d "$destination" &&
+  cd "$destination" &&
+  chmod +x ./chopper &&
+  ./chopper --version
+```
+
+Confirm the version is `chopper 0.5.0`. From that same directory, run the Job
+and inspect the CSVs and manifest.
+
+```sh
+./chopper run --config quickstart/job.json --yes &&
+  wc -l quickstart-output/part-*.csv &&
+  cat quickstart-output/manifest.jsonl
+```
+
+`wc -l` includes each file's header. For these sample records it prints
+`6`, `6` and `3` lines, plus a total.
+
+To rerun, save a copy of the supplied Job with a fresh output directory.
+
+```sh
+sed 's/"quickstart-output"/"quickstart-output-rerun"/' quickstart/job.json > quickstart/rerun-job.json &&
+  ./chopper run --config quickstart/rerun-job.json --yes
+```
+
+### Expected results
+
+The three upload-ready CSV files keep the input order, with one header per file.
+
+| File in `quickstart-output/` | Data rows |
+| --- | ---: |
+| `part-00000001.csv` | 5 |
+| `part-00000002.csv` | 5 |
+| `part-00000003.csv` | 2 |
+
+`manifest.jsonl` contains one Job record and three output records with the
+same filenames and row counts. Upload the CSVs and keep the
+[manifest](docs/native-manifest.md) for verification. Use a different output
+directory for each rerun. Chopper protects existing results.
 
 ![Chopper hosted workbench showing CSV configuration and execution views](docs/images/workbench.png)
 

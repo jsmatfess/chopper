@@ -1,28 +1,12 @@
-Chopper native CLI
-
-Extract this entire archive into a new directory. On Linux retain the executable
-permission (chmod +x chopper if your ZIP extractor does not preserve Unix modes).
-Use ./chopper --help (Windows: .\chopper.exe --help) for current commands and
-./chopper --version to inspect the executable version. Run jobs with an explicit
-configuration and a new output directory; preserve prior results and receipts.
-The browser UI is hosted separately at https://chopper-1rx.pages.dev/. This executable is CLI-only.
-
-Working memory reservations are not a complete process RSS cap. Supported
-platforms, scale and acceptance apply only to the accompanying release record.
-Usage and configuration: https://github.com/jsmatfess/chopper/blob/main/README.md
-
-Chopper is MIT licensed. See LICENSE. The bundled patched ZIP component retains
-its upstream notice in licenses/zip-2.4.2. Patch attribution and source are
-available in vendor/zip-2.4.2/CHOPPER.md.
-
 ===============================================================================
 THIRD-PARTY COMPONENTS AND UPSTREAM NOTICES
 ===============================================================================
 
-Chopper 0.3.0 default production dependency and runtime notice inventory.
-This text accompanies the Windows/Linux CLI packages and hosted WASI/browser
-distribution. Upstream notice texts below are preserved byte for byte. Identical
-texts appear once with all source files identified.
+Distribution notices for the Windows/Linux CLI and hosted WASI/browser app.
+The inventory and source pins below record the Chopper 0.3.0 provenance
+for these retained dependency and runtime notices. Upstream notice texts below
+are preserved byte for byte. Identical texts appear once with all source files
+identified.
 
 Scope: default normal-dependency closures for chopper on x86_64-unknown-linux-gnu
 and x86_64-pc-windows-msvc; chopper-browser on wasm32-wasip1; and the bundled

@@ -8,9 +8,8 @@ chopper run --config job.json --yes
 
 The forms are mutually exclusive. `--config` permits the existing `--memory-mb`
 and `--workers` overrides plus `--yes`; it rejects all job-building flags before
-opening the config. Ordered Run flags require the current source build: the
-published v0.1.0 Windows executable supports only the JSON Run form. The separate
-`pipeline` subcommand has been removed, with no alias. Existing `split` commands
+opening the config. Current native packages support ordered Run flags. The
+v0.1.0 Windows executable supports only the JSON Run form. Existing `split` commands
 retain their fixed partition → assign → shuffle → balanced/interleaved → limits order.
 
 ```sh

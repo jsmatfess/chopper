@@ -2,11 +2,13 @@
 """Tiny local controls: no product build, execution or release assets."""
 import importlib.util
 import json
+import os
 from pathlib import Path
 import subprocess
 import shutil
 import tempfile
 import unittest
+from unittest.mock import patch
 import warnings
 import zipfile
 
@@ -33,6 +35,7 @@ class PackagingTests(unittest.TestCase):
         write('ui/package-lock.json', '{"version":"0.2.0","packages":{"":{"version":"0.2.0"}}}')
         for path in pkg.PAYLOADS.values():
             write(path, f'Synthetic fixture: {path}\n')
+        write('docs/releases/native-quickstart.txt', 'Chopper @VERSION@\nhttps://github.com/jsmatfess/chopper/blob/v@VERSION@/README.md#native-quickstart\n')
         (self.source / 'scripts').mkdir()
         for name in ('package-release.py', 'browser-artifacts.mjs'):
             shutil.copyfile(Path(__file__).with_name(name), self.source / 'scripts' / name)
@@ -76,6 +79,41 @@ class PackagingTests(unittest.TestCase):
         self.assertEqual(set(receipt['hosted']), set(pkg.HOSTED))
         with self.assertRaisesRegex(ValueError, 'new path'):
             self.assemble()
+
+    def test_native_packages_contain_the_release_quickstart_and_notices(self):
+        self.assemble()
+        for platform in ('linux', 'windows'):
+            with self.subTest(platform=platform), zipfile.ZipFile(
+                self.output / f'chopper-0.2.0-{platform}-x86_64.zip'
+            ) as archive:
+                readme = archive.read('README.txt')
+                self.assertIn(b'Chopper 0.2.0\n', readme)
+                self.assertIn(b'/blob/v0.2.0/README.md#native-quickstart', readme)
+                self.assertEqual(
+                    archive.read('THIRD-PARTY-NOTICES.txt'),
+                    (self.source / 'docs/releases/native-usage.txt').read_bytes(),
+                )
+                self.assertEqual(archive.read('quickstart/customers.csv'),
+                                 (self.source / 'examples/customers.csv').read_bytes())
+                self.assertEqual(archive.read('quickstart/job.json'),
+                                 (self.source / 'examples/quickstart-job.json').read_bytes())
+
+    def test_smoke_rejects_unverified_bytes_before_extraction(self):
+        self.assemble()
+        suffix = 'windows-x86_64' if os.name == 'nt' else 'linux-x86_64'
+        archive = self.output / f'chopper-0.2.0-{suffix}.zip'
+        extracted = self.root / 'fresh extraction'
+        with self.assertRaisesRegex(ValueError, 'Archive SHA-256 mismatch'):
+            pkg.smoke(archive, '0' * 64, extracted)
+        self.assertFalse(extracted.exists())
+
+    def test_legacy_four_member_native_archives_still_verify(self):
+        legacy = {'LICENSE': 'LICENSE',
+                  'licenses/zip-2.4.2/LICENSE': 'vendor/zip-2.4.2/LICENSE',
+                  'README.txt': 'docs/releases/native-usage.txt'}
+        with patch.object(pkg, 'PAYLOADS', legacy):
+            result = self.assemble()
+        self.assertEqual(pkg.verify(self.output, result['artifact_receipt']['sha256']), result)
 
     def test_output_cannot_dirty_source(self):
         self.output = self.source / 'packages'

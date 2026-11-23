@@ -8,6 +8,7 @@ source trees; they are not a list of current engine capabilities.
 | --- | --- |
 | Browser engine | `node scripts/build-browser.mjs`; the Bash alias uses the same Node implementation. Feature flags are supported; use `CARGO_TARGET_DIR` for output placement. [Browser build contract](../docs/browser.md#local-development). |
 | Hosted package | `npm --prefix ui run build:hosted`, after restoring the default production engine. [Packaging and test boundaries](../docs/browser.md). |
+| Native release package | `python3 scripts/package-release.py` to assemble, verify and smoke-test release archives. [Packaging and exact-binary smoke](../docs/release-packaging.md). |
 | Hosted step motion | `node scripts/test-browser-step-motion.mjs` after the default hosted build; real observed shuffle strategies, live materialization rows/time, themes, pause/reduced motion and terminal stop. [Browser setup](../docs/browser.md#local-development). |
 | Hosted value distributions | `node scripts/test-browser-value-shares.mjs` after the default browser build; real profiling/preparation counts, bounded high-cardinality omission, themes and mobile layout. [Browser setup](../docs/browser.md#local-development). |
 | Durable sequential checks | `python3 scripts/validation-runner.py PLAN BATCH`; declare inputs, artifacts and deadlines. [Lifecycle and resume](../docs/validation-runner.md#local-batch-execution). |

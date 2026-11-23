@@ -5,16 +5,22 @@ in the approved private R2 archive, downloaded and verified. Retain that archive
 through publication smoke tests; completed snapshots have no automatic deletion.
 The separate evidence-reader site is retired; it is not part of app rollback.
 
-## Current next-release predecessor: 0.1.0
+## Identify the predecessor
 
-For [the current 0.2 release](releases/0.2.0.md), restore **released
+Use [GitHub Releases](https://github.com/jsmatfess/chopper/releases) and the
+publication and deployment receipts for the release being replaced. Bind each
+restoration attempt to the published native archive and deployed hosted assets.
+
+## Historical 0.2.0 predecessor: 0.1.0
+
+For [the 0.2 release](releases/0.2.0.md), restore **released
 0.1.0** using [its publication record](releases/0.1.0-publication.json) and
 [artifact receipt](releases/0.1.0-candidate.json). The receipt's historical
 candidate status is superseded by the publication record. The sections below
 about the first native release and older hosted package describe the completed
 0.1.0 rehearsal; they do not waive next-release predecessor acceptance.
 
-The current hosted predecessor is Pages project `chopper`, production branch
+The recorded hosted predecessor was Pages project `chopper`, production branch
 `master`, deployment `8d497a07-be6e-43e2-abae-67f05f097ae2` at
 `https://8d497a07.chopper-1rx.pages.dev`. Release source is
 `7d78706c432f34742bbc29c17be9261002a6816a`; recover exact published assets,
