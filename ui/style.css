@@ -500,6 +500,11 @@ input:disabled,select:disabled{background:#edf0ec;color:#66736b;opacity:.7;curso
 .hosted-workspace .input-action input{border:0;background:transparent;margin:0;border-radius:7px 0 0 7px;outline:0}
 .hosted-workspace .input-action .secondary{border:0;border-inline-start:1px solid var(--input-line);border-radius:0 6px 6px 0;padding-inline:16px;font-size:.875rem;background:var(--surface)}
 .hosted-workspace .input-action .secondary:hover:not(:disabled){background:var(--selection)}
+.hosted-workspace #output-picker{margin-block-end:12px}
+.hosted-workspace #output-picker>label{margin-block-end:5px}
+.hosted-workspace #output-picker small{font-size:.875rem}
+.hosted-workspace #output-picker a{color:inherit}
+.hosted-workspace #output-picker-status:empty{margin:0}
 .hosted-workspace .file-limits{padding-block-start:4px}
 .hosted-workspace .quantity-input{gap:0;border:1px solid var(--input-line);border-radius:7px;background:var(--field);align-items:stretch;grid-template-columns:minmax(0,1fr) 5.5rem}
 .hosted-workspace .quantity-input :is(input,select){border:0;border-radius:6px;background:transparent}

@@ -90,7 +90,7 @@ w.lifecycle={
       hashes.push(Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join(''));
     }
     if(composed&&JSON.stringify(allRows.sort((a,b)=>Number(a.split(',')[0])-Number(b.split(',')[0])))!==JSON.stringify(rows.map(row=>row.trimEnd())))throw new Error('Composed output conservation/fields');
-    return {status:state.status,marker,csv_files:csv.length,result_files:files.length,csv_sha256:hashes,jobId:records.filter(r=>r.jobId).at(-1).jobId};
+    return {status:state.status,folder:folder.name,marker,csv_files:csv.length,result_files:files.length,csv_sha256:hashes,jobId:records.filter(r=>r.jobId).at(-1).jobId};
   }
 };`,resolveDir:root,loader:'ts'},bundle:true,write:false});
 
@@ -309,7 +309,10 @@ try{
     if(folder){
       const partial=await destination(folder);assert.equal(partial.valid_marker,phase==='marker_closed');
       if(phase==='marker_write'){assert.equal(partial.marker_entry,true);assert.equal(partial.marker_bytes,0);assert.equal(paused.pause.writer_closed,false);}
-      if(phase==='export_closed')assert(partial.files.some(file=>(file.name.endsWith('.csv')||file.name.endsWith('.gz'))&&file.bytes>0));
+      if(phase==='export_closed'){
+        assert.equal(partial.marker_entry,false,'Closed CSVs alone do not complete an export');
+        assert(partial.files.some(file=>(file.name.endsWith('.csv')||file.name.endsWith('.gz'))&&file.bytes>0));
+      }
       if(phase==='marker_closed'){
         assert.equal(paused.state.status,'running');assert.equal(paused.pause.closed_csv_files,5);
         committed=await owner.evaluate(()=>window.lifecycle.inspectSuccess());assert.equal(committed.marker.complete,true);assert.equal(committed.csv_files,5);
@@ -328,6 +331,8 @@ try{
       await owner.evaluate(parent=>window.lifecycle.begin('none',parent),fixture.parentName);
       await waitState(owner,s=>s.state.status==='complete','fresh retry publication');
       retry=await owner.evaluate(()=>window.lifecycle.inspectSuccess());
+      assert.notEqual(retry.folder,folder,'Retry must use a fresh results folder');
+      assert.equal((await destination(retry.folder)).valid_marker,true);
       assert.equal(retry.marker.complete,true);assert.equal(retry.marker.files,6);assert.equal((await workspace(retry.jobId)).exists,false);
       await owner.close();
     }else{
@@ -351,6 +356,7 @@ try{
   report.success_control=await success.evaluate(()=>window.lifecycle.inspectSuccess());
   const successfulFolder=(await success.evaluate(()=>window.lifecycle.api('state'))).output.split('/').at(-1);
   const successfulExport=await destination(successfulFolder);
+  assert.equal(successfulExport.valid_marker,true);
   assert.equal(report.success_control.marker.complete,true);assert.equal(report.success_control.marker.files,6);assert.equal(report.success_control.result_files,7);
   assert.equal((await workspace(report.success_control.jobId)).exists,false);await success.close();await preserved();
   if(persistent){
