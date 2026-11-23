@@ -3,8 +3,11 @@ THIRD-PARTY COMPONENTS AND UPSTREAM NOTICES
 ===============================================================================
 
 Distribution notices for the Windows/Linux CLI and hosted WASI/browser app.
-The inventory and source pins below record the Chopper 0.3.0 provenance
-for these retained dependency and runtime notices. Upstream notice texts below
+The original inventory and source pins below record the Chopper 0.3.0
+provenance for the retained dependency and runtime notices. Chopper 0.5.0
+adds serde_path_to_error 0.1.20 (MIT OR Apache-2.0). Its two license files
+are byte-identical to the included serde license files and appear together
+with them in the notices below. Upstream notice texts
 are preserved byte for byte. Identical texts appear once with all source files
 identified.
 
@@ -1618,6 +1621,7 @@ Source files:
   licenses/rust/serde_core-1.0.229/LICENSE-MIT
   licenses/rust/serde_derive-1.0.229/LICENSE-MIT
   licenses/rust/serde_json-1.0.151/LICENSE-MIT
+  licenses/rust/serde_path_to_error-0.1.20/LICENSE-MIT
   licenses/rust/syn-3.0.7/LICENSE-MIT
   licenses/rust/thiserror-2.0.21/LICENSE-MIT
   licenses/rust/thiserror-impl-2.0.21/LICENSE-MIT
@@ -32703,6 +32707,7 @@ Source files:
   licenses/rust/serde_core-1.0.229/LICENSE-APACHE
   licenses/rust/serde_derive-1.0.229/LICENSE-APACHE
   licenses/rust/serde_json-1.0.151/LICENSE-APACHE
+  licenses/rust/serde_path_to_error-0.1.20/LICENSE-APACHE
   licenses/rust/syn-3.0.7/LICENSE-APACHE
   licenses/rust/thiserror-2.0.21/LICENSE-APACHE
   licenses/rust/thiserror-impl-2.0.21/LICENSE-APACHE
