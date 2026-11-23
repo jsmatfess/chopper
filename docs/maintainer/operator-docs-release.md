@@ -62,9 +62,10 @@ candidate. Use the same commands for a retry, with the intended release tag.
 Keep only one local docs deployment in progress at a time.
 
 ```sh
-git fetch --tags origin
-npm --prefix docs-site run build:published -- v0.5.0
-npm --prefix docs-site run smoke
+git fetch --tags origin &&
+test "$(git rev-parse HEAD)" = "$(git rev-parse 'v0.5.0^{commit}')" &&
+npm --prefix docs-site run build:published -- v0.5.0 &&
+npm --prefix docs-site run smoke &&
 (cd docs-site && npm exec -- wrangler pages deploy dist --project-name chopper-docs --branch main)
 ```
 
