@@ -6,11 +6,11 @@
 chopper run --config job.json --yes
 ```
 
-The forms are mutually exclusive. `--config` permits the existing `--memory-mb`
-and `--workers` overrides plus `--yes`; it rejects all job-building flags before
-opening the config. Ordered Run flags require the current source build: the
-published v0.1.0 Windows executable supports only the JSON Run form. The separate
-`pipeline` subcommand has been removed, with no alias. Existing `split` commands
+The forms are mutually exclusive. `--config` permits the `--memory-mb` and
+`--workers` overrides and the `--analysis`, `--summary` and `--yes` options.
+It rejects job-building flags before opening the config. Current native packages
+support ordered Run flags. The v0.1.0 Windows executable supports only the JSON
+Run form. Existing `split` commands
 retain their fixed partition → assign → shuffle → balanced/interleaved → limits order.
 
 ```sh
@@ -70,11 +70,16 @@ there is no seed flag or public replay guarantee. Use `--help` for the full list
 
 Parsing and Job validation do not read the input. Execution uses the existing
 confirmation path (`--yes` for noninteractive runs), engine dispatch, cancellation
-and native atomic publication. The output path must be a new directory. CLI
-ordering changes requested logical operations, not the rewrite eligibility rules.
+and native atomic publication. Choose a new directory path or an existing empty
+directory, with an existing parent directory. Run checks the destination before
+reading the CSV or staging output. If Run reports `choose a new or empty output
+directory`, set `--output` (or `output` in the JSON job) to a fresh path and
+rerun the same job. Files, links and nonempty directories are refused. Run rechecks
+the destination when staging and commits atomically. CLI ordering changes
+requested logical operations, not the rewrite eligibility rules.
 
-Run includes an `auto_plan` in its stdout report with the effective memory and
-workers, publication route and strategy, peak writer slots and merge reader
+Run includes an `auto_plan` in its default stdout report with the effective
+memory and workers, publication route and strategy, peak writer slots and merge reader
 fan-in, validated facts, and fallback counts. For an eligible uncapped native
 Partition, Analyze can report `writer_estimate.suggested_max_files` using the
 exact key count. A matching Run can include that recommendation in
@@ -100,6 +105,51 @@ Analyze behavior and the former `profile` command. Run always processes its own
 submitted configuration and validates the input it consumes; no prepared-result
 approval command remains. Run's normal path confirmation still precedes input
 consumption (`--yes` for noninteractive use).
+
+## Summary JSON for automation
+
+Use `--summary` on Analyze, either form of Run, or Split to print a small
+success report to stdout. The default detailed JSON remains available by
+omitting the flag.
+
+```sh
+chopper analyze --config job.json --summary > analyze-summary.json
+chopper run --config job.json --yes --summary > run-summary.json
+```
+
+Analyze reports `status: "analyzed"`, `rows` (data rows scanned) and `columns`
+(input columns). Run and Split report `status: "published"`, `rows`, `columns`,
+`groups` (final pipeline groups), `output_files` (CSV chunks, including members
+inside ZIP output), and `output_csv_bytes` (total serialized CSV bytes before
+compression, including any emitted headers). Automation should check the command's
+exit status before consuming stdout.
+
+The summary omits preview rows, headers, column and partition values, paths,
+the job configuration, and diagnostic text. The flag applies only to the
+successful stdout report. Prompts, progress and errors on stderr, command
+arguments, output CSVs and full manifests can contain sensitive information.
+Review them separately before sharing. Run and Split still publish the full
+results and manifest through native atomic publication.
+
+Keep the default Analyze JSON if you plan to use `run --analysis`. A summary has
+no advisory observations, so passing one to `--analysis` has the same effect
+on planning as omitting the advice file.
+
+## Run exit statuses
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| `0` | Run published the destination and delivered one complete JSON report to stdout, in the requested format. Help and version requests also exit successfully. | Read stdout for the report. |
+| `1` | Run stopped before publication, including config read errors, declined confirmation, invalid input, and cancellation before commit. | Read the error on stderr. Resolve the cause before retrying. |
+| `2` | Invalid command syntax or ordered Run arguments. | Correct the invocation using the diagnostic and `chopper run --help`. |
+| `3` | Run committed the destination, but writing or flushing its stdout report failed. Stdout may contain an incomplete JSON document. | Check the configured destination before retrying. |
+
+For status `3`, stderr identifies the report failure after commit. Open
+`manifest.jsonl` in the output directory and check its job/config record.
+Verify the files listed by the manifest. For ZIP output, check the members of
+`outputs.zip`, which also contains the manifest. Keep the published result if
+it matches the job. A separate Run requires a fresh destination. Progress lines
+on stderr are advisory. Use the exit status for automation.
 
 ## Hosted command export and quoting
 
@@ -145,3 +195,12 @@ confirmation and check malformed-input cleanup. UI tests cover draft refresh,
 clipboard success/denial/fallback and oversized-command JSON fallback. Coverage
 is build/platform-specific; these checks do not establish native Windows
 execution or PowerShell 7 argument-marshalling acceptance.
+
+The native CLI publication suite checks exit statuses and destination contents.
+On Linux it uses `/dev/full` to fail the stdout report and a gated row checkpoint
+to deliver SIGINT before commit.
+
+```sh
+cargo test --locked -p chopper --test cli_publication
+cargo test --locked -p chopper --test cli_publication --features resource-contract-tests
+```

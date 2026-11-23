@@ -726,9 +726,7 @@ fn run_inner(config: Option<PathBuf>) -> Result<()> {
     ctrlc::set_handler(move || {
         signal.store(true, Ordering::Relaxed);
         #[cfg(feature = "resource-contract-tests")]
-        if std::env::var_os("CHOPPER_GUIDE_TEST_PHASE").is_some() {
-            eprintln!("guide test interrupt received");
-        }
+        chopper::guide_test_control::signal_received();
     })?;
     let job = config
         .as_deref()

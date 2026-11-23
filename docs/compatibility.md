@@ -7,8 +7,8 @@ candidate binary in a fresh destination before switching automation.
 | Interface | What scripts can rely on |
 | --- | --- |
 | [Documented CLI commands and arguments](run-cli.md) | Existing invocations are expected to keep working across upgrades. Check the target release's `--help` for commands and flags introduced since your pinned version. Use the exit status and documented native result directory when integrating a Run. Human-readable diagnostics and progress text may change. |
-| [Job JSON](specification.md) | A Job with a supported `version` and supported settings is expected to work without edits. Only Job version 1 is supported today. The reader rejects unknown fields and unsupported settings, so Jobs written with newer settings may fail on older binaries. |
-| Versioned Job schemas | When a release provides a JSON Schema, use the schema shipped or tagged with the exact binary and select the artifact matching the Job's `version`. Schema validation checks structure. The binary also validates Job semantics and Run checks the actual input. |
+| [Job JSON](job-json.md) | A Job with a supported `version` and supported settings is expected to work without edits. Only Job version 1 is supported today. The reader rejects unknown fields and unsupported settings, so Jobs written with newer settings may fail on older binaries. |
+| [Versioned Job schemas](job-json.md#editor-setup) | When a release provides a JSON Schema, use the schema shipped or tagged with the exact binary and select the artifact matching the Job's `version`. Schema validation checks structure. The binary also validates Job semantics and Run checks the actual input. |
 | [Documented native manifest fields](native-manifest.md#schema-version-1) | Use the fields documented for the manifest's `schema_version`. Readers should accept additional fields in known records, reject unsupported schema versions, and use `path` and `lineage` to identify outputs. Filenames, record order, planner diagnostics, randomized membership within quotas, and randomized row order can vary. |
 
 The release version shown by `chopper --version` identifies the application.

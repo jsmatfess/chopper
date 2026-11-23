@@ -14,7 +14,10 @@ flowchart TD
     Schema -->|Yes| Action{Which action?}
     Action -->|Analyze input| Profile[Full-file validation and bounded statistics]
     Profile --> Report[Return bounded observations and source binding]
-    Action -->|UI or CLI Run with current configuration| Advice[Read cheap metadata and check optional Analyze binding]
+    Action -->|Native Run| NativeDestination{New or empty destination with an existing parent?}
+    NativeDestination -->|No| DestinationError[Reject before CSV intake or staging]
+    NativeDestination -->|Yes| Advice[Read cheap metadata and check optional Analyze binding]
+    Action -->|Hosted Run| Advice
     Report -.->|Optional| Advice
     Advice --> Counted{Native counted Auto or opt-in, eligible UTF-8 source and Balanced shape?}
     Counted -->|Yes| CountPass[Strict count pass and direct write with decoded header, count and metadata checks]
@@ -56,8 +59,9 @@ flowchart TD
     Internal --> Publish
     Publish --> Native{Linux or Windows Run at snapshot publication, one plain Partition, at least 2 GiB and 1,152 files, and four workers?}
     Native -->|Yes| NativeBatch[Choose up to four writers per batch using live memory, descriptors and remaining files]
-    Native -->|Other native publication| NativeCommit[Atomic destination directory commit]
+    Native -->|Other native publication| NativeCommit[Atomic destination directory commit without replacement]
     NativeBatch --> NativeCommit --> NativeReceipt[Engine publication receipt]
+    NativeCommit -->|Commit failure| NativeCleanup[Clean owned staging and temporary files]
     Publish --> Browser[Browser destination publication]
     Browser --> Format{ZIP?}
     Format -->|No| StreamIO{Selected CSV with plain output and supported pipeline?}
@@ -79,6 +83,9 @@ The unified `run` CLI accepts either admitted `--config` JSON or a caller-owned
 Job from ordered `--step` blocks, then uses the same confirmation and
 `engine::run` dispatch as `split`. Config and job-building flags cannot mix;
 existing JSON memory/worker overrides remain supported.
+Native publication checks the path again before creating staging. A directory
+that appears after an absent preflight is refused, even if it is empty. A
+permitted empty destination is checked again before non-recursive removal.
 [Native Auto paths](direct-execution.md#native-auto-paths) lists the measured
 route bounds. Native direct dispatch checks live working headroom after building
 the context. It may return to the ordinary plan before opening the destination.

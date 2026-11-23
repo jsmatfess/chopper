@@ -27,6 +27,11 @@ class ScopeTests(unittest.TestCase):
     def test_shared_core_checks_every_runtime_and_portable_target(self):
         self.assertEqual(self.selected('crates/chopper-core/src/config.rs'), {'native', 'features', 'core', 'browser'})
 
+    def test_job_authoring_artifact_and_guide_select_native_checks(self):
+        for path in ('schemas/0.5.0/job.schema.json', 'docs/job-json.md',
+                     'scripts/test-job-schema.py', 'scripts/requirements-job-schema.txt'):
+            self.assertEqual(self.selected(path), {'native'}, path)
+
     def test_native_engine_and_vendored_code_also_reach_browser(self):
         for path in ('crates/chopper/src/storage.rs', 'vendor/zip-2.4.2/src/lib.rs'):
             self.assertEqual(self.selected(path), {'native', 'features', 'browser'})
@@ -36,7 +41,8 @@ class ScopeTests(unittest.TestCase):
 
     def test_ownership_boundaries_select_their_own_checks(self):
         self.assertEqual(self.selected('scripts/windows-native.py'), {'tooling'})
-        for path in ('scripts/package-release.py', 'scripts/test-package-release.py'):
+        for path in ('scripts/package-release.py', 'scripts/test-package-release.py',
+                     'docs/releases/native-quickstart.txt', 'examples/quickstart-job.json'):
             self.assertEqual(self.selected(path), {'tooling'})
         self.assertEqual(self.selected('docs/releases/native-usage.txt'), {'browser', 'tooling'})
         self.assertEqual(self.selected('scripts/browser-artifacts.mjs'), {'browser', 'tooling'})

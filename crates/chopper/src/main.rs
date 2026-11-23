@@ -1,4 +1,5 @@
 mod cli_json;
+mod cli_summary;
 mod guide;
 mod run_cli;
 
@@ -8,6 +9,7 @@ use clap::{CommandFactory, FromArgMatches, Parser, Subcommand};
 use std::{
     io::{self, IsTerminal, Write},
     path::PathBuf,
+    process::ExitCode,
     sync::{
         atomic::{AtomicBool, Ordering},
         Arc,
@@ -41,6 +43,8 @@ enum Command {
         memory_mb: Option<MemoryBudget>,
         #[arg(long)]
         workers: Option<usize>,
+        #[arg(long, help = cli_summary::HELP)]
+        summary: bool,
     },
     /// Convenience form: partition, assign, shuffle, balanced split, then final limits.
     Split {
@@ -89,6 +93,8 @@ enum Command {
         no_headers: bool,
         #[arg(short, long)]
         yes: bool,
+        #[arg(long, help = cli_summary::HELP)]
+        summary: bool,
     },
 }
 // Keep flag-built Jobs separate from admitted scripted JSON decoding.
@@ -116,7 +122,12 @@ impl CliJob {
         }
     }
 }
-fn run_job(source: CliJob, yes: bool, advice: Option<&std::path::Path>) -> Result<()> {
+fn run_job(
+    source: CliJob,
+    yes: bool,
+    advice: Option<&std::path::Path>,
+    summary: bool,
+) -> Result<()> {
     let job = source.job();
     if !yes {
         ensure!(
@@ -128,20 +139,26 @@ fn run_job(source: CliJob, yes: bool, advice: Option<&std::path::Path>) -> Resul
     let signal = cancelled.clone();
     ctrlc::set_handler(move || {
         signal.store(true, Ordering::Relaxed);
+        #[cfg(feature = "resource-contract-tests")]
+        chopper::guide_test_control::signal_received();
     })?;
     let notify: Notify = Arc::new(|p| {
-        eprintln!(
+        // Progress delivery, including Complete, must not change the Run outcome.
+        let _ = writeln!(
+            io::stderr(),
             "{} | {} rows | {} MiB temporary",
             p.phase,
             p.rows,
             p.temp_bytes / 1024 / 1024
-        )
+        );
     });
     if !yes {
-        eprint!(
+        write!(
+            io::stderr(),
             "Process {} and write output to {}? [y/N] ",
-            job.input, job.output
-        );
+            job.input,
+            job.output
+        )?;
         io::stderr().flush()?;
         let mut answer = String::new();
         io::stdin().read_line(&mut answer)?;
@@ -153,13 +170,18 @@ fn run_job(source: CliJob, yes: bool, advice: Option<&std::path::Path>) -> Resul
     let hint = advice.and_then(|path| match read_advice(path) {
         Ok(hint) => hint,
         Err(error) => {
-            eprintln!("Analyze advice unavailable: {error:#}");
+            let _ = writeln!(io::stderr(), "Analyze advice unavailable: {error:#}");
             None
         }
     });
-    let analysis = source.execute(cancelled, notify, hint)?;
-    cli_json::write_pretty(&mut io::stdout().lock(), &analysis)?;
-    Ok(())
+    let analysis = source
+        .execute(cancelled, notify, hint)
+        .context("Run stopped before publication")?;
+    if summary {
+        cli_json::write_published(&cli_summary::RunSummary::from(&analysis))
+    } else {
+        cli_json::write_published(&analysis)
+    }
 }
 
 fn read_advice(path: &std::path::Path) -> Result<Option<engine::AutoObservations>> {
@@ -180,10 +202,18 @@ fn read_advice(path: &std::path::Path) -> Result<Option<engine::AutoObservations
     Ok(report.auto_observations)
 }
 
-fn main() {
-    if let Err(error) = main_result() {
-        eprintln!("chopper: {error:#}");
-        std::process::exit(1);
+fn main() -> ExitCode {
+    let Err(error) = main_result() else {
+        return ExitCode::SUCCESS;
+    };
+    if let Some(usage) = error.downcast_ref::<clap::Error>() {
+        usage.exit();
+    }
+    let _ = writeln!(io::stderr(), "chopper: {error:#}");
+    if error.is::<cli_json::PublishedReportFailure>() {
+        ExitCode::from(3)
+    } else {
+        ExitCode::FAILURE
     }
 }
 fn main_result() -> Result<()> {
@@ -196,6 +226,7 @@ fn main_result() -> Result<()> {
             arguments
                 .get_one::<PathBuf>("analysis")
                 .map(PathBuf::as_path),
+            arguments.get_flag("summary"),
         );
     }
     match Cli::from_arg_matches(&matches)?.command {
@@ -232,6 +263,7 @@ fn main_result() -> Result<()> {
             config,
             memory_mb,
             workers,
+            summary,
         } => {
             let cancelled = Arc::new(AtomicBool::new(false));
             let signal = cancelled.clone();
@@ -242,7 +274,12 @@ fn main_result() -> Result<()> {
                     cancelled,
                     Arc::new(|p| eprintln!("{} | {} rows", p.phase, p.rows)),
                 )?;
-            cli_json::write_pretty(&mut io::stdout().lock(), &profile)?;
+            let mut stdout = io::stdout().lock();
+            if summary {
+                cli_json::write_pretty(&mut stdout, &cli_summary::AnalyzeSummary::from(&profile))?;
+            } else {
+                cli_json::write_pretty(&mut stdout, &profile)?;
+            }
         }
         Command::Split {
             input,
@@ -267,6 +304,7 @@ fn main_result() -> Result<()> {
             max_files,
             no_headers,
             yes,
+            summary,
         } => {
             let mut job = Job {
                 input,
@@ -336,7 +374,7 @@ fn main_result() -> Result<()> {
                     Operation::Balanced { files }
                 });
             }
-            run_job(CliJob::Ordinary(job), yes, None)?;
+            run_job(CliJob::Ordinary(job), yes, None, summary)?;
         }
     }
     Ok(())

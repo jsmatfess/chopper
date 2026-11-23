@@ -1,0 +1,35 @@
+Chopper @VERSION@
+
+Open a terminal in the directory that contains this README and the executable.
+Run the saved Job on the bundled synthetic customer CSV.
+
+Windows PowerShell
+
+  .\chopper.exe --version
+  .\chopper.exe run --config quickstart/job.json --yes
+  Get-ChildItem quickstart-output -Filter *.csv | Sort-Object Name | ForEach-Object {
+      '{0} {1}' -f $_.Name, @(Import-Csv -LiteralPath $_.FullName).Count
+  }
+  Get-Content quickstart-output/manifest.jsonl
+
+Linux shell
+
+  chmod +x ./chopper
+  ./chopper --version
+  ./chopper run --config quickstart/job.json --yes
+  wc -l quickstart-output/part-*.csv
+  cat quickstart-output/manifest.jsonl
+
+Expect "chopper @VERSION@" and three CSVs with 5, 5 and 2 data rows:
+part-00000001.csv, part-00000002.csv and part-00000003.csv. The Linux line
+counts include one header per file. The manifest lists all three files.
+
+To rerun, copy quickstart/job.json to quickstart/rerun-job.json, edit its
+"output" field to a fresh directory name and run with --config quickstart/rerun-job.json.
+
+Release documentation with prerequisites, checksum verification and rerun steps:
+https://github.com/jsmatfess/chopper/blob/v@VERSION@/README.md#native-quickstart
+
+See LICENSE, THIRD-PARTY-NOTICES.txt and licenses/zip-2.4.2/LICENSE for
+licensing and attribution. The patched ZIP component's source and patch notes:
+https://github.com/jsmatfess/chopper/blob/v@VERSION@/vendor/zip-2.4.2/CHOPPER.md
