@@ -168,10 +168,13 @@ fn requested_layouts_before_delivery_and_drop_before_release() -> Result<()> {
         std::mem::size_of::<chopper_core::Operation>(),
         std::mem::size_of::<chopper_core::Allocation>()
     );
-    for wire in wire_cases() {
+    for (wire, track_paths) in wire_cases()
+        .into_iter()
+        .flat_map(|wire| [(wire.clone(), false), (wire, true)])
+    {
         let pool = ample();
         begin();
-        let owner = DecodedJob::decode(Cursor::new(&wire), pool.clone());
+        let owner = DecodedJob::decode(Cursor::new(&wire), pool.clone(), track_paths);
         // Successful payload construction is the covered census. Serde/anyhow
         // error objects are deliberately tested separately below.
         let owner = match owner {
@@ -265,7 +268,10 @@ fn legacy_reader_errors_values_positions_and_consumption() -> Result<()> {
         )
         .into_bytes(),
     );
-    for wire in cases {
+    for (wire, track_paths) in cases
+        .into_iter()
+        .flat_map(|wire| [(wire.clone(), false), (wire, true)])
+    {
         for (interrupt, fail) in [
             (None, None),
             (Some(0), None),
@@ -279,7 +285,7 @@ fn legacy_reader_errors_values_positions_and_consumption() -> Result<()> {
             legacy.fail = fail;
             let mut adapted = legacy.clone();
             let old = serde_json::from_reader::<_, Job>(&mut legacy).context("read job JSON");
-            let new = DecodedJob::decode(&mut adapted, ample());
+            let new = DecodedJob::decode(&mut adapted, ample(), track_paths);
             match (old, new) {
                 (Ok(old), Ok(new)) => {
                     assert_eq!(
@@ -313,7 +319,7 @@ fn shared_edges_sticky_denial_eof_and_competing_owners() -> Result<()> {
         for limit in [required - 1, required, required + 1] {
             let pool = Arc::new(MemoryPool::new(limit as u64));
             let mut source = trace(&wire);
-            let result = DecodedJob::decode(&mut source, pool.clone());
+            let result = DecodedJob::decode(&mut source, pool.clone(), false);
             assert_eq!(result.is_ok(), limit >= required);
             if let Err(error) = &result {
                 assert!(matches!(
@@ -334,6 +340,7 @@ fn shared_edges_sticky_denial_eof_and_competing_owners() -> Result<()> {
         prefix: prefix::Prefix::default(),
         grant: &mut grant,
         denial: None,
+        track_paths: false,
     };
     let mut out = [0];
     assert!(reader.read(&mut out).is_err());
@@ -353,12 +360,13 @@ fn shared_edges_sticky_denial_eof_and_competing_owners() -> Result<()> {
         prefix: prefix::Prefix::default(),
         grant: &mut grant,
         denial: None,
+        track_paths: false,
     };
     assert_eq!(reader.read(&mut out)?, 0);
     assert!(reader.denial.is_none());
     let wire = br#"{"input":"retain"}"#;
     let probe = ample();
-    let owner = DecodedJob::decode(Cursor::new(wire), probe.clone())?;
+    let owner = DecodedJob::decode(Cursor::new(wire), probe.clone(), false)?;
     let retained = engine::job_capacity(owner.job())?;
     drop(owner);
     let mut prefix = prefix::Prefix::default();
@@ -366,11 +374,11 @@ fn shared_edges_sticky_denial_eof_and_competing_owners() -> Result<()> {
         prefix.advance(*b).unwrap();
     }
     let pool = Arc::new(MemoryPool::new((prefix.required + retained - 1) as u64));
-    let first = DecodedJob::decode(Cursor::new(wire), pool.clone())?;
-    assert!(DecodedJob::decode(Cursor::new(wire), pool.clone()).is_err());
+    let first = DecodedJob::decode(Cursor::new(wire), pool.clone(), false)?;
+    assert!(DecodedJob::decode(Cursor::new(wire), pool.clone(), false).is_err());
     assert_eq!(pool.usage().reserved_bytes, retained as u64);
     drop(first);
-    let retry = DecodedJob::decode(Cursor::new(wire), pool.clone())?;
+    let retry = DecodedJob::decode(Cursor::new(wire), pool.clone(), false)?;
     drop(retry);
     assert_eq!(pool.usage().reserved_bytes, 0);
     Ok(())
@@ -583,6 +591,7 @@ fn metadata_open_order_and_stream_length_divergence() -> Result<()> {
                 pools.set(pools.get() + 1);
                 Ok(ample())
             },
+            false,
         );
         if length > 1_048_576 {
             assert_eq!(
@@ -598,6 +607,7 @@ fn metadata_open_order_and_stream_length_divergence() -> Result<()> {
         0,
         || -> io::Result<Cursor<&[u8]>> { Err(io::ErrorKind::PermissionDenied.into()) },
         || panic!("pool before open"),
+        false,
     );
     assert!(!format!("{:#}", error.err().unwrap()).contains("read job JSON"));
     // A virtual reader has tiny storage but reports over 1 MiB of whitespace.
@@ -630,6 +640,7 @@ fn metadata_open_order_and_stream_length_divergence() -> Result<()> {
             })
         },
         || Ok(ample()),
+        false,
     )?;
     assert!(owner.job().operations.is_empty());
     Ok(())
@@ -656,7 +667,7 @@ fn source_lifetime_profile_run_prepare_cancel_and_unwind() -> Result<()> {
             &serde_json::json!({"input":input,"output":output,"resources":{"memory_mb":32,"max_record_bytes":1024,"workers":1},"operations":if mode=="prepare" {serde_json::json!([{"type":"balanced","files":1}])} else {serde_json::json!([])}}),
         )?;
         let pool = ample();
-        let owner = DecodedJob::decode(Cursor::new(&wire), pool.clone())?;
+        let owner = DecodedJob::decode(Cursor::new(&wire), pool.clone(), false)?;
         let source = owner.grant.bytes as u64;
         let minimum = Arc::new(AtomicU64::new(u64::MAX));
         let progress_min = minimum.clone();
@@ -751,6 +762,7 @@ fn every_enabling_prefix_boundary_and_no_denial_allocation() -> Result<()> {
                 prefix: prefix::Prefix::default(),
                 grant: &mut grant,
                 denial: None,
+                track_paths: false,
             };
             let mut out = [0];
             for _ in 0..index {
@@ -809,7 +821,7 @@ fn partial_payloads_destroy_before_denied_grant_release() -> Result<()> {
                 withheld: index,
             };
             begin();
-            let error = DecodedJob::decode(source, pool.clone())
+            let error = DecodedJob::decode(source, pool.clone(), false)
                 .err()
                 .context("denial expected")?;
             let (live, _, violations) = end();

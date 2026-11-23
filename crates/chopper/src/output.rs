@@ -1204,9 +1204,10 @@ fn commit_directory(
 }
 
 #[cfg(not(target_os = "wasi"))]
-pub(crate) fn preflight_destination(output: &str) -> Result<bool> {
+pub(crate) fn preflight_destination(job: &Job) -> Result<bool> {
+    let output = &job.output;
     let check = || {
-        ensure!(!output.is_empty(), "output path is required");
+        job.validate_output()?;
         let destination = std::path::absolute(output)?;
         let existing_empty = empty_destination(&destination, false)?;
         let parent = destination.parent().context("invalid output directory")?;
