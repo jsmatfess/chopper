@@ -964,4 +964,13 @@ input:disabled,select:disabled{background:#edf0ec;color:#66736b;opacity:.7;curso
 .hosted-workspace #execution-results-link{margin-inline-start:auto;padding:5px}
 .hosted-workspace #run-results #result-path{margin-block-start:0;overflow-wrap:anywhere}
 .hosted-workspace #run-results #result-path.complete{color:var(--ink);font-weight:600}
+.hosted-workspace #result-message{margin-block:0 10px}
+.hosted-workspace #published-output{font-weight:400}
+.hosted-workspace #published-output dl{display:grid;gap:8px;margin:0 0 12px}
+.hosted-workspace #published-output dt{font-weight:600}
+.hosted-workspace #published-output dd{margin:0;color:var(--ink);overflow-wrap:anywhere}
+.hosted-workspace #published-output p{margin:8px 0 0;color:var(--muted)}
+.hosted-workspace #result-copy-feedback:empty{margin:0}
+.hosted-workspace #error-recovery{margin-block-end:12px}
+.hosted-workspace #error-recovery p{margin-block:0 8px}
 @media(pointer:coarse){.hosted-workspace :is(#run-next-step,#run-direct,.source-analysis-action #profile){min-block-size:44px}}

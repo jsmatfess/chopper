@@ -151,7 +151,7 @@ export class BrowserLifecycle {
   snapshot():State{return structuredClone(this.state);}
   private setProfile(result:OwnedResult<InputProfile>){this.state.profile=result.value;this.state.origins={...this.state.origins,profile:result.origin};}
   private setAnalysis(result:OwnedResult<Analysis>){this.state.analysis=result.value;this.state.origins={...this.state.origins,analysis:result.origin};}
-  private clearResults(){this.state.analysis=null;this.state.profile=null;this.state.origins={};}
+  private clearResults(){this.state.analysis=null;this.state.profile=null;this.state.origins={};delete this.state.publication;}
   private showHistory(){try{this.effects.historyChanged(this.history);}catch{if(this.history)this.history.unavailable=true;}}
   private receive(data:any,session:WorkerSession){
     if(data.retiredStorage){if(this.profiling&&this.latestSession===session)this.diagnostics.storage=data.retiredStorage;return;}
@@ -196,11 +196,14 @@ export class BrowserLifecycle {
     this.generation++;const session=this.session;this.session=null;
     return session?.retire()??Promise.resolve(undefined);
   }
-  private async completeRun(publication:VerifiedPublication){
+  private async completeRun(publication:VerifiedPublication,compression:Job['compression']){
     this.state.output=publication.output;
     const cleanup=this.stop(),current=this.generation;
     try{await cleanup;}catch(error){if(current===this.generation)this.state.error=String(error);}
-    if(current===this.generation){this.state.status='complete';this.exporting=false;}
+    if(current===this.generation){
+      this.state.publication={...publication.receipt,compression};
+      this.state.status='complete';this.exporting=false;
+    }
   }
   private async fail(error:unknown,current:number){
     if(current!==this.generation)return;
@@ -300,7 +303,7 @@ export class BrowserLifecycle {
         const analysis=result.analysis as Analysis;
         analysis.warnings.push('Browser export is not atomic. A valid CHOPPER-COMPLETE.json record marks successful completion.');
         this.setAnalysis(ownedResult(origin,analysis));
-        await this.completeRun(verifyPublication(result,this.folder,session.exportPath(this.folder)));
+        await this.completeRun(verifyPublication(result,this.folder,session.exportPath(this.folder)),data.compression);
       }).catch(error=>this.fail(error,current));return {};
     }
     if(path==='cancel'){

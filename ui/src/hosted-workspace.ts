@@ -262,9 +262,37 @@ export function configureHostedWorkspace() {
   const report=document.createElement('section');report.id='run-results';report.className='card run-results';report.hidden=true;
   report.innerHTML='<div class="section-title"><h2>Results</h2></div><div class="section-body"></div>';
   report.querySelector('.section-title')!.append(get('status'));report.querySelector('.section-title')!.setAttribute('aria-live','polite');
+  observations.after(report);decorate(report,'results');
   const reportBody=report.querySelector('.section-body')!;
   for(const id of ['result-path','analysis','progress'])reportBody.append(get(id));
-  observations.after(report);decorate(report,'results');
+  const resultPath=get('result-path');
+  resultPath.innerHTML='<p id="result-message"></p><div id="published-output" hidden><dl><div><dt>Chosen folder</dt><dd id="result-parent"></dd></div><div><dt>Results subfolder</dt><dd id="result-folder"></dd></div></dl><button id="copy-result-folder" type="button" class="secondary">Copy folder name</button><p id="result-marker"></p><p id="result-copy-feedback" role="status"></p></div>';
+  const resultFolder=get('result-folder');
+  const copyFeedback=get('result-copy-feedback');
+  get('copy-result-folder').onclick=async()=>{
+    const folder=resultFolder.textContent!;
+    let message='Folder name copied.';
+    try{await navigator.clipboard.writeText(folder);}
+    catch{message='Copy failed. Select the folder name and copy it manually.';}
+    if(folder===resultFolder.textContent)copyFeedback.textContent=message;
+  };
+  const errorMessage=get('error');
+  errorMessage.tabIndex=-1;
+  const recovery=document.createElement('div');recovery.id='error-recovery';recovery.hidden=true;
+  recovery.innerHTML='<p></p><button type="button" class="secondary"></button>';
+  errorMessage.after(recovery);
+  const recoveryButton=recovery.querySelector('button')!;
+  function showRecovery(action:string,detail:string,field:string){
+    recovery.hidden=false;
+    recovery.querySelector('p')!.textContent=detail;
+    recoveryButton.textContent=action;
+    recoveryButton.onclick=()=>{
+      showView('configuration',false);
+      const control=get(field);
+      control.focus();control.scrollIntoView({block:'center'});
+      if(field==='browse-output')control.click();
+    };
+  }
   get('execution-results-link').onclick=()=>{
     report.tabIndex=-1;report.focus({preventScroll:true});
     report.scrollIntoView({block:'nearest',behavior:'instant'});
@@ -282,6 +310,13 @@ export function configureHostedWorkspace() {
     while(parent){if(parent instanceof HTMLDetailsElement)parent.open=true;parent=parent.parentElement;}
   },true);
   return {
+    errorRecovery(message:string){
+      if(/Output folder write permission was not granted|Result folder already exists/i.test(message)){
+        showRecovery('Choose another folder','Select a writable folder and grant access when prompted. Then run again.','browse-output');
+      }else if(/(?:header\/BOM|one row plus header) exceeds output byte limit/i.test(message)){
+        showRecovery('Review maximum CSV size','Increase the byte limit enough to fit a data row and its header, or clear the limit if you don’t need one.','max-bytes');
+      }else recovery.hidden=true;
+    },
     readiness(next:{message:string;reveal:()=>void}|undefined){
       const button=get('run-next-step') as HTMLButtonElement;
       button.hidden=!next;
@@ -352,10 +387,28 @@ export function configureHostedWorkspace() {
       const busy=['profiling','running'].includes(state.status),finished=processingStarted!==null&&!busy;
       const completed=state.status==='complete'?state.analysis:null;
       const files=completed?`${completed.output_files.toLocaleString()} CSV ${completed.output_files===1?'file':'files'}`:'';
+      const output=completed?state.output:null;
+      const folder=output?(state.publication?.folder??output.slice(output.lastIndexOf('/')+1)):'';
+      const archive=state.publication?.compression==='zip';
+      const outputSummary=archive?`outputs.zip contains ${files}.`:`${files} saved.`;
+      get('published-output').hidden=!output;
+      const parent=output?.slice(0,Math.max(0,output.lastIndexOf('/')))??'';
+      if(resultFolder.textContent!==folder||get('result-parent').textContent!==parent){
+        resultFolder.textContent=folder;copyFeedback.textContent='';
+        get('result-parent').textContent=parent;
+      }
+      get('result-marker').textContent=output&&state.publication?`Completion marker verified (${state.publication.marker}).`:'';
+      const resultMessage=output?(dirty?`Previous export complete. ${outputSummary} Draft changed. Run again to use the current settings.`:`Export complete. ${outputSummary}`)
+        :state.status==='cancelled'?(state.error?'Cancelled. See cleanup and destination details.':'Cancelled. Job-owned temporary files cleaned up.')
+        :dirty&&state.analysis?'Draft changed. Processing results describe the previous submitted configuration.':'';
+      get('result-message').textContent=resultMessage;
+      resultPath.hidden=!resultMessage;
+      resultPath.classList.toggle('complete',!!output);
       processing.hidden=!busy;setup.hidden=busy;get('execution-live').hidden=!busy&&!completed;
       const viewResults=get('execution-results-link');viewResults.hidden=!completed;
       if(completed){
-        get('execution-phase').textContent=dirty?`Previous run · ${files} saved`:`${files} saved`;
+        const saved=archive?`ZIP archive saved · ${files} inside`:`${files} saved`;
+        get('execution-phase').textContent=dirty?`Previous run · ${saved}`:saved;
         get('execution-counters').textContent=[state.output,completed.warnings.length?`${completed.warnings.length} ${completed.warnings.length===1?'warning':'warnings'}`:''].filter(Boolean).join(' · ');
       }
       if(busy){
@@ -379,13 +432,6 @@ export function configureHostedWorkspace() {
       scheduleNavigation();
       report.hidden=!state.analysis&&['idle','profiled','profiling','running'].includes(state.status);
       get('analysis').setAttribute('aria-label',dirty?'Previous processing result; draft has changed':'Processing result');
-      if(dirty && state.analysis) {
-        const saved=state.status==='complete'&&state.output?` Last completed result folder: ${state.output}.`:'';
-        get('result-path').textContent = `Draft changed. Processing results describe the previous submitted configuration.${saved} Run again to process the current settings.`;
-      }
-      if(completed&&!dirty){
-        get('result-path').textContent=`✓ Complete. ${files} ${cliJob?.compression==='zip'?'in a ZIP archive saved to':'saved to'} ${state.output}.`;
-      }
       if(finished&&['complete','failed','profiled'].includes(state.status)&&!(document.activeElement as HTMLElement|null)?.closest('#job-form')){
         const active=document.activeElement as HTMLElement|null;
         if(view==='execution'&&state.status!=='failed'){

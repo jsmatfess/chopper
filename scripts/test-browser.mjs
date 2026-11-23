@@ -134,7 +134,7 @@ try {
       await app.locator('#run-direct').click();
       await app.waitForFunction(()=>['COMPLETE','FAILED'].includes(document.getElementById('status')?.textContent),{},{timeout:30000});
       assert.equal(await app.locator('#status').textContent(),'COMPLETE');
-      await app.waitForFunction(previous=>document.getElementById('status')?.textContent==='COMPLETE'&&document.getElementById('result-path')?.textContent!==previous&&document.getElementById('result-path')?.textContent.includes('CSV files saved to'),previousResult,{timeout:30000});
+      await app.waitForFunction(previous=>document.getElementById('status')?.textContent==='COMPLETE'&&document.getElementById('result-path')?.textContent!==previous&&document.getElementById('result-message')?.textContent.includes('CSV files saved.'),previousResult,{timeout:30000});
       const disabled=await app.evaluate(async()=>{
         const root=await navigator.storage.getDirectory(),parent=await root.getDirectoryHandle(window.directSmokeParent);
         const folders=[];for await(const [,handle]of parent.entries())folders.push(handle);

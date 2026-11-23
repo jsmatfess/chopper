@@ -9,6 +9,7 @@ import {createSizeControl,populateSize,readSize,type SizeUnit} from './size-unit
 import {configurePlanLinks} from './plan-links';
 import {configureValidation} from './validation';
 import {configureHostedWorkspace} from './hosted-workspace';
+import type {PublicationReceipt} from './browser/publication';
 
 export {};
 type Csv = { encoding: string; headers: boolean; delimiter: string; quote: string; escape: string | null; line_ending: string; bom: boolean; skip_empty_lines: boolean };
@@ -28,7 +29,7 @@ type AutoPlan = {
 };
 export type Analysis = {auto_plan?:AutoPlan;algorithm_version?: string; execution?: {replay_guarantee: string; plan_version: number; records: number; rng_version: string; plan_digest_blake3: number[]}; diagnostics?: {shuffle_partition_retries?: number;partition_balanced_retries?: number;streaming_chain_retries?: number;consecutive_partition_retries?: number;compact_spill_fallbacks?: number;routing_reused_runs?: number; resident_sorts: number; routed_groupings: number; routing_fallbacks: number; sort_runs: number; merge_operations: number; peak_workspace_reserved_bytes: number}; column_values?: {column: number; values: string[]; frequencies?:Record<string,number>; truncated: boolean}[]; analysis_seconds: number; peak_temp_bytes: number; memory_budget_bytes: number; workers: number; rows: number; columns: number; header: string[] | null; preview: string[][]; groups: number; output_files: number; output_csv_bytes: number; temp_bytes: number; seed: string; accuracy: string; warnings: string[]; stages: {operation: number; input_groups: number; output_groups: number}[]};
 export type InputProfile = {auto_observations?:unknown;suggested_run_memory_mb?:number;rows:number;columns:number;cache_hit:boolean;seconds:number;accuracy:string;header:string[]|null;column_values:{column:number;values:string[];frequencies?:Record<string,number>;truncated:boolean;distinct:number;distinct_exact:boolean}[];stages:{operation:number;strategy:string;input_distinct_keys:number|null;distinct_exact:boolean}[]};
-export type State = {origins?:{profile?:ResultOrigin;analysis?:ResultOrigin};profile?:InputProfile|null;status: string; progress: {phase: string; rows: number; temp_bytes: number}; analysis: Analysis | null; error: string | null; output: string | null};
+export type State = {origins?:{profile?:ResultOrigin;analysis?:ResultOrigin};publication?:PublicationReceipt & {compression:string};profile?:InputProfile|null;status: string; progress: {phase: string; rows: number; temp_bytes: number}; analysis: Analysis | null; error: string | null; output: string | null};
 const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const advancedExecution = () => $<HTMLInputElement>('execution-mode').checked;
 const value = (id: string) => $<HTMLInputElement>(id).value;
@@ -46,7 +47,16 @@ async function api<T = unknown>(path: string, data?: unknown): Promise<T> {
   return await browserApi<T>(path,data);
   } finally {if(mutation){activeCommands--;requestEpoch++;}}
 }
-function error(e: unknown) { $('error').textContent = e instanceof Error ? e.message : String(e); $('error').hidden = false; }
+function error(e: unknown) {
+  const message=e instanceof Error?e.message:String(e);
+  if($('error').textContent!==message)$('error').textContent=message;
+  $('error').hidden=false;
+  hostedWorkspace.errorRecovery(message);
+}
+function clearError() {
+  $('error').hidden=true;
+  hostedWorkspace.errorRecovery('');
+}
 let columnSchema: ColumnSchema | null = null;
 let columnMessage = 'Choose an input file to load its columns.';
 let columnSource = '', columnRequest = 0;
@@ -324,8 +334,6 @@ async function poll() {
 
     if(s.analysis) renderAnalysis(s.analysis);
     if(s.error) error(s.error);
-    $('result-path').className=status==='complete'?'hint complete':'hint';
-    $('result-path').textContent=status==='complete'?`✓ Complete. Results saved to ${s.output}`:status==='cancelled'?(s.error?'Cancelled. See cleanup and destination details.':'Cancelled. Job-owned temporary files cleaned up.'):'';
     hostedWorkspace?.state(s,dirty);
   } catch(e) { $('connection').hidden=false;$('connection').textContent=e instanceof Error?e.message:String(e); }
 }
@@ -445,19 +453,22 @@ $('sniff-csv').onclick=async()=>{
 $('copy-csv').onclick=()=>{csvForm('output',readCsv('input'));markDirty();};
 $('profile').onclick=async()=>{
   if(!validation.check(false))return;
-  try{const submitted=readJob();$('error').hidden=true;profileOrigin=resultOrigin(sourceKey(),submitted,editRevision,++resultSerial);profileDirty=false;lastProfileData=null;await api('profile',submitted);lastProfile='';lastAnalysis='';$('input-profile').hidden=true;$('analysis').hidden=true;await poll();}catch(e){error(e);}
+  try{const submitted=readJob();clearError();profileOrigin=resultOrigin(sourceKey(),submitted,editRevision,++resultSerial);profileDirty=false;lastProfileData=null;await api('profile',submitted);lastProfile='';lastAnalysis='';$('input-profile').hidden=true;$('analysis').hidden=true;await poll();}catch(e){error(e);}
 };
 async function startJob(){
   if(!validation.check())return;
   try{
-    const submitted=readJob();updateDraft();$('error').hidden=true;
+    const submitted=readJob();updateDraft();clearError();
     const submittedRevision=editRevision;analysisOrigin=resultOrigin(sourceKey(),submitted,editRevision,++resultSerial);
     await api('run-direct',submitted);
     // Acknowledgement validates only the draft revision that was submitted.
     if(submittedRevision===editRevision)dirty=false;
     lastAnalysis='';$('input-profile').hidden=true;$('analysis').hidden=true;
     $('empty-plan').hidden=true;await poll();
-  }catch(e){error(e);}
+  }catch(e){
+    error(e);
+    if(document.activeElement===$('run-direct'))$('error').focus();
+  }
 }
 function updateRunControl() {
   const button=$<HTMLButtonElement>('run-direct');

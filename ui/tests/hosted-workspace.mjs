@@ -28,7 +28,7 @@ async function bundle(){
         if(path==='pick-path')return {path:data.mode==='sample'?'customers.csv':data.mode==='input'?'source.csv':'destination'};
         if(path==='sniff')return {settings:{...data.input_csv,delimiter:';'},note:'Fixture detection; no scan'};
         if(path==='profile'){if(window.deferAnalysisAck)await new Promise(resolve=>window.releaseAnalysisAck=resolve);const finish=()=>window.fixtureState={...window.fixtureState,status:'profiled',profile:window.profileFixture??{rows:4,columns:2,header:['country','note'],seconds:1,accuracy:'Exact fixture input count',stages:[],column_values:[]}};if(window.deferProfile){window.fixtureState={...window.fixtureState,status:'profiling',profile:null};window.finishProfile=finish;}else finish();return {};}
-        if(path==='run-direct'){window.fixtureState={...window.fixtureState,status:'running',error:null,progress:{phase:'Fixture processing',rows:1,temp_bytes:0}};return {};}
+        if(path==='run-direct'){if(window.runError)throw new Error(window.runError);window.fixtureState={...window.fixtureState,status:'running',error:null,progress:{phase:'Fixture processing',rows:1,temp_bytes:0}};return {};}
         if(path==='cancel'){window.fixtureState={...window.fixtureState,status:'cancelled',analysis:null};return {};}
         throw new Error('Unexpected mock client action '+path);
       }`}));
@@ -59,6 +59,42 @@ async function harness(browser,hosted=true,clock=false,scrollspy=true,transition
   return {page,errors};
 }
 async function choose(page){await page.locator('#browse-input').click();await page.locator('#browse-output').click();}
+test('results describe the published archive and copy its subfolder name',async()=>{
+ const browser=await chromium.launch();
+ try{
+  const {page,errors}=await harness(browser);await choose(page);
+  await page.evaluate(()=>{
+   Object.defineProperty(navigator,'clipboard',{value:{writeText:async text=>{window.copiedResult=text;}}});
+   window.fixtureState={...window.fixtureState,status:'complete',analysis:window.analysis,output:'selected folder/chopper-results-test',
+    publication:{kind:'browser-completion-marker',version:1,compression:'zip',files:2,folder:'chopper-results-test',marker:'CHOPPER-COMPLETE.json'}};
+  });
+  await page.locator('#result-message').filter({hasText:'outputs.zip contains 2 CSV files'}).waitFor();
+  assert.equal(await page.locator('#result-parent').textContent(),'selected folder');
+  assert.equal(await page.locator('#result-folder').textContent(),'chopper-results-test');
+  assert.match(await page.locator('#result-marker').textContent(),/verified.*CHOPPER-COMPLETE\.json/);
+  await page.getByRole('button',{name:'Copy folder name'}).click();
+  assert.equal(await page.evaluate(()=>window.copiedResult),'chopper-results-test');
+  await page.locator('#result-copy-feedback').filter({hasText:'Folder name copied.'}).waitFor();
+  assert.deepEqual(errors,[]);
+ }finally{await browser.close();}
+});
+test('targeted recovery opens the folder picker or focuses the CSV size limit',async()=>{
+ const browser=await chromium.launch();
+ try{
+  const {page,errors}=await harness(browser);await choose(page);
+  await page.evaluate(()=>window.runError='Output folder write permission was not granted.');
+  await page.locator('#run-direct').click();
+  await page.getByRole('button',{name:'Choose another folder',exact:true}).click();
+  await page.waitForFunction(()=>window.calls.filter(call=>call.path==='pick-path'&&call.data.mode==='output').length===2);
+  await page.evaluate(()=>{window.runError=null;window.fixtureState={...window.fixtureState,status:'failed',error:'Error: one row plus header exceeds output byte limit'};});
+  await page.getByRole('button',{name:'Review maximum CSV size',exact:true}).click();
+  assert.equal(await page.evaluate(()=>document.activeElement.id),'max-bytes');
+  await page.evaluate(()=>window.fixtureState.error='Unexpected failure');
+  await page.locator('#error').filter({hasText:'Unexpected failure'}).waitFor();
+  assert.equal(await page.locator('#error-recovery').isHidden(),true);
+  assert.deepEqual(errors,[]);
+ }finally{await browser.close();}
+});
 test('sample loads the source and row cap without opening a picker or starting Run',async()=>{
   const browser=await chromium.launch();
   try{
@@ -195,10 +231,11 @@ test('keyboard validation, column picker, seed-free submission and mobile reacha
     assert.equal(Object.hasOwn(await exported(page),'seed'),false);
     await page.locator('#cancel').click();await page.locator('#run-direct').click();assert.equal(Object.hasOwn(await exported(page),'seed'),false);
     await page.evaluate(()=>{window.fixtureState={...window.fixtureState,status:'complete',output:'destination/result',analysis:window.analysis};});await tick(page);
-    assert.match(await page.locator('#result-path').innerText(),/2 CSV files saved to destination\/result/);
+    assert.match(await page.locator('#result-message').innerText(),/Export complete. 2 CSV files saved/);
     await page.locator('#max-rows').fill('7');await tick(page);
     assert.match(await page.locator('#result-path').innerText(),/Draft changed/);
-    assert.ok((await page.locator('#result-path').textContent()).includes('destination/result'),'draft edits retain the completed result location');
+    assert.equal(await page.locator('#result-parent').textContent(),'destination');
+    assert.equal(await page.locator('#result-folder').textContent(),'result','draft edits retain the completed result location');
     for(const width of [390,760,1280]){
       await page.setViewportSize({width,height:900});
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow at ${width}`);

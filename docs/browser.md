@@ -135,6 +135,12 @@ files can appear in the results folder while the browser is still writing.
 A failed or cancelled export attempts to remove its own incomplete folder.
 Closing or losing the tab or browser during export can leave files behind.
 
+After a successful Run, **Results** shows the chosen folder and the new
+results subfolder separately. **Copy folder name** copies the subfolder name
+for finding it in your file manager. For ZIP output, Results shows the number
+of CSVs inside `outputs.zip`. Chopper confirms the completion marker after
+verifying it.
+
 1. Open the parent folder chosen for the Run and look for its
    `chopper-results-<UUID>` subfolder. Open `CHOPPER-COMPLETE.json` in a text
    editor. A valid v1 marker is JSON with `complete: true`,
