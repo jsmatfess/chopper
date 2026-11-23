@@ -41,7 +41,11 @@ fn analyze_summary_contains_only_scan_status_and_counts() {
     let full = analyze(&[]);
     assert_eq!(full["header"][0], "PRIVATE_HEADER");
     assert_eq!(full["preview"][0][0], "PRIVATE_VALUE");
-    assert!(full["auto_observations"].is_object());
+    if cfg!(windows) {
+        assert!(full["auto_observations"].is_null());
+    } else {
+        assert!(full["auto_observations"].is_object());
+    }
     assert!(!output.exists());
 
     let advice = dir.path().join("summary.json");
