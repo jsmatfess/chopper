@@ -1,3 +1,4 @@
+import {job_values as jobValues} from '../../docs/cli-reference-data.json';
 import type {Job} from './app';
 
 // Literal selectors avoid comma splitting and preserve names versus indices.
@@ -5,7 +6,7 @@ export function runArguments(job:Job):string[]{
  const args=['run'];
  const add=(flag:string,value:unknown)=>{if(value!==null&&value!==undefined)args.push(`--${flag}=${String(value)}`);};
  add('input',job.input);add('output',job.output);
- if(job.version!==1)add('job-version',job.version);
+ if(job.version!==jobValues.version)add('job-version',job.version);
  add('zip-member',job.zip_member);
  add('compression',job.compression);
  for(const [field,flag] of [['rows','rows'],['bytes','bytes'],['compressed_bytes','compressed-bytes']] as const)add(flag,job.limits[field]);

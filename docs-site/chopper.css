@@ -220,6 +220,19 @@
   width: 42%;
 }
 
+.cli-option-table th:first-child:nth-last-child(3) {
+  width: 36%;
+}
+
+.cli-option-table th:nth-child(3) {
+  width: 24%;
+}
+
+.cli-option-table td small {
+  display: block;
+  margin-block-start: .25rem;
+}
+
 .cli-option-table th[scope='row'] {
   font-weight: 500;
 }

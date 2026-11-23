@@ -79,7 +79,7 @@ impl Job {
     /// Check configuration values and cross-field rules without accessing any job paths.
     pub fn validate(&self) -> Result<()> {
         ensure_field!(
-            self.version == 1,
+            self.version == super::JOB_VERSION,
             "/version",
             "unsupported configuration version"
         );
@@ -150,7 +150,7 @@ impl Job {
                 "escape must differ from delimiter and quote; omit escape for doubled quotes"
             );
             ensure_field!(
-                matches!(settings.line_ending.as_str(), "lf" | "crlf"),
+                super::LINE_ENDINGS.contains(&settings.line_ending.as_str()),
                 format!("{path}/line_ending"),
                 "line_ending must be lf or crlf"
             );

@@ -1,0 +1,735 @@
+{
+  "commands": [
+    {
+      "arguments": [
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Print help",
+          "heading": "Options",
+          "id": "help",
+          "syntax": "-h, --help"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Print version",
+          "heading": "Options",
+          "id": "version",
+          "syntax": "-V, --version"
+        }
+      ],
+      "description": "Split large CSVs with bounded memory, ordered pipelines and full random shuffles",
+      "name": "chopper",
+      "notes": "",
+      "subcommands": [
+        {
+          "description": "Build, save and run a capped plain CSV export in a terminal wizard",
+          "syntax": "guide"
+        },
+        {
+          "description": "Print a complete example job configuration",
+          "syntax": "example"
+        },
+        {
+          "description": "Check a saved job without opening its input or creating output",
+          "syntax": "validate"
+        },
+        {
+          "description": "Inspect all input rows and report bounded statistics and pipeline estimates",
+          "syntax": "analyze"
+        },
+        {
+          "description": "Run a JSON job (--config) or ordered --step operations",
+          "syntax": "run"
+        },
+        {
+          "description": "Print help for Chopper or a subcommand",
+          "syntax": "help"
+        }
+      ],
+      "usage": "Usage: chopper <COMMAND>"
+    },
+    {
+      "arguments": [
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Open an existing saved Job in the wizard",
+          "heading": "Options",
+          "id": "config",
+          "syntax": "--config <CONFIG>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Print help",
+          "heading": "Options",
+          "id": "help",
+          "syntax": "-h, --help"
+        }
+      ],
+      "description": "Build, save and run a capped plain CSV export in a terminal wizard",
+      "name": "chopper guide",
+      "notes": "",
+      "subcommands": [],
+      "usage": "Usage: chopper guide [OPTIONS]"
+    },
+    {
+      "arguments": [
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Print help",
+          "heading": "Options",
+          "id": "help",
+          "syntax": "-h, --help"
+        }
+      ],
+      "description": "Print a complete example job configuration",
+      "name": "chopper example",
+      "notes": "",
+      "subcommands": [],
+      "usage": "Usage: chopper example"
+    },
+    {
+      "arguments": [
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Read settings from this saved Job JSON file",
+          "heading": "Options",
+          "id": "config",
+          "syntax": "-c, --config <CONFIG>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Write a machine-readable validation result to stdout",
+          "heading": "Options",
+          "id": "json",
+          "syntax": "--json"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Print help",
+          "heading": "Options",
+          "id": "help",
+          "syntax": "-h, --help"
+        }
+      ],
+      "description": "Check a saved job without opening its input or creating output",
+      "name": "chopper validate",
+      "notes": "",
+      "subcommands": [],
+      "usage": "Usage: chopper validate [OPTIONS] --config <CONFIG>"
+    },
+    {
+      "arguments": [
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Read settings from this saved Job JSON file",
+          "heading": "Options",
+          "id": "config",
+          "syntax": "-c, --config <CONFIG>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Override the working budget in MiB, or use auto",
+          "heading": "Options",
+          "id": "memory_mb",
+          "syntax": "--memory-mb <MEMORY_MB>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Override the sort and compression worker count; 0 selects automatically",
+          "heading": "Options",
+          "id": "workers",
+          "syntax": "--workers <WORKERS>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Print only completion status and aggregate counts in stdout JSON",
+          "heading": "Options",
+          "id": "summary",
+          "syntax": "--summary"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Print help",
+          "heading": "Options",
+          "id": "help",
+          "syntax": "-h, --help"
+        }
+      ],
+      "description": "Inspect all input rows and report bounded statistics and pipeline estimates",
+      "name": "chopper analyze",
+      "notes": "",
+      "subcommands": [],
+      "usage": "Usage: chopper analyze [OPTIONS] --config <CONFIG>"
+    },
+    {
+      "arguments": [
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Input file path",
+          "heading": "Flag-built Jobs",
+          "id": "input",
+          "syntax": "--input <input>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "New or empty output directory path",
+          "heading": "Flag-built Jobs",
+          "id": "output",
+          "syntax": "--output <output>"
+        },
+        {
+          "accepted_values": [
+            "1"
+          ],
+          "defaults": [],
+          "description": "Job schema version (default 1)",
+          "heading": "Flag-built Jobs",
+          "id": "job-version",
+          "syntax": "--job-version <job-version>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Input ZIP member",
+          "heading": "Flag-built Jobs",
+          "id": "zip-member",
+          "syntax": "--zip-member <zip-member>"
+        },
+        {
+          "accepted_values": [
+            "none",
+            "gzip",
+            "zip"
+          ],
+          "defaults": [],
+          "description": "Select the output compression format",
+          "heading": "Flag-built Jobs",
+          "id": "compression",
+          "syntax": "--compression <compression>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Maximum rows per output CSV",
+          "heading": "Flag-built Jobs",
+          "id": "rows",
+          "syntax": "--rows <rows>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Maximum serialized bytes per CSV",
+          "heading": "Flag-built Jobs",
+          "id": "bytes",
+          "syntax": "--bytes <bytes>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Advisory compressed-byte target",
+          "heading": "Flag-built Jobs",
+          "id": "compressed-bytes",
+          "syntax": "--compressed-bytes <compressed-bytes>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Working budget in MiB or auto (default auto)",
+          "heading": "Options",
+          "id": "memory-mb",
+          "syntax": "--memory-mb <memory-mb>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Sort/compression workers; 0 selects automatically",
+          "heading": "Options",
+          "id": "workers",
+          "syntax": "--workers <workers>"
+        },
+        {
+          "accepted_values": [
+            "auto",
+            "sort"
+          ],
+          "defaults": [],
+          "description": "Select the physical grouping implementation",
+          "heading": "Flag-built Jobs",
+          "id": "grouping",
+          "syntax": "--grouping <grouping>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Maximum files/groups",
+          "heading": "Flag-built Jobs",
+          "id": "max-files",
+          "syntax": "--max-files <max-files>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Maximum record working size in bytes",
+          "heading": "Flag-built Jobs",
+          "id": "max-record-bytes",
+          "syntax": "--max-record-bytes <max-record-bytes>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Temporary directory",
+          "heading": "Flag-built Jobs",
+          "id": "temp-dir",
+          "syntax": "--temp-dir <temp-dir>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Optional temporary-space budget",
+          "heading": "Flag-built Jobs",
+          "id": "temp-bytes",
+          "syntax": "--temp-bytes <temp-bytes>"
+        },
+        {
+          "accepted_values": [
+            "blake3_counter_v1"
+          ],
+          "defaults": [],
+          "description": "Versioned source for full-shuffle random numbers",
+          "heading": "Flag-built Jobs",
+          "id": "full-shuffle-rng",
+          "syntax": "--full-shuffle-rng <full-shuffle-rng>"
+        },
+        {
+          "accepted_values": [
+            "adaptive_v1"
+          ],
+          "defaults": [],
+          "description": "Versioned algorithm for full shuffles",
+          "heading": "Flag-built Jobs",
+          "id": "full-shuffle-algorithm",
+          "syntax": "--full-shuffle-algorithm <full-shuffle-algorithm>"
+        },
+        {
+          "accepted_values": [
+            "balanced",
+            "interleaved",
+            "partition",
+            "assign",
+            "assign_probabilistic",
+            "shuffle"
+          ],
+          "defaults": [],
+          "description": "Append an operation to the pipeline",
+          "heading": "Ordered steps",
+          "id": "step",
+          "syntax": "--step <step>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Partition column names, comma-separated; use --column for literal names",
+          "heading": "Ordered steps",
+          "id": "by",
+          "syntax": "--by <by>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Append one literal partition column name (including numeric names)",
+          "heading": "Ordered steps",
+          "id": "column",
+          "syntax": "--column <column>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Append one zero-based partition column index",
+          "heading": "Ordered steps",
+          "id": "column-index",
+          "syntax": "--column-index <column-index>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Allocation name=percent pairs, comma-separated; use --group for literal names",
+          "heading": "Ordered steps",
+          "id": "groups",
+          "syntax": "--groups <groups>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Append one allocation name=percent (split at the last = sign)",
+          "heading": "Ordered steps",
+          "id": "group",
+          "syntax": "--group <group>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Allocation stratum names, comma-separated; use --stratum for literal names",
+          "heading": "Ordered steps",
+          "id": "strata",
+          "syntax": "--strata <strata>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Append one literal allocation stratum name",
+          "heading": "Ordered steps",
+          "id": "stratum",
+          "syntax": "--stratum <stratum>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Append one zero-based allocation stratum index",
+          "heading": "Ordered steps",
+          "id": "stratum-index",
+          "syntax": "--stratum-index <stratum-index>"
+        },
+        {
+          "accepted_values": [
+            "uniform",
+            "auto",
+            "fisher_yates"
+          ],
+          "defaults": [],
+          "description": "Select the shuffle strategy for the preceding step",
+          "heading": "Ordered steps",
+          "id": "strategy",
+          "syntax": "--strategy <strategy>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Balanced/interleaved file count",
+          "heading": "Ordered steps",
+          "id": "files",
+          "syntax": "--files <files>"
+        },
+        {
+          "accepted_values": [
+            "UTF-8",
+            "UTF-16LE",
+            "UTF-16BE",
+            "windows-1250",
+            "windows-1251",
+            "windows-1252",
+            "windows-1253",
+            "windows-1254",
+            "windows-1255",
+            "windows-1256",
+            "windows-1257",
+            "windows-1258",
+            "Shift_JIS",
+            "GBK",
+            "Big5",
+            "EUC-KR",
+            "ISO-8859-2"
+          ],
+          "defaults": [],
+          "description": "CSV character encoding; labels are case-insensitive and may use WHATWG aliases for the listed encodings",
+          "heading": "Flag-built input CSV",
+          "id": "input-encoding",
+          "syntax": "--input-encoding <input-encoding>"
+        },
+        {
+          "accepted_values": [
+            "true",
+            "false"
+          ],
+          "defaults": [],
+          "description": "Treat the first input row as a header",
+          "heading": "Flag-built input CSV",
+          "id": "input-headers",
+          "syntax": "--input-headers <input-headers>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "One ASCII character (pass a literal tab for tab-separated CSV)",
+          "heading": "Flag-built input CSV",
+          "id": "input-delimiter",
+          "syntax": "--input-delimiter <input-delimiter>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "One ASCII character distinct from the delimiter",
+          "heading": "Flag-built input CSV",
+          "id": "input-quote",
+          "syntax": "--input-quote <input-quote>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "One ASCII character distinct from delimiter and quote; omit for doubled quotes",
+          "heading": "Flag-built input CSV",
+          "id": "input-escape",
+          "syntax": "--input-escape <input-escape>"
+        },
+        {
+          "accepted_values": [
+            "lf",
+            "crlf"
+          ],
+          "defaults": [],
+          "description": "Set the input dialect's line ending; input parsing detects LF and CRLF",
+          "heading": "Flag-built input CSV",
+          "id": "input-line-ending",
+          "syntax": "--input-line-ending <input-line-ending>"
+        },
+        {
+          "accepted_values": [
+            "true",
+            "false"
+          ],
+          "defaults": [],
+          "description": "Set the input dialect's byte order mark flag; the reader detects input marks",
+          "heading": "Flag-built input CSV",
+          "id": "input-bom",
+          "syntax": "--input-bom <input-bom>"
+        },
+        {
+          "accepted_values": [
+            "true",
+            "false"
+          ],
+          "defaults": [],
+          "description": "Skip empty lines during input parsing",
+          "heading": "Flag-built input CSV",
+          "id": "input-skip-empty-lines",
+          "syntax": "--input-skip-empty-lines <input-skip-empty-lines>"
+        },
+        {
+          "accepted_values": [
+            "UTF-8",
+            "UTF-16LE",
+            "UTF-16BE",
+            "windows-1250",
+            "windows-1251",
+            "windows-1252",
+            "windows-1253",
+            "windows-1254",
+            "windows-1255",
+            "windows-1256",
+            "windows-1257",
+            "windows-1258",
+            "Shift_JIS",
+            "GBK",
+            "Big5",
+            "EUC-KR",
+            "ISO-8859-2"
+          ],
+          "defaults": [],
+          "description": "CSV character encoding; labels are case-insensitive and may use WHATWG aliases for the listed encodings",
+          "heading": "Flag-built output CSV",
+          "id": "output-encoding",
+          "syntax": "--output-encoding <output-encoding>"
+        },
+        {
+          "accepted_values": [
+            "true",
+            "false"
+          ],
+          "defaults": [],
+          "description": "Write a header in each output CSV",
+          "heading": "Flag-built output CSV",
+          "id": "output-headers",
+          "syntax": "--output-headers <output-headers>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "One ASCII character (pass a literal tab for tab-separated CSV)",
+          "heading": "Flag-built output CSV",
+          "id": "output-delimiter",
+          "syntax": "--output-delimiter <output-delimiter>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "One ASCII character distinct from the delimiter",
+          "heading": "Flag-built output CSV",
+          "id": "output-quote",
+          "syntax": "--output-quote <output-quote>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "One ASCII character distinct from delimiter and quote; omit for doubled quotes",
+          "heading": "Flag-built output CSV",
+          "id": "output-escape",
+          "syntax": "--output-escape <output-escape>"
+        },
+        {
+          "accepted_values": [
+            "lf",
+            "crlf"
+          ],
+          "defaults": [],
+          "description": "Write records with this line ending",
+          "heading": "Flag-built output CSV",
+          "id": "output-line-ending",
+          "syntax": "--output-line-ending <output-line-ending>"
+        },
+        {
+          "accepted_values": [
+            "true",
+            "false"
+          ],
+          "defaults": [],
+          "description": "Write a byte order mark for UTF-8 or UTF-16 output",
+          "heading": "Flag-built output CSV",
+          "id": "output-bom",
+          "syntax": "--output-bom <output-bom>"
+        },
+        {
+          "accepted_values": [
+            "true",
+            "false"
+          ],
+          "defaults": [],
+          "description": "Set the output dialect's empty-line flag; skipping applies to input parsing",
+          "heading": "Flag-built output CSV",
+          "id": "output-skip-empty-lines",
+          "syntax": "--output-skip-empty-lines <output-skip-empty-lines>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "JSON job file; allows --memory-mb, --workers, --analysis, --summary and --yes",
+          "heading": "Options",
+          "id": "config",
+          "syntax": "-c, --config <config>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Optional full JSON report from chopper analyze",
+          "heading": "Options",
+          "id": "analysis",
+          "syntax": "--analysis <analysis>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Print only completion status and aggregate counts in stdout JSON",
+          "heading": "Options",
+          "id": "summary",
+          "syntax": "--summary"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Skip execution confirmation; validation still applies",
+          "heading": "Options",
+          "id": "yes",
+          "syntax": "-y, --yes"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Print help",
+          "heading": "Options",
+          "id": "help",
+          "syntax": "-h, --help"
+        }
+      ],
+      "description": "Run a JSON job (--config) or ordered --step operations",
+      "name": "chopper run",
+      "notes": "Each --step appends an operation. Step options belong to the preceding --step. Job-wide settings may appear anywhere.\nUse --flag=value for values beginning with '-'. Names and indices have separate flags.\nExample: chopper run --input input.csv --output results --step shuffle --strategy auto --step partition --by country --yes",
+      "subcommands": [],
+      "usage": "Usage: chopper run [OPTIONS]"
+    },
+    {
+      "arguments": [
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Subcommand path; omit it for top-level help",
+          "heading": "Arguments",
+          "id": "command",
+          "syntax": "[COMMAND]..."
+        }
+      ],
+      "description": "Print help for Chopper or a subcommand",
+      "name": "chopper help",
+      "notes": "",
+      "subcommands": [],
+      "usage": "Usage: chopper help [COMMAND]..."
+    }
+  ],
+  "job_values": {
+    "compression": [
+      "none",
+      "gzip",
+      "zip"
+    ],
+    "encoding": [
+      "UTF-8",
+      "UTF-16LE",
+      "UTF-16BE",
+      "windows-1250",
+      "windows-1251",
+      "windows-1252",
+      "windows-1253",
+      "windows-1254",
+      "windows-1255",
+      "windows-1256",
+      "windows-1257",
+      "windows-1258",
+      "Shift_JIS",
+      "GBK",
+      "Big5",
+      "EUC-KR",
+      "ISO-8859-2"
+    ],
+    "full_shuffle_algorithm": [
+      "adaptive_v1"
+    ],
+    "full_shuffle_rng": [
+      "blake3_counter_v1"
+    ],
+    "grouping": [
+      "auto",
+      "sort"
+    ],
+    "line_ending": [
+      "lf",
+      "crlf"
+    ],
+    "operation": [
+      "balanced",
+      "interleaved",
+      "partition",
+      "assign",
+      "assign_probabilistic",
+      "shuffle"
+    ],
+    "shuffle": [
+      "uniform",
+      "auto",
+      "fisher_yates"
+    ],
+    "version": 1
+  },
+  "version": "0.5.0"
+}

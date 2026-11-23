@@ -6,6 +6,41 @@ mod validation;
 pub use memory_budget::MemoryBudget;
 pub use validation::JobValidationError;
 
+pub const JOB_VERSION: u32 = 1;
+pub const LINE_ENDINGS: &[&str] = &["lf", "crlf"];
+
+// The serialized spelling and the exposed choices come from the same declaration.
+macro_rules! wire_choices {
+    (
+        $(#[$meta:meta])* pub enum $name:ident {
+            $($(#[$variant_meta:meta])* $variant:ident $( { $($fields:tt)* } )? => $wire:literal),+ $(,)?
+        }
+        $(; $constructor:ident)?
+    ) => {
+        $(#[$meta])*
+        pub enum $name {
+            $($(#[$variant_meta])* #[serde(rename = $wire)] $variant $( { $($fields)* } )?),+
+        }
+
+        impl $name {
+            pub const CHOICES: &'static [&'static str] = &[$($wire),+];
+            wire_choices!(@constructor [$($variant $( { $($fields)* } )? => $wire),+] $($constructor)?);
+        }
+    };
+    (@constructor [$($variants:tt)*]) => {};
+    (@constructor [
+        $($variant:ident $( { $($(#[$field_meta:meta])* $field:ident: $ty:ty),* $(,)? } )? => $wire:literal),+
+    ] $constructor:ident) => {
+        /// Create a draft step for ordered CLI parsing before filling its required fields.
+        pub fn $constructor(name: &str) -> Option<Self> {
+            match name {
+                $($wire => Some(Self::$variant $( { $($field: Default::default()),* } )?),)+
+                _ => None,
+            }
+        }
+    };
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Job {
@@ -32,7 +67,7 @@ pub struct Job {
 impl Default for Job {
     fn default() -> Self {
         Self {
-            version: 1,
+            version: JOB_VERSION,
             input: String::new(),
             output: String::new(),
             zip_member: None,
@@ -49,24 +84,26 @@ impl Default for Job {
         }
     }
 }
-/// Versioned counter source. Removed source names remain strict decoding errors.
-#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-pub enum FullShuffleRng {
-    #[default]
-    Blake3CounterV1,
+wire_choices! {
+    /// Versioned counter source. Removed source names remain strict decoding errors.
+    #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+    pub enum FullShuffleRng {
+        #[default]
+        Blake3CounterV1 => "blake3_counter_v1",
+    }
 }
 impl FullShuffleRng {
     pub fn is_v1(&self) -> bool {
         *self == Self::Blake3CounterV1
     }
 }
-/// Explicit full-shuffle construction used by flexible auto requests.
-#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-pub enum FullShuffleAlgorithm {
-    #[default]
-    AdaptiveV1,
+wire_choices! {
+    /// Explicit full-shuffle construction used by flexible auto requests.
+    #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+    pub enum FullShuffleAlgorithm {
+        #[default]
+        AdaptiveV1 => "adaptive_v1",
+    }
 }
 impl FullShuffleAlgorithm {
     pub fn is_adaptive(&self) -> bool {
@@ -100,74 +137,86 @@ impl Default for CsvSettings {
         }
     }
 }
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case", try_from = "CompressionSetting")]
-pub enum Compression {
-    None,
-    Gzip,
-    Zip,
-}
-
-#[derive(Deserialize)]
-#[serde(rename = "Compression", rename_all = "snake_case")]
-enum CompressionSetting {
-    None,
-    Gzip,
-    Zip,
-    Zstd,
-}
-
-impl TryFrom<CompressionSetting> for Compression {
-    type Error = &'static str;
-
-    fn try_from(setting: CompressionSetting) -> std::result::Result<Self, Self::Error> {
-        match setting {
-            CompressionSetting::None => Ok(Self::None),
-            CompressionSetting::Gzip => Ok(Self::Gzip),
-            CompressionSetting::Zip => Ok(Self::Zip),
-            CompressionSetting::Zstd => Err(
-                "Zstandard output compression \"zstd\" was removed in 0.4.0; set \"compression\" to \"gzip\", \"zip\", or \"none\"",
-            ),
+// Keep the legacy error while defining accepted wire spellings once.
+macro_rules! compression_choices {
+    ($($variant:ident => $wire:literal),+ $(,)?) => {
+        wire_choices! {
+            #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
+            #[serde(try_from = "CompressionSetting")]
+            pub enum Compression {
+                $($variant => $wire),+
+            }
         }
+
+        #[derive(Deserialize)]
+        #[serde(rename = "Compression")]
+        enum CompressionSetting {
+            $(#[serde(rename = $wire)] $variant,)+
+            #[serde(rename = "zstd")]
+            Zstd,
+        }
+
+        impl TryFrom<CompressionSetting> for Compression {
+            type Error = &'static str;
+
+            fn try_from(setting: CompressionSetting) -> std::result::Result<Self, Self::Error> {
+                match setting {
+                    $(CompressionSetting::$variant => Ok(Self::$variant),)+
+                    CompressionSetting::Zstd => Err(
+                        "Zstandard output compression \"zstd\" was removed in 0.4.0; set \"compression\" to \"gzip\", \"zip\", or \"none\"",
+                    ),
+                }
+            }
+        }
+    };
+}
+
+compression_choices! {
+    None => "none",
+    Gzip => "gzip",
+    Zip => "zip",
+}
+
+wire_choices! {
+    #[derive(Clone, Debug, Serialize, Deserialize)]
+    #[serde(tag = "type", deny_unknown_fields)]
+    pub enum Operation {
+        Balanced {
+            files: u64,
+        } => "balanced",
+        /// Round-robin membership; still exactly balanced and nonempty.
+        Interleaved {
+            files: u64,
+        } => "interleaved",
+        Partition {
+            columns: Vec<Column>,
+        } => "partition",
+        Assign {
+            groups: Vec<Allocation>,
+            #[serde(default)]
+            strata: Vec<Column>,
+        } => "assign",
+        /// Independent seeded draws, without exact per-stratum quotas.
+        AssignProbabilistic {
+            groups: Vec<Allocation>,
+            #[serde(default)]
+            strata: Vec<Column>,
+        } => "assign_probabilistic",
+        Shuffle {
+            #[serde(default)]
+            strategy: Shuffle,
+        } => "shuffle",
+    }; empty_step
+}
+wire_choices! {
+    #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+    pub enum Shuffle {
+        #[default]
+        Uniform => "uniform",
+        Auto => "auto",
+        /// Uniform resident shuffle; never falls back to another permutation.
+        FisherYates => "fisher_yates",
     }
-}
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[serde(tag = "type", rename_all = "snake_case", deny_unknown_fields)]
-pub enum Operation {
-    Balanced {
-        files: u64,
-    },
-    /// Round-robin membership; still exactly balanced and nonempty.
-    Interleaved {
-        files: u64,
-    },
-    Partition {
-        columns: Vec<Column>,
-    },
-    Assign {
-        groups: Vec<Allocation>,
-        #[serde(default)]
-        strata: Vec<Column>,
-    },
-    /// Independent seeded draws, without exact per-stratum quotas.
-    AssignProbabilistic {
-        groups: Vec<Allocation>,
-        #[serde(default)]
-        strata: Vec<Column>,
-    },
-    Shuffle {
-        #[serde(default)]
-        strategy: Shuffle,
-    },
-}
-#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-pub enum Shuffle {
-    #[default]
-    Uniform,
-    Auto,
-    /// Uniform resident shuffle; never falls back to another permutation.
-    FisherYates,
 }
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
@@ -199,13 +248,14 @@ pub struct Resources {
     pub max_record_bytes: usize,
     pub grouping: Grouping,
 }
-/// Physical grouping policy; both choices preserve identical logical results.
-#[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "snake_case")]
-pub enum Grouping {
-    #[default]
-    Auto,
-    Sort,
+wire_choices! {
+    /// Physical grouping policy; both choices preserve identical logical results.
+    #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+    pub enum Grouping {
+        #[default]
+        Auto => "auto",
+        Sort => "sort",
+    }
 }
 impl Default for Resources {
     fn default() -> Self {

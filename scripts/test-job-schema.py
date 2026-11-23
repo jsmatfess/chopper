@@ -33,6 +33,7 @@ def main():
     artifact = (ROOT / relative_path).read_bytes()
     schema = json.loads(artifact)
     Draft7Validator.check_schema(schema)
+    check_choice_parity(chopper, schema)
     check(schema["$id"] == url, f"expected release-pinned schema ID {url}")
     if args.published:
         with urlopen(url, timeout=30) as response:
@@ -57,6 +58,28 @@ def main():
         check_defaults(chopper, validator, work)
 
     print(f"Job schema {version} passed: release identity, editor example, decoder parity and defaults")
+
+
+def check_choice_parity(chopper, schema):
+    contract = json.loads(subprocess.check_output([chopper, "reference-json"], text=True))
+    choices = contract["job_values"]
+    props = schema["properties"]
+    definitions = schema["definitions"]
+    operations = {branch["properties"]["type"]["const"]: branch["properties"]
+                  for branch in definitions["operation"]["oneOf"]}
+    csv = definitions["csv"]["properties"]
+    comparisons = {
+        "version": props["version"]["const"],
+        "compression": props["compression"]["enum"],
+        "operation": list(operations),
+        "shuffle": operations["shuffle"]["strategy"]["enum"],
+        "grouping": definitions["resources"]["properties"]["grouping"]["enum"],
+        "line_ending": csv["line_ending"]["enum"],
+        "full_shuffle_rng": [props["full_shuffle_rng"]["const"]],
+        "full_shuffle_algorithm": [props["full_shuffle_algorithm"]["const"]],
+    }
+    for key, actual in comparisons.items():
+        check(actual == choices[key], f"Job schema {key} choices differ from the native contract")
 
 
 def check_decoder(chopper, validator, work):
@@ -126,7 +149,7 @@ def check_decoder(chopper, validator, work):
         ({"resources": []}, False, True, None),
         ({"operations": [["shuffle"]]}, False, True, None),
         # Configuration semantics and data-dependent checks come after decoding.
-        ({"version": 2}, True, True, "unsupported configuration version"),
+        ({"version": 2}, False, True, "unsupported configuration version"),
         ({"limits": {"compressed_bytes": 1}}, True, True, "requires output compression"),
         ({"resources": {"memory_mb": 0}}, True, True, "memory_mb must be between"),
         ({"operations": [{"type": "assign", "groups": [dict(group, percent="99")]}]},

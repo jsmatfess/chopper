@@ -111,7 +111,7 @@ consumption (`--yes` for noninteractive use).
 
 ## Summary JSON for automation
 
-Use `--summary` on Analyze, either form of Run, or Split to print a small
+Use `--summary` on Analyze or either form of Run to print a small
 success report to stdout. The default detailed JSON remains available by
 omitting the flag.
 
@@ -121,7 +121,7 @@ chopper run --config job.json --yes --summary > run-summary.json
 ```
 
 Analyze reports `status: "analyzed"`, `rows` (data rows scanned) and `columns`
-(input columns). Run and Split report `status: "published"`, `rows`, `columns`,
+(input columns). Run reports `status: "published"`, `rows`, `columns`,
 `groups` (final pipeline groups), `output_files` (CSV chunks, including members
 inside ZIP output), and `output_csv_bytes` (total serialized CSV bytes before
 compression, including any emitted headers). Automation should check the command's
@@ -131,7 +131,7 @@ The summary omits preview rows, headers, column and partition values, paths,
 the job configuration, and diagnostic text. The flag applies only to the
 successful stdout report. Prompts, progress and errors on stderr, command
 arguments, output CSVs and full manifests can contain sensitive information.
-Review them separately before sharing. Run and Split still publish the full
+Review them separately before sharing. Run still publishes the full
 results and manifest through native atomic publication.
 
 Keep the default Analyze JSON if you plan to use `run --analysis`. A summary has

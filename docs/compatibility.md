@@ -21,6 +21,38 @@ versions stay the same. Release notes identify intentional incompatibilities
 and explain the replacement or conversion. Keep the original executable and
 its release identity when continued use of a removed capability is required.
 
+## Replace Split with Run in 0.5
+
+Chopper 0.5 removes `chopper split`. Use `run --input PATH --output PATH`
+for flag-based jobs or save the same pipeline in a Job and use
+`run --config job.json`.
+
+```sh
+chopper run --input examples/customers.csv --output results --step partition --by country --step balanced --files 3 --yes
+```
+
+That command replaces `chopper split examples/customers.csv --output results --by country --files 3 --yes`.
+To reproduce Split's fixed pipeline order, append these steps in sequence
+when the corresponding options were present.
+
+| Previous Split options | Run options |
+| --- | --- |
+| `--by country,segment` | `--step partition --by country,segment` |
+| `--groups treatment=80,control=20` | `--step assign --groups treatment=80,control=20` |
+| `--groups … --probabilistic` | `--step assign_probabilistic --groups …` |
+| `--shuffle auto` | `--step shuffle --strategy auto` |
+| `--files 3` | `--step balanced --files 3` |
+| `--files 3 --interleaved` | `--step interleaved --files 3` |
+| `--no-headers` | `--input-headers false --output-headers false` |
+
+Keep Job-wide limits, compression, resource options, `--summary`, and `--yes`.
+For example, `--rows 5000` still caps each CSV at 5,000 data rows.
+If your script set a small explicit memory budget, also set
+`--max-record-bytes` to fit that budget. Split previously chose the smaller of
+8 MiB and one thirty-second of the specified memory budget. For its old
+32 MiB setting, use `--memory-mb 32 --max-record-bytes 1048576`.
+Use a fresh destination for the migration test. [Run syntax and examples](run-cli.md)
+
 ## Migrate Zstandard Jobs from 0.3 to 0.4 or later
 
 **Output compression.** Change the saved Job setting

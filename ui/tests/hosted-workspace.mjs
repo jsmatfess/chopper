@@ -8,6 +8,7 @@ import {build} from 'esbuild';
 import {chromium} from 'playwright';
 
 const csv={encoding:'utf-8',headers:true,delimiter:',',quote:'"',escape:null,line_ending:'lf',bom:false,skip_empty_lines:false};
+const {job_values: jobValues}=JSON.parse(await readFile(new URL('../../docs/cli-reference-data.json',import.meta.url),'utf8'));
 const defaults={version:1,input:'',output:'',zip_member:null,input_csv:csv,output_csv:csv,compression:'none',operations:[],limits:{rows:null,bytes:null,compressed_bytes:null},resources:{grouping:'auto',workers:0,memory_mb:256,max_files:100000,max_record_bytes:8388608,temp_dir:null,temp_bytes:null}};
 const analysis={algorithm_version:'test-only',rows:4,columns:2,header:['country','note'],preview:[['US','sample']],groups:1,output_files:2,output_csv_bytes:32,temp_bytes:0,peak_temp_bytes:0,analysis_seconds:1,memory_budget_bytes:268435456,workers:1,seed:'fixture',accuracy:'Exact fixture response',warnings:['Fixture warning'],stages:[]};
 const html=await readFile('index.html','utf8');
@@ -68,6 +69,15 @@ test('hosted workspace preserves configuration and real app action wiring throug
   const browser=await chromium.launch({headless:true});
   try{
     const {page,errors}=await harness(browser);
+    for(const [selector, expected] of [
+      ['#compression',jobValues.compression],
+      ['#grouping',jobValues.grouping],
+      ['#input-csv [data-csv="encoding"]',jobValues.encoding],
+      ['#output-csv [data-csv="line_ending"]',jobValues.line_ending],
+    ]){
+      const actual=await page.locator(selector+' option').evaluateAll(options=>options.map(option=>option.value.toLowerCase()));
+      assert.deepEqual(actual,expected.map(value=>value.toLowerCase()),selector);
+    }
     if(process.env.CHOPPER_UI_SCREENSHOTS){
       await mkdir(process.env.CHOPPER_UI_SCREENSHOTS,{recursive:true});
       for(const width of [1280,390]){

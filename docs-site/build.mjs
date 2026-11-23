@@ -43,7 +43,6 @@ function section(markdown, heading) {
 }
 
 function content(source, name) {
-  if (name === 'cli-reference') return renderCliReference(source);
   if (name === 'quickstart') {
     return section(source, 'Native quickstart')
       .replace(/^## (Native quickstart)$/m, '# $1');
@@ -133,7 +132,9 @@ try {
     await mkdir(join(source, 'public'), { recursive: true });
     await cp(stylesheet, join(source, 'public/chopper.css'));
     const documents = pages.map(([path, name, text]) => ({
-      name, text, markdown: content(read(path).toString(), name),
+      name, text, markdown: name === 'cli-reference'
+        ? renderCliReference(read(path).toString(), JSON.parse(read('docs/cli-reference-data.json')), version)
+        : content(read(path).toString(), name),
     }));
     for (const { name, markdown } of documents) {
       await writeFile(join(source, `${name}.md`), markdown);

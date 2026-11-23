@@ -63,7 +63,7 @@ def classify(paths, full=False, platform='all'):
             selected.update(('native', 'features', 'browser'))
             if path.startswith('crates/chopper-core/'):
                 selected.add('core')
-        elif path.startswith('ui/'):
+        elif path.startswith('ui/') or path == 'docs/cli-reference-data.json':
             selected.update(('native', 'browser'))
         elif path.startswith('docs/'):
             if path.startswith(('docs/benchmarks/', 'docs/history/', 'docs/evidence-', 'docs/performance/')) or path in {

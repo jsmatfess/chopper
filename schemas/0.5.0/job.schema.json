@@ -6,7 +6,7 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "version": { "type": "integer", "minimum": 0, "maximum": 4294967295, "default": 1, "description": "Job format version. Chopper supports version 1." },
+    "version": { "type": "integer", "const": 1, "default": 1, "description": "Supported Job format version." },
     "input": { "type": "string", "default": "", "description": "Input CSV, gzip or ZIP path. Chopper requires a nonempty path.", "examples": ["examples/customers.csv"] },
     "output": { "type": "string", "default": "", "description": "New output directory for Run.", "examples": ["chopped-customers"] },
     "zip_member": { "type": ["string", "null"], "default": null, "description": "Exact ZIP member name. Omit for automatic selection." },
@@ -126,12 +126,12 @@
       "additionalProperties": false,
       "default": {},
       "properties": {
-        "encoding": { "type": "string", "default": "utf-8", "description": "Character encoding label.", "examples": ["utf-16le", "windows-1252"] },
+        "encoding": { "type": "string", "default": "utf-8", "description": "Case-insensitive character encoding label. WHATWG aliases for Chopper’s supported encodings are accepted.", "examples": ["utf-16le", "windows-1252"] },
         "headers": { "type": "boolean", "default": true, "description": "Read a header from input or write a header in output." },
         "delimiter": { "allOf": [{ "$ref": "#/definitions/character" }], "default": ",", "description": "ASCII field delimiter." },
         "quote": { "allOf": [{ "$ref": "#/definitions/character" }], "default": "\"", "description": "ASCII quote character." },
         "escape": { "anyOf": [{ "$ref": "#/definitions/character" }, { "type": "null" }], "default": null, "description": "ASCII escape character. Null uses doubled quotes." },
-        "line_ending": { "type": "string", "default": "lf", "description": "Line ending setting. Chopper accepts lf or crlf.", "examples": ["crlf"] },
+        "line_ending": { "enum": ["lf", "crlf"], "default": "lf", "description": "CSV record line ending." },
         "bom": { "type": "boolean", "default": false, "description": "Write an encoding-appropriate byte order mark in output." },
         "skip_empty_lines": { "type": "boolean", "default": false, "description": "Skip bare blank records on input." }
       }

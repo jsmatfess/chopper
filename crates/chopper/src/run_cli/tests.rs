@@ -7,6 +7,26 @@ fn parsed(args: &[&str]) -> Result<Job> {
     )?;
     parse(&matches).map(|(job, _)| job)
 }
+
+#[test]
+fn every_documented_step_builds_an_operation() -> Result<()> {
+    for step in Operation::CHOICES {
+        let mut args = vec!["--step", step];
+        args.extend_from_slice(match *step {
+            "partition" => &["--by", "country"][..],
+            "assign" | "assign_probabilistic" => &["--group", "only=100"],
+            "balanced" | "interleaved" => &["--files", "2"],
+            "shuffle" => &[],
+            _ => panic!("add a valid invocation for {step}"),
+        });
+        let job = parsed(&args)?;
+        assert_eq!(serde_json::to_value(&job.operations[0])?["type"], *step);
+    }
+    assert!(parsed(&["--input-encoding", "latin1"]).is_ok());
+    assert!(parsed(&["--output-line-ending", "bogus"]).is_err());
+    assert!(parsed(&["--output-headers", "yes"]).is_err());
+    Ok(())
+}
 #[test]
 fn ordered_steps_preserve_all_public_job_fields() {
     let job = parsed(&[
@@ -210,6 +230,9 @@ fn rejects_wrong_scope_duplicates_missing_values_and_obsolete_options() {
         vec!["--input-quote", "xx"],
         vec!["--seed", "anything"],
         vec!["--step", "shuffle", "--strategy", "buffer"],
+        vec!["--step", "shuffle", "--strategy", "radix"],
+        vec!["--step", "shuffle", "--strategy", "prefix_distribution"],
+        vec!["--step", "shuffle", "--buffer-rows", "7"],
         vec!["--memory-mb", "256", "--memory-mb", "512"],
         vec!["--step", "assign", "--group", "missing-percent"],
         vec!["--step", "partition", "--column-index", "-1"],
@@ -281,32 +304,41 @@ fn config_form_retains_admitted_owner_and_existing_resource_overrides() {
 }
 #[test]
 fn config_conflicts_with_every_job_building_flag_before_file_io() {
-    for &(flag, _) in GLOBAL.iter().chain(LOCAL) {
-        if matches!(flag, "memory-mb" | "workers") {
-            continue;
-        }
-        let args = [
-            "run",
-            "--config",
-            "missing.json",
-            &format!("--{flag}"),
-            "value",
-        ];
-        let error = command()
-            .try_get_matches_from(args)
-            .unwrap_err()
-            .to_string();
-        assert!(error.contains("cannot be used with"), "{flag}: {error}");
-    }
+    let mut cli = command();
+    cli.build();
+    let job_flags = GLOBAL
+        .iter()
+        .chain(LOCAL)
+        .map(|(flag, _)| *flag)
+        .filter(|flag| !matches!(*flag, "memory-mb" | "workers"));
+    let mut flags: Vec<_> = job_flags.map(str::to_owned).collect();
     for prefix in ["input", "output"] {
         for &(suffix, _) in CSV {
-            let flag = format!("--{prefix}-{suffix}");
-            let error = command()
-                .try_get_matches_from(["run", "--config", "missing.json", &flag, "value"])
-                .unwrap_err()
-                .to_string();
-            assert!(error.contains("cannot be used with"), "{flag}: {error}");
+            flags.push(format!("{prefix}-{suffix}"));
         }
+    }
+    for flag in flags {
+        let arg = cli
+            .get_arguments()
+            .find(|arg| arg.get_id() == flag.as_str())
+            .unwrap();
+        let values = arg.get_possible_values();
+        let value = values.first().map_or("value", |choice| choice.get_name());
+        let error = cli
+            .clone()
+            .try_get_matches_from([
+                "run",
+                "--config",
+                "missing.json",
+                &format!("--{flag}"),
+                value,
+            ])
+            .unwrap_err();
+        assert_eq!(
+            error.kind(),
+            clap::error::ErrorKind::ArgumentConflict,
+            "{flag}: {error}"
+        );
     }
     for args in [
         vec!["run"],

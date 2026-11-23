@@ -1,3 +1,4 @@
+import {job_values as jobValues} from '../../docs/cli-reference-data.json';
 import {sourceIdentity,resultOrigin,belongsToSource,type ResultOrigin} from './result-ownership';
 import {operationColor,operationName} from './step-labels';
 import {browserApi,configureBrowserUI,invalidateBrowserDraft} from './browser/client';
@@ -71,10 +72,29 @@ async function loadColumns() {
   } catch(e) {if(request!==columnRequest||columnSource!==sourceKey())return;columnMessage=e instanceof Error?e.message:String(e);$('preview').textContent=`Input preview unavailable: ${columnMessage}`;$('preview-card').hidden=false;hostedWorkspace?.preview(null,true);}
   renderPickers();updateFields();validation.update();
 }
+function choiceOptions(values: readonly string[], selected = '', labels: Record<string, string> = {}) {
+  return values.map(value => `<option value="${escape(value)}" ${value === selected ? 'selected' : ''}>${escape(labels[value] ?? value)}</option>`).join('');
+}
+
+function configureJobChoices() {
+  $('compression').innerHTML = choiceOptions(jobValues.compression, '', {
+    none: 'CSV · uncompressed', gzip: 'gzip · one file per chunk', zip: 'ZIP · all CSVs in one archive',
+  });
+  $('grouping').innerHTML = choiceOptions(jobValues.grouping, '', {
+    auto: 'Automatic (recommended)', sort: 'Always sort',
+  });
+  // Assignment and split variants share entries and use their in-step mode controls.
+  const labels = {partition: 'Partition by one or more columns', balanced: 'Split into equal parts',
+    assign: 'Assign groups by percentage', shuffle: 'Shuffle row order'};
+  const operations = Object.keys(labels).filter(type => jobValues.operation.includes(type));
+  $('new-operation').innerHTML = choiceOptions(operations, '', labels);
+}
+
 function csvForm(prefix: string, settings: Csv) {
-  const encodings = ['utf-8','utf-16le','utf-16be','windows-1252','windows-1250','windows-1251','windows-1253','windows-1254','windows-1255','windows-1256','windows-1257','windows-1258','Shift_JIS','GBK','Big5','EUC-KR','ISO-8859-2'];
-  if (!encodings.some(e=>e.toLowerCase()===settings.encoding.toLowerCase())) encodings.push(settings.encoding);
-  $(prefix+'-csv').innerHTML = `<label>Encoding<select data-csv="encoding">${encodings.map(e=>`<option value="${escape(e)}" ${e.toLowerCase()===settings.encoding.toLowerCase()?'selected':''}>${escape(e)}</option>`).join('')}</select></label><div class="grid2"><label>Delimiter<input data-csv="delimiter" maxlength="1" value="${escape(settings.delimiter)}"></label><label>Quote<input data-csv="quote" maxlength="1" value="${escape(settings.quote)}"></label><label>Escape<input data-csv="escape" maxlength="1" placeholder="Double quotes" value="${escape(settings.escape||'')}"></label><label>Line ending<select data-csv="line_ending"><option value="lf" ${settings.line_ending==='lf'?'selected':''}>LF</option><option value="crlf" ${settings.line_ending==='crlf'?'selected':''}>CRLF</option></select></label></div>${[['headers','Header row'],['bom','Byte-order mark'],['skip_empty_lines','Skip bare empty lines']].map(([key,label])=>`<label class="check-label"><input type="checkbox" data-csv="${key}" ${(settings as unknown as Record<string,boolean>)[key]?'checked':''}>${label}</label>`).join('')}`;
+  const encodings = jobValues.encoding.map(value => value.startsWith('UTF-') ? value.toLowerCase() : value);
+  const selectedEncoding = encodings.find(value => value.toLowerCase() === settings.encoding.toLowerCase()) ?? settings.encoding;
+  if (!encodings.includes(selectedEncoding)) encodings.push(selectedEncoding);
+  $(prefix+'-csv').innerHTML = `<label>Encoding<select data-csv="encoding">${choiceOptions(encodings, selectedEncoding)}</select></label><div class="grid2"><label>Delimiter<input data-csv="delimiter" maxlength="1" value="${escape(settings.delimiter)}"></label><label>Quote<input data-csv="quote" maxlength="1" value="${escape(settings.quote)}"></label><label>Escape<input data-csv="escape" maxlength="1" placeholder="Double quotes" value="${escape(settings.escape||'')}"></label><label>Line ending<select data-csv="line_ending">${choiceOptions(jobValues.line_ending, settings.line_ending, {lf: 'LF', crlf: 'CRLF'})}</select></label></div>${[['headers','Header row'],['bom','Byte-order mark'],['skip_empty_lines','Skip bare empty lines']].map(([key,label])=>`<label class="check-label"><input type="checkbox" data-csv="${key}" ${(settings as unknown as Record<string,boolean>)[key]?'checked':''}>${label}</label>`).join('')}`;
   for(const key of prefix==='input'?['line_ending','bom']:['skip_empty_lines']){
     const field=$(prefix+'-csv').querySelector<HTMLInputElement>('[data-csv="'+key+'"]')!;
     field.disabled=true;
@@ -109,7 +129,9 @@ function renderOps() {
     if(op.type==='balanced'||op.type==='interleaved') fields = `<label>Number of equal parts<input data-field="files" type="number" min="1" value="${op.files}"></label><small>Counts differ by at most one. Fewer rows than parts is an error. ${op.type==='interleaved'?'Rows alternate between parts; concatenating files will not restore input order.':'Each part contains a consecutive range of rows.'}</small>`;
     if(op.type==='partition') fields = pickerMarkup('columns',op.columns||[],i,columnSchema,columnMessage);
     if(op.type==='assign'||op.type==='assign_probabilistic') fields = `<fieldset class="group-builder"><legend>Named percentages</legend>${(op.groups||[]).map((g,j)=>`<div class="group-row" data-group="${j}"><label>Group name<input data-group-field="name" required value="${escape(g.name)}" placeholder="e.g. treatment"></label><label>Percent<input data-group-field="percent" required inputmode="decimal" value="${escape(g.percent)}" placeholder="80"></label><button type="button" class="text-button" data-action="remainder" aria-label="Fill remaining percentage for group ${j+1}">Fill remainder</button><button type="button" class="icon-button" data-action="remove-group" aria-label="Remove group ${j+1}" ${(op.groups?.length||0)<=1?'disabled':''}>×</button></div>`).join('')}<button type="button" class="secondary" data-action="add-group" ${(op.groups?.length||0)>=1024?'disabled':''}>+ Add group</button><small id="group-feedback-${i}" data-group-feedback></small></fieldset>${pickerMarkup('strata',op.strata||[],i,columnSchema,columnMessage)}${operationNote('Allocation & stratification',op.type==='assign_probabilistic'?'Each row is assigned independently using the target percentages. Counts are approximate, including within strata; small strata may have no rows in a destination. Membership is random and row order is preserved.':'Stratification applies these percentages separately within every combination of the selected column values. For example, stratifying by country keeps an 80% / 20% allocation within each country, rounded to whole rows. Membership is random; row order is preserved.')}`;
-    if(op.type==='shuffle') fields = advancedExecution() ? `<div><label>Strategy<select data-field="strategy">${[['auto','Automatic (full shuffle; recommended)'],['uniform','Uniform (random-key sort)'],['fisher_yates','Uniform in memory (Fisher–Yates v1)']].map(([v,l])=>`<option value="${v}" ${op.strategy===v?'selected':''}>${l}</option>`).join('')}</select></label>${operationNote('How shuffle strategies work','Automatic uses a full external-capable shuffle and combines compatible steps. Output order may vary with resources and execution plan. Explicit Fisher–Yates requires each group to fit in memory; oversized groups fail.')}</div>` : '<p class="hint auto-shuffle-strategy">Shuffle strategy set by Auto · Full shuffle</p>';
+    if(op.type==='shuffle') fields = advancedExecution() ? `<div><label>Strategy<select data-field="strategy">${choiceOptions(jobValues.shuffle,op.strategy ?? 'auto',{
+      auto:'Automatic (full shuffle; recommended)',uniform:'Uniform (random-key sort)',fisher_yates:'Uniform in memory (Fisher–Yates v1)',
+    })}</select></label>${operationNote('How shuffle strategies work','Automatic uses a full external-capable shuffle and combines compatible steps. Output order may vary with resources and execution plan. Explicit Fisher–Yates requires each group to fit in memory; oversized groups fail.')}</div>` : '<p class="hint auto-shuffle-strategy">Shuffle strategy set by Auto · Full shuffle</p>';
     const split=op.type==='balanced'||op.type==='interleaved';
     const assignment=op.type==='assign'||op.type==='assign_probabilistic';
     const name=split?'Split into equal parts':assignment?'Assign groups by percentage':operationName(op.type);
@@ -464,4 +486,5 @@ const validation=configureValidation(()=>job,()=>columnSchema,readSizeField,()=>
 $('execution-mode').onchange=()=>{renderOps();markDirty();};
 const hostedWorkspace=configureHostedWorkspace();
 configureBrowserUI();
+configureJobChoices();
 void start();

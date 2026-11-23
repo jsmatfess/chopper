@@ -2,6 +2,7 @@
 """Generate the CLI reference from a built Chopper executable."""
 
 import argparse
+import json
 import os
 from pathlib import Path
 import re
@@ -9,6 +10,7 @@ import subprocess
 
 
 REFERENCE = Path(__file__).resolve().parents[1] / 'docs/cli-reference.md'
+CONTRACT = REFERENCE.with_name('cli-reference-data.json')
 
 
 def render(binary):
@@ -48,12 +50,15 @@ def main():
     parser.add_argument('binary', type=Path)
     parser.add_argument('--check', action='store_true')
     args = parser.parse_args()
-    reference = render(args.binary.resolve())
-    if args.check:
-        if not REFERENCE.is_file() or REFERENCE.read_text(encoding='utf-8') != reference:
-            parser.exit(1, f'Stale CLI reference. Regenerate with python scripts/cli-reference.py "{args.binary}"\n')
-    else:
-        REFERENCE.write_bytes(reference.encode('utf-8'))
+    binary = args.binary.resolve()
+    data = json.loads(subprocess.check_output([binary, 'reference-json'], timeout=30, encoding='utf-8'))
+    artifacts = [(REFERENCE, render(binary)), (CONTRACT, json.dumps(data, indent=2) + '\n')]
+    for path, content in artifacts:
+        if args.check:
+            if not path.is_file() or path.read_bytes() != content.encode('utf-8'):
+                parser.exit(1, f'Stale {path.name}. Regenerate with python scripts/cli-reference.py "{args.binary}"\n')
+        else:
+            path.write_bytes(content.encode('utf-8'))
 
 
 if __name__ == '__main__':

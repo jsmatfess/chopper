@@ -74,7 +74,7 @@ fn run_summary_reports_published_counts_in_all_run_forms() {
     let csv = "PRIVATE_HEADER,other\nPRIVATE_PARTITION,PRIVATE_VALUE\n";
     fs::write(&input, csv).unwrap();
 
-    for form in ["config", "ordered", "split"] {
+    for form in ["config", "ordered"] {
         let output = dir.path().join(format!("PRIVATE_DESTINATION_{form}"));
         let mut command = Command::new(env!("CARGO_BIN_EXE_chopper"));
         match form {
@@ -105,14 +105,6 @@ fn run_summary_reports_published_counts_in_all_run_forms() {
                         "--column",
                         "PRIVATE_HEADER",
                     ]);
-            }
-            "split" => {
-                command
-                    .arg("split")
-                    .arg(&input)
-                    .arg("--output")
-                    .arg(&output)
-                    .args(["--by", "PRIVATE_HEADER"]);
             }
             _ => unreachable!(),
         }

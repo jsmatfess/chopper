@@ -56,6 +56,8 @@ try {
     assert.equal((await page.goto(origin + base + 'cli-reference#chopper-run'))?.status(), 200);
     await page.locator('h2#chopper-run').waitFor();
     await page.getByRole('rowheader', { name: '--analysis <analysis>', exact: true }).waitFor();
+    const lineEnding = page.getByRole('rowheader', { name: '--output-line-ending <output-line-ending>', exact: true });
+    assert.deepEqual(await lineEnding.locator('..').locator('.cli-choices code').allTextContents(), ['lf', 'crlf']);
     const runHelp = page.locator('details').filter({ hasText: 'Usage: chopper run [OPTIONS]' });
     await runHelp.locator('summary').press('Enter');
     assert.equal(await runHelp.getAttribute('open'), '');

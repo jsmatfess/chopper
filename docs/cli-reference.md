@@ -18,9 +18,8 @@ Commands:
   example   Print a complete example job configuration
   validate  Check a saved job without opening its input or creating output
   analyze   Inspect all input rows and report bounded statistics and pipeline estimates
-  split     Convenience form: partition, assign, shuffle, balanced split, then final limits
   run       Run a JSON job (--config) or ordered --step operations
-  help      Print this message or the help of the given subcommand(s)
+  help      Print help for Chopper or a subcommand
 
 Options:
   -h, --help     Print help
@@ -36,7 +35,10 @@ Usage: chopper guide [OPTIONS]
 
 Options:
       --config <CONFIG>
-  -h, --help             Print help
+          Open an existing saved Job in the wizard
+
+  -h, --help
+          Print help
 ```
 
 ## `chopper example`
@@ -47,7 +49,8 @@ Print a complete example job configuration
 Usage: chopper example
 
 Options:
-  -h, --help  Print help
+  -h, --help
+          Print help
 ```
 
 ## `chopper validate`
@@ -59,8 +62,13 @@ Usage: chopper validate [OPTIONS] --config <CONFIG>
 
 Options:
   -c, --config <CONFIG>
-      --json             Write a machine-readable validation result to stdout
-  -h, --help             Print help
+          Read settings from this saved Job JSON file
+
+      --json
+          Write a machine-readable validation result to stdout
+
+  -h, --help
+          Print help
 ```
 
 ## `chopper analyze`
@@ -72,65 +80,17 @@ Usage: chopper analyze [OPTIONS] --config <CONFIG>
 
 Options:
   -c, --config <CONFIG>
-      --memory-mb <MEMORY_MB>
-      --workers <WORKERS>
-      --summary                Print only completion status and aggregate counts in stdout JSON
-  -h, --help                   Print help
-```
-
-## `chopper split`
-
-```text
-Convenience form: partition, assign, shuffle, balanced split, then final limits
-
-Usage: chopper split [OPTIONS] --output <OUTPUT> <INPUT>
-
-Arguments:
-  <INPUT>
-
-Options:
-  -o, --output <OUTPUT>
-
-      --files <FILES>
-
-      --interleaved
-          Distribute consecutive rows cyclically instead of consecutive ranges
-      --rows <ROWS>
-
-      --bytes <BYTES>
-
-      --compressed-bytes <COMPRESSED_BYTES>
-
-      --by <BY>
-
-      --groups <GROUPS>
-          Named percentages, e.g. treatment=80,control=20
-      --probabilistic
-          Use independent draws with approximate counts instead of exact quotas
-      --shuffle <SHUFFLE>
-          [possible values: uniform, auto, fisher_yates]
-      --compression <COMPRESSION>
-          [default: none] [possible values: none, gzip, zip]
-      --zip-member <ZIP_MEMBER>
+          Read settings from this saved Job JSON file
 
       --memory-mb <MEMORY_MB>
-          [default: auto]
+          Override the working budget in MiB, or use auto
+
       --workers <WORKERS>
-          [default: 0]
-      --grouping <GROUPING>
-          Physical grouping implementation; logical results are identical [default: auto] [possible values: auto, sort]
-      --temp-dir <TEMP_DIR>
-
-      --temp-bytes <TEMP_BYTES>
-
-      --max-files <MAX_FILES>
-          [default: 100000]
-      --no-headers
-
-  -y, --yes
+          Override the sort and compression worker count; 0 selects automatically
 
       --summary
           Print only completion status and aggregate counts in stdout JSON
+
   -h, --help
           Print help
 ```
@@ -143,79 +103,188 @@ Run a JSON job (--config) or ordered --step operations
 Usage: chopper run [OPTIONS]
 
 Options:
-      --memory-mb <memory-mb>  Working budget in MiB or auto (default auto)
-      --workers <workers>      Sort/compression workers; 0 selects automatically
-  -c, --config <config>        JSON job file; allows --memory-mb, --workers, --analysis, --summary and --yes
-      --analysis <analysis>    Optional full JSON report from chopper analyze
-      --summary                Print only completion status and aggregate counts in stdout JSON
-  -y, --yes                    Skip execution confirmation; validation still applies
-  -h, --help                   Print help
+      --memory-mb <memory-mb>
+          Working budget in MiB or auto (default auto)
+
+      --workers <workers>
+          Sort/compression workers; 0 selects automatically
+
+  -c, --config <config>
+          JSON job file; allows --memory-mb, --workers, --analysis, --summary and --yes
+
+      --analysis <analysis>
+          Optional full JSON report from chopper analyze
+
+      --summary
+          Print only completion status and aggregate counts in stdout JSON
+
+  -y, --yes
+          Skip execution confirmation; validation still applies
+
+  -h, --help
+          Print help
 
 Flag-built Jobs:
-      --input <input>                                    Input file path
-      --output <output>                                  New or empty output directory path
-      --job-version <job-version>                        Job schema version (default 1)
-      --zip-member <zip-member>                          Input ZIP member
-      --compression <compression>                        none, gzip or zip
-      --rows <rows>                                      Maximum rows per output CSV
-      --bytes <bytes>                                    Maximum serialized bytes per CSV
-      --compressed-bytes <compressed-bytes>              Advisory compressed-byte target
-      --grouping <grouping>                              auto or sort
-      --max-files <max-files>                            Maximum files/groups
-      --max-record-bytes <max-record-bytes>              Maximum record working size in bytes
-      --temp-dir <temp-dir>                              Temporary directory
-      --temp-bytes <temp-bytes>                          Optional temporary-space budget
-      --full-shuffle-rng <full-shuffle-rng>              Versioned source: blake3_counter_v1
-      --full-shuffle-algorithm <full-shuffle-algorithm>  Versioned construction: adaptive_v1
+      --input <input>
+          Input file path
+
+      --output <output>
+          New or empty output directory path
+
+      --job-version <job-version>
+          Job schema version (default 1)
+
+      --zip-member <zip-member>
+          Input ZIP member
+
+      --compression <compression>
+          Select the output compression format
+
+          [possible values: none, gzip, zip]
+
+      --rows <rows>
+          Maximum rows per output CSV
+
+      --bytes <bytes>
+          Maximum serialized bytes per CSV
+
+      --compressed-bytes <compressed-bytes>
+          Advisory compressed-byte target
+
+      --grouping <grouping>
+          Select the physical grouping implementation
+
+          [possible values: auto, sort]
+
+      --max-files <max-files>
+          Maximum files/groups
+
+      --max-record-bytes <max-record-bytes>
+          Maximum record working size in bytes
+
+      --temp-dir <temp-dir>
+          Temporary directory
+
+      --temp-bytes <temp-bytes>
+          Optional temporary-space budget
+
+      --full-shuffle-rng <full-shuffle-rng>
+          Versioned source for full-shuffle random numbers
+
+          [possible values: blake3_counter_v1]
+
+      --full-shuffle-algorithm <full-shuffle-algorithm>
+          Versioned algorithm for full shuffles
+
+          [possible values: adaptive_v1]
 
 Ordered steps:
-      --step <step>                    Append a step: partition, assign, assign_probabilistic, shuffle, balanced, interleaved
-      --by <by>                        Partition column names, comma-separated; use --column for literal names
-      --column <column>                Append one literal partition column name (including numeric names)
-      --column-index <column-index>    Append one zero-based partition column index
-      --groups <groups>                Allocation name=percent pairs, comma-separated; use --group for literal names
-      --group <group>                  Append one allocation name=percent (split at the last = sign)
-      --strata <strata>                Allocation stratum names, comma-separated; use --stratum for literal names
-      --stratum <stratum>              Append one literal allocation stratum name
-      --stratum-index <stratum-index>  Append one zero-based allocation stratum index
-      --strategy <strategy>            Shuffle strategy: uniform, auto, fisher_yates
-      --files <files>                  Balanced/interleaved file count
+      --step <step>
+          Append an operation to the pipeline
+
+          [possible values: balanced, interleaved, partition, assign, assign_probabilistic, shuffle]
+
+      --by <by>
+          Partition column names, comma-separated; use --column for literal names
+
+      --column <column>
+          Append one literal partition column name (including numeric names)
+
+      --column-index <column-index>
+          Append one zero-based partition column index
+
+      --groups <groups>
+          Allocation name=percent pairs, comma-separated; use --group for literal names
+
+      --group <group>
+          Append one allocation name=percent (split at the last = sign)
+
+      --strata <strata>
+          Allocation stratum names, comma-separated; use --stratum for literal names
+
+      --stratum <stratum>
+          Append one literal allocation stratum name
+
+      --stratum-index <stratum-index>
+          Append one zero-based allocation stratum index
+
+      --strategy <strategy>
+          Select the shuffle strategy for the preceding step
+
+          [possible values: uniform, auto, fisher_yates]
+
+      --files <files>
+          Balanced/interleaved file count
 
 Flag-built input CSV:
       --input-encoding <input-encoding>
-          Encoding name
+          CSV character encoding; labels are case-insensitive and may use WHATWG aliases for the listed encodings
+
+          [possible values: UTF-8, UTF-16LE, UTF-16BE, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258, Shift_JIS, GBK, Big5, EUC-KR, ISO-8859-2]
+
       --input-headers <input-headers>
-          true or false
+          Treat the first input row as a header
+
+          [possible values: true, false]
+
       --input-delimiter <input-delimiter>
           One ASCII character (pass a literal tab for tab-separated CSV)
+
       --input-quote <input-quote>
           One ASCII character distinct from the delimiter
+
       --input-escape <input-escape>
           One ASCII character distinct from delimiter and quote; omit for doubled quotes
+
       --input-line-ending <input-line-ending>
-          lf or crlf
+          Set the input dialect's line ending; input parsing detects LF and CRLF
+
+          [possible values: lf, crlf]
+
       --input-bom <input-bom>
-          true or false
+          Set the input dialect's byte order mark flag; the reader detects input marks
+
+          [possible values: true, false]
+
       --input-skip-empty-lines <input-skip-empty-lines>
-          true or false
+          Skip empty lines during input parsing
+
+          [possible values: true, false]
 
 Flag-built output CSV:
       --output-encoding <output-encoding>
-          Encoding name
+          CSV character encoding; labels are case-insensitive and may use WHATWG aliases for the listed encodings
+
+          [possible values: UTF-8, UTF-16LE, UTF-16BE, windows-1250, windows-1251, windows-1252, windows-1253, windows-1254, windows-1255, windows-1256, windows-1257, windows-1258, Shift_JIS, GBK, Big5, EUC-KR, ISO-8859-2]
+
       --output-headers <output-headers>
-          true or false
+          Write a header in each output CSV
+
+          [possible values: true, false]
+
       --output-delimiter <output-delimiter>
           One ASCII character (pass a literal tab for tab-separated CSV)
+
       --output-quote <output-quote>
           One ASCII character distinct from the delimiter
+
       --output-escape <output-escape>
           One ASCII character distinct from delimiter and quote; omit for doubled quotes
+
       --output-line-ending <output-line-ending>
-          lf or crlf
+          Write records with this line ending
+
+          [possible values: lf, crlf]
+
       --output-bom <output-bom>
-          true or false
+          Write a byte order mark for UTF-8 or UTF-16 output
+
+          [possible values: true, false]
+
       --output-skip-empty-lines <output-skip-empty-lines>
-          true or false
+          Set the output dialect's empty-line flag; skipping applies to input parsing
+
+          [possible values: true, false]
 
 Each --step appends an operation. Step options belong to the preceding --step. Job-wide settings may appear anywhere.
 Use --flag=value for values beginning with '-'. Names and indices have separate flags.
@@ -225,10 +294,11 @@ Example: chopper run --input input.csv --output results --step shuffle --strateg
 ## `chopper help`
 
 ```text
-Print this message or the help of the given subcommand(s)
+Print help for Chopper or a subcommand
 
 Usage: chopper help [COMMAND]...
 
 Arguments:
-  [COMMAND]...  Print help for the subcommand(s)
+  [COMMAND]...
+          Subcommand path; omit it for top-level help
 ```

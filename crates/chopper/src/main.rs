@@ -1,4 +1,5 @@
 mod cli_json;
+mod cli_reference;
 mod cli_summary;
 mod guide;
 mod run_cli;
@@ -31,6 +32,7 @@ struct Cli {
 enum Command {
     /// Build, save and run a capped plain CSV export in a terminal wizard.
     Guide {
+        /// Open an existing saved Job in the wizard.
         #[arg(long)]
         config: Option<PathBuf>,
     },
@@ -38,6 +40,7 @@ enum Command {
     Example,
     /// Check a saved job without opening its input or creating output.
     Validate {
+        /// Read settings from this saved Job JSON file.
         #[arg(short, long)]
         config: PathBuf,
         /// Write a machine-readable validation result to stdout.
@@ -46,62 +49,15 @@ enum Command {
     },
     /// Inspect all input rows and report bounded statistics and pipeline estimates.
     Analyze {
+        /// Read settings from this saved Job JSON file.
         #[arg(short, long)]
         config: PathBuf,
+        /// Override the working budget in MiB, or use auto.
         #[arg(long)]
         memory_mb: Option<MemoryBudget>,
+        /// Override the sort and compression worker count; 0 selects automatically.
         #[arg(long)]
         workers: Option<usize>,
-        #[arg(long, help = cli_summary::HELP)]
-        summary: bool,
-    },
-    /// Convenience form: partition, assign, shuffle, balanced split, then final limits.
-    Split {
-        input: String,
-        #[arg(short, long)]
-        output: String,
-        #[arg(long)]
-        files: Option<u64>,
-        /// Distribute consecutive rows cyclically instead of consecutive ranges.
-        #[arg(long, requires = "files")]
-        interleaved: bool,
-        #[arg(long)]
-        rows: Option<u64>,
-        #[arg(long)]
-        bytes: Option<String>,
-        #[arg(long)]
-        compressed_bytes: Option<String>,
-        #[arg(long, value_delimiter = ',')]
-        by: Vec<String>,
-        /// Named percentages, e.g. treatment=80,control=20.
-        #[arg(long)]
-        groups: Option<String>,
-        /// Use independent draws with approximate counts instead of exact quotas.
-        #[arg(long, requires = "groups")]
-        probabilistic: bool,
-        #[arg(long, value_parser = ["uniform", "auto", "fisher_yates"])]
-        shuffle: Option<String>,
-        #[arg(long, default_value = "none", value_parser = ["none", "gzip", "zip"])]
-        compression: String,
-        #[arg(long)]
-        zip_member: Option<String>,
-        #[arg(long, default_value = "auto")]
-        memory_mb: MemoryBudget,
-        #[arg(long, default_value_t = 0)]
-        workers: usize,
-        /// Physical grouping implementation; logical results are identical.
-        #[arg(long, default_value = "auto", value_parser = ["auto", "sort"])]
-        grouping: String,
-        #[arg(long)]
-        temp_dir: Option<String>,
-        #[arg(long)]
-        temp_bytes: Option<String>,
-        #[arg(long, default_value_t = 100000)]
-        max_files: u64,
-        #[arg(long)]
-        no_headers: bool,
-        #[arg(short, long)]
-        yes: bool,
         #[arg(long, help = cli_summary::HELP)]
         summary: bool,
     },
@@ -225,8 +181,54 @@ fn main() -> ExitCode {
         ExitCode::FAILURE
     }
 }
+fn cli_command() -> clap::Command {
+    Cli::command()
+        .disable_help_subcommand(true)
+        .subcommand(run_cli::command())
+        .subcommand(
+            clap::Command::new("help")
+                .about("Print help for Chopper or a subcommand")
+                .disable_help_flag(true)
+                .arg(
+                    clap::Arg::new("command")
+                        .value_name("COMMAND")
+                        .num_args(0..)
+                        .help("Subcommand path; omit it for top-level help"),
+                ),
+        )
+}
+
+fn print_command_help(arguments: &clap::ArgMatches) -> Result<()> {
+    let mut root = cli_command();
+    root.build();
+    let mut command = &mut root;
+    if let Some(path) = arguments.get_many::<String>("command") {
+        for name in path {
+            if command.find_subcommand(name).is_none() {
+                return Err(clap::Error::raw(
+                    clap::error::ErrorKind::InvalidSubcommand,
+                    format!("unrecognized subcommand '{name}'"),
+                )
+                .with_cmd(command)
+                .into());
+            }
+            command = command.find_subcommand_mut(name).unwrap();
+        }
+    }
+    command.print_long_help()?;
+    Ok(())
+}
+
 fn main_result() -> Result<()> {
-    let matches = Cli::command().subcommand(run_cli::command()).get_matches();
+    let matches = cli_command()
+        .subcommand(clap::Command::new("reference-json").hide(true))
+        .get_matches();
+    if matches.subcommand_name() == Some("reference-json") {
+        return cli_reference::write(cli_command());
+    }
+    if let Some(("help", arguments)) = matches.subcommand() {
+        return print_command_help(arguments);
+    }
     if let Some(("run", arguments)) = matches.subcommand() {
         let source = run_cli::source(arguments)?;
         return run_job(
@@ -295,169 +297,8 @@ fn main_result() -> Result<()> {
                 cli_json::write_pretty(&mut stdout, &profile)?;
             }
         }
-        Command::Split {
-            input,
-            output,
-            files,
-            interleaved,
-            rows,
-            bytes,
-            compressed_bytes,
-            by,
-            groups,
-            probabilistic,
-            shuffle,
-
-            compression,
-            zip_member,
-            memory_mb,
-            workers,
-            grouping,
-            temp_dir,
-            temp_bytes,
-            max_files,
-            no_headers,
-            yes,
-            summary,
-        } => {
-            let mut job = Job {
-                input,
-                output,
-                zip_member,
-                ..Job::default()
-            };
-            job.input_csv.headers = !no_headers;
-            job.output_csv.headers = !no_headers;
-            job.limits = Limits {
-                rows,
-                bytes: bytes.map(|s| parse_bytes(&s)).transpose()?,
-                compressed_bytes: compressed_bytes.map(|s| parse_bytes(&s)).transpose()?,
-            };
-            job.resources = Resources {
-                memory_mb,
-                workers,
-                grouping: serde_json::from_value(serde_json::Value::String(grouping))?,
-                temp_dir,
-                temp_bytes: temp_bytes.map(|s| parse_bytes(&s)).transpose()?,
-                max_files,
-                max_record_bytes: memory_mb.as_mib().map_or(8 * 1024 * 1024, |mb| {
-                    (mb.saturating_mul(1024 * 1024) / 32).min(8 * 1024 * 1024) as usize
-                }),
-            };
-            job.compression = serde_json::from_value(serde_json::Value::String(compression))?;
-            if !by.is_empty() {
-                job.operations.push(Operation::Partition {
-                    columns: by.into_iter().map(Column::Name).collect(),
-                });
-            }
-            if let Some(groups) = groups {
-                let groups: Result<Vec<_>> = groups
-                    .split(',')
-                    .map(|g| {
-                        let (name, percent) = g
-                            .split_once('=')
-                            .context("groups must be name=percent pairs")?;
-                        Ok(Allocation {
-                            name: name.into(),
-                            percent: percent.into(),
-                        })
-                    })
-                    .collect();
-                let groups = groups?;
-                job.operations.push(if probabilistic {
-                    Operation::AssignProbabilistic {
-                        groups,
-                        strata: vec![],
-                    }
-                } else {
-                    Operation::Assign {
-                        groups,
-                        strata: vec![],
-                    }
-                });
-            }
-            if let Some(strategy) = shuffle {
-                job.operations.push(Operation::Shuffle {
-                    strategy: serde_json::from_value(serde_json::Value::String(strategy))?,
-                });
-            }
-            if let Some(files) = files {
-                job.operations.push(if interleaved {
-                    Operation::Interleaved { files }
-                } else {
-                    Operation::Balanced { files }
-                });
-            }
-            run_job(CliJob::Ordinary(job), yes, None, summary)?;
-        }
     }
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn split_rejects_removed_shuffle_controls() {
-        for args in [
-            vec![
-                "chopper",
-                "split",
-                "input.csv",
-                "--output",
-                "result",
-                "--shuffle",
-                "buffer",
-            ],
-            vec![
-                "chopper",
-                "split",
-                "input.csv",
-                "--output",
-                "result",
-                "--buffer-rows",
-                "7",
-            ],
-        ] {
-            let error = Cli::try_parse_from(args).err().unwrap().to_string();
-            assert!(
-                error.contains("invalid value 'buffer'")
-                    || error.contains("unexpected argument '--buffer-rows'"),
-                "{error}"
-            );
-        }
-        for strategy in ["radix", "prefix_distribution"] {
-            let error = Cli::try_parse_from([
-                "chopper",
-                "split",
-                "input.csv",
-                "--output",
-                "result",
-                "--shuffle",
-                strategy,
-            ])
-            .err()
-            .unwrap()
-            .to_string();
-            assert!(
-                error.contains(&format!("invalid value '{strategy}'")),
-                "{error}"
-            );
-        }
-        for strategy in ["uniform", "auto", "fisher_yates"] {
-            assert!(Cli::try_parse_from([
-                "chopper",
-                "split",
-                "input.csv",
-                "--output",
-                "result",
-                "--shuffle",
-                strategy
-            ])
-            .is_ok());
-        }
-    }
 }
 
 #[cfg(test)]
@@ -495,23 +336,5 @@ mod automatic_cli_tests {
         let retained = applied.resource_overrides(None, None);
         assert_eq!(retained.job().resources.memory_mb, MemoryBudget::Auto);
         assert_eq!(retained.job().resources.workers, 2);
-
-        assert!(matches!(
-            Cli::try_parse_from([
-                "chopper",
-                "split",
-                "in.csv",
-                "--output",
-                "out",
-                "--memory-mb",
-                "auto"
-            ])
-            .unwrap()
-            .command,
-            Command::Split {
-                memory_mb: MemoryBudget::Auto,
-                ..
-            }
-        ));
     }
 }

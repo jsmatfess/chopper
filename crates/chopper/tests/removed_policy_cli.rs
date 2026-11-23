@@ -8,7 +8,7 @@ fn native_server_and_picker_commands_are_rejected() {
         .unwrap();
     assert!(help.status.success());
     let help = String::from_utf8_lossy(&help.stdout);
-    for command in ["run", "split", "analyze", "guide", "example"] {
+    for command in ["run", "analyze", "guide", "example"] {
         assert!(help
             .lines()
             .any(|line| line.split_whitespace().next() == Some(command)));
@@ -33,7 +33,7 @@ fn native_server_and_picker_commands_are_rejected() {
 
 #[test]
 fn removed_reproducibility_flag_is_rejected() {
-    for command in ["run", "analyze", "split"] {
+    for command in ["run", "analyze"] {
         let output = Command::new(env!("CARGO_BIN_EXE_chopper"))
             .args([command, "--reproducible"])
             .output()
@@ -47,7 +47,15 @@ fn removed_reproducibility_flag_is_rejected() {
 #[test]
 fn seed_option_and_saved_job_fields_are_rejected() {
     let output = Command::new(env!("CARGO_BIN_EXE_chopper"))
-        .args(["split", "input.csv", "--seed", "obsolete"])
+        .args([
+            "run",
+            "--input",
+            "input.csv",
+            "--output",
+            "out",
+            "--seed",
+            "obsolete",
+        ])
         .output()
         .unwrap();
     assert!(!output.status.success());
@@ -65,4 +73,15 @@ fn seed_option_and_saved_job_fields_are_rejected() {
     let json = serde_json::to_value(job).unwrap();
     assert!(json.get("seed").is_none());
     assert!(json.get("random_seed").is_none());
+}
+
+#[test]
+fn split_is_retired() {
+    let output = Command::new(env!("CARGO_BIN_EXE_chopper"))
+        .args(["split", "input.csv", "--output", "results"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(2));
+    assert!(output.stdout.is_empty());
+    assert!(String::from_utf8_lossy(&output.stderr).contains("unrecognized subcommand 'split'"));
 }

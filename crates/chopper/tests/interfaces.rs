@@ -10,7 +10,7 @@ fn cli_requires_confirmation_and_runs_configured_job() {
     fs::write(&input, "id\n1\n2\n3\n").unwrap();
     let output = temp.path().join("result");
     let result = Command::new(env!("CARGO_BIN_EXE_chopper"))
-        .arg("split")
+        .args(["run", "--input"])
         .arg(&input)
         .arg("--output")
         .arg(&output)
@@ -22,7 +22,7 @@ fn cli_requires_confirmation_and_runs_configured_job() {
     assert!(String::from_utf8_lossy(&result.stderr).contains("--yes"));
     assert!(!output.exists());
     let result = Command::new(env!("CARGO_BIN_EXE_chopper"))
-        .arg("split")
+        .args(["run", "--input"])
         .arg(&input)
         .arg("--output")
         .arg(&output)

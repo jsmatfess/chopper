@@ -2,10 +2,11 @@ use serde_json::{json, Value};
 use std::{fs, process::Command};
 
 #[test]
-fn split_rejects_overflowing_memory_before_input() {
+fn run_rejects_overflowing_memory_before_input() {
     let result = Command::new(env!("CARGO_BIN_EXE_chopper"))
         .args([
-            "split",
+            "run",
+            "--input",
             "missing.csv",
             "--output",
             "unused-output",
@@ -27,8 +28,10 @@ fn automatic_cli_overrides_work_without_seed_input() {
     let input = dir.path().join("input.csv");
     fs::write(&input, "id\n1\n2\n").unwrap();
     let config = dir.path().join("job.json");
-    for command in ["run", "analyze", "split"] {
-        let output = dir.path().join(command);
+    for (command, flag_built) in [("run", false), ("analyze", false), ("run", true)] {
+        let output = dir
+            .path()
+            .join(if flag_built { "flag-built" } else { command });
         fs::write(
             &config,
             json!({"input":input,"output":output,"resources":{"memory_mb":512,"workers":3,"max_record_bytes":1048576}})
@@ -37,8 +40,8 @@ fn automatic_cli_overrides_work_without_seed_input() {
         .unwrap();
         let mut cli = Command::new(env!("CARGO_BIN_EXE_chopper"));
         cli.env("CHOPPER_MEMORY_LIMIT_MB", "64").arg(command);
-        if command == "split" {
-            cli.arg(&input).arg("--output").arg(&output);
+        if flag_built {
+            cli.arg("--input").arg(&input).arg("--output").arg(&output);
         } else {
             cli.arg("--config").arg(&config);
         }
@@ -62,8 +65,8 @@ fn automatic_cli_overrides_work_without_seed_input() {
         }
         // Scripted decoding now retains a positive, sub-half-MiB source grant
         // while Auto observes headroom. The unchanged floor(F/(MiB/2)) formula
-        // resolves 127 MiB; split keeps its separate caller-construction path.
-        let expected_mb = if command == "split" { 128 } else { 127 };
+        // resolves 127 MiB; flag-built Run keeps its caller-construction path.
+        let expected_mb = if flag_built { 128 } else { 127 };
         assert_eq!(analysis["memory_budget_bytes"], expected_mb * 1024 * 1024);
         assert_eq!(analysis["workers"], 1);
         assert_eq!(

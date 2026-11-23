@@ -1,14 +1,16 @@
 //! Unified Run keeps admitted JSON and caller-owned flag-built Jobs distinct.
 use anyhow::{bail, ensure, Context, Result};
 use chopper::core::*;
-use clap::{Arg, ArgAction, ArgMatches, Command};
-use std::{path::PathBuf, str::FromStr};
+use clap::{
+    builder::{
+        BoolValueParser, PossibleValue, PossibleValuesParser, StringValueParser, TypedValueParser,
+    },
+    Arg, ArgAction, ArgMatches, Command,
+};
+use std::{ffi::OsStr, path::PathBuf, str::FromStr};
 
 const LOCAL: &[(&str, &str)] = &[
-    (
-        "step",
-        "Append a step: partition, assign, assign_probabilistic, shuffle, balanced, interleaved",
-    ),
+    ("step", "Append an operation to the pipeline"),
     (
         "by",
         "Partition column names, comma-separated; use --column for literal names",
@@ -38,7 +40,10 @@ const LOCAL: &[(&str, &str)] = &[
         "stratum-index",
         "Append one zero-based allocation stratum index",
     ),
-    ("strategy", "Shuffle strategy: uniform, auto, fisher_yates"),
+    (
+        "strategy",
+        "Select the shuffle strategy for the preceding step",
+    ),
     ("files", "Balanced/interleaved file count"),
 ];
 const GLOBAL: &[(&str, &str)] = &[
@@ -46,7 +51,7 @@ const GLOBAL: &[(&str, &str)] = &[
     ("output", "New or empty output directory path"),
     ("job-version", "Job schema version (default 1)"),
     ("zip-member", "Input ZIP member"),
-    ("compression", "none, gzip or zip"),
+    ("compression", "Select the output compression format"),
     ("rows", "Maximum rows per output CSV"),
     ("bytes", "Maximum serialized bytes per CSV"),
     ("compressed-bytes", "Advisory compressed-byte target"),
@@ -55,20 +60,23 @@ const GLOBAL: &[(&str, &str)] = &[
         "workers",
         "Sort/compression workers; 0 selects automatically",
     ),
-    ("grouping", "auto or sort"),
+    ("grouping", "Select the physical grouping implementation"),
     ("max-files", "Maximum files/groups"),
     ("max-record-bytes", "Maximum record working size in bytes"),
     ("temp-dir", "Temporary directory"),
     ("temp-bytes", "Optional temporary-space budget"),
-    ("full-shuffle-rng", "Versioned source: blake3_counter_v1"),
+    (
+        "full-shuffle-rng",
+        "Versioned source for full-shuffle random numbers",
+    ),
     (
         "full-shuffle-algorithm",
-        "Versioned construction: adaptive_v1",
+        "Versioned algorithm for full shuffles",
     ),
 ];
 const CSV: &[(&str, &str)] = &[
-    ("encoding", "Encoding name"),
-    ("headers", "true or false"),
+    ("encoding", "CSV character encoding; labels are case-insensitive and may use WHATWG aliases for the listed encodings"),
+    ("headers", "Read or write a header row"),
     (
         "delimiter",
         "One ASCII character (pass a literal tab for tab-separated CSV)",
@@ -78,10 +86,45 @@ const CSV: &[(&str, &str)] = &[
         "escape",
         "One ASCII character distinct from delimiter and quote; omit for doubled quotes",
     ),
-    ("line-ending", "lf or crlf"),
-    ("bom", "true or false"),
-    ("skip-empty-lines", "true or false"),
+    ("line-ending", "CSV record line ending"),
+    ("bom", "Set the byte order mark setting; input marks are detected automatically"),
+    ("skip-empty-lines", "Skip empty lines during input parsing"),
 ];
+
+// Use the actual validator when labels have aliases or retired values with guidance.
+#[derive(Clone)]
+struct DocumentedLabels {
+    choices: &'static [&'static str],
+    validate: fn(&str) -> Result<()>,
+}
+
+impl TypedValueParser for DocumentedLabels {
+    type Value = String;
+
+    fn parse_ref(
+        &self,
+        command: &Command,
+        arg: Option<&Arg>,
+        value: &OsStr,
+    ) -> std::result::Result<String, clap::Error> {
+        let value = StringValueParser::new().parse_ref(command, arg, value)?;
+        (self.validate)(&value).map_err(|error| {
+            clap::Error::raw(clap::error::ErrorKind::InvalidValue, format!("{error:#}"))
+                .with_cmd(command)
+        })?;
+        Ok(value)
+    }
+
+    fn possible_values(&self) -> Option<Box<dyn Iterator<Item = PossibleValue> + '_>> {
+        Some(Box::new(
+            self.choices.iter().copied().map(PossibleValue::new),
+        ))
+    }
+}
+
+fn choices(values: &'static [&'static str]) -> PossibleValuesParser {
+    PossibleValuesParser::new(values.iter().copied())
+}
 
 pub fn command() -> Command {
     let mut command = Command::new("run")
@@ -97,17 +140,33 @@ pub fn command() -> Command {
         if matches!(id, "input" | "output") {
             argument = argument.required_unless_present("config");
         }
+        argument = match id {
+            "compression" => argument.value_parser(DocumentedLabels {
+                choices: Compression::CHOICES,
+                validate: |value| enumeration::<Compression>(value, "compression").map(|_| ()),
+            }),
+            "grouping" => argument.value_parser(choices(Grouping::CHOICES)),
+            "full-shuffle-rng" => argument.value_parser(choices(FullShuffleRng::CHOICES)),
+            "full-shuffle-algorithm" => {
+                argument.value_parser(choices(FullShuffleAlgorithm::CHOICES))
+            }
+            _ => argument,
+        };
         command = command.arg(argument);
     }
     for &(id, help) in LOCAL {
         config_conflicts.push(id);
-        command = command.arg(
-            Arg::new(id)
-                .long(id)
-                .help(help)
-                .help_heading("Ordered steps")
-                .action(ArgAction::Append),
-        );
+        let argument = Arg::new(id)
+            .long(id)
+            .help(help)
+            .help_heading("Ordered steps")
+            .action(ArgAction::Append);
+        let argument = match id {
+            "step" => argument.value_parser(choices(Operation::CHOICES)),
+            "strategy" => argument.value_parser(choices(Shuffle::CHOICES)),
+            _ => argument,
+        };
+        command = command.arg(argument);
     }
     // Static names keep clap's owned-string feature unnecessary.
     for (ids, prefix) in [
@@ -138,9 +197,37 @@ pub fn command() -> Command {
             "Flag-built output CSV",
         ),
     ] {
-        for (id, &(_, help)) in ids.into_iter().zip(CSV) {
+        for (id, &(suffix, help)) in ids.into_iter().zip(CSV) {
             config_conflicts.push(id);
-            command = command.arg(Arg::new(id).long(id).help(help).help_heading(prefix));
+            let help = match id {
+                "input-headers" => "Treat the first input row as a header",
+                "output-headers" => "Write a header in each output CSV",
+                "input-line-ending" => {
+                    "Set the input dialect's line ending; input parsing detects LF and CRLF"
+                }
+                "output-line-ending" => "Write records with this line ending",
+                "input-bom" => {
+                    "Set the input dialect's byte order mark flag; the reader detects input marks"
+                }
+                "output-bom" => "Write a byte order mark for UTF-8 or UTF-16 output",
+                "output-skip-empty-lines" => {
+                    "Set the output dialect's empty-line flag; skipping applies to input parsing"
+                }
+                _ => help,
+            };
+            let argument = Arg::new(id).long(id).help(help).help_heading(prefix);
+            let argument = match suffix {
+                "encoding" => argument.value_parser(DocumentedLabels {
+                    choices: chopper::core::csv::ENCODINGS,
+                    validate: |value| chopper::core::csv::encoding(value).map(|_| ()),
+                }),
+                "headers" | "bom" | "skip-empty-lines" => {
+                    argument.value_parser(BoolValueParser::new().map(|value| value.to_string()))
+                }
+                "line-ending" => argument.value_parser(choices(LINE_ENDINGS)),
+                _ => argument,
+            };
+            command = command.arg(argument);
         }
     }
     command = command.arg(
@@ -299,23 +386,10 @@ pub fn parse(matches: &ArgMatches) -> Result<(Job, bool)> {
                 job.operations.len() < 64,
                 "pipeline supports at most 64 steps"
             );
-            job.operations.push(match value {
-                "partition" => Operation::Partition { columns: vec![] },
-                "assign" => Operation::Assign {
-                    groups: vec![],
-                    strata: vec![],
-                },
-                "assign_probabilistic" => Operation::AssignProbabilistic {
-                    groups: vec![],
-                    strata: vec![],
-                },
-                "shuffle" => Operation::Shuffle {
-                    strategy: Shuffle::default(),
-                },
-                "balanced" => Operation::Balanced { files: 0 },
-                "interleaved" => Operation::Interleaved { files: 0 },
-                _ => bail!("unknown --step {value:?}"),
-            });
+            job.operations.push(
+                Operation::empty_step(value)
+                    .with_context(|| format!("unknown --step {value:?}"))?,
+            );
             seen.clear();
             continue;
         }
