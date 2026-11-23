@@ -283,7 +283,9 @@ Stage into a new job-owned directory on the output filesystem. Proposed publicat
 
 Cancellation removes job-owned staging and temp data where possible; report any cleanup failures and their paths. A future startup can identify abandoned job directories but must not delete unrelated files. Resume is deferred.
 
-Use a streamed manifest format (proposed JSON Lines) so billions of partition entries are not collected into one in-memory object. Include schema/algorithm versions, effective configuration and internal diagnostic entropy identifier, source identity, counts, output paths or members, tuple/group lineage, sizes, and warnings.
+Native results publish a streamed JSON Lines manifest. The
+[native manifest contract](native-manifest.md) defines the supported fields,
+output layout, byte units and verification procedure for downstream readers.
 
 Native commands include analyze, run, split and guide. Ordered jobs can use versioned JSON or the [unified Run CLI](run-cli.md), whose explicit --step boundaries preserve requested operation order and reuse Job validation. The hosted web UI provides browser file/member selection, CSV configuration and preview, operation reordering, constraints and resource settings, optional Analyze and independent Run, execution progress/cancellation, and output summary. Both interfaces consume the same resolved plan and structured progress/error events.
 

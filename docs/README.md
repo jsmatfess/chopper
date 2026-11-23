@@ -9,7 +9,9 @@ operations. Historical checklists and research do not create additional work.
 
 | Question | Start here |
 | --- | --- |
-| How do I build and use Chopper? | [README](../README.md), [ordered Run CLI](run-cli.md), [Validate CLI](validate-cli.md) |
+| How do I build and use Chopper? | [README](../README.md), [ordered Run CLI](run-cli.md) |
+| How do I check a saved Job before running it? | [Validate CLI](validate-cli.md) |
+| How do I verify a completed native Job? | [Native manifest](native-manifest.md) |
 | What behavior and limits are supported? | [Specification](specification.md), [pipeline rewrites](pipeline-rewrites.md), [validation](validation.md) |
 | How do native and hosted execution differ? | [Direct execution](direct-execution.md), [browser setup and export limits](browser.md) |
 | Where should I make a change and which checks apply? | [Architecture](architecture.md), [contributing](../CONTRIBUTING.md), [script guide](../scripts/README.md) |
