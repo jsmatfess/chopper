@@ -1,5 +1,11 @@
 //! Deterministic actual-binary controls, compiled only in resource-contract builds.
 //! The parent holds the host validation lock and owns the barrier pipe.
+pub fn signal_received() {
+    if std::env::var_os("CHOPPER_GUIDE_TEST_PHASE").is_some() {
+        eprintln!("guide test interrupt received");
+    }
+}
+
 pub fn checkpoint(phase: &str) {
     use std::io::Read;
     if std::env::var("CHOPPER_GUIDE_TEST_PHASE").as_deref() != Ok(phase) {
