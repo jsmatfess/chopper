@@ -133,6 +133,9 @@ not promise identical row membership or order across separate executions.
 
 ## Verification
 
+Downstream scripts can reconcile a completed native Job from its
+[published manifest](native-manifest.md), even when the stdout report is unavailable.
+
 Native parser tests cover every public Job field, repeated operations,
 interleaved global flags, literal names versus indices, wrong scopes and errors.
 A shared fixture in `crates/chopper/tests/fixtures/run-cli.json` is checked by
