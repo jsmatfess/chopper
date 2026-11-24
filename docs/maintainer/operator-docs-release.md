@@ -24,7 +24,7 @@ sidebar, CLI cross-link, and function search check for that page.
 npm --prefix docs-site ci
 npm --prefix docs-site exec -- playwright install chromium
 v=$(node -p "require('./ui/package.json').version")
-npm --prefix docs-site run build -- v0.5.0 "${v}=HEAD"
+npm --prefix docs-site run build -- 0.5.0 "${v}=HEAD"
 npm --prefix docs-site run smoke
 ```
 

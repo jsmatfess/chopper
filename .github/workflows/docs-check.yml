@@ -19,6 +19,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
@@ -30,7 +32,7 @@ jobs:
         working-directory: docs-site
         run: |
           version=$(node -p "require('../ui/package.json').version")
-          npm run build -- "${version}=HEAD"
+          npm run build -- 0.5.0 "${version}=HEAD"
       - run: npx playwright install --with-deps chromium
         working-directory: docs-site
       - run: npm run smoke

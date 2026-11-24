@@ -174,6 +174,8 @@ try {
         };
       },
     });
+    // The next version must create its sidebar with a fresh Markdown renderer.
+    disposeMdItInstance();
   }
 
   const [latest] = releases;
