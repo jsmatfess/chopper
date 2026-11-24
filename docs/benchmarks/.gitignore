@@ -229,3 +229,7 @@ reservation-entry-2026-11-05-linux-lock.py
 
 # Compact parallel gzip and ZIP evidence; originals remain in local scratch.
 !parallel-compression-summary-2026-11-22.json
+
+# Paired calculated-column measurements without workstation paths.
+!calculated-column-optimization-summary-2026-11-24.json
+!calculated-partition-summary-2026-11-24.json

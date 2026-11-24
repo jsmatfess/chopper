@@ -40,7 +40,7 @@ checks the tracked decoder's construction and release ordering.
 
 All terms count requested allocation layouts, including old plus new during
 reallocation. All arithmetic is checked. C is the versioned private serde Content
-size, L is Column size, and U is max(Operation, Allocation, Column) size. These are
+size, L is Column size, and U is max(Operation, Allocation, CalculatedColumn, Column) size. These are
 computed from actual types; compilation requires C, 2C, L and U in 2..=1024.
 
 For n enabled slots of size s:
@@ -79,7 +79,7 @@ in-progress key/value/child heaps have separate text/container origins, so need
 no duplicate descriptor charge. One physical array has at most one Content Vec
 and one typed Vec. Owning Content IntoIter retains its source allocation while
 the destination grows. Column can push scalar elements, bounded by G(k,L).
-Operation/Allocation can push only container elements, bounded by G(c,U), but
+Operations, allocations and calculated columns can push only container elements, bounded by G(c,U), but
 their eager cautious hint may allocate before rejecting even the first scalar:
 min(k*U,1 MiB) remains necessary. These are alternative typed-vector phases,
 hence max. Struct and internally tagged sequence representations are covered.

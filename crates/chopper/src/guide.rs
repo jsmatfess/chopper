@@ -280,7 +280,7 @@ fn load(path: &Path) -> Result<Job> {
 }
 fn supported(job: &Job) -> Result<()> {
     ensure!(
-        job.operations.iter().all(|op| matches!(op, Operation::Calculate { .. } | Operation::Partition { .. })),
+        job.operations.iter().all(|op| matches!(op, Operation::Partition { .. })),
         "this guide supports calculated columns and partitions; use chopper run for other operations; imported operations retained"
     );
     let defaults = serde_json::to_value(CsvSettings::default())?;
@@ -469,24 +469,17 @@ impl Session {
     fn pipeline(&mut self, io: &mut impl Terminal, cancel: &AtomicBool) -> Result<()> {
         for (index, operation) in self.job.operations.iter().enumerate() {
             let summary = match operation {
-                Operation::Calculate { name, expression } => {
-                    format!("Calculate {} = {}", display(name), display(expression))
-                }
                 Operation::Partition { columns } => format!("Partition by {columns:?}"),
                 _ => "Unsupported operation".into(),
             };
             io.say(&format!("{}. {summary}", index + 1))?;
         }
         let action = io.line(
-            "Pipeline: 1 Add calculated column; 2 Add partition; 3 Remove step; empty returns",
+            "Pipeline: 2 Add partition; 3 Remove step; empty returns",
             cancel,
         )?;
         let operation = match action.trim() {
             "" => return Ok(()),
-            "1" => Operation::Calculate {
-                name: io.line("Calculated column name", cancel)?,
-                expression: io.line("Formula", cancel)?,
-            },
             "2" => Operation::Partition {
                 columns: vec![Column::Name(io.line("Partition column name", cancel)?)],
             },
@@ -513,6 +506,47 @@ impl Session {
         supported(&self.job)?;
         let mut draft = self.job.clone();
         draft.operations.push(operation);
+        self.apply_draft(draft)
+    }
+    fn calculated_columns(&mut self, io: &mut impl Terminal, cancel: &AtomicBool) -> Result<()> {
+        for (index, column) in self.job.calculated_columns.iter().enumerate() {
+            io.say(&format!(
+                "{}. {} = {}",
+                index + 1,
+                display(&column.name),
+                display(&column.expression)
+            ))?;
+        }
+        let mut draft = self.job.clone();
+        let action = io.line(
+            "Calculated Columns: 1 Add column; 2 Edit column; 3 Remove column; empty returns",
+            cancel,
+        )?;
+        match action.trim() {
+            "" => return Ok(()),
+            "1" => draft.calculated_columns.push(CalculatedColumn {
+                name: io.line("Calculated column name", cancel)?,
+                expression: io.line("Formula", cancel)?,
+            }),
+            "2" | "3" => {
+                let index: usize = io.line("Calculated column number", cancel)?.parse()?;
+                ensure!(
+                    (1..=draft.calculated_columns.len()).contains(&index),
+                    "calculated column number is out of range"
+                );
+                if action.trim() == "2" {
+                    let column = &mut draft.calculated_columns[index - 1];
+                    column.name = io.line("Calculated column name", cancel)?;
+                    column.expression = io.line("Formula", cancel)?;
+                } else {
+                    draft.calculated_columns.remove(index - 1);
+                }
+            }
+            _ => bail!("choose a displayed calculated-column action"),
+        }
+        self.apply_draft(draft)
+    }
+    fn apply_draft(&mut self, draft: Job) -> Result<()> {
         // Configuration-only checks are available even before choosing input.
         let mut validate = draft.clone();
         if validate.input.is_empty() {
@@ -682,7 +716,7 @@ impl Session {
             if self.step == 4 {
                 io.say(&resource_description(&self.job))?;
             }
-            let action = io.line("1 Edit / inspect / review; 2 Next; 90 Back; 91 Edit step; 92 Save; 93 Reload; 94 Help; 95 Cancel; 96 Save and exit; 97 Convert paths to absolute; 98 Run (review); 99 Edit pipeline", &cancel)?;
+            let action = io.line("1 Edit / inspect / review; 2 Next; 90 Back; 91 Edit step; 92 Save; 93 Reload; 94 Help; 95 Cancel; 96 Save and exit; 97 Convert paths to absolute; 98 Run (review); 99 Edit pipeline; 100 Calculated Columns", &cancel)?;
             let result = (|| -> Result<Option<bool>> {
                 match action.trim() {
                     "" => (),
@@ -706,6 +740,7 @@ impl Session {
                     }
                     "94" => io.say("The guide supports local UTF-8 headered CSV, calculated columns, partitions, and strict row and serialized-byte caps. Data prompts accept literal command words. Inspection is optional. Memory and workers default to automatic. Auto memory resolves at task start from shared admission. Existing engine validation remains authoritative. Ctrl+C/EOF abort without saving.")?,
                     "99" => self.pipeline(io, &cancel)?,
+                    "100" => self.calculated_columns(io, &cancel)?,
                     "95" => {
                         if self.dirty && self.confirm(io, &cancel, "Save dirty draft before cancelling?")? && !self.save(io, &cancel)? { return Ok(None); }
                         return Ok(Some(false));
@@ -891,7 +926,7 @@ mod tests {
         let (dir, job) = fixture();
         let saved = dir.path().join("calculation.json");
         let mut transcript = Transcript::new(&[
-            "99",
+            "100",
             "1",
             "normalized",
             "UPPER(text)",
@@ -909,10 +944,13 @@ mod tests {
         let analysis = journey(&mut session, &mut transcript)?.context("guide did not run")?;
         assert_eq!(analysis.groups, 3);
         let saved = load(&saved)?;
-        assert!(matches!(&saved.operations[..], [
-            Operation::Calculate { name, expression },
-            Operation::Partition { columns },
-        ] if name == "normalized" && expression == "UPPER(text)" && columns.len() == 1));
+        assert!(
+            matches!(&saved.operations[..], [Operation::Partition { columns }] if columns.len() == 1)
+        );
+        assert!(
+            matches!(&saved.calculated_columns[..], [CalculatedColumn { name, expression }]
+            if name == "normalized" && expression == "UPPER(text)")
+        );
         assert!(Path::new(&saved.output).join("manifest.jsonl").is_file());
         Ok(())
     }

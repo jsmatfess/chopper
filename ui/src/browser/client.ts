@@ -1,5 +1,6 @@
 import {renderExecutionHistory,type ExecutionHistory} from './execution-history';
-import {BrowserLifecycle} from './session';
+import {BrowserLifecycle,type FormulaSampleBatch} from './session';
+import type {Job} from '../app';
 import {configureCleanupControls} from './cleanup-controls';
 export let executionHistory:ExecutionHistory|null=null;
 type PickerWindow=Window & {
@@ -20,6 +21,9 @@ const lifecycle=new BrowserLifecycle({
   historyChanged:history=>{executionHistory=history;renderExecutionHistory(history);},
 });
 export const browserDiagnostics=lifecycle.diagnostics;
+export function startFormulaScan(job:Job,onBatch:(batch:FormulaSampleBatch)=>void,onError:(error:string)=>void){
+  return lifecycle.startFormulaScan(job,onBatch,onError);
+}
 export function enableBrowserProfiling(){lifecycle.enableProfiling();}
 export function invalidateBrowserDraft(source:string){lifecycle.invalidateDraft(source);}
 function selectInputFile(input:File, estimate=true){

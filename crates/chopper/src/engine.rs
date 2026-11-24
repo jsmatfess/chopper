@@ -24,8 +24,10 @@ mod domain_cache;
 mod group_metadata;
 mod header;
 pub use header::Header;
+mod formula_sample;
 mod input_gzip;
 mod input_inspection;
+pub use formula_sample::{sample_formula_rows, FormulaSample};
 mod inspection_result;
 mod shared_analysis;
 mod stages;
@@ -287,7 +289,10 @@ fn run_using(
     let mut destination = output::RunDestination::preflight(&job)?;
     #[cfg(target_os = "wasi")]
     let mut destination = output::RunDestination::Unchecked;
-    let mut direct_plan = if job.operations.is_empty() {
+    let calculates = !job.calculated_columns.is_empty();
+    let mut direct_plan = if calculates {
+        None
+    } else if job.operations.is_empty() {
         Some(direct::Plan::Streaming)
     } else if observed {
         None
@@ -321,20 +326,27 @@ fn run_using(
     } else {
         None
     };
-    let merge = (!observed && direct_plan.is_none())
+    let merge = (!calculates && !observed && direct_plan.is_none())
         .then(|| auto::native_terminal_merge(&job, &pool))
         .flatten();
-    let try_retained_exact = !observed
+    let try_retained_exact = !calculates
+        && !observed
         && direct_plan.is_none()
         && merge.is_none()
         && auto::native_retained_exact(&job, &pool);
     let route = if let Some(plan) = direct_plan {
         plan.route()
-    } else if merge.is_some()
-        || try_retained_exact
-        || terminal_direct_eligible(&job)
-        || (!observed && native_shuffle_direct_eligible(&job))
-    {
+    } else if !calculates {
+        if merge.is_some()
+            || try_retained_exact
+            || terminal_direct_eligible(&job)
+            || (!observed && native_shuffle_direct_eligible(&job))
+        {
+            Route::PrivateTerminal
+        } else {
+            Route::Snapshot
+        }
+    } else if !observed && large_calculation_direct_eligible(&job) {
         Route::PrivateTerminal
     } else {
         Route::Snapshot
@@ -360,6 +372,7 @@ fn run_using(
                 pool,
                 physical,
                 matches!(route, Route::PrivateTerminal),
+                !observed,
                 Some(&plan),
                 destination,
                 |job, ctx, p, b, s| {
@@ -499,6 +512,7 @@ fn prepare_using(
         pool,
         physical,
         false,
+        false,
         None,
         output::RunDestination::Unchecked,
         read_input,
@@ -506,6 +520,17 @@ fn prepare_using(
         Processed::Snapshot(prepared) => Ok(prepared),
         Processed::Direct { .. } => anyhow::bail!("explicit preparation requires a snapshot"),
     }
+}
+
+fn large_calculation_direct_eligible(job: &Job) -> bool {
+    // The measured benefit came from avoiding a large serialized snapshot.
+    // Keep the existing path for smaller, evaluator-heavy exports.
+    const MINIMUM_SOURCE_BYTES: u64 = 128 * 1024 * 1024;
+    cfg!(target_os = "linux")
+        && job.operations.is_empty()
+        && job.compression == chopper_core::Compression::None
+        && std::fs::metadata(&job.input)
+            .is_ok_and(|source| source.is_file() && source.len() >= MINIMUM_SOURCE_BYTES)
 }
 
 fn native_shuffle_direct_eligible(job: &Job) -> bool {
@@ -570,6 +595,7 @@ fn process_using(
     pool: Arc<crate::resources::MemoryPool>,
     physical: Option<crate::observation::physical::Sink>,
     direct_terminal: bool,
+    _unobserved_run: bool,
     auto_plan: Option<&AutoPlan>,
     destination: output::RunDestination,
     mut read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
@@ -594,17 +620,6 @@ fn process_using(
     ctx.auto_final_writers = ctx.auto_retained_exact;
 
     let job = PreparedJob::admit(job, Reservation::new(&ctx))?;
-    let mut programs = None;
-    let mut calculation_times = None;
-    if job
-        .operations
-        .iter()
-        .any(|op| matches!(op, Operation::Calculate { .. }))
-    {
-        let started = std::time::Instant::now();
-        programs = Some(calculation::compile_steps(&job, &ctx)?);
-        calculation_times = Some((started.elapsed().as_secs_f64(), 0.0));
-    }
     ctx.event("Reading and validating CSV", 0)?;
     let source_metadata = std::fs::metadata(&job.input).context("open input")?;
     ensure!(source_metadata.is_file(), "input must be a regular file");
@@ -690,71 +705,83 @@ fn process_using(
     ctx.physical_stage_complete(0);
     let mut stage_completion = ctx.physical_stages();
     let mut index = consumed;
-    while index < job.operations.len() {
+    let mut calculation_times = None;
+    let mut calculations = if job.calculated_columns.is_empty() {
+        None
+    } else {
+        let started = std::time::Instant::now();
+        let plan = calculation::Plan::prepare(
+            &job,
+            input_header.as_deref(),
+            input_columns,
+            Reservation::new(&ctx),
+        )?;
+        calculation_times = Some((started.elapsed().as_secs_f64(), 0.0));
+        Some(plan)
+    };
+    while index < job.operations.len() || calculations.is_some() {
         stage_completion.complete_through(index);
-        if let Operation::Calculate { name, .. } = &job.operations[index] {
-            ctx.operation_event(index + 1, job.operations.len())?;
+        if calculations
+            .as_ref()
+            .is_some_and(|plan| plan.boundary == index)
+        {
+            let plan = calculations.take().unwrap();
+            ctx.event("Evaluating calculated columns", 0)?;
             let mut step_ctx = ctx.physical_scope([index + 1, 0]);
             step_ctx.physical_source = dataset.physical_source;
             let started = std::time::Instant::now();
-            let compiled = programs
-                .as_mut()
-                .and_then(|programs| programs[index].take())
-                .context("missing compiled calculation")?;
-            let (program, next_header) = compiled
-                .bind(
-                    name,
-                    analysis.header.as_deref(),
-                    analysis.columns,
-                    if input_header.is_none() {
-                        input_columns
-                    } else {
-                        0
-                    },
-                )
-                .with_context(|| {
-                    format!(
-                        "preparing calculated column {name:?} at operation {}",
-                        index + 1
-                    )
-                })?;
-            let (prepare, traverse) = calculation_times.as_mut().unwrap();
-            *prepare += started.elapsed().as_secs_f64();
-            let started = std::time::Instant::now();
-            let before = dataset.groups;
-            if index + 1 == job.operations.len() {
-                let mut writer = output::PlanWriter::new(&job, Some(&next_header), &step_ctx)?;
-                program.apply(
-                    &dataset,
-                    name,
-                    analysis.columns - input_columns,
-                    &step_ctx,
-                    &mut writer,
-                )?;
-                final_plan = Some(writer.finish()?);
+            #[cfg(target_os = "linux")]
+            if _unobserved_run
+                && !cfg!(feature = "experimental-constant-partition")
+                && index == 0
+                && dataset.groups == 1
+                && source_metadata.len() >= 128 * 1024 * 1024
+                && job.compression == chopper_core::Compression::None
+            {
+                if let [Operation::Partition { columns }] = job.operations.as_slice() {
+                    match try_calculated_partition(&plan, &dataset, columns, &job, &step_ctx) {
+                        Ok((output, stats, traversal_seconds)) => {
+                            calculation_times.as_mut().unwrap().1 = traversal_seconds;
+                            analysis.columns = plan.header.len();
+                            analysis.header = Some(plan.header);
+                            analysis.groups = stats.output_groups;
+                            analysis.stages.push(stats)?;
+                            final_plan = Some(output);
+                            index += 1;
+                            break;
+                        }
+                        // Everything created by the speculative pass is private.
+                        // Replay the retained source to preserve staged error order.
+                        Err(_) => ctx.check()?,
+                    }
+                }
+            }
+            if index == job.operations.len() {
+                if direct_terminal {
+                    let mut writer =
+                        output::PlanWriter::direct_grouped(&job, Some(&plan.header), &step_ctx)?;
+                    plan.apply(&dataset, &job, &step_ctx, &mut writer)?;
+                    terminal_publication = Some(writer.finish_direct()?);
+                } else {
+                    let mut writer = output::PlanWriter::new(&job, Some(&plan.header), &step_ctx)?;
+                    plan.apply(&dataset, &job, &step_ctx, &mut writer)?;
+                    final_plan = Some(writer.finish()?);
+                }
+                analysis.groups = dataset.groups;
             } else {
                 let mut writer = DatasetWriter::new(&step_ctx)?;
-                program.apply(
-                    &dataset,
-                    name,
-                    analysis.columns - input_columns,
-                    &step_ctx,
-                    &mut writer,
-                )?;
+                plan.apply(&dataset, &job, &step_ctx, &mut writer)?;
                 dataset = writer.finish()?;
             }
-            *traverse += started.elapsed().as_secs_f64();
-            analysis
-                .stages
-                .push(dataset_stats(&dataset, index + 1, before, &step_ctx)?)?;
-            analysis.groups = dataset.groups;
-            analysis.columns += 1;
-            analysis.header = Some(next_header);
-            index += 1;
-            continue;
+            calculation_times.as_mut().unwrap().1 = started.elapsed().as_secs_f64();
+            analysis.columns = plan.header.len();
+            analysis.header = Some(plan.header);
+            if index == job.operations.len() {
+                break;
+            }
         }
         #[cfg(feature = "experimental-consecutive-partitions")]
-        if partition_fusion {
+        if partition_fusion && calculations.is_none() {
             if let Some(plan) = consecutive_partitions::Plan::at(&job, index) {
                 ctx.event("Preparing consecutive value partitions", 0)?;
                 let attempt = retained_execution::execute(
@@ -800,7 +827,11 @@ fn process_using(
             }
         }
         #[cfg(feature = "experimental-streaming-chain")]
-        if let Some(plan) = streaming_chain::Plan::at(&job, index) {
+        if let Some(plan) = calculations
+            .is_none()
+            .then(|| streaming_chain::Plan::at(&job, index))
+            .flatten()
+        {
             ctx.event("Preparing streaming routing chain", 0)?;
             let attempt = retained_execution::execute(&job, &analysis, &ctx, index, 3, |writer| {
                 plan.apply(&dataset, &job, &analysis, &ctx, writer)
@@ -830,7 +861,11 @@ fn process_using(
             }
         }
         #[cfg(feature = "experimental-partition-balanced")]
-        if let Some(plan) = partition_balanced::Plan::at(&job, index) {
+        if let Some(plan) = calculations
+            .is_none()
+            .then(|| partition_balanced::Plan::at(&job, index))
+            .flatten()
+        {
             ctx.event("Preparing partition/shuffle balanced ranges", 0)?;
             let attempt =
                 retained_execution::execute(&job, &analysis, &ctx, index, plan.len(), |writer| {
@@ -866,7 +901,7 @@ fn process_using(
                 .count();
             if count > 1 {
                 ctx.event("Preparing nested balanced ranges", 0)?;
-                if index + count == job.operations.len() {
+                if calculations.is_none() && index + count == job.operations.len() {
                     let mut writer =
                         output::PlanWriter::new(&job, analysis.header.as_deref(), &ctx)?;
                     nested_balanced::emit(
@@ -948,10 +983,12 @@ fn process_using(
         } else {
             None
         };
-        let partition_after =
-            shuffle_partition::ENABLED && shuffle_partition::Plan::at(&job, index).is_some();
-        let assignment_after =
-            shuffle_assignment::ENABLED && shuffle_assignment::Plan::at(&job, index).is_some();
+        let partition_after = calculations.is_none()
+            && shuffle_partition::ENABLED
+            && shuffle_partition::Plan::at(&job, index).is_some();
+        let assignment_after = calculations.is_none()
+            && shuffle_assignment::ENABLED
+            && shuffle_assignment::Plan::at(&job, index).is_some();
         let consumed = 1
             + following_shuffles
             + usize::from(balanced_after.is_some())
@@ -973,7 +1010,7 @@ fn process_using(
             None
         };
         let mut stats;
-        if index + consumed == job.operations.len() {
+        if calculations.is_none() && index + consumed == job.operations.len() {
             let mut writer = if direct_terminal {
                 output::PlanWriter::direct_grouped(&job, analysis.header.as_ref(), &ctx)?
             } else {
@@ -1161,7 +1198,7 @@ pub fn input_columns(job: &Job) -> Result<Inspection> {
 pub fn input_preview(job: &Job) -> Result<Inspection> {
     inspect_input(job, true)
 }
-fn inspect_input(job: &Job, preview: bool) -> Result<Inspection> {
+fn validate_input_inspection(job: &Job) -> Result<()> {
     Job {
         input: job.input.clone(),
         input_csv: job.input_csv.clone(),
@@ -1169,7 +1206,10 @@ fn inspect_input(job: &Job, preview: bool) -> Result<Inspection> {
         resources: job.resources.clone(),
         ..Job::default()
     }
-    .validate()?;
+    .validate()
+}
+fn inspect_input(job: &Job, preview: bool) -> Result<Inspection> {
+    validate_input_inspection(job)?;
     let mut signature = [0u8; 4];
     let read = File::open(&job.input)?.read(&mut signature)?;
     let input_is_zip =
@@ -1442,9 +1482,21 @@ fn ingest_records(
         crate::observation::physical::identity(0, crate::observation::physical::Kind::Read);
     let mut writer = DatasetWriter::new(&input_dataset_ctx)?;
     let mut group = writer.begin(vec![], false);
-    let leading_shuffles = job.operations.iter().take_while(|op| uniform(op)).count();
-    let initial_fisher_step = shuffle_elision::initial_fisher_step(job, leading_shuffles);
-    let initial_assignment = if shuffle_assignment::ENABLED {
+    // Calculation planning needs the validated source width before any selectors run.
+    let raw_snapshot = !job.calculated_columns.is_empty();
+    let initial_operations = if raw_snapshot {
+        &[][..]
+    } else {
+        job.operations.as_slice()
+    };
+    let leading_shuffles = initial_operations
+        .iter()
+        .take_while(|op| uniform(op))
+        .count();
+    let initial_fisher_step = (!raw_snapshot)
+        .then(|| shuffle_elision::initial_fisher_step(job, leading_shuffles))
+        .flatten();
+    let initial_assignment = if !raw_snapshot && shuffle_assignment::ENABLED {
         shuffle_assignment::Plan::at(
             job,
             initial_fisher_step.unwrap_or(leading_shuffles.saturating_sub(1)),
@@ -1460,13 +1512,13 @@ fn ingest_records(
     let first_partition =
         reverse_partition
             .map(|plan| plan.columns)
-            .or_else(|| match job.operations.first() {
+            .or_else(|| match initial_operations.first() {
                 Some(Operation::Partition { columns }) => Some(columns.as_slice()),
                 _ => None,
             });
     let partition_step = reverse_partition.map_or(0, |plan| plan.partition_step);
     #[cfg(feature = "experimental-consecutive-partitions")]
-    let consecutive = if _fuse_partitions {
+    let consecutive = if _fuse_partitions && !raw_snapshot {
         consecutive_partitions::Plan::at(job, 0)
     } else {
         None
@@ -1482,7 +1534,7 @@ fn ingest_records(
     };
     let partition_randomized = partition_shuffles > 0 || reverse_partition.is_some();
     #[cfg(feature = "experimental-partition-balanced")]
-    let balanced_plan = _fuse_balanced
+    let balanced_plan = (_fuse_balanced && !raw_snapshot)
         .then(|| partition_balanced::Plan::at(job, 0))
         .flatten();
     #[cfg(feature = "experimental-partition-balanced")]
@@ -1549,10 +1601,12 @@ fn ingest_records(
             },
         ));
     }
-    let first_streaming = job.operations.first().filter(|op| streaming::eligible(op));
+    let first_streaming = initial_operations
+        .first()
+        .filter(|op| streaming::eligible(op));
     let mut initial_streaming = None;
     #[cfg(feature = "experimental-streaming-chain")]
-    let chain_plan = _fuse_streaming
+    let chain_plan = (_fuse_streaming && !raw_snapshot)
         .then(|| streaming_chain::Plan::at(job, 0))
         .flatten();
     #[cfg(feature = "experimental-streaming-chain")]
@@ -1567,7 +1621,7 @@ fn ingest_records(
             random::domain(job.random_seed.as_deref().unwrap(), step as u64, "[]"),
         )
     });
-    let mut direct = if job.operations.is_empty() {
+    let mut direct = if job.operations.is_empty() && !raw_snapshot {
         Some(output::PlanWriter::new(job, header.as_deref(), ctx)?)
     } else {
         None
@@ -1578,7 +1632,7 @@ fn ingest_records(
     let mut total_record_bytes = 0u64;
     let mut column_values = column_summaries::Builder::new(Reservation::new(ctx));
     // Plain serialization keeps owned strings; retaining operations keep compact records.
-    let owned_ingestion = job.operations.is_empty();
+    let owned_ingestion = job.operations.is_empty() && !raw_snapshot;
     while {
         let next = if owned_ingestion {
             input.next_owned(|| ctx.check())
@@ -2406,7 +2460,6 @@ fn apply_parent(
         &parent.lineage,
     )?;
     match operation {
-        Operation::Calculate { .. } => unreachable!("calculation uses a schema-aware stage"),
         Operation::Interleaved { .. } | Operation::AssignProbabilistic { .. } => {
             let mut routed = StreamingGroups::new(
                 operation,
@@ -2788,6 +2841,42 @@ fn partition(
         ctx,
     )
 }
+#[cfg(target_os = "linux")]
+#[cold]
+#[inline(never)]
+fn try_calculated_partition(
+    plan: &calculation::Plan,
+    dataset: &Dataset,
+    columns: &[chopper_core::Column],
+    job: &Job,
+    ctx: &Context,
+) -> Result<(output::OutputPlan, StageStats, f64)> {
+    let columns = resolve_columns(columns, Some(&plan.header), plan.header.len())?;
+    let parent = dataset
+        .groups()?
+        .next()
+        .context("missing retained root group")??;
+    let started = std::time::Instant::now();
+    let sorted = plan.sorted_partition(dataset, &parent, &columns, job, ctx)?;
+    let traversal_seconds = started.elapsed().as_secs_f64();
+    ctx.operation_event(1, 1)?;
+    let mut writer = output::PlanWriter::new(job, Some(&plan.header), ctx)?;
+    emit_partition(sorted, &parent, &columns, 0, false, &mut writer, ctx)?;
+    let stats = StageStats {
+        operation: 1,
+        input_groups: 1,
+        output_groups: writer.groups,
+        smallest_group: if writer.groups == 0 {
+            0
+        } else {
+            writer.smallest
+        },
+        largest_group: writer.largest,
+        empty_groups: writer.empty,
+    };
+    Ok((writer.finish()?, stats, traversal_seconds))
+}
+
 fn emit_partition(
     rows: SortedRows,
     parent: &Group,

@@ -27,6 +27,13 @@ validate a later execution snapshot.
 The former alternate flexible-policy runner and its build features are removed.
 There is no Job policy selector.
 
+An unobserved Linux Run with calculated columns, plain output, no ordered
+operations, and a source file of at least 128 MiB uses the grouped private
+publication writer. It still completes and validates source intake before
+evaluating formulas. The ordinary capped CSV serializer writes the calculated
+rows directly into private publication, removing the encoded output snapshot.
+Destination checks, atomic commit, and cleanup apply.
+
 The opt-in `experimental-terminal-shuffle` build also permits exactly a root
 Uniform/Auto shuffle followed by Balanced, with uncompressed output. Its existing
 external or resident random-key sort streams the same rows into grouped private

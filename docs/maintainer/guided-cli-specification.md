@@ -23,9 +23,9 @@ own current engine contracts. [GitHub Issues](https://github.com/jsmatfess/chopp
 The sections below define the complete journey. Slice A implements only its
 bounded subset; B/C behavior remains proposed and creates no validation claim.
 
-The guide also supports calculated columns and partitions through **Edit
-pipeline**. Add or remove steps, inspect the input, then save or run through
-the existing review step. The [formula guide](../job-json.md#formulas) owns
+The guide supports formulas through **Calculated Columns** and partitions
+through **Edit pipeline**. Add or remove steps, inspect the input, then save or run through
+the existing review step. The [function reference](../formula-functions.md) owns
 the language and column reference rules.
 
 ## Entry point and interaction
@@ -124,9 +124,9 @@ saved job. Full values may be used by selecting their index without printing
 arbitrarily large text. Existing record, configuration and admission limits still
 apply; a display bound is not a process RSS bound.
 
-The profiler currently retains up to 64 selected columns, up to 100 values per
-column under a shared 256 KiB value budget, and an admitted preview under its
-32 KiB selection budget. Do not increase those limits. Each displayed statistic
+The profiler covers every source column and retains up to 100 values per column
+under a shared 256 KiB value budget. Its admitted preview has a 32 KiB selection
+budget. Each displayed statistic
 must carry its coverage and accuracy:
 
 - `rows`: exact for that completed full scan, not a prediction of a later source.

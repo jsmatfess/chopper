@@ -549,65 +549,46 @@ impl PackedRow {
     }
     pub(crate) fn append_calculated(
         &mut self,
-        value: &str,
-        kind: char,
-        has_kind_field: bool,
+        values: &[(String, char)],
         maximum: usize,
     ) -> Result<()> {
         let (count, payload) = self.field_sizes();
-        // Derive the tail from validated fields rather than trusting an offset.
-        let prior_kinds = if has_kind_field {
-            Some(
-                self.fields()
-                    .last()
-                    .context("missing calculation metadata")?
-                    .len(),
-            )
-        } else {
-            None
-        };
-        let new_sidecar = prior_kinds.is_none();
         let count = count
-            .checked_add(1 + usize::from(new_sidecar))
+            .checked_add(values.len() + 1)
             .context("column count overflow")?;
-        let mut kind_bytes = [0; 4];
-        let kind = kind.encode_utf8(&mut kind_bytes).as_bytes();
+        let kinds = values
+            .iter()
+            .map(|(_, kind)| kind.len_utf8())
+            .sum::<usize>();
+        let added = values.iter().try_fold(kinds, |size, (value, _)| {
+            size.checked_add(value.len())
+                .context("record size overflow")
+        })?;
         ensure!(
-            count <= maximum / 24 + 1
-                && value
-                    .len()
-                    .checked_add(kind.len())
-                    .is_some_and(|n| n <= maximum.saturating_sub(payload)),
+            count <= maximum / 24 + 1 && added <= maximum.saturating_sub(payload),
             "calculated row exceeds maximum record size"
         );
         let Fields::Packed(bytes) = &mut self.fields else {
             anyhow::bail!("calculated row requires a packed input");
         };
-        let old_end = bytes.len();
-        let value_frame = 8 + value.len();
-        let extra = value_frame + usize::from(new_sidecar) * 8 + kind.len();
-        let target = old_end.checked_add(extra).context("record size overflow")?;
+        let target = bytes
+            .len()
+            .checked_add(8 * (values.len() + 1))
+            .and_then(|size| size.checked_add(added))
+            .context("record size overflow")?;
         reserve_decode_bytes(
             bytes,
             target,
             self.key.heap_bytes(),
             &mut self.decode_reservation,
         )?;
-        if let Some(prior_kinds) = prior_kinds {
-            let start = old_end
-                .checked_sub(8 + prior_kinds)
-                .context("invalid calculation metadata")?;
-            bytes.resize(old_end + value_frame, 0);
-            bytes.copy_within(start + 8..old_end, start + value_frame + 8);
-            bytes[start..start + 8].copy_from_slice(&(value.len() as u64).to_le_bytes());
-            bytes[start + 8..start + value_frame].copy_from_slice(value.as_bytes());
-            let sidecar = start + value_frame;
-            bytes[sidecar..sidecar + 8]
-                .copy_from_slice(&((prior_kinds + kind.len()) as u64).to_le_bytes());
-            bytes.extend_from_slice(kind);
-        } else {
+        for (value, _) in values {
             put_bytes(bytes, value.as_bytes())?;
-            put_bytes(bytes, kind)?;
+        }
+        bytes.extend_from_slice(&(kinds as u64).to_le_bytes());
+        let mut buffer = [0; 4];
+        for (_, kind) in values {
+            bytes.extend_from_slice(kind.encode_utf8(&mut buffer).as_bytes());
         }
         bytes[..8].copy_from_slice(&(count as u64).to_le_bytes());
         Ok(())
@@ -616,7 +597,7 @@ impl PackedRow {
         let (count, payload) = self.field_sizes();
         (32 + self.key.len() + 8 * count + payload) as u64
     }
-    fn field_sizes(&self) -> (usize, usize) {
+    pub(crate) fn field_sizes(&self) -> (usize, usize) {
         match &self.fields {
             Fields::Packed(bytes) => {
                 let count = u64::from_le_bytes(bytes[..8].try_into().unwrap()) as usize;

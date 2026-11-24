@@ -53,6 +53,7 @@ class ScopeTests(unittest.TestCase):
                      'docs/releases/native-quickstart.txt'):
             self.assertEqual(self.selected(path), {'tooling'})
         self.assertEqual(self.selected('docs/releases/native-usage.txt'), {'browser', 'tooling'})
+        self.assertEqual(self.selected('docs/formula-functions.md'), {'browser'})
         self.assertEqual(self.selected('scripts/browser-artifacts.mjs'), {'browser', 'tooling'})
         for path in ('scripts/browser-small-contract.mjs', 'scripts/browser-small-observer.mjs', 'scripts/browser-small-observer.test.mjs', 'scripts/browser-launch.mjs', 'scripts/browser-acceptance.mjs', 'scripts/browser-acceptance.test.mjs', 'scripts/test-browser-editor-submission.mjs', 'scripts/test-browser-cleanup.mjs', 'scripts/test-browser-graph-lifecycle.mjs', 'scripts/test-browser-graph-inspection.mjs',
                      'scripts/graph-codec-fixtures.py', 'scripts/test-browser-graph-bounds.mjs',

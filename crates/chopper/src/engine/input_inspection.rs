@@ -54,19 +54,24 @@ pub(super) fn preview(
     let header = owner.header()?;
     let header = header.map(|header| header.into_parts());
     let mut sample = preview::Builder::new(owner.reservation());
-    for _ in 0..8 {
+    let mut row_numbers = [0; 8];
+    let mut retained = 0;
+    for number in 1..=8 {
         if !owner.next_owned(|| Ok(()))? {
             break;
         }
         let bytes = owner.owned().iter().map(String::len).sum();
-        sample.consider(FieldViews::owned(owner.owned()), bytes)?;
+        if sample.consider(FieldViews::owned(owner.owned()), bytes)? {
+            row_numbers[retained] = number;
+            retained += 1;
+        }
     }
     let sample = sample.finish()?;
     let header_fields = header.as_ref().map(|(fields, _)| fields);
     let mut items = header_fields.map_or(0, |fields| fields.len());
     let mut text = header_fields.map_or(0, |fields| fields.iter().map(String::len).sum::<usize>());
     items = items
-        .checked_add(sample.len())
+        .checked_add(sample.len() + retained)
         .context("preview array length overflow")?;
     for row in sample.iter() {
         items = items
@@ -82,6 +87,7 @@ pub(super) fn preview(
         json!({
             "columns": owner.columns(), "header": header_fields, "input_is_zip": input_is_zip,
             "preview": sample,
+            "preview_row_numbers": &row_numbers[..retained],
         })
     })
 }

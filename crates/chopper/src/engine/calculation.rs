@@ -2,110 +2,186 @@ use super::*;
 use chopper_core::expression::{Expression, Value};
 use std::borrow::Cow;
 
-pub(crate) struct Program {
-    expression: Expression,
+pub(crate) struct Plan {
+    programs: [Option<Program>; 64],
+    order: [usize; 64],
+    referenced_results: u64,
     width: usize,
+    pub(crate) header: Header,
+    pub(super) boundary: usize,
+}
+
+struct Program {
+    expression: Expression,
+    dependencies: u64,
     _memory: Reservation,
 }
 
-pub(super) struct Unbound {
-    expression: Expression,
-    memory: Reservation,
-}
-
-impl Unbound {
-    fn compile(source: &str, mut memory: Reservation) -> Result<Self> {
-        memory.resize(Expression::preparation_bytes(source))?;
-        let expression = Expression::parse(source).map_err(anyhow::Error::msg)?;
-        Ok(Self { expression, memory })
-    }
-
-    pub(super) fn bind(
-        mut self,
-        name: &str,
-        header: Option<&[String]>,
-        width: usize,
-        unnamed: usize,
-    ) -> Result<(Program, Header)> {
-        self.expression
-            .bind(header, width, unnamed)
-            .map_err(anyhow::Error::msg)?;
-        let next = Header::appended(header, width, name, self.memory.sibling())?;
-        self.memory.resize(
-            (self.memory.bytes() as usize)
-                .checked_add(self.expression.workspace_bytes())
-                .context("formula allocation overflow")?,
-        )?;
-        Ok((
-            Program {
-                expression: self.expression,
-                width,
-                _memory: self.memory,
-            },
-            next,
-        ))
-    }
-}
-
-pub(super) fn compile_steps(job: &Job, ctx: &Context) -> Result<[Option<Unbound>; 64]> {
-    let mut programs = [const { None }; 64];
-    for (index, op) in job.operations.iter().enumerate() {
-        if let Operation::Calculate { name, expression } = op {
-            ctx.check()?;
-            programs[index] = Some(
-                Unbound::compile(expression, Reservation::new(ctx)).with_context(|| {
-                    format!(
-                        "preparing calculated column {name:?} at operation {}",
-                        index + 1
-                    )
-                })?,
-            );
-        }
-    }
-    Ok(programs)
-}
-
-pub(crate) fn prepare(
+fn prepare(
     source: &str,
-    name: &str,
-    header: Option<&[String]>,
-    width: usize,
+    schema: &Header,
+    source_width: usize,
     unnamed: usize,
-    memory: Reservation,
-) -> Result<(Program, Header)> {
-    Unbound::compile(source, memory)?.bind(name, header, width, unnamed)
+    mut memory: Reservation,
+    source_reference: &mut impl FnMut(usize),
+) -> Result<Program> {
+    memory.resize(Expression::preparation_bytes(source))?;
+    let mut expression = Expression::parse(source).map_err(anyhow::Error::msg)?;
+    let mut dependencies = 0;
+    expression
+        .bind_references(Some(schema), schema.len(), unnamed, &mut |index| {
+            if index >= source_width {
+                dependencies |= 1 << (index - source_width);
+            } else {
+                source_reference(index);
+            }
+        })
+        .map_err(anyhow::Error::msg)?;
+    reserve_scratch_bytes(&mut memory, expression.workspace_bytes())?;
+    Ok(Program {
+        expression,
+        dependencies,
+        _memory: memory,
+    })
 }
 
-pub(crate) fn schema_after(
+fn ready(programs: &[Option<Program>], completed: u64) -> Option<usize> {
+    programs.iter().enumerate().position(|(index, program)| {
+        completed & (1 << index) == 0
+            && program
+                .as_ref()
+                .is_none_or(|program| program.dependencies & !completed == 0)
+    })
+}
+
+pub(crate) fn schema(
+    job: &Job,
     header: Option<&[String]>,
     width: usize,
-    name: &str,
     memory: Reservation,
 ) -> Result<Header> {
-    Header::appended(header, width, name, memory)
+    for column in &job.calculated_columns {
+        ensure!(
+            !header.is_some_and(|fields| fields.contains(&column.name)),
+            "calculated column {:?} already exists",
+            column.name
+        );
+    }
+    Header::with_calculations(
+        header,
+        width,
+        job.calculated_columns
+            .iter()
+            .map(|column| column.name.as_str()),
+        memory,
+    )
 }
 
-impl Program {
-    fn evaluate<'a>(
-        &'a self,
-        field: &(impl Fn(usize) -> Option<Value<'a>> + 'a),
-        reserve: &mut chopper_core::expression::Reserve<'_>,
-    ) -> Result<(char, Cow<'a, str>)> {
-        let value = self.expression.evaluate(field, reserve)?;
-        Ok((value.kind(), value.rendered(reserve)?))
+impl Plan {
+    pub(crate) fn prepare(
+        job: &Job,
+        header: Option<&[String]>,
+        width: usize,
+        memory: Reservation,
+    ) -> Result<Self> {
+        let expanded = schema(job, header, width, memory.sibling())?;
+        let mut programs = [const { None }; 64];
+        let mut order = [0; 64];
+        let count = job.calculated_columns.len();
+        for (index, column) in job.calculated_columns.iter().enumerate() {
+            programs[index] = Some(
+                prepare(
+                    &column.expression,
+                    &expanded,
+                    width,
+                    if header.is_none() { width } else { 0 },
+                    memory.sibling(),
+                    &mut |_| {},
+                )
+                .with_context(|| format!("preparing calculated column {:?}", column.name))?,
+            );
+        }
+        let referenced_results = programs[..count]
+            .iter()
+            .flatten()
+            .fold(0, |mask, program| mask | program.dependencies);
+        let mut completed = 0;
+        for slot in &mut order[..count] {
+            let index = ready(&programs[..count], completed).with_context(|| {
+                let blocked = completed.trailing_ones() as usize;
+                format!(
+                    "cyclic calculated column dependency involving {:?}",
+                    job.calculated_columns[blocked].name
+                )
+            })?;
+            *slot = index;
+            completed |= 1 << index;
+        }
+        let mut boundary = job.operations.len();
+        for (index, operation) in job.operations.iter().enumerate() {
+            let selectors = match operation {
+                Operation::Partition { columns } => columns,
+                Operation::Assign { strata, .. }
+                | Operation::AssignProbabilistic { strata, .. } => strata,
+                _ => continue,
+            };
+            for column in selectors {
+                if resolve_column(column, Some(&expanded), expanded.len())? >= width {
+                    boundary = boundary.min(index);
+                }
+            }
+        }
+        Ok(Self {
+            programs,
+            order,
+            referenced_results,
+            width,
+            header: expanded,
+            boundary,
+        })
+    }
+
+    #[cfg(target_os = "linux")]
+    pub(super) fn sorted_partition(
+        &self,
+        dataset: &Dataset,
+        parent: &Group,
+        columns: &[usize],
+        job: &Job,
+        ctx: &Context,
+    ) -> Result<SortedRows> {
+        let mut sorter = Sorter::new(ctx, SortOrder::Key);
+        let mut evaluator = RowEvaluator::new(self, job, ctx);
+        let mut rows = dataset.rows(parent, ctx.max_record)?;
+        let mut previous = None;
+        while let Some(mut row) = rows.next_packed(previous.take())? {
+            evaluator.append(&mut row, ctx)?;
+            let key =
+                OperationKey::tuple(row.fields(), columns, 0, Reservation::new(ctx), &mut sorter)?;
+            let capacity = key.install(&mut row, &mut sorter)?;
+            previous = sorter.push_compact_reusing(row, capacity)?;
+        }
+        drop(rows);
+        drop(evaluator);
+        sorter.finish()
     }
 
     pub(super) fn apply(
         &self,
         dataset: &Dataset,
-        name: &str,
-        prior_columns: usize,
+        job: &Job,
         ctx: &Context,
         output: &mut impl RowSink,
     ) -> Result<()> {
-        output.physical_input(dataset.physical_source);
-        let mut scratch = Reservation::new(ctx);
-        let mut value = String::new();
+        use crate::observation::physical::Kind;
+        let mut observation = ctx.physical_span(Kind::Calculation);
+        output.physical_input(if observation.is_some() {
+            ctx.physical_identity(Kind::Calculation)
+        } else {
+            dataset.physical_source
+        });
+        let mut calculated_rows = 0;
+        let mut evaluator = RowEvaluator::new(self, job, ctx);
         for parent in dataset.groups()? {
             ctx.check()?;
             let parent = parent?;
@@ -114,67 +190,178 @@ impl Program {
             let mut rows = dataset.rows(&parent, ctx.max_record)?;
             let mut previous = None;
             while let Some(mut row) = rows.next_packed(previous.take())? {
-                ctx.check()?;
-                value.clear();
-                let kind = {
-                    let metadata = if prior_columns > 0 {
-                        Some(
-                            row.fields()
-                                .nth(self.width)
-                                .context("missing calculation metadata")?,
-                        )
-                    } else {
-                        None
-                    };
-                    let first_calculated = self.width - prior_columns;
-                    let field = |index| {
-                        let text = row.fields().nth(index)?;
-                        if index < first_calculated {
-                            Some(Value::Text(Cow::Borrowed(text)))
-                        } else {
-                            Value::from_stored(
-                                text,
-                                metadata?.chars().nth(index - first_calculated)?,
-                            )
-                        }
-                    };
-                    let mut reserve = |bytes| reserve_scratch(&mut scratch, bytes, ctx);
-                    let mut resource_failure = None;
-                    let evaluation = self.evaluate(&field, &mut |n| {
-                        reserve(n).map_err(|error| {
-                            let message = error.to_string();
-                            resource_failure = Some(error);
-                            message
-                        })
-                    });
-                    let (kind, result) = evaluation
-                        .map_err(|error| resource_failure.unwrap_or(error))
-                        .with_context(|| {
-                            format!("input record {}, calculated column {name:?}", row.id + 1)
-                        })?;
-                    if value.capacity() < result.len() {
-                        reserve(result.len())?;
-                        value.try_reserve_exact(result.len())?;
-                    }
-                    value.push_str(&result);
-                    kind
-                };
-                row.append_calculated(&value, kind, prior_columns > 0, ctx.max_record)
-                    .with_context(|| {
-                        format!("input record {}, calculated column {name:?}", row.id + 1)
-                    })?;
-                scratch.resize(value.capacity())?;
+                evaluator.append(&mut row, ctx)?;
+                calculated_rows += 1;
+                if let Some(observation) = &mut observation {
+                    observation.rows_processed(calculated_rows);
+                }
                 output.packed_row_ref(&mut group.group, &row)?;
                 previous = Some(row);
             }
             group.finish(output)?;
         }
+        if let Some(observation) = observation {
+            observation.finish(calculated_rows);
+        }
         Ok(())
     }
 }
 
-fn reserve_scratch(scratch: &mut Reservation, bytes: usize, ctx: &Context) -> Result<()> {
-    ctx.check()?;
+struct RowEvaluator<'a> {
+    plan: &'a Plan,
+    job: &'a Job,
+    values: [(String, char); 64],
+    scalars: [Option<Value<'static>>; 64],
+    retained: Reservation,
+}
+
+impl<'a> RowEvaluator<'a> {
+    fn new(plan: &'a Plan, job: &'a Job, ctx: &Context) -> Self {
+        Self {
+            plan,
+            job,
+            values: std::array::from_fn(|_| (String::new(), 'n')),
+            scalars: [const { None }; 64],
+            retained: Reservation::new(ctx),
+        }
+    }
+
+    #[inline(always)]
+    fn append(&mut self, row: &mut PackedRow, ctx: &Context) -> Result<()> {
+        let Self {
+            plan,
+            job,
+            values,
+            scalars,
+            retained,
+        } = self;
+        let count = job.calculated_columns.len();
+        ctx.check()?;
+        let (fields, payload) = row.field_sizes();
+        ensure!(
+            fields + count <= ctx.max_record / 24,
+            "input record {}, calculated row exceeds maximum record size",
+            row.id + 1
+        );
+        let mut remaining = ctx.max_record.saturating_sub(payload);
+        let mut scratch = retained.sibling();
+        for &index in &plan.order[..count] {
+            let (before, rest) = values.split_at_mut(index);
+            let ((value, kind), after) = rest.split_first_mut().unwrap();
+            let field = |column: usize| {
+                if column < plan.width {
+                    return row
+                        .fields()
+                        .nth(column)
+                        .map(|text| Value::Text(Cow::Borrowed(text)));
+                }
+                let relative = column - plan.width;
+                if let Some(value) = scalars.get(relative).and_then(Option::as_ref) {
+                    return scalar_value(value);
+                }
+                let (text, kind) = if relative < index {
+                    before.get(relative)?
+                } else {
+                    after.get(relative.checked_sub(index + 1)?)?
+                };
+                Value::from_stored(text, *kind)
+            };
+            let mut resource_failure = None;
+            let result = plan.programs[index]
+                .as_ref()
+                .unwrap()
+                .evaluate_retaining_scalar(
+                    &field,
+                    plan.referenced_results & (1 << index) != 0,
+                    &mut |bytes| {
+                        ctx.check()
+                            .and_then(|()| reserve_scratch_bytes(&mut scratch, bytes))
+                            .map_err(|error| {
+                                let message = error.to_string();
+                                resource_failure = Some(error);
+                                message
+                            })
+                    },
+                );
+            let (scalar, result_kind, rendered) = result
+                .map_err(|error| resource_failure.unwrap_or(error))
+                .with_context(|| {
+                    format!(
+                        "input record {}, calculated column {:?}",
+                        row.id + 1,
+                        job.calculated_columns[index].name
+                    )
+                })?;
+            remaining = remaining
+                .checked_sub(result_kind.len_utf8())
+                .and_then(|bytes| bytes.checked_sub(rendered.len()))
+                .with_context(|| {
+                    format!(
+                        "input record {}, calculated column {:?} exceeds maximum record size",
+                        row.id + 1,
+                        job.calculated_columns[index].name
+                    )
+                })?;
+            value.clear();
+            let previous_capacity = value.capacity();
+            if previous_capacity < rendered.len() {
+                let other_capacity = retained.bytes() as usize - previous_capacity;
+                reserve_scratch_bytes(retained, rendered.len())?;
+                value.try_reserve_exact(rendered.len())?;
+                retained.resize(other_capacity + value.capacity())?;
+            }
+            value.push_str(&rendered);
+            *kind = result_kind;
+            drop(rendered);
+            scalars[index] = scalar;
+            scratch.resize(0)?;
+        }
+        row.append_calculated(&values[..count], ctx.max_record)
+            .with_context(|| {
+                format!("input record {}, appending calculated columns", row.id + 1)
+            })?;
+        Ok(())
+    }
+}
+
+fn scalar_value(value: &Value<'_>) -> Option<Value<'static>> {
+    match value {
+        Value::Text(_) => None,
+        Value::Null => Some(Value::Null),
+        Value::Number(number) => Some(Value::Number(*number)),
+        Value::Bool(boolean) => Some(Value::Bool(*boolean)),
+        Value::Date(date) => Some(Value::Date(*date)),
+        Value::Timestamp(timestamp) => Some(Value::Timestamp(*timestamp)),
+    }
+}
+
+impl Program {
+    fn evaluate_retaining_scalar<'a>(
+        &'a self,
+        field: &(impl Fn(usize) -> Option<Value<'a>> + 'a),
+        retain_scalar: bool,
+        reserve: &mut chopper_core::expression::Reserve<'_>,
+    ) -> Result<(Option<Value<'static>>, char, Cow<'a, str>)> {
+        let value = self.expression.evaluate(field, reserve)?;
+        let scalar = if retain_scalar {
+            scalar_value(&value)
+        } else {
+            None
+        };
+        Ok((scalar, value.kind(), value.rendered(reserve)?))
+    }
+
+    fn evaluate<'a>(
+        &'a self,
+        field: &(impl Fn(usize) -> Option<Value<'a>> + 'a),
+        reserve: &mut chopper_core::expression::Reserve<'_>,
+    ) -> Result<(char, Cow<'a, str>)> {
+        let value = self.expression.evaluate(field, reserve)?;
+        Ok((value.kind(), value.rendered(reserve)?))
+    }
+}
+
+fn reserve_scratch_bytes(scratch: &mut Reservation, bytes: usize) -> Result<()> {
     scratch.resize(
         (scratch.bytes() as usize)
             .checked_add(bytes)
@@ -188,6 +375,9 @@ struct FormulaPreviewRequest {
     columns: usize,
     rows: Vec<Vec<String>>,
     calculations: Vec<PreviewCalculation>,
+    #[serde(default)]
+    include_references: bool,
+    target: Option<usize>,
 }
 
 #[derive(Deserialize)]
@@ -210,6 +400,8 @@ struct PreviewStep {
     operation: usize,
     error: Option<String>,
     rows: Vec<PreviewCell>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    references: Vec<usize>,
 }
 
 #[derive(Serialize)]
@@ -242,6 +434,8 @@ fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
         columns,
         rows,
         calculations,
+        include_references,
+        target,
     } = request;
     ensure!(
         rows.len() <= 8 && calculations.len() <= 64,
@@ -255,40 +449,107 @@ fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
     let mut memory = input_inspection_reservation(&Job::default())?;
     let mut steps: Vec<PreviewStep> = Vec::new();
     memory.reserve_vec(&mut steps, calculations.len())?;
-    let mut derived_header = None;
+    let expanded = Header::with_calculations(
+        header.as_deref(),
+        columns,
+        calculations.iter().map(|column| column.name.as_str()),
+        memory.sibling(),
+    )?;
+    let mut programs = [const { None }; 64];
+    let mut direct_references: [Vec<usize>; 64] = std::array::from_fn(|_| Vec::new());
     let mut display_bytes = 0;
-    for (index, calculation) in calculations.into_iter().enumerate() {
-        let mut step = PreviewStep {
-            operation: calculation.operation,
-            error: None,
-            rows: Vec::new(),
-        };
-        let source_header = derived_header.as_deref().or(header.as_deref());
+    for (index, calculation) in calculations.iter().enumerate() {
+        let mut reference_error = None;
+        let direct = &mut direct_references[index];
         let program = if calculation.name.is_empty() {
-            Err(anyhow::anyhow!("enter a calculated column name"))
+            Err(anyhow::anyhow!(
+                "enter a calculated column name. Use a unique name for the formula result"
+            ))
+        } else if expanded
+            .iter()
+            .filter(|name| **name == calculation.name)
+            .count()
+            > 1
+        {
+            Err(anyhow::anyhow!("calculated column name already exists. Choose a name that differs from all input and calculated columns"))
         } else {
             prepare(
                 &calculation.expression,
-                &calculation.name,
-                source_header,
-                columns + index,
+                &expanded,
+                columns,
                 if header.is_none() { columns } else { 0 },
                 memory.sibling(),
+                &mut |field| {
+                    if include_references && reference_error.is_none() {
+                        reference_error = add_preview_reference(&mut memory, direct, field).err();
+                    }
+                },
             )
         };
-        let (program, next_header) = match program {
-            Ok(prepared) => prepared,
-            Err(error) => {
-                step.error = Some(copy_preview_error(&mut memory, &error)?);
-                steps.push(step);
-                derived_header = Some(Header::append_for_preview(
-                    source_header,
-                    columns + index,
-                    &calculation.name,
-                    memory.sibling(),
-                )?);
-                continue;
+        if let Some(error) = reference_error {
+            return Err(error);
+        }
+        let error = match program {
+            Ok(program) => {
+                programs[index] = Some(program);
+                None
             }
+            Err(error) => Some(copy_preview_error(&mut memory, &error)?),
+        };
+        steps.push(PreviewStep {
+            operation: calculation.operation,
+            error,
+            rows: Vec::new(),
+            references: Vec::new(),
+        });
+    }
+    let dependency_closure = |mut mask: u64| {
+        let mut pending = mask;
+        while pending != 0 {
+            let index = pending.trailing_zeros() as usize;
+            pending &= pending - 1;
+            if let Some(program) = &programs[index] {
+                pending |= program.dependencies & !mask;
+                mask |= program.dependencies;
+            }
+        }
+        mask
+    };
+    let needed = if let Some(operation) = target {
+        let index = steps
+            .iter()
+            .position(|step| step.operation == operation)
+            .context("unknown formula preview target")?;
+        dependency_closure(1 << index)
+    } else {
+        u64::MAX
+    };
+    let mut completed = 0;
+    while let Some(index) = ready(&programs[..steps.len()], completed) {
+        completed |= 1 << index;
+        let Some(program) = programs[index].as_ref() else {
+            continue;
+        };
+        if needed & (1 << index) == 0 {
+            continue;
+        }
+        let mut references = Vec::new();
+        if include_references {
+            let mut dependencies = dependency_closure(1 << index);
+            while dependencies != 0 {
+                let dependency = dependencies.trailing_zeros() as usize;
+                dependencies &= dependencies - 1;
+                for &field in &direct_references[dependency] {
+                    add_preview_reference(&mut memory, &mut references, field)?;
+                }
+            }
+            references.sort_unstable();
+        }
+        let mut step = PreviewStep {
+            operation: steps[index].operation,
+            error: None,
+            rows: Vec::new(),
+            references,
         };
         memory.reserve_vec(&mut step.rows, rows.len())?;
         let mut scratch = memory.sibling();
@@ -339,8 +600,9 @@ fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
                 Err(error) => PreviewCell {
                     value: None,
                     error: Some(if dependency_failed.get() {
-                        memory
-                            .copy_string("An earlier calculated column has no value for this row")?
+                        memory.copy_string(
+                            "A referenced calculated column has no value for this row. Check the referenced formula for an error",
+                        )?
                     } else {
                         copy_preview_error(&mut memory, &error)?
                     }),
@@ -352,14 +614,32 @@ fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
             scratch.resize(0)?;
             step.rows.push(cell);
         }
-        steps.push(step);
-        derived_header = Some(next_header);
+        steps[index] = step;
+    }
+    for (index, step) in steps.iter_mut().enumerate() {
+        if completed & (1 << index) == 0 {
+            step.error = Some(memory.copy_string("Cyclic calculated column dependency. Edit a formula to remove its reference back to this column")?);
+        }
     }
     Ok(FormulaPreview {
         functions: chopper_core::expression::FUNCTIONS,
         steps,
         _memory: memory,
     })
+}
+
+fn add_preview_reference(
+    memory: &mut Reservation,
+    fields: &mut Vec<usize>,
+    field: usize,
+) -> Result<()> {
+    if !fields.contains(&field) {
+        if fields.len() == fields.capacity() {
+            memory.reserve_vec(fields, fields.capacity().max(2) * 2)?;
+        }
+        fields.push(field);
+    }
+    Ok(())
 }
 
 fn copy_preview_error(memory: &mut Reservation, error: &anyhow::Error) -> Result<String> {

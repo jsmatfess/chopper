@@ -1,5 +1,7 @@
 import type {Job, State} from './app';
 import {configureTheme} from './theme';
+import {configureColumnExplorer} from './column-explorer';
+import type {FormulaInsertionTarget} from './formula-editor';
 import {runCommand,defaultCommandPlatform,type CommandPlatform} from './run-command';
 import {version} from '../package.json';
 
@@ -7,12 +9,13 @@ const cliVersion=version.split('.').slice(0,2).join('.');
 
 // Presentation only: move the existing form controls, preserving their listeners,
 // validation and configuration. The native entry point never calls this module.
-export function configureHostedWorkspace() {
+export function configureHostedWorkspace(formula:FormulaInsertionTarget) {
   const get = (id: string) => document.getElementById(id)!;
   const label = (id: string) => get(id).closest('.quantity-field,label')!;
   const symbols:Record<string,string>={
     source:'<path d="M14 2H6a2 2 0 0 0-2 2v16h16V8z"/><path d="M14 2v6h6M8 12h8M8 16h5"/>',
     output:'<path d="M3 13h5l2 3h4l2-3h5v7H3zM12 3v9m-4-4 4 4 4-4"/>',
+    calculations:'<path d="M4 5h16v14H4zM10 5v14M4 10h16m-7 4h4m-2-2v4"/>',
     pipeline:'<rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><path d="M9 6h6a3 3 0 0 1 3 3v6M6 9v9h9"/>',
     resources:'<path d="M5 3v6m0 4v8M12 3v12m0 4v2M19 3v2m0 4v12M2 9h6M9 15h6M16 5h6"/>',
     plan:'<path d="M8 5h13M8 12h13M8 19h13"/><path d="m2 5 1 1 2-2m-3 8 1 1 2-2m-3 8 1 1 2-2"/>',
@@ -25,7 +28,7 @@ export function configureHostedWorkspace() {
   }
   const form = get('job-form');
   const cards = form.querySelectorAll<HTMLElement>(':scope > section');
-  const [source, pipeline, limits] = cards;
+  const [source, calculations, pipeline, limits] = cards;
   document.body.classList.add('hosted-workspace');
   configureTheme();
   const footer=document.querySelector('footer')!;
@@ -43,7 +46,7 @@ export function configureHostedWorkspace() {
   document.querySelector('.local-badge')!.remove();
   const nav = document.createElement('nav');
   nav.className = 'workspace-nav'; nav.setAttribute('aria-label','Workspace steps');
-  nav.innerHTML = '<a href="#source">Source</a><a href="#output-settings">Output</a><a href="#pipeline">Pipeline</a><a href="#review">Resources</a>';
+  nav.innerHTML = '<a href="#source">Source</a><a href="#output-settings">Output</a><a href="#calculated-columns">Columns</a><a href="#pipeline">Pipeline</a><a href="#review">Resources</a>';
   const toolbar=document.createElement('div');toolbar.className='workspace-toolbar';
   const dock=document.createElement('div');dock.id='run-dock';
   dock.setAttribute('role','region');dock.setAttribute('aria-label','Run controls');
@@ -52,7 +55,7 @@ export function configureHostedWorkspace() {
   const run=get('run-direct');run.classList.remove('full');setup.append(run);
   const processing=document.createElement('div');processing.id='processing-strip';processing.hidden=true;
   processing.setAttribute('role','region');processing.setAttribute('aria-label','Processing status');
-  processing.innerHTML='<div class="processing-inner"><div class="processing-copy"><span class="processing-dot" aria-hidden="true"></span><span id="processing-activity" role="status"></span><span id="processing-elapsed"></span></div><div class="processing-actions"><button type="button" class="secondary" id="processing-view">View execution</button><span class="processing-cancel"></span></div></div>';
+  processing.innerHTML='<div class="processing-inner"><div class="processing-copy"><span class="processing-dot" aria-hidden="true"></span><span id="processing-activity" role="status"></span><div class="processing-metrics"><span id="processing-rows" hidden></span><span id="processing-elapsed"></span></div></div><div class="processing-actions"><button type="button" class="secondary" id="processing-view">View execution</button><span class="processing-cancel"></span></div></div>';
   const cancel=get('cancel');cancel.textContent='Cancel';cancel.classList.remove('full');
   processing.querySelector('.processing-cancel')!.replaceWith(cancel);
   dock.append(setup,processing);document.body.append(dock);
@@ -127,7 +130,7 @@ export function configureHostedWorkspace() {
   pipeline.querySelector('.hint')!.textContent = 'Steps run in order, within the preceding groups.';
   pipeline.querySelector<HTMLElement>('.tag')!.id = 'pipeline-count';
   title(limits,'review','04','Resources');
-  for(const [card,key] of [[source,'source'],[pipeline,'pipeline'],[output,'output'],[limits,'resources']] as const)decorate(card,key);
+  for(const [card,key] of [[source,'source'],[calculations,'calculations'],[pipeline,'pipeline'],[output,'output'],[limits,'resources']] as const)decorate(card,key);
   const reviewBody = limits.querySelector('.section-body')!;
   const resources=get('resource-settings');
   reviewBody.replaceChildren(label('execution-mode'),get('execution-mode-help'),resources);
@@ -152,7 +155,7 @@ export function configureHostedWorkspace() {
   get('memory-help').textContent='Automatic chooses a budget at Run, usually up to 256 MiB. Manual uses 1 MiB increments. This budget covers working allocations, not total browser memory.';
   for(const id of ['zip-member']){const input=get(id) as HTMLInputElement;input.spellcheck=false;input.setAttribute('autocapitalize','none');}
 
-  for(const card of [source,output,pipeline,limits]){
+  for(const card of [source,output,calculations,pipeline,limits]){
     sectionObserver.observe(card);
     card.addEventListener('click',()=>{
       selectedNavigation=navLinks.find(link=>link.hash===`#${card.id}`)!;selectedScrollY=scrollY;
@@ -166,24 +169,38 @@ export function configureHostedWorkspace() {
   const preview=document.createElement('details');preview.id='source-preview';preview.hidden=true;preview.open=true;
   preview.innerHTML='<summary>Input preview <span id="source-sample-note"></span></summary>';
   const previewCard=get('preview-card');previewCard.classList.remove('card');previewCard.querySelector('.section-title')!.remove();preview.append(previewCard);facts.after(preview);
-  const values=document.createElement('section');values.id='input-values';values.hidden=true;
-  values.innerHTML='<div class="input-values-heading"><h3>Column values</h3><span id="input-values-count"></span></div><p class="hint" id="input-values-origin"></p><label class="input-values-filter">Find a column<input type="search" data-inspection-search placeholder="Column name" autocomplete="off"></label><div class="input-values-list"></div><p class="hint input-values-empty" hidden>No matching columns.</p>';
   const analyze=document.createElement('div');analyze.className='source-analysis-action';
   analyze.innerHTML='<p id="analyze-advice" class="hint"></p>';
-  const profile=get('profile');profile.textContent='Analyze input';profile.setAttribute('aria-describedby','analyze-advice');
+  const profile=get('profile') as HTMLButtonElement;profile.textContent='Analyze input';profile.setAttribute('aria-describedby','analyze-advice');
   const oldAnalyzeActions=profile.parentElement!;
   analyze.prepend(profile);oldAnalyzeActions.remove();
-  preview.after(analyze,get('input-profile'),values);
-  const valuesSearch=values.querySelector<HTMLInputElement>('input')!,valuesList=values.querySelector<HTMLElement>('.input-values-list')!;
-  function filterValues(){const query=valuesSearch.value.trim().toLocaleLowerCase();let matches=0;for(const row of valuesList.querySelectorAll<HTMLElement>('details')){row.hidden=!row.dataset.search!.includes(query);if(!row.hidden)matches++;}values.querySelector<HTMLElement>('.input-values-empty')!.hidden=matches>0;}
-  valuesSearch.addEventListener('input',filterValues);
-  let valuesKey='';
+  const inputProfile=get('input-profile');
+  const explorer=configureColumnExplorer(profile,formula);
+  const values=explorer.panel;
+  preview.after(analyze,inputProfile,values);
   const actions = form.querySelector('.actions')!;
   const portable = document.createElement('div'); portable.className = 'job-portability';
   portable.append(get('import'),get('import-file'),get('export')); sourceBody.append(portable);
   actions.remove();
   const results = document.querySelector('.results')!;
-  const workspace=document.querySelector('.workspace')!,shell=document.createElement('div');shell.className='configuration-shell';workspace.before(shell);shell.append(toolbar,workspace);
+  const workspace=document.querySelector('.workspace')!,shell=document.createElement('div');shell.className='configuration-shell';workspace.before(shell);
+  const sidebar=document.createElement('div');sidebar.className='workspace-sidebar';
+  sidebar.append(toolbar);shell.append(sidebar,workspace);
+  function placeColumnValues(){
+    const parent=wideNavigation.matches?sidebar:inputProfile.parentElement!;
+    if(values.parentElement===parent)return;
+    const before=wideNavigation.matches?null:inputProfile.nextSibling;
+    const moveBefore=(parent as HTMLElement & {moveBefore?:(node:Node,before:Node|null)=>void}).moveBefore;
+    if(moveBefore){
+      moveBefore.call(parent,values,before);
+    }else{
+      const focused=document.activeElement;
+      parent.insertBefore(values,before);
+      if(focused instanceof HTMLElement&&values.contains(focused))focused.focus({preventScroll:true});
+    }
+  }
+  placeColumnValues();
+  wideNavigation.addEventListener('change',placeColumnValues);
   const execution=document.createElement('section');execution.className='execution-pane';execution.setAttribute('aria-label','Execution graph');
   execution.innerHTML='<div class="execution-live" id="execution-live" hidden><strong id="execution-phase"></strong><span id="execution-counters"></span><button type="button" id="execution-results-link" class="text-button" hidden>View results</button></div><div class="execution-empty card"><h2>Execution will appear here</h2><p>Run your pipeline to follow its execution.</p></div>';
   workspace.prepend(execution);
@@ -299,9 +316,16 @@ export function configureHostedWorkspace() {
   };
   nav.addEventListener('click',event=>{
     const link=(event.target as HTMLElement).closest<HTMLAnchorElement>('a');
-    if(!link)return;
+    if(!link||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+    event.preventDefault();
     const target=get(link.hash.slice(1));
-    target.focus();
+    target.focus({preventScroll:true});
+    target.scrollIntoView({block:'start',behavior:'instant'});
+    selectedNavigation=link;
+    selectedScrollY=scrollY;
+    nav.dataset.selected=target.id;
+    if(location.hash!==link.hash)history.pushState(history.state,'',link.hash);
+    syncNavigation();
   });
   // Native validation must be able to reveal an invalid control in a disclosure.
   form.addEventListener('invalid',event=>{
@@ -327,7 +351,8 @@ export function configureHostedWorkspace() {
       button.onclick=next?.reveal??null;
       get('run-readiness').textContent=next?'':'Ready to run';
     },
-    preview(schema:{columns:number;preview:string[][]}|null,failed=false){
+    preview(schema:{columns:number;header:string[]|null;preview:string[][]}|null,failed=false){
+      if(schema)explorer.source(schema);
       const input=get('input') as HTMLInputElement;
       facts.hidden=!input.value;preview.hidden=!failed&&!schema?.preview.length;
       const bytes=input.dataset.fileName===input.value?Number(input.dataset.fileBytes):NaN;
@@ -336,39 +361,8 @@ export function configureHostedWorkspace() {
       facts.textContent=[fileSize,schema?`${schema.columns.toLocaleString()} columns`:null].filter(Boolean).join(' · ')||'File details available after choosing a source with Browse.';
       get('source-sample-note').textContent=schema?`${schema.preview.length.toLocaleString()} sample row${schema.preview.length===1?'':'s'}`:'';
     },
-    values(columns:{column:number;values:string[];frequencies?:Record<string,number>;truncated:boolean;distinct?:number;distinct_exact?:boolean}[],header:string[]|null,origin:string,rows=0){
-      const key=JSON.stringify([columns,header,origin,rows]);if(key===valuesKey)return;valuesKey=key;
-      values.hidden=!columns.length;
-      if(!columns.length){valuesList.replaceChildren();valuesSearch.value='';return;}
-      const expanded=new Set([...valuesList.querySelectorAll<HTMLDetailsElement>('details[open]')].map(row=>row.dataset.column));
-      valuesList.replaceChildren();
-      get('input-values-count').textContent=`${columns.length.toLocaleString()} analyzed`;
-      get('input-values-origin').textContent=`${origin} · selected columns only.`;
-      valuesSearch.closest('label')!.hidden=columns.length<6;
-      for(const column of columns){
-        const row=document.createElement('details'),summary=document.createElement('summary'),indexLabel=document.createElement('span'),name=document.createElement('span'),count=document.createElement('span'),list=document.createElement('ul'),note=document.createElement('small');
-        row.className='column-values-row';row.dataset.column=String(column.column);row.dataset.countKind=column.distinct===undefined?'values':column.distinct_exact?'exact':'estimated';
-        indexLabel.className='column-values-index';indexLabel.textContent=`#${column.column}`;indexLabel.setAttribute('aria-hidden','true');row.open=expanded.has(row.dataset.column);
-        name.className='column-values-name';name.textContent=header?.[column.column]??`Column #${column.column}`;row.dataset.search=name.textContent.toLocaleLowerCase();
-        count.className='column-values-count';count.textContent=column.distinct===undefined?`${column.values.length.toLocaleString()}${column.truncated?'+':''} values shown`:`${column.distinct_exact?'':'~'}${column.distinct.toLocaleString()} distinct · ${column.distinct_exact?'exact':'estimated'}`;
-        list.className='value-chips';list.setAttribute('role','list');list.tabIndex=0;list.setAttribute('aria-label',`Retained values for ${name.textContent}`);for(const value of column.values){const item=document.createElement('li');item.textContent=value||'(empty)';if(value==='')item.dataset.empty='true';list.append(item);}
-        const frequencies=column.frequencies;
-        const ranked=column.values.map(value=>({value,count:frequencies&&Object.hasOwn(frequencies,value)?frequencies[value]:NaN}));
-        const shares=!column.truncated&&rows>0&&ranked.length>0&&ranked.every(entry=>Number.isSafeInteger(entry.count)&&entry.count>0)&&ranked.reduce((sum,entry)=>sum+entry.count,0)===rows;
-        if(shares){
-          ranked.sort((a,b)=>b.count-a.count);list.classList.add('value-distribution');list.setAttribute('aria-label',`Value shares for ${name.textContent}, largest first`);list.replaceChildren();
-          for(const {value,count:frequency} of ranked){
-            const item=document.createElement('li'),label=document.createElement('span'),share=document.createElement('span'),track=document.createElement('span'),fill=document.createElement('span');
-            label.className='value-label';label.textContent=value||'(empty)';share.className='value-share';
-            const percent=100*frequency/rows;share.textContent=percent<0.1?'<0.1%':`${percent.toLocaleString(undefined,{maximumFractionDigits:1})}%`;
-            item.title=`${frequency.toLocaleString()} of ${rows.toLocaleString()} input rows`;track.className='value-track';track.setAttribute('aria-hidden','true');fill.className='value-fill';fill.style.inlineSize=`${percent}%`;track.append(fill);item.append(label,share,track);list.append(item);
-          }
-        }
-        note.textContent=shares?'Share of all input rows · exact counts · largest first.':column.truncated?`Showing ${column.values.length.toLocaleString()} values; more exist. Shares omitted for this column.`:`All ${column.values.length.toLocaleString()} values shown.`;
-        summary.append(indexLabel,name,count);row.append(summary,list,note);valuesList.append(row);
-      }
-      filterValues();
-    },
+    resetColumnExplorer:explorer.reset,
+    values:explorer.values,
     draft(job: Job | null, operations: number) {
       cliJob=job;renderCommand();
       get('pipeline-count').textContent = operations ? `${operations} step${operations===1?'':'s'}` : 'Optional';
@@ -404,6 +398,7 @@ export function configureHostedWorkspace() {
       get('result-message').textContent=resultMessage;
       resultPath.hidden=!resultMessage;
       resultPath.classList.toggle('complete',!!output);
+      explorer.processing(busy,state.status==='profiling');
       processing.hidden=!busy;setup.hidden=busy;get('execution-live').hidden=!busy&&!completed;
       const viewResults=get('execution-results-link');viewResults.hidden=!completed;
       if(completed){
@@ -424,6 +419,13 @@ export function configureHostedWorkspace() {
         processingStarted??=performance.now();
         const phase=state.progress.phase||'Processing',activity=get('processing-activity');
         if(activity.textContent!==phase)activity.textContent=activity.title=phase;
+        const rows=get('processing-rows');
+        rows.hidden=state.status!=='profiling';
+        if(!rows.hidden){
+          const count=state.progress.rows;
+          const label=`${count.toLocaleString()} ${count===1?'row':'rows'} scanned`;
+          if(rows.textContent!==label)rows.textContent=label;
+        }
         get('processing-elapsed').textContent=`${Math.floor((performance.now()-processingStarted)/1000).toLocaleString()} s elapsed`;
       }else{
         processingStarted=null;
@@ -432,7 +434,7 @@ export function configureHostedWorkspace() {
       scheduleNavigation();
       report.hidden=!state.analysis&&['idle','profiled','profiling','running'].includes(state.status);
       get('analysis').setAttribute('aria-label',dirty?'Previous processing result; draft has changed':'Processing result');
-      if(finished&&['complete','failed','profiled'].includes(state.status)&&!(document.activeElement as HTMLElement|null)?.closest('#job-form')){
+      if(finished&&['complete','failed','profiled'].includes(state.status)&&!(document.activeElement as HTMLElement|null)?.closest('#job-form,#input-values')){
         const active=document.activeElement as HTMLElement|null;
         if(view==='execution'&&state.status!=='failed'){
           if(active?.closest('#run-dock')||active===get('cancel')||active===document.body)heading.focus({preventScroll:true});

@@ -6,7 +6,7 @@ Status: behavior contract and original design baseline, with explicit later exte
 
 - Native CLI for technical users on supported 64-bit Windows and Linux; a separate hosted browser UI uses the same engine and job configuration. macOS source builds are unqualified. No local server or native UI is part of current product scope.
 - Local files, including gzip and ZIP inputs and outputs.
-- Ordered operations include balanced and interleaved splitting, value partitions, exact and probabilistic allocation, shuffling, and calculated columns. Final caps bound row count and serialized CSV bytes.
+- Ordered operations include balanced and interleaved splitting, value partitions, exact and probabilistic allocation, and shuffling. Jobs can also declare calculated columns. Final caps bound row count and serialized CSV bytes.
 - Typical inputs: tens of thousands to millions of rows. Scale target: one billion rows, potentially several KB per row, with bounded working memory and sufficient external storage.
 - Analysis and confirmation, progress, cancellation and cleanup, safe publication, and output manifests.
 - Fully client-side hosted UI is implemented; see [browser execution and limits](browser.md). Resumable jobs remain deferred. GPU acceleration has been assessed and deferred; there is no GPU dependency.
@@ -75,20 +75,25 @@ consecutive ranges.
 
 ### Calculated columns
 
-A calculation step appends one uniquely named column. Its formula operates on
-the current row and can reference input columns and earlier calculations by
-exact header name or zero-based index. Later steps can partition or stratify
-by the calculated column. The step preserves row count, encounter order, and
+A Job declares calculated columns separately from its ordered operations.
+Each formula operates on the current row and can reference input fields and
+other calculated columns by exact name or zero-based index. References may point
+to later definitions. Cyclic references and names that collide with input
+headers are rejected when the source schema is bound. Partition and allocation
+strata can select calculated fields anywhere in the pipeline.
+
+The planner evaluates the formulas together once per row, in dependency order,
+before the first consuming operation or during output preparation. Output
+retains declaration order. Evaluation preserves row count, encounter order, and
 group membership. Typed results survive working storage and spills. Partition
-keys and CSV output use the result's field text, including an empty field for
-`NULL` and UTC text for timestamps. Generated headers and fields count toward
+keys and CSV output use rendered field text, including an empty field for
+`NULL` and UTC text for timestamps. Calculated headers and fields count toward
 the serialized byte cap.
 
-Validate checks formula syntax without opening input. Analyze binds references
-to the observed input schema and continues to report advisory input statistics.
-Run binds against its current input and evaluates each calculated column once
-per incoming row. A failed evaluation identifies the input record and column.
-See the [saved Job and formula guide](job-json.md#formulas) for syntax and
+Validate checks formula syntax without opening input. Analyze binds references to
+the observed input schema and reports advisory input statistics. Run binds
+against its current input. A failed evaluation identifies the input record and column.
+See the [function reference](formula-functions.md) for syntax and
 function behavior.
 
 ### Partition by column values
@@ -206,7 +211,26 @@ Original proposed analysis modes (not a list of implemented modes):
 2. Exact: full validation with external aggregation or pipeline simulation for exact statistics where possible. Compressed sizes and runtime remain estimates.
 3. Quick preview: bounded sample for early configuration feedback. Explicitly incomplete; cannot certify validity, exact counts, or unseen rare values. Required validation still occurs before publication.
 
-The Analyze action returns a full-file input profile; see [implemented profiling and cache behavior](performance.md#full-file-input-profiling-2026-10-12). The UI also requests a bounded input sample on source selection, import and parser changes: at most eight data records are inspected, retaining at most eight rows and 32 KiB of field text with admitted field/container overhead. This sample does not validate unseen records or predict counts, cardinalities or output sizes. Full-file profiles and prepared analyses also report exact per-value input-row frequencies when a column’s bounded value list is complete (at most 100 values per column and 256 KiB of display values overall). Frequencies include empty fields, count during the existing input pass, and are discarded on truncation. These counts describe input values, not final pipeline groups; incomplete lists never imply a partial percentage distribution. A predictive resource planner remains future work.
+The Analyze action returns a [full-file input profile](performance.md#full-file-input-profiling-2026-10-12)
+for every source column. The hosted Column explorer lists column names as soon
+as the input preview loads. Analyze adds counts and distributions where
+available. The explorer sits below the navigation on wide screens and in
+Source on narrower screens. It retains source statistics across job edits
+while the input, ZIP member, and input parser settings are the same. Pipeline
+estimates apply to the job configuration analyzed.
+
+Full-file profiles and prepared analyses report exact per-value input-row
+frequencies for columns with complete value lists. Lists retain at most 100
+values per column and 256 KiB overall. Frequencies include empty fields, count
+during the input pass, and are discarded on truncation. Incomplete lists do not
+imply a partial percentage distribution. These counts describe source values.
+Run computes final pipeline groups.
+
+The UI also requests a bounded sample on source selection, import, and parser
+changes. It inspects at most eight data records, retaining up to eight rows and
+32 KiB of field text with admitted field and container overhead. This sample
+does not validate unseen records or predict counts, cardinalities, or output
+sizes.
 
 HyperLogLog reduces cardinality tracking memory, not bytes read for a full-file scan. It cannot enumerate partition values or supply exact per-partition allocation counts. Estimates of cardinality alone cannot determine capped output counts because group sizes and row lengths matter. Do not extrapolate sampled unique counts as though they were full-stream HLL results.
 

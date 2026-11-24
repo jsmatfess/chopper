@@ -390,35 +390,21 @@ fn selections(
     let mut reservation = owner.sibling();
     let mut selections = Vec::new();
     reservation.reserve_vec(&mut selections, job.operations.len())?;
-    let mut derived_header = None;
-    let mut current_width = width;
-    for (step, operation) in job.operations.iter().enumerate() {
-        let current_header = derived_header.as_deref().or(header);
-        if let Operation::Calculate { name, expression } = operation {
-            let next = if bind_formulas {
-                engine::calculation::prepare(
-                    expression,
-                    name,
-                    current_header,
-                    current_width,
-                    if header.is_none() { width } else { 0 },
-                    owner.sibling(),
-                )
-                .map(|(_, header)| header)
-            } else {
-                engine::calculation::schema_after(
-                    current_header,
-                    current_width,
-                    name,
-                    owner.sibling(),
-                )
-            }
-            .with_context(|| format!("calculated column {name:?} at operation {}", step + 1))?;
-            derived_header = Some(next);
-            current_width += 1;
-            selections.push(Vec::new());
-            continue;
-        }
+    let expanded = if job.calculated_columns.is_empty() {
+        None
+    } else if bind_formulas {
+        Some(engine::calculation::Plan::prepare(job, header, width, owner.sibling())?.header)
+    } else {
+        Some(engine::calculation::schema(
+            job,
+            header,
+            width,
+            owner.sibling(),
+        )?)
+    };
+    let current_header = expanded.as_deref().or(header);
+    let current_width = width + job.calculated_columns.len();
+    for operation in &job.operations {
         let columns = match operation {
             Operation::Partition { columns } => columns.as_slice(),
             Operation::Assign { strata, .. } | Operation::AssignProbabilistic { strata, .. } => {
@@ -444,7 +430,6 @@ fn selections(
 }
 fn strategy(operation: &Operation, job: &Job) -> &'static str {
     match operation {
-        Operation::Calculate { .. } => "Evaluate the prepared expression once per row",
         Operation::Partition { .. } if engine::bounded_final_partition_shape(job) => {
             "Bounded final writers (experimental shape; admission still required)"
         }
@@ -513,8 +498,7 @@ impl ProfileCache {
                 cache_hit = partition_columns.is_none_or(|columns| {
                     observations.partition_for(columns, &wanted[0]).is_some()
                 }) && wanted.iter().all(|indices| match indices.as_slice() {
-                    [] => true,
-                    [column] => p.column_values.iter().any(|c| c.column == *column),
+                    [] | [_] => true,
                     _ => observations
                         .combinations
                         .iter()
@@ -598,8 +582,7 @@ impl ProfileCache {
                 [] => (None, false),
                 [column] => profile
                     .column_values
-                    .iter()
-                    .find(|c| c.column == *column)
+                    .get(*column)
                     .map_or((None, false), |c| (Some(c.distinct), c.distinct_exact)),
                 _ => (
                     observations
@@ -711,45 +694,22 @@ fn scan_configured(
     let columns = input.columns();
     let (wanted, _selection_buffers) =
         selections(job, header.as_deref(), columns, &scan_buffers, false)?;
-    // All profiling collections use vectors with visible, reserved capacities.
-    // Sorted bounded value vectors preserve the BTreeSet's JSON order exactly.
-    let mut selected = Vec::new();
-    scan_buffers.reserve_vec(&mut selected, 64)?;
-    for &column in wanted.iter().flatten() {
-        if let Err(index) = selected.binary_search(&column) {
-            ensure!(
-                selected.len() < 64,
-                "input profiling supports up to 64 selected columns"
-            );
-            selected.insert(index, column);
-        }
-    }
-    let mut indices = Vec::new();
-    scan_buffers.reserve_vec(&mut indices, columns.min(64))?;
-    indices.extend(selected.iter().copied());
+    // Source column summaries are independent of the pipeline. Admit the
+    // summary descriptors up front and allocate sketches only on truncation.
+    let mut column_values = Vec::new();
+    metadata_buffers.reserve_vec(&mut column_values, columns)?;
+    let mut sketches: Vec<Option<Box<Cardinality>>> = Vec::new();
+    scan_buffers.reserve_vec(&mut sketches, columns)?;
     for column in 0..columns {
-        if indices.len() == 64 {
-            break;
-        }
-        if selected.binary_search(&column).is_err() {
-            indices.push(column);
-        }
-    }
-    indices.sort_unstable();
-    let mut stats = Vec::new();
-    scan_buffers.reserve_vec(&mut stats, indices.len())?;
-    for column in indices {
-        stats.push((
-            ColumnProfile {
-                column,
-                values: Vec::new(),
-                frequencies: Default::default(),
-                truncated: false,
-                distinct: 0,
-                distinct_exact: false,
-            },
-            Cardinality::default(),
-        ));
+        column_values.push(ColumnProfile {
+            column,
+            values: Vec::new(),
+            frequencies: Default::default(),
+            truncated: false,
+            distinct: 0,
+            distinct_exact: false,
+        });
+        sketches.push(None);
     }
     let mut combinations: Vec<(Vec<usize>, Cardinality)> = Vec::new();
     scan_buffers.reserve_vec(
@@ -773,14 +733,9 @@ fn scan_configured(
     let mut values_bytes = 0;
     let mut preview = Vec::new();
     let mut preview_bytes = 0;
-    let mut records = records::Records::new(
-        input,
-        first,
-        job,
-        stats.len() + combinations.len(),
-        parallel,
-    );
-    while let Some(record) = records.next(&stats, &combinations, cancel)? {
+    let mut records =
+        records::Records::new(input, first, job, columns + combinations.len(), parallel);
+    while let Some(record) = records.next(&combinations, cancel)? {
         let fields = record.fields;
         let row_bytes = fields.iter().map(|field| field.len() as u64).sum();
         decoded_field_bytes += row_bytes;
@@ -790,48 +745,58 @@ fn scan_configured(
             partition_buckets[hash.as_bytes()[0] as usize % 64] += 1;
         }
         ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
-        for (i, (summary, cardinality)) in stats.iter_mut().enumerate() {
-            let value = &fields[summary.column];
+        for (i, (summary, cardinality)) in column_values.iter_mut().zip(&mut sketches).enumerate() {
+            let value = &fields[i];
             if let Some(count) = summary.frequencies.get_mut(value.as_str()) {
                 *count += 1;
                 continue;
             }
-            let position = (!summary.truncated).then(|| summary.values.binary_search(value));
-            cardinality.add(
+            let hash = || {
                 record
                     .hashes
-                    .map_or_else(|| blake3::hash(value.as_bytes()), |hashes| hashes[i]),
-            );
-            if !summary.truncated {
-                if summary.values.len() == 100 || values_bytes + value.len() + 64 > 256 * 1024 {
-                    summary.truncated = true;
-                    let frequency_bytes = summary.frequencies.len() * FREQUENCY_NODE_BYTES
-                        + summary
-                            .frequencies
-                            .keys()
-                            .map(String::capacity)
-                            .sum::<usize>();
-                    summary.frequencies.clear();
-                    metadata_buffers.resize(metadata_buffers.bytes() as usize - frequency_bytes)?;
-                } else {
-                    values_bytes += value.len() + 64;
-                    let capacity = (summary.values.capacity().max(4) * 2).min(100);
-                    if summary.values.len() == summary.values.capacity() {
-                        metadata_buffers.reserve_vec(&mut summary.values, capacity)?;
-                    }
-                    metadata_buffers
-                        .resize(metadata_buffers.bytes() as usize + FREQUENCY_NODE_BYTES)?;
-                    let counted = metadata_buffers.copy_string(value)?;
-                    let copy = metadata_buffers.copy_string(value)?;
-                    summary.frequencies.insert(counted, 1);
-                    summary.values.insert(position.unwrap().unwrap_err(), copy);
+                    .map_or_else(|| blake3::hash(value.as_bytes()), |hashes| hashes[i])
+            };
+            if let Some(sketch) = cardinality {
+                sketch.add(hash());
+                continue;
+            }
+            if summary.values.len() == 100 || values_bytes + value.len() + 64 > 256 * 1024 {
+                scan_buffers
+                    .resize(scan_buffers.bytes() as usize + std::mem::size_of::<Cardinality>())?;
+                let mut sketch = Box::<Cardinality>::default();
+                for previous in &summary.values {
+                    sketch.add(blake3::hash(previous.as_bytes()));
                 }
+                sketch.add(hash());
+                *cardinality = Some(sketch);
+                summary.truncated = true;
+                let frequency_bytes = summary.frequencies.len() * FREQUENCY_NODE_BYTES
+                    + summary
+                        .frequencies
+                        .keys()
+                        .map(String::capacity)
+                        .sum::<usize>();
+                summary.frequencies.clear();
+                metadata_buffers.resize(metadata_buffers.bytes() as usize - frequency_bytes)?;
+            } else {
+                values_bytes += value.len() + 64;
+                let capacity = (summary.values.capacity() * 2).clamp(1, 100);
+                if summary.values.len() == summary.values.capacity() {
+                    metadata_buffers.reserve_vec(&mut summary.values, capacity)?;
+                }
+                metadata_buffers
+                    .resize(metadata_buffers.bytes() as usize + FREQUENCY_NODE_BYTES)?;
+                let counted = metadata_buffers.copy_string(value)?;
+                let copy = metadata_buffers.copy_string(value)?;
+                let position = summary.values.binary_search(value).unwrap_err();
+                summary.frequencies.insert(counted, 1);
+                summary.values.insert(position, copy);
             }
         }
         for (i, (indices, cardinality)) in combinations.iter_mut().enumerate() {
             let hash = record.hashes.map_or_else(
                 || combination_hash(fields, indices),
-                |hashes| hashes[stats.len() + i],
+                |hashes| hashes[columns + i],
             );
             cardinality.add(hash);
             if first_partition.is_some_and(|wanted| wanted == indices) {
@@ -874,19 +839,11 @@ fn scan_configured(
         }
     }
     let mut execution = records.execution;
-    let mut column_values = Vec::new();
-    metadata_buffers.reserve_vec(&mut column_values, stats.len())?;
-    for (mut summary, cardinality) in stats {
+    for (summary, cardinality) in column_values.iter_mut().zip(sketches) {
         summary.distinct_exact = !summary.truncated;
-        summary.distinct = if summary.distinct_exact {
-            summary.values.len() as u64
-        } else {
-            cardinality
-                .estimate()
-                .max(summary.values.len() as u64)
-                .min(rows)
-        };
-        column_values.push(summary);
+        let retained = summary.values.len() as u64;
+        summary.distinct =
+            cardinality.map_or(retained, |sketch| sketch.estimate().max(retained).min(rows));
     }
     let mut retained_combinations = Vec::new();
     combination_buffers.reserve_vec(&mut retained_combinations, combinations.len())?;

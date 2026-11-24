@@ -26,38 +26,29 @@ impl Header {
     fn admit(fields: Vec<String>, memory: Reservation) -> Result<Self> {
         Shared::admit(fields, memory).map(Self)
     }
-    pub(super) fn appended(
-        previous: Option<&[String]>,
+    pub(super) fn with_calculations<'a>(
+        source: Option<&[String]>,
         width: usize,
-        name: &str,
-        memory: Reservation,
-    ) -> Result<Self> {
-        ensure!(
-            !previous.is_some_and(|fields| fields.iter().any(|field| field == name)),
-            "calculated column {name:?} already exists"
-        );
-        Self::append_for_preview(previous, width, name, memory)
-    }
-
-    pub(super) fn append_for_preview(
-        previous: Option<&[String]>,
-        width: usize,
-        name: &str,
+        names: impl ExactSizeIterator<Item = &'a str>,
         mut memory: Reservation,
     ) -> Result<Self> {
         let mut fields = Vec::new();
         memory.reserve_vec(
             &mut fields,
-            width.checked_add(1).context("column count overflow")?,
+            width
+                .checked_add(names.len())
+                .context("column count overflow")?,
         )?;
-        if let Some(previous) = previous {
-            for field in previous {
+        if let Some(source) = source {
+            for field in source {
                 fields.push(memory.copy_string(field)?);
             }
         } else {
             fields.resize_with(width, String::new);
         }
-        fields.push(memory.copy_string(name)?);
+        for name in names {
+            fields.push(memory.copy_string(name)?);
+        }
         Self::admit(fields, memory)
     }
 }

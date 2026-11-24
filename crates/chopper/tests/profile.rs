@@ -24,6 +24,35 @@ fn profile(cache: &mut ProfileCache, job: &Job) -> anyhow::Result<InputProfile> 
     cache.profile(job, Arc::new(AtomicBool::new(false)), Arc::new(|_| {}))
 }
 #[test]
+fn profiles_all_source_columns_without_pipeline_references() -> anyhow::Result<()> {
+    let header = (0..80)
+        .map(|index| format!("column{index}"))
+        .collect::<Vec<_>>();
+    let row = (0..80).map(|index| index.to_string()).collect::<Vec<_>>();
+    let mut other = row.clone();
+    other[79] = String::new();
+    let (_dir, job) = fixture(&format!(
+        "{}\n{}\n{}\n{}\n",
+        header.join(","),
+        row.join(","),
+        row.join(","),
+        other.join(",")
+    ));
+    let profile = profile(&mut ProfileCache::default(), &job)?;
+    assert_eq!(profile.column_values.len(), 80);
+    for (index, summary) in profile.column_values.iter().enumerate() {
+        assert_eq!(summary.column, index);
+        assert!(summary.distinct_exact);
+        assert_eq!(
+            summary.frequencies[&row[index]],
+            if index == 79 { 2 } else { 3 }
+        );
+    }
+    assert_eq!(profile.column_values[79].frequencies[""], 1);
+    Ok(())
+}
+
+#[test]
 fn preview_membership_does_not_change_when_parser_storage_is_reused() {
     let (_dir, job) = fixture(&format!("value\nfirst\n{}\nlast\n", "x".repeat(20000)));
     let result = profile(&mut ProfileCache::default(), &job).unwrap();

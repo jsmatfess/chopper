@@ -13,13 +13,15 @@ Measured outcome, decision and delivery are independent fields. Favorable eviden
 does not imply default activation. Scope applies to the recorded builds/workloads;
 current contracts remain authoritative. Older baselines stay in the historical log.
 
-Registry coverage: 72 records; latest recorded decision 2026-11-22.
+Registry coverage: 74 records; latest recorded decision 2026-11-24.
 16 superseded records remain queryable but are omitted below.
 
 ## Delivered in default builds
 
 | Decision record | Outcome and scope | Interpretation |
 | --- | --- | --- |
+| [Feed calculated rows directly into a single Partition](performance/decisions/calculated-columns-followed-by-partition-2026-11-24.json) | mixed; native-linux. The retained Linux build improves matched 2M-row routed and spilling jobs by 3.10 and 2.56 seconds and removes 2.71–2.80 GB each of tracked temporary reads and writes. A formula-free direct elapsed signal reversed on repeat. The prior terminal export showed a small CPU tradeoff. | [Evidence](performance/investigations/calculated-columns-followed-by-partition-2026-11-24.md) |
+| [Reuse calculated scalars and bypass large terminal output snapshots](performance/decisions/calculated-column-evaluation-and-terminal-publication-2026-11-24.json) | mixed; native-linux. The source-gated combined build saves 93–117 ms and 228–233 MB tracked temporary space on wide Linux terminal exports. Narrow grouped dependency jobs save 22–29 ms. Two formula-free control batches show no slowdown. One below-threshold calculated text cell repeats a small cost. | [Evidence](performance/investigations/calculated-column-evaluation-and-terminal-publication-2026-11-24.md) |
 | [Use the validated probabilistic shuffle fusion in native Linux and hosted Auto](performance/decisions/probabilistic-fusion-auto-delivery-2026-11-22.json) | favorable; native-linux, wasi-chromium. The engine applies narrow Linux and Chromium fusion gates using mandatory validated row, payload, and Partition facts. The browser keeps linear quota lookup. | [Evidence](performance/investigations/probabilistic-shuffle-fusion-at-2-gib-2026-11-21.md) |
 | [Select parallel gzip and ZIP output automatically](performance/decisions/parallel-gzip-and-zip-output-2026-11-22.json) | favorable; native-linux, native-windows, wasi-chromium. Bounded parallel blocks save about 7–10 seconds on one 256 MiB output across WSL, Windows and Chromium. Chromium also benefits from dividing small outputs among workers. Direct ZIP publication and bounded small-member buffering cut logical scratch. | [Evidence](performance/investigations/parallel-gzip-and-zip-output-2026-11-22.md) |
 | [Enable bounded native publication for high-fanout plain Partition](performance/decisions/native-high-fanout-publication-adoption-2026-11-22.json) | favorable; native-linux, native-windows. At 1,152 files per job, competing makespan falls from 34.20 to 19.14 seconds on Linux and 22.45 to 18.41 seconds on Windows. The 192-file control misses the all-pairs gate. | [Evidence](performance/investigations/bounded-io-overlap-adoption-2026-11-22.md) |

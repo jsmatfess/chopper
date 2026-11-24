@@ -1,0 +1,221 @@
+--- crates/chopper/src/engine.rs
++++ crates/chopper/src/engine.rs
+@@ -336,12 +336,17 @@
+         && auto::native_retained_exact(&job, &pool);
+     let route = if let Some(plan) = direct_plan {
+         plan.route()
+-    } else if !calculates
+-        && (merge.is_some()
++    } else if !calculates {
++        if merge.is_some()
+             || try_retained_exact
+             || terminal_direct_eligible(&job)
+-            || (!observed && native_shuffle_direct_eligible(&job)))
+-    {
++            || (!observed && native_shuffle_direct_eligible(&job))
++        {
++            Route::PrivateTerminal
++        } else {
++            Route::Snapshot
++        }
++    } else if !observed && large_calculation_direct_eligible(&job) {
+         Route::PrivateTerminal
+     } else {
+         Route::Snapshot
+@@ -515,6 +520,17 @@
+     }
+ }
+ 
++fn large_calculation_direct_eligible(job: &Job) -> bool {
++    // The measured benefit came from avoiding a large serialized snapshot.
++    // Keep the existing path for smaller, evaluator-heavy exports.
++    const MINIMUM_SOURCE_BYTES: u64 = 128 * 1024 * 1024;
++    cfg!(target_os = "linux")
++        && job.operations.is_empty()
++        && job.compression == chopper_core::Compression::None
++        && std::fs::metadata(&job.input)
++            .is_ok_and(|source| source.is_file() && source.len() >= MINIMUM_SOURCE_BYTES)
++}
++
+ fn native_shuffle_direct_eligible(job: &Job) -> bool {
+     cfg!(all(
+         feature = "experimental-terminal-shuffle",
+@@ -712,9 +728,16 @@
+             step_ctx.physical_source = dataset.physical_source;
+             let started = std::time::Instant::now();
+             if index == job.operations.len() {
+-                let mut writer = output::PlanWriter::new(&job, Some(&plan.header), &step_ctx)?;
+-                plan.apply(&dataset, &job, &step_ctx, &mut writer)?;
+-                final_plan = Some(writer.finish()?);
++                if direct_terminal {
++                    let mut writer =
++                        output::PlanWriter::direct_grouped(&job, Some(&plan.header), &step_ctx)?;
++                    plan.apply(&dataset, &job, &step_ctx, &mut writer)?;
++                    terminal_publication = Some(writer.finish_direct()?);
++                } else {
++                    let mut writer = output::PlanWriter::new(&job, Some(&plan.header), &step_ctx)?;
++                    plan.apply(&dataset, &job, &step_ctx, &mut writer)?;
++                    final_plan = Some(writer.finish()?);
++                }
+                 analysis.groups = dataset.groups;
+             } else {
+                 let mut writer = DatasetWriter::new(&step_ctx)?;
+--- crates/chopper/src/engine/calculation.rs
++++ crates/chopper/src/engine/calculation.rs
+@@ -5,6 +5,7 @@
+ pub(crate) struct Plan {
+     programs: [Option<Program>; 64],
+     order: [usize; 64],
++    referenced_results: u64,
+     width: usize,
+     pub(crate) header: Header,
+     pub(super) boundary: usize,
+@@ -100,6 +101,10 @@
+                 .with_context(|| format!("preparing calculated column {:?}", column.name))?,
+             );
+         }
++        let referenced_results = programs[..count]
++            .iter()
++            .flatten()
++            .fold(0, |mask, program| mask | program.dependencies);
+         let mut completed = 0;
+         for slot in &mut order[..count] {
+             let index = ready(&programs[..count], completed).with_context(|| {
+@@ -129,6 +134,7 @@
+         Ok(Self {
+             programs,
+             order,
++            referenced_results,
+             width,
+             header: expanded,
+             boundary,
+@@ -142,6 +148,20 @@
+         ctx: &Context,
+         output: &mut impl RowSink,
+     ) -> Result<()> {
++        if self.referenced_results == 0 {
++            self.apply_rows::<false>(dataset, job, ctx, output)
++        } else {
++            self.apply_rows::<true>(dataset, job, ctx, output)
++        }
++    }
++
++    fn apply_rows<const RETAIN_SCALARS: bool>(
++        &self,
++        dataset: &Dataset,
++        job: &Job,
++        ctx: &Context,
++        output: &mut impl RowSink,
++    ) -> Result<()> {
+         use crate::observation::physical::Kind;
+         let mut observation = ctx.physical_span(Kind::Calculation);
+         output.physical_input(if observation.is_some() {
+@@ -153,6 +173,8 @@
+         let mut retained = Reservation::new(ctx);
+         let count = job.calculated_columns.len();
+         let mut values: [(String, char); 64] = std::array::from_fn(|_| (String::new(), 'n'));
++        // Text dependencies borrow the original rendered field. Scalars keep their evaluated type.
++        let mut scalars: [Option<Value<'static>>; 64] = [const { None }; 64];
+         for parent in dataset.groups()? {
+             ctx.check()?;
+             let parent = parent?;
+@@ -181,6 +203,12 @@
+                                 .map(|text| Value::Text(Cow::Borrowed(text)));
+                         }
+                         let relative = column - self.width;
++                        if let Some(value) = RETAIN_SCALARS
++                            .then(|| scalars.get(relative).and_then(Option::as_ref))
++                            .flatten()
++                        {
++                            return scalar_value(value);
++                        }
+                         let (text, kind) = if relative < index {
+                             before.get(relative)?
+                         } else {
+@@ -189,20 +217,28 @@
+                         Value::from_stored(text, *kind)
+                     };
+                     let mut resource_failure = None;
+-                    let result =
+-                        self.programs[index]
+-                            .as_ref()
+-                            .unwrap()
+-                            .evaluate(&field, &mut |bytes| {
+-                                ctx.check()
+-                                    .and_then(|()| reserve_scratch_bytes(&mut scratch, bytes))
+-                                    .map_err(|error| {
+-                                        let message = error.to_string();
+-                                        resource_failure = Some(error);
+-                                        message
+-                                    })
+-                            });
+-                    let (result_kind, rendered) = result
++                    let mut reserve = |bytes| {
++                        ctx.check()
++                            .and_then(|()| reserve_scratch_bytes(&mut scratch, bytes))
++                            .map_err(|error| {
++                                let message = error.to_string();
++                                resource_failure = Some(error);
++                                message
++                            })
++                    };
++                    let program = self.programs[index].as_ref().unwrap();
++                    let result = if RETAIN_SCALARS {
++                        program.evaluate_retaining_scalar(
++                            &field,
++                            self.referenced_results & (1 << index) != 0,
++                            &mut reserve,
++                        )
++                    } else {
++                        program
++                            .evaluate(&field, &mut reserve)
++                            .map(|(kind, rendered)| (None, kind, rendered))
++                    };
++                    let (scalar, result_kind, rendered) = result
+                         .map_err(|error| resource_failure.unwrap_or(error))
+                         .with_context(|| {
+                             format!(
+@@ -231,6 +267,9 @@
+                     value.push_str(&rendered);
+                     *kind = result_kind;
+                     drop(rendered);
++                    if RETAIN_SCALARS {
++                        scalars[index] = scalar;
++                    }
+                     scratch.resize(0)?;
+                 }
+                 row.append_calculated(&values[..count], ctx.max_record)
+@@ -253,7 +292,33 @@
+     }
+ }
+ 
++fn scalar_value(value: &Value<'_>) -> Option<Value<'static>> {
++    match value {
++        Value::Text(_) => None,
++        Value::Null => Some(Value::Null),
++        Value::Number(number) => Some(Value::Number(*number)),
++        Value::Bool(boolean) => Some(Value::Bool(*boolean)),
++        Value::Date(date) => Some(Value::Date(*date)),
++        Value::Timestamp(timestamp) => Some(Value::Timestamp(*timestamp)),
++    }
++}
++
+ impl Program {
++    fn evaluate_retaining_scalar<'a>(
++        &'a self,
++        field: &(impl Fn(usize) -> Option<Value<'a>> + 'a),
++        retain_scalar: bool,
++        reserve: &mut chopper_core::expression::Reserve<'_>,
++    ) -> Result<(Option<Value<'static>>, char, Cow<'a, str>)> {
++        let value = self.expression.evaluate(field, reserve)?;
++        let scalar = if retain_scalar {
++            scalar_value(&value)
++        } else {
++            None
++        };
++        Ok((scalar, value.kind(), value.rendered(reserve)?))
++    }
++
+     fn evaluate<'a>(
+         &'a self,
+         field: &(impl Fn(usize) -> Option<Value<'a>> + 'a),

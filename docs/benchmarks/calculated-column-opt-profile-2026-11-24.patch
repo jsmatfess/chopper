@@ -1,0 +1,34 @@
+--- baseline/calculation.rs
++++ profile/calculation.rs
+@@ -150,6 +150,7 @@
+             dataset.physical_source
+         });
+         let mut calculated_rows = 0;
++        let mut evaluator_wall = std::time::Duration::ZERO;
+         let mut retained = Reservation::new(ctx);
+         let count = job.calculated_columns.len();
+         let mut values: [(String, char); 64] = std::array::from_fn(|_| (String::new(), 'n'));
+@@ -189,6 +190,7 @@
+                         Value::from_stored(text, *kind)
+                     };
+                     let mut resource_failure = None;
++                    let evaluator_start = std::time::Instant::now();
+                     let result =
+                         self.programs[index]
+                             .as_ref()
+@@ -202,6 +204,7 @@
+                                         message
+                                     })
+                             });
++                    evaluator_wall += evaluator_start.elapsed();
+                     let (result_kind, rendered) = result
+                         .map_err(|error| resource_failure.unwrap_or(error))
+                         .with_context(|| {
+@@ -246,6 +249,7 @@
+             }
+             group.finish(output)?;
+         }
++        eprintln!("chopper_profile_formula_and_render_ns={}", evaluator_wall.as_nanos());
+         if let Some(observation) = observation {
+             observation.finish(calculated_rows);
+         }

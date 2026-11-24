@@ -16,36 +16,47 @@ fn calculated_pipeline_has_one_completed_source_scan() {
     let job = Job {
         input: input.to_string_lossy().into(),
         output: output.to_string_lossy().into(),
-        operations: vec![
-            Operation::Calculate {
+        calculated_columns: vec![
+            CalculatedColumn {
                 name: "cost".into(),
                 expression: "NUMBER(amount) * 2".into(),
             },
-            Operation::Calculate {
+            CalculatedColumn {
                 name: "band".into(),
                 expression: "IF(cost >= 10, \"large\", \"small\")".into(),
             },
+        ],
+        operations: vec![
+            Operation::Balanced { files: 1 },
             Operation::Partition {
-                columns: vec![Column::Name("band".into())],
+                columns: vec![Column::Index(3)],
             },
         ],
         ..Job::default()
     };
-    let reads = Arc::new(Mutex::new(Vec::new()));
-    let seen = reads.clone();
+    let completed = Arc::new(Mutex::new(Vec::new()));
+    let seen = completed.clone();
     let analysis = engine::run_with_observations(
         job,
         Arc::new(AtomicBool::new(false)),
         Arc::new(|_| {}),
         Arc::new(move |fact| {
-            if fact.kind == Kind::Read && fact.status == Status::Completed {
-                seen.lock().unwrap().push(fact.rows);
+            if matches!(fact.kind, Kind::Read | Kind::Calculation)
+                && fact.status == Status::Completed
+            {
+                seen.lock()
+                    .unwrap()
+                    .push((fact.kind, fact.operations, fact.rows));
             }
             true
         }),
     )
     .unwrap();
-    assert_eq!(*reads.lock().unwrap(), [2]);
+    assert_eq!(
+        *completed.lock().unwrap(),
+        [(Kind::Read, [0, 0], 2), (Kind::Calculation, [2, 0], 2)]
+    );
+    assert_eq!(analysis.stages.len(), 2);
     assert_eq!(analysis.groups, 2);
     assert!(output.join("manifest.jsonl").exists());
 }

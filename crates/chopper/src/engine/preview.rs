@@ -82,9 +82,9 @@ impl Builder {
             payload: 0,
         }
     }
-    pub(super) fn consider(&mut self, fields: FieldViews<'_>, payload: usize) -> Result<()> {
+    pub(super) fn consider(&mut self, fields: FieldViews<'_>, payload: usize) -> Result<bool> {
         if self.values.len() == 8 || payload > 32 * 1024 - self.payload {
-            return Ok(());
+            return Ok(false);
         }
         // Reserve the known maximum once. Many empty fields still require a
         // String slot each, independently of the historical payload-only limit.
@@ -101,7 +101,7 @@ impl Builder {
         self.memory.absorb(memory);
         self.values.push(values);
         self.payload += payload;
-        Ok(())
+        Ok(true)
     }
     pub(super) fn finish(self) -> Result<Preview> {
         if self.values.is_empty() {

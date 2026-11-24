@@ -31,10 +31,46 @@ fn prepare(job: Job) -> Result<Prepared> {
 }
 
 #[test]
+fn saved_job_tests_membership_with_typed_values_and_nulls() -> Result<()> {
+    let (dir, mut job) =
+        fixture("region,alternate,amount\nNORTH,WEST,12\nSOUTH,NORTH,0\nWEST,WEST,5\n");
+    job.calculated_columns = serde_json::from_value(serde_json::json!([
+        {"name":"listed","expression":"region in (\"NORTH\", alternate) AND NOT (NUMBER(amount) IN (0, 1 + 1))"},
+        {"name":"nullable","expression":"NUMBER(amount) IN (NULL, 12, 5)"},
+        {"name":"short_circuit","expression":"1 IN (1, 1 / 0)"},
+        {"name":"strict_types","expression":"SAFE(amount IN (12))"}
+    ]))?;
+    prepare(job.clone())?.execute()?;
+    assert_eq!(
+        fs::read_to_string(dir.path().join("result/part-00000001.csv"))?,
+        concat!(
+            "region,alternate,amount,listed,nullable,short_circuit,strict_types\n",
+            "NORTH,WEST,12,true,true,true,\"\"\n",
+            "SOUTH,NORTH,0,false,\"\",true,\"\"\n",
+            "WEST,WEST,5,true,true,true,\"\"\n",
+        )
+    );
+    for invalid in [
+        "region IN ()",
+        "region IN \"NORTH\"",
+        "region IN (\"NORTH\",)",
+    ] {
+        job.calculated_columns = vec![CalculatedColumn {
+            name: "listed".into(),
+            expression: invalid.into(),
+        }];
+        assert!(job.validate().is_err(), "{invalid}");
+    }
+    Ok(())
+}
+
+#[test]
 fn saved_job_partitions_and_exports_a_calculated_column() -> Result<()> {
     let (dir, mut job) = fixture("id,Sales Region\n1, north \n2, south\n3,NORTH\n");
+    job.calculated_columns = serde_json::from_value(serde_json::json!([
+        {"name": "region", "expression": "upper(TRIM([Sales Region]))"}
+    ]))?;
     job.operations = serde_json::from_value(serde_json::json!([
-        {"type": "calculate", "name": "region", "expression": "upper(TRIM([Sales Region]))"},
         {"type": "partition", "columns": ["region"]}
     ]))?;
     let prepared = prepare(job)?;
@@ -62,16 +98,18 @@ fn saved_job_partitions_and_exports_a_calculated_column() -> Result<()> {
 #[test]
 fn saved_job_chains_typed_calculations_and_keeps_null_distinct() -> Result<()> {
     let (dir, mut job) = fixture("id,amount\n1,120\n2,invalid\n3,\n");
+    job.calculated_columns = serde_json::from_value(serde_json::json!([
+        {"name":"band", "expression":"IFS(IS_NULL(numeric), \"missing\", numeric >= 100, \"large\", \"small\")"},
+        {"name":"numeric", "expression":"SAFE.NUMBER(amount)"}
+    ]))?;
     job.operations = serde_json::from_value(serde_json::json!([
-        {"type":"calculate", "name":"numeric", "expression":"SAFE.NUMBER(amount)"},
-        {"type":"balanced", "files":1},
-        {"type":"calculate", "name":"band", "expression":"IFS(IS_NULL(numeric), \"missing\", numeric >= 100, \"large\", \"small\")"}
+        {"type":"balanced", "files":1}
     ]))?;
     prepare(job)?.execute()?;
     let csv = fs::read_to_string(dir.path().join("result/split-1-part-00000001.csv"))?;
     assert_eq!(
         csv,
-        "id,amount,numeric,band\n1,120,120,large\n2,invalid,\"\",missing\n3,\"\",\"\",missing\n"
+        "id,amount,band,numeric\n1,120,large,120\n2,invalid,missing,\"\"\n3,\"\",missing,\"\"\n"
     );
     Ok(())
 }
@@ -79,11 +117,13 @@ fn saved_job_chains_typed_calculations_and_keeps_null_distinct() -> Result<()> {
 #[test]
 fn saved_job_extracts_utc_and_local_timestamp_days() -> Result<()> {
     let (dir, mut job) = fixture("source\n2026-11-23T00:30:00.123456789+02:00\n");
+    job.calculated_columns = serde_json::from_value(serde_json::json!([
+        {"name":"ts","expression":"TIMESTAMP_PARSE(source)"},
+        {"name":"utc_day","expression":"TIMESTAMP_EXTRACT(ts, \"day\")"},
+        {"name":"local_day","expression":"TIMESTAMP_EXTRACT(ts, \"day\", \"local\")"}
+    ]))?;
     job.operations = serde_json::from_value(serde_json::json!([
-        {"type":"calculate","name":"ts","expression":"TIMESTAMP_PARSE(source)"},
-        {"type":"balanced","files":1},
-        {"type":"calculate","name":"utc_day","expression":"TIMESTAMP_EXTRACT(ts, \"day\")"},
-        {"type":"calculate","name":"local_day","expression":"TIMESTAMP_EXTRACT(ts, \"day\", \"local\")"}
+        {"type":"balanced","files":1}
     ]))?;
     prepare(job)?.execute()?;
     assert_eq!(
@@ -93,28 +133,197 @@ fn saved_job_extracts_utc_and_local_timestamp_days() -> Result<()> {
     Ok(())
 }
 
+#[cfg(target_os = "linux")]
+#[test]
+fn large_terminal_calculations_match_snapshot_bytes_and_clean_cancelled_output() -> Result<()> {
+    let (dir, mut job) = fixture("");
+    {
+        let mut input = std::io::BufWriter::new(File::create(&job.input)?);
+        writeln!(input, "id,amount,when,payload")?;
+        let payload = "x".repeat(512 * 1024);
+        for id in 0..256 {
+            let amount = if id % 2 == 0 { "2" } else { "invalid" };
+            writeln!(
+                input,
+                "{id},{amount},2026-11-23T00:30:00.123456789+02:00,{payload}"
+            )?;
+        }
+        input.flush()?;
+    }
+    job.calculated_columns = serde_json::from_value(serde_json::json!([
+        {"name":"day","expression":"TIMESTAMP_EXTRACT(ts, \"day\", \"local\")"},
+        {"name":"amount_number","expression":"SAFE.NUMBER(amount)"},
+        {"name":"ts","expression":"TIMESTAMP_PARSE(when)"},
+        {"name":"classified","expression":"IF(IS_NULL(amount_number), \"missing\", TEXT(amount_number))"}
+    ]))?;
+    job.resources.workers = 1;
+    job.limits.rows = Some(16);
+    let byte_cap = 8 * 1024 * 1024;
+    job.limits.bytes = Some(byte_cap);
+    let snapshot_output = dir.path().join("snapshot");
+    let mut snapshot = job.clone();
+    snapshot.output = snapshot_output.to_string_lossy().into();
+    let snapshot = prepare(snapshot)?.execute()?;
+
+    let published_directly = Arc::new(AtomicBool::new(false));
+    let phase = published_directly.clone();
+    let direct = engine::run(
+        job.clone(),
+        Arc::new(AtomicBool::new(false)),
+        Arc::new(move |progress| {
+            if progress.phase == "Finalizing direct terminal output" {
+                phase.store(true, Ordering::Relaxed);
+            }
+        }),
+    )?;
+    assert!(published_directly.load(Ordering::Relaxed));
+    assert_eq!(direct.output_files, 18);
+    assert_eq!(direct.output_files, snapshot.output_files);
+    assert_eq!(direct.output_csv_bytes, snapshot.output_csv_bytes);
+    assert_eq!(direct.groups, snapshot.groups);
+
+    let output = dir.path().join("result");
+    for index in 1..=direct.output_files {
+        let name = format!("part-{index:08}.csv");
+        let direct_csv = fs::read(output.join(&name))?;
+        assert!(direct_csv.len() as u64 <= byte_cap);
+        assert_eq!(direct_csv, fs::read(snapshot_output.join(&name))?);
+    }
+
+    let mut failing = job.clone();
+    failing.output = dir.path().join("failed").to_string_lossy().into();
+    failing.calculated_columns = vec![CalculatedColumn {
+        name: "late_error".into(),
+        expression: r#"IF(NUMBER(id) = 255, NUMBER("invalid"), 1)"#.into(),
+    }];
+    let failure = engine::run(failing, Arc::new(AtomicBool::new(false)), Arc::new(|_| {}))
+        .expect_err("the last formula should fail");
+    assert!(format!("{failure:#}").contains("input record 256, calculated column \"late_error\""));
+    assert_eq!(fs::read_dir(dir.path())?.count(), 3);
+
+    job.output = dir.path().join("cancelled").to_string_lossy().into();
+    let cancel = Arc::new(AtomicBool::new(false));
+    let cancel_before_publish = cancel.clone();
+    let cancelled = engine::run(
+        job,
+        cancel,
+        Arc::new(move |progress| {
+            if progress.phase == "Finalizing direct terminal output" {
+                cancel_before_publish.store(true, Ordering::Relaxed);
+            }
+        }),
+    );
+    assert!(format!("{:#}", cancelled.expect_err("Run should cancel")).contains("cancel"));
+    assert_eq!(fs::read_dir(dir.path())?.count(), 3);
+    Ok(())
+}
+
+#[cfg(all(target_os = "linux", not(feature = "experimental-constant-partition")))]
+#[test]
+fn large_calculated_partition_matches_the_staged_snapshot() -> Result<()> {
+    let (dir, mut job) = fixture("");
+    let mut input = std::io::BufWriter::new(File::create(&job.input)?);
+    writeln!(input, "id,amount,payload")?;
+    let padding = "x".repeat(512 * 1024);
+    for id in 0..256 {
+        let amount = if id % 2 == 0 { "12" } else { "missing" };
+        writeln!(input, "{id},{amount},{padding}")?;
+    }
+    input.into_inner()?;
+    job.calculated_columns = serde_json::from_value(serde_json::json!([
+        {"name":"band","expression":"IF(IS_NULL(value), \"missing\", TEXT(value))"},
+        {"name":"value","expression":"SAFE.NUMBER(amount)"}
+    ]))?;
+    job.operations = vec![Operation::Partition {
+        columns: vec![Column::Name("band".into())],
+    }];
+    job.resources.grouping = Grouping::Auto;
+    job.resources.memory_mb = MemoryBudget::MiB(256);
+    job.resources.workers = 1;
+    let temp = dir.path().join("temp");
+    fs::create_dir(&temp)?;
+    job.resources.temp_dir = Some(temp.to_string_lossy().into());
+    let cap = 8 * 1024 * 1024;
+    job.limits.bytes = Some(cap);
+    let staged_output = dir.path().join("staged");
+    let mut staged = job.clone();
+    staged.output = staged_output.to_string_lossy().into();
+    let staged = prepare(staged)?.execute()?;
+    let fused = engine::run(
+        job.clone(),
+        Arc::new(AtomicBool::new(false)),
+        Arc::new(|_| {}),
+    )?;
+    assert_eq!(fused.groups, 2);
+    assert_eq!(
+        serde_json::to_value(&fused.stages)?,
+        serde_json::to_value(&staged.stages)?
+    );
+    assert_eq!(fused.output_files, staged.output_files);
+    assert_eq!(fused.output_csv_bytes, staged.output_csv_bytes);
+
+    let mut files = 0;
+    for entry in fs::read_dir(&staged_output)? {
+        let entry = entry?;
+        if entry.path().extension().is_some_and(|ext| ext == "csv") {
+            let expected = fs::read(entry.path())?;
+            assert!(expected.len() as u64 <= cap);
+            assert_eq!(
+                fs::read(dir.path().join("result").join(entry.file_name()))?,
+                expected
+            );
+            files += 1;
+        }
+    }
+    assert_eq!(files, fused.output_files);
+
+    let cancelled_output = dir.path().join("cancelled");
+    job.output = cancelled_output.to_string_lossy().into();
+    let cancel = Arc::new(AtomicBool::new(false));
+    let request_cancel = cancel.clone();
+    let failure = engine::run(
+        job,
+        cancel,
+        Arc::new(move |progress| {
+            if progress.phase == "Preparing operation 1 of 1" {
+                request_cancel.store(true, Ordering::Relaxed);
+            }
+        }),
+    )
+    .expect_err("cancelled partition should fail");
+    assert!(format!("{failure:#}").contains("cancelled"));
+    assert!(!cancelled_output.exists());
+    assert_eq!(fs::read_dir(temp)?.count(), 0);
+    Ok(())
+}
+
 #[test]
 fn calculated_column_binding_follows_the_available_schema() -> Result<()> {
     let (_dir, mut job) = fixture("Name,Name,br]acket\na,b,x\n");
-    let operations = |formula| {
-        serde_json::from_value(serde_json::json!([
-            {"type":"calculate","name":"copy","expression":formula},
-            {"type":"partition","columns":["copy"]}
-        ]))
-        .unwrap()
-    };
-    for invalid in ["Name", "name", "copy"] {
-        job.operations = operations(invalid);
+    job.operations = vec![Operation::Partition {
+        columns: vec![Column::Name("copy".into())],
+    }];
+    job.calculated_columns = vec![CalculatedColumn {
+        name: "copy".into(),
+        expression: String::new(),
+    }];
+    for (invalid, expected) in [
+        ("Name", "missing or ambiguous"),
+        ("name", "missing or ambiguous"),
+        ("copy", "cyclic"),
+        ("$3", "cyclic"),
+    ] {
+        job.calculated_columns[0].expression = invalid.into();
         let failure = prepare(job.clone()).err().unwrap();
-        assert!(format!("{failure:#}").contains("missing or ambiguous"));
+        assert!(format!("{failure:#}").contains(expected), "{failure:#}");
     }
     for valid in ["$1", "[br]]acket]"] {
-        job.operations = operations(valid);
+        job.calculated_columns[0].expression = valid.into();
         assert_eq!(prepare(job.clone())?.analysis.groups, 1);
     }
     job.input_csv.headers = false;
     job.output_csv.headers = false;
-    job.operations = operations("$1");
+    job.calculated_columns[0].expression = "$1".into();
     assert_eq!(prepare(job)?.analysis.groups, 2);
     Ok(())
 }
@@ -127,7 +336,7 @@ fn calculation_growth_and_cancellation_clean_temporary_output() -> Result<()> {
         let temp = dir.path().join("temp");
         fs::create_dir(&temp)?;
         job.resources.temp_dir = Some(temp.to_string_lossy().into());
-        job.operations = vec![Operation::Calculate {
+        job.calculated_columns = vec![CalculatedColumn {
             name: "expanded".into(),
             expression: "REGEX_REPLACE(source, \"a\", \"12345678\")".into(),
         }];
@@ -137,7 +346,7 @@ fn calculation_growth_and_cancellation_clean_temporary_output() -> Result<()> {
             job,
             stopped,
             Arc::new(move |progress| {
-                if cancel && progress.phase.as_str() == "Preparing operation 1 of 1" {
+                if cancel && progress.phase.as_str() == "Evaluating calculated columns" {
                     flag.store(true, Ordering::Relaxed);
                 }
             }),
@@ -160,14 +369,66 @@ fn calculation_growth_and_cancellation_clean_temporary_output() -> Result<()> {
 #[test]
 fn saved_job_replaces_regex_captures_and_matches_unicode_wildcards() -> Result<()> {
     let (dir, mut job) = fixture("source\nÉTÉ-123-45\n");
-    job.operations = serde_json::from_value(serde_json::json!([
-        {"type":"calculate","name":"masked","expression":"REGEX_REPLACE(source, \"([0-9]+)\", \"<$1>\")"},
-        {"type":"calculate","name":"matches","expression":"ILIKE(masked, \"été-.*\")"}
+    job.calculated_columns = serde_json::from_value(serde_json::json!([
+        {"name":"masked","expression":"REGEX_REPLACE(source, \"([0-9]+)\", \"<$1>\")"},
+        {"name":"matches","expression":"ILIKE(masked, \"été-.*\")"}
     ]))?;
     prepare(job)?.execute()?;
     assert_eq!(
         fs::read_to_string(dir.path().join("result/part-00000001.csv"))?,
         "source,masked,matches\nÉTÉ-123-45,ÉTÉ-<123>-<45>,true\n"
+    );
+    Ok(())
+}
+
+#[test]
+fn saved_job_groups_by_extracted_text_and_exports_date_arithmetic() -> Result<()> {
+    let (dir, mut job) = fixture("code,date\nA-012,2024-01-31\nA-002,2024-02-03\n");
+    job.calculated_columns = serde_json::from_value(serde_json::json!([
+        {"name":"code_prefix","expression":"REGEX_EXTRACT(code, \"([A-Z]+)-([0-9]+)\", capture)"},
+        {"name":"capture","expression":"NUMBER(LEFT(\"11\", 1))"},
+        {"name":"next_month","expression":"DATE_ADD_MONTHS(DATE_PARSE(date), 1)"},
+        {"name":"weeks","expression":"DATE_ISO_WEEK(next_month)"}
+    ]))?;
+    job.operations = vec![Operation::Partition {
+        columns: vec![Column::Name("code_prefix".into())],
+    }];
+    let prepared = prepare(job)?;
+    assert_eq!(prepared.analysis.groups, 1);
+    prepared.execute()?;
+    let file = fs::read_dir(dir.path().join("result"))?
+        .filter_map(|entry| entry.ok().map(|entry| entry.path()))
+        .find(|path| path.extension().is_some_and(|ext| ext == "csv"))
+        .expect("calculated CSV output");
+    assert_eq!(
+        fs::read_to_string(file)?,
+        concat!(
+            "code,date,code_prefix,capture,next_month,weeks\n",
+            "A-012,2024-01-31,A,1,2024-02-29,9\n",
+            "A-002,2024-02-03,A,1,2024-03-03,9\n",
+        )
+    );
+    Ok(())
+}
+
+#[test]
+fn saved_job_keeps_unicode_wildcard_width_and_subnormal_bucket_boundaries() -> Result<()> {
+    let (dir, mut job) = fixture("letter,amount\nİ,-5e-324\nΟΣ,5e-324\ni̇,-0\n");
+    job.calculated_columns = serde_json::from_value(serde_json::json!([
+        {"name":"one_scalar","expression":r#"ILIKE(letter, ".")"#},
+        {"name":"case_match","expression":r#"ILIKE(letter, "οσ")"#},
+        {"name":"band","expression":"BUCKET(NUMBER(amount), 2)"},
+        {"name":"is_below_zero","expression":"band < 0"}
+    ]))?;
+    prepare(job)?.execute()?;
+    assert_eq!(
+        fs::read_to_string(dir.path().join("result/part-00000001.csv"))?,
+        concat!(
+            "letter,amount,one_scalar,case_match,band,is_below_zero\n",
+            "İ,-5e-324,true,false,-2,true\n",
+            "ΟΣ,5e-324,false,true,0,false\n",
+            "i̇,-0,false,false,0,false\n",
+        )
     );
     Ok(())
 }
@@ -189,11 +450,13 @@ fn calculated_values_survive_sort_spill_without_changing_csv_output() -> Result<
     job.resources.grouping = Grouping::Sort;
     job.resources.max_record_bytes = 1024 * 1024;
     job.resources.workers = 1;
+    job.calculated_columns = serde_json::from_value(serde_json::json!([
+        {"name":"ts","expression":"TIMESTAMP_PARSE(source)"},
+        {"name":"rank","expression":"NUMBER(id) + 1"},
+        {"name":"bucket","expression":"IF(rank > 0, TIMESTAMP_EXTRACT(ts, \"day\", \"local\"), NULL)"}
+    ]))?;
     job.operations = serde_json::from_value(serde_json::json!([
-        {"type":"calculate","name":"ts","expression":"TIMESTAMP_PARSE(source)"},
-        {"type":"calculate","name":"rank","expression":"NUMBER(id) + 1"},
-        {"type":"partition","columns":["ts"]},
-        {"type":"calculate","name":"bucket","expression":"IF(rank > 0, TIMESTAMP_EXTRACT(ts, \"day\", \"local\"), NULL)"}
+        {"type":"partition","columns":["ts"]}
     ]))?;
     let mut results = Vec::new();
     for memory in [256, 32] {

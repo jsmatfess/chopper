@@ -36,6 +36,7 @@ with synthetic data and check the results.
 | --- | --- |
 | Find commands and flags for the installed version | [CLI reference](../cli-reference.md) |
 | Write a saved Job and get editor completions | [Job JSON and schema](../job-json.md) |
+| Write calculated columns and look up a function | [Formula functions](../formula-functions.md) |
 | Check a saved Job before opening its input | [Validate](../validate-cli.md) |
 | Schedule Runs and handle exit statuses or reports | [Run and automation](../run-cli.md) |
 | Verify published CSVs or ZIP members | [Native manifest](../native-manifest.md) |

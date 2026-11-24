@@ -49,22 +49,15 @@ impl<R: Read> Records<R> {
     }
     pub fn next<'a>(
         &'a mut self,
-        stats: &[(ColumnProfile, Cardinality)],
         combinations: &[(Vec<usize>, Cardinality)],
         cancel: &AtomicBool,
     ) -> Result<Option<Record<'a>>> {
         ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
         #[cfg(all(feature = "experimental-parallel-profile", not(target_os = "wasi")))]
         if let Some(batch) = &mut self.batch {
-            return batch.next(
-                &mut self.input,
-                stats,
-                combinations,
-                cancel,
-                &mut self.execution,
-            );
+            return batch.next(&mut self.input, combinations, cancel, &mut self.execution);
         }
-        let _ = (stats, combinations);
+        let _ = combinations;
         if !self.input.next_owned(|| Ok(()))? {
             return Ok(None);
         }
@@ -157,7 +150,6 @@ mod parallel {
         pub fn next<'a, R: Read>(
             &'a mut self,
             input: &mut DecodedInput<R>,
-            stats: &[(ColumnProfile, Cardinality)],
             combinations: &[(Vec<usize>, Cardinality)],
             cancel: &AtomicBool,
             execution: &mut ProfileExecution,
@@ -198,9 +190,8 @@ mod parallel {
                         .try_for_each(|slot| -> Result<()> {
                             ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
                             slot.hashes.clear();
-                            for (summary, _) in stats {
-                                slot.hashes
-                                    .push(blake3::hash(slot.fields[summary.column].as_bytes()));
+                            for field in &slot.fields {
+                                slot.hashes.push(blake3::hash(field.as_bytes()));
                             }
                             for (indices, _) in combinations {
                                 slot.hashes.push(combination_hash(&slot.fields, indices));

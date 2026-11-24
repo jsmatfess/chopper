@@ -20,11 +20,15 @@ async function bundle(){
     build.onResolve({filter:/^\.\/browser\/client$/},args=>args.importer.endsWith('/app.ts')?{path:'mock-client',namespace:'fixture'}:undefined);
     build.onLoad({filter:/.*/,namespace:'fixture'},()=>({resolveDir:resolve('.'),loader:'ts',contents:`
       export {configureBrowserUI,invalidateBrowserDraft} from ${JSON.stringify(resolve('src/browser/client.ts'))};
+      export function startFormulaScan(job,onBatch){
+        queueMicrotask(()=>onBatch({rows:[],done:true}));
+        return {more(){},stop(){}};
+      }
       export async function browserApi(path,data){
         window.calls.push({path,data:structuredClone(data)});
         if(path==='defaults')return structuredClone(window.defaults);
         if(path==='state'){const snapshot=structuredClone(window.fixtureState);if(window.deferNextState){window.deferNextState=false;return await new Promise(resolve=>window.releaseState=()=>resolve(snapshot));}return snapshot;}
-        if(path==='preview'){if(window.deferPreview)await new Promise(resolve=>window.releasePreview=resolve);return window.previewFixture??{columns:2,header:['country','note'],preview:[[data.input==='old.csv'?'OLD':'US','sample']],input_is_zip:false};}
+        if(path==='preview'){if(window.deferPreview)await new Promise(resolve=>window.releasePreview=resolve);const sample=window.previewFixture??{columns:2,header:['country','note'],preview:[[data.input==='old.csv'?'OLD':'US','sample']],input_is_zip:false};return {...sample,preview_row_numbers:sample.preview.map((_,index)=>index+1)};}
         if(path==='pick-path')return {path:data.mode==='sample'?'customers.csv':data.mode==='input'?'source.csv':'destination'};
         if(path==='sniff')return {settings:{...data.input_csv,delimiter:';'},note:'Fixture detection; no scan'};
         if(path==='profile'){if(window.deferAnalysisAck)await new Promise(resolve=>window.releaseAnalysisAck=resolve);const finish=()=>window.fixtureState={...window.fixtureState,status:'profiled',profile:window.profileFixture??{rows:4,columns:2,header:['country','note'],seconds:1,accuracy:'Exact fixture input count',stages:[],column_values:[]}};if(window.deferProfile){window.fixtureState={...window.fixtureState,status:'profiling',profile:null};window.finishProfile=finish;}else finish();return {};}
@@ -393,7 +397,7 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} paired operations s
     const {page,errors}=await harness(browser,hosted);
     await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({...defaults,input:'source.csv',output:'destination'}))});
     await page.waitForFunction(()=>document.getElementById('input').value==='source.csv');
-    assert.deepEqual(await page.locator('#new-operation option').evaluateAll(options=>options.map(option=>option.value)),['partition','balanced','assign','shuffle','calculate']);
+    assert.deepEqual(await page.locator('#new-operation option').evaluateAll(options=>options.map(option=>option.value)),['partition','balanced','assign','shuffle']);
     await page.locator('#new-operation').selectOption('balanced');await page.locator('#add-operation').click();
     assert.equal(await page.locator('[data-step="0"] input[value="balanced"]').isChecked(),true);
     await page.locator('[data-step="0"] [data-field="files"]').fill('5');
@@ -662,7 +666,7 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} plan keeps its own 
   const config={...defaults,input:'source.csv',output:'destination',operations:[{type:'balanced',files:3},{type:'assign',groups:[{name:'a',percent:'50'},{name:'b',percent:'50'}],strata:[]}]};
   await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(config))});
   await page.waitForFunction(()=>document.getElementById('input').value==='source.csv');
-  const configOrder=['source','output-settings','pipeline','review'];
+  const configOrder=['source','output-settings','calculated-columns','pipeline','review'];
   const planOrder=['source','pipeline','output-settings','review'];
   assert.deepEqual(await page.locator('#job-form > section').evaluateAll(cards=>cards.map(card=>card.id)),configOrder);
   assert.deepEqual(await page.locator('.plan-summary-section').evaluateAll(cards=>cards.map(card=>card.dataset.configSection)),planOrder);
@@ -1256,7 +1260,7 @@ for(const scrollspy of [true,false])test(`hosted navigation (${scrollspy?'native
   const rules=page.locator('.plan-step-details[data-target="step-0"]');assert.equal(await rules.evaluate(el=>el.open),false);
   assert.match(await page.locator('.plan-steps>li').first().innerText(),/Shuffle rows within each group/);
   await rules.locator('summary').click();await page.locator('#max-rows').fill('20');assert.equal(await rules.evaluate(el=>el.open),true,'draft refresh retains the open explanation');
-  for(const id of ['output-settings','pipeline','review','source']){
+  for(const id of ['output-settings','calculated-columns','pipeline','review','source']){
    await page.locator(`.workspace-nav a[href="#${id}"]`).click();
    await page.clock.runFor(100);
    assert.equal(await page.evaluate(()=>document.activeElement.id),id);
@@ -1275,7 +1279,8 @@ for(const scrollspy of [true,false])test(`hosted navigation (${scrollspy?'native
   await page.evaluate(()=>{scrollBy(0,40);document.dispatchEvent(new Event('scroll'));});await page.clock.runFor(100);
   assert.equal(await page.locator('.workspace-nav').getAttribute('data-selected'),null,'scrolling resumes visible-section tracking');
   const compact=await page.locator('.workspace-toolbar').boundingBox(),workspace=await page.locator('.workspace').boundingBox();
-  assert(compact.width<180,'wide navigation becomes a slim rail');assert(compact.x+compact.width<workspace.x,'rail sits beside the configuration');assert(compact.height>compact.width,'wide navigation uses vertical links');
+  assert(compact.x+compact.width<workspace.x,'rail sits beside the configuration');
+  assert.equal(await page.locator('.workspace-nav').evaluate(nav=>getComputedStyle(nav).flexDirection),'column','wide navigation uses vertical links');
   await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'running',progress:{phase:'Sorting rows',rows:100,temp_bytes:200}});await tick(page);
   assert.equal(await page.locator('#processing-strip').isVisible(),true);
   const elapsedBefore=parseInt(await page.locator('#processing-elapsed').textContent(),10);await page.clock.runFor(4100);
@@ -1288,7 +1293,11 @@ for(const scrollspy of [true,false])test(`hosted navigation (${scrollspy?'native
    const rail=await page.locator('.rail').boundingBox(),bar=await page.locator('.workspace-toolbar').boundingBox();
    const railOffset=width<=640?0:rail.height;
    if(width<1600){assert(Math.abs(bar.y-railOffset)<1,'top navigation stays flush with the sticky stack');assert(bar.height<60,'top navigation stays compact');}
-   else{assert(Math.abs(bar.y-railOffset-16)<1,'wide section navigation stays within reach');assert(bar.width<180,'rail stays slim');}
+   else{
+    assert(Math.abs(bar.y-railOffset-16)<1,'wide section navigation stays within reach');
+    const sidebar=await page.locator('.workspace-sidebar').boundingBox();
+    assert.equal(bar.width,sidebar.width,'nav fills the desktop sidebar');
+   }
    const bottom=await page.locator('#run-dock').boundingBox();assert(Math.abs(bottom.y+bottom.height-900)<1,'processing bar sits at the viewport bottom');assert(bottom.height<110,'processing bar stays compact');
    await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));await page.clock.runFor(100);const last=await page.locator('#review').evaluate(el=>el.getBoundingClientRect().bottom);assert(last<=bottom.y,'bottom padding keeps the final content above processing controls');
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`busy overflow at ${width}`);
@@ -1332,9 +1341,10 @@ test('column inspection lives by the preview, survives config edits, and retires
   assert.equal(await page.locator('#source #input-values').isVisible(),true);
   assert.equal(await page.locator('.column-values-row[open]').count(),0,'column values start collapsed');
   await page.locator('.column-values-row>summary').first().click();
+  await page.locator('.column-values-row .value-label').first().waitFor();
   assert.equal(await page.locator('#run-results .value-chips').count(),0);
   assert.match(await page.locator('#input-values').innerText(),/<img src=x onerror=alert\(1\)>/);assert.equal(await page.locator('#input-values img').count(),0);
-  assert.match(await page.locator('.column-values-count').nth(1).textContent(),/~1,000 distinct · estimated/);
+  assert.match(await page.locator('.column-values-count').nth(1).textContent(),/~1K distinct · estimated/);
   assert.deepEqual(await page.locator('.column-values-row').first().locator('.value-label').allTextContents(),['US','CA','<img src=x onerror=alert(1)>','(empty)']);
   assert.deepEqual(await page.locator('.column-values-row').first().locator('.value-share').allTextContents(),['75%','12.5%','12.5%','<0.1%']);
   assert.equal(await page.locator('.column-values-row').nth(1).locator('.value-distribution').count(),0,'truncated columns do not present partial counts as shares');
@@ -1345,8 +1355,14 @@ test('column inspection lives by the preview, survives config edits, and retires
   await page.locator('[data-inspection-search]').fill('missing');assert.equal(await page.locator('.input-values-empty').isVisible(),true);await page.locator('[data-inspection-search]').fill('');
   await page.locator('#max-rows').fill('20');await tick(page);
   assert.equal(await page.locator('#input-profile').isVisible(),true);assert.equal(await page.locator('#input-values').isVisible(),true);assert.match(await page.locator('.profile-context').innerText(),/Input unchanged/);
-  assert.doesNotMatch(await page.locator('#input-profile').innerText(),/Run memory target/);
-  assert.equal(await page.locator('#input-profile details').first().evaluate(el=>el.open),false,'dense estimates start collapsed');
+  assert.doesNotMatch(await page.locator('#input-profile').innerText(),/Run memory target|Pipeline estimates/);
+  assert.equal(await page.locator('.column-values-row').count(),6);
+  await page.locator('#run-direct').click();
+  await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'complete',analysis:{...window.analysis,column_values:[{column:0,values:['different'],truncated:false}]},output:'destination/results'});
+  await tick(page);
+  assert.match(await page.locator('#input-values-origin').textContent(),/Full-file input analysis/);
+  assert.equal(await page.locator('.column-values-row').count(),6);
+
   for(const mode of ['light','dark']){
    await setTheme(page,mode);
    await page.locator('.column-values-row').first().evaluate(el=>el.open=true);
@@ -1366,8 +1382,76 @@ test('column inspection lives by the preview, survives config edits, and retires
   if(process.env.CHOPPER_PROFILE_SCREENSHOTS){const dir=process.env.CHOPPER_PROFILE_SCREENSHOTS;await mkdir(dir,{recursive:true});for(const theme of ['light','dark']){await setTheme(page,theme);await page.setViewportSize({width:1440,height:1000});await page.locator('#input-values').evaluate(el=>el.scrollIntoView({block:'start'}));await page.locator('#input-values').screenshot({path:`${dir}/column-values-${theme}.png`});await page.locator('#run-results').screenshot({path:`${dir}/analysis-${theme}.png`});}}
   for(const width of [320,390,760,1920]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);}
   await page.locator('#source-settings>summary').click();await page.locator('#input-csv [data-csv=delimiter]').fill(';');await tick(page);
-  assert.equal(await page.locator('#input-values').isHidden(),true,'parser changes retire the old column values');
-  assert.match(await page.locator('#input-profile').innerText(),/different input or parsing configuration/);assert.doesNotMatch(await page.locator('#input-profile').innerText(),/4,000/);
+  assert.equal(await page.locator('#input-values .column-values-count').count(),0,'parser changes retire the old column counts');
+  assert.equal(await page.locator('#input-profile').isHidden(),true,'parser changes retire the source profile after Run');
+  assert.deepEqual(errors,[]);await page.close();
+ }finally{await browser.close();}
+});
+
+test('column explorer starts from the preview and keeps search and distributions across layouts',async()=>{
+ const browser=await chromium.launch({headless:true});
+ try{
+  const {page,errors}=await harness(browser);
+  await page.setViewportSize({width:1600,height:800});
+  await page.evaluate(()=>{
+   const header=['country','note','segment','label','status','bucket',...Array.from({length:34},(_,index)=>'extra '+index)];
+   window.previewFixture={columns:header.length,header,preview:[header.map(()=> 'A')]};
+   window.profileFixture={rows:2_000_000,columns:header.length,header,seconds:1,cache_hit:false,accuracy:'Fixture',stages:[],
+    column_values:header.map((_,column)=>({column,values:['A','B'],frequencies:{A:1_000_000,B:1_000_000},distinct:2,distinct_exact:true,truncated:false}))};
+  });
+  await choose(page);
+  const search=page.getByRole('searchbox',{name:'Find a column'});
+  const panel=page.getByRole('region',{name:'Column explorer'});
+  const country=panel.locator('[data-column="0"]');
+  await page.locator('.workspace-sidebar > #input-values').waitFor();
+  assert.equal(await panel.locator('.column-values-name').count(),40);
+  assert.equal(await panel.locator('.column-values-count').count(),0);
+  assert.equal(await panel.locator('.input-values-list').evaluate(list=>list.scrollHeight>list.clientHeight),true);
+  await search.fill('country');
+  await panel.getByRole('button',{name:'Analyze input'}).click();
+  const countryDisclosure=country.locator('summary');
+  await countryDisclosure.click();
+  await country.getByText('50%',{exact:true}).first().waitFor();
+  assert.equal(await search.inputValue(),'country');
+  assert.deepEqual(await country.locator('.value-frequency').allTextContents(),['1M','1M']);
+  assert.equal(await country.locator('.column-values-index').textContent(),'$0');
+  await search.fill('');
+  const second=panel.locator('[data-column="1"]');
+  await second.locator('summary').click();
+  await second.getByText('50%',{exact:true}).first().waitFor();
+  assert.equal(await panel.locator('details[open]').count(),2,'columns expand independently');
+  await search.fill('country');
+  for(const theme of ['light','dark']){
+   await setTheme(page,theme);
+   const chrome=await page.evaluate(()=>['.workspace-toolbar','#input-values'].map(selector=>{
+    const rules=getComputedStyle(document.querySelector(selector));
+    return [rules.backgroundColor,rules.borderTopColor];
+   }));
+   assert.deepEqual(chrome[0],chrome[1],`${theme} explorer uses the navigation palette`);
+  }
+  await search.focus();
+  for(const width of [1600,1920]){
+   await page.setViewportSize({width,height:800});
+   assert.equal(await search.evaluate(input=>input===document.activeElement),true);
+   assert.equal(await countryDisclosure.evaluate(summary=>summary.parentElement.open),true);
+   assert.deepEqual(await country.locator('.value-share').allTextContents(),['50%','50%']);
+   const [nav,values,editor,dock]=await Promise.all([
+    page.locator('.workspace-toolbar').boundingBox(),panel.boundingBox(),page.locator('#source').boundingBox(),page.locator('#run-dock').boundingBox(),
+   ]);
+   assert(nav.y+nav.height<values.y&&values.x+values.width<=editor.x,'the explorer is a separate card below the nav');
+   assert.equal(nav.x,values.x,'sidebar cards share their left edge');
+   assert.equal(nav.width,values.width,'navigation matches the explorer width');
+   assert(values.y+values.height<=dock.y,'sidebar clears the bottom Run controls');
+  }
+  await page.setViewportSize({width:1599,height:800});
+  await page.locator('#source #input-values').waitFor();
+  assert.equal(await search.inputValue(),'country');
+  assert.equal(await search.evaluate(input=>input===document.activeElement),true);
+  assert.equal(await country.locator('summary').evaluate(summary=>summary.parentElement.open),true);
+  const editorBackgrounds=await page.evaluate(()=>['#source .section-title','#input-values'].map(selector=>
+   getComputedStyle(document.querySelector(selector)).backgroundColor));
+  assert.equal(editorBackgrounds[0],editorBackgrounds[1],'Source explorer uses the editor palette');
+
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
 });
@@ -1377,7 +1461,7 @@ test('a profile finishing after another selection of the same filename is not ap
  try{
   const {page,errors}=await harness(browser);await choose(page);await page.evaluate(()=>window.deferProfile=true);await page.locator('#profile').click();
   await page.locator('#browse-input').click();await page.evaluate(()=>window.finishProfile());await tick(page);
-  assert.match(await page.locator('#input-profile').innerText(),/different input/);assert.equal(await page.locator('#input-values').isHidden(),true);
+  assert.match(await page.locator('#input-profile').innerText(),/different input/);assert.equal(await page.locator('#input-values .column-values-count').count(),0);
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
 });
@@ -1386,13 +1470,31 @@ test('filtering completed column values keeps the analysis source and fresh Run 
  const browser=await chromium.launch({headless:true});
  try{
   const {page,errors}=await harness(browser);await choose(page);
-  await page.evaluate(()=>window.analysis={...window.analysis,column_values:Array.from({length:6},(_,column)=>({column,values:['a','b'],truncated:false}))});
+  await page.evaluate(()=>window.analysis={...window.analysis,column_values:Array.from({length:2},(_,column)=>({column,values:['a','b'],truncated:false}))});
   await page.locator('#run-direct').click();await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'complete',analysis:window.analysis,output:'destination/result'});await tick(page);assert.equal(await page.locator('#run-direct').innerText(),'Run →');
   assert.match(await page.locator('#input-values-origin').innerText(),/Completed output analysis/);
   assert.equal(await page.locator('.column-values-row[open]').count(),0,'completed values also start collapsed');
   await page.locator('[data-inspection-search]').fill('country');await tick(page);
   assert.equal(await page.locator('.column-values-row:visible').count(),1);assert.equal(await page.locator('#run-direct').innerText(),'Run →');
   await page.locator('#run-direct').click();assert.equal(await page.evaluate(()=>window.calls.filter(call=>call.path!=='state').at(-1).path),'run-direct');
+  assert.deepEqual(errors,[]);await page.close();
+ }finally{await browser.close();}
+});
+
+test('Analyze shows an updating row count in the bottom bar',async()=>{
+ const browser=await chromium.launch({headless:true});
+ try{
+  const {page,errors}=await harness(browser,true,true);await choose(page);
+  await page.setViewportSize({width:320,height:800});
+  for(const count of [0,1,12345678]){
+   await page.evaluate(rows=>window.fixtureState={...window.fixtureState,status:'profiling',progress:{phase:'Profiling all input records',rows,temp_bytes:0}},count);
+   await tick(page);
+   assert.equal(await page.locator('#processing-rows').innerText(),`${count.toLocaleString('en-US')} ${count===1?'row':'rows'} scanned`);
+   const [rows,actions]=await Promise.all([page.locator('#processing-rows').boundingBox(),page.locator('.processing-actions').boundingBox()]);
+   assert(rows.x+rows.width<=actions.x,'row total stays clear of the processing actions');
+  }
+  await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'running'});await tick(page);
+  assert.equal(await page.locator('#processing-rows').isHidden(),true);
   assert.deepEqual(errors,[]);await page.close();
  }finally{await browser.close();}
 });

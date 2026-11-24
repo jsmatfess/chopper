@@ -21,9 +21,9 @@ export async function checkSite(root) {
   }
 
   const expected = new Set(['index.html']);
-  for (const { version } of manifest.versions) {
+  for (const { version, additionalPages = [] } of manifest.versions) {
     const base = `versions/${version}/`;
-    for (const page of manifest.pages) expected.add(`${base}${page}.html`);
+    for (const page of [...manifest.pages, ...additionalPages]) expected.add(`${base}${page}.html`);
     const assets = files.filter(path => path.startsWith(`${base}assets/`));
     if (!assets.some(path => path.includes('@localSearchIndex') && path.endsWith('.js'))) {
       throw new Error(`Missing local search index for ${version}`);

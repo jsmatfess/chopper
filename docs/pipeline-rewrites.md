@@ -6,10 +6,25 @@ shuffle distributions and strict serialized caps; they need not preserve a
 particular seeded realization. Public seed input is removed; execution generates
 internal entropy and internal snapshot execution preserves retained output bytes.
 
-Calculated columns introduce an ordered schema dependency and can raise
-row-level errors. Current rewrites keep calculation steps at their declared
-positions. Spills between operations preserve calculated types and timestamp
-offsets. Partition keys compare the calculated fields' rendered text.
+Calculated columns are bound to the validated source schema. The retained
+snapshot plan evaluates them before the first consuming operation, or during
+final output preparation when only export uses them. Rewrites must preserve
+that boundary and any row-level evaluation failures. Spills preserve types
+and timestamp offsets. Partition keys compare the rendered text.
+
+An unobserved Linux Run can feed calculated rows directly into a single plain
+Partition that uses a calculated field. Eligibility requires plain output, one
+root group, and a source file of at least 128 MiB. Auto grouping keeps its
+existing choice between routing and sorting. Builds with experimental constant
+Partition use their staged route.
+
+The fused pass supplies the existing sorter with the same rendered tuple,
+ordinal, and packed fields. Its final writer constructs the same capped output
+snapshot. A failed attempt drops its private output and spills before replaying
+the original staged route from the retained input. Replay preserves error order
+when a resource or Partition failure occurs before a later formula error.
+Cancellation aborts the attempt. The calculation traversal timer includes
+collecting and finishing the sort when this route succeeds.
 
 Ordinary builds now fuse adjacent `auto/uniform -> partition(columns)` into one
 sort on partition tuples and random keys, avoiding the global shuffle

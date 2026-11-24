@@ -270,3 +270,5 @@ Topics reuse the reviewed strategy-family assignments; they do not establish com
 | <a id="automatic-native-execution-bounds-2026-11-22"></a>[Automatic native execution bounds (2026-11-22)](performance/investigations/automatic-native-execution-bounds-2026-11-22.md) | ownership-and-lifecycle |
 | <a id="parallel-gzip-and-zip-output-2026-11-22"></a>[Parallel gzip and ZIP output (2026-11-22)](performance/investigations/parallel-gzip-and-zip-output-2026-11-22.md) | ownership-and-lifecycle |
 | <a id="calculated-column-streaming-baseline-2026-11-23"></a>[Calculated-column streaming baseline (2026-11-23)](performance/investigations/calculated-column-streaming-baseline-2026-11-23.md) | profiling |
+| <a id="calculated-column-evaluation-and-terminal-publication-2026-11-24"></a>[Calculated-column evaluation and terminal publication (2026-11-24)](performance/investigations/calculated-column-evaluation-and-terminal-publication-2026-11-24.md) | profiling |
+| <a id="calculated-columns-followed-by-partition-2026-11-24"></a>[Calculated columns followed by Partition (2026-11-24)](performance/investigations/calculated-columns-followed-by-partition-2026-11-24.md) | profiling |

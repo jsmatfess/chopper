@@ -175,6 +175,35 @@ impl Job {
             "/output_csv/headers",
             "cannot copy a header from headerless input; disable output headers"
         );
+        ensure_field!(
+            self.calculated_columns.len() <= 64,
+            "/calculated_columns",
+            "at most 64 calculated columns are supported"
+        );
+        for (index, column) in self.calculated_columns.iter().enumerate() {
+            ensure_field!(
+                !column.name.is_empty()
+                    && !self.calculated_columns[..index]
+                        .iter()
+                        .any(|prior| prior.name == column.name),
+                format!("/calculated_columns/{index}/name"),
+                "calculated column names must be nonempty and unique"
+            );
+            ensure_field!(
+                !column.expression.trim().is_empty()
+                    && column.expression.len() <= crate::expression::MAX_SOURCE_BYTES,
+                format!("/calculated_columns/{index}/expression"),
+                "calculated column formula is empty or exceeds the size limit"
+            );
+            if prepare_formulas {
+                crate::expression::Expression::parse(&column.expression).map_err(|cause| {
+                    JobValidationError::new(
+                        format!("/calculated_columns/{index}/expression"),
+                        anyhow::anyhow!(cause),
+                    )
+                })?;
+            }
+        }
         for (index, op) in self.operations.iter().enumerate() {
             match op {
                 Operation::Balanced { files } | Operation::Interleaved { files } => ensure_field!(
@@ -188,30 +217,6 @@ impl Job {
                         format!("/operations/{index}/columns"),
                         "partition requires columns"
                     );
-                }
-                Operation::Calculate { name, expression } => {
-                    ensure_field!(
-                        !name.is_empty()
-                            && !self.operations[..index].iter().any(|previous| {
-                                matches!(previous, Operation::Calculate { name: prior, .. } if prior == name)
-                            }),
-                        format!("/operations/{index}/name"),
-                        "calculated column names must be nonempty and unique"
-                    );
-                    ensure_field!(
-                        !expression.trim().is_empty()
-                            && expression.len() <= crate::expression::MAX_SOURCE_BYTES,
-                        format!("/operations/{index}/expression"),
-                        "calculated column formula is empty or exceeds the size limit"
-                    );
-                    if prepare_formulas {
-                        crate::expression::Expression::parse(expression).map_err(|cause| {
-                            JobValidationError::new(
-                                format!("/operations/{index}/expression"),
-                                anyhow::anyhow!(cause),
-                            )
-                        })?;
-                    }
                 }
                 Operation::Assign { groups, .. }
                 | Operation::AssignProbabilistic { groups, .. } => {
@@ -257,8 +262,8 @@ impl Job {
                 for (selector, column) in selectors.iter().enumerate() {
                     ensure_field!(
                         matches!(column, Column::Index(_))
-                            || self.operations[..index].iter().any(|previous| {
-                                matches!((column, previous), (Column::Name(column), Operation::Calculate { name, .. }) if column == name)
+                            || self.calculated_columns.iter().any(|calculated| {
+                                matches!(column, Column::Name(name) if *name == calculated.name)
                             }),
                         format!("/operations/{index}/{field}/{selector}"),
                         "name selection requires headers"

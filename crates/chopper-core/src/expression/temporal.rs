@@ -203,7 +203,16 @@ impl Unit {
             "hour" if timestamp => Ok(Self::Hour),
             "minute" if timestamp => Ok(Self::Minute),
             "second" if timestamp => Ok(Self::Second),
-            _ => Err(format!("unsupported date or timestamp unit {unit:?}")),
+            _ => {
+                let choices = if timestamp {
+                    "year, quarter, month, day, hour, minute, or second"
+                } else {
+                    "year, quarter, month, or day"
+                };
+                Err(format!(
+                    "unsupported date or timestamp unit {unit:?}. Use {choices}."
+                ))
+            }
         }
     }
 
@@ -267,7 +276,16 @@ impl Token {
             'S' if timestamp => Ok(Self::Second),
             'f' if timestamp => Ok(Self::Fraction),
             'z' if timestamp => Ok(Self::Offset),
-            _ => Err(format!("unsupported date or timestamp format token %{c}")),
+            _ => {
+                let choices = if timestamp {
+                    "%Y, %m, %d, %H, %M, %S, %f, or %z"
+                } else {
+                    "%Y, %m, or %d"
+                };
+                Err(format!(
+                    "unsupported date or timestamp format token %{c}. Use {choices}."
+                ))
+            }
         }
     }
     fn width(self) -> usize {
@@ -423,16 +441,18 @@ pub(super) fn prepare(function: Function, args: &[Node]) -> Result<Option<Instru
         TIMESTAMP_TRUNC => (true, Kind::Truncate),
         _ => return Ok(None),
     };
-    let option = |index| match args.get(index) {
+    let option = |index| {
+        match args.get(index) {
         Some(Node::Literal(Value::Text(text))) => Ok(Some(text.as_ref())),
         None => Ok(None),
-        _ => Err("date and timestamp options must be literal text"),
+        _ => Err("date and timestamp options must be literal text. Put the format, part, unit, or basis in double quotes."),
+    }
     };
     let parameter = option(1)?;
     let local = match option(2)? {
         None | Some("utc") => false,
         Some("local") => true,
-        Some(_) => return Err("timestamp basis must be utc or local".into()),
+        Some(_) => return Err("timestamp basis must be utc or local. Use \"utc\" for UTC or \"local\" for the value’s offset.".into()),
     };
     let operation = match kind {
         Kind::Parse => Operation::Parse(
@@ -462,21 +482,31 @@ impl Instruction {
         }
         if let Operation::Parse(format) = &self.operation {
             let text = value.text()?;
+            let parse_error = |error| {
+                let hint = if format.is_some() {
+                    "Make text match the supplied format."
+                } else if self.timestamp {
+                    "Use a timestamp such as 2024-01-02T03:04:05Z or supply a format."
+                } else {
+                    "Use a date such as 2024-01-02 or supply a format."
+                };
+                row(format!("{error}. {hint}"))
+            };
             return if let Some(format) = format {
-                let (civil, offset) = format.read(&text).map_err(row)?;
+                let (civil, offset) = format.read(&text).map_err(parse_error)?;
                 if self.timestamp {
                     Timestamp::new(civil, offset)
                         .map(Value::Timestamp)
-                        .map_err(row)
+                        .map_err(parse_error)
                 } else {
                     Ok(Value::Date(civil.date))
                 }
             } else if self.timestamp {
                 Timestamp::canonical(&text)
                     .map(Value::Timestamp)
-                    .map_err(row)
+                    .map_err(parse_error)
             } else {
-                Date::canonical(&text).map(Value::Date).map_err(row)
+                Date::canonical(&text).map(Value::Date).map_err(parse_error)
             };
         }
         let (civil, zone, original_offset) = match value {
@@ -493,12 +523,8 @@ impl Instruction {
                 0,
                 0,
             ),
-            _ if self.timestamp => {
-                return Err(row(
-                    "expected a timestamp; use TIMESTAMP_PARSE to convert text",
-                ))
-            }
-            _ => return Err(row("expected a date; use DATE_PARSE to convert text")),
+            other if self.timestamp => return Err(wrong_timestamp(&other)),
+            other => return Err(wrong_date(&other)),
         };
         match &self.operation {
             Operation::Format(format) => {
@@ -568,4 +594,218 @@ fn offset(text: &str) -> Result<(i16, &str), String> {
         return Err("invalid timestamp offset".into());
     }
     Ok((sign * (hour * 60 + minute) as i16, rest))
+}
+
+const SECONDS_PER_DAY: i64 = 86_400;
+const NANOS_PER_SECOND: i128 = 1_000_000_000;
+
+const fn days_before_year(year: i64) -> i64 {
+    let previous = year - 1;
+    previous * 365 + previous / 4 - previous / 100 + previous / 400
+}
+
+impl Date {
+    // Day zero is 0001-01-01, a Monday in the proleptic Gregorian calendar.
+    fn day_number(self) -> i64 {
+        days_before_year(i64::from(self.year))
+            + (1..self.month)
+                .map(|month| i64::from(days_in_month(self.year, month)))
+                .sum::<i64>()
+            + i64::from(self.day - 1)
+    }
+
+    fn from_day_number(day: i64) -> EvalResult<Self> {
+        if !(0..days_before_year(10_000)).contains(&day) {
+            return Err(row("date is outside years 0001 through 9999"));
+        }
+        let (mut year, mut upper) = (1, 10_000);
+        while upper - year > 1 {
+            let middle = (year + upper) / 2;
+            if days_before_year(middle) <= day {
+                year = middle;
+            } else {
+                upper = middle;
+            }
+        }
+        let year = year as u16;
+        let mut remaining = day - days_before_year(i64::from(year));
+        for month in 1..=12 {
+            let length = i64::from(days_in_month(year, month));
+            if remaining < length {
+                return Ok(Self {
+                    year,
+                    month,
+                    day: (remaining + 1) as u8,
+                });
+            }
+            remaining -= length;
+        }
+        unreachable!()
+    }
+
+    fn iso_week(self) -> (i64, i64) {
+        let day = self.day_number();
+        let thursday = day + 3 - day % 7;
+        let year = i64::from(self.year);
+        let iso_year = if thursday < days_before_year(year) {
+            year - 1
+        } else if thursday >= days_before_year(year + 1) {
+            year + 1
+        } else {
+            year
+        };
+        (iso_year, (thursday - days_before_year(iso_year)) / 7 + 1)
+    }
+
+    fn add_months(self, count: i64) -> EvalResult<Self> {
+        let month = (i64::from(self.year) - 1) * 12 + i64::from(self.month) - 1;
+        let month = month
+            .checked_add(count)
+            .filter(|month| (0..9999 * 12).contains(month))
+            .ok_or_else(|| row("date is outside years 0001 through 9999"))?;
+        let year = (month / 12 + 1) as u16;
+        let month = (month % 12 + 1) as u8;
+        Ok(Self {
+            year,
+            month,
+            day: self.day.min(days_in_month(year, month)),
+        })
+    }
+}
+
+impl Timestamp {
+    fn unix_nanos(self) -> i128 {
+        let days_since_epoch = self.utc.date.day_number() - days_before_year(1970);
+        i128::from(days_since_epoch * SECONDS_PER_DAY + i64::from(self.utc.second))
+            * NANOS_PER_SECOND
+            + i128::from(self.utc.nanos)
+    }
+
+    fn from_unix_nanos(nanos: i128, offset: i16) -> EvalResult<Self> {
+        let seconds = nanos.div_euclid(NANOS_PER_SECOND);
+        let nanos = nanos.rem_euclid(NANOS_PER_SECOND) as u32;
+        let day = i64::try_from(seconds.div_euclid(i128::from(SECONDS_PER_DAY)))
+            .map_err(|_| row("timestamp is outside years 0001 through 9999"))?;
+        let date = Date::from_day_number(day + days_before_year(1970))?;
+        let utc = Civil {
+            date,
+            second: seconds.rem_euclid(i128::from(SECONDS_PER_DAY)) as u32,
+            nanos,
+        };
+        utc.shift(offset).map_err(row)?;
+        Ok(Self { utc, offset })
+    }
+}
+
+fn whole_i64(number: f64) -> EvalResult<i64> {
+    if number.fract() == 0.0 && (i64::MIN as f64..-(i64::MIN as f64)).contains(&number) {
+        Ok(number as i64)
+    } else {
+        Err(row(
+            "expected a whole number in the supported range. Use an integer of smaller magnitude.",
+        ))
+    }
+}
+
+fn nanos_from_seconds(seconds: f64) -> EvalResult<i128> {
+    let whole = whole_i64(seconds.trunc())?;
+    Ok(i128::from(whole) * NANOS_PER_SECOND
+        + (seconds.fract() * NANOS_PER_SECOND as f64).round() as i128)
+}
+
+fn seconds_from_nanos(nanos: i128) -> f64 {
+    (nanos / NANOS_PER_SECOND) as f64 + (nanos % NANOS_PER_SECOND) as f64 / NANOS_PER_SECOND as f64
+}
+
+fn wrong_date(value: &Value<'_>) -> super::EvalError {
+    row(format!(
+        "expected a date, received {}. Use DATE_PARSE(...) for text such as \"2024-01-02\".",
+        value.type_name()
+    ))
+}
+
+fn wrong_timestamp(value: &Value<'_>) -> super::EvalError {
+    row(format!("expected a timestamp, received {}. Use TIMESTAMP_PARSE(...) for text or TIMESTAMP_FROM_UNIX(...) for epoch seconds.", value.type_name()))
+}
+
+fn date(value: Value<'_>) -> EvalResult<Date> {
+    match value {
+        Value::Date(date) => Ok(date),
+        other => Err(wrong_date(&other)),
+    }
+}
+
+fn timestamp(value: Value<'_>) -> EvalResult<Timestamp> {
+    match value {
+        Value::Timestamp(timestamp) => Ok(timestamp),
+        other => Err(wrong_timestamp(&other)),
+    }
+}
+
+pub(super) fn arithmetic<'a>(
+    function: Function,
+    first: Value<'a>,
+    second: Option<Value<'a>>,
+    third: Option<Value<'a>>,
+) -> EvalResult<Value<'a>> {
+    use Function::*;
+    match function {
+        DATE_FROM_PARTS => {
+            let part = |value: Value<'a>| {
+                u32::try_from(whole_i64(value.number()?)?)
+                    .map_err(|_| row("invalid Gregorian date. Use a year from 1 to 9999, a month from 1 to 12, and a day valid for that month."))
+            };
+            Date::new(part(first)?, part(second.unwrap())?, part(third.unwrap())?)
+                .map(Value::Date)
+                .map_err(row)
+        }
+        TIMESTAMP_FROM_UNIX => Timestamp::from_unix_nanos(nanos_from_seconds(first.number()?)?, 0)
+            .map(Value::Timestamp),
+        TIMESTAMP_TO_UNIX | TIMESTAMP_ADD_SECONDS | TIMESTAMP_DIFF_SECONDS => {
+            let start = timestamp(first)?;
+            let nanos = start.unix_nanos();
+            match function {
+                TIMESTAMP_ADD_SECONDS => {
+                    let delta = nanos_from_seconds(second.unwrap().number()?)?;
+                    Timestamp::from_unix_nanos(nanos + delta, start.offset).map(Value::Timestamp)
+                }
+                TIMESTAMP_DIFF_SECONDS => {
+                    let end = timestamp(second.unwrap())?.unix_nanos();
+                    Ok(Value::Number(seconds_from_nanos(end - nanos)))
+                }
+                _ => Ok(Value::Number(seconds_from_nanos(nanos))),
+            }
+        }
+        _ => {
+            let start = date(first)?;
+            match function {
+                DATE_ADD_DAYS => {
+                    let count = whole_i64(second.unwrap().number()?)?;
+                    let day = start
+                        .day_number()
+                        .checked_add(count)
+                        .ok_or_else(|| row("date is outside years 0001 through 9999"))?;
+                    Date::from_day_number(day).map(Value::Date)
+                }
+                DATE_DIFF_DAYS => {
+                    let end = date(second.unwrap())?;
+                    Ok(Value::Number(
+                        (end.day_number() - start.day_number()) as f64,
+                    ))
+                }
+                DATE_WEEKDAY => Ok(Value::Number((start.day_number() % 7 + 1) as f64)),
+                DATE_IS_WEEKEND => Ok(Value::Bool(start.day_number() % 7 >= 5)),
+                DATE_END_OF_MONTH => Ok(Value::Date(Date {
+                    day: days_in_month(start.year, start.month),
+                    ..start
+                })),
+                DATE_ADD_MONTHS => start
+                    .add_months(whole_i64(second.unwrap().number()?)?)
+                    .map(Value::Date),
+                DATE_ISO_WEEK => Ok(Value::Number(start.iso_week().1 as f64)),
+                DATE_ISO_WEEK_YEAR => Ok(Value::Number(start.iso_week().0 as f64)),
+                _ => unreachable!(),
+            }
+        }
+    }
 }

@@ -1,0 +1,120 @@
+--- crates/chopper/src/engine/calculation.rs
++++ crates/chopper/src/engine/calculation.rs
+@@ -5,6 +5,7 @@
+ pub(crate) struct Plan {
+     programs: [Option<Program>; 64],
+     order: [usize; 64],
++    referenced_results: u64,
+     width: usize,
+     pub(crate) header: Header,
+     pub(super) boundary: usize,
+@@ -100,6 +101,10 @@
+                 .with_context(|| format!("preparing calculated column {:?}", column.name))?,
+             );
+         }
++        let referenced_results = programs[..count]
++            .iter()
++            .flatten()
++            .fold(0, |mask, program| mask | program.dependencies);
+         let mut completed = 0;
+         for slot in &mut order[..count] {
+             let index = ready(&programs[..count], completed).with_context(|| {
+@@ -129,6 +134,7 @@
+         Ok(Self {
+             programs,
+             order,
++            referenced_results,
+             width,
+             header: expanded,
+             boundary,
+@@ -153,6 +159,7 @@
+         let mut retained = Reservation::new(ctx);
+         let count = job.calculated_columns.len();
+         let mut values: [(String, char); 64] = std::array::from_fn(|_| (String::new(), 'n'));
++        let mut scalars: [Option<Value<'static>>; 64] = [const { None }; 64];
+         for parent in dataset.groups()? {
+             ctx.check()?;
+             let parent = parent?;
+@@ -181,6 +188,9 @@
+                                 .map(|text| Value::Text(Cow::Borrowed(text)));
+                         }
+                         let relative = column - self.width;
++                        if let Some(value) = scalars.get(relative).and_then(Option::as_ref) {
++                            return scalar_value(value);
++                        }
+                         let (text, kind) = if relative < index {
+                             before.get(relative)?
+                         } else {
+@@ -189,11 +199,13 @@
+                         Value::from_stored(text, *kind)
+                     };
+                     let mut resource_failure = None;
+-                    let result =
+-                        self.programs[index]
+-                            .as_ref()
+-                            .unwrap()
+-                            .evaluate(&field, &mut |bytes| {
++                    let result = self.programs[index]
++                        .as_ref()
++                        .unwrap()
++                        .evaluate_retaining_scalar(
++                            &field,
++                            self.referenced_results & (1 << index) != 0,
++                            &mut |bytes| {
+                                 ctx.check()
+                                     .and_then(|()| reserve_scratch_bytes(&mut scratch, bytes))
+                                     .map_err(|error| {
+@@ -201,8 +213,9 @@
+                                         resource_failure = Some(error);
+                                         message
+                                     })
+-                            });
+-                    let (result_kind, rendered) = result
++                            },
++                        );
++                    let (scalar, result_kind, rendered) = result
+                         .map_err(|error| resource_failure.unwrap_or(error))
+                         .with_context(|| {
+                             format!(
+@@ -231,6 +244,7 @@
+                     value.push_str(&rendered);
+                     *kind = result_kind;
+                     drop(rendered);
++                    scalars[index] = scalar;
+                     scratch.resize(0)?;
+                 }
+                 row.append_calculated(&values[..count], ctx.max_record)
+@@ -253,7 +267,33 @@
+     }
+ }
+ 
++fn scalar_value(value: &Value<'_>) -> Option<Value<'static>> {
++    match value {
++        Value::Text(_) => None,
++        Value::Null => Some(Value::Null),
++        Value::Number(number) => Some(Value::Number(*number)),
++        Value::Bool(boolean) => Some(Value::Bool(*boolean)),
++        Value::Date(date) => Some(Value::Date(*date)),
++        Value::Timestamp(timestamp) => Some(Value::Timestamp(*timestamp)),
++    }
++}
++
+ impl Program {
++    fn evaluate_retaining_scalar<'a>(
++        &'a self,
++        field: &(impl Fn(usize) -> Option<Value<'a>> + 'a),
++        retain_scalar: bool,
++        reserve: &mut chopper_core::expression::Reserve<'_>,
++    ) -> Result<(Option<Value<'static>>, char, Cow<'a, str>)> {
++        let value = self.expression.evaluate(field, reserve)?;
++        let scalar = if retain_scalar {
++            scalar_value(&value)
++        } else {
++            None
++        };
++        Ok((scalar, value.kind(), value.rendered(reserve)?))
++    }
++
+     fn evaluate<'a>(
+         &'a self,
+         field: &(impl Fn(usize) -> Option<Value<'a>> + 'a),

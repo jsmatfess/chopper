@@ -45,13 +45,13 @@ fn validates_saved_job_without_input_or_work_directory() {
 fn validates_calculation_syntax_without_opening_a_csv() {
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("job.json");
-    fs::write(&path, r#"{"input":"missing.csv","output":"out","operations":[{"type":"calculate","name":"label","expression":"UPPER([missing header])"}]}"#).unwrap();
+    fs::write(&path, r#"{"input":"missing.csv","output":"out","calculated_columns":[{"name":"label","expression":"UPPER([missing header])"}]}"#).unwrap();
     assert!(validate(dir.path(), &[]).status.success());
-    fs::write(&path, r#"{"input":"missing.csv","output":"out","operations":[{"type":"calculate","name":"label","expression":"SAFE.REGEX_MATCH(a, \"[\")"}]}"#).unwrap();
+    fs::write(&path, r#"{"input":"missing.csv","output":"out","calculated_columns":[{"name":"label","expression":"SAFE.REGEX_MATCH(a, \"[\")"}]}"#).unwrap();
     let failed = validate(dir.path(), &["--json"]);
     assert_eq!(failed.status.code(), Some(1));
     let report: serde_json::Value = serde_json::from_slice(&failed.stdout).unwrap();
-    assert_eq!(report["error"]["path"], "/operations/0/expression");
+    assert_eq!(report["error"]["path"], "/calculated_columns/0/expression");
     assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 1);
 }
 

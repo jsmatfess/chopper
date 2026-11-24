@@ -12,10 +12,9 @@ use std::{ffi::OsStr, path::PathBuf, str::FromStr};
 const LOCAL: &[(&str, &str)] = &[
     ("step", "Append an operation to the pipeline"),
     (
-        "name",
-        "Output column name for the preceding calculate step",
+        "calculated-column",
+        "Define a calculated column as NAME=FORMULA",
     ),
-    ("expression", "Formula for the preceding calculate step"),
     (
         "by",
         "Partition column names, comma-separated; use --column for literal names",
@@ -164,7 +163,11 @@ pub fn command() -> Command {
         let argument = Arg::new(id)
             .long(id)
             .help(help)
-            .help_heading("Ordered steps")
+            .help_heading(if id == "calculated-column" {
+                "Calculated columns"
+            } else {
+                "Ordered steps"
+            })
             .action(ArgAction::Append);
         let argument = match id {
             "step" => argument.value_parser(choices(Operation::CHOICES)),
@@ -386,6 +389,16 @@ pub fn parse(matches: &ArgMatches) -> Result<(Job, bool)> {
     ordered.sort_unstable_by_key(|entry| entry.0);
     let mut seen = Vec::new();
     for (_, flag, value) in ordered {
+        if flag == "calculated-column" {
+            let (name, expression) = value
+                .split_once('=')
+                .context("--calculated-column requires NAME=FORMULA")?;
+            job.calculated_columns.push(CalculatedColumn {
+                name: name.into(),
+                expression: expression.into(),
+            });
+            continue;
+        }
         if flag == "step" {
             ensure!(
                 job.operations.len() < 64,
@@ -403,13 +416,11 @@ pub fn parse(matches: &ArgMatches) -> Result<(Job, bool)> {
             .operations
             .last_mut()
             .with_context(|| format!("--{flag} requires a preceding --step"))?;
-        if matches!(flag, "files" | "strategy" | "name" | "expression") {
+        if matches!(flag, "files" | "strategy") {
             ensure!(!seen.contains(&flag), "step {index}: repeated --{flag}");
             seen.push(flag);
         }
         match (flag, step) {
-            ("name", Operation::Calculate { name, .. }) => *name = value.into(),
-            ("expression", Operation::Calculate { expression, .. }) => *expression = value.into(),
             ("by" | "column" | "column-index", Operation::Partition { columns }) => {
                 if flag == "by" {
                     columns.extend(value.split(',').map(|name| Column::Name(name.into())));

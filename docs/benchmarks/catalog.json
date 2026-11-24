@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "e1430ed743e22b0758d5860b90c35a8965f64a6a3fb63b6cc14059b2876b53f0"
+    "sha256": "bcd1c4f4b96112ab021a7bc07e053eef68c6ff3832b47f107f3c764dcd1d9e7c"
   },
   "experiments": [
     {
@@ -4425,6 +4425,35 @@
       "narrative": {
         "path": "docs/performance/investigations/calculated-column-streaming-baseline-2026-11-23.md",
         "sha256": "c11dbece22144fe7f01abaeed3e146451b9487ab0078c5e42ddf03e62674cd21",
+        "topic": "profiling"
+      }
+    },
+    {
+      "title": "Calculated-column evaluation and terminal publication (2026-11-24)",
+      "evidence": "docs/performance.md#calculated-column-evaluation-and-terminal-publication-2026-11-24",
+      "artifacts": [
+        "docs/benchmarks/calculated-column-opt-integrated-2026-11-24.patch",
+        "docs/benchmarks/calculated-column-optimization-summary-2026-11-24.json"
+      ],
+      "scripts": [
+        "scripts/benchmark-calculated-column-optimization.py"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/calculated-column-evaluation-and-terminal-publication-2026-11-24.md",
+        "sha256": "fae62f13352ef76ffcc14f1fb8ad647c3aa8302c06d97ad605cf02e5fa03669e",
+        "topic": "profiling"
+      }
+    },
+    {
+      "title": "Calculated columns followed by Partition (2026-11-24)",
+      "evidence": "docs/performance.md#calculated-columns-followed-by-partition-2026-11-24",
+      "artifacts": [
+        "docs/benchmarks/calculated-partition-summary-2026-11-24.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/calculated-columns-followed-by-partition-2026-11-24.md",
+        "sha256": "3f154b58e963247b8d8f720417d8bc3cd03e2f4658d40a77ca448483d1a689db",
         "topic": "profiling"
       }
     }
@@ -10288,6 +10317,126 @@
       ]
     },
     {
+      "path": "docs/benchmarks/calculated-column-opt-dependency-fast-path-2026-11-24.patch",
+      "sha256": "796723347df6bbb02b3dc7ae1d6e85d5ebb833ff62e3c0b0e0dbcc1cf3d5f4e1",
+      "bytes": 9103,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": []
+    },
+    {
+      "path": "docs/benchmarks/calculated-column-opt-format-once-2026-11-24.patch",
+      "sha256": "58ff736943b71cfd1a713811bd2e85761debb05e61103ed9c26818aeff029e47",
+      "bytes": 1838,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": []
+    },
+    {
+      "path": "docs/benchmarks/calculated-column-opt-integrated-2026-11-24.patch",
+      "sha256": "f6dd6f05a6c472ec247a28fd2564da0b2b2c11962416e14c94c0c74b0c5b459e",
+      "bytes": 7423,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#calculated-column-evaluation-and-terminal-publication-2026-11-24"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/calculated-column-opt-profile-2026-11-24.patch",
+      "sha256": "979f633fe73ae208d42edf21ec215138a5da8e65d69272ffdeffefb6a88b481d",
+      "bytes": 1436,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": []
+    },
+    {
+      "path": "docs/benchmarks/calculated-column-opt-profile-thread-2026-11-24.patch",
+      "sha256": "2927062b70040eca035f86275314b30d5fb7e32fc4fba4b6e6bec677c6bb9645",
+      "bytes": 2573,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": []
+    },
+    {
+      "path": "docs/benchmarks/calculated-column-opt-terminal-direct-2026-11-24.patch",
+      "sha256": "48db15dbb881e3a306412735d06e5945c24c3decb54daeb71db074b1db60f216",
+      "bytes": 1622,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": []
+    },
+    {
+      "path": "docs/benchmarks/calculated-column-opt-terminal-large-2026-11-24.patch",
+      "sha256": "91f340b135260544f82c46e400dee83d01db5904183c46a68323450c1ed226e2",
+      "bytes": 2639,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": []
+    },
+    {
+      "path": "docs/benchmarks/calculated-column-opt-terminal-linux-fresh-2026-11-24.patch",
+      "sha256": "a01de68f91c0415ea3bb44a50f488d1642db128a6a52e7f021f1f5143a963ebe",
+      "bytes": 2019,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": []
+    },
+    {
+      "path": "docs/benchmarks/calculated-column-opt-typed-dependencies-fresh-2026-11-24.patch",
+      "sha256": "4f7b922db30dcad9778b4848c6c5490af6fa8d82705492d10146f6bc0cb18e3d",
+      "bytes": 4784,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": []
+    },
+    {
+      "path": "docs/benchmarks/calculated-column-optimization-summary-2026-11-24.json",
+      "sha256": "05cc7a1574965a9479a7de6f7add828f3c5fd0e09f96288ceec19a1d069e72ba",
+      "bytes": 151450,
+      "format": "json",
+      "record_counts": {
+        "calculated_column_optimization_summary": 1
+      },
+      "fields": [
+        "baseline_parent_commit",
+        "baseline_tree_sha1",
+        "build_command",
+        "experiments",
+        "ineligible_attempts",
+        "platform",
+        "raw_storage",
+        "rust_features",
+        "rustc",
+        "sample_columns",
+        "schema_version",
+        "selected_experiment",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#calculated-column-evaluation-and-terminal-publication-2026-11-24"
+      ]
+    },
+    {
       "path": "docs/benchmarks/calculated-columns-native-2026-11-23.jsonl",
       "sha256": "5f36a16188947121e33489cc540e7ec717b2f9a109444604b30a4b5f99d56458",
       "bytes": 41373,
@@ -10381,6 +10530,29 @@
       ],
       "evidence": [
         "docs/performance.md#calculated-column-streaming-baseline-2026-11-23"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/calculated-partition-summary-2026-11-24.json",
+      "sha256": "1058b4537c5951f48e7971114419d8385d606351a8e4731feb47232b59a0f9b2",
+      "bytes": 28742,
+      "format": "json",
+      "record_counts": {
+        "calculated_partition_fusion_measurements": 1
+      },
+      "fields": [
+        "baseline_tree_sha1",
+        "batches",
+        "optimized_source_patch_sha256",
+        "platform",
+        "sample_columns",
+        "schema_version",
+        "type",
+        "whole_job_clock"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#calculated-columns-followed-by-partition-2026-11-24"
       ]
     },
     {
@@ -36178,8 +36350,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "b4423f99e579cfd0ae626191496044dde2312de80d4711c3131df2aaf2b30f9b",
-      "bytes": 1710554,
+      "sha256": "c42e6cb6401f8333ab4afd0872ebe1e13ed08281dc6daaee8942de490b50cfcd",
+      "bytes": 1719886,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -40476,7 +40648,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "a3300c317b4b34af7d1fe8c32dc37666535a7a0124316371c3bfde4041b64176"
+    "sha256": "7f5ea9539041027247e760e7d372b6a5bbc513349d7ed8bf458d6d1f164702c8"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

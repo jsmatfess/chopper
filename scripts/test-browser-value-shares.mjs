@@ -13,7 +13,14 @@ await withHostedBrowser({port:8434,viewport:{width:1440,height:1050}},async({con
  await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(job))});await page.waitForFunction(()=>document.querySelector('.step'));
  await page.locator('#profile').click();await page.waitForFunction(()=>['PROFILED','FAILED'].includes(document.getElementById('status').textContent));assert.equal(await page.locator('#status').textContent(),'PROFILED',await page.locator('#error').textContent());
  const cohort=page.locator('.column-values-row[data-column="1"]');
- async function checkShares(){await cohort.evaluate(el=>el.open=true);assert.deepEqual(await cohort.locator('.value-label').allTextContents(),['B','A','(empty)']);assert.deepEqual(await cohort.locator('.value-share').allTextContents(),['66.7%','25%','8.3%']);assert.match(await cohort.innerText(),/exact counts/);}
+ async function checkShares(){
+  await cohort.evaluate(el=>el.open=true);
+  await cohort.locator('.value-share').first().waitFor();
+  assert.deepEqual(await cohort.locator('.value-label').allTextContents(),['B','A','(empty)']);
+  assert.deepEqual(await cohort.locator('.value-frequency').allTextContents(),['80','30','10']);
+  assert.deepEqual(await cohort.locator('.value-share').allTextContents(),['66.7%','25%','8.3%']);
+  assert.match(await cohort.innerText(),/Exact row counts and shares/);
+ }
  await checkShares();assert.equal(await page.locator('.column-values-row[data-column="0"] .value-distribution').count(),0,'120 unique IDs omit shares');
  await page.locator('#run-direct').click();await page.waitForFunction(()=>['COMPLETE','FAILED'].includes(document.getElementById('status').textContent));assert.equal(await page.locator('#status').textContent(),'COMPLETE',await page.locator('#error').textContent());await page.locator('.workspace-view-controls [data-workspace-view=configuration]').click();await page.waitForFunction(()=>document.body.dataset.workspaceView==='configuration');await checkShares();
  const captures=process.argv.find(arg=>arg.startsWith('--screenshots='))?.slice(14);if(captures)await mkdir(captures,{recursive:true});

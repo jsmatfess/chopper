@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "f6629da1735ef77253a69d514ed0dde69f41012e5d48b5d6c4ef0e92f0c9700f",
+  "catalog_sha256": "0ad2020f40a0f45a2b78d1657b49bf1f735037d803e32fb339b48675f5afa191",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -296,6 +296,19 @@
       "source_sha256": "04ff46b4757aa4d115812187e75887797619944325085dad11e80ff90825e54a",
       "aliases": [
         "docs/benchmarks/hosted-deployment-acceptance-2026-10-22.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/calculated-column-optimization-summary-2026-11-24.json",
+      "source_sha256": "05cc7a1574965a9479a7de6f7add828f3c5fd0e09f96288ceec19a1d069e72ba",
+      "aliases": [
+        "docs/benchmarks/calculated-column-optimization-summary-2026-11-24.json"
       ],
       "format": "json",
       "layouts": [],
@@ -1024,6 +1037,19 @@
         "docs/benchmarks/random-buckets-skew-invalid-config-2026-10-19.log"
       ],
       "format": "log",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/calculated-partition-summary-2026-11-24.json",
+      "source_sha256": "1058b4537c5951f48e7971114419d8385d606351a8e4731feb47232b59a0f9b2",
+      "aliases": [
+        "docs/benchmarks/calculated-partition-summary-2026-11-24.json"
+      ],
+      "format": "json",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -2540,6 +2566,19 @@
       "source_sha256": "28c1e68cae164850d38587dbcbc54052d7304fd1af68007a59dd9c4aa229c72a",
       "aliases": [
         "docs/benchmarks/overlap-followup-2026-11-22-digest-profile.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/calculated-column-opt-profile-thread-2026-11-24.patch",
+      "source_sha256": "2927062b70040eca035f86275314b30d5fb7e32fc4fba4b6e6bec677c6bb9645",
+      "aliases": [
+        "docs/benchmarks/calculated-column-opt-profile-thread-2026-11-24.patch"
       ],
       "format": "patch",
       "layouts": [],
@@ -4188,6 +4227,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/calculated-column-opt-terminal-direct-2026-11-24.patch",
+      "source_sha256": "48db15dbb881e3a306412735d06e5945c24c3decb54daeb71db074b1db60f216",
+      "aliases": [
+        "docs/benchmarks/calculated-column-opt-terminal-direct-2026-11-24.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/ascii-quoted-escapes-2026-11-05.json",
       "source_sha256": "4923bae1f66493417ce3abbc88c3b54634e9873e918d25292d6ebb307e34c002",
       "aliases": [
@@ -4586,6 +4638,19 @@
         "docs/benchmarks/terminal-uniform-merge-read-buffers-summary-2026-11-21.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/calculated-column-opt-typed-dependencies-fresh-2026-11-24.patch",
+      "source_sha256": "4f7b922db30dcad9778b4848c6c5490af6fa8d82705492d10146f6bc0cb18e3d",
+      "aliases": [
+        "docs/benchmarks/calculated-column-opt-typed-dependencies-fresh-2026-11-24.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -5182,6 +5247,19 @@
         "contract-duration": 24
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/calculated-column-opt-format-once-2026-11-24.patch",
+      "source_sha256": "58ff736943b71cfd1a713811bd2e85761debb05e61103ed9c26818aeff029e47",
+      "aliases": [
+        "docs/benchmarks/calculated-column-opt-format-once-2026-11-24.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/consecutive-partitions-engines-2026-10-17.jsonl",
@@ -7249,6 +7327,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/calculated-column-opt-dependency-fast-path-2026-11-24.patch",
+      "source_sha256": "796723347df6bbb02b3dc7ae1d6e85d5ebb833ff62e3c0b0e0dbcc1cf3d5f4e1",
+      "aliases": [
+        "docs/benchmarks/calculated-column-opt-dependency-fast-path-2026-11-24.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/uniform-balanced-40gib-cross-tool-summary-2026-11-21.json",
       "source_sha256": "79767980b633d0e81a63c79fc9e07a00013c6a6bad34174d58902b48dbafa3db",
       "aliases": [
@@ -8568,6 +8659,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/calculated-column-opt-terminal-large-2026-11-24.patch",
+      "source_sha256": "91f340b135260544f82c46e400dee83d01db5904183c46a68323450c1ed226e2",
+      "aliases": [
+        "docs/benchmarks/calculated-column-opt-terminal-large-2026-11-24.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/browser-direct-destination-write-overlap-2026-11-22-holdout.jsonl",
       "source_sha256": "92573dca0ab0156c9bda4cc1a2e13c2a49bb33fb069609b780f1896d8290cc4c",
       "aliases": [
@@ -8900,6 +9004,19 @@
         "docs/benchmarks/zstandard-output-source-audit-2026-10-23.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/calculated-column-opt-profile-2026-11-24.patch",
+      "source_sha256": "979f633fe73ae208d42edf21ec215138a5da8e65d69272ffdeffefb6a88b481d",
+      "aliases": [
+        "docs/benchmarks/calculated-column-opt-profile-2026-11-24.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -9446,6 +9563,19 @@
         "measurement": 24
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/calculated-column-opt-terminal-linux-fresh-2026-11-24.patch",
+      "source_sha256": "a01de68f91c0415ea3bb44a50f488d1642db128a6a52e7f021f1f5143a963ebe",
+      "aliases": [
+        "docs/benchmarks/calculated-column-opt-terminal-linux-fresh-2026-11-24.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/shuffle-partition-trap-write-probe-2026-10-17.jsonl",
@@ -10535,19 +10665,6 @@
       "coverage": "adapted"
     },
     {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "b4423f99e579cfd0ae626191496044dde2312de80d4711c3131df2aaf2b30f9b",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
       "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-counted-zstd.jsonl",
       "source_sha256": "b4660836df7db44f93ef48bad1e0284cc4f04d7e567401f6c82391b8fad35093",
       "aliases": [
@@ -11474,6 +11591,19 @@
         "contract-duration": 23
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "c42e6cb6401f8333ab4afd0872ebe1e13ed08281dc6daaee8942de490b50cfcd",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/csv-marker-cache-2026-11-05-native.py",
@@ -14639,6 +14769,19 @@
         "measurement": 72
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/calculated-column-opt-integrated-2026-11-24.patch",
+      "source_sha256": "f6dd6f05a6c472ec247a28fd2564da0b2b2c11962416e14c94c0c74b0c5b459e",
+      "aliases": [
+        "docs/benchmarks/calculated-column-opt-integrated-2026-11-24.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/zstandard-input-linux-validation-2026-10-23.json",

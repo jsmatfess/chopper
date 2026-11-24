@@ -1,0 +1,598 @@
+{
+  "TRIM": [
+    ["\" \r\nÅ\t \"", "t", "Å"],
+    ["\"​x​\"", "t", "​x​"],
+    ["NULL", "n", ""],
+    ["42", "row", "expected text"]
+  ],
+  "UPPER": [
+    ["\"Straße\"", "t", "STRASSE"],
+    ["\"ﬃé🙂\"", "t", "FFIÉ🙂"],
+    ["NULL", "n", ""],
+    ["TRUE", "row", "expected text"]
+  ],
+  "LOWER": [
+    ["\"ΟΣ ΟΣΑ\"", "t", "ος οσα"],
+    ["\"İ\"", "t", "i̇"],
+    ["NULL", "n", ""],
+    ["42", "row", "expected text"]
+  ],
+  "CONCAT": [
+    ["\"\", \"é\", \"\r\n\", \"🙂\"", "t", "é\r\n🙂"],
+    ["\"x\", NULL, 1/0", "n", ""],
+    ["\"x\", TRUE", "row", "expected text"],
+    ["", "parse", "expected CONCAT"]
+  ],
+  "REPLACE": [
+    ["\"é🙂\",\"\", \"-\"", "t", "-é-🙂-"],
+    ["\"aaaa\",\"aa\",\"z\"", "t", "zz"],
+    ["\"a\r\nb\r\n\",\"\r\n\",\"\"", "t", "ab"],
+    ["\"x\", NULL,\"y\"", "n", ""],
+    ["\"x\",\"x\",1", "row", "expected text"]
+  ],
+  "STARTSWITH": [
+    ["\"Keep\",\"kE\",TRUE", "b", "true"],
+    ["\"North\",\"north\",FALSE", "b", "false"],
+    ["\"abc\",\"much longer\",TRUE", "b", "false"],
+    ["\"x\",\"\",TRUE", "b", "true"],
+    ["\"ßabc\",\"ß\"", "b", "true"],
+    ["\"é\",\"é\"", "b", "false"],
+    ["\"\",\"\"", "b", "true"],
+    ["NULL,\"x\"", "n", ""],
+    ["\"a\",0", "row", "expected text"]
+  ],
+  "ENDSWITH": [
+    ["\"abcς\",\"Σ\",TRUE", "b", "true"],
+    ["\"abcK\",\"K\",TRUE", "b", "true"],
+    ["\"a\",\"long\",TRUE", "b", "false"],
+    ["\"abc\",\"\",TRUE", "b", "true"],
+    ["\"abc🙂\",\"🙂\"", "b", "true"],
+    ["\"abc\",\"BC\"", "b", "false"],
+    ["\"\",\"\"", "b", "true"],
+    ["\"x\", NULL", "n", ""],
+    ["0,\"a\"", "row", "expected text"]
+  ],
+  "SUBSTRING": [
+    ["\"é🙂é\",1,2", "t", "🙂e"],
+    ["\"é🙂\",2", "t", ""],
+    ["\"é🙂\",0,0", "t", ""],
+    ["\"x\",NULL", "n", ""],
+    ["\"é\",-1", "row", "must be a nonnegative whole number"],
+    ["\"é\",0,1.5", "row", "must be a nonnegative whole number"]
+  ],
+  "NUMBER": [
+    ["\"+4.2e1\"", "f", "42"],
+    ["\"-0\"", "f", "-0"],
+    ["\"\"", "n", ""],
+    ["NULL", "n", ""],
+    ["\" 42\"", "row", "invalid number"],
+    ["\"1_000\"", "row", "invalid number"],
+    ["\"NaN\"", "row", "not finite"],
+    ["\"1e999\"", "row", "not finite"]
+  ],
+  "TEXT": [
+    ["FALSE", "t", "false"],
+    ["NUMBER(\"-0\")", "t", "-0"],
+    ["DATE_PARSE(\"0001-01-01\")", "t", "0001-01-01"],
+    ["TIMESTAMP_PARSE(\"2024-01-01T00:15:00+00:30\")", "t", "2023-12-31T23:45:00Z"],
+    ["NULL", "n", ""]
+  ],
+  "ABS": [
+    ["-1e4", "f", "10000"],
+    ["NUMBER(\"-0\")", "f", "0"],
+    ["NULL", "n", ""],
+    ["\"4\"", "row", "expected a number"]
+  ],
+  "ROUND": [
+    ["-2.5", "f", "-3"],
+    ["149,-2", "f", "100"],
+    ["0.125,2", "f", "0.13"],
+    ["120,NULL", "n", ""],
+    ["1,1.5", "row", "ROUND places"],
+    ["1,-309", "row", "ROUND places"]
+  ],
+  "IF": [
+    ["NULL,1/0,\"else\"", "t", "else"],
+    ["TRUE,7,1/0", "f", "7"],
+    ["FALSE,1/0,NULL", "n", ""],
+    ["1,\"a\",\"b\"", "row", "expected a boolean condition"],
+    ["TRUE,1", "parse", "expected IF"]
+  ],
+  "IFS": [
+    ["NULL,1/0,FALSE,1/0,\"fallback\"", "t", "fallback"],
+    ["FALSE,1/0,TRUE,4,1/0", "f", "4"],
+    ["TRUE,1/0,0", "row", "Cannot divide by zero"],
+    ["FALSE,1,TRUE,2", "parse", "expected IFS"]
+  ],
+  "IS_NULL": [
+    ["NUMBER(\"\")", "b", "true"],
+    ["\"\"", "b", "false"],
+    ["FALSE", "b", "false"],
+    ["1/0", "row", "Cannot divide by zero"]
+  ],
+  "COALESCE": [
+    ["NULL,\"\",1/0", "t", ""],
+    ["NULL,0,1/0", "f", "0"],
+    ["NULL,NULL", "n", ""],
+    ["NULL,1/0,42", "row", "Cannot divide by zero"],
+    ["", "parse", "expected COALESCE"]
+  ],
+  "SAFE": [
+    ["NUMBER(\"42\")", "f", "42"],
+    ["NUMBER(\"bad\")", "n", ""],
+    ["NULL", "n", ""],
+    ["1/0", "n", ""],
+    ["ghost()", "parse", "unknown function"],
+    ["REGEX_MATCH(\"x\", \"[\")", "parse", "unclosed character class"]
+  ],
+  "IS_ERROR": [
+    ["NUMBER(\"\")", "b", "false"],
+    ["NUMBER(\"bad\")", "b", "true"],
+    ["SAFE(1/0)", "b", "false"],
+    ["1/0", "b", "true"],
+    ["ghost()", "parse", "unknown function"]
+  ],
+  "DATE_PARSE": [
+    ["\"2000-02-29\"", "d", "2000-02-29"],
+    ["\"29/02/2000 %\",\"%d/%m/%Y %%\"", "d", "2000-02-29"],
+    ["NULL", "n", ""],
+    ["\"1900-02-29\"", "row", "invalid Gregorian date"],
+    ["\"0000-01-01\"", "row", "invalid Gregorian date"],
+    ["\"2024-02-09é\"", "row", "unexpected text"],
+    ["\"2024\",\"%Y\"", "parse", "parse format requires"]
+  ],
+  "DATE_FORMAT": [
+    ["DATE_PARSE(\"0001-02-03\"),\"猫 %d/%m/%Y %%\"", "t", "猫 03/02/0001 %"],
+    ["DATE_PARSE(\"2024-01-01\"),\"\"", "t", ""],
+    ["NULL,\"%Y\"", "n", ""],
+    ["\"2024-01-01\",\"%Y\"", "row", "expected a date"],
+    ["NULL,\"%z\"", "parse", "unsupported date or timestamp format token"]
+  ],
+  "DATE_EXTRACT": [
+    ["DATE_PARSE(\"2023-12-31\"),\"quarter\"", "f", "4"],
+    ["DATE_PARSE(\"0001-01-01\"),\"year\"", "f", "1"],
+    ["NULL,\"day\"", "n", ""],
+    ["TIMESTAMP_FROM_UNIX(0),\"year\"", "row", "expected a date"],
+    ["NULL,\"hour\"", "parse", "unsupported date or timestamp unit"]
+  ],
+  "DATE_TRUNC": [
+    ["DATE_PARSE(\"2024-02-29\"),\"quarter\"", "d", "2024-01-01"],
+    ["DATE_PARSE(\"2024-02-29\"),\"month\"", "d", "2024-02-01"],
+    ["NULL,\"day\"", "n", ""],
+    ["1,\"day\"", "row", "expected a date"],
+    ["NULL, \"week\"", "parse", "unsupported date or timestamp unit"]
+  ],
+  "TIMESTAMP_PARSE": [
+    ["\"2000-02-29t23:59:59.000000001-00:30\"", "timestamp", "2000-03-01T00:29:59.000000001Z"],
+    ["\"2024/02/29 17:49\",\"%Y/%m/%d %H:%M\"", "timestamp", "2024-02-29T17:49:00Z"],
+    ["NULL", "n", ""],
+    ["\"2024-02-29T23:59:60Z\"", "row", "invalid clock time"],
+    ["\"2024-02-29T23:59:59.1234567890Z\"", "row", "fractional-second digits"],
+    ["\"2024-02-29T17:49:00+24:00\"", "row", "invalid timestamp offset"],
+    ["\"0001-01-01T00:00:00+00:01\"", "row", "outside years"],
+    ["\"2024-02-29\",\"%Y-%m-%d\"", "parse", "requires %H"]
+  ],
+  "TIMESTAMP_FORMAT": [
+    ["TIMESTAMP_PARSE(\"2024-03-01T00:01:02.034+01:00\"),\"%Y-%m-%d %H:%M:%S.%f %z\",\"local\"", "t", "2024-03-01 00:01:02.034000000 +01:00"],
+    ["TIMESTAMP_PARSE(\"2024-03-01T00:01:02.034+01:00\"),\"%d %H %z\"", "t", "29 23 +00:00"],
+    ["NULL,\"%z\"", "n", ""],
+    ["DATE_PARSE(\"2024-01-01\"),\"%Y\"", "row", "expected a timestamp"],
+    ["NULL,\"%Y\",\"Europe/Paris\"", "parse", "timestamp basis"]
+  ],
+  "TIMESTAMP_EXTRACT": [
+    ["TIMESTAMP_PARSE(\"2025-01-01T00:01:00+00:30\"),\"year\"", "f", "2024"],
+    ["TIMESTAMP_PARSE(\"2025-01-01T00:01:00+00:30\"),\"year\",\"local\"", "f", "2025"],
+    ["NULL,\"second\",\"local\"", "n", ""],
+    ["\"now\",\"hour\"", "row", "expected a timestamp"],
+    ["NULL,\"seconds\"", "parse", "unsupported date or timestamp unit"]
+  ],
+  "TIMESTAMP_TRUNC": [
+    ["TIMESTAMP_PARSE(\"2024-01-01T00:01:23.987+00:30\"),\"hour\",\"local\"", "timestamp", "2023-12-31T23:30:00Z"],
+    ["TIMESTAMP_PARSE(\"2024-01-01T00:01:23.987+00:30\"),\"hour\"", "timestamp", "2023-12-31T23:00:00Z"],
+    ["TIMESTAMP_PARSE(\"2024-01-01T00:01:23.987+00:30\"),\"second\"", "timestamp", "2023-12-31T23:31:23Z"],
+    ["NULL,\"second\"", "n", ""],
+    ["\"now\",\"minute\"", "row", "expected a timestamp"]
+  ],
+  "LIKE": [
+    ["\"猫🙂\",\".*\" ", "b", "true"],
+    ["\"猫🙂\",\".\"", "b", "false"],
+    ["\"a.*b\",\"a\\.\\*b\"", "b", "true"],
+    ["\"a\nb\",\"a.b\"", "b", "true"],
+    ["\"catfish\",\"cat\"", "b", "false"],
+    ["NULL,\".\"", "n", ""],
+    ["\"x\",\"\\\"", "parse", "trailing wildcard escape"]
+  ],
+  "ILIKE": [
+    ["\"Été\",\"éTÉ\"", "b", "true"],
+    ["\"ÄBC\",\"ä.*\"", "b", "true"],
+    ["\"İ\",\".\"", "b", "true"],
+    ["\"ΟΣ\",\"οσ\"", "b", "true"],
+    ["\"i̇\",\".\"", "b", "false"],
+    ["NULL,\".\"", "n", ""],
+    ["42,\".*\"", "row", "expected text"]
+  ],
+  "REGEX_MATCH": [
+    ["\"α-004\",\"^[^A-Z]+-\\d{3}$\"", "b", "true"],
+    ["\"xxaaab\",\"a{1,3}b\"", "b", "true"],
+    ["\"abxx\",\"^ab$\"", "b", "false"],
+    ["\"١\",\"\\d\"", "b", "false"],
+    ["\"\",\"(?:a?)*$\"", "b", "true"],
+    ["NULL,\".\"", "n", ""],
+    ["\"x\",\"[z-a]\"", "parse", "reversed"],
+    ["\"x\",\"(?=x)\"", "parse", "unsupported group"],
+    ["\"x\",\"a{2,1}\"", "parse", "invalid repetition bounds"]
+  ],
+  "REGEX_REPLACE": [
+    ["\" banana \",\"(na)\",\"<$1>\"", "t", " ba<na><na> "],
+    ["\"é🙂\",\"\", \"-\"", "t", "-é-🙂-"],
+    ["\"é🙂\",\"(é)\",\"$0$1\"", "t", "éé🙂"],
+    ["\"b\",\"(a)?b\",\"<$1>\"", "t", "<>"],
+    ["\"x\",\"x\",NULL", "n", ""],
+    ["\"x\",\"x\",\"$1\"", "row", "missing capture"]
+  ],
+  "LEFT": [
+    ["\"é🙂\",1", "t", "e"],
+    ["\"é🙂\",999", "t", "é🙂"],
+    ["\"é\",0", "t", ""],
+    ["NULL,0", "n", ""],
+    ["\"x\",-1", "row", "must be a nonnegative whole number"]
+  ],
+  "RIGHT": [
+    ["\"é🙂\",2", "t", "́🙂"],
+    ["\"é🙂\",999", "t", "é🙂"],
+    ["\"é\",0", "t", ""],
+    ["\"x\",NULL", "n", ""],
+    ["\"x\",0.5", "row", "must be a nonnegative whole number"]
+  ],
+  "LENGTH": [
+    ["\"é👩‍💻\"", "f", "5"],
+    ["\"\"", "f", "0"],
+    ["NULL", "n", ""],
+    ["TRUE", "row", "expected text"]
+  ],
+  "CONTAINS": [
+    ["\"Straße\",\"SS\",TRUE", "b", "false"],
+    ["\"ÉTÉ\",\"té\",1 = 1", "b", "true"],
+    ["\"é\",\"É\",TRUE", "b", "false"],
+    ["\"abc\",\"X\",TRUE", "b", "false"],
+    ["\"aabAA\",\"ABa\",TRUE", "b", "true"],
+    ["\"\",\"\",TRUE", "b", "true"],
+    ["\"x\",\"x\",NULL", "n", ""],
+    ["\"x\",\"x\",\"true\"", "row", "ignore_case must be a Boolean"],
+    ["\"x\",\"x\",TRUE,FALSE", "parse", "received 4 arguments"],
+    ["\"éé\",\"é\"", "b", "true"],
+    ["\"é\",\"é\"", "b", "false"],
+    ["\"\",\"\"", "b", "true"],
+    ["\"x\",NULL", "n", ""],
+    ["\"x\",1", "row", "expected text"]
+  ],
+  "NULLIF": [
+    ["0,NUMBER(\"-0\")", "n", ""],
+    ["\"ab\",NULL", "t", "ab"],
+    ["\"é\",\"é\"", "t", "é"],
+    ["NULL,1/0", "n", ""],
+    ["\"1\",1", "row", "Cannot compare text with a number. Use NUMBER("]
+  ],
+  "IS_BLANK": [
+    ["\"\t\r\n  \"", "b", "true"],
+    ["\"​\"", "b", "false"],
+    ["NULL", "b", "true"],
+    ["0", "row", "expected text"]
+  ],
+  "SPLIT_PART": [
+    ["\"é::::x::\",\"::\",1", "t", ""],
+    ["\"é::::x::\",\"::\",3", "t", ""],
+    ["\"\",\"|\",0", "t", ""],
+    ["\"abc\",\"|\",0", "t", "abc"],
+    ["\"abc\",\"|\",1", "n", ""],
+    ["\"abc\",\"\",0", "row", "delimiter"],
+    ["\"abc\",\"|\",-1", "row", "must be a nonnegative whole number"]
+  ],
+  "LTRIM": [
+    ["\" \r\n🙂\t\"", "t", "🙂\t"],
+    ["\"​ x\"", "t", "​ x"],
+    ["NULL", "n", ""],
+    ["FALSE", "row", "expected text"]
+  ],
+  "RTRIM": [
+    ["\"\t🙂\r\n \"", "t", "\t🙂"],
+    ["\"x ​\"", "t", "x ​"],
+    ["NULL", "n", ""],
+    ["0", "row", "expected text"]
+  ],
+  "FLOOR": [
+    ["-1.00001", "f", "-2"],
+    ["0.9", "f", "0"],
+    ["NULL", "n", ""],
+    ["\"1\"", "row", "expected a number"]
+  ],
+  "CEIL": [
+    ["-1.00001", "f", "-1"],
+    ["0.00001", "f", "1"],
+    ["NULL", "n", ""],
+    ["TRUE", "row", "expected a number"]
+  ],
+  "STRIP_PREFIX": [
+    ["\"KKeep\",\"k\",TRUE", "t", "Keep"],
+    ["UPPER(\"file\"),\"fi\",TRUE", "t", "LE"],
+    ["\"Abc\",\"ab\",FALSE", "t", "Abc"],
+    ["\"éé山\",\"é\"", "t", "é山"],
+    ["\"éz\",\"é\"", "t", "éz"],
+    ["\"abc\",\"\"", "t", "abc"],
+    ["\"abc\",NULL", "n", ""],
+    ["\"abc\",1", "row", "expected text"]
+  ],
+  "STRIP_SUFFIX": [
+    ["\"CooK\",\"k\",TRUE", "t", "Coo"],
+    ["\"Abc\",\"BC\",FALSE", "t", "Abc"],
+    ["\"report...\", \".\"", "t", "report.."],
+    ["\"é\",\"é\"", "t", "é"],
+    ["\"abc\",\"longer\"", "t", "abc"],
+    ["NULL,\".\"", "n", ""],
+    ["42,\".\"", "row", "expected text"]
+  ],
+  "TEXT_BEFORE": [
+    ["\"NorthKeepKEep\",\"keeP\",TRUE", "t", "North"],
+    ["\"NorthKeep\",\"KEEP\",FALSE", "n", ""],
+    ["\"a::b::c\",\"::\"", "t", "a"],
+    ["\"::a\",\"::\"", "t", ""],
+    ["\"a\",\"::\"", "n", ""],
+    ["\"a\",\"\"", "row", "delimiter"]
+  ],
+  "TEXT_AFTER": [
+    ["\"NorthKeepKeEp\",\"keep\",TRUE", "t", "KeEp"],
+    ["\"Keep\",\"keep\",TRUE", "t", ""],
+    ["\"abc\",\"\",TRUE", "row", "delimiter"],
+    ["\"a🙂b🙂c\",\"🙂\"", "t", "b🙂c"],
+    ["\"a::\",\"::\"", "t", ""],
+    ["\"a\",\"::\"", "n", ""],
+    ["\"a\",\"\"", "row", "delimiter"]
+  ],
+  "IS_ASCII": [
+    ["\"\r\n\u0000\"", "b", "true"],
+    ["\"é\"", "b", "false"],
+    ["\"\"", "b", "true"],
+    ["NULL", "n", ""],
+    ["4", "row", "expected text"]
+  ],
+  "IS_DIGITS": [
+    ["\"00042\"", "b", "true"],
+    ["\"0١２\"", "b", "false"],
+    ["\"+42\"", "b", "false"],
+    ["\"\"", "b", "false"],
+    ["NULL", "n", ""],
+    ["42", "row", "expected text"]
+  ],
+  "BYTE_LENGTH": [
+    ["\"é🙂é\"", "f", "9"],
+    ["\"\u0000\"", "f", "1"],
+    ["\"\"", "f", "0"],
+    ["NULL", "n", ""],
+    ["9", "row", "expected text"]
+  ],
+  "TRANSLATE": [
+    ["\"aé!a🙂\",\"aéa!\",\"ø猫X\"", "t", "ø猫ø🙂"],
+    ["\"aé猫\",\"é猫\",\"\"", "t", "a"],
+    ["\"é\",\"\",\"ignored\"", "t", "é"],
+    ["\"abc\",NULL,\"\"", "n", ""],
+    ["\"abc\",\"ab\",42", "row", "expected text"]
+  ],
+  "LPAD": [
+    ["\"é\",4,\"🙂x\"", "t", "🙂x🙂é"],
+    ["\"a🙂\",1,\"ø\"", "t", "a"],
+    ["\"a\",0", "t", ""],
+    ["\"a\",3", "t", "  a"],
+    ["\"a\",NULL", "n", ""],
+    ["\"a\",3,\"\"", "row", "padding text"],
+    ["\"a\",-1", "row", "must be a nonnegative whole number"]
+  ],
+  "RPAD": [
+    ["\"é\",4,\"🙂x\"", "t", "é🙂x🙂"],
+    ["\"a🙂\",1,\"ø\"", "t", "a"],
+    ["\"a\",0", "t", ""],
+    ["\"a\",3", "t", "a  "],
+    ["\"a\",3,NULL", "n", ""],
+    ["\"a\",3,\"\"", "row", "padding text"],
+    ["\"a\",1.5", "row", "must be a nonnegative whole number"]
+  ],
+  "REPEAT": [
+    ["\"🙂\",2", "t", "🙂🙂"],
+    ["\"abc\",0", "t", ""],
+    ["\"\",1e30", "t", ""],
+    ["\"x\",NULL", "n", ""],
+    ["\"a\",0.25", "row", "must be a nonnegative whole number"]
+  ],
+  "CONCAT_WS": [
+    ["\"|\",\"a\",NULL,\"\",\"b\"", "t", "a||b"],
+    ["\"|\",\"a\",NULL,\"\",\"b\",TRUE,TRUE", "t", "a|b"],
+    ["\"|\",\"a\",NULL,\"\",\"b\",FALSE,TRUE", "t", "a||b"],
+    ["\"|\",NULL,NULL,FALSE,TRUE", "t", "|"],
+    ["\"\", \"a\", \"b\"", "t", "ab"],
+    ["NULL,1/0", "n", ""],
+    ["\"|\",42", "row", "expected text"],
+    ["\"|\",TRUE,TRUE", "parse", "expected CONCAT_WS"]
+  ],
+  "BETWEEN": [
+    ["1,1,1", "b", "true"],
+    ["2,3,1", "b", "false"],
+    ["\"é\",\"a\",\"é\"", "b", "true"],
+    ["FALSE,FALSE,TRUE", "b", "true"],
+    ["1,NULL,2", "n", ""],
+    ["1,0,\"2\"", "row", "Cannot compare a number with text. Use NUMBER("]
+  ],
+  "IS_TEXT": [
+    ["\"\"", "b", "true"],
+    ["NUMBER(\"1\")", "b", "false"],
+    ["NULL", "b", "false"],
+    ["1/0", "row", "Cannot divide by zero"]
+  ],
+  "IS_NUMBER": [
+    ["NUMBER(\"-0\")", "b", "true"],
+    ["\"1\"", "b", "false"],
+    ["NULL", "b", "false"],
+    ["1/0", "row", "Cannot divide by zero"]
+  ],
+  "IS_BOOLEAN": [
+    ["FALSE", "b", "true"],
+    ["0", "b", "false"],
+    ["NULL", "b", "false"],
+    ["1/0", "row", "Cannot divide by zero"]
+  ],
+  "TRUNC": [
+    ["-19.75", "f", "-19"],
+    ["-0.5", "f", "-0"],
+    ["NULL", "n", ""],
+    ["\"1.25\"", "row", "expected a number"]
+  ],
+  "SQRT": [
+    ["0", "f", "0"],
+    ["2.25", "f", "1.5"],
+    ["NULL", "n", ""],
+    ["-0.25", "row", "not finite"],
+    ["\"4\"", "row", "expected a number"]
+  ],
+  "POWER": [
+    ["-8,3", "f", "-512"],
+    ["4,-1", "f", "0.25"],
+    ["0,0", "f", "1"],
+    ["NULL,-1", "n", ""],
+    ["-8,0.5", "row", "not finite"],
+    ["1e300,2", "row", "not finite"]
+  ],
+  "LN": [
+    ["1", "f", "0"],
+    ["NULL", "n", ""],
+    ["0", "row", "not finite"],
+    ["-1", "row", "not finite"],
+    ["\"1\"", "row", "expected a number"]
+  ],
+  "LOG10": [
+    ["0.01", "f", "-2"],
+    ["1000", "f", "3"],
+    ["NULL", "n", ""],
+    ["-1", "row", "not finite"],
+    ["0", "row", "not finite"]
+  ],
+  "EXP": [
+    ["0", "f", "1"],
+    ["-10000", "f", "0"],
+    ["NULL", "n", ""],
+    ["10000", "row", "not finite"]
+  ],
+  "BUCKET": [
+    ["-1,5", "f", "-5"],
+    ["11,5,2", "f", "7"],
+    ["-5,5", "f", "-5"],
+    ["-5e-324,2", "f", "-2"],
+    ["1,NULL", "n", ""],
+    ["5,0", "row", "positive"],
+    ["5,-1", "row", "positive"],
+    ["1e308,1e-308", "row", "not finite"]
+  ],
+  "DATE_FROM_PARTS": [
+    ["2000,2,29", "d", "2000-02-29"],
+    ["1,1,1", "d", "0001-01-01"],
+    ["2024,NULL,29", "n", ""],
+    ["2100,2,29", "row", "invalid Gregorian date"],
+    ["2024,2.5,1", "row", "whole number"],
+    ["1e20,2,1", "row", "whole number"]
+  ],
+  "DATE_ADD_DAYS": [
+    ["DATE_PARSE(\"2000-02-28\"),2", "d", "2000-03-01"],
+    ["DATE_PARSE(\"1900-03-01\"),-1", "d", "1900-02-28"],
+    ["NULL,3", "n", ""],
+    ["DATE_PARSE(\"9999-12-31\"),1", "row", "outside years"],
+    ["DATE_PARSE(\"2024-01-01\"),0.5", "row", "whole number"]
+  ],
+  "DATE_DIFF_DAYS": [
+    ["DATE_PARSE(\"0001-01-01\"),DATE_PARSE(\"9999-12-31\")", "f", "3652058"],
+    ["DATE_PARSE(\"1900-03-01\"),DATE_PARSE(\"1900-02-28\")", "f", "-1"],
+    ["DATE_PARSE(\"2000-01-01\"),NULL", "n", ""],
+    ["DATE_PARSE(\"2000-01-01\"),\"2000-01-02\"", "row", "expected a date"]
+  ],
+  "DATE_WEEKDAY": [
+    ["DATE_PARSE(\"0001-01-01\")", "f", "1"],
+    ["DATE_PARSE(\"1970-01-04\")", "f", "7"],
+    ["NULL", "n", ""],
+    ["TIMESTAMP_FROM_UNIX(0)", "row", "expected a date"]
+  ],
+  "DATE_IS_WEEKEND": [
+    ["DATE_PARSE(\"1970-01-03\")", "b", "true"],
+    ["DATE_PARSE(\"1970-01-05\")", "b", "false"],
+    ["NULL", "n", ""],
+    ["\"1970-01-03\"", "row", "expected a date"]
+  ],
+  "DATE_END_OF_MONTH": [
+    ["DATE_PARSE(\"1900-02-01\")", "d", "1900-02-28"],
+    ["DATE_PARSE(\"2000-02-01\")", "d", "2000-02-29"],
+    ["DATE_PARSE(\"9999-12-01\")", "d", "9999-12-31"],
+    ["NULL", "n", ""],
+    ["0", "row", "expected a date"]
+  ],
+  "DATE_ADD_MONTHS": [
+    ["DATE_PARSE(\"2024-01-31\"),1", "d", "2024-02-29"],
+    ["DATE_PARSE(\"2024-03-31\"),-1", "d", "2024-02-29"],
+    ["DATE_PARSE(\"2024-02-29\"),12", "d", "2025-02-28"],
+    ["NULL,-1", "n", ""],
+    ["DATE_PARSE(\"0001-01-01\"),-1", "row", "outside years"],
+    ["DATE_PARSE(\"2024-01-01\"),1.25", "row", "whole number"]
+  ],
+  "DATE_ISO_WEEK": [
+    ["DATE_PARSE(\"2019-12-30\")", "f", "1"],
+    ["DATE_PARSE(\"2021-01-03\")", "f", "53"],
+    ["DATE_PARSE(\"2021-01-04\")", "f", "1"],
+    ["NULL", "n", ""],
+    ["42", "row", "expected a date"]
+  ],
+  "DATE_ISO_WEEK_YEAR": [
+    ["DATE_PARSE(\"2019-12-30\")", "f", "2020"],
+    ["DATE_PARSE(\"2021-01-03\")", "f", "2020"],
+    ["DATE_PARSE(\"0001-01-01\")", "f", "1"],
+    ["NULL", "n", ""],
+    ["\"2021-01-03\"", "row", "expected a date"]
+  ],
+  "TIMESTAMP_ADD_SECONDS": [
+    ["TIMESTAMP_PARSE(\"2024-01-01T00:00:00+00:30\"),-0.25", "timestamp", "2023-12-31T23:29:59.75Z"],
+    ["TIMESTAMP_FROM_UNIX(0),0.0000000006", "timestamp", "1970-01-01T00:00:00.000000001Z"],
+    ["NULL,1", "n", ""],
+    ["TIMESTAMP_PARSE(\"9999-12-31T23:59:59+00:30\"),1", "row", "outside years"],
+    ["TIMESTAMP_FROM_UNIX(0),1e30", "row", "supported range"]
+  ],
+  "TIMESTAMP_DIFF_SECONDS": [
+    ["TIMESTAMP_PARSE(\"1970-01-01T01:00:00+01:00\"),TIMESTAMP_FROM_UNIX(0)", "f", "0"],
+    ["TIMESTAMP_FROM_UNIX(0.25),TIMESTAMP_FROM_UNIX(-0.25)", "f", "-0.5"],
+    ["TIMESTAMP_PARSE(\"9999-12-31T12:00:00.000000001Z\"),TIMESTAMP_PARSE(\"9999-12-31T12:00:00Z\")", "f", "-0.000000001"],
+    ["NULL,TIMESTAMP_FROM_UNIX(0)", "n", ""],
+    ["TIMESTAMP_FROM_UNIX(0),DATE_PARSE(\"1970-01-01\")", "row", "expected a timestamp"]
+  ],
+  "TIMESTAMP_FROM_UNIX": [
+    ["-0.25", "timestamp", "1969-12-31T23:59:59.75Z"],
+    ["0.0000000004", "timestamp", "1970-01-01T00:00:00Z"],
+    ["-62135596800", "timestamp", "0001-01-01T00:00:00Z"],
+    ["NULL", "n", ""],
+    ["-62135596801", "row", "outside years"],
+    ["253402300800", "row", "outside years"]
+  ],
+  "TIMESTAMP_TO_UNIX": [
+    ["TIMESTAMP_PARSE(\"1970-01-01T00:59:59.75+01:00\")", "f", "-0.25"],
+    ["TIMESTAMP_PARSE(\"0001-01-01T00:00:00Z\")", "f", "-62135596800"],
+    ["NULL", "n", ""],
+    ["DATE_PARSE(\"1970-01-01\")", "row", "expected a timestamp"]
+  ],
+  "REGEX_EXTRACT": [
+    ["\"é aaa a\",\"(a+)\",1", "t", "aaa"],
+    ["\"xxabbb\",\"a|ab+\"", "t", "a"],
+    ["\"a\",\"(?:|a)*\"", "t", ""],
+    ["\"a\",\"(?:|a)+\"", "t", ""],
+    ["\"a\",\"(?:|a){1,}\"", "t", ""],
+    ["\"a\",\"(|a)*\",1", "t", ""],
+    ["\"aaa\",\"(a*)*\",1", "t", "aaa"],
+    ["\"\",\"(a*)*\",1", "t", ""],
+    ["\"xy\",\"^\"", "t", ""],
+    ["\"b\",\"(a)?b\",1", "n", ""],
+    ["\"x\",\"y\"", "n", ""],
+    ["\"x\",\"(x)\",2", "row", "capture does not exist"],
+    ["\"x\",\"(x)\",-1", "row", "must be a nonnegative whole number"],
+    ["\"x\",\"(?:x{100}){100}\"", "parse", "compiled pattern"]
+  ]
+}

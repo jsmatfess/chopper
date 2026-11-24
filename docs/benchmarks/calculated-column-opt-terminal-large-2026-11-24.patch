@@ -1,0 +1,62 @@
+--- crates/chopper/src/engine.rs
++++ crates/chopper/src/engine.rs
+@@ -336,12 +336,17 @@
+         && auto::native_retained_exact(&job, &pool);
+     let route = if let Some(plan) = direct_plan {
+         plan.route()
+-    } else if !calculates
+-        && (merge.is_some()
++    } else if !calculates {
++        if merge.is_some()
+             || try_retained_exact
+             || terminal_direct_eligible(&job)
+-            || (!observed && native_shuffle_direct_eligible(&job)))
+-    {
++            || (!observed && native_shuffle_direct_eligible(&job))
++        {
++            Route::PrivateTerminal
++        } else {
++            Route::Snapshot
++        }
++    } else if !observed && large_calculation_direct_eligible(&job) {
+         Route::PrivateTerminal
+     } else {
+         Route::Snapshot
+@@ -515,6 +520,17 @@
+     }
+ }
+ 
++fn large_calculation_direct_eligible(job: &Job) -> bool {
++    // The measured benefit came from avoiding a large serialized snapshot.
++    // Keep the existing path for smaller, evaluator-heavy exports.
++    const MINIMUM_SOURCE_BYTES: u64 = 128 * 1024 * 1024;
++    cfg!(target_os = "linux")
++        && job.operations.is_empty()
++        && job.compression == chopper_core::Compression::None
++        && std::fs::metadata(&job.input)
++            .is_ok_and(|source| source.is_file() && source.len() >= MINIMUM_SOURCE_BYTES)
++}
++
+ fn native_shuffle_direct_eligible(job: &Job) -> bool {
+     cfg!(all(
+         feature = "experimental-terminal-shuffle",
+@@ -712,9 +728,16 @@
+             step_ctx.physical_source = dataset.physical_source;
+             let started = std::time::Instant::now();
+             if index == job.operations.len() {
+-                let mut writer = output::PlanWriter::new(&job, Some(&plan.header), &step_ctx)?;
+-                plan.apply(&dataset, &job, &step_ctx, &mut writer)?;
+-                final_plan = Some(writer.finish()?);
++                if direct_terminal {
++                    let mut writer =
++                        output::PlanWriter::direct_grouped(&job, Some(&plan.header), &step_ctx)?;
++                    plan.apply(&dataset, &job, &step_ctx, &mut writer)?;
++                    terminal_publication = Some(writer.finish_direct()?);
++                } else {
++                    let mut writer = output::PlanWriter::new(&job, Some(&plan.header), &step_ctx)?;
++                    plan.apply(&dataset, &job, &step_ctx, &mut writer)?;
++                    final_plan = Some(writer.finish()?);
++                }
+                 analysis.groups = dataset.groups;
+             } else {
+                 let mut writer = DatasetWriter::new(&step_ctx)?;

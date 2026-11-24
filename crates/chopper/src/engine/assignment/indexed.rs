@@ -109,6 +109,7 @@ mod tests {
             pool.clone(),
             None,
             false,
+            false,
             None,
             output::RunDestination::Unchecked,
             |job, ctx, partitions, balanced, streaming| {

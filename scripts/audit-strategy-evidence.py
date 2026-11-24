@@ -73,6 +73,8 @@ def main():
 
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
+    'Calculated columns followed by Partition (2026-11-24)': 'profiling',
+    'Calculated-column evaluation and terminal publication (2026-11-24)': 'profiling',
     'Calculated-column streaming baseline (2026-11-23)': 'profiling',
     'Auto Chromium thresholds and resource calibration (2026-11-21)': 'adaptive-routing',
     'Browser Auto resource calibration (2026-11-21)': 'adaptive-routing',
@@ -331,6 +333,14 @@ SECTIONS = {
 
 # Explicit orphan associations are navigation only, never recovered metadata.
 ORPHANS = {
+    'calculated-column-opt-dependency-fast-path-2026-11-24.patch': 'profiling',
+    'calculated-column-opt-format-once-2026-11-24.patch': 'profiling',
+    'calculated-column-opt-profile-2026-11-24.patch': 'profiling',
+    'calculated-column-opt-profile-thread-2026-11-24.patch': 'profiling',
+    'calculated-column-opt-terminal-direct-2026-11-24.patch': 'profiling',
+    'calculated-column-opt-terminal-large-2026-11-24.patch': 'profiling',
+    'calculated-column-opt-terminal-linux-fresh-2026-11-24.patch': 'profiling',
+    'calculated-column-opt-typed-dependencies-fresh-2026-11-24.patch': 'profiling',
  'bounded-writers-2026-11-19.svg': 'ownership-and-lifecycle',
  'cross-tool-checks-summary-2026-11-18.json': 'ownership-and-lifecycle',
  'oom-comparison-2026-11-18.svg': 'ownership-and-lifecycle',

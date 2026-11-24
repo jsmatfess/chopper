@@ -22,11 +22,11 @@ def command(*args):
 
 
 def calculation(name, expression):
-    return {"type": "calculate", "name": name, "expression": expression}
+    return {"name": name, "expression": expression}
 
 
-def workload(name, *operations):
-    return name, [*operations, {"type": "partition", "columns": [operations[-1]["name"]]}]
+def workload(name, *definitions):
+    return name, definitions, [{"type": "partition", "columns": [definitions[-1]["name"]]}]
 
 
 CASES = [
@@ -118,7 +118,7 @@ def main():
             "cache": "fixture written once, no cache drop, modes alternate order",
             "timing_scope": "CLI process launch through native publication and stdout completion",
         })
-        for name, operations in CASES:
+        for name, definitions, operations in CASES:
             reference = None
             for repeat in range(args.repeats):
                 order = [256, 32] if repeat % 2 == 0 else [32, 256]
@@ -129,7 +129,7 @@ def main():
                         workspace = directory / "temp"
                         workspace.mkdir()
                         configuration = {
-                            "input": str(source), "output": str(output), "operations": operations,
+                            "input": str(source), "output": str(output), "calculated_columns": definitions, "operations": operations,
                             "limits": {"bytes": MAX_BYTES},
                             "resources": {"workers": 1, "memory_mb": memory, "grouping": "sort",
                                           "max_record_bytes": 1024 * 1024, "temp_dir": str(workspace)},
@@ -143,7 +143,7 @@ def main():
                         record = {
                             "type": "calculation_baseline_run", "case": name, "repeat": repeat + 1,
                             "memory_mib": memory, "workers": 1, "wall_seconds": seconds,
-                            "exit_code": completed.returncode, "operations": operations,
+                            "exit_code": completed.returncode, "calculated_columns": definitions, "operations": operations,
                             "fixture_sha256": source_info["sha256"], "binary_sha256": build["binary_sha256"],
                         }
                         try:

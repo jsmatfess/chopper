@@ -252,7 +252,7 @@ export function configurePlanLinks() {
         const columns=(op.columns||[]).map(column=>typeof column==='number'?`#${column}`:column);
         const selected=columns.slice(0,2).join(', ')+(columns.length>2?` +${columns.length-2} more`:'');
         const shares=(op.groups||[]).slice(0,2).map(group=>`${group.percent}% ${group.name}`).join(' · ')+((op.groups?.length||0)>2?` +${op.groups!.length-2} more`:'');
-        const summary=op.type==='calculate'?('Calculate '+(op.name||'a column')):op.type==='partition'?`Partition by ${selected||'selected columns'}`:['balanced','interleaved'].includes(op.type)?`${op.files} ${op.type==='interleaved'?'alternating':'consecutive'} parts per group`:op.type==='shuffle'?'Shuffle rows within each group':`Assign ${op.type==='assign_probabilistic'?'approximately ':''}${shares||'named percentages'}`;
+        const summary=op.type==='partition'?`Partition by ${selected||'selected columns'}`:['balanced','interleaved'].includes(op.type)?`${op.files} ${op.type==='interleaved'?'alternating':'consecutive'} parts per group`:op.type==='shuffle'?'Shuffle rows within each group':`Assign ${op.type==='assign_probabilistic'?'approximately ':''}${shares||'named percentages'}`;
         const details=document.createElement('details');details.className='plan-step-details';details.dataset.target=target;details.open=expanded.has(target);
         const label=document.createElement('summary');label.textContent='Rules & details';details.append(label,...item.childNodes);
         item.replaceChildren(button(summary,target as PlanTarget),details);

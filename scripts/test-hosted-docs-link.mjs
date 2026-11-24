@@ -17,10 +17,14 @@ try {
   const help = page.getByRole('navigation', { name: 'Chopper help' });
   const docs = help.getByRole('link', { name: 'Docs (opens in a new tab)', exact: true });
   const sample = help.getByRole('button', { name: 'Try a sample', exact: true });
+  const functions = page.getByRole('link', { name: 'Function reference (opens in a new tab)', exact: true });
   const folder = page.getByRole('link', { name: 'Folder and export help (opens in a new tab)', exact: true });
   await docs.waitFor();
   assert.equal(await docs.getAttribute('href'), target);
   await sample.waitFor();
+  assert.equal(await functions.getAttribute('href'), docsOrigin
+    ? new URL('formula-functions', target).href
+    : 'https://github.com/jsmatfess/chopper/blob/main/docs/formula-functions.md');
   assert.equal(await folder.getAttribute('href'), docsOrigin
     ? new URL('browser#choosing-an-output-folder', target).href
     : 'https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#choosing-an-output-folder');
@@ -32,7 +36,7 @@ try {
       'index.html', 'storage-worker.js', 'style.css',
     ]);
   } else if (docsOrigin) {
-    for (const [link, heading] of [[docs, 'h1#user-guide'], [folder, 'h2#choosing-an-output-folder']]) {
+    for (const [link, heading] of [[docs, 'h1#user-guide'], [folder, 'h2#choosing-an-output-folder'], [functions, 'h1#formula-functions']]) {
       const popup = page.waitForEvent('popup');
       await link.click();
       const opened = await popup;

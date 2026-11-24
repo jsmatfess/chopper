@@ -17,12 +17,14 @@ From a clean, frozen release candidate checkout, use its committed revision.
 The site build checks local links and anchors and emits `dist/versions.json`
 with the commit that supplied each release version. The browser smoke test
 checks the landing page, version navigation, an export-recovery deep link,
-and search within each version.
+and search within each version. Versions with the formula reference also get a
+sidebar, CLI cross-link, and function search check for that page.
 
 ```sh
 npm --prefix docs-site ci
 npm --prefix docs-site exec -- playwright install chromium
-npm --prefix docs-site run build -- 0.5.0=HEAD
+v=$(node -p "require('./ui/package.json').version")
+npm --prefix docs-site run build -- v0.5.0 "${v}=HEAD"
 npm --prefix docs-site run smoke
 ```
 
@@ -59,7 +61,7 @@ The docs ship separately to the Cloudflare Pages Direct Upload project
 published docs versions and `/latest` points to the highest stable version.
 
 GitHub Actions is disabled at the repository level. Use the local publication
-path for 0.5. Log in to Wrangler for the account that owns the docs project
+path. Log in to Wrangler for the account that owns the docs project
 or supply an account-scoped Pages Edit token through the environment.
 From the approved checkout, fetch the public tags and run the following.
 `build:published` verifies the requested release against GitHub, then bundles
@@ -69,9 +71,10 @@ candidate. Use the same commands for a retry, with the intended release tag.
 Keep only one local docs deployment in progress at a time.
 
 ```sh
+tag=v0.6.0
 git fetch --tags origin &&
-test "$(git rev-parse HEAD)" = "$(git rev-parse 'v0.5.0^{commit}')" &&
-npm --prefix docs-site run build:published -- v0.5.0 &&
+test "$(git rev-parse HEAD)" = "$(git rev-parse "${tag}^{commit}")" &&
+npm --prefix docs-site run build:published -- "$tag" &&
 npm --prefix docs-site run smoke &&
 (cd docs-site && npm exec -- wrangler pages deploy dist --project-name chopper-docs --branch main)
 ```

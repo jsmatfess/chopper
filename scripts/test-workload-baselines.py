@@ -172,7 +172,8 @@ class BaselineTests(unittest.TestCase):
                 self.assertTrue({'ui/src', 'ui/index.html', 'ui/style.css',
                     'ui/package.json', 'ui/package-lock.json', 'ui/dist/engine.wasm',
                     'scripts/build-hosted.mjs', 'scripts/browser-artifacts.mjs',
-                    'scripts/hosted-theme.mjs', 'docs/releases/native-usage.txt'} <= set(hosted))
+                    'scripts/hosted-theme.mjs', 'docs/releases/native-usage.txt',
+                    'docs/formula-functions.md'} <= set(hosted))
 
     def test_cross_runtime_parity_checks_recipe_and_output_bytes(self):
         first, _, _ = self.fixture()

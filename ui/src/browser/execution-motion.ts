@@ -32,6 +32,7 @@ export const motionScenes={
  exact_membership:bins+bar(3,4,5,3)+bar(11,4,5,3,'motion-b')+bar(19,4,5,3,'motion-c'),
  probabilistic_membership:bins+path('M4 12h15l12-8M19 12h12M19 12l12 8')+dot(7,12),
  stratification:path('M3 3h17v7H3zM3 14h17v7H3zM29 3h15v7H29zM29 14h15v7H29z')+bar(6,5,5,3)+bar(13,16,5,3,'motion-b'),
+ calculation:rows+path('M25 2v20M30 12h11m-5-5v10')+bar(5,10,15,3),
  dataset_materialize:path('M28 3v18h16V3M30 8h12M30 14h12')+bar(3,4,15,3)+bar(3,11,15,3,'motion-b')+bar(3,18,15,3,'motion-c'),
  shared_ranges:path('M3 5h42v14H3zM17 5v14M31 5v14')+path('M4 22h12','motion-a'),
  interleaved_membership:bins+dot(4,5)+dot(11,12,'motion-b')+dot(18,19,'motion-c'),

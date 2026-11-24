@@ -1,5 +1,5 @@
 // Product labels shared by the editor, plan links and observed execution views.
-const names:Record<string,string>={calculate:'Calculate a column',partition:'Partition by column',shuffle:'Shuffle row order',assign:'Assign exact groups',assign_probabilistic:'Assign approximate groups',balanced:'Split into consecutive parts',interleaved:'Split into alternating parts'};
+const names:Record<string,string>={partition:'Partition by column',shuffle:'Shuffle row order',assign:'Assign exact groups',assign_probabilistic:'Assign approximate groups',balanced:'Split into consecutive parts',interleaved:'Split into alternating parts'};
 const colors:Record<string,string>={partition:'blue',shuffle:'amber',assign:'purple',assign_probabilistic:'purple',balanced:'teal',interleaved:'teal'};
 export const operationName=(type:string)=>Object.hasOwn(names,type)?names[type]:'Pipeline step';
 export const operationColor=(type:string)=>Object.hasOwn(colors,type)?colors[type]:'slate';

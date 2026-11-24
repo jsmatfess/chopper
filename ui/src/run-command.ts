@@ -17,10 +17,10 @@ export function runArguments(job:Job):string[]{
   const settings=job[`${prefix}_csv`];
   for(const field of Object.keys(csvDefaults) as (keyof typeof csvDefaults)[]){if(settings[field]!==csvDefaults[field])add(`${prefix}-${field.replaceAll('_','-')}`,settings[field]);}
  }
+ for(const column of job.calculated_columns??[])add('calculated-column',`${column.name}=${column.expression}`);
  for(const op of job.operations){
   add('step',op.type);
   switch(op.type){
-   case 'calculate':add('name',op.name);add('expression',op.expression);break;
    case 'partition':for(const column of op.columns??[])add(typeof column==='number'?'column-index':'column',column);break;
    case 'assign':case 'assign_probabilistic':
     for(const group of op.groups??[])add('group',`${group.name}=${group.percent}`);
@@ -46,6 +46,6 @@ export function runCommand(job:Job,platform:CommandPlatform='windows'){
  const quote=windows?powershellLiteral:posixLiteral;
  const command=executable+' '+args.map(arg=>safe.test(arg)?arg:quote(arg)).join(' ');
  // A conservative portable threshold leaves headroom for native argument limits.
- const usesJson=command.length>24000||args.some(arg=>arg.includes('\0'));
+ const usesJson=command.length>24000||args.some(arg=>arg.includes('\0'))||job.calculated_columns?.some(column=>column.name.includes('='))===true;
  return {command:usesJson?`${executable} run --config ${windows?'.\\chopper-job.json':'./chopper-job.json'} --yes`:command,usesJson};
 }

@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "calculated-columns-followed-by-partition-2026-11-24",
+  "date": "2026-11-24",
+  "title": "Feed calculated rows directly into a single Partition",
+  "subsystem": "execution",
+  "question": "Does eliminating the augmented spool improve complete calculated Partition jobs?",
+  "disposition": "adopt",
+  "outcome": "mixed",
+  "delivery": "default",
+  "summary": "The retained Linux build improves matched 2M-row routed and spilling jobs by 3.10 and 2.56 seconds and removes 2.71–2.80 GB each of tracked temporary reads and writes. A formula-free direct elapsed signal reversed on repeat. The prior terminal export showed a small CPU tradeoff.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "measurement": "complete-run",
+    "workloads": [
+      "Warm-cache WSL2 on x86-64, single worker, uncompressed output and one Partition consuming a calculated column.",
+      "Resident 350,000-row and 2–8M-row pilot jobs, followed by retained 2M-row Auto routing and explicit Sort comparisons.",
+      "Formula-free direct, routed and spilled controls and the existing calculated-only terminal export."
+    ]
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Matched published CSV hashes, caps, lineage, stage statistics and spill counts. Native tests exercise snapshot parity, failure order and cleanup. Chromium checks cover the existing formula pipeline."
+  },
+  "limitations": [
+    "Two synthetic fixture shapes and one WSL2 ext4 host. Native Windows and browser throughput are unmeasured.",
+    "The 8M-row result uses the explicit Sort pilot, a different artifact from the retained build.",
+    "The retained terminal-only regex control used 0.13 seconds more CPU at the paired median. Wall time varied in either direction."
+  ],
+  "exclusions": [
+    "Observed Runs, explicit preparation, compressed output, multiple ordered operations, and source inputs below 128 MiB are outside fusion eligibility.",
+    "Tracked temporary traffic is separate from physical I/O, RSS and peak footprint."
+  ],
+  "reopen_when": "A new workload shows a repeatable regression or controlled evidence supports another pipeline shape.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#calculated-columns-followed-by-partition-2026-11-24",
+      "sha256": "2e6e983f50bab7931b3146df1d96466e0f20ecdc41d0384a85176e768f5aa32a"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/calculated-partition-summary-2026-11-24.json",
+      "sha256": "1058b4537c5951f48e7971114419d8385d606351a8e4731feb47232b59a0f9b2"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/execution-decisions.md"
+  ]
+}

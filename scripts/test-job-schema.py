@@ -90,7 +90,6 @@ def check_decoder(chopper, validator, work):
     valid_operations = [
         ({"type": "balanced", "files": 2}, None),
         ({"type": "interleaved", "files": 2}, None),
-        ({"type": "calculate", "name": "category", "expression": "UPPER([0])"}, None),
         ({"type": "partition", "columns": [0]}, 3),
         ({"type": "partition", "columns": ["0"]}, 2),
         ({"type": "assign", "groups": [group]}, None),
@@ -112,6 +111,9 @@ def check_decoder(chopper, validator, work):
     # Each fragment goes alongside a usable input path; inspect the actual
     # decoder's error context separately from later configuration and input checks.
     cases = [
+        ({"calculated_columns": [{"name": "category", "expression": "UPPER([0])"}]}, True, True, None),
+        ({"calculated_columns": [{"name": "category", "expression": "UPPER([0])", "type": "calculate"}]}, False, False, None),
+        ({"operations": [{"type": "calculate", "name": "category", "expression": "UPPER([0])"}]}, False, False, None),
         ({"resources": {"memory_mb": "auto"}}, True, True, None),
         ({"resources": {"memory_mb": 256, "temp_dir": None, "temp_bytes": None}}, True, True, None),
         ({"resources": {"max_files": 2**64 - 1}}, True, True, None),
@@ -189,7 +191,7 @@ def check_defaults(chopper, validator, work):
         saved = json.loads(next(manifest))["config"]
     validator.validate(saved)
     properties = validator.schema["properties"]
-    omitted_on_write = {"full_shuffle_rng", "full_shuffle_algorithm"}
+    omitted_on_write = {"full_shuffle_rng", "full_shuffle_algorithm", "calculated_columns"}
     check(set(saved) | omitted_on_write == set(properties),
           "top-level schema fields and the manifest config differ")
     for field, value in saved.items():

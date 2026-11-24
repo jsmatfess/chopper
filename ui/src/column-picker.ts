@@ -1,13 +1,13 @@
 export type Column = string | number;
-export type ColumnSchema = {input_is_zip?: boolean; columns: number; header: string[] | null; unnamed?:number};
-export function columnsBefore(
-  schema: ColumnSchema | null, operations: {type: string; name?: string}[], step: number,
+export type ColumnSchema = {input_is_zip?: boolean; columns: number; header: string[] | null; unnamed?:number; calculatedStart?:number};
+export function withCalculatedColumns(
+  schema: ColumnSchema | null, calculated: {name: string}[],
 ): ColumnSchema | null {
   if (!schema) return null;
-  const names = operations.slice(0, step).flatMap(op => op.type === 'calculate' ? [op.name ?? ''] : []);
+  const names = calculated.map(column=>column.name);
   if (!names.length) return schema;
   const header = schema.header ?? Array<string>(schema.columns).fill('');
-  return {...schema, columns: schema.columns + names.length, header: [...header, ...names], unnamed:schema.header?0:schema.columns};
+  return {...schema, columns: schema.columns + names.length, header: [...header, ...names], unnamed:schema.header?0:schema.columns, calculatedStart:schema.columns};
 }
 type Choice = {value: Column; label: string; index: number};
 const escape = (s: unknown) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
@@ -20,7 +20,7 @@ export function columnChoices(schema: ColumnSchema | null): Choice[] {
     const name=index<(schema.unnamed??0)?undefined:schema.header?.[index];
     const unique=name!==undefined&&counts.get(name)===1;
     return {index,value:unique?name:index,label:name===undefined?`Column #${index}`:name||`(empty header) · #${index}`};
-  });
+  }).filter(choice=>choice.index<(schema.calculatedStart??schema.columns)||Boolean(schema.header?.[choice.index]));
 }
 export function columnIndex(column: Column, schema: ColumnSchema | null): number | undefined {
   if(!schema)return undefined;

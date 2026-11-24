@@ -1,21 +1,23 @@
 import {job_values as jobValues} from '../../docs/cli-reference-data.json';
 import {sourceIdentity,resultOrigin,belongsToSource,type ResultOrigin} from './result-ownership';
 import {operationColor,operationName} from './step-labels';
-import {browserApi,configureBrowserUI,invalidateBrowserDraft} from './browser/client';
+import {browserApi,configureBrowserUI,invalidateBrowserDraft,startFormulaScan} from './browser/client';
 import {percentageUnits} from './plan';
-import {bindColumnPickers,columnsBefore,pickerMarkup,type ColumnSchema} from './column-picker';
+import {bindColumnPickers,withCalculatedColumns,pickerMarkup,type ColumnSchema} from './column-picker';
 import {populateMemory,updateMemory,readMemory} from './memory';
 import {createSizeControl,populateSize,readSize,type SizeUnit} from './size-units';
 import {configurePlanLinks} from './plan-links';
 import {configureValidation} from './validation';
 import {configureHostedWorkspace} from './hosted-workspace';
 import {configureFormulaEditor} from './formula-editor';
+import type {FormulaSample} from './formula-examples';
 import type {PublicationReceipt} from './browser/publication';
 
 export {};
 type Csv = { encoding: string; headers: boolean; delimiter: string; quote: string; escape: string | null; line_ending: string; bom: boolean; skip_empty_lines: boolean };
-type Operation = { type: string; files?: number; columns?: (string | number)[]; groups?: {name: string; percent: string}[]; strata?: (string | number)[]; strategy?: string; name?: string; expression?: string };
-export type Job = {version: number; input: string; output: string; zip_member: string | null; input_csv: Csv; output_csv: Csv; compression: string; operations: Operation[]; limits: {rows: number | null; bytes: number | null; compressed_bytes: number | null}; resources: {grouping?: 'auto' | 'sort'; workers: number; memory_mb: number | 'auto'; max_files: number; max_record_bytes: number; temp_dir: string | null; temp_bytes: number | null}; full_shuffle_rng?: 'blake3_counter_v1'; full_shuffle_algorithm?: 'adaptive_v1'};
+type Operation = { type: string; files?: number; columns?: (string | number)[]; groups?: {name: string; percent: string}[]; strata?: (string | number)[]; strategy?: string };
+type CalculatedColumn = {name:string;expression:string};
+export type Job = {version: number; input: string; output: string; zip_member: string | null; input_csv: Csv; output_csv: Csv; compression: string; calculated_columns?: CalculatedColumn[]; operations: Operation[]; limits: {rows: number | null; bytes: number | null; compressed_bytes: number | null}; resources: {grouping?: 'auto' | 'sort'; workers: number; memory_mb: number | 'auto'; max_files: number; max_record_bytes: number; temp_dir: string | null; temp_bytes: number | null}; full_shuffle_rng?: 'blake3_counter_v1'; full_shuffle_algorithm?: 'adaptive_v1'};
 type AutoFact = {value:number|null;accuracy:'exact'|'estimated'|'unknown'};
 type AutoPlan = {
   physical_plan:string;actual_strategy:string;
@@ -59,29 +61,31 @@ function clearError() {
   hostedWorkspace.errorRecovery('');
 }
 let columnSchema: ColumnSchema | null = null;
-let inputSample: (ColumnSchema & {preview:string[][]}) | null = null;
+let inputSample: FormulaSample | null = null;
 let columnMessage = 'Choose an input file to load its columns.';
 let columnSource = '', columnRequest = 0;
-const stepSchema = (step: number) => columnsBefore(columnSchema, job.operations, step);
+const pickerSchema = () => withCalculatedColumns(columnSchema, job.calculated_columns ?? []);
 function sourceKey() { return sourceIdentity(inputSelectionRevision,{input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input')}); }
 function renderPickers() {
   $('operations').querySelectorAll<HTMLElement>('[data-column-field]').forEach(picker=>{
     const step=Number(picker.closest<HTMLElement>('[data-step]')!.dataset.step);
     const field=picker.dataset.columnField as 'columns'|'strata';
-    picker.innerHTML=new DOMParser().parseFromString(pickerMarkup(field,job.operations[step][field]||[],step,stepSchema(step),columnMessage),'text/html').body.firstElementChild!.innerHTML;
+    picker.innerHTML=new DOMParser().parseFromString(pickerMarkup(field,job.operations[step][field]||[],step,pickerSchema(),columnMessage),'text/html').body.firstElementChild!.innerHTML;
   });
 }
 async function loadColumns() {
   const request=++columnRequest;
-  columnSource=sourceKey();columnSchema=null;inputSample=null;formulaEditor.update();$('preview-card').hidden=true;hostedWorkspace?.preview(null);
+  columnSource=sourceKey();columnSchema=null;inputSample=null;formulaEditor.resetSample();formulaEditor.update();$('preview-card').hidden=true;hostedWorkspace?.preview(null);
   columnMessage=value('input')?'Loading input columns?':'Choose an input file to load its columns.';
   renderPickers();
   if(!value('input'))return;
   try {
-    const schema=await api<ColumnSchema & {preview:string[][]}>('preview',{...job,input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input'),
-      resources:{...job.resources,max_record_bytes:readSizeField('max-record')??job.resources.max_record_bytes}});
+    const sourceJob={...job,input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input'),
+      resources:{...job.resources,max_record_bytes:readSizeField('max-record')??job.resources.max_record_bytes}};
+    const schema=await api<FormulaSample>('preview',sourceJob);
     if(request!==columnRequest||columnSource!==sourceKey())return;
     renderPreview(schema);hostedWorkspace?.preview(schema);inputSample=schema;columnSchema=schema;columnMessage=schema.columns?'':'The input file has no columns.';
+    if(schema.columns)formulaEditor.startScan((batch,error)=>startFormulaScan(sourceJob,batch,error));
   } catch(e) {if(request!==columnRequest||columnSource!==sourceKey())return;columnMessage=e instanceof Error?e.message:String(e);$('preview').textContent=`Input preview unavailable: ${columnMessage}`;$('preview-card').hidden=false;hostedWorkspace?.preview(null,true);}
   renderPickers();updateFields();validation.update();formulaEditor.update();
 }
@@ -98,7 +102,7 @@ function configureJobChoices() {
   });
   // Assignment and split variants share entries and use their in-step mode controls.
   const labels = {partition: 'Partition by one or more columns', balanced: 'Split into equal parts',
-    assign: 'Assign groups by percentage', shuffle: 'Shuffle row order', calculate: 'Calculate a column'};
+    assign: 'Assign groups by percentage', shuffle: 'Shuffle row order'};
   const operations = Object.keys(labels).filter(type => jobValues.operation.includes(type));
   $('new-operation').innerHTML = choiceOptions(operations, '', labels);
 }
@@ -132,6 +136,15 @@ function operationId(op: Operation) {
 function operationNote(title:string,text:string){
   return `<details class="step-help"><summary>${title}</summary><small>${text}</small></details>`;
 }
+function renderCalculations() {
+  const columns=job.calculated_columns ?? [];
+  $('calculated-columns-list').innerHTML=columns.map((column,i)=>{
+    const fields = `<label>Column name<input data-field="name" required value="${escape(column.name)}"></label><div class="column-typeahead"><label>Formula<span class="formula-input-wrap"><span class="formula-token-layer" aria-hidden="true"></span><textarea rows="1" data-field="expression" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="formula-suggestions-${i}" aria-describedby="formula-help-${i}" required autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false">
+${escape(column.expression)}</textarea></span></label><div id="formula-help-${i}" class="formula-help" data-formula-help hidden><code></code><small></small><ul class="formula-help-examples" aria-label="Examples" data-formula-examples hidden></ul></div><div id="formula-suggestions-${i}" class="column-results" role="listbox" aria-label="Formula suggestions" data-formula-suggestions hidden></div></div><div data-formula-preview hidden></div>`;
+    return `<div class="step" data-calculation="${i}"><div class="step-fields">${fields}<button type="button" class="secondary" data-remove-calculation aria-label="Remove calculated column ${i+1}">Remove column</button></div></div>`;
+  }).join('');
+  $<HTMLButtonElement>('add-calculated-column').disabled=columns.length>=64;
+}
 function renderOps() {
   finishStepDrag();
   const active=document.activeElement as HTMLElement|null;
@@ -140,9 +153,8 @@ function renderOps() {
   $('operations').innerHTML = job.operations.length ? job.operations.map((op,i)=>{
     let fields = '';
     if(op.type==='balanced'||op.type==='interleaved') fields = `<label>Number of equal parts<input data-field="files" type="number" min="1" value="${op.files}"></label><small>Counts differ by at most one. Fewer rows than parts is an error. ${op.type==='interleaved'?'Rows alternate between parts; concatenating files will not restore input order.':'Each part contains a consecutive range of rows.'}</small>`;
-    if(op.type==='calculate') fields = `<label>Column name<input data-field="name" required value="${escape(op.name??'')}"></label><div class="column-typeahead"><label>Formula<input data-field="expression" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="formula-suggestions-${i}" required autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" value="${escape(op.expression??'')}"></label><div id="formula-suggestions-${i}" class="column-results" role="listbox" aria-label="Formula suggestions" data-formula-suggestions hidden></div></div><div data-formula-preview hidden></div>`;
-    if(op.type==='partition') fields = pickerMarkup('columns',op.columns||[],i,stepSchema(i),columnMessage);
-    if(op.type==='assign'||op.type==='assign_probabilistic') fields = `<fieldset class="group-builder"><legend>Named percentages</legend>${(op.groups||[]).map((g,j)=>`<div class="group-row" data-group="${j}"><label>Group name<input data-group-field="name" required value="${escape(g.name)}" placeholder="e.g. treatment"></label><label>Percent<input data-group-field="percent" required inputmode="decimal" value="${escape(g.percent)}" placeholder="80"></label><button type="button" class="text-button" data-action="remainder" aria-label="Fill remaining percentage for group ${j+1}">Fill remainder</button><button type="button" class="icon-button" data-action="remove-group" aria-label="Remove group ${j+1}" ${(op.groups?.length||0)<=1?'disabled':''}>×</button></div>`).join('')}<button type="button" class="secondary" data-action="add-group" ${(op.groups?.length||0)>=1024?'disabled':''}>+ Add group</button><small id="group-feedback-${i}" data-group-feedback></small></fieldset>${pickerMarkup('strata',op.strata||[],i,stepSchema(i),columnMessage)}${operationNote('Allocation & stratification',op.type==='assign_probabilistic'?'Each row is assigned independently using the target percentages. Counts are approximate, including within strata; small strata may have no rows in a destination. Membership is random and row order is preserved.':'Stratification applies these percentages separately within every combination of the selected column values. For example, stratifying by country keeps an 80% / 20% allocation within each country, rounded to whole rows. Membership is random; row order is preserved.')}`;
+    if(op.type==='partition') fields = pickerMarkup('columns',op.columns||[],i,pickerSchema(),columnMessage);
+    if(op.type==='assign'||op.type==='assign_probabilistic') fields = `<fieldset class="group-builder"><legend>Named percentages</legend>${(op.groups||[]).map((g,j)=>`<div class="group-row" data-group="${j}"><label>Group name<input data-group-field="name" required value="${escape(g.name)}" placeholder="e.g. treatment"></label><label>Percent<input data-group-field="percent" required inputmode="decimal" value="${escape(g.percent)}" placeholder="80"></label><button type="button" class="text-button" data-action="remainder" aria-label="Fill remaining percentage for group ${j+1}">Fill remainder</button><button type="button" class="icon-button" data-action="remove-group" aria-label="Remove group ${j+1}" ${(op.groups?.length||0)<=1?'disabled':''}>×</button></div>`).join('')}<button type="button" class="secondary" data-action="add-group" ${(op.groups?.length||0)>=1024?'disabled':''}>+ Add group</button><small id="group-feedback-${i}" data-group-feedback></small></fieldset>${pickerMarkup('strata',op.strata||[],i,pickerSchema(),columnMessage)}${operationNote('Allocation & stratification',op.type==='assign_probabilistic'?'Each row is assigned independently using the target percentages. Counts are approximate, including within strata; small strata may have no rows in a destination. Membership is random and row order is preserved.':'Stratification applies these percentages separately within every combination of the selected column values. For example, stratifying by country keeps an 80% / 20% allocation within each country, rounded to whole rows. Membership is random; row order is preserved.')}`;
     if(op.type==='shuffle') fields = advancedExecution() ? `<div><label>Strategy<select data-field="strategy">${choiceOptions(jobValues.shuffle,op.strategy ?? 'auto',{
       auto:'Automatic (full shuffle; recommended)',uniform:'Uniform (random-key sort)',fisher_yates:'Uniform in memory (Fisher–Yates v1)',
     })}</select></label>${operationNote('How shuffle strategies work','Automatic uses a full external-capable shuffle and combines compatible steps. Output order may vary with resources and execution plan. Explicit Fisher–Yates requires each group to fit in memory; oversized groups fail.')}</div>` : '<p class="hint auto-shuffle-strategy">Shuffle strategy set by Auto · Full shuffle</p>';
@@ -175,7 +187,7 @@ function populate() {
   setValue('input',job.input);setValue('output',job.output);setValue('zip-member',job.zip_member);setValue('compression',job.compression);
   setValue('max-rows',job.limits.rows);populateSize(unitFields.get('max-bytes')!,job.limits.bytes);populateSize(unitFields.get('compressed-bytes')!,job.limits.compressed_bytes);
   setValue('grouping',job.resources.grouping || 'auto');setValue('workers',job.resources.workers);populateMemory(memoryControls,job.resources.memory_mb);setValue('max-files',job.resources.max_files);populateSize(unitFields.get('max-record')!,job.resources.max_record_bytes);setValue('temp-dir',job.resources.temp_dir);populateSize(unitFields.get('temp-bytes')!,job.resources.temp_bytes);
-  csvForm('input',job.input_csv);csvForm('output',job.output_csv);renderOps();markDirty();void loadColumns();
+  csvForm('input',job.input_csv);csvForm('output',job.output_csv);renderCalculations();renderOps();markDirty();void loadColumns();
 }
 const effectiveOperations = () => advancedExecution() ? job.operations :
   job.operations.map(op=>op.type==='shuffle'?{...op,strategy:'auto'}:op);
@@ -213,13 +225,16 @@ function updateFields() {
   $<HTMLButtonElement>('add-operation').disabled=(job?.operations.length||0)>=64;
 }
 function markDirty() {
-  profileDirty=!belongsToSource(profileOrigin,sourceKey());if(profileDirty)$('input-profile').hidden=true;
-  if(inspectionSource!==sourceKey())hostedWorkspace?.values([],null,'');
-  if(lastProfileData&&!profileDirty&&status==='profiled')renderProfile(lastProfileData);
+  profileDirty=!belongsToSource(profileOrigin,sourceKey());
+  if(profileDirty){lastProfileData=null;$('input-profile').hidden=true;}
+  const source=sourceKey();
+  if(columnSource!==source)hostedWorkspace?.resetColumnExplorer();
+  else if(inspectionSource!==source)hostedWorkspace?.values([],null,'',0);
+  if(lastProfileData&&!profileDirty)renderProfile(lastProfileData);
   updateFields();
   editRevision++;invalidateBrowserDraft(sourceKey()); dirty = true; updateRunControl();
   if(job) planLinks.render(effectiveOperations(),{rows:value('max-rows'),bytes:sizeText('max-bytes'),compressed:sizeText('compressed-bytes')},value('compression'));
-  const finalGrouping = job?.operations.filter(op=>op.type!=='shuffle'&&op.type!=='calculate').at(-1);
+  const finalGrouping = job?.operations.filter(op=>op.type!=='shuffle').at(-1);
   const conflict = ['balanced','interleaved'].includes(finalGrouping?.type||'') && !!(value('max-rows')||value('max-bytes'));
   $('conflict').hidden = !conflict; $('conflict').textContent = 'Equal parts and hard limits can conflict. Processing will reject balanced groups that cannot fit without extra files.';
   updateDraft();validation.update();formulaEditor.update();
@@ -231,17 +246,20 @@ function updateDraft() {
   hostedWorkspace?.draft(draft,job.operations.length);
   planLinks.summary();
 }
-function renderProfile(p:InputProfile,showValues=true){
+function renderProfile(p:InputProfile){
   $('input-profile').hidden=false;$('empty-plan').hidden=true;
   let changed=true;try{changed=profileOrigin?.configuration!==JSON.stringify(readJob());}catch{/* Keep incomplete edits editable. */}
-  if(showValues){inspectionSource=profileOrigin?.source??null;hostedWorkspace?.values(p.column_values,p.header,'Full-file input analysis',p.rows);}
+  inspectionSource=profileOrigin?.source??null;hostedWorkspace?.values(p.column_values,p.header,'Full-file input analysis',p.rows);
   const key=JSON.stringify([p,changed]);if(key===lastProfile)return;lastProfile=key;
   const memoryTarget=!changed&&p.suggested_run_memory_mb!=null
     ?`<div><dt>Run memory target · estimated</dt><dd>${size(p.suggested_run_memory_mb*2**20)}</dd></div>`:'';
-  $('input-profile').innerHTML=`<h3>Input analysis</h3><dl class="profile-facts"><div><dt>Records · exact</dt><dd>${format(p.rows)}</dd></div><div><dt>Columns</dt><dd>${format(p.columns)}</dd></div>${memoryTarget}</dl><p class="profile-duration">Scanned in ${p.seconds.toFixed(2)} s${p.cache_hit?' · reused profile':''}</p>${changed?'<p class="profile-context">Input unchanged. Pipeline estimates reflect the earlier configuration.</p>':''}${p.stages.length?`<details><summary>Pipeline estimates${changed?' · previous settings':''}</summary><ul class="profile-stages">${p.stages.map(stage=>`<li>Step ${stage.operation}: ${escape(stage.strategy)}${stage.input_distinct_keys===null?'':` · ${stage.distinct_exact?'':'~'}${format(stage.input_distinct_keys)} distinct keys (${stage.distinct_exact?'exact':'estimated'})`}</li>`).join('')}</ul></details>`:''}<details><summary>Coverage & methodology</summary><p>${escape(p.accuracy)}</p><p>Statistics cover up to 64 selected columns. Value lists show at most 100 values per column and 256 KiB in total. Run reports the final exact group counts and file sizes. Analyzing input does not create output files.</p></details>`;
+  $('input-profile').innerHTML=`<h3>Input analysis</h3><dl class="profile-facts"><div><dt>Records · exact</dt><dd>${format(p.rows)}</dd></div><div><dt>Columns</dt><dd>${format(p.columns)}</dd></div>${memoryTarget}</dl><p class="profile-duration">Scanned in ${p.seconds.toFixed(2)} s${p.cache_hit?' · reused profile':''}</p>${changed?'<p class="profile-context">Input unchanged. Analyze again to refresh pipeline estimates.</p>':''}${!changed&&p.stages.length?`<details><summary>Pipeline estimates</summary><ul class="profile-stages">${p.stages.map(stage=>`<li>Step ${stage.operation}: ${escape(stage.strategy)}${stage.input_distinct_keys===null?'':` · ${stage.distinct_exact?'':'~'}${format(stage.input_distinct_keys)} distinct keys (${stage.distinct_exact?'exact':'estimated'})`}</li>`).join('')}</ul></details>`:''}<details><summary>Coverage & methodology</summary><p>${escape(p.accuracy)}</p><p>Statistics cover every input column. Value lists show at most 100 values per column and 256 KiB in total. Run reports the final exact group counts and file sizes. Analyzing input does not create output files.</p></details>`;
 }
 function renderAnalysis(a: Analysis) {
-  if(belongsToSource(analysisOrigin,sourceKey())){inspectionSource=analysisOrigin?.source??null;hostedWorkspace?.values(a.column_values||[],a.header,'Completed output analysis',a.rows);}
+  if((!lastProfileData||profileDirty)&&belongsToSource(analysisOrigin,sourceKey())){
+    inspectionSource=analysisOrigin?.source??null;
+    hostedWorkspace?.values(a.column_values||[],a.header,'Completed output analysis',a.rows);
+  }
   const key = JSON.stringify(a); if(key===lastAnalysis) return; lastAnalysis=key;
   $('empty-plan').hidden=true; $('analysis').hidden=false;
   const facts=(items:[string,string][])=>`<dl class="analysis-facts">${items.map(([label,value])=>`<div><dt>${escape(label)}</dt><dd>${escape(value)}</dd></div>`).join('')}</dl>`;
@@ -334,7 +352,8 @@ async function poll() {
     $('progress-detail').textContent=`${format(s.progress.rows)} rows · ${size(s.progress.temp_bytes)} temporary · ${Math.floor(seconds)} s in phase${seconds>=1&&rate>0?` · ${format(Math.round(rate))} rows/s`:''}`;
     updateRunControl();$<HTMLButtonElement>('profile').disabled=busy;
     $('cancel').hidden=!['profiling','running'].includes(status);
-    if(s.profile){lastProfileData=s.profile;if(!profileDirty)renderProfile(s.profile,!s.analysis||!belongsToSource(analysisOrigin,sourceKey()));else if(status==='profiled'){lastProfile='';$('input-profile').hidden=false;$('input-profile').textContent='Analysis finished for a different input or parsing configuration. Analyze input again for the current source.';}}
+    if(s.profile&&!profileDirty){lastProfileData=s.profile;renderProfile(s.profile);}
+    else if(s.profile&&status==='profiled'){lastProfile='';$('input-profile').hidden=false;$('input-profile').textContent='Analysis finished for a different input or parsing configuration. Analyze input again for the current source.';}
 
     if(s.analysis) renderAnalysis(s.analysis);
     if(s.error) error(s.error);
@@ -344,17 +363,16 @@ async function poll() {
 bindColumnPickers($('operations'),picker=>{
   const step=Number(picker.closest<HTMLElement>('[data-step]')!.dataset.step);
   return job.operations[step][picker.dataset.columnField as 'columns'|'strata']||[];
-},picker=>stepSchema(Number(picker.closest<HTMLElement>('[data-step]')!.dataset.step)),(picker,columns)=>{
+},pickerSchema,(picker,columns)=>{
   const step=Number(picker.closest<HTMLElement>('[data-step]')!.dataset.step);
   job.operations[step][picker.dataset.columnField as 'columns'|'strata']=columns;
   renderPickers();markDirty();
 },()=>void loadColumns());
 const formulaEditor=configureFormulaEditor(
-  $('operations'),
-  ()=>job?.operations.flatMap((op,operation)=>op.type==='calculate'
-    ?[{operation,name:op.name??'',expression:op.expression??''}]:[])??[],
+  $('calculated-columns-list'),
+  ()=>(job?.calculated_columns ?? []).map((column,operation)=>({...column,operation})),
   ()=>inputSample,
-  stepSchema,
+  pickerSchema,
   data=>api('formula-preview',data),
 );
 let columnTimer: ReturnType<typeof setTimeout>;
@@ -368,7 +386,7 @@ $('job-form').addEventListener('input',event=>{
   }
   markDirty();
   if(target.id==='input'||target.id==='zip-member'||target.closest('#input-csv')){
-    clearTimeout(columnTimer);columnRequest++;columnSchema=null;inputSample=null;formulaEditor.update();columnMessage='Loading input columns?';renderPickers();
+    clearTimeout(columnTimer);columnRequest++;columnSchema=null;inputSample=null;formulaEditor.resetSample();formulaEditor.update();columnMessage='Loading input columns?';renderPickers();
     $('preview-card').hidden=true;validation.update();columnTimer=setTimeout(()=>void loadColumns(),400);
   }
 });
@@ -378,8 +396,6 @@ $('operations').addEventListener('input',e=>{
   if(el.dataset.groupField){const group=op.groups![Number(el.closest<HTMLElement>('[data-group]')!.dataset.group)];group[el.dataset.groupField as 'name'|'percent']=el.value;return;}
   if(!field)return;
   if(field==='files') op[field]=Number(el.value);
-  else if(field==='name'){op.name=el.value;renderPickers();}
-  else if(field==='expression')op.expression=el.value;
   else if(field==='strategy'){op.strategy=el.value;renderOps();}
   else if(field==='type'){op.type=el.value;renderOps();}
 });
@@ -455,7 +471,30 @@ $('operations').addEventListener('click',e=>{
     next.focus();
 
 });
-$('add-operation').onclick=()=>{const type=value('new-operation');job.operations.push(type==='calculate'?{type,name:'',expression:''}:(type==='balanced'||type==='interleaved')?{type,files:2}:type==='partition'?{type,columns:[]}:(type==='assign'||type==='assign_probabilistic')?{type,groups:[{name:'treatment',percent:'80'},{name:'control',percent:'20'}],strata:[]}:{type,strategy:'auto'});renderOps();markDirty();};
+$('calculated-columns-list').addEventListener('input',event=>{
+  const target=event.target as HTMLInputElement;
+  const row=target.closest<HTMLElement>('[data-calculation]');
+  const field=target.dataset.field;
+  if(!row||(field!=='name'&&field!=='expression'))return;
+  job.calculated_columns![Number(row.dataset.calculation)][field]=target.value;
+  if(field==='name')renderPickers();
+});
+$('calculated-columns-list').addEventListener('click',event=>{
+  const button=(event.target as Element).closest('[data-remove-calculation]');
+  if(!button)return;
+  const index=Number(button.closest<HTMLElement>('[data-calculation]')!.dataset.calculation);
+  job.calculated_columns!.splice(index,1);
+  renderCalculations();renderPickers();markDirty();
+  ($('calculated-columns-list').querySelector<HTMLElement>(`[data-calculation="${index}"] [data-field="name"]`)
+    ??$('add-calculated-column')).focus();
+});
+$('add-calculated-column').onclick=()=>{
+  const columns=job.calculated_columns??=[];
+  columns.push({name:'',expression:''});
+  renderCalculations();renderPickers();markDirty();
+  $('calculated-columns-list').querySelector<HTMLElement>(`[data-calculation="${columns.length-1}"] [data-field="name"]`)?.focus();
+};
+$('add-operation').onclick=()=>{const type=value('new-operation');job.operations.push((type==='balanced'||type==='interleaved')?{type,files:2}:type==='partition'?{type,columns:[]}:(type==='assign'||type==='assign_probabilistic')?{type,groups:[{name:'treatment',percent:'80'},{name:'control',percent:'20'}],strata:[]}:{type,strategy:'auto'});renderOps();markDirty();};
 $('sniff-csv').onclick=async()=>{
   const button=$<HTMLButtonElement>('sniff-csv');button.disabled=true;
   const source=sourceKey();
@@ -467,7 +506,12 @@ $('sniff-csv').onclick=async()=>{
 $('copy-csv').onclick=()=>{csvForm('output',readCsv('input'));markDirty();};
 $('profile').onclick=async()=>{
   if(!validation.check(false))return;
-  try{const submitted=readJob();clearError();profileOrigin=resultOrigin(sourceKey(),submitted,editRevision,++resultSerial);profileDirty=false;lastProfileData=null;await api('profile',submitted);lastProfile='';lastAnalysis='';$('input-profile').hidden=true;$('analysis').hidden=true;await poll();}catch(e){error(e);}
+  try{
+    const submitted=readJob();clearError();
+    if(!lastProfileData||profileDirty)profileOrigin=resultOrigin(sourceKey(),submitted,editRevision,++resultSerial);
+    await api('profile',submitted);
+    lastProfile='';lastAnalysis='';$('analysis').hidden=true;await poll();
+  }catch(e){error(e);}
 };
 async function startJob(){
   if(!validation.check())return;
@@ -477,7 +521,7 @@ async function startJob(){
     await api('run-direct',submitted);
     // Acknowledgement validates only the draft revision that was submitted.
     if(submittedRevision===editRevision)dirty=false;
-    lastAnalysis='';$('input-profile').hidden=true;$('analysis').hidden=true;
+    lastAnalysis='';$('analysis').hidden=true;
     $('empty-plan').hidden=true;await poll();
   }catch(e){
     error(e);
@@ -544,7 +588,7 @@ async function start(){try{job=await api<Job>('defaults');populate();await poll(
 const planLinks=configurePlanLinks();
 const validation=configureValidation(()=>job,()=>columnSchema,readSizeField,()=>advancedExecution()?readMemory(memoryControls):'auto',next=>hostedWorkspace.readiness(next));
 $('execution-mode').onchange=()=>{renderOps();markDirty();};
-const hostedWorkspace=configureHostedWorkspace();
+const hostedWorkspace=configureHostedWorkspace(formulaEditor.insertionTarget);
 configureBrowserUI();
 configureJobChoices();
 void start();

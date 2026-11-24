@@ -317,6 +317,32 @@ test('input analysis survives draft edits but a replacement input rejects its pe
  await h.api('profile',job());request=engine.messages.at(-1);h.lifecycle.selectInput({name:h.file.name});
  engine.reply({id:request.id,result:{rows:99}});await tick();assert.equal(h.lifecycle.snapshot().profile,null);assert.equal(h.lifecycle.snapshot().status,'idle');await h.api('cancel');
 });
+test('Analyze resets the row count before processing its input',async()=>{
+ const h=harness();
+ await h.api('profile',job());
+ const engine=h.workers.at(-1),request=engine.messages.at(-1);
+ engine.reply({progress:{phase:'Profiling all input records',rows:16384,temp_bytes:0}});
+ engine.reply({id:request.id,result:{rows:16384}});await tick();
+ assert.equal(h.lifecycle.snapshot().progress.rows,16384);
+ await h.api('profile',job());
+ assert.equal(h.lifecycle.snapshot().progress.rows,0);
+ await h.api('cancel');
+});
+test('Run and cancellation keep source statistics until the input changes',async()=>{
+ const h=harness();
+ await h.api('profile',job());
+ const engine=h.workers.at(-1),request=engine.messages.at(-1);
+ const profile={rows:3,column_values:[{column:0,frequencies:{a:3}}]};
+ engine.reply({id:request.id,result:profile});await tick();
+ const changed={...job(),operations:[{type:'balanced',files:3}]};
+ h.lifecycle.invalidateDraft();
+ await h.api('run-direct',changed);
+ assert.deepEqual(h.lifecycle.snapshot().profile,profile);
+ await h.api('cancel');
+ assert.deepEqual(h.lifecycle.snapshot().profile,profile);
+ h.lifecycle.selectInput({name:h.file.name});
+ assert.equal(h.lifecycle.snapshot().profile,null);
+});
 test('Run after analysis submits current source and revision, with no prepared handle',async()=>{
  const h=harness();await h.api('profile',job());let engine=h.workers.at(-1),request=engine.messages.at(-1);
  engine.reply({id:request.id,result:{rows:3}});await tick();

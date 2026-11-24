@@ -36,7 +36,7 @@ try {
   const { latest, versions } = await response.json();
   assert.ok(versions.length);
   assert.equal(latest, versions[0].version);
-  if (expectedCommit) assert.equal(versions.find(({ version }) => version === '0.5.0')?.commit, expectedCommit);
+  if (expectedCommit) assert.equal(versions[0].commit, expectedCommit);
 
   browser = await chromium.launch();
   const page = await browser.newPage();
@@ -46,7 +46,7 @@ try {
   assert.equal(await support.getAttribute('href'), 'https://buymeacoffee.com/tblflip');
   assert.equal(await page.getByRole('link', { name: /Latest stable release/ }).getAttribute('href'), `/versions/${latest}/`);
   await page.getByRole('link', { name: latest, exact: true }).waitFor();
-  for (const { version, commit } of versions) {
+  for (const { version, commit, additionalPages = [] } of versions) {
     const base = `/versions/${version}/`;
     assert.match(commit, /^[0-9a-f]{40}$/);
     assert.equal((await page.goto(origin + base))?.status(), 200);
@@ -114,6 +114,21 @@ try {
     await result.waitFor();
     await result.click();
     await page.waitForURL(url => url.pathname === base + 'browser' && url.hash.length > 1);
+    if (additionalPages.includes('formula-functions')) {
+      await sidebar.getByRole('link', { name: 'Formula functions', exact: true }).click();
+      await page.waitForURL(origin + base + 'formula-functions');
+      await page.locator('h1#formula-functions').waitFor();
+      await guide.getByText('CONCAT_WS(separator, text, ..., ignore_null?, ignore_empty?)', { exact: true }).waitFor();
+      await sidebar.getByRole('link', { name: 'CLI reference', exact: true }).click();
+      await page.waitForURL(origin + base + 'cli-reference');
+      assert.equal(await guide.getByRole('link', { name: 'formula functions', exact: true })
+        .evaluate(link => link.href), origin + base + 'formula-functions');
+      await page.getByRole('button', { name: 'Search' }).first().click();
+      await page.getByRole('searchbox').fill('REGEX_EXTRACT');
+      const formulaResult = page.locator(`#localsearch-list a[href^="${base}formula-functions"]`).first();
+      await formulaResult.click();
+      await page.waitForURL(url => url.pathname === base + 'formula-functions' && url.hash.length > 1);
+    }
     console.log(`Verified ${version} landing, version navigation, sidebar anchors, deep link and search at ${origin}`);
   }
   if (live) {

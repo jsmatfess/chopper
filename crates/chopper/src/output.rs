@@ -418,11 +418,7 @@ impl<'a> PlanWriter<'a> {
                 bytes: 0,
                 processed: 0,
                 observation: observation.take(),
-                calculated_width: if job
-                    .operations
-                    .iter()
-                    .any(|op| matches!(op, Operation::Calculate { .. }))
-                {
+                calculated_width: if !job.calculated_columns.is_empty() {
                     Some(
                         header
                             .context("missing final calculated-column schema")?

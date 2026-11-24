@@ -1,0 +1,69 @@
+--- crates/chopper/src/engine/calculation.rs
++++ crates/chopper/src/engine/calculation.rs
+@@ -2,6 +2,18 @@
+ use chopper_core::expression::{Expression, Value};
+ use std::borrow::Cow;
+ 
++fn thread_cpu_ns() -> u64 {
++    let mut time = libc::timespec {
++        tv_sec: 0,
++        tv_nsec: 0,
++    };
++    assert_eq!(
++        unsafe { libc::clock_gettime(libc::CLOCK_THREAD_CPUTIME_ID, &mut time) },
++        0
++    );
++    time.tv_sec as u64 * 1_000_000_000 + time.tv_nsec as u64
++}
++
+ pub(crate) struct Plan {
+     programs: [Option<Program>; 64],
+     order: [usize; 64],
+@@ -150,6 +162,10 @@
+             dataset.physical_source
+         });
+         let mut calculated_rows = 0;
++        let thread_start = thread_cpu_ns();
++        let mut sampled_calls = 0;
++        let mut sampled_ns = 0;
++        let mut timer_overhead_ns = 0;
+         let mut retained = Reservation::new(ctx);
+         let count = job.calculated_columns.len();
+         let mut values: [(String, char); 64] = std::array::from_fn(|_| (String::new(), 'n'));
+@@ -189,6 +205,8 @@
+                         Value::from_stored(text, *kind)
+                     };
+                     let mut resource_failure = None;
++                    let sample = row.id.wrapping_mul(0x9E3779B97F4A7C15).rotate_left(32) & 63 == 0;
++                    let sampled_start = sample.then(thread_cpu_ns);
+                     let result =
+                         self.programs[index]
+                             .as_ref()
+@@ -202,6 +220,12 @@
+                                         message
+                                     })
+                             });
++                    if let Some(start) = sampled_start {
++                        sampled_ns += thread_cpu_ns() - start;
++                        let start = thread_cpu_ns();
++                        timer_overhead_ns += thread_cpu_ns() - start;
++                        sampled_calls += 1;
++                    }
+                     let (result_kind, rendered) = result
+                         .map_err(|error| resource_failure.unwrap_or(error))
+                         .with_context(|| {
+@@ -246,6 +270,14 @@
+             }
+             group.finish(output)?;
+         }
++        eprintln!(
++            "chopper_profile_thread_cpu={},{},{},{},{}",
++            thread_cpu_ns() - thread_start,
++            sampled_ns,
++            sampled_calls,
++            timer_overhead_ns,
++            calculated_rows * count as u64
++        );
+         if let Some(observation) = observation {
+             observation.finish(calculated_rows);
+         }

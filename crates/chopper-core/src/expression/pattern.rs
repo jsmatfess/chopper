@@ -1,4 +1,7 @@
-use super::{admitted, row, EvalError, EvalResult, Field, Function, Node, Reserve, Value};
+use super::{
+    admitted, position, row, text_slice, EvalError, EvalResult, Field, Function, Node, Reserve,
+    Value,
+};
 use std::{borrow::Cow, cell::RefCell, ops::Range};
 
 const MAX_PROGRAM: usize = 512;
@@ -10,8 +13,8 @@ const MISSING: usize = usize::MAX;
 pub(super) struct Instruction {
     regex: Regex,
     text: Node,
-    replacement: Option<Node>,
-    insensitive: bool,
+    argument: Option<Node>,
+    function: Function,
     scratch: RefCell<Option<(States, States)>>,
 }
 
@@ -21,20 +24,20 @@ impl Instruction {
         let text = args.next().unwrap();
         let pattern = match args.next().unwrap() {
             Node::Literal(Value::Text(pattern)) => pattern,
-            _ => return Err("pattern must be literal text".into()),
+            _ => {
+                return Err(
+                    "pattern must be literal text. Put the pattern in double quotes.".into(),
+                )
+            }
         };
         let like = matches!(function, Function::LIKE | Function::ILIKE);
         let insensitive = matches!(function, Function::ILIKE);
-        let regex = if insensitive {
-            Regex::compile(&pattern.to_lowercase(), like)?
-        } else {
-            Regex::compile(&pattern, like)?
-        };
+        let regex = Regex::compile(&pattern, like, insensitive)?;
         Ok(Self {
             regex,
             text,
-            replacement: args.next(),
-            insensitive,
+            argument: args.next(),
+            function,
             scratch: RefCell::new(None),
         })
     }
@@ -42,7 +45,7 @@ impl Instruction {
     pub(super) fn workspace_bytes(&self) -> usize {
         2 * self.regex.instructions.len() * (std::mem::size_of::<Thread>() + 1)
             + self.text.workspace_bytes()
-            + self.replacement.as_ref().map_or(0, Node::workspace_bytes)
+            + self.argument.as_ref().map_or(0, Node::workspace_bytes)
     }
 
     pub(super) fn bind(
@@ -50,10 +53,11 @@ impl Instruction {
         header: Option<&[String]>,
         width: usize,
         unnamed: usize,
+        reference: &mut impl FnMut(usize),
     ) -> Result<(), String> {
-        self.text.bind(header, width, unnamed)?;
-        if let Some(replacement) = &mut self.replacement {
-            replacement.bind(header, width, unnamed)?;
+        self.text.bind(header, width, unnamed, reference)?;
+        if let Some(replacement) = &mut self.argument {
+            replacement.bind(header, width, unnamed, reference)?;
         }
         Ok(())
     }
@@ -67,16 +71,7 @@ impl Instruction {
         if matches!(value, Value::Null) {
             return Ok(Value::Null);
         }
-        let mut text = value.text()?;
-        if self.insensitive {
-            let output_bytes: usize = text
-                .chars()
-                .flat_map(char::to_lowercase)
-                .map(char::len_utf8)
-                .sum();
-            admitted(reserve, output_bytes.saturating_mul(2).saturating_add(8))?;
-            text = Cow::Owned(text.to_lowercase());
-        }
+        let text = value.text()?;
         let length = self.regex.instructions.len();
         let mut scratch = self.scratch.borrow_mut();
         let (current, next) =
@@ -86,7 +81,33 @@ impl Instruction {
             current,
             next,
         };
-        let Some(replacement) = &self.replacement else {
+        if matches!(self.function, Function::REGEX_EXTRACT) {
+            let group = if let Some(arg) = &self.argument {
+                let value = arg.evaluate(field, reserve)?;
+                if matches!(value, Value::Null) {
+                    return Ok(Value::Null);
+                }
+                position(value, "group")?
+            } else {
+                0
+            };
+            if group > self.regex.captures {
+                return Err(row("regular expression capture does not exist. Use group 0 for the full match or a capture number present in the pattern."));
+            }
+            let range = matcher.find(&text, 0, reserve)?.and_then(|found| {
+                if group == 0 {
+                    Some(found.start..found.end)
+                } else {
+                    let [start, end] = found.captures[group - 1];
+                    (start != MISSING && end != MISSING).then_some(start..end)
+                }
+            });
+            return match range {
+                Some(range) => text_slice(text, |_| range),
+                None => Ok(Value::Null),
+            };
+        }
+        let Some(replacement) = &self.argument else {
             return Ok(Value::Bool(matcher.find(&text, 0, reserve)?.is_some()));
         };
         let replacement = replacement.evaluate(field, reserve)?;
@@ -156,7 +177,7 @@ fn replace(
             let next = tail
                 .chars()
                 .next()
-                .ok_or_else(|| row("trailing replacement escape"))?;
+                .ok_or_else(|| row("trailing replacement escape. Use two backslashes to insert a literal backslash."))?;
             append(output, &tail[..next.len_utf8()], reserve)?;
             replacement = &tail[next.len_utf8()..];
         } else {
@@ -168,10 +189,10 @@ fn replace(
             }
             let group = tail[..len]
                 .parse::<usize>()
-                .map_err(|_| row("invalid replacement capture number"))?;
+                .map_err(|_| row("invalid replacement capture number. Use $0 for the full match or $1, $2, and so on for captures."))?;
             if group > groups {
                 return Err(row(format!(
-                    "replacement references missing capture {group}"
+                    "replacement references missing capture {group}. Use $0 for the full match or a capture number present in the pattern."
                 )));
             }
             if group == 0 {
@@ -192,6 +213,7 @@ fn replace(
 enum Predicate {
     Any,
     Literal(char),
+    InsensitiveLiteral(char),
     Class(usize),
     Digit,
     Word,
@@ -224,6 +246,7 @@ impl Predicate {
         match self {
             Self::Any => true,
             Self::Literal(value) => character == value,
+            Self::InsensitiveLiteral(value) => super::chars_equal_ignore_case(character, value),
             Self::Class(index) => classes[index].matches(character),
             Self::Digit => character.is_ascii_digit(),
             Self::Word => character.is_alphanumeric() || character == '_',
@@ -241,6 +264,19 @@ enum Ast {
     Sequence(Vec<Ast>),
     Alternation(Vec<Ast>),
     Repeat(Box<Ast>, usize, Option<usize>),
+}
+
+impl Ast {
+    fn can_match_empty(&self) -> bool {
+        match self {
+            Self::Test(_) => false,
+            Self::Start | Self::End => true,
+            Self::Capture(_, inner) => inner.can_match_empty(),
+            Self::Sequence(parts) => parts.iter().all(Self::can_match_empty),
+            Self::Alternation(parts) => parts.iter().any(Self::can_match_empty),
+            Self::Repeat(inner, min, _) => *min == 0 || inner.can_match_empty(),
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -263,7 +299,7 @@ struct Regex {
 }
 
 impl Regex {
-    fn compile(pattern: &str, whole: bool) -> Result<Self, String> {
+    fn compile(pattern: &str, whole: bool, insensitive: bool) -> Result<Self, String> {
         if pattern.len() > 4096 {
             return Err("pattern exceeds 4096 bytes".into());
         }
@@ -273,7 +309,7 @@ impl Regex {
             captures: 0,
         };
         let tree = if whole {
-            parser.like()?
+            parser.like(insensitive)?
         } else {
             parser.alternation(0)?
         };
@@ -335,18 +371,30 @@ impl Regex {
                 Ok(start)
             }
             Ast::Repeat(item, min, maximum) => {
-                if let Some(max) = maximum {
+                let required = if let Some(max) = maximum {
                     for _ in *min..*max {
                         let repeat = self.compile_ast(item, next, remaining)?;
                         next = self.emit(Op::Split(repeat, next))?;
                     }
+                    *min
                 } else {
-                    let loop_start = self.emit(Op::Accept)?;
-                    let repeat = self.compile_ast(item, loop_start, remaining)?;
-                    self.instructions[loop_start] = Op::Split(repeat, next);
-                    next = loop_start;
-                }
-                for _ in 0..*min {
+                    let exit = next;
+                    let loop_split = self.emit(Op::Accept)?;
+                    let repeat = self.compile_ast(item, loop_split, remaining)?;
+                    self.instructions[loop_split] = Op::Split(repeat, exit);
+                    next = if *min > 0 {
+                        repeat
+                    } else if item.can_match_empty() {
+                        // Use (item+)? for a nullable item so the initial empty
+                        // path can reach the exit before lower-priority alternatives.
+                        // https://github.com/rust-lang/regex/issues/779
+                        self.emit(Op::Split(repeat, exit))?
+                    } else {
+                        loop_split
+                    };
+                    min.saturating_sub(1)
+                };
+                for _ in 0..required {
                     next = self.compile_ast(item, next, remaining)?;
                 }
                 Ok(next)
@@ -377,18 +425,21 @@ impl Parser<'_> {
         }
     }
 
-    fn like(&mut self) -> Result<Ast, String> {
+    fn like(&mut self, insensitive: bool) -> Result<Ast, String> {
+        let literal = if insensitive {
+            Predicate::InsensitiveLiteral
+        } else {
+            Predicate::Literal
+        };
         let mut items = Vec::new();
         while let Some(character) = self.take() {
             items.push(match character {
-                '\\' => Ast::Test(Predicate::Literal(
-                    self.take().ok_or("trailing wildcard escape")?,
-                )),
+                '\\' => Ast::Test(literal(self.take().ok_or("trailing wildcard escape")?)),
                 '.' if self.consume('*') => {
                     Ast::Repeat(Box::new(Ast::Test(Predicate::Any)), 0, None)
                 }
                 '.' => Ast::Test(Predicate::Any),
-                _ => Ast::Test(Predicate::Literal(character)),
+                _ => Ast::Test(literal(character)),
             });
         }
         Ok(Ast::Sequence(items))
@@ -420,18 +471,18 @@ impl Parser<'_> {
                 '(' => {
                     let capturing = !self.consume('?');
                     if !capturing && !(self.consume(':')) {
-                        return Err("unsupported group assertion or option".into());
+                        return Err("unsupported group assertion or option. Use a numbered group (...) or a noncapturing group (?:...)".into());
                     }
                     let group = self.captures;
                     if capturing {
                         if self.captures >= MAX_CAPTURES {
-                            return Err("pattern exceeds 12 numbered capture groups".into());
+                            return Err("pattern exceeds 12 numbered capture groups. Use (?:...) for groups you do not need to capture".into());
                         }
                         self.captures += 1;
                     }
                     let inner = self.alternation(depth + 1)?;
                     if !self.consume(')') {
-                        return Err("unclosed pattern group".into());
+                        return Err("unclosed pattern group. Add a closing parenthesis.".into());
                     }
                     if capturing {
                         Ast::Capture(group, Box::new(inner))
@@ -445,7 +496,7 @@ impl Parser<'_> {
                 '$' => Ast::End,
                 '\\' => Ast::Test(self.escape()?),
                 '*' | '+' | '?' | '{' => {
-                    return Err("repetition requires a preceding pattern".into())
+                    return Err("repetition requires a preceding pattern. Put the quantifier after the character or group it repeats".into())
                 }
                 _ => Ast::Test(Predicate::Literal(character)),
             };
@@ -481,7 +532,7 @@ impl Parser<'_> {
             Some(min)
         };
         if !self.consume('}') || max.is_some_and(|max| max < min) {
-            return Err("invalid repetition bounds".into());
+            return Err("invalid repetition bounds. The bounds must be nonnegative and the upper bound must be at least the lower bound.".into());
         }
         Ok((min, max))
     }
@@ -530,7 +581,7 @@ impl Parser<'_> {
                         return Err("character class ranges require literal endpoints".into());
                     };
                     if end < start {
-                        return Err("character class range is reversed".into());
+                        return Err("character class range is reversed. Put the lower character first, as in [a-z]".into());
                     }
                     class.ranges.push(start..end);
                     continue;
@@ -547,7 +598,10 @@ impl Parser<'_> {
     }
 
     fn class_atom(&mut self) -> Result<Predicate, String> {
-        match self.take().ok_or("unclosed character class")? {
+        match self
+            .take()
+            .ok_or("unclosed character class. Add a closing bracket.")?
+        {
             '\\' => self.escape(),
             c => Ok(Predicate::Literal(c)),
         }

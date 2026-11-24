@@ -87,6 +87,7 @@ test('production restore removes both reactors and export guard still rejects a 
     for(const folder of ['scripts','ui/dist','ui/src/browser','docs/releases','examples'])await mkdir(join(root,folder),{recursive:true});
     const noticePath=join(root,'docs/releases/native-usage.txt'),notices='Synthetic dependency notice\n';
     await writeFile(noticePath,notices);
+    await writeFile(join(root,'docs/formula-functions.md'),'| `TRIM(text)` | Trim whitespace. |\n');
     for(const name of ['build-hosted.mjs','browser-artifacts.mjs','hosted-theme.mjs'])await copyFile(new URL(name,import.meta.url),join(root,'scripts',name));
     await symlink(resolve('ui/node_modules'),join(root,'ui/node_modules'),'dir');
     for(const name of ['app.ts','browser/engine-worker.ts','browser/storage-worker.ts'])await writeFile(join(root,'ui/src',name),'export {};');

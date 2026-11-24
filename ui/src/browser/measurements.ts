@@ -21,7 +21,7 @@ function counterUnit(kind:Kind|undefined):Counter['unit']|null {
  case 'shared_ranges':return 'frame lengths';
  case 'merge':case 'hierarchical_merge':case 'merge_traversal':return 'row visits';
  case 'materialize':case 'elided':case 'fallback':case 'reuse':return null;
- case undefined:case 'read':case 'resident_sort':case 'fisher_yates':case 'grouping':case 'serialize':case 'routed_grouping':case 'spill':case 'routing':case 'exact_membership':case 'probabilistic_membership':case 'stratification':case 'dataset_materialize':case 'interleaved_membership':case 'balanced_traversal':case 'fused_balanced':return 'rows';
+ case undefined:case 'read':case 'resident_sort':case 'fisher_yates':case 'grouping':case 'serialize':case 'routed_grouping':case 'spill':case 'routing':case 'exact_membership':case 'probabilistic_membership':case 'stratification':case 'dataset_materialize':case 'calculation':case 'interleaved_membership':case 'balanced_traversal':case 'fused_balanced':return 'rows';
  default:{const exhaustive:never=kind;throw new Error(`Unsupported measurement kind: ${exhaustive}`);}
  }
 }

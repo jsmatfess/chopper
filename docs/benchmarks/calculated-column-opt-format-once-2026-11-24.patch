@@ -1,0 +1,52 @@
+--- crates/chopper-core/src/expression.rs
++++ crates/chopper-core/src/expression.rs
+@@ -81,15 +81,14 @@
+                 Ok(Cow::Owned(text))
+             }
+             Self::Number(value) => {
+-                // Decimal Rust display of any finite binary64 fits in this bound.
+-                // A counting pass avoids reserving hundreds of bytes for
+-                // ordinary small numeric values or hidden formatter growth.
+-                let mut size = TextLength::default();
+-                write!(size, "{value}").unwrap();
+-                admitted(reserve, size.0)?;
+-                let mut result = String::with_capacity(size.0);
+-                write!(result, "{value}").unwrap();
+-                Ok(Cow::Owned(result))
++                let mut text = NumberText {
++                    bytes: [0; 328],
++                    length: 0,
++                };
++                write!(text, "{value}").unwrap();
++                let text = std::str::from_utf8(&text.bytes[..text.length]).unwrap();
++                admitted(reserve, text.len())?;
++                Ok(Cow::Owned(text.to_owned()))
+             }
+         }
+     }
+@@ -175,12 +174,21 @@
+     }
+ }
+ 
+-#[derive(Default)]
+-struct TextLength(usize);
++struct NumberText {
++    // A signed binary64 in Rust's shortest decimal display fits in 328 bytes,
++    // including values formatted with leading fractional zeroes.
++    bytes: [u8; 328],
++    length: usize,
++}
+ 
+-impl fmt::Write for TextLength {
++impl fmt::Write for NumberText {
+     fn write_str(&mut self, text: &str) -> fmt::Result {
+-        self.0 += text.len();
++        let end = self.length + text.len();
++        self.bytes
++            .get_mut(self.length..end)
++            .ok_or(fmt::Error)?
++            .copy_from_slice(text.as_bytes());
++        self.length = end;
+         Ok(())
+     }
+ }

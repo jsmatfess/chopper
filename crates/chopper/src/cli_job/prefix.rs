@@ -1,6 +1,6 @@
 //! Nonvalidating lexical accounting; serde remains the only JSON validator.
 //! Equations and pinned implementation assumptions: docs/cli-job-decoding.md.
-use chopper_core::{Allocation, Column, Operation};
+use chopper_core::{Allocation, CalculatedColumn, Column, Operation};
 use std::mem::size_of;
 
 pub(super) const DEFAULTS: usize = 28;
@@ -9,7 +9,9 @@ pub(super) const L: usize = size_of::<Column>();
 pub(super) const U: usize = {
     let o = size_of::<Operation>();
     let a = size_of::<Allocation>();
+    let calculated = size_of::<CalculatedColumn>();
     let m = if o > a { o } else { a };
+    let m = if m > calculated { m } else { calculated };
     if m > L {
         m
     } else {

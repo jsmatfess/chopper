@@ -62,6 +62,7 @@ fn execute(
         pool,
         physical,
         false,
+        false,
         None,
         output::RunDestination::Unchecked,
         |job, ctx, p, b, s| {

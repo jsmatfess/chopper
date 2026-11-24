@@ -1,5 +1,5 @@
 type Group = {name: string; percent: string};
-type Step = {type: string; files?: number; columns?: (string | number)[]; groups?: Group[]; strata?: (string | number)[]; strategy?: string; name?: string};
+type Step = {type: string; files?: number; columns?: (string | number)[]; groups?: Group[]; strata?: (string | number)[]; strategy?: string};
 
 // Match the engine's exact, millionths-of-a-percent arithmetic.
 export function percentageUnits(text: string): number | null {
@@ -55,7 +55,7 @@ export function describePlan(operations: Step[], limits: {rows: string; bytes: s
   const link=(text:string,to:PlanTarget)=>decorate?decorate(text,to):text;
   const detail=(text:string,to:PlanTarget=target)=>details.push(link(text,to));
   const deliver=(text:string,to:PlanTarget='output')=>delivery.push(link(text,to));
-  const lastGrouping = operations.reduce((last, op, i) => ['shuffle','calculate'].includes(op.type) ? last : i, -1);
+  const lastGrouping = operations.reduce((last, op, i) => op.type === 'shuffle' ? last : i, -1);
   // Shuffling preserves fixed counts; partitioning and assignment create new,
   // subdividable groups even when a balanced split came earlier.
   const fixedFiles = ['balanced', 'interleaved'].includes(operations[lastGrouping]?.type);
@@ -126,9 +126,7 @@ export function describePlan(operations: Step[], limits: {rows: string; bytes: s
       pendingShuffle = `shuffle ${subject}${operations[i - 1]?.type === 'shuffle' ? ' again' : ''} into a random order`;
       continue;
     }
-    if (op.type === 'calculate') {
-      action(`calculate ${op.name ? quote(op.name) : 'a new column'} for each row`);
-    } else if (op.type === 'partition') {
+    if (op.type === 'partition') {
       const columns = op.columns || [];
       if (!columns.length) {
         action(`choose the columns ${final ? 'that should have separate CSV files' : 'to group rows by'}`);

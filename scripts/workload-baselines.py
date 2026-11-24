@@ -315,7 +315,8 @@ def make_plans(directory, executable, node, parameters, byte_cap=4096, build_sta
                               'timeout_seconds': 60, 'inputs': ['ui/src', 'ui/index.html', 'ui/style.css',
                                   'ui/package.json', 'ui/package-lock.json', 'ui/dist/engine.wasm',
                                   'scripts/build-hosted.mjs', 'scripts/browser-artifacts.mjs', 'scripts/hosted-theme.mjs',
-                                  'docs/releases/native-usage.txt', 'examples/customers.csv', 'examples/quickstart-job.json'],
+                                  'docs/releases/native-usage.txt', 'docs/formula-functions.md',
+                                  'examples/customers.csv', 'examples/quickstart-job.json'],
                               'artifacts': ['ui/dist'], 'depends': ['engine-build']})
             write_new(directory / (runtime + '-build-plan.json'), {
                 'root': str(ROOT), 'batch_timeout_seconds': 600, 'estimated_seconds': 180,

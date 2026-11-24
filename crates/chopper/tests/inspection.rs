@@ -125,10 +125,56 @@ fn preview_is_bounded_and_does_not_validate_unseen_records() -> anyhow::Result<(
         assert_eq!(sample["header"], header);
         assert_eq!(sample["preview"], serde_json::json!([]));
     }
-    std::fs::write(&input, format!("note\n{}\n", "x".repeat(32769)))?;
+    std::fs::write(&input, format!("note\n{}\nsmall\n", "x".repeat(32769)))?;
+    let sample = engine::input_preview(&job)?;
+    assert_eq!(sample["preview"], serde_json::json!([["small"]]));
+    assert_eq!(sample["preview_row_numbers"], serde_json::json!([2]));
+    Ok(())
+}
+
+#[test]
+fn formula_sample_continues_from_its_byte_boundary() -> anyhow::Result<()> {
+    let directory = tempfile::tempdir()?;
+    let input = directory.path().join("sample.csv");
+    let job = Job {
+        input: input.to_string_lossy().into_owned(),
+        ..Job::default()
+    };
+    let wide = "x".repeat(600_000);
+    std::fs::write(
+        &input,
+        format!("tag,note\nfirst,{wide}\nsecond,{wide}\nthird,small\n"),
+    )?;
+    let mut batches = Vec::new();
+    engine::sample_formula_rows(
+        &job,
+        |batch| {
+            let value = serde_json::to_value(batch)?;
+            let rows = value["rows"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|row| {
+                    (
+                        row[0].as_u64().unwrap(),
+                        row[1][0].as_str().unwrap().to_owned(),
+                    )
+                })
+                .collect::<Vec<_>>();
+            batches.push((rows, value["done"].as_bool().unwrap()));
+            Ok(())
+        },
+        || Ok(true),
+    )?;
     assert_eq!(
-        engine::input_preview(&job)?["preview"],
-        serde_json::json!([])
+        batches,
+        [
+            (vec![(1, "first".to_owned())], false),
+            (
+                vec![(2, "second".to_owned()), (3, "third".to_owned())],
+                true
+            ),
+        ]
     );
     Ok(())
 }

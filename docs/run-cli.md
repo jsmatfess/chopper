@@ -102,12 +102,29 @@ Native Windows currently uses fresh Run facts because the existing profile
 identity cannot reliably check rapid same-size edits on that runtime.
 See [Auto planning](execution-decisions.md#3-current-auto-planning).
 
-`chopper analyze --config job.json` scans input statistics and reports pipeline
-estimates without building output files. It replaces the former exact-plan
+`chopper analyze --config job.json` scans statistics for every source column and reports
+pipeline estimates without building output files. It replaces the former exact-plan
 Analyze behavior and the former `profile` command. Run always processes its own
 submitted configuration and validates the input it consumes; no prepared-result
 approval command remains. Run's normal path confirmation still precedes input
 consumption (`--yes` for noninteractive use).
+
+## Calculated columns
+
+Use repeatable `--calculated-column 'name=formula'` flags to define calculated
+columns. Definitions can reference each other and can be selected by
+`--column` or `--stratum`. Use saved JSON when a calculated column name contains
+an equals sign. In the interactive `chopper guide`, choose **Calculated Columns**.
+
+This command joins two CSV fields while skipping nulls and empty text, then
+partitions by the result. Use one line in Bash or PowerShell.
+
+```sh
+chopper run --input input.csv --output by-region --calculated-column 'key=CONCAT_WS("-", country, region, TRUE, TRUE)' --step partition --column key --yes
+```
+
+See [Formula functions](formula-functions.md) for the language reference and
+[Calculated columns in Job JSON](job-json.md#formulas) for `--config`.
 
 ## Summary JSON for automation
 

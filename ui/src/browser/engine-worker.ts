@@ -34,12 +34,24 @@ scope.onmessage=async({data})=>{
   if(type==='compress-block'){compressBlock(data);return;}
   try {
     let result:unknown, directDestination=false;
-    if(type==='init'){
-      bridge=new DiskBridge(data.port,data.shared);root=new DiskDirectory(bridge);
-      root.contents.set('tmp',new DiskDirectory(bridge));
+    if(type==='init'||type==='formula-scan'){
+      const scan=type==='formula-scan';
+      // The source-backed DiskFile reads directly with FileReaderSync in this worker.
+      // It has no access to the application's temporary storage or output worker.
+      const local=scan?new MessageChannel():null;
+      bridge=new DiskBridge(local?.port1??data.port, data.shared);
+      root=new DiskDirectory(bridge);
+      if(!scan)root.contents.set('tmp',new DiskDirectory(bridge));
+      const signal=scan?new Int32Array(data.signal):null;
+      const stdin=new MemoryFile([]).path_open(0,0n,0).fd_obj;
+      if(signal&&stdin)stdin.fd_read=()=>{
+        // This pause blocks only the dedicated sampler and keeps its decoder open.
+        while(Atomics.exchange(signal,0,0)===0)Atomics.wait(signal,0,0);
+        return {ret:0,data:new Uint8Array([1])};
+      };
       const wasi=new WASI(['chopper-browser'],['TMPDIR=/tmp',`CHOPPER_DISK_AVAILABLE=${data.available}`],[
-        new MemoryFile([]).path_open(0,0n,0).fd_obj,
-        ConsoleStdout.lineBuffered(line=>{const message=JSON.parse(line);if(message.physical?.kind==='stage_complete'){if(observations){stages.accept(message.physical);observations.update({physical:physicalHistory.snapshot(),completedStages:stages.snapshot(),unavailable:stages.unavailable||observations.unavailable});}}else if(message.physical){if(observations){try{const prior=physicalHistory.summaries.get(message.physical.id);const transition=!prior||prior.status!==message.physical.status||prior.last_attempt!==message.physical.attempt;physicalHistory.accept(message.physical);observations.recordPhysical(message.physical);collectPhysical(transition);}catch{observations.update({unavailable:true});}}}else if(message.observation){try{observations?.update(message.observation);}catch{observations=null;}}else if(message.progress)scope.postMessage(message);else last=message;}),
+        stdin,
+        ConsoleStdout.lineBuffered(line=>{const message=JSON.parse(line);if(scan&&Array.isArray(message.rows)){scope.postMessage({batch:message});return;}if(message.physical?.kind==='stage_complete'){if(observations){stages.accept(message.physical);observations.update({physical:physicalHistory.snapshot(),completedStages:stages.snapshot(),unavailable:stages.unavailable||observations.unavailable});}}else if(message.physical){if(observations){try{const prior=physicalHistory.summaries.get(message.physical.id);const transition=!prior||prior.status!==message.physical.status||prior.last_attempt!==message.physical.attempt;physicalHistory.accept(message.physical);observations.recordPhysical(message.physical);collectPhysical(transition);}catch{observations.update({unavailable:true});}}}else if(message.observation){try{observations?.update(message.observation);}catch{observations=null;}}else if(message.progress)scope.postMessage(message);else last=message;}),
         ConsoleStdout.lineBuffered(line=>scope.postMessage({diagnostic:line})),new RootFd(root)
       ]);
       // The upstream shim appends descriptors forever. Reuse closed slots for large fan-out jobs.
@@ -57,6 +69,14 @@ scope.onmessage=async({data})=>{
       });
       instance=loaded.instance;
       wasi.initialize(instance as WebAssembly.Instance & {exports:{memory:WebAssembly.Memory}});
+      if(scan){
+        const file:File=data.file;
+        const path='input'+(file.name.match(/\.[^.]+$/)?.[0]??'.csv');
+        root.contents.set(path,new DiskFile(bridge,file));
+        root.contents.set('job.json',new MemoryFile(encoder.encode(JSON.stringify({...data.job,input:'/'+path})),{readonly:true}));
+        invoke('chopper_formula_scan');
+        return;
+      }
       compression.init(loaded.module,instance.exports);
       result=invoke('chopper_defaults');
     } else if(type==='formula-preview'){

@@ -9034,6 +9034,32 @@
       "original_section_sha256": "a26bfc5622005eb277efd10c4213e305d8fc599b3e0c1887059a952ff0399b77",
       "sha256": "c11dbece22144fe7f01abaeed3e146451b9487ab0078c5e42ddf03e62674cd21",
       "relocations": []
+    },
+    {
+      "id": "calculated-column-evaluation-and-terminal-publication-2026-11-24",
+      "title": "Calculated-column evaluation and terminal publication (2026-11-24)",
+      "anchor": "calculated-column-evaluation-and-terminal-publication-2026-11-24",
+      "path": "docs/performance/investigations/calculated-column-evaluation-and-terminal-publication-2026-11-24.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "calculated-column-evaluation-and-terminal-publication-2026-11-24"
+      ],
+      "original_section_sha256": "108492bb886161b63909c6f4f76bfb3dcecc4f384a5cd4948cfdd603687acf09",
+      "sha256": "fae62f13352ef76ffcc14f1fb8ad647c3aa8302c06d97ad605cf02e5fa03669e",
+      "relocations": []
+    },
+    {
+      "id": "calculated-columns-followed-by-partition-2026-11-24",
+      "title": "Calculated columns followed by Partition (2026-11-24)",
+      "anchor": "calculated-columns-followed-by-partition-2026-11-24",
+      "path": "docs/performance/investigations/calculated-columns-followed-by-partition-2026-11-24.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "calculated-columns-followed-by-partition-2026-11-24"
+      ],
+      "original_section_sha256": "2e6e983f50bab7931b3146df1d96466e0f20ecdc41d0384a85176e768f5aa32a",
+      "sha256": "3f154b58e963247b8d8f720417d8bc3cd03e2f4658d40a77ca448483d1a689db",
+      "relocations": []
     }
   ],
   "migrated_count": 193

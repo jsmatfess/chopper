@@ -37,14 +37,7 @@ fn unhandled_calculation_error_keeps_the_destination_private() {
     let destination = dir.path().join("result");
     fs::write(&input, "amount\n120\nunknown\n").unwrap();
     let failed = run(&input, &destination)
-        .args([
-            "--step",
-            "calculate",
-            "--name",
-            "total",
-            "--expression",
-            "NUMBER(amount)",
-        ])
+        .args(["--calculated-column", "total=NUMBER(amount)"])
         .output()
         .unwrap();
     let diagnostic = String::from_utf8_lossy(&failed.stderr);

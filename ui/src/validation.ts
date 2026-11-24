@@ -1,5 +1,5 @@
 import type {Job} from './app';
-import {columnIndex,columnsBefore,type ColumnSchema} from './column-picker';
+import {columnIndex,withCalculatedColumns,type ColumnSchema} from './column-picker';
 import {GROUP_TOTAL_ERROR,groupErrors,percentageUnits} from './plan';
 
 type Field = HTMLInputElement | HTMLSelectElement;
@@ -74,14 +74,18 @@ export function configureValidation(getJob:()=>Job, getSchema:()=>ColumnSchema|n
     const outputBom=get('output-csv').querySelector<HTMLInputElement>('[data-csv="bom"]')!;
     if(outputBom.checked&&!['utf-8','utf8','utf-16','utf-16le','utf-16be'].includes(outputEncoding))add(outputBom,'Turn off the output byte-order mark, or choose a UTF encoding.');
     if(job.operations.length>64)add(get('operations').querySelector('[data-action="remove"]')||get('add-operation'),'Remove steps until the pipeline has at most 64 operations.');
+    const definitions=job.calculated_columns??[];
+    const source=getSchema();
+    const schema=withCalculatedColumns(source,definitions);
+    if(definitions.length>64)add(get('calculated-columns-list').querySelector('[data-remove-calculation]'),'Remove columns until there are at most 64 calculated columns.');
+    definitions.forEach((column,index)=>{
+      const row=form.querySelector(`[data-calculation="${index}"]`)!;
+      if(!column.name)add(row.querySelector('[data-field="name"]'),'Enter a calculated column name.');
+      else if(source?.header?.includes(column.name)||definitions.some((other,i)=>i!==index&&other.name===column.name))add(row.querySelector('[data-field="name"]'),'Choose a column name that is not already in use.');
+      if(!column.expression.trim())add(row.querySelector('[data-field="expression"]'),'Enter a formula.');
+    });
     job.operations.forEach((op,index)=>{
-      const schema=columnsBefore(getSchema(),job.operations,index);
       const step=form.querySelector<HTMLElement>(`[data-step="${index}"]`)!;
-      if(op.type==='calculate'){
-        if(!op.name)add(step.querySelector('[data-field="name"]'),'Enter a calculated column name.');
-        else if(schema?.header?.includes(op.name))add(step.querySelector('[data-field="name"]'),'Choose a column name that is not already in use.');
-        if(!op.expression?.trim())add(step.querySelector('[data-field="expression"]'),'Enter a formula.');
-      }
       if(op.type==='balanced'||op.type==='interleaved'){
         if((op.files||0)>Number(get('max-files').value))add(step.querySelector('[data-field="files"]'),`Step ${index+1}: reduce equal parts to the maximum output files / groups limit, or increase that limit.`);
       }

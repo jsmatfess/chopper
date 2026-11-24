@@ -19,7 +19,18 @@ await mkdir(ui+'dist',{recursive:true});
 for(const name of testAssets)await unlink(ui+'dist/'+name).catch(e=>{if(e.code!=='ENOENT')throw e;});
 await stat(ui+'dist/engine.wasm').catch(()=>{throw new Error('Build the Rust browser engine first: node scripts/build-browser.mjs');});
 assertProductionWasm(await readFile(ui+'dist/engine.wasm'));
-await build({entryPoints:[ui+'src/app.ts'],bundle:true,minify:true,outfile:ui+'dist/app.js'});
+const formulaReference=await readFile(new URL('../docs/formula-functions.md',import.meta.url),'utf8');
+const formulaUsage=Object.fromEntries(
+  [...formulaReference.matchAll(/^\| `([A-Z_][A-Z_0-9]*)\([^`]*\)` \| (.*?) \| (.*?) \|$/gm)]
+    .map(([,name,behavior,cell])=>[name,{
+      behavior:behavior.replaceAll('`',''),
+      examples:[...cell.matchAll(/`([^`]+)` → `([^`]+)`/g)].map(([,expression,result])=>[expression,result]),
+    }])
+);
+await build({
+  entryPoints:[ui+'src/app.ts'],bundle:true,minify:true,outfile:ui+'dist/app.js',
+  define:{__CHOPPER_FORMULA_USAGE__:JSON.stringify(formulaUsage)},
+});
 await build({entryPoints:[ui+'src/browser/engine-worker.ts',ui+'src/browser/storage-worker.ts'],bundle:true,minify:true,format:'esm',outdir:ui+'dist'});
 let html=await readFile(ui+'index.html','utf8');
 const sampleMarker='id="try-sample"';
@@ -31,6 +42,7 @@ html=html.replace(sampleMarker,`${sampleMarker} data-csv="${sample.toString('bas
 if(releaseDocs){
   const links=[
     ['data-docs-link',releaseDocs],
+    ['data-formula-docs-link',new URL('formula-functions',releaseDocs).href],
     ['data-folder-docs-link',new URL('browser#choosing-an-output-folder',releaseDocs).href],
   ];
   for(const [attribute,href] of links){

@@ -37,6 +37,7 @@ pub enum Kind {
     BalancedTraversal,
     FusedBalanced,
     GzipInput,
+    Calculation,
     ZipInput = 25,
 
     GzipOutput,
@@ -69,6 +70,7 @@ impl Kind {
             | Self::ExactMembership
             | Self::ProbabilisticMembership
             | Self::Stratification
+            | Self::Calculation
             | Self::DatasetMaterialize
             | Self::SharedRanges
             | Self::InterleavedMembership

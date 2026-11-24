@@ -144,6 +144,7 @@ fn wire_cases() -> Vec<Vec<u8>> {
         br#"{"input_csv":{},"output_csv":{},"resources":{"memory_mb":"auto"}}"#.to_vec(),
         br#"{"input":"\u00e9\u96ea\ud83e\udd80","operations":[{"type":"shuffle"},{"files":2,"type":"balanced"},{"type":"interleaved","files":2}]}"#.to_vec(),
         br#"{"operations":[{"columns":[0,"0","snow",1],"type":"partition"},{"groups":[{"name":"a","percent":"100"}],"strata":[0],"type":"assign"},{"type":"assign_probabilistic","groups":[["b","100"]]}]}"#.to_vec(),
+        br#"{"calculated_columns":[{"name":"value","expression":"SAFE.NUMBER(a)"},{"name":"more","expression":"value + 2"}]}"#.to_vec(),
         br#"[1,"in","out",null,[],[],"none",[["partition",[0,"name"]],["assign",[["a","100"]],[]]],[],[]]"#.to_vec(),
     ];
     for n in [0, 1, 2, 4, 5, 7, 8, 9, 15, 16, 17, 31, 32, 33, 65, 129, 257] {

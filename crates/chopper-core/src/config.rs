@@ -63,6 +63,8 @@ pub struct Job {
     pub full_shuffle_rng: FullShuffleRng,
     #[serde(skip_serializing_if = "FullShuffleAlgorithm::is_adaptive")]
     pub full_shuffle_algorithm: FullShuffleAlgorithm,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub calculated_columns: Vec<CalculatedColumn>,
 }
 impl Default for Job {
     fn default() -> Self {
@@ -74,6 +76,7 @@ impl Default for Job {
             input_csv: CsvSettings::default(),
             output_csv: CsvSettings::default(),
             compression: Compression::None,
+            calculated_columns: vec![],
             operations: vec![],
             limits: Limits::default(),
             resources: Resources::default(),
@@ -177,6 +180,13 @@ compression_choices! {
     Zip => "zip",
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct CalculatedColumn {
+    pub name: String,
+    pub expression: String,
+}
+
 wire_choices! {
     #[derive(Clone, Debug, Serialize, Deserialize)]
     #[serde(tag = "type", deny_unknown_fields)]
@@ -188,10 +198,6 @@ wire_choices! {
         Interleaved {
             files: u64,
         } => "interleaved",
-        Calculate {
-            name: String,
-            expression: String,
-        } => "calculate",
         Partition {
             columns: Vec<Column>,
         } => "partition",

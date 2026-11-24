@@ -17,9 +17,9 @@ The reading of decoded CSV records and discovery of their header and column
 count for profiling, input inspection or a job's pipeline.
 
 **Calculated column**:
-A column introduced at a position in the ordered pipeline, with each value
-defined by a deterministic expression over that row. The expression can
-reference input columns and calculated columns available at that position.
+A Job-level column defined by a deterministic expression over the current row.
+The expression can reference input columns and other calculated columns. The
+planner evaluates it when the pipeline or export needs it.
 
 **NULL**:
 An absent expression value, distinct from empty text within a formula. `NULL`

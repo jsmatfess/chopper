@@ -3,6 +3,8 @@ import {verifyPublication,type VerifiedPublication} from './publication';
 import type {Job,State,Analysis,InputProfile} from '../app';
 import {ExecutionHistory,type Observation} from './execution-history';
 
+export type FormulaSampleBatch = {rows:[number,string[]][];done:boolean};
+
 // Browser effects have a real adapter in client.ts and controlled adapters in
 // lifecycle tests. No worker or ownership token escapes this module's interface.
 export interface BrowserEffects {
@@ -144,14 +146,28 @@ export class BrowserLifecycle {
   private exporting=false;
   private readonly state:State={status:'idle',progress:{phase:'',rows:0,temp_bytes:0},analysis:null,error:null,output:null};
   constructor(private effects:BrowserEffects){}
-  selectInput(input:File){this.input=input;this.inputSelection++;this.currentSource=null;this.previewAdvice=null;}
-  invalidateDraft(source?:string){this.draftRevision++;if(source!==undefined)this.currentSource=source;}
+  selectInput(input:File){this.input=input;this.inputSelection++;this.currentSource=null;this.previewAdvice=null;this.clearProfile();}
+  invalidateDraft(source?:string){
+    this.draftRevision++;
+    if(source===undefined)return;
+    this.currentSource=source;
+    if(!belongsToSource(this.state.origins?.profile,source))this.clearProfile();
+  }
   selectOutput(output:FileSystemDirectoryHandle){this.output=output;}
   enableProfiling(){this.profiling=true;}
   snapshot():State{return structuredClone(this.state);}
   private setProfile(result:OwnedResult<InputProfile>){this.state.profile=result.value;this.state.origins={...this.state.origins,profile:result.origin};}
   private setAnalysis(result:OwnedResult<Analysis>){this.state.analysis=result.value;this.state.origins={...this.state.origins,analysis:result.origin};}
-  private clearResults(){this.state.analysis=null;this.state.profile=null;this.state.origins={};delete this.state.publication;}
+  private clearProfile(){
+    this.state.profile=null;
+    if(this.state.origins)delete this.state.origins.profile;
+    if(this.state.status==='profiled')this.state.status='idle';
+  }
+  private clearRunResults(){
+    this.state.analysis=null;
+    if(this.state.origins)delete this.state.origins.analysis;
+    delete this.state.publication;
+  }
   private showHistory(){try{this.effects.historyChanged(this.history);}catch{if(this.history)this.history.unavailable=true;}}
   private receive(data:any,session:WorkerSession){
     if(data.retiredStorage){if(this.profiling&&this.latestSession===session)this.diagnostics.storage=data.retiredStorage;return;}
@@ -228,6 +244,30 @@ export class BrowserLifecycle {
     const handle=output as FileSystemDirectoryHandle & {requestPermission?:(options:{mode:string})=>Promise<string>};
     if(handle.requestPermission&&await handle.requestPermission({mode:'readwrite'})!=='granted')throw new Error('Output folder write permission was not granted.');
   }
+  startFormulaScan(job:Job, onBatch:(batch:FormulaSampleBatch)=>void, onError:(error:string)=>void) {
+    if(!this.input)throw new Error('Choose a file to scan for formula examples.');
+    const worker=this.effects.worker('/engine-worker.js');
+    let stopped=false;
+    const stop=()=>{if(!stopped){stopped=true;worker.terminate();}};
+    const fail=(error:string)=>{stop();onError(error);};
+    try{
+      const signal=new Int32Array(this.effects.shared(4));
+      worker.onmessage=({data})=>{
+        if(stopped)return;
+        if(data.error){fail(data.error);return;}
+        if(data.batch){
+          onBatch(data.batch);
+          if(data.batch.done)stop();
+        }
+      };
+      worker.onerror=event=>{if(!stopped)fail(event.message);};
+      worker.postMessage({
+        type:'formula-scan',file:this.input,job,available:Number.MAX_SAFE_INTEGER,
+        signal:signal.buffer,shared:this.effects.shared(16+1024*1024),
+      });
+      return {stop,more:()=>{if(!stopped){Atomics.store(signal,0,1);Atomics.notify(signal,0);}}};
+    }catch(error){stop();throw error;}
+  }
   async execute(path:string,data?:any):Promise<any>{
     if(path==='state')return this.snapshot();
     if(path==='defaults'){
@@ -267,13 +307,14 @@ export class BrowserLifecycle {
       data=structuredClone(data);
       if(this.active())throw new Error('A job is active.');
       if(!this.input)throw new Error('Choose an input file with Browse.');
-      this.state.status='profiling';this.state.error=null;this.clearResults();this.state.output=null;this.exporting=false;
+      this.state.status='profiling';this.state.error=null;this.clearRunResults();this.state.output=null;this.exporting=false;
+      this.state.progress={phase:'Analyzing input',rows:0,temp_bytes:0};
       const session=this.start(),current=this.generation,file=this.input;
       const origin=resultOrigin(sourceIdentity(this.inputSelection,data),data,this.draftRevision,current);
       await this.setup(session.start(),current);if(current!==this.generation)return {};
       void session.profile(data,file).then(result=>{
         if(current!==this.generation)return;
-        if(!belongsToSource(origin,this.currentSource??sourceIdentity(this.inputSelection,data))){this.state.status='idle';this.state.profile=null;return;}
+        if(!belongsToSource(origin,this.currentSource??sourceIdentity(this.inputSelection,data))){this.state.status='idle';return;}
         this.setProfile(ownedResult(origin,result));this.state.status='profiled';
       }).catch(error=>this.fail(error,current));return {};
     }
@@ -301,7 +342,7 @@ export class BrowserLifecycle {
       })(),current);
       if(current!==this.generation)return {};
       this.folder='chopper-results-'+this.effects.uuid();this.exporting=false;
-      this.state.status='running';this.state.error=null;this.clearResults();this.state.output=null;
+      this.state.status='running';this.state.error=null;this.clearRunResults();this.state.output=null;
       for(const key of Object.keys(this.diagnostics))delete this.diagnostics[key];
       const session=this.session!;session.exportTo(output);
       void session.request('run-direct',{job:data,file,autoObservations,previewObservations,profiling:this.profiling,output,folder:this.folder,...session.observationRequest(this.history?.run,!this.history?.unavailable)}).then(async result=>{
@@ -318,7 +359,7 @@ export class BrowserLifecycle {
       let failure:string|null=null,destination=pendingOutput;
       try{const result=await cleanup;if(result!==undefined)destination=result;}catch(error){failure=String(error);}
       if(current!==this.generation)return {};
-      this.state.status='cancelled';this.clearResults();this.state.output=destination;
+      this.state.status='cancelled';this.clearRunResults();this.state.output=destination;
       const warning=destination?`Export cancelled. Check ${destination}: a valid CHOPPER-COMPLETE.json record marks completed results; otherwise files are incomplete.`:null;
       this.state.error=failure!==null?[warning,`Cleanup failed: ${failure}`].filter(Boolean).join(' '):warning;
       this.exporting=false;return {};

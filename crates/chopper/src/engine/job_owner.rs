@@ -112,6 +112,7 @@ pub(crate) fn capacity(job: &Job) -> Result<usize> {
         zip_member,
         input_csv,
         output_csv,
+        calculated_columns,
         operations,
         resources,
         random_seed,
@@ -144,13 +145,14 @@ pub(crate) fn capacity(job: &Job) -> Result<usize> {
         grouping: _,
     } = resources;
     optional(&mut bytes, temp_dir)?;
+    vector(&mut bytes, calculated_columns)?;
+    for column in calculated_columns {
+        add(&mut bytes, column.name.capacity())?;
+        add(&mut bytes, column.expression.capacity())?;
+    }
     vector(&mut bytes, operations)?;
     for operation in operations {
         match operation {
-            Operation::Calculate { name, expression } => {
-                add(&mut bytes, name.capacity())?;
-                add(&mut bytes, expression.capacity())?;
-            }
             Operation::Partition { columns: values } => columns(&mut bytes, values)?,
             Operation::Assign { groups, strata }
             | Operation::AssignProbabilistic { groups, strata } => {

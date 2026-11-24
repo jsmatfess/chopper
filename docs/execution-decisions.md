@@ -20,7 +20,18 @@ flowchart TD
     Witness --> Advice[Read cheap metadata and check optional Analyze binding]
     Action -->|Hosted Run| Advice
     Report -.->|Optional| Advice
-    Advice --> Counted{Native counted Auto or opt-in, eligible UTF-8 source and Balanced shape?}
+    Advice --> Calculation{Calculated column definitions?}
+    Calculation -->|Yes| Calculated[Retain source snapshot, bind references and order dependencies]
+    Calculated --> Boundary[Evaluate once per row before first consuming operation or during final output preparation]
+    Boundary --> CalcPartition{Unobserved Linux Run, one Partition on a calculated field, plain output, one root group, source at least 128 MiB?}
+    CalcPartition -->|Yes| CalcSort[Feed calculated rows to the existing grouping path and build the capped output snapshot]
+    CalcSort -->|Success| Publish
+    CalcSort -->|Retry after releasing private state| Internal
+    CalcPartition -->|No| CalcDirect{Unobserved Linux Run, plain output, no ordered operations, and source at least 128 MiB?}
+    CalcDirect -->|Yes| CalcPrivate[Write calculated rows to capped CSV in private publication]
+    CalcPrivate --> Publish
+    CalcDirect -->|No| Internal
+    Calculation -->|No| Counted{Native counted Auto or opt-in, eligible UTF-8 source and Balanced shape?}
     Counted -->|Yes| CountPass[Strict count pass and direct write with decoded header, count and metadata checks]
     CountPass --> ReleaseCounted[Release first-pass metadata and any Partition proof after comparison]
     ReleaseCounted --> Publish
@@ -55,10 +66,7 @@ flowchart TD
     OriginalExact --> Direct
     ExactReady -->|Other error| ExactFail[Fail and clean private output]
     ExactWriters -->|No| Direct
-    Routing -->|No| Calculation{Contains a calculated column?}
-    Calculation -->|Yes| Calculated[Bind at the step schema, stream typed results through later steps, serialize visible fields]
-    Calculation -->|No| Internal[Prepare snapshot internally, then execute]
-    Calculated --> Internal
+    Routing -->|No| Internal[Prepare snapshot internally, then execute]
     Direct --> Publish[Finalize and publish or export]
     Internal --> Publish
     Publish --> Native{Linux or Windows Run at snapshot publication, one plain Partition, at least 2 GiB and 1,152 files, and four workers?}

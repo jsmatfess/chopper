@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "calculated-column-evaluation-and-terminal-publication-2026-11-24",
+  "date": "2026-11-24",
+  "title": "Reuse calculated scalars and bypass large terminal output snapshots",
+  "subsystem": "execution",
+  "question": "Which changes improve complete calculated-column Runs without slowing formula-free jobs?",
+  "disposition": "adopt",
+  "outcome": "mixed",
+  "delivery": "default",
+  "summary": "The source-gated combined build saves 93–117 ms and 228–233 MB tracked temporary space on wide Linux terminal exports. Narrow grouped dependency jobs save 22–29 ms. Two formula-free control batches show no slowdown. One below-threshold calculated text cell repeats a small cost.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "measurement": "complete-run",
+    "workloads": [
+      "22.7–232.5 MB deterministic CSVs, 18,000 to 350,000 rows, one worker, fitting and spilled grouping.",
+      "Plain unobserved Linux terminal Run above 128 MiB plus grouped numeric and timestamp dependencies.",
+      "No-formula direct and forced-spill grouped controls."
+    ]
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Verified ordered CSV hashes, chunk caps and lineage in paired Linux Runs. Native tests compare direct and explicit snapshots and check cleanup after formula errors and cancellation. Chromium verifies formula and regular pipeline execution."
+  },
+  "limitations": [
+    "Single Ryzen WSL2 host, warm ext4, controlled fixtures, four formula families, no native Windows or WASI performance measurement.",
+    "Confirmed 9 ms paired median cost on one 119.7 MB dependency-free calculated text export.",
+    "Tracked peak temporary bytes, workspace and RSS have distinct scopes. GNU filesystem counts are not physical disk bytes."
+  ],
+  "exclusions": [
+    "Observed Runs and explicit preparation are outside direct publication eligibility.",
+    "No SIMD evaluator, batch evaluator or cross-row formula caching trial."
+  ],
+  "reopen_when": "A real workload shows a repeatable regression or a larger evidence panel supports stronger selection.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#calculated-column-evaluation-and-terminal-publication-2026-11-24",
+      "sha256": "108492bb886161b63909c6f4f76bfb3dcecc4f384a5cd4948cfdd603687acf09"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/calculated-column-optimization-summary-2026-11-24.json",
+      "sha256": "05cc7a1574965a9479a7de6f7add828f3c5fd0e09f96288ceec19a1d069e72ba"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/execution-decisions.md"
+  ]
+}

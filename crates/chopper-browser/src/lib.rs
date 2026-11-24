@@ -127,6 +127,29 @@ mod reactor {
         })())
     }
     #[no_mangle]
+    pub extern "C" fn chopper_formula_scan() -> i32 {
+        use std::io::{Read, Write};
+        let result = (|| {
+            let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
+            engine::sample_formula_rows(
+                &job,
+                |batch| {
+                    let mut stdout = std::io::stdout().lock();
+                    serde_json::to_writer(&mut stdout, batch)?;
+                    Ok(writeln!(stdout)?)
+                },
+                || {
+                    let mut command = [0_u8; 1];
+                    Ok(std::io::stdin().lock().read(&mut command)? == 1)
+                },
+            )
+        })();
+        match result {
+            Ok(()) => 0,
+            Err(error) => report::<()>(Err(error)),
+        }
+    }
+    #[no_mangle]
     pub extern "C" fn chopper_formula_preview() -> i32 {
         report((|| {
             let file = std::fs::File::open("/formula-preview.json")?;

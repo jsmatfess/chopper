@@ -29,11 +29,11 @@ const pages = [
   ['docs/operator-support.md', 'operator-support', 'Operator support'],
   ['docs/compatibility.md', 'compatibility', 'Compatibility and migration'],
 ];
+const formulaPage = ['docs/formula-functions.md', 'formula-functions', 'Formula functions'];
 const imagePath = 'docs/images/workbench.png';
 const samplePath = 'examples/customers.csv';
 const supportUrl = 'https://buymeacoffee.com/tblflip';
 const stylesheet = fileURLToPath(new URL('./chopper.css', import.meta.url));
-const pageMap = new Map(pages.map(([source, name]) => [source, name]));
 const git = (...args) => execFileSync('git', args, { cwd: root, maxBuffer: 5 * 1024 * 1024 });
 
 function section(markdown, heading) {
@@ -60,14 +60,15 @@ function content(source, name) {
   return source;
 }
 
-function rewriteLinks(md, tag) {
+function rewriteLinks(md, tag, releasePages) {
+  const pageMap = new Map(releasePages.map(([source, name]) => [source, name]));
   for (const [rule, attribute] of [['link_open', 'href'], ['image', 'src']]) {
     const render = md.renderer.rules[rule] ?? ((tokens, i, options, _env, self) => self.renderToken(tokens, i, options));
     md.renderer.rules[rule] = (tokens, i, options, env, self) => {
       const token = tokens[i];
       const target = token.attrGet(attribute);
       if (target && !/^(?:[\w+.-]+:|\/|#)/.test(target)) {
-        const source = pages.find(([, name]) => `${name}.md` === env.relativePath)?.[0];
+        const source = releasePages.find(([, name]) => `${name}.md` === env.relativePath)?.[0];
         if (!source) throw new Error(`Unknown link source: ${env.relativePath}`);
         const [path, hash] = target.split('#', 2);
         const suffix = hash ? `#${hash}` : '';
@@ -126,19 +127,22 @@ const releases = versions.map(arg => {
   if (JSON.parse(read('ui/package.json')).version !== version) {
     throw new Error(`App version does not match docs version ${version} at ${commit}`);
   }
-  return { version, commit, read };
+  const hasFormulas = git('ls-tree', '--name-only', commit, '--', formulaPage[0]).length > 0;
+  return { version, commit, read, hasFormulas };
 }).sort((a, b) => b.version.localeCompare(a.version, 'en', { numeric: true }));
 if (new Set(releases.map(r => r.version)).size !== releases.length) throw new Error('Duplicate documentation version');
 
 const staging = await mkdtemp(fileURLToPath(new URL('./.build-', import.meta.url)));
 try {
   const site = join(staging, 'dist');
-  for (const { version, read } of releases) {
+  for (const { version, read, hasFormulas } of releases) {
     const source = join(staging, version);
     const base = `/versions/${version}/`;
     await mkdir(join(source, 'public'), { recursive: true });
     await cp(stylesheet, join(source, 'public/chopper.css'));
-    const documents = pages.map(([path, name, text]) => ({
+    const releasePages = pages.flatMap(page =>
+      hasFormulas && page[1] === 'job-json' ? [page, formulaPage] : [page]);
+    const documents = releasePages.map(([path, name, text]) => ({
       name, text, markdown: name === 'cli-reference'
         ? renderCliReference(read(path).toString(), JSON.parse(read('docs/cli-reference-data.json')), version)
         : content(read(path).toString(), name),
@@ -158,7 +162,7 @@ try {
         config.site.title = `Chopper ${version}`;
         config.site.description = `Operator documentation for Chopper ${version}`;
         config.site.head.push(['link', { rel: 'stylesheet', href: base + 'chopper.css' }]);
-        config.markdown = { config: md => rewriteLinks(md, `v${version}`) };
+        config.markdown = { config: md => rewriteLinks(md, `v${version}`, releasePages) };
         config.site.themeConfig = {
           nav: [
             { text: 'Release notes', link: `${repo}/releases/tag/v${version}` },
@@ -195,7 +199,9 @@ try {
   await writeFile(join(site, '_redirects'), `/latest /versions/${latest.version}/ 302\n/latest/* /versions/${latest.version}/:splat 302\n`);
   await writeFile(join(site, 'versions.json'), JSON.stringify({
     latest: latest.version,
-    versions: releases.map(({ version, commit }) => ({ version, commit })),
+    versions: releases.map(({ version, commit, hasFormulas }) => ({
+      version, commit, ...(hasFormulas ? { additionalPages: [formulaPage[1]] } : {}),
+    })),
     pages: pages.map(([, name]) => name),
   }, null, 2) + '\n');
   await checkSite(site);
