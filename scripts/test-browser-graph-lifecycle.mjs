@@ -70,10 +70,19 @@ await withHostedBrowser({port:8425},async({context,url,browserVersion})=>{
  const page=await context.newPage();await page.addInitScript(()=>{
   window.graphParent='graph-lifecycle-'+crypto.randomUUID();window.graphMode='success';window.graphSource='id,key\n1,a\n2,b\n3,a\n4,b\n5,a\n6,b\n';window.graphWorkers=new Set();window.graphPaused=null;window.graphRunStarted=false;window.graphReadbacks=0;
   const Native=window.Worker,handler=Object.getOwnPropertyDescriptor(Native.prototype,'onmessage');window.Worker=class extends Native{
-   constructor(url,options){super(url,options);this.graphMode=window.graphMode;this.graphEngine=String(url).endsWith('/engine-worker.js');window.graphWorkers.add(this);if(this.graphEngine)window.graphEngine=this;this.addEventListener('message',({data})=>{if(data.graphPaused)window.graphPaused=data.graphPaused;if(data.graphReadbacks!=null)window.graphReadbacks=data.graphReadbacks;});}
+   constructor(url,options){super(url,options);this.graphMode=window.graphMode;this.graphEngine=String(url).endsWith('/engine-worker.js');window.graphWorkers.add(this);this.addEventListener('message',({data})=>{if(this.formulaSampler)return;if(data.graphPaused)window.graphPaused=data.graphPaused;if(data.graphReadbacks!=null)window.graphReadbacks=data.graphReadbacks;});}
    set onmessage(callback){this.graphHandler=callback;handler.set.call(this,callback?event=>{if(this.graphEngine&&this.graphMode==='marker_late'&&(event.data.observation??event.data.observationFinal)?.marker?.status==='completed'){window.graphLate={handler:callback,data:event.data};window.graphPaused='marker-late';return;}callback(event);}:null);}
    get onmessage(){return this.graphHandler;}
-   postMessage(data,transfer=[]){if(data.type==='run-direct')window.graphRunStarted=true;const message=data.type==='init'||data.type==='run-direct'?{...data,graphMode:window.graphMode}:data.type==='cleanup'?{...data,graphFailCleanup:window.graphRunStarted&&window.graphMode.startsWith('cleanup_error')}:data;super.postMessage(message,transfer);}
+   postMessage(data,transfer=[]){
+    // Formula samples own a separate source lifetime and may pause between batches.
+    if(data.type==='formula-scan'){
+     this.formulaSampler=true;window.graphWorkers.delete(this);
+     return super.postMessage(data,transfer);
+    }
+    if(data.type==='run-direct'){window.graphRunStarted=true;window.graphEngine=this;}
+    const message=data.type==='init'||data.type==='run-direct'?{...data,graphMode:window.graphMode}:data.type==='cleanup'?{...data,graphFailCleanup:window.graphRunStarted&&window.graphMode.startsWith('cleanup_error')}:data;
+    super.postMessage(message,transfer);
+   }
    terminate(){super.terminate();window.graphWorkers.delete(this);}
   };
   window.showOpenFilePicker=async()=>[{getFile:async()=>new File([window.graphSource],'fixture.csv')}];
