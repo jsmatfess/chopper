@@ -385,6 +385,7 @@ fn selections(
     header: Option<&[String]>,
     width: usize,
     owner: &Reservation,
+    bind_formulas: bool,
 ) -> Result<(Vec<Vec<usize>>, Reservation)> {
     let mut reservation = owner.sibling();
     let mut selections = Vec::new();
@@ -394,14 +395,24 @@ fn selections(
     for (step, operation) in job.operations.iter().enumerate() {
         let current_header = derived_header.as_deref().or(header);
         if let Operation::Calculate { name, expression } = operation {
-            let (_, next) = engine::calculation::prepare(
-                expression,
-                name,
-                current_header,
-                current_width,
-                if header.is_none() { width } else { 0 },
-                owner.sibling(),
-            )
+            let next = if bind_formulas {
+                engine::calculation::prepare(
+                    expression,
+                    name,
+                    current_header,
+                    current_width,
+                    if header.is_none() { width } else { 0 },
+                    owner.sibling(),
+                )
+                .map(|(_, header)| header)
+            } else {
+                engine::calculation::schema_after(
+                    current_header,
+                    current_width,
+                    name,
+                    owner.sibling(),
+                )
+            }
             .with_context(|| format!("calculated column {name:?} at operation {}", step + 1))?;
             derived_header = Some(next);
             current_width += 1;
@@ -475,7 +486,7 @@ impl ProfileCache {
         notify: Notify,
     ) -> Result<InputProfile> {
         let started = Instant::now();
-        job.validate()?;
+        job.validate_for_execution()?;
         ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
         let pool = self
             .pool
@@ -492,8 +503,13 @@ impl ProfileCache {
             // rescan instead of reusing observations on that runtime.
             if !cfg!(windows) && *old == key {
                 let p = &observations.profile;
-                let (wanted, _selection_buffers) =
-                    selections(job, p.header.as_deref(), p.columns, &p.metadata_buffers)?;
+                let (wanted, _selection_buffers) = selections(
+                    job,
+                    p.header.as_deref(),
+                    p.columns,
+                    &p.metadata_buffers,
+                    false,
+                )?;
                 cache_hit = partition_columns.is_none_or(|columns| {
                     observations.partition_for(columns, &wanted[0]).is_some()
                 }) && wanted.iter().all(|indices| match indices.as_slice() {
@@ -568,6 +584,7 @@ impl ProfileCache {
             profile.header.as_deref(),
             profile.columns,
             &profile.metadata_buffers,
+            true,
         )?;
         let partition =
             partition_columns.and_then(|columns| observations.partition_for(columns, &wanted[0]));
@@ -692,7 +709,8 @@ fn scan_configured(
     });
     let first = input.prefetch()?;
     let columns = input.columns();
-    let (wanted, _selection_buffers) = selections(job, header.as_deref(), columns, &scan_buffers)?;
+    let (wanted, _selection_buffers) =
+        selections(job, header.as_deref(), columns, &scan_buffers, false)?;
     // All profiling collections use vectors with visible, reserved capacities.
     // Sorted bounded value vectors preserve the BTreeSet's JSON order exactly.
     let mut selected = Vec::new();

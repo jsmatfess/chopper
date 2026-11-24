@@ -5,6 +5,52 @@ use std::{
 };
 
 #[test]
+fn calculated_pipeline_has_one_completed_source_scan() {
+    use chopper::observation::physical::Kind;
+    use std::sync::Mutex;
+
+    let dir = tempfile::tempdir().unwrap();
+    let input = dir.path().join("input.csv");
+    fs::write(&input, b"id,amount\n1,10\n2,3\n").unwrap();
+    let output = dir.path().join("out");
+    let job = Job {
+        input: input.to_string_lossy().into(),
+        output: output.to_string_lossy().into(),
+        operations: vec![
+            Operation::Calculate {
+                name: "cost".into(),
+                expression: "NUMBER(amount) * 2".into(),
+            },
+            Operation::Calculate {
+                name: "band".into(),
+                expression: "IF(cost >= 10, \"large\", \"small\")".into(),
+            },
+            Operation::Partition {
+                columns: vec![Column::Name("band".into())],
+            },
+        ],
+        ..Job::default()
+    };
+    let reads = Arc::new(Mutex::new(Vec::new()));
+    let seen = reads.clone();
+    let analysis = engine::run_with_observations(
+        job,
+        Arc::new(AtomicBool::new(false)),
+        Arc::new(|_| {}),
+        Arc::new(move |fact| {
+            if fact.kind == Kind::Read && fact.status == Status::Completed {
+                seen.lock().unwrap().push(fact.rows);
+            }
+            true
+        }),
+    )
+    .unwrap();
+    assert_eq!(*reads.lock().unwrap(), [2]);
+    assert_eq!(analysis.groups, 2);
+    assert!(output.join("manifest.jsonl").exists());
+}
+
+#[test]
 fn observed_limits_run_preserves_csv_caps_and_observer_failure_is_optional() {
     let dir = tempfile::tempdir().unwrap();
     let input = dir.path().join("input.csv");

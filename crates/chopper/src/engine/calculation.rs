@@ -8,28 +8,81 @@ pub(crate) struct Program {
     _memory: Reservation,
 }
 
+pub(super) struct Unbound {
+    expression: Expression,
+    memory: Reservation,
+}
+
+impl Unbound {
+    fn compile(source: &str, mut memory: Reservation) -> Result<Self> {
+        memory.resize(Expression::preparation_bytes(source))?;
+        let expression = Expression::parse(source).map_err(anyhow::Error::msg)?;
+        Ok(Self { expression, memory })
+    }
+
+    pub(super) fn bind(
+        mut self,
+        name: &str,
+        header: Option<&[String]>,
+        width: usize,
+        unnamed: usize,
+    ) -> Result<(Program, Header)> {
+        self.expression
+            .bind(header, width, unnamed)
+            .map_err(anyhow::Error::msg)?;
+        let next = Header::appended(header, width, name, self.memory.sibling())?;
+        self.memory.resize(
+            (self.memory.bytes() as usize)
+                .checked_add(self.expression.workspace_bytes())
+                .context("formula allocation overflow")?,
+        )?;
+        Ok((
+            Program {
+                expression: self.expression,
+                width,
+                _memory: self.memory,
+            },
+            next,
+        ))
+    }
+}
+
+pub(super) fn compile_steps(job: &Job, ctx: &Context) -> Result<[Option<Unbound>; 64]> {
+    let mut programs = [const { None }; 64];
+    for (index, op) in job.operations.iter().enumerate() {
+        if let Operation::Calculate { name, expression } = op {
+            ctx.check()?;
+            programs[index] = Some(
+                Unbound::compile(expression, Reservation::new(ctx)).with_context(|| {
+                    format!(
+                        "preparing calculated column {name:?} at operation {}",
+                        index + 1
+                    )
+                })?,
+            );
+        }
+    }
+    Ok(programs)
+}
+
 pub(crate) fn prepare(
     source: &str,
     name: &str,
     header: Option<&[String]>,
     width: usize,
     unnamed: usize,
-    mut memory: Reservation,
+    memory: Reservation,
 ) -> Result<(Program, Header)> {
-    memory.resize(Expression::preparation_bytes(source))?;
-    let mut expression = Expression::parse(source).map_err(anyhow::Error::msg)?;
-    expression
-        .bind(header, width, unnamed)
-        .map_err(anyhow::Error::msg)?;
-    let next = Header::appended(header, width, name, memory.sibling())?;
-    Ok((
-        Program {
-            expression,
-            width,
-            _memory: memory,
-        },
-        next,
-    ))
+    Unbound::compile(source, memory)?.bind(name, header, width, unnamed)
+}
+
+pub(crate) fn schema_after(
+    header: Option<&[String]>,
+    width: usize,
+    name: &str,
+    memory: Reservation,
+) -> Result<Header> {
+    Header::appended(header, width, name, memory)
 }
 
 impl Program {
@@ -63,7 +116,7 @@ impl Program {
             while let Some(mut row) = rows.next_packed(previous.take())? {
                 ctx.check()?;
                 value.clear();
-                let (kind, prior_kinds) = {
+                let kind = {
                     let metadata = if prior_columns > 0 {
                         Some(
                             row.fields()
@@ -86,9 +139,17 @@ impl Program {
                         }
                     };
                     let mut reserve = |bytes| reserve_scratch(&mut scratch, bytes, ctx);
-                    let mut provision = |n| reserve(n).map_err(|e| e.to_string());
-                    let (kind, result) =
-                        self.evaluate(&field, &mut provision).with_context(|| {
+                    let mut resource_failure = None;
+                    let evaluation = self.evaluate(&field, &mut |n| {
+                        reserve(n).map_err(|error| {
+                            let message = error.to_string();
+                            resource_failure = Some(error);
+                            message
+                        })
+                    });
+                    let (kind, result) = evaluation
+                        .map_err(|error| resource_failure.unwrap_or(error))
+                        .with_context(|| {
                             format!("input record {}, calculated column {name:?}", row.id + 1)
                         })?;
                     if value.capacity() < result.len() {
@@ -96,9 +157,9 @@ impl Program {
                         value.try_reserve_exact(result.len())?;
                     }
                     value.push_str(&result);
-                    (kind, metadata.map(str::len))
+                    kind
                 };
-                row.append_calculated(&value, kind, prior_kinds, ctx.max_record)
+                row.append_calculated(&value, kind, prior_columns > 0, ctx.max_record)
                     .with_context(|| {
                         format!("input record {}, calculated column {name:?}", row.id + 1)
                     })?;
@@ -122,7 +183,7 @@ fn reserve_scratch(scratch: &mut Reservation, bytes: usize, ctx: &Context) -> Re
 }
 
 #[derive(Deserialize)]
-pub struct FormulaPreviewRequest {
+struct FormulaPreviewRequest {
     header: Option<Vec<String>>,
     columns: usize,
     rows: Vec<Vec<String>>,
@@ -158,9 +219,24 @@ struct PreviewCell {
     is_null: bool,
     #[serde(skip)]
     kind: char,
+    #[serde(skip)]
+    stored: Option<String>,
 }
 
-pub fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
+pub fn formula_preview_json(reader: impl Read, wire_bytes: u64) -> Result<FormulaPreview> {
+    ensure!(
+        wire_bytes <= 2 * 1024 * 1024,
+        "formula preview request exceeds 2 MiB"
+    );
+    let mut wire_memory = input_inspection_reservation(&Job::default())?;
+    // Bound JSON container descriptor growth, overlapping vector allocation,
+    // and decoded strings before deserializing the request.
+    wire_memory.resize(wire_bytes as usize * 32)?;
+    let request = serde_json::from_reader(reader.take(wire_bytes))?;
+    formula_preview(request)
+}
+
+fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
     let FormulaPreviewRequest {
         header,
         columns,
@@ -205,21 +281,33 @@ pub fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview>
             Err(error) => {
                 step.error = Some(copy_preview_error(&mut memory, &error)?);
                 steps.push(step);
-                break;
+                derived_header = Some(Header::append_for_preview(
+                    source_header,
+                    columns + index,
+                    &calculation.name,
+                    memory.sibling(),
+                )?);
+                continue;
             }
         };
         memory.reserve_vec(&mut step.rows, rows.len())?;
         let mut scratch = memory.sibling();
         for (row_index, row) in rows.iter().enumerate() {
+            let dependency_failed = std::cell::Cell::new(false);
             let field = |index: usize| {
                 if let Some(text) = row.get(index) {
                     return Some(Value::Text(Cow::Borrowed(text)));
                 }
-                let cell = steps
-                    .get(index.checked_sub(columns)?)?
-                    .rows
-                    .get(row_index)?;
-                Value::from_stored(cell.value.as_deref()?, cell.kind)
+                let previous = steps
+                    .get(index.checked_sub(columns)?)
+                    .and_then(|step| step.rows.get(row_index));
+                let value = previous.and_then(|cell| {
+                    Value::from_stored(cell.value.as_deref().or(cell.stored.as_deref())?, cell.kind)
+                });
+                if value.is_none() {
+                    dependency_failed.set(true);
+                }
+                value
             };
             let result = program.evaluate(&field, &mut |bytes| {
                 scratch
@@ -238,19 +326,27 @@ pub fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview>
                         error: None,
                         is_null: kind == 'n',
                         kind,
+                        stored: None,
                     }
                 }
-                Ok(_) => PreviewCell {
+                Ok((kind, value)) => PreviewCell {
                     value: None,
                     error: Some(memory.copy_string("Value exceeds the preview size limit")?),
                     is_null: false,
-                    kind: 't',
+                    kind,
+                    stored: Some(memory.copy_string(&value)?),
                 },
                 Err(error) => PreviewCell {
                     value: None,
-                    error: Some(copy_preview_error(&mut memory, &error)?),
+                    error: Some(if dependency_failed.get() {
+                        memory
+                            .copy_string("An earlier calculated column has no value for this row")?
+                    } else {
+                        copy_preview_error(&mut memory, &error)?
+                    }),
                     is_null: false,
                     kind: 't',
+                    stored: None,
                 },
             };
             scratch.resize(0)?;

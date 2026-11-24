@@ -78,6 +78,15 @@ impl Resources {
 impl Job {
     /// Check configuration values and cross-field rules without accessing any job paths.
     pub fn validate(&self) -> Result<()> {
+        self.validate_configuration(true)
+    }
+
+    /// Execution prepares formulas under its own reservation.
+    pub fn validate_for_execution(&self) -> Result<()> {
+        self.validate_configuration(false)
+    }
+
+    fn validate_configuration(&self, prepare_formulas: bool) -> Result<()> {
         ensure_field!(
             self.version == super::JOB_VERSION,
             "/version",
@@ -189,12 +198,20 @@ impl Job {
                         format!("/operations/{index}/name"),
                         "calculated column names must be nonempty and unique"
                     );
-                    crate::expression::Expression::parse(expression).map_err(|cause| {
-                        JobValidationError::new(
-                            format!("/operations/{index}/expression"),
-                            anyhow::anyhow!(cause),
-                        )
-                    })?;
+                    ensure_field!(
+                        !expression.trim().is_empty()
+                            && expression.len() <= crate::expression::MAX_SOURCE_BYTES,
+                        format!("/operations/{index}/expression"),
+                        "calculated column formula is empty or exceeds the size limit"
+                    );
+                    if prepare_formulas {
+                        crate::expression::Expression::parse(expression).map_err(|cause| {
+                            JobValidationError::new(
+                                format!("/operations/{index}/expression"),
+                                anyhow::anyhow!(cause),
+                            )
+                        })?;
+                    }
                 }
                 Operation::Assign { groups, .. }
                 | Operation::AssignProbabilistic { groups, .. } => {

@@ -450,7 +450,7 @@ pub fn parse(matches: &ArgMatches) -> Result<(Job, bool)> {
             _ => bail!("step {index}: --{flag} does not apply to this operation"),
         }
     }
-    job.validate()?;
+    job.validate_for_execution()?;
     Ok((job, matches.get_flag("yes")))
 }
 

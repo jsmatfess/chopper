@@ -128,15 +128,10 @@ mod reactor {
     }
     #[no_mangle]
     pub extern "C" fn chopper_formula_preview() -> i32 {
-        use std::io::Read;
         report((|| {
             let file = std::fs::File::open("/formula-preview.json")?;
-            anyhow::ensure!(
-                file.metadata()?.len() <= 2 * 1024 * 1024,
-                "formula preview request exceeds 2 MiB"
-            );
-            let request = serde_json::from_reader(file.take(2 * 1024 * 1024))?;
-            engine::formula_preview(request)
+            let size = file.metadata()?.len();
+            engine::formula_preview_json(file, size)
         })())
     }
     #[no_mangle]

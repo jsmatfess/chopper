@@ -551,10 +551,21 @@ impl PackedRow {
         &mut self,
         value: &str,
         kind: char,
-        prior_kinds: Option<usize>,
+        has_kind_field: bool,
         maximum: usize,
     ) -> Result<()> {
         let (count, payload) = self.field_sizes();
+        // Derive the tail from validated fields rather than trusting an offset.
+        let prior_kinds = if has_kind_field {
+            Some(
+                self.fields()
+                    .last()
+                    .context("missing calculation metadata")?
+                    .len(),
+            )
+        } else {
+            None
+        };
         let new_sidecar = prior_kinds.is_none();
         let count = count
             .checked_add(1 + usize::from(new_sidecar))

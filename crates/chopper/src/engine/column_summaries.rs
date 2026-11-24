@@ -98,16 +98,24 @@ impl Builder {
         // This fixed stack array replaces unbounded temporary Vec/BTreeSet work.
         let mut selected = [0usize; MAX_COLUMNS];
         let mut len = 0;
+        let mut after_calculation = false;
         for operation in &job.operations {
             let columns = match operation {
-                Operation::Calculate { .. } => break,
+                Operation::Calculate { .. } => {
+                    after_calculation = true;
+                    continue;
+                }
                 Operation::Partition { columns } => columns,
                 Operation::Assign { strata, .. }
                 | Operation::AssignProbabilistic { strata, .. } => strata,
                 _ => continue,
             };
             for column in columns {
-                let index = resolve_column(column, header, width)?;
+                let index = match resolve_column(column, header, width) {
+                    Ok(index) => index,
+                    Err(_) if after_calculation => continue,
+                    Err(error) => return Err(error),
+                };
                 if let Err(position) = selected[..len].binary_search(&index) {
                     if len < MAX_COLUMNS {
                         selected.copy_within(position..len, position + 1);

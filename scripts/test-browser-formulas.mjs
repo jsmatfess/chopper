@@ -4,9 +4,9 @@ import {withHostedBrowser, revealFormControl} from './browser-acceptance.mjs';
 await withHostedBrowser({port:8427}, async ({context,url}) => {
   const page=await context.newPage();
   await page.addInitScript(()=>{
-    const source='id,Sales Region,amount\n1, north ,120\n2,south,unknown\n';
+    window.formulaSource='id,Sales Region,amount\n1, north ,120\n2,south,unknown\n';
     window.formulaOutput='formulas-'+crypto.randomUUID();
-    window.showOpenFilePicker=async()=>[{getFile:async()=>new File([source],'formula-fixture.csv')}];
+    window.showOpenFilePicker=async()=>[{getFile:async()=>new File([window.formulaSource],'formula-fixture.csv')}];
     window.showDirectoryPicker=async()=> (await navigator.storage.getDirectory()).getDirectoryHandle(window.formulaOutput,{create:true});
   });
   await page.goto(url+'/');
@@ -53,6 +53,19 @@ await withHostedBrowser({port:8427}, async ({context,url}) => {
   await second.getByText('invalid number',{exact:true}).waitFor();
   await secondFormula.fill('SAFE.NUMBER(amount)');
   await second.getByText('NULL',{exact:true}).waitFor();
+  const original=await page.evaluate(()=>window.formulaSource);
+  await page.evaluate(()=>{window.formulaSource=window.formulaSource.replace('Sales Region','Market');});
+  await page.locator('#browse-input').click();
+  await first.getByText(/missing or ambiguous/).waitFor();
+  await second.getByText('NULL',{exact:true}).waitFor();
+  await formula.fill('UPPER(TRIM($1');
+  await first.getByRole('option',{name:/Market/}).waitFor();
+  await formula.press('Tab');
+  assert.equal(await formula.inputValue(),'UPPER(TRIM($1');
+  await page.evaluate(source=>{window.formulaSource=source;},original);
+  await page.locator('#browse-input').click();
+  await formula.fill('UPPER(TRIM([Sales Region]))');
+  await first.getByText('NORTH',{exact:true}).waitFor();
 
   await revealFormControl(page,'#run-direct');
   await page.locator('#run-direct').click();

@@ -30,12 +30,21 @@ impl Header {
         previous: Option<&[String]>,
         width: usize,
         name: &str,
-        mut memory: Reservation,
+        memory: Reservation,
     ) -> Result<Self> {
         ensure!(
             !previous.is_some_and(|fields| fields.iter().any(|field| field == name)),
             "calculated column {name:?} already exists"
         );
+        Self::append_for_preview(previous, width, name, memory)
+    }
+
+    pub(super) fn append_for_preview(
+        previous: Option<&[String]>,
+        width: usize,
+        name: &str,
+        mut memory: Reservation,
+    ) -> Result<Self> {
         let mut fields = Vec::new();
         memory.reserve_vec(
             &mut fields,

@@ -79,16 +79,18 @@ def verify(output, analysis):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("chopper", type=Path)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--repeats", type=int, default=3)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.repeats < 1:
         parser.error("--repeats must be positive")
-    executable = args.chopper.resolve()
     if command("git", "status", "--porcelain"):
         parser.error("benchmark from a clean committed source checkout")
+    build_command = ["cargo", "build", "--release", "--locked", "-p", "chopper"]
+    subprocess.run(build_command, check=True)
+    metadata = json.loads(command("cargo", "metadata", "--no-deps", "--format-version", "1"))
+    executable = Path(metadata["target_directory"]) / "release" / "chopper"
     build = {
         "commit": command("git", "rev-parse", "HEAD"),
         "tree": command("git", "rev-parse", "HEAD^{tree}"),
@@ -96,7 +98,7 @@ def main():
         "harness_sha256": digest(Path(__file__)),
         "rustc": command("rustc", "-Vv"),
         "package": command(str(executable), "--version"),
-        "build_command": "cargo build --release --locked -p chopper",
+        "build_command": build_command,
         "features": "default",
     }
     with args.output.open("x", encoding="utf-8", newline="\n") as evidence, \

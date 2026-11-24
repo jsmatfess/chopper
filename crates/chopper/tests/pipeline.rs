@@ -94,6 +94,70 @@ fn saved_job_extracts_utc_and_local_timestamp_days() -> Result<()> {
 }
 
 #[test]
+fn calculated_column_binding_follows_the_available_schema() -> Result<()> {
+    let (_dir, mut job) = fixture("Name,Name,br]acket\na,b,x\n");
+    let operations = |formula| {
+        serde_json::from_value(serde_json::json!([
+            {"type":"calculate","name":"copy","expression":formula},
+            {"type":"partition","columns":["copy"]}
+        ]))
+        .unwrap()
+    };
+    for invalid in ["Name", "name", "copy"] {
+        job.operations = operations(invalid);
+        let failure = prepare(job.clone()).err().unwrap();
+        assert!(format!("{failure:#}").contains("missing or ambiguous"));
+    }
+    for valid in ["$1", "[br]]acket]"] {
+        job.operations = operations(valid);
+        assert_eq!(prepare(job.clone())?.analysis.groups, 1);
+    }
+    job.input_csv.headers = false;
+    job.output_csv.headers = false;
+    job.operations = operations("$1");
+    assert_eq!(prepare(job)?.analysis.groups, 2);
+    Ok(())
+}
+
+#[test]
+fn calculation_growth_and_cancellation_clean_temporary_output() -> Result<()> {
+    for cancel in [false, true] {
+        let (dir, mut job) = fixture("source\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+        job.resources.max_record_bytes = 128;
+        let temp = dir.path().join("temp");
+        fs::create_dir(&temp)?;
+        job.resources.temp_dir = Some(temp.to_string_lossy().into());
+        job.operations = vec![Operation::Calculate {
+            name: "expanded".into(),
+            expression: "REGEX_REPLACE(source, \"a\", \"12345678\")".into(),
+        }];
+        let stopped = Arc::new(AtomicBool::new(false));
+        let flag = stopped.clone();
+        let result = engine::run(
+            job,
+            stopped,
+            Arc::new(move |progress| {
+                if cancel && progress.phase.as_str() == "Preparing operation 1 of 1" {
+                    flag.store(true, Ordering::Relaxed);
+                }
+            }),
+        );
+        let error = format!("{:#}", result.unwrap_err());
+        assert!(
+            error.contains(if cancel {
+                "job cancelled"
+            } else {
+                "maximum record size"
+            }),
+            "{error}"
+        );
+        assert!(!dir.path().join("result").exists());
+        assert_eq!(fs::read_dir(temp)?.count(), 0);
+    }
+    Ok(())
+}
+
+#[test]
 fn saved_job_replaces_regex_captures_and_matches_unicode_wildcards() -> Result<()> {
     let (dir, mut job) = fixture("source\nÉTÉ-123-45\n");
     job.operations = serde_json::from_value(serde_json::json!([

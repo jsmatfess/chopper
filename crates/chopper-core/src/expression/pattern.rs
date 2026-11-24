@@ -1,5 +1,5 @@
 use super::{admitted, row, EvalError, EvalResult, Field, Function, Node, Reserve, Value};
-use std::{borrow::Cow, ops::Range};
+use std::{borrow::Cow, cell::RefCell, ops::Range};
 
 const MAX_PROGRAM: usize = 512;
 pub(super) const PROGRAM_ALLOCATION_BOUND: usize = 2 * MAX_PROGRAM * std::mem::size_of::<Op>();
@@ -12,6 +12,7 @@ pub(super) struct Instruction {
     text: Node,
     replacement: Option<Node>,
     insensitive: bool,
+    scratch: RefCell<Option<(States, States)>>,
 }
 
 impl Instruction {
@@ -34,7 +35,14 @@ impl Instruction {
             text,
             replacement: args.next(),
             insensitive,
+            scratch: RefCell::new(None),
         })
+    }
+
+    pub(super) fn workspace_bytes(&self) -> usize {
+        2 * self.regex.instructions.len() * (std::mem::size_of::<Thread>() + 1)
+            + self.text.workspace_bytes()
+            + self.replacement.as_ref().map_or(0, Node::workspace_bytes)
     }
 
     pub(super) fn bind(
@@ -69,7 +77,15 @@ impl Instruction {
             admitted(reserve, output_bytes.saturating_mul(2).saturating_add(8))?;
             text = Cow::Owned(text.to_lowercase());
         }
-        let mut matcher = Matcher::new(&self.regex, reserve)?;
+        let length = self.regex.instructions.len();
+        let mut scratch = self.scratch.borrow_mut();
+        let (current, next) =
+            scratch.get_or_insert_with(|| (States::new(length), States::new(length)));
+        let mut matcher = Matcher {
+            regex: &self.regex,
+            current,
+            next,
+        };
         let Some(replacement) = &self.replacement else {
             return Ok(Value::Bool(matcher.find(&text, 0, reserve)?.is_some()));
         };
@@ -272,7 +288,7 @@ impl Regex {
             whole,
         };
         let end = if whole { regex.emit(Op::End(0))? } else { 0 };
-        regex.start = regex.compile_ast(&tree, end)?;
+        regex.start = regex.compile_ast(&tree, end, &mut (4 * MAX_PROGRAM))?;
         Ok(regex)
     }
 
@@ -285,27 +301,35 @@ impl Regex {
         Ok(index)
     }
 
-    fn compile_ast(&mut self, ast: &Ast, mut next: usize) -> Result<usize, String> {
+    fn compile_ast(
+        &mut self,
+        ast: &Ast,
+        mut next: usize,
+        remaining: &mut usize,
+    ) -> Result<usize, String> {
+        *remaining = remaining
+            .checked_sub(1)
+            .ok_or("pattern exceeds compilation work limit")?;
         match ast {
             Ast::Test(test) => self.emit(Op::Test(*test, next)),
             Ast::Start => self.emit(Op::Start(next)),
             Ast::End => self.emit(Op::End(next)),
             Ast::Capture(group, item) => {
                 let after = self.emit(Op::Save(*group, 1, next))?;
-                let inner = self.compile_ast(item, after)?;
+                let inner = self.compile_ast(item, after, remaining)?;
                 self.emit(Op::Save(*group, 0, inner))
             }
             Ast::Sequence(items) => {
                 for item in items.iter().rev() {
-                    next = self.compile_ast(item, next)?;
+                    next = self.compile_ast(item, next, remaining)?;
                 }
                 Ok(next)
             }
             Ast::Alternation(alternatives) => {
-                let (last, remaining) = alternatives.split_last().unwrap();
-                let mut start = self.compile_ast(last, next)?;
-                for item in remaining.iter().rev() {
-                    let earlier = self.compile_ast(item, next)?;
+                let (last, earlier_items) = alternatives.split_last().unwrap();
+                let mut start = self.compile_ast(last, next, remaining)?;
+                for item in earlier_items.iter().rev() {
+                    let earlier = self.compile_ast(item, next, remaining)?;
                     start = self.emit(Op::Split(earlier, start))?;
                 }
                 Ok(start)
@@ -313,17 +337,17 @@ impl Regex {
             Ast::Repeat(item, min, maximum) => {
                 if let Some(max) = maximum {
                     for _ in *min..*max {
-                        let repeat = self.compile_ast(item, next)?;
+                        let repeat = self.compile_ast(item, next, remaining)?;
                         next = self.emit(Op::Split(repeat, next))?;
                     }
                 } else {
                     let loop_start = self.emit(Op::Accept)?;
-                    let repeat = self.compile_ast(item, loop_start)?;
+                    let repeat = self.compile_ast(item, loop_start, remaining)?;
                     self.instructions[loop_start] = Op::Split(repeat, next);
                     next = loop_start;
                 }
                 for _ in 0..*min {
-                    next = self.compile_ast(item, next)?;
+                    next = self.compile_ast(item, next, remaining)?;
                 }
                 Ok(next)
             }
@@ -530,7 +554,7 @@ impl Parser<'_> {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 struct Thread {
     pc: usize,
     start: usize,
@@ -543,6 +567,7 @@ struct Match {
     captures: [[usize; 2]; MAX_CAPTURES],
 }
 
+#[derive(Debug)]
 struct States {
     seen: Vec<bool>,
     threads: Vec<Thread>,
@@ -597,21 +622,11 @@ impl States {
 
 struct Matcher<'a> {
     regex: &'a Regex,
-    current: States,
-    next: States,
+    current: &'a mut States,
+    next: &'a mut States,
 }
 
-impl<'a> Matcher<'a> {
-    fn new(regex: &'a Regex, reserve: &mut Reserve<'_>) -> EvalResult<Self> {
-        let length = regex.instructions.len();
-        admitted(reserve, 2 * length * (std::mem::size_of::<Thread>() + 1))?;
-        Ok(Self {
-            regex,
-            current: States::new(length),
-            next: States::new(length),
-        })
-    }
-
+impl Matcher<'_> {
     fn find(
         &mut self,
         input: &str,

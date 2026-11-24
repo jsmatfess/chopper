@@ -11,7 +11,7 @@ mod direct;
 pub use diagnostics::Diagnostics;
 mod assignment;
 pub(crate) mod calculation;
-pub use calculation::{formula_preview, FormulaPreviewRequest};
+pub use calculation::formula_preview_json;
 mod child_metadata;
 mod column_summaries;
 mod exact_writers;
@@ -282,7 +282,7 @@ fn run_using(
     use auto::Route;
     let observed = snapshot.is_some() || physical.is_some();
     let started = std::time::Instant::now();
-    job.validate()?;
+    job.validate_for_execution()?;
     #[cfg(not(target_os = "wasi"))]
     let mut destination = output::RunDestination::preflight(&job)?;
     #[cfg(target_os = "wasi")]
@@ -491,7 +491,7 @@ fn prepare_using(
     physical: Option<crate::observation::physical::Sink>,
     read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
 ) -> Result<Prepared> {
-    job.validate()?;
+    job.validate_for_execution()?;
     match process_using(
         job,
         cancel,
@@ -594,6 +594,17 @@ fn process_using(
     ctx.auto_final_writers = ctx.auto_retained_exact;
 
     let job = PreparedJob::admit(job, Reservation::new(&ctx))?;
+    let mut programs = None;
+    let mut calculation_times = None;
+    if job
+        .operations
+        .iter()
+        .any(|op| matches!(op, Operation::Calculate { .. }))
+    {
+        let started = std::time::Instant::now();
+        programs = Some(calculation::compile_steps(&job, &ctx)?);
+        calculation_times = Some((started.elapsed().as_secs_f64(), 0.0));
+    }
     ctx.event("Reading and validating CSV", 0)?;
     let source_metadata = std::fs::metadata(&job.input).context("open input")?;
     ensure!(source_metadata.is_file(), "input must be a regular file");
@@ -679,33 +690,35 @@ fn process_using(
     ctx.physical_stage_complete(0);
     let mut stage_completion = ctx.physical_stages();
     let mut index = consumed;
-    let mut calculation_times = None;
     while index < job.operations.len() {
         stage_completion.complete_through(index);
-        if let Operation::Calculate { name, expression } = &job.operations[index] {
+        if let Operation::Calculate { name, .. } = &job.operations[index] {
             ctx.operation_event(index + 1, job.operations.len())?;
             let mut step_ctx = ctx.physical_scope([index + 1, 0]);
             step_ctx.physical_source = dataset.physical_source;
             let started = std::time::Instant::now();
-            let (program, next_header) = calculation::prepare(
-                expression,
-                name,
-                analysis.header.as_deref(),
-                analysis.columns,
-                if input_header.is_none() {
-                    input_columns
-                } else {
-                    0
-                },
-                Reservation::new(&step_ctx),
-            )
-            .with_context(|| {
-                format!(
-                    "preparing calculated column {name:?} at operation {}",
-                    index + 1
+            let compiled = programs
+                .as_mut()
+                .and_then(|programs| programs[index].take())
+                .context("missing compiled calculation")?;
+            let (program, next_header) = compiled
+                .bind(
+                    name,
+                    analysis.header.as_deref(),
+                    analysis.columns,
+                    if input_header.is_none() {
+                        input_columns
+                    } else {
+                        0
+                    },
                 )
-            })?;
-            let (prepare, traverse) = calculation_times.get_or_insert((0.0, 0.0));
+                .with_context(|| {
+                    format!(
+                        "preparing calculated column {name:?} at operation {}",
+                        index + 1
+                    )
+                })?;
+            let (prepare, traverse) = calculation_times.as_mut().unwrap();
             *prepare += started.elapsed().as_secs_f64();
             let started = std::time::Instant::now();
             let before = dataset.groups;

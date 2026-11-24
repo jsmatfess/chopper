@@ -17,10 +17,10 @@ function token(input:HTMLInputElement) {
   return {start:at-prefix.length, end:input.selectionEnd??at, prefix};
 }
 
-function columnSuggestions(schema:ColumnSchema|null):Suggestion[] {
+function columnSuggestions(schema:ColumnSchema|null, indexReference:boolean):Suggestion[] {
   return columnChoices(schema).map(choice=>{
     const {value,label,index}=choice;
-    const insertion = typeof value==='number' ? '$'+value
+    const insertion = indexReference||typeof value==='number' ? '$'+index
       : bareName.test(value)&&!reserved.test(value) ? value : '['+value.replaceAll(']',']]')+']';
     return {label,detail:'Column #'+index,insertion};
   });
@@ -75,10 +75,12 @@ export function configureFormulaEditor(
     const functions=catalog.map(([name,detail])=>({
       label:safe?'SAFE.'+name:name,detail,insertion:safe?'SAFE.'+name:name,call:true,
     }));
-    options=[...functions,...(safe?[]:columnSuggestions(schema(step)))]
-      .filter(option=>option.insertion.toUpperCase().startsWith(prefix)
-        ||option.label.toUpperCase().startsWith(prefix))
-      .slice(0,24);
+    const matches=(option:Suggestion)=>option.insertion.toUpperCase().startsWith(prefix)
+      ||option.label.toUpperCase().startsWith(prefix);
+    options=[
+      ...functions.filter(matches).slice(0,16),
+      ...(safe?[]:columnSuggestions(schema(step),prefix.startsWith('$')).filter(matches).slice(0,16)),
+    ];
     if(!options.length){close();return;}
     menu.replaceChildren(...options.map((option,index)=>{
       const row=document.createElement('div');

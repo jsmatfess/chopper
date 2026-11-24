@@ -289,6 +289,10 @@ impl Expression {
         self.0.bind(header, width, unnamed)
     }
 
+    pub fn workspace_bytes(&self) -> usize {
+        self.0.workspace_bytes()
+    }
+
     pub fn evaluate<'a>(
         &'a self,
         field: &Field<'a>,
@@ -299,6 +303,16 @@ impl Expression {
 }
 
 impl Node {
+    fn workspace_bytes(&self) -> usize {
+        match self {
+            Self::Call(_, args) => args.iter().map(Self::workspace_bytes).sum(),
+            Self::Unary(_, arg) | Self::Safe(arg) | Self::Temporal(_, arg) => arg.workspace_bytes(),
+            Self::Binary(_, left, right) => left.workspace_bytes() + right.workspace_bytes(),
+            Self::Pattern(pattern) => pattern.workspace_bytes(),
+            _ => 0,
+        }
+    }
+
     fn bind(
         &mut self,
         header: Option<&[String]>,
@@ -591,7 +605,7 @@ impl Function {
 
 fn position(value: Value<'_>) -> EvalResult<usize> {
     let n = value.number()?;
-    if n < 0.0 || n.fract() != 0.0 || n >= usize::MAX as f64 {
+    if n < 0.0 || n.fract() != 0.0 {
         return Err(row("substring positions must be nonnegative integers"));
     }
     Ok(n as usize)
