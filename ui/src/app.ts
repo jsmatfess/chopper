@@ -97,8 +97,8 @@ function configureJobChoices() {
     auto: 'Automatic (recommended)', sort: 'Always sort',
   });
   // Assignment and split variants share entries and use their in-step mode controls.
-  const labels = {calculate: 'Calculate a column', partition: 'Partition by one or more columns', balanced: 'Split into equal parts',
-    assign: 'Assign groups by percentage', shuffle: 'Shuffle row order'};
+  const labels = {partition: 'Partition by one or more columns', balanced: 'Split into equal parts',
+    assign: 'Assign groups by percentage', shuffle: 'Shuffle row order', calculate: 'Calculate a column'};
   const operations = Object.keys(labels).filter(type => jobValues.operation.includes(type));
   $('new-operation').innerHTML = choiceOptions(operations, '', labels);
 }
