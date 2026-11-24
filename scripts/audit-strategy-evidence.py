@@ -73,6 +73,7 @@ def main():
 
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
+    'Calculated-column streaming baseline (2026-11-23)': 'profiling',
     'Auto Chromium thresholds and resource calibration (2026-11-21)': 'adaptive-routing',
     'Browser Auto resource calibration (2026-11-21)': 'adaptive-routing',
     'Browser Auto memory tiers (2026-11-21)': 'adaptive-routing',

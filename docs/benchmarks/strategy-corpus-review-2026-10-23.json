@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "922698e657b37c84ef820555050d20fb5c81cba4aaaf7d52b7a2d220785f1fbe",
+  "analysis_script_sha256": "303ca690c742addb7bd41232c6cb5f87f18bd4f36502ccf13ade0c302f1c86e7",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "faa328b2f0550c1597ef45da3c0eba28252c28b1e3f5ff475aa0063e2333f13e"
+    "sha256": "e1430ed743e22b0758d5860b90c35a8965f64a6a3fb63b6cc14059b2876b53f0"
   },
   "families": [
     "adaptive-routing",
@@ -4688,6 +4688,23 @@
         "topic": "ownership-and-lifecycle"
       },
       "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Calculated-column streaming baseline (2026-11-23)",
+      "evidence": "docs/performance.md#calculated-column-streaming-baseline-2026-11-23",
+      "artifacts": [
+        "docs/benchmarks/calculated-columns-native-2026-11-23.jsonl",
+        "docs/benchmarks/calculated-columns-tmpfs-2026-11-23.jsonl"
+      ],
+      "scripts": [
+        "scripts/benchmark-calculated-columns.py"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/calculated-column-streaming-baseline-2026-11-23.md",
+        "sha256": "c11dbece22144fe7f01abaeed3e146451b9487ab0078c5e42ddf03e62674cd21",
+        "topic": "profiling"
+      },
+      "family": "profiling"
     }
   ],
   "sources": [
@@ -13543,6 +13560,146 @@
           },
           "last": {
             "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/calculated-columns-native-2026-11-23.jsonl",
+      "sha256": "5f36a16188947121e33489cc540e7ec717b2f9a109444604b30a4b5f99d56458",
+      "bytes": 41373,
+      "format": "jsonl",
+      "record_counts": {
+        "calculation_baseline_run": 24,
+        "context": 1
+      },
+      "fields": [
+        "binary_sha256",
+        "build",
+        "cache",
+        "case",
+        "cpu",
+        "exit_code",
+        "filesystem_type",
+        "fixture",
+        "fixture_sha256",
+        "logical_cpus",
+        "machine",
+        "memory_mib",
+        "merge_operations",
+        "operations",
+        "output",
+        "peak_temp_bytes",
+        "peak_workspace_reserved_bytes",
+        "platform",
+        "repeat",
+        "schema_version",
+        "sort_runs",
+        "status",
+        "timing_scope",
+        "timings",
+        "type",
+        "wall_seconds",
+        "workers"
+      ],
+      "context_records": [
+        {
+          "line": 1,
+          "kind": "context"
+        }
+      ],
+      "evidence": [
+        "docs/performance.md#calculated-column-streaming-baseline-2026-11-23"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "context": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 1
+          }
+        },
+        "calculation_baseline_run": {
+          "first": {
+            "line": 2
+          },
+          "last": {
+            "line": 25
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/calculated-columns-tmpfs-2026-11-23.jsonl",
+      "sha256": "44d8c8d8e169243f9466d8c11b6ab9c629e31391b9b6295944e123df1d87a1a4",
+      "bytes": 41410,
+      "format": "jsonl",
+      "record_counts": {
+        "calculation_baseline_run": 24,
+        "context": 1
+      },
+      "fields": [
+        "binary_sha256",
+        "build",
+        "cache",
+        "case",
+        "cpu",
+        "exit_code",
+        "filesystem_type",
+        "fixture",
+        "fixture_sha256",
+        "logical_cpus",
+        "machine",
+        "memory_mib",
+        "merge_operations",
+        "operations",
+        "output",
+        "peak_temp_bytes",
+        "peak_workspace_reserved_bytes",
+        "platform",
+        "repeat",
+        "schema_version",
+        "sort_runs",
+        "status",
+        "timing_scope",
+        "timings",
+        "type",
+        "wall_seconds",
+        "workers"
+      ],
+      "context_records": [
+        {
+          "line": 1,
+          "kind": "context"
+        }
+      ],
+      "evidence": [
+        "docs/performance.md#calculated-column-streaming-baseline-2026-11-23"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "context": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 1
+          }
+        },
+        "calculation_baseline_run": {
+          "first": {
+            "line": 2
+          },
+          "last": {
+            "line": 25
           }
         }
       },

@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "faa328b2f0550c1597ef45da3c0eba28252c28b1e3f5ff475aa0063e2333f13e"
+    "sha256": "e1430ed743e22b0758d5860b90c35a8965f64a6a3fb63b6cc14059b2876b53f0"
   },
   "experiments": [
     {
@@ -4410,6 +4410,22 @@
         "path": "docs/performance/investigations/parallel-gzip-and-zip-output-2026-11-22.md",
         "sha256": "43b6fd24b52a9981150e453a46069b95b1692dc388f4aacac526533b3f13709a",
         "topic": "ownership-and-lifecycle"
+      }
+    },
+    {
+      "title": "Calculated-column streaming baseline (2026-11-23)",
+      "evidence": "docs/performance.md#calculated-column-streaming-baseline-2026-11-23",
+      "artifacts": [
+        "docs/benchmarks/calculated-columns-native-2026-11-23.jsonl",
+        "docs/benchmarks/calculated-columns-tmpfs-2026-11-23.jsonl"
+      ],
+      "scripts": [
+        "scripts/benchmark-calculated-columns.py"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/calculated-column-streaming-baseline-2026-11-23.md",
+        "sha256": "c11dbece22144fe7f01abaeed3e146451b9487ab0078c5e42ddf03e62674cd21",
+        "topic": "profiling"
       }
     }
   ],
@@ -10269,6 +10285,102 @@
       "evidence": [
         "docs/performance.md#buffered-random-draws-and-seed-removal-2026-11-16",
         "docs/performance.md#buffered-random-final-transfer-2026-11-16"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/calculated-columns-native-2026-11-23.jsonl",
+      "sha256": "5f36a16188947121e33489cc540e7ec717b2f9a109444604b30a4b5f99d56458",
+      "bytes": 41373,
+      "format": "jsonl",
+      "record_counts": {
+        "calculation_baseline_run": 24,
+        "context": 1
+      },
+      "fields": [
+        "binary_sha256",
+        "build",
+        "cache",
+        "case",
+        "cpu",
+        "exit_code",
+        "filesystem_type",
+        "fixture",
+        "fixture_sha256",
+        "logical_cpus",
+        "machine",
+        "memory_mib",
+        "merge_operations",
+        "operations",
+        "output",
+        "peak_temp_bytes",
+        "peak_workspace_reserved_bytes",
+        "platform",
+        "repeat",
+        "schema_version",
+        "sort_runs",
+        "status",
+        "timing_scope",
+        "timings",
+        "type",
+        "wall_seconds",
+        "workers"
+      ],
+      "context_records": [
+        {
+          "line": 1,
+          "kind": "context"
+        }
+      ],
+      "evidence": [
+        "docs/performance.md#calculated-column-streaming-baseline-2026-11-23"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/calculated-columns-tmpfs-2026-11-23.jsonl",
+      "sha256": "44d8c8d8e169243f9466d8c11b6ab9c629e31391b9b6295944e123df1d87a1a4",
+      "bytes": 41410,
+      "format": "jsonl",
+      "record_counts": {
+        "calculation_baseline_run": 24,
+        "context": 1
+      },
+      "fields": [
+        "binary_sha256",
+        "build",
+        "cache",
+        "case",
+        "cpu",
+        "exit_code",
+        "filesystem_type",
+        "fixture",
+        "fixture_sha256",
+        "logical_cpus",
+        "machine",
+        "memory_mib",
+        "merge_operations",
+        "operations",
+        "output",
+        "peak_temp_bytes",
+        "peak_workspace_reserved_bytes",
+        "platform",
+        "repeat",
+        "schema_version",
+        "sort_runs",
+        "status",
+        "timing_scope",
+        "timings",
+        "type",
+        "wall_seconds",
+        "workers"
+      ],
+      "context_records": [
+        {
+          "line": 1,
+          "kind": "context"
+        }
+      ],
+      "evidence": [
+        "docs/performance.md#calculated-column-streaming-baseline-2026-11-23"
       ]
     },
     {
@@ -36066,8 +36178,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "89f6d654e7d80d6107289c4e570fa7ad18e5f3efb12b487f6e5bdf82680fb96a",
-      "bytes": 1706412,
+      "sha256": "b4423f99e579cfd0ae626191496044dde2312de80d4711c3131df2aaf2b30f9b",
+      "bytes": 1710554,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -40364,7 +40476,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "48d588cd243368db93c3fd055efb79eb07ee75286292d06a8d9eb7a34dc447ed"
+    "sha256": "a3300c317b4b34af7d1fe8c32dc37666535a7a0124316371c3bfde4041b64176"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

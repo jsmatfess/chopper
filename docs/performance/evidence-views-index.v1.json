@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "68bc92a62c02c45b4b8d476b28268d2a64d7bc6aaabc231c71d75770ee3cd23a",
+  "catalog_sha256": "f6629da1735ef77253a69d514ed0dde69f41012e5d48b5d6c4ef0e92f0c9700f",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -3984,6 +3984,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/calculated-columns-tmpfs-2026-11-23.jsonl",
+      "source_sha256": "44d8c8d8e169243f9466d8c11b6ab9c629e31391b9b6295944e123df1d87a1a4",
+      "aliases": [
+        "docs/benchmarks/calculated-columns-tmpfs-2026-11-23.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 24,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 24
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/auto-followup-2026-11-21-linux-workers.jsonl",
       "source_sha256": "44fce06a9b6f35618bbdf68c5a423681a2aceca0d178c7004fdc697d710bfe71",
       "aliases": [
@@ -5578,6 +5595,23 @@
       "validation_records": 0,
       "classes": {
         "unclassified": 6
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/calculated-columns-native-2026-11-23.jsonl",
+      "source_sha256": "5f36a16188947121e33489cc540e7ec717b2f9a109444604b30a4b5f99d56458",
+      "aliases": [
+        "docs/benchmarks/calculated-columns-native-2026-11-23.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 24,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 24
       },
       "coverage": "adapted"
     },
@@ -8056,19 +8090,6 @@
       "coverage": "not-adapted"
     },
     {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "89f6d654e7d80d6107289c4e570fa7ad18e5f3efb12b487f6e5bdf82680fb96a",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
       "source": "docs/benchmarks/shuffle-policy-auto-fit-native-2026-11-15.jsonl",
       "source_sha256": "89f9381a68361c894bbaf4bb636d03fc35c7e92d8268283fc0c1818dc38432b3",
       "aliases": [
@@ -10512,6 +10533,19 @@
         "measurement": 12
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "b4423f99e579cfd0ae626191496044dde2312de80d4711c3131df2aaf2b30f9b",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-counted-zstd.jsonl",

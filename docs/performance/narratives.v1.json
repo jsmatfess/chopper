@@ -9021,6 +9021,19 @@
       "original_section_sha256": "aac8cad45b4f0ddb61b19453046281399a2f19b781abc0d67886b47195245b1f",
       "sha256": "43b6fd24b52a9981150e453a46069b95b1692dc388f4aacac526533b3f13709a",
       "relocations": []
+    },
+    {
+      "id": "calculated-column-streaming-baseline-2026-11-23",
+      "title": "Calculated-column streaming baseline (2026-11-23)",
+      "anchor": "calculated-column-streaming-baseline-2026-11-23",
+      "path": "docs/performance/investigations/calculated-column-streaming-baseline-2026-11-23.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "calculated-column-streaming-baseline-2026-11-23"
+      ],
+      "original_section_sha256": "a26bfc5622005eb277efd10c4213e305d8fc599b3e0c1887059a952ff0399b77",
+      "sha256": "c11dbece22144fe7f01abaeed3e146451b9487ab0078c5e42ddf03e62674cd21",
+      "relocations": []
     }
   ],
   "migrated_count": 193
