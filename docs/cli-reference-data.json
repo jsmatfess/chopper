@@ -329,6 +329,7 @@
           "accepted_values": [
             "balanced",
             "interleaved",
+            "calculate",
             "partition",
             "assign",
             "assign_probabilistic",
@@ -339,6 +340,22 @@
           "heading": "Ordered steps",
           "id": "step",
           "syntax": "--step <step>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Output column name for the preceding calculate step",
+          "heading": "Ordered steps",
+          "id": "name",
+          "syntax": "--name <name>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Formula for the preceding calculate step",
+          "heading": "Ordered steps",
+          "id": "expression",
+          "syntax": "--expression <expression>"
         },
         {
           "accepted_values": [],
@@ -719,6 +736,7 @@
     "operation": [
       "balanced",
       "interleaved",
+      "calculate",
       "partition",
       "assign",
       "assign_probabilistic",

@@ -147,6 +147,10 @@ pub(crate) fn capacity(job: &Job) -> Result<usize> {
     vector(&mut bytes, operations)?;
     for operation in operations {
         match operation {
+            Operation::Calculate { name, expression } => {
+                add(&mut bytes, name.capacity())?;
+                add(&mut bytes, expression.capacity())?;
+            }
             Operation::Partition { columns: values } => columns(&mut bytes, values)?,
             Operation::Assign { groups, strata }
             | Operation::AssignProbabilistic { groups, strata } => {

@@ -31,6 +31,144 @@ fn prepare(job: Job) -> Result<Prepared> {
 }
 
 #[test]
+fn saved_job_partitions_and_exports_a_calculated_column() -> Result<()> {
+    let (dir, mut job) = fixture("id,Sales Region\n1, north \n2, south\n3,NORTH\n");
+    job.operations = serde_json::from_value(serde_json::json!([
+        {"type": "calculate", "name": "region", "expression": "upper(TRIM([Sales Region]))"},
+        {"type": "partition", "columns": ["region"]}
+    ]))?;
+    let prepared = prepare(job)?;
+    assert_eq!(prepared.analysis.groups, 2);
+    prepared.execute()?;
+    let output = dir.path().join("result");
+    let mut csv = fs::read_dir(output)?
+        .filter_map(|entry| {
+            let path = entry.expect("list result file").path();
+            (path.extension().and_then(|ext| ext.to_str()) == Some("csv")).then_some(path)
+        })
+        .map(fs::read_to_string)
+        .collect::<std::io::Result<Vec<_>>>()?;
+    csv.sort();
+    assert_eq!(
+        csv,
+        [
+            "id,Sales Region,region\n1, north ,NORTH\n3,NORTH,NORTH\n",
+            "id,Sales Region,region\n2, south,SOUTH\n"
+        ]
+    );
+    Ok(())
+}
+
+#[test]
+fn saved_job_chains_typed_calculations_and_keeps_null_distinct() -> Result<()> {
+    let (dir, mut job) = fixture("id,amount\n1,120\n2,invalid\n3,\n");
+    job.operations = serde_json::from_value(serde_json::json!([
+        {"type":"calculate", "name":"numeric", "expression":"SAFE.NUMBER(amount)"},
+        {"type":"balanced", "files":1},
+        {"type":"calculate", "name":"band", "expression":"IFS(IS_NULL(numeric), \"missing\", numeric >= 100, \"large\", \"small\")"}
+    ]))?;
+    prepare(job)?.execute()?;
+    let csv = fs::read_to_string(dir.path().join("result/split-1-part-00000001.csv"))?;
+    assert_eq!(
+        csv,
+        "id,amount,numeric,band\n1,120,120,large\n2,invalid,\"\",missing\n3,\"\",\"\",missing\n"
+    );
+    Ok(())
+}
+
+#[test]
+fn saved_job_extracts_utc_and_local_timestamp_days() -> Result<()> {
+    let (dir, mut job) = fixture("source\n2026-11-23T00:30:00.123456789+02:00\n");
+    job.operations = serde_json::from_value(serde_json::json!([
+        {"type":"calculate","name":"ts","expression":"TIMESTAMP_PARSE(source)"},
+        {"type":"balanced","files":1},
+        {"type":"calculate","name":"utc_day","expression":"TIMESTAMP_EXTRACT(ts, \"day\")"},
+        {"type":"calculate","name":"local_day","expression":"TIMESTAMP_EXTRACT(ts, \"day\", \"local\")"}
+    ]))?;
+    prepare(job)?.execute()?;
+    assert_eq!(
+        fs::read_to_string(dir.path().join("result/split-1-part-00000001.csv"))?,
+        "source,ts,utc_day,local_day\n2026-11-23T00:30:00.123456789+02:00,2026-11-22T22:30:00.123456789Z,22,23\n"
+    );
+    Ok(())
+}
+
+#[test]
+fn saved_job_replaces_regex_captures_and_matches_unicode_wildcards() -> Result<()> {
+    let (dir, mut job) = fixture("source\nÉTÉ-123-45\n");
+    job.operations = serde_json::from_value(serde_json::json!([
+        {"type":"calculate","name":"masked","expression":"REGEX_REPLACE(source, \"([0-9]+)\", \"<$1>\")"},
+        {"type":"calculate","name":"matches","expression":"ILIKE(masked, \"été-.*\")"}
+    ]))?;
+    prepare(job)?.execute()?;
+    assert_eq!(
+        fs::read_to_string(dir.path().join("result/part-00000001.csv"))?,
+        "source,masked,matches\nÉTÉ-123-45,ÉTÉ-<123>-<45>,true\n"
+    );
+    Ok(())
+}
+
+#[test]
+fn calculated_values_survive_sort_spill_without_changing_csv_output() -> Result<()> {
+    use std::fmt::Write as _;
+    let mut text = String::from("id,source,payload\n");
+    let payload = "x".repeat(1200);
+    for id in 0..18000 {
+        let source = if id % 2 == 0 {
+            "2026-11-23T00:30:00+02:00"
+        } else {
+            "2026-11-22T22:30:00Z"
+        };
+        writeln!(&mut text, "{id},{source},{payload}").unwrap();
+    }
+    let (dir, mut job) = fixture(&text);
+    job.resources.grouping = Grouping::Sort;
+    job.resources.max_record_bytes = 1024 * 1024;
+    job.resources.workers = 1;
+    job.operations = serde_json::from_value(serde_json::json!([
+        {"type":"calculate","name":"ts","expression":"TIMESTAMP_PARSE(source)"},
+        {"type":"calculate","name":"rank","expression":"NUMBER(id) + 1"},
+        {"type":"partition","columns":["ts"]},
+        {"type":"calculate","name":"bucket","expression":"IF(rank > 0, TIMESTAMP_EXTRACT(ts, \"day\", \"local\"), NULL)"}
+    ]))?;
+    let mut results = Vec::new();
+    for memory in [256, 32] {
+        let output = dir.path().join(format!("memory-{memory}"));
+        job.resources.memory_mb = memory.into();
+        job.output = output.to_string_lossy().into();
+        let prepared = prepare(job.clone())?;
+        assert_eq!(prepared.analysis.groups, 1);
+        assert_eq!(
+            prepared.analysis.diagnostics["sort_runs"].as_u64().unwrap() > 0,
+            memory == 32
+        );
+        prepared.execute()?;
+        let csv = fs::read_dir(&output)?
+            .filter_map(|entry| {
+                let path = entry.ok()?.path();
+                (path.extension().and_then(|ext| ext.to_str()) == Some("csv")).then_some(path)
+            })
+            .next()
+            .unwrap();
+        let data = fs::read_to_string(csv)?;
+        let mut lines = data.lines();
+        assert_eq!(lines.next(), Some("id,source,payload,ts,rank,bucket"));
+        assert!(lines
+            .next()
+            .unwrap()
+            .ends_with(",2026-11-22T22:30:00Z,1,23"));
+        assert!(lines
+            .next()
+            .unwrap()
+            .ends_with(",2026-11-22T22:30:00Z,2,22"));
+        assert_eq!(data.lines().count(), 18001);
+        results.push(blake3::hash(data.as_bytes()));
+    }
+    assert_eq!(results[0], results[1]);
+    Ok(())
+}
+
+#[test]
 fn adaptive_grouping_matches_sorting_through_late_shape_changes() -> Result<()> {
     for shape in [
         "small",

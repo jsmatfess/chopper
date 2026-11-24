@@ -121,14 +121,16 @@ pub(in crate::engine) fn run() -> Result<serde_json::Value> {
     builder.insert("a", 1.0)?;
     builder.insert("b", 2.0)?;
     builder.insert("c", 3.0)?;
+    builder.insert("d", 4.0)?;
+    builder.insert("e", 5.0)?;
     builder.insert("a", 4.0)?;
     ensure!(
-        builder.insert("fourth", 5.0).is_err() && workspace.used() == 0,
+        builder.insert("sixth", 6.0).is_err() && workspace.used() == 0,
         "timing stack bound allocated or changed"
     );
     let result = builder.finish()?;
     ensure!(
-        result.len() == 3 && result["a"] == 4.0,
+        result.len() == 5 && result["a"] == 4.0,
         "timing overwrite/bound changed values"
     );
     drop(result);
@@ -145,7 +147,7 @@ pub(in crate::engine) fn run() -> Result<serde_json::Value> {
         "partial timing key copy leaked"
     );
     Ok(
-        json!({"required_bytes":required,"node_allowance_bytes":NODE_ALLOWANCE,"local_shared_edges":6,"shared_clone_and_last_drop":true,"competing_owner_retry":true,"caller_json_equal":true,"empty_no_allocation":true,"stack_observations_and_overwrite":true,"fourth_entry_rejected":true,"partial_key_copy_cleanup":true}),
+        json!({"required_bytes":required,"node_allowance_bytes":NODE_ALLOWANCE,"local_shared_edges":6,"shared_clone_and_last_drop":true,"competing_owner_retry":true,"caller_json_equal":true,"empty_no_allocation":true,"stack_observations_and_overwrite":true,"sixth_entry_rejected":true,"partial_key_copy_cleanup":true}),
     )
 }
 #[cfg(test)]

@@ -389,7 +389,25 @@ fn selections(
     let mut reservation = owner.sibling();
     let mut selections = Vec::new();
     reservation.reserve_vec(&mut selections, job.operations.len())?;
-    for operation in &job.operations {
+    let mut derived_header = None;
+    let mut current_width = width;
+    for (step, operation) in job.operations.iter().enumerate() {
+        let current_header = derived_header.as_deref().or(header);
+        if let Operation::Calculate { name, expression } = operation {
+            let (_, next) = engine::calculation::prepare(
+                expression,
+                name,
+                current_header,
+                current_width,
+                if header.is_none() { width } else { 0 },
+                owner.sibling(),
+            )
+            .with_context(|| format!("calculated column {name:?} at operation {}", step + 1))?;
+            derived_header = Some(next);
+            current_width += 1;
+            selections.push(Vec::new());
+            continue;
+        }
         let columns = match operation {
             Operation::Partition { columns } => columns.as_slice(),
             Operation::Assign { strata, .. } | Operation::AssignProbabilistic { strata, .. } => {
@@ -400,7 +418,12 @@ fn selections(
         let mut indices = Vec::new();
         reservation.reserve_vec(&mut indices, columns.len())?;
         for column in columns {
-            indices.push(resolve_column(column, header, width)?);
+            indices.push(resolve_column(column, current_header, current_width)?);
+        }
+        // These observations describe source fields. A tuple with a calculated
+        // field cannot be estimated by profiling its input members alone.
+        if indices.iter().any(|&index| index >= width) {
+            indices.clear();
         }
         indices.sort_unstable();
         indices.dedup();
@@ -410,6 +433,7 @@ fn selections(
 }
 fn strategy(operation: &Operation, job: &Job) -> &'static str {
     match operation {
+        Operation::Calculate { .. } => "Evaluate the prepared expression once per row",
         Operation::Partition { .. } if engine::bounded_final_partition_shape(job) => {
             "Bounded final writers (experimental shape; admission still required)"
         }

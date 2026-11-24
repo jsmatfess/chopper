@@ -235,6 +235,12 @@ export class BrowserLifecycle {
       try{const defaults=await session.start();return {...defaults,input:'',output:''};}
       catch(error){if(current===this.generation)await this.stop();throw error;}
     }
+    if(path==='formula-preview'){
+      if(this.active())throw new Error('Formula preview is available when processing is idle.');
+      const session=this.start(),current=this.generation;
+      await this.setup(session.start(),current);
+      return session.request(path,{preview:data});
+    }
     if(path==='columns'||path==='preview'||path==='sniff'){
       data=structuredClone(data);
       if(!this.input)throw new Error('Choose an input file with Browse to load its columns.');

@@ -90,6 +90,7 @@ def check_decoder(chopper, validator, work):
     valid_operations = [
         ({"type": "balanced", "files": 2}, None),
         ({"type": "interleaved", "files": 2}, None),
+        ({"type": "calculate", "name": "category", "expression": "UPPER([0])"}, None),
         ({"type": "partition", "columns": [0]}, 3),
         ({"type": "partition", "columns": ["0"]}, 2),
         ({"type": "assign", "groups": [group]}, None),

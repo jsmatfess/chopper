@@ -1,5 +1,6 @@
 pub mod config;
 pub mod csv;
+pub mod expression;
 pub mod random;
 
 pub use config::*;

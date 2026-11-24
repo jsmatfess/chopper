@@ -58,8 +58,8 @@ impl PartialEq for Timings {
     }
 }
 
-const MAX_TIMINGS: usize = 3;
-// The audited Rust BTree has 11 key/value slots per leaf. Three insertions
+const MAX_TIMINGS: usize = 5;
+// The audited Rust BTree has 11 key/value slots per leaf. Five insertions
 // cannot split it. One conservative full-node envelope also includes alignment
 // and child-edge headroom, though only a leaf is constructed here.
 const NODE_ALLOWANCE: usize = 16

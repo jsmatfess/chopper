@@ -6,7 +6,7 @@ Status: behavior contract and original design baseline, with explicit later exte
 
 - Native CLI for technical users on supported 64-bit Windows and Linux; a separate hosted browser UI uses the same engine and job configuration. macOS source builds are unqualified. No local server or native UI is part of current product scope.
 - Local files, including gzip and ZIP inputs and outputs.
-- All six operations in v1: balanced file counts, maximum rows, maximum bytes, unique-value partitions, shuffling, and percentage-based treatment/control allocation.
+- Ordered operations include balanced and interleaved splitting, value partitions, exact and probabilistic allocation, shuffling, and calculated columns. Final caps bound row count and serialized CSV bytes.
 - Typical inputs: tens of thousands to millions of rows. Scale target: one billion rows, potentially several KB per row, with bounded working memory and sufficient external storage.
 - Analysis and confirmation, progress, cancellation and cleanup, safe publication, and output manifests.
 - Fully client-side hosted UI is implemented; see [browser execution and limits](browser.md). Resumable jobs remain deferred. GPU acceleration has been assessed and deferred; there is no GPU dependency.
@@ -72,6 +72,24 @@ consecutive ranges.
 - Distinguish decimal units (KB, MB, GB) from binary units (KiB, MiB, GiB).
 - Compressed-byte targets are explicitly advisory. Use a cheap conservative estimate and report that the target may be exceeded. An estimate is not a hard resource bound.
 - Conflicts known from configuration fail immediately; data-dependent conflicts fail when established by analysis or execution. Nothing is published after a failed job.
+
+### Calculated columns
+
+A calculation step appends one uniquely named column. Its formula operates on
+the current row and can reference input columns and earlier calculations by
+exact header name or zero-based index. Later steps can partition or stratify
+by the calculated column. The step preserves row count, encounter order, and
+group membership. Typed results survive working storage and spills. Partition
+keys and CSV output use the result's field text, including an empty field for
+`NULL` and UTC text for timestamps. Generated headers and fields count toward
+the serialized byte cap.
+
+Validate checks formula syntax without opening input. Analyze binds references
+to the observed input schema and continues to report advisory input statistics.
+Run binds against its current input and evaluates each calculated column once
+per incoming row. A failed evaluation identifies the input record and column.
+See the [saved Job and formula guide](job-json.md#formulas) for syntax and
+function behavior.
 
 ### Partition by column values
 

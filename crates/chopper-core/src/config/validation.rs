@@ -180,6 +180,22 @@ impl Job {
                         "partition requires columns"
                     );
                 }
+                Operation::Calculate { name, expression } => {
+                    ensure_field!(
+                        !name.is_empty()
+                            && !self.operations[..index].iter().any(|previous| {
+                                matches!(previous, Operation::Calculate { name: prior, .. } if prior == name)
+                            }),
+                        format!("/operations/{index}/name"),
+                        "calculated column names must be nonempty and unique"
+                    );
+                    crate::expression::Expression::parse(expression).map_err(|cause| {
+                        JobValidationError::new(
+                            format!("/operations/{index}/expression"),
+                            anyhow::anyhow!(cause),
+                        )
+                    })?;
+                }
                 Operation::Assign { groups, .. }
                 | Operation::AssignProbabilistic { groups, .. } => {
                     ensure_field!(
@@ -223,7 +239,10 @@ impl Job {
                 };
                 for (selector, column) in selectors.iter().enumerate() {
                     ensure_field!(
-                        matches!(column, Column::Index(_)),
+                        matches!(column, Column::Index(_))
+                            || self.operations[..index].iter().any(|previous| {
+                                matches!((column, previous), (Column::Name(column), Operation::Calculate { name, .. }) if column == name)
+                            }),
                         format!("/operations/{index}/{field}/{selector}"),
                         "name selection requires headers"
                     );

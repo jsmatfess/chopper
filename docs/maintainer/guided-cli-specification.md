@@ -23,6 +23,11 @@ own current engine contracts. [GitHub Issues](https://github.com/jsmatfess/chopp
 The sections below define the complete journey. Slice A implements only its
 bounded subset; B/C behavior remains proposed and creates no validation claim.
 
+The guide also supports calculated columns and partitions through **Edit
+pipeline**. Add or remove steps, inspect the input, then save or run through
+the existing review step. The [formula guide](../job-json.md#formulas) owns
+the language and column reference rules.
+
 ## Entry point and interaction
 
 Slice A adds explicit `chopper guide [--config PATH]`. Keep bare invocation's

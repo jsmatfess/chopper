@@ -59,6 +59,10 @@ scope.onmessage=async({data})=>{
       wasi.initialize(instance as WebAssembly.Instance & {exports:{memory:WebAssembly.Memory}});
       compression.init(loaded.module,instance.exports);
       result=invoke('chopper_defaults');
+    } else if(type==='formula-preview'){
+      root.contents.set('formula-preview.json',new MemoryFile(encoder.encode(JSON.stringify(data.preview)),{readonly:true}));
+      try{result=invoke('chopper_formula_preview');}
+      finally{root.contents.delete('formula-preview.json');}
     } else if(type==='run-direct'||type==='columns'||type==='preview'||type==='sniff'||type==='profile'){
       physicalHistory=new PhysicalHistory();stages=new StageCompletions();physicalLastSent=0;
       observations=type==='run-direct'&&data.observationCredit?new ObservationDelivery(data.observationRun,new Int32Array(data.observationCredit),message=>scope.postMessage(message)):null;
@@ -125,7 +129,7 @@ scope.onmessage=async({data})=>{
         });
       }
       result={...(result as object),analysis};
-    } else if(!['init','columns','preview','sniff','profile'].includes(type))throw new Error('Unknown engine request');
+    } else if(!['init','columns','preview','sniff','profile','formula-preview'].includes(type))throw new Error('Unknown engine request');
     if(bridge?.profiling)scope.postMessage({profile:{phase:type==='run-direct'?'export':type,metrics:bridge.metrics}});
     collectPhysical(true);
     scope.postMessage({id,result,observationFinal:observations?.snapshot(),observationRun:data.observationRun});

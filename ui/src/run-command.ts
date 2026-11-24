@@ -20,6 +20,7 @@ export function runArguments(job:Job):string[]{
  for(const op of job.operations){
   add('step',op.type);
   switch(op.type){
+   case 'calculate':add('name',op.name);add('expression',op.expression);break;
    case 'partition':for(const column of op.columns??[])add(typeof column==='number'?'column-index':'column',column);break;
    case 'assign':case 'assign_probabilistic':
     for(const group of op.groups??[])add('group',`${group.name}=${group.percent}`);

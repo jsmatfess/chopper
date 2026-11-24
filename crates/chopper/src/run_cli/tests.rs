@@ -13,6 +13,7 @@ fn every_documented_step_builds_an_operation() -> Result<()> {
     for step in Operation::CHOICES {
         let mut args = vec!["--step", step];
         args.extend_from_slice(match *step {
+            "calculate" => &["--name", "region", "--expression", "UPPER(country)"],
             "partition" => &["--by", "country"][..],
             "assign" | "assign_probabilistic" => &["--group", "only=100"],
             "balanced" | "interleaved" => &["--files", "2"],

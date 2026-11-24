@@ -127,6 +127,19 @@ mod reactor {
         })())
     }
     #[no_mangle]
+    pub extern "C" fn chopper_formula_preview() -> i32 {
+        use std::io::Read;
+        report((|| {
+            let file = std::fs::File::open("/formula-preview.json")?;
+            anyhow::ensure!(
+                file.metadata()?.len() <= 2 * 1024 * 1024,
+                "formula preview request exceeds 2 MiB"
+            );
+            let request = serde_json::from_reader(file.take(2 * 1024 * 1024))?;
+            engine::formula_preview(request)
+        })())
+    }
+    #[no_mangle]
     pub extern "C" fn chopper_sniff() -> i32 {
         report((|| {
             let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;

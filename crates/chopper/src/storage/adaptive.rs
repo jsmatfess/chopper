@@ -547,6 +547,60 @@ impl PackedRow {
             },
         })
     }
+    pub(crate) fn append_calculated(
+        &mut self,
+        value: &str,
+        kind: char,
+        prior_kinds: Option<usize>,
+        maximum: usize,
+    ) -> Result<()> {
+        let (count, payload) = self.field_sizes();
+        let new_sidecar = prior_kinds.is_none();
+        let count = count
+            .checked_add(1 + usize::from(new_sidecar))
+            .context("column count overflow")?;
+        let mut kind_bytes = [0; 4];
+        let kind = kind.encode_utf8(&mut kind_bytes).as_bytes();
+        ensure!(
+            count <= maximum / 24 + 1
+                && value
+                    .len()
+                    .checked_add(kind.len())
+                    .is_some_and(|n| n <= maximum.saturating_sub(payload)),
+            "calculated row exceeds maximum record size"
+        );
+        let Fields::Packed(bytes) = &mut self.fields else {
+            anyhow::bail!("calculated row requires a packed input");
+        };
+        let old_end = bytes.len();
+        let value_frame = 8 + value.len();
+        let extra = value_frame + usize::from(new_sidecar) * 8 + kind.len();
+        let target = old_end.checked_add(extra).context("record size overflow")?;
+        reserve_decode_bytes(
+            bytes,
+            target,
+            self.key.heap_bytes(),
+            &mut self.decode_reservation,
+        )?;
+        if let Some(prior_kinds) = prior_kinds {
+            let start = old_end
+                .checked_sub(8 + prior_kinds)
+                .context("invalid calculation metadata")?;
+            bytes.resize(old_end + value_frame, 0);
+            bytes.copy_within(start + 8..old_end, start + value_frame + 8);
+            bytes[start..start + 8].copy_from_slice(&(value.len() as u64).to_le_bytes());
+            bytes[start + 8..start + value_frame].copy_from_slice(value.as_bytes());
+            let sidecar = start + value_frame;
+            bytes[sidecar..sidecar + 8]
+                .copy_from_slice(&((prior_kinds + kind.len()) as u64).to_le_bytes());
+            bytes.extend_from_slice(kind);
+        } else {
+            put_bytes(bytes, value.as_bytes())?;
+            put_bytes(bytes, kind)?;
+        }
+        bytes[..8].copy_from_slice(&(count as u64).to_le_bytes());
+        Ok(())
+    }
     pub fn disk_len(&self) -> u64 {
         let (count, payload) = self.field_sizes();
         (32 + self.key.len() + 8 * count + payload) as u64

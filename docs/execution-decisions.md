@@ -55,7 +55,10 @@ flowchart TD
     OriginalExact --> Direct
     ExactReady -->|Other error| ExactFail[Fail and clean private output]
     ExactWriters -->|No| Direct
-    Routing -->|No| Internal[Prepare snapshot internally, then execute]
+    Routing -->|No| Calculation{Contains a calculated column?}
+    Calculation -->|Yes| Calculated[Bind at the step schema, stream typed results through later steps, serialize visible fields]
+    Calculation -->|No| Internal[Prepare snapshot internally, then execute]
+    Calculated --> Internal
     Direct --> Publish[Finalize and publish or export]
     Internal --> Publish
     Publish --> Native{Linux or Windows Run at snapshot publication, one plain Partition, at least 2 GiB and 1,152 files, and four workers?}

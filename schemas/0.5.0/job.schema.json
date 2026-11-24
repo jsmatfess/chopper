@@ -78,6 +78,17 @@
           }
         },
         {
+          "title": "Calculated column",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "name", "expression"],
+          "properties": {
+            "type": { "const": "calculate", "description": "Append a column calculated from the current row." },
+            "name": { "type": "string", "minLength": 1 },
+            "expression": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
           "title": "Partition",
           "type": "object",
           "additionalProperties": false,

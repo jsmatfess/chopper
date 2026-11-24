@@ -12,6 +12,11 @@ use std::{ffi::OsStr, path::PathBuf, str::FromStr};
 const LOCAL: &[(&str, &str)] = &[
     ("step", "Append an operation to the pipeline"),
     (
+        "name",
+        "Output column name for the preceding calculate step",
+    ),
+    ("expression", "Formula for the preceding calculate step"),
+    (
         "by",
         "Partition column names, comma-separated; use --column for literal names",
     ),
@@ -398,11 +403,13 @@ pub fn parse(matches: &ArgMatches) -> Result<(Job, bool)> {
             .operations
             .last_mut()
             .with_context(|| format!("--{flag} requires a preceding --step"))?;
-        if matches!(flag, "files" | "strategy") {
+        if matches!(flag, "files" | "strategy" | "name" | "expression") {
             ensure!(!seen.contains(&flag), "step {index}: repeated --{flag}");
             seen.push(flag);
         }
         match (flag, step) {
+            ("name", Operation::Calculate { name, .. }) => *name = value.into(),
+            ("expression", Operation::Calculate { expression, .. }) => *expression = value.into(),
             ("by" | "column" | "column-index", Operation::Partition { columns }) => {
                 if flag == "by" {
                     columns.extend(value.split(',').map(|name| Column::Name(name.into())));

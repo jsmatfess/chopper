@@ -6,6 +6,11 @@ shuffle distributions and strict serialized caps; they need not preserve a
 particular seeded realization. Public seed input is removed; execution generates
 internal entropy and internal snapshot execution preserves retained output bytes.
 
+Calculated columns introduce an ordered schema dependency and can raise
+row-level errors. Current rewrites keep calculation steps at their declared
+positions. Spills between operations preserve calculated types and timestamp
+offsets. Partition keys compare the calculated fields' rendered text.
+
 Ordinary builds now fuse adjacent `auto/uniform -> partition(columns)` into one
 sort on partition tuples and random keys, avoiding the global shuffle
 materialization. Explicit Fisher–Yates remains excluded from this physical sort.

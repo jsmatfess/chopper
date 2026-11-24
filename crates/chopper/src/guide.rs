@@ -279,7 +279,10 @@ fn load(path: &Path) -> Result<Job> {
     Ok(job)
 }
 fn supported(job: &Job) -> Result<()> {
-    ensure!(job.operations.is_empty(), "slice A does not support operations; use chopper run or slice B; imported operations retained");
+    ensure!(
+        job.operations.iter().all(|op| matches!(op, Operation::Calculate { .. } | Operation::Partition { .. })),
+        "this guide supports calculated columns and partitions; use chopper run for other operations; imported operations retained"
+    );
     let defaults = serde_json::to_value(CsvSettings::default())?;
     ensure!(serde_json::to_value(&job.input_csv)? == defaults && serde_json::to_value(&job.output_csv)? == defaults,
         "slice A requires default UTF-8 headered CSV settings; use chopper run or slice C; import retained");
@@ -463,6 +466,65 @@ impl Session {
             "y" | "yes"
         ))
     }
+    fn pipeline(&mut self, io: &mut impl Terminal, cancel: &AtomicBool) -> Result<()> {
+        for (index, operation) in self.job.operations.iter().enumerate() {
+            let summary = match operation {
+                Operation::Calculate { name, expression } => {
+                    format!("Calculate {} = {}", display(name), display(expression))
+                }
+                Operation::Partition { columns } => format!("Partition by {columns:?}"),
+                _ => "Unsupported operation".into(),
+            };
+            io.say(&format!("{}. {summary}", index + 1))?;
+        }
+        let action = io.line(
+            "Pipeline: 1 Add calculated column; 2 Add partition; 3 Remove step; empty returns",
+            cancel,
+        )?;
+        let operation = match action.trim() {
+            "" => return Ok(()),
+            "1" => Operation::Calculate {
+                name: io.line("Calculated column name", cancel)?,
+                expression: io.line("Formula", cancel)?,
+            },
+            "2" => Operation::Partition {
+                columns: vec![Column::Name(io.line("Partition column name", cancel)?)],
+            },
+            "3" => {
+                let index: usize = io.line("Operation number to remove", cancel)?.parse()?;
+                ensure!(
+                    (1..=self.job.operations.len()).contains(&index),
+                    "operation number is out of range"
+                );
+                self.job.operations.remove(index - 1);
+                self.dirty = true;
+                self.inspected = false;
+                self.auto_observations = None;
+                return Ok(());
+            }
+            _ => bail!("choose a displayed pipeline action"),
+        };
+        if let Operation::Partition { columns } = &operation {
+            ensure!(
+                !matches!(&columns[0], Column::Name(name) if name.is_empty()),
+                "partition column name is required"
+            );
+        }
+        supported(&self.job)?;
+        let mut draft = self.job.clone();
+        draft.operations.push(operation);
+        // Configuration-only checks are available even before choosing input.
+        let mut validate = draft.clone();
+        if validate.input.is_empty() {
+            validate.input = "pending.csv".into();
+        }
+        validate.validate()?;
+        self.job = draft;
+        self.dirty = true;
+        self.inspected = false;
+        self.auto_observations = None;
+        Ok(())
+    }
     fn save(&mut self, io: &mut impl Terminal, cancel: &AtomicBool) -> Result<bool> {
         validate(&self.job)?;
         let path = io.line("Save: configuration path (empty returns)", cancel)?;
@@ -592,8 +654,8 @@ impl Session {
     }
     fn review(&mut self, io: &mut impl Terminal) -> Result<()> {
         validate(&self.job)?;
-        io.say(&format!("Review: cwd {}\nInput {}\nOutput {}\nDefault UTF-8, headered comma CSV, doubled quotes, LF, no BOM. No operations; plain CSV.\nRows cap {:?}; serialized CSV bytes cap {:?}. File count, bytes and time unknown.\nAlgorithm {}; randomized output order may vary.\nInspection {}; Run validates fresh input. Use analyze for a separate input scan and pipeline estimates.\nResources: {}\nNo overwrite. Native private staging and atomic directory publication; cleanup on failure/cancellation.",
-            display(&std::env::current_dir()?.to_string_lossy()), display(&absolute(&self.job.input)?.to_string_lossy()), display(&absolute(&self.job.output)?.to_string_lossy()), self.job.limits.rows, self.job.limits.bytes,
+        io.say(&format!("Review: cwd {}\nInput {}\nOutput {}\nDefault UTF-8, headered comma CSV, doubled quotes, LF, no BOM. {} pipeline steps; plain CSV.\nRows cap {:?}; serialized CSV bytes cap {:?}. File count, bytes and time unknown.\nAlgorithm {}; randomized output order may vary.\nInspection {}; Run validates fresh input. Use analyze for a separate input scan and pipeline estimates.\nResources: {}\nNo overwrite. Native private staging and atomic directory publication; cleanup on failure/cancellation.",
+            display(&std::env::current_dir()?.to_string_lossy()), display(&absolute(&self.job.input)?.to_string_lossy()), display(&absolute(&self.job.output)?.to_string_lossy()), self.job.operations.len(), self.job.limits.rows, self.job.limits.bytes,
             ALGORITHM_VERSION, if self.inspected { "completed previously; advisory only" } else { "not retained" }, resource_description(&self.job)))
     }
     fn journey(
@@ -620,7 +682,7 @@ impl Session {
             if self.step == 4 {
                 io.say(&resource_description(&self.job))?;
             }
-            let action = io.line("1 Edit / inspect / review; 2 Next; 90 Back; 91 Edit step; 92 Save; 93 Reload; 94 Help; 95 Cancel; 96 Save and exit; 97 Convert paths to absolute; 98 Run (review)", &cancel)?;
+            let action = io.line("1 Edit / inspect / review; 2 Next; 90 Back; 91 Edit step; 92 Save; 93 Reload; 94 Help; 95 Cancel; 96 Save and exit; 97 Convert paths to absolute; 98 Run (review); 99 Edit pipeline", &cancel)?;
             let result = (|| -> Result<Option<bool>> {
                 match action.trim() {
                     "" => (),
@@ -642,7 +704,8 @@ impl Session {
                             }
                         }
                     }
-                    "94" => io.say("Slice A: typed local default UTF-8 headered CSV, no operations, strict row/serialized-byte caps. Data prompts accept literal command words. Inspection is optional. Memory and workers default to automatic. Auto memory resolves at task start from shared admission; working allocations are not an RSS cap. Workers do not parallelize every phase. Existing engine validation remains authoritative. Ctrl+C/EOF abort without saving.")?,
+                    "94" => io.say("The guide supports local UTF-8 headered CSV, calculated columns, partitions, and strict row and serialized-byte caps. Data prompts accept literal command words. Inspection is optional. Memory and workers default to automatic. Auto memory resolves at task start from shared admission. Existing engine validation remains authoritative. Ctrl+C/EOF abort without saving.")?,
+                    "99" => self.pipeline(io, &cancel)?,
                     "95" => {
                         if self.dirty && self.confirm(io, &cancel, "Save dirty draft before cancelling?")? && !self.save(io, &cancel)? { return Ok(None); }
                         return Ok(Some(false));
@@ -822,6 +885,36 @@ mod tests {
             Arc::new(AtomicBool::new(false)),
             Arc::new(|_| {}),
         )
+    }
+    #[test]
+    fn guide_authors_and_runs_a_saved_calculation() -> Result<()> {
+        let (dir, job) = fixture();
+        let saved = dir.path().join("calculation.json");
+        let mut transcript = Transcript::new(&[
+            "99",
+            "1",
+            "normalized",
+            "UPPER(text)",
+            "99",
+            "2",
+            "normalized",
+            "92",
+            saved.to_str().unwrap(),
+            "91",
+            "6",
+            "98",
+            "yes",
+        ]);
+        let mut session = Session::new(job);
+        let analysis = journey(&mut session, &mut transcript)?.context("guide did not run")?;
+        assert_eq!(analysis.groups, 3);
+        let saved = load(&saved)?;
+        assert!(matches!(&saved.operations[..], [
+            Operation::Calculate { name, expression },
+            Operation::Partition { columns },
+        ] if name == "normalized" && expression == "UPPER(text)" && columns.len() == 1));
+        assert!(Path::new(&saved.output).join("manifest.jsonl").is_file());
+        Ok(())
     }
     #[test]
     fn response_bounds_utf8_eof_and_cancel() {

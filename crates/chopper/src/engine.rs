@@ -10,6 +10,8 @@ mod diagnostics;
 mod direct;
 pub use diagnostics::Diagnostics;
 mod assignment;
+pub(crate) mod calculation;
+pub use calculation::{formula_preview, FormulaPreviewRequest};
 mod child_metadata;
 mod column_summaries;
 mod exact_writers;
@@ -660,6 +662,8 @@ fn process_using(
         mut terminal_publication,
         consumed,
     } = ingested;
+    let input_header = analysis.header.clone();
+    let input_columns = analysis.columns;
     let mut phase_timings = timings::Builder::new(Reservation::new(&ctx));
     phase_timings.insert(
         "ingest_and_fused_operations",
@@ -675,8 +679,67 @@ fn process_using(
     ctx.physical_stage_complete(0);
     let mut stage_completion = ctx.physical_stages();
     let mut index = consumed;
+    let mut calculation_times = None;
     while index < job.operations.len() {
         stage_completion.complete_through(index);
+        if let Operation::Calculate { name, expression } = &job.operations[index] {
+            ctx.operation_event(index + 1, job.operations.len())?;
+            let mut step_ctx = ctx.physical_scope([index + 1, 0]);
+            step_ctx.physical_source = dataset.physical_source;
+            let started = std::time::Instant::now();
+            let (program, next_header) = calculation::prepare(
+                expression,
+                name,
+                analysis.header.as_deref(),
+                analysis.columns,
+                if input_header.is_none() {
+                    input_columns
+                } else {
+                    0
+                },
+                Reservation::new(&step_ctx),
+            )
+            .with_context(|| {
+                format!(
+                    "preparing calculated column {name:?} at operation {}",
+                    index + 1
+                )
+            })?;
+            let (prepare, traverse) = calculation_times.get_or_insert((0.0, 0.0));
+            *prepare += started.elapsed().as_secs_f64();
+            let started = std::time::Instant::now();
+            let before = dataset.groups;
+            if index + 1 == job.operations.len() {
+                let mut writer = output::PlanWriter::new(&job, Some(&next_header), &step_ctx)?;
+                program.apply(
+                    &dataset,
+                    name,
+                    analysis.columns - input_columns,
+                    &step_ctx,
+                    &mut writer,
+                )?;
+                final_plan = Some(writer.finish()?);
+            } else {
+                let mut writer = DatasetWriter::new(&step_ctx)?;
+                program.apply(
+                    &dataset,
+                    name,
+                    analysis.columns - input_columns,
+                    &step_ctx,
+                    &mut writer,
+                )?;
+                dataset = writer.finish()?;
+            }
+            *traverse += started.elapsed().as_secs_f64();
+            analysis
+                .stages
+                .push(dataset_stats(&dataset, index + 1, before, &step_ctx)?)?;
+            analysis.groups = dataset.groups;
+            analysis.columns += 1;
+            analysis.header = Some(next_header);
+            index += 1;
+            continue;
+        }
         #[cfg(feature = "experimental-consecutive-partitions")]
         if partition_fusion {
             if let Some(plan) = consecutive_partitions::Plan::at(&job, index) {
@@ -986,6 +1049,10 @@ fn process_using(
         "remaining_operations",
         pipeline_started.elapsed().as_secs_f64(),
     )?;
+    if let Some((prepare, traverse)) = calculation_times {
+        phase_timings.insert("calculation_prepare", prepare)?;
+        phase_timings.insert("calculation_traverse", traverse)?;
+    }
     let output_started = std::time::Instant::now();
     let output_plan = if terminal_publication.is_some() {
         None
@@ -1004,6 +1071,8 @@ fn process_using(
         "final_serialization",
         output_started.elapsed().as_secs_f64(),
     )?;
+    analysis.header = input_header;
+    analysis.columns = input_columns;
     drop(dataset);
     let (files, bytes) = match (&terminal_publication, &output_plan) {
         (Some((_, files, bytes)), None) => (*files, *bytes),
@@ -2324,6 +2393,7 @@ fn apply_parent(
         &parent.lineage,
     )?;
     match operation {
+        Operation::Calculate { .. } => unreachable!("calculation uses a schema-aware stage"),
         Operation::Interleaved { .. } | Operation::AssignProbabilistic { .. } => {
             let mut routed = StreamingGroups::new(
                 operation,

@@ -91,6 +91,7 @@ Each operation requires a `type`. The following objects can go inside
 | --- | --- | --- |
 | `balanced` | `{"type":"balanced","files":4}` | Split into four consecutive balanced parts within each group. `files` must be positive, at most `max_files`, and feasible for the group's row count. |
 | `interleaved` | `{"type":"interleaved","files":4}` | Split into four balanced parts using round-robin membership. The same file count rules apply. |
+| `calculate` | `{"type":"calculate","name":"region","expression":"UPPER(TRIM([Sales Region]))"}` | Append one calculated column for later steps and CSV output. |
 | `partition` | `{"type":"partition","columns":["country",0]}` | Group by distinct tuples of values. Supply at least one column. |
 | `assign` | `{"type":"assign","groups":[{"name":"control","percent":"20"},{"name":"treatment","percent":"80"}]}` | Allocate exact quotas. Optional `strata` is a column list and defaults to `[]`. |
 | `assign_probabilistic` | `{"type":"assign_probabilistic","groups":[{"name":"control","percent":"20"},{"name":"treatment","percent":"80"}],"strata":["country"]}` | Draw assignments independently, so group counts can vary. Optional `strata` defaults to `[]`. |
@@ -102,6 +103,46 @@ are case-sensitive and must resolve to a unique column. Use an index for
 headerless input or an ambiguous header. A column index and other sizes modeled
 as unsigned 64-bit integers in the schema may have a narrower bound on a
 32-bit runtime for fields backed by an index or platform-sized count.
+
+### Formulas
+
+Write a bare column name, a bracketed name such as `[Sales Region]`, or an
+index such as `$0`. Double a closing bracket inside a bracketed name. Use an
+index to disambiguate duplicate headers. Double quotes delimit text literals,
+and doubling an embedded quote inserts it literally. Use the `calculate`
+step's name to select the new column in a later Partition or assignment.
+The guided CLI offers **Edit pipeline** for calculations and partitions.
+In the hosted editor, Tab accepts a highlighted suggestion. Use Ctrl+Space
+to open the suggestions. Sample results reflect the current formula and
+available columns.
+
+Function names are case-insensitive. Arithmetic, comparisons, `AND`, `OR`,
+and `NOT` work with explicitly typed values. Use `NUMBER` for CSV text,
+`TEXT` to convert a result to text, `ABS` and `ROUND` for numeric operations,
+`IF` and `IFS` for lazy branches, and `IS_NULL` and `COALESCE` for missing
+values. `IFS` takes condition and value pairs followed by a fallback.
+`NUMBER("")` yields `NULL`. Whitespace requires explicit trimming, and numbers
+use finite binary floating point. `SAFE.NUMBER(value)` or
+`SAFE(expression)` replaces a row-level formula error with `NULL`. Invalid
+formulas and resource errors still fail.
+
+Text functions include `TRIM`, `UPPER`, `LOWER`, `CONCAT`, `REPLACE`,
+`STARTSWITH`, `ENDSWITH`, and `SUBSTRING(text, start, length?)`. Substring
+positions are zero-based Unicode scalar offsets. `LIKE` and `ILIKE` match the
+whole field. Period matches one character, period-asterisk matches zero or more,
+and backslash escapes a pattern character. `REGEX_MATCH` searches case-sensitively
+unless the pattern changes what it matches. `REGEX_REPLACE` replaces all matches
+and accepts numbered replacements such as `$1`. Regex supports groups, classes,
+alternation, anchors, and greedy repetition. Patterns are literal strings.
+
+`DATE_PARSE`, `DATE_FORMAT`, `DATE_EXTRACT`, and `DATE_TRUNC` use calendar
+dates. The timestamp equivalents use UTC by default. Pass `"local"` as the
+last argument to timestamp formatting, extraction, or truncation to use the
+offset in the value. Default date input uses `YYYY-MM-DD`. Default timestamp
+input uses date, time, and a `Z` or numeric offset, with up to nine fractional
+digits. An explicit format can parse an offsetless timestamp as UTC. Formats
+use `%Y`, `%m`, and `%d`, plus `%H`, `%M`, `%S`, `%f`, and `%z` for
+timestamps. Formats, units, and time bases are literal strings.
 
 Each allocation needs 1 to 1,024 groups with nonempty, unique names. Each
 `percent` is a JSON string with an unsigned decimal percentage, such as

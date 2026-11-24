@@ -100,6 +100,7 @@ impl Builder {
         let mut len = 0;
         for operation in &job.operations {
             let columns = match operation {
+                Operation::Calculate { .. } => break,
                 Operation::Partition { columns } => columns,
                 Operation::Assign { strata, .. }
                 | Operation::AssignProbabilistic { strata, .. } => strata,

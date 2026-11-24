@@ -187,6 +187,7 @@ jobs:
       - run: node scripts/test-browser-launch.mjs
       - run: npm --prefix ui run test:workspace
       - run: node scripts/test-browser.mjs
+      - run: node scripts/test-browser-formulas.mjs
       - run: node scripts/test-browser-direct-destination.mjs
       - run: node scripts/test-browser-graph.mjs
       - run: node scripts/test-browser-graph-lifecycle.mjs

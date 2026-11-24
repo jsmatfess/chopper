@@ -26,6 +26,31 @@ impl Header {
     fn admit(fields: Vec<String>, memory: Reservation) -> Result<Self> {
         Shared::admit(fields, memory).map(Self)
     }
+    pub(super) fn appended(
+        previous: Option<&[String]>,
+        width: usize,
+        name: &str,
+        mut memory: Reservation,
+    ) -> Result<Self> {
+        ensure!(
+            !previous.is_some_and(|fields| fields.iter().any(|field| field == name)),
+            "calculated column {name:?} already exists"
+        );
+        let mut fields = Vec::new();
+        memory.reserve_vec(
+            &mut fields,
+            width.checked_add(1).context("column count overflow")?,
+        )?;
+        if let Some(previous) = previous {
+            for field in previous {
+                fields.push(memory.copy_string(field)?);
+            }
+        } else {
+            fields.resize_with(width, String::new);
+        }
+        fields.push(memory.copy_string(name)?);
+        Self::admit(fields, memory)
+    }
 }
 impl std::ops::Deref for Header {
     type Target = [String];

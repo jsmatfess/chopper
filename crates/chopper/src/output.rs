@@ -267,6 +267,7 @@ pub struct PlanWriter<'a> {
     bytes: u64,
     processed: u64,
     observation: Option<crate::observation::physical::Span<'a>>,
+    calculated_width: Option<usize>,
     pub groups: u64,
     pub smallest: u64,
     pub largest: u64,
@@ -417,6 +418,19 @@ impl<'a> PlanWriter<'a> {
                 bytes: 0,
                 processed: 0,
                 observation: observation.take(),
+                calculated_width: if job
+                    .operations
+                    .iter()
+                    .any(|op| matches!(op, Operation::Calculate { .. }))
+                {
+                    Some(
+                        header
+                            .context("missing final calculated-column schema")?
+                            .len(),
+                    )
+                } else {
+                    None
+                },
                 groups: 0,
                 smallest: u64::MAX,
                 largest: 0,
@@ -557,12 +571,26 @@ impl RowSink for PlanWriter<'_> {
         }
     }
     fn row(&mut self, group: &mut Group, row: &Row) -> Result<()> {
+        if let Some(width) = self.calculated_width {
+            ensure!(
+                row.fields.len() == width + 1,
+                "invalid calculated row width"
+            );
+            return self.write_fields(group, row.fields[..width].iter().map(String::as_str));
+        }
         self.write_fields(group, row.fields.iter().map(String::as_str))
     }
     fn packed_row(&mut self, group: &mut Group, row: PackedRow) -> Result<()> {
         self.packed_row_ref(group, &row)
     }
     fn packed_row_ref(&mut self, group: &mut Group, row: &PackedRow) -> Result<()> {
+        if let Some(width) = self.calculated_width {
+            ensure!(
+                row.fields().len() == width + 1,
+                "invalid calculated row width"
+            );
+            return self.write_fields(group, row.fields().take(width));
+        }
         self.write_fields(group, row.fields())
     }
     fn end(&mut self, group: Group) -> Result<()> {

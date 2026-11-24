@@ -3,17 +3,18 @@ import {sourceIdentity,resultOrigin,belongsToSource,type ResultOrigin} from './r
 import {operationColor,operationName} from './step-labels';
 import {browserApi,configureBrowserUI,invalidateBrowserDraft} from './browser/client';
 import {percentageUnits} from './plan';
-import {bindColumnPickers,pickerMarkup,type ColumnSchema} from './column-picker';
+import {bindColumnPickers,columnsBefore,pickerMarkup,type ColumnSchema} from './column-picker';
 import {populateMemory,updateMemory,readMemory} from './memory';
 import {createSizeControl,populateSize,readSize,type SizeUnit} from './size-units';
 import {configurePlanLinks} from './plan-links';
 import {configureValidation} from './validation';
 import {configureHostedWorkspace} from './hosted-workspace';
+import {configureFormulaEditor} from './formula-editor';
 import type {PublicationReceipt} from './browser/publication';
 
 export {};
 type Csv = { encoding: string; headers: boolean; delimiter: string; quote: string; escape: string | null; line_ending: string; bom: boolean; skip_empty_lines: boolean };
-type Operation = { type: string; files?: number; columns?: (string | number)[]; groups?: {name: string; percent: string}[]; strata?: (string | number)[]; strategy?: string };
+type Operation = { type: string; files?: number; columns?: (string | number)[]; groups?: {name: string; percent: string}[]; strata?: (string | number)[]; strategy?: string; name?: string; expression?: string };
 export type Job = {version: number; input: string; output: string; zip_member: string | null; input_csv: Csv; output_csv: Csv; compression: string; operations: Operation[]; limits: {rows: number | null; bytes: number | null; compressed_bytes: number | null}; resources: {grouping?: 'auto' | 'sort'; workers: number; memory_mb: number | 'auto'; max_files: number; max_record_bytes: number; temp_dir: string | null; temp_bytes: number | null}; full_shuffle_rng?: 'blake3_counter_v1'; full_shuffle_algorithm?: 'adaptive_v1'};
 type AutoFact = {value:number|null;accuracy:'exact'|'estimated'|'unknown'};
 type AutoPlan = {
@@ -58,19 +59,21 @@ function clearError() {
   hostedWorkspace.errorRecovery('');
 }
 let columnSchema: ColumnSchema | null = null;
+let inputSample: (ColumnSchema & {preview:string[][]}) | null = null;
 let columnMessage = 'Choose an input file to load its columns.';
 let columnSource = '', columnRequest = 0;
+const stepSchema = (step: number) => columnsBefore(columnSchema, job.operations, step);
 function sourceKey() { return sourceIdentity(inputSelectionRevision,{input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input')}); }
 function renderPickers() {
   $('operations').querySelectorAll<HTMLElement>('[data-column-field]').forEach(picker=>{
     const step=Number(picker.closest<HTMLElement>('[data-step]')!.dataset.step);
     const field=picker.dataset.columnField as 'columns'|'strata';
-    picker.innerHTML=new DOMParser().parseFromString(pickerMarkup(field,job.operations[step][field]||[],step,columnSchema,columnMessage),'text/html').body.firstElementChild!.innerHTML;
+    picker.innerHTML=new DOMParser().parseFromString(pickerMarkup(field,job.operations[step][field]||[],step,stepSchema(step),columnMessage),'text/html').body.firstElementChild!.innerHTML;
   });
 }
 async function loadColumns() {
   const request=++columnRequest;
-  columnSource=sourceKey();columnSchema=null;$('preview-card').hidden=true;hostedWorkspace?.preview(null);
+  columnSource=sourceKey();columnSchema=null;inputSample=null;formulaEditor.update();$('preview-card').hidden=true;hostedWorkspace?.preview(null);
   columnMessage=value('input')?'Loading input columns?':'Choose an input file to load its columns.';
   renderPickers();
   if(!value('input'))return;
@@ -78,9 +81,9 @@ async function loadColumns() {
     const schema=await api<ColumnSchema & {preview:string[][]}>('preview',{...job,input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input'),
       resources:{...job.resources,max_record_bytes:readSizeField('max-record')??job.resources.max_record_bytes}});
     if(request!==columnRequest||columnSource!==sourceKey())return;
-    renderPreview(schema);hostedWorkspace?.preview(schema);columnSchema=schema;columnMessage=schema.columns?'':'The input file has no columns.';
+    renderPreview(schema);hostedWorkspace?.preview(schema);inputSample=schema;columnSchema=schema;columnMessage=schema.columns?'':'The input file has no columns.';
   } catch(e) {if(request!==columnRequest||columnSource!==sourceKey())return;columnMessage=e instanceof Error?e.message:String(e);$('preview').textContent=`Input preview unavailable: ${columnMessage}`;$('preview-card').hidden=false;hostedWorkspace?.preview(null,true);}
-  renderPickers();updateFields();validation.update();
+  renderPickers();updateFields();validation.update();formulaEditor.update();
 }
 function choiceOptions(values: readonly string[], selected = '', labels: Record<string, string> = {}) {
   return values.map(value => `<option value="${escape(value)}" ${value === selected ? 'selected' : ''}>${escape(labels[value] ?? value)}</option>`).join('');
@@ -94,7 +97,7 @@ function configureJobChoices() {
     auto: 'Automatic (recommended)', sort: 'Always sort',
   });
   // Assignment and split variants share entries and use their in-step mode controls.
-  const labels = {partition: 'Partition by one or more columns', balanced: 'Split into equal parts',
+  const labels = {calculate: 'Calculate a column', partition: 'Partition by one or more columns', balanced: 'Split into equal parts',
     assign: 'Assign groups by percentage', shuffle: 'Shuffle row order'};
   const operations = Object.keys(labels).filter(type => jobValues.operation.includes(type));
   $('new-operation').innerHTML = choiceOptions(operations, '', labels);
@@ -137,8 +140,9 @@ function renderOps() {
   $('operations').innerHTML = job.operations.length ? job.operations.map((op,i)=>{
     let fields = '';
     if(op.type==='balanced'||op.type==='interleaved') fields = `<label>Number of equal parts<input data-field="files" type="number" min="1" value="${op.files}"></label><small>Counts differ by at most one. Fewer rows than parts is an error. ${op.type==='interleaved'?'Rows alternate between parts; concatenating files will not restore input order.':'Each part contains a consecutive range of rows.'}</small>`;
-    if(op.type==='partition') fields = pickerMarkup('columns',op.columns||[],i,columnSchema,columnMessage);
-    if(op.type==='assign'||op.type==='assign_probabilistic') fields = `<fieldset class="group-builder"><legend>Named percentages</legend>${(op.groups||[]).map((g,j)=>`<div class="group-row" data-group="${j}"><label>Group name<input data-group-field="name" required value="${escape(g.name)}" placeholder="e.g. treatment"></label><label>Percent<input data-group-field="percent" required inputmode="decimal" value="${escape(g.percent)}" placeholder="80"></label><button type="button" class="text-button" data-action="remainder" aria-label="Fill remaining percentage for group ${j+1}">Fill remainder</button><button type="button" class="icon-button" data-action="remove-group" aria-label="Remove group ${j+1}" ${(op.groups?.length||0)<=1?'disabled':''}>×</button></div>`).join('')}<button type="button" class="secondary" data-action="add-group" ${(op.groups?.length||0)>=1024?'disabled':''}>+ Add group</button><small id="group-feedback-${i}" data-group-feedback></small></fieldset>${pickerMarkup('strata',op.strata||[],i,columnSchema,columnMessage)}${operationNote('Allocation & stratification',op.type==='assign_probabilistic'?'Each row is assigned independently using the target percentages. Counts are approximate, including within strata; small strata may have no rows in a destination. Membership is random and row order is preserved.':'Stratification applies these percentages separately within every combination of the selected column values. For example, stratifying by country keeps an 80% / 20% allocation within each country, rounded to whole rows. Membership is random; row order is preserved.')}`;
+    if(op.type==='calculate') fields = `<label>Column name<input data-field="name" required value="${escape(op.name??'')}"></label><div class="column-typeahead"><label>Formula<input data-field="expression" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="formula-suggestions-${i}" required autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" value="${escape(op.expression??'')}"></label><div id="formula-suggestions-${i}" class="column-results" role="listbox" aria-label="Formula suggestions" data-formula-suggestions hidden></div></div><div data-formula-preview hidden></div>`;
+    if(op.type==='partition') fields = pickerMarkup('columns',op.columns||[],i,stepSchema(i),columnMessage);
+    if(op.type==='assign'||op.type==='assign_probabilistic') fields = `<fieldset class="group-builder"><legend>Named percentages</legend>${(op.groups||[]).map((g,j)=>`<div class="group-row" data-group="${j}"><label>Group name<input data-group-field="name" required value="${escape(g.name)}" placeholder="e.g. treatment"></label><label>Percent<input data-group-field="percent" required inputmode="decimal" value="${escape(g.percent)}" placeholder="80"></label><button type="button" class="text-button" data-action="remainder" aria-label="Fill remaining percentage for group ${j+1}">Fill remainder</button><button type="button" class="icon-button" data-action="remove-group" aria-label="Remove group ${j+1}" ${(op.groups?.length||0)<=1?'disabled':''}>×</button></div>`).join('')}<button type="button" class="secondary" data-action="add-group" ${(op.groups?.length||0)>=1024?'disabled':''}>+ Add group</button><small id="group-feedback-${i}" data-group-feedback></small></fieldset>${pickerMarkup('strata',op.strata||[],i,stepSchema(i),columnMessage)}${operationNote('Allocation & stratification',op.type==='assign_probabilistic'?'Each row is assigned independently using the target percentages. Counts are approximate, including within strata; small strata may have no rows in a destination. Membership is random and row order is preserved.':'Stratification applies these percentages separately within every combination of the selected column values. For example, stratifying by country keeps an 80% / 20% allocation within each country, rounded to whole rows. Membership is random; row order is preserved.')}`;
     if(op.type==='shuffle') fields = advancedExecution() ? `<div><label>Strategy<select data-field="strategy">${choiceOptions(jobValues.shuffle,op.strategy ?? 'auto',{
       auto:'Automatic (full shuffle; recommended)',uniform:'Uniform (random-key sort)',fisher_yates:'Uniform in memory (Fisher–Yates v1)',
     })}</select></label>${operationNote('How shuffle strategies work','Automatic uses a full external-capable shuffle and combines compatible steps. Output order may vary with resources and execution plan. Explicit Fisher–Yates requires each group to fit in memory; oversized groups fail.')}</div>` : '<p class="hint auto-shuffle-strategy">Shuffle strategy set by Auto · Full shuffle</p>';
@@ -215,10 +219,10 @@ function markDirty() {
   updateFields();
   editRevision++;invalidateBrowserDraft(sourceKey()); dirty = true; updateRunControl();
   if(job) planLinks.render(effectiveOperations(),{rows:value('max-rows'),bytes:sizeText('max-bytes'),compressed:sizeText('compressed-bytes')},value('compression'));
-  const finalGrouping = job?.operations.filter(op=>op.type!=='shuffle').at(-1);
+  const finalGrouping = job?.operations.filter(op=>op.type!=='shuffle'&&op.type!=='calculate').at(-1);
   const conflict = ['balanced','interleaved'].includes(finalGrouping?.type||'') && !!(value('max-rows')||value('max-bytes'));
   $('conflict').hidden = !conflict; $('conflict').textContent = 'Equal parts and hard limits can conflict. Processing will reject balanced groups that cannot fit without extra files.';
-  updateDraft();validation.update();
+  updateDraft();validation.update();formulaEditor.update();
 }
 function updateDraft() {
   if(!job)return;
@@ -340,11 +344,19 @@ async function poll() {
 bindColumnPickers($('operations'),picker=>{
   const step=Number(picker.closest<HTMLElement>('[data-step]')!.dataset.step);
   return job.operations[step][picker.dataset.columnField as 'columns'|'strata']||[];
-},()=>columnSchema,(picker,columns)=>{
+},picker=>stepSchema(Number(picker.closest<HTMLElement>('[data-step]')!.dataset.step)),(picker,columns)=>{
   const step=Number(picker.closest<HTMLElement>('[data-step]')!.dataset.step);
   job.operations[step][picker.dataset.columnField as 'columns'|'strata']=columns;
   renderPickers();markDirty();
 },()=>void loadColumns());
+const formulaEditor=configureFormulaEditor(
+  $('operations'),
+  ()=>job?.operations.flatMap((op,operation)=>op.type==='calculate'
+    ?[{operation,name:op.name??'',expression:op.expression??''}]:[])??[],
+  ()=>inputSample,
+  stepSchema,
+  data=>api('formula-preview',data),
+);
 let columnTimer: ReturnType<typeof setTimeout>;
 $('job-form').addEventListener('input',event=>{
   const target=event.target as HTMLElement;
@@ -356,7 +368,7 @@ $('job-form').addEventListener('input',event=>{
   }
   markDirty();
   if(target.id==='input'||target.id==='zip-member'||target.closest('#input-csv')){
-    clearTimeout(columnTimer);columnRequest++;columnSchema=null;columnMessage='Loading input columns?';renderPickers();
+    clearTimeout(columnTimer);columnRequest++;columnSchema=null;inputSample=null;formulaEditor.update();columnMessage='Loading input columns?';renderPickers();
     $('preview-card').hidden=true;validation.update();columnTimer=setTimeout(()=>void loadColumns(),400);
   }
 });
@@ -366,6 +378,8 @@ $('operations').addEventListener('input',e=>{
   if(el.dataset.groupField){const group=op.groups![Number(el.closest<HTMLElement>('[data-group]')!.dataset.group)];group[el.dataset.groupField as 'name'|'percent']=el.value;return;}
   if(!field)return;
   if(field==='files') op[field]=Number(el.value);
+  else if(field==='name'){op.name=el.value;renderPickers();}
+  else if(field==='expression')op.expression=el.value;
   else if(field==='strategy'){op.strategy=el.value;renderOps();}
   else if(field==='type'){op.type=el.value;renderOps();}
 });
@@ -441,7 +455,7 @@ $('operations').addEventListener('click',e=>{
     next.focus();
 
 });
-$('add-operation').onclick=()=>{const type=value('new-operation');job.operations.push((type==='balanced'||type==='interleaved')?{type,files:2}:type==='partition'?{type,columns:[]}:(type==='assign'||type==='assign_probabilistic')?{type,groups:[{name:'treatment',percent:'80'},{name:'control',percent:'20'}],strata:[]}:{type,strategy:'auto'});renderOps();markDirty();};
+$('add-operation').onclick=()=>{const type=value('new-operation');job.operations.push(type==='calculate'?{type,name:'',expression:''}:(type==='balanced'||type==='interleaved')?{type,files:2}:type==='partition'?{type,columns:[]}:(type==='assign'||type==='assign_probabilistic')?{type,groups:[{name:'treatment',percent:'80'},{name:'control',percent:'20'}],strata:[]}:{type,strategy:'auto'});renderOps();markDirty();};
 $('sniff-csv').onclick=async()=>{
   const button=$<HTMLButtonElement>('sniff-csv');button.disabled=true;
   const source=sourceKey();

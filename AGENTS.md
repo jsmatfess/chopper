@@ -146,6 +146,7 @@ node scripts/build-browser.mjs
 npm --prefix ui run build:hosted
 node scripts/build-browser-tests.mjs
 node scripts/test-browser.mjs
+node scripts/test-browser-formulas.mjs
 node scripts/test-browser-graph.mjs
 node scripts/test-browser-graph-lifecycle.mjs
 node scripts/test-browser-graph-inspection.mjs

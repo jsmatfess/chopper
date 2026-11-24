@@ -978,6 +978,11 @@ scratch remains runtime headroom, not a heap/RSS grant. Diagnostic trees, other
 Analysis metadata, response/error framing and native thread/runtime storage
 remain open. See the [validation interpretation](performance.md#analysis-warning-and-timing-admission-2026-10-23).
 
+Calculated-column jobs add preparation and traversal timings. The current
+builder admits up to five entries under the same single-leaf envelope.
+Traversal includes spool reads and writes or final serialization when the
+calculation is terminal.
+
 ## Analysis text ownership (2026-10-23)
 
 `Analysis.seed`, `logical_digest` and `accuracy` are immutable `AnalysisText`

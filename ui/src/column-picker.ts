@@ -1,14 +1,23 @@
 export type Column = string | number;
-export type ColumnSchema = {input_is_zip?: boolean; columns: number; header: string[] | null};
+export type ColumnSchema = {input_is_zip?: boolean; columns: number; header: string[] | null; unnamed?:number};
+export function columnsBefore(
+  schema: ColumnSchema | null, operations: {type: string; name?: string}[], step: number,
+): ColumnSchema | null {
+  if (!schema) return null;
+  const names = operations.slice(0, step).flatMap(op => op.type === 'calculate' ? [op.name ?? ''] : []);
+  if (!names.length) return schema;
+  const header = schema.header ?? Array<string>(schema.columns).fill('');
+  return {...schema, columns: schema.columns + names.length, header: [...header, ...names], unnamed:schema.header?0:schema.columns};
+}
 type Choice = {value: Column; label: string; index: number};
 const escape = (s: unknown) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 
 export function columnChoices(schema: ColumnSchema | null): Choice[] {
   if(!schema)return [];
   const counts=new Map<string,number>();
-  schema.header?.forEach(name=>counts.set(name,(counts.get(name)||0)+1));
+  schema.header?.slice(schema.unnamed??0).forEach(name=>counts.set(name,(counts.get(name)||0)+1));
   return Array.from({length:schema.columns},(_,index)=>{
-    const name=schema.header?.[index];
+    const name=index<(schema.unnamed??0)?undefined:schema.header?.[index];
     const unique=name!==undefined&&counts.get(name)===1;
     return {index,value:unique?name:index,label:name===undefined?`Column #${index}`:name||`(empty header) · #${index}`};
   });
@@ -16,8 +25,8 @@ export function columnChoices(schema: ColumnSchema | null): Choice[] {
 export function columnIndex(column: Column, schema: ColumnSchema | null): number | undefined {
   if(!schema)return undefined;
   if(typeof column==='number')return Number.isSafeInteger(column)&&column>=0&&column<schema.columns?column:undefined;
-  if(schema.header?.filter(name=>name===column).length!==1)return undefined;
-  const index=schema.header?.indexOf(column)??-1;
+  if(schema.header?.slice(schema.unnamed??0).filter(name=>name===column).length!==1)return undefined;
+  const index=schema.header?.indexOf(column,schema.unnamed??0)??-1;
   return index<0?undefined:index;
 }
 export function matchingColumns(schema: ColumnSchema | null, selected: Column[], query: string): Choice[] {
@@ -37,7 +46,7 @@ export function pickerMarkup(field: 'columns'|'strata', selected: Column[], step
   }).join('')}</div><input id="${id}" data-column-search role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}-results" aria-label="Add ${label.toLowerCase()} column" autocomplete="off" placeholder="${!schema?'Load input columns to choose':available.length?(selected.length?'Add column?':'Type to find a column?'):'All columns selected'}" ${!available.length?'disabled':''}></div><div id="${id}-results" class="column-results" role="listbox" aria-label="Matching columns" hidden></div><span class="sr-only" data-column-feedback role="status"></span></div><small class="column-picker-hint">${escape(message||'Drag chips to reorder, or focus a grip and use ← / →.')}</small>${!schema?'<button type="button" class="text-button" data-column-reload>Load columns</button>':''}</div>`;
 }
 
-export function bindColumnPickers(container: HTMLElement, getSelection: (picker: HTMLElement)=>Column[], getSchema: ()=>ColumnSchema|null, changed: (picker: HTMLElement, columns: Column[])=>void, reload: ()=>void) {
+export function bindColumnPickers(container: HTMLElement, getSelection: (picker: HTMLElement)=>Column[], getSchema: (picker: HTMLElement)=>ColumnSchema|null, changed: (picker: HTMLElement, columns: Column[])=>void, reload: ()=>void) {
   let drag:{picker:HTMLElement;column:Column;target:HTMLElement|null;position:'before'|'after'}|null=null;
   const clearDrop=()=>{for(const chip of container.querySelectorAll<HTMLElement>('[data-column-drop]'))delete chip.dataset.columnDrop;};
   const finishDrag=()=>{clearDrop();for(const chip of container.querySelectorAll('.column-chip.is-dragging'))chip.classList.remove('is-dragging');drag=null;};
@@ -63,14 +72,14 @@ export function bindColumnPickers(container: HTMLElement, getSelection: (picker:
   const suggest=(picker: HTMLElement)=>{
     const input=picker.querySelector<HTMLInputElement>('[data-column-search]')!;
     if(input.disabled)return;
-    const choices=matchingColumns(getSchema(),getSelection(picker),input.value);
+    const choices=matchingColumns(getSchema(picker),getSelection(picker),input.value);
     const list=picker.querySelector<HTMLElement>('.column-results')!;
     list.innerHTML=choices.length?choices.map(choice=>`<div id="${input.id}-option-${choice.index}" role="option" aria-selected="false" data-column-option="${choice.index}"><span>${escape(choice.label)}</span><small>#${choice.index}</small></div>`).join(''):'<div class="column-no-results">No matching columns</div>';
     list.hidden=false;input.setAttribute('aria-expanded','true');activate(picker,0);
     picker.querySelector<HTMLElement>('[data-column-feedback]')!.textContent=choices.length?`${choices.length} matching columns.`:'No matching columns.';
   };
   const add=(picker: HTMLElement,index: number)=>{
-    const choice=matchingColumns(getSchema(),getSelection(picker),'').find(c=>c.index===index);
+    const choice=matchingColumns(getSchema(picker),getSelection(picker),'').find(c=>c.index===index);
     if(!choice)return;
     changed(picker,[...getSelection(picker),choice.value]);
     const input=picker.querySelector<HTMLInputElement>('[data-column-search]')!;

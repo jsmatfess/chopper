@@ -188,6 +188,10 @@ wire_choices! {
         Interleaved {
             files: u64,
         } => "interleaved",
+        Calculate {
+            name: String,
+            expression: String,
+        } => "calculate",
         Partition {
             columns: Vec<Column>,
         } => "partition",

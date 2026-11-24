@@ -182,7 +182,13 @@ Ordered steps:
       --step <step>
           Append an operation to the pipeline
 
-          [possible values: balanced, interleaved, partition, assign, assign_probabilistic, shuffle]
+          [possible values: balanced, interleaved, calculate, partition, assign, assign_probabilistic, shuffle]
+
+      --name <name>
+          Output column name for the preceding calculate step
+
+      --expression <expression>
+          Formula for the preceding calculate step
 
       --by <by>
           Partition column names, comma-separated; use --column for literal names

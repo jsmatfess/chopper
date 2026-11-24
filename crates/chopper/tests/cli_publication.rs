@@ -31,6 +31,34 @@ fn invalid_ordered_arguments_have_usage_exit_status() {
 }
 
 #[test]
+fn unhandled_calculation_error_keeps_the_destination_private() {
+    let dir = tempfile::tempdir().unwrap();
+    let input = dir.path().join("input.csv");
+    let destination = dir.path().join("result");
+    fs::write(&input, "amount\n120\nunknown\n").unwrap();
+    let failed = run(&input, &destination)
+        .args([
+            "--step",
+            "calculate",
+            "--name",
+            "total",
+            "--expression",
+            "NUMBER(amount)",
+        ])
+        .output()
+        .unwrap();
+    let diagnostic = String::from_utf8_lossy(&failed.stderr);
+    assert_eq!(failed.status.code(), Some(1), "{diagnostic}");
+    assert!(
+        diagnostic.contains("input record 2, calculated column \"total\""),
+        "{diagnostic}"
+    );
+    assert!(diagnostic.contains("invalid number"), "{diagnostic}");
+    assert!(failed.stdout.is_empty());
+    assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 1);
+}
+
+#[test]
 fn malformed_input_reports_prepublication_failure_and_cleans_staging() {
     let dir = tempfile::tempdir().unwrap();
     let input = dir.path().join("input.csv");

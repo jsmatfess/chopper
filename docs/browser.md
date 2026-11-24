@@ -434,7 +434,7 @@ node scripts/build-browser-tests.mjs
 
 With the local server running, open http://127.0.0.1:8421/tests.html. Contracts use real workers, WebAssembly, browser file objects, and OPFS; only the user picker interactions are replaced with test fixture selections. Tests exercise all operations, compression roundtrips, strict validation, encoding/byte caps, bounded-disk shuffling, and cancellation cleanup. The native suite remains `cargo test --workspace --locked`.
 
-For CI, install Chromium with `npm --prefix ui exec -- playwright install --with-deps chromium`, then run `node scripts/test-browser.mjs`. Production `build:hosted` removes the test harness from `ui/dist`.
+For CI, install Chromium with `npm --prefix ui exec -- playwright install --with-deps chromium`, then run `node scripts/test-browser.mjs` and `node scripts/test-browser-formulas.mjs`. The formula check uses the hosted worker and verifies completion, sample evaluation, and a published CSV. Production `build:hosted` removes the test harness from `ui/dist`.
 
 The browser, bridge, peer-cleanup and termination harnesses accept
 `CHOPPER_BROWSER_CHANNEL=chrome` or `CHOPPER_BROWSER_CHANNEL=msedge` to use an

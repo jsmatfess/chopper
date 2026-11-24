@@ -42,6 +42,20 @@ fn validates_saved_job_without_input_or_work_directory() {
 }
 
 #[test]
+fn validates_calculation_syntax_without_opening_a_csv() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("job.json");
+    fs::write(&path, r#"{"input":"missing.csv","output":"out","operations":[{"type":"calculate","name":"label","expression":"UPPER([missing header])"}]}"#).unwrap();
+    assert!(validate(dir.path(), &[]).status.success());
+    fs::write(&path, r#"{"input":"missing.csv","output":"out","operations":[{"type":"calculate","name":"label","expression":"SAFE.REGEX_MATCH(a, \"[\")"}]}"#).unwrap();
+    let failed = validate(dir.path(), &["--json"]);
+    assert_eq!(failed.status.code(), Some(1));
+    let report: serde_json::Value = serde_json::from_slice(&failed.stdout).unwrap();
+    assert_eq!(report["error"]["path"], "/operations/0/expression");
+    assert_eq!(fs::read_dir(dir.path()).unwrap().count(), 1);
+}
+
+#[test]
 fn terminal_diagnostics_name_the_config_and_field() {
     let dir = tempfile::tempdir().unwrap();
     fs::write(dir.path().join("job.json"), r#"{"input":"missing.csv"}"#).unwrap();

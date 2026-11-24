@@ -31,7 +31,7 @@ pub(super) fn estimate(job: &Job, profile: &InputProfile) -> Option<WriterEstima
     let mut unchanged_parent = true;
     for (index, operation) in job.operations.iter().enumerate() {
         let multiplier = match operation {
-            Operation::Shuffle { .. } => 1,
+            Operation::Shuffle { .. } | Operation::Calculate { .. } => 1,
             Operation::Partition { .. } => {
                 // Input sketches cannot supply conditional per-parent counts.
                 // Do not multiply marginal estimates across correlated keys.
