@@ -71,7 +71,7 @@ async function main(){
         const notes=warningOwner.public_lifetimes;
         assert(notes.analysis_and_independent_payload_clones&&notes.prepared_drop_and_execute&&notes.serialization_failures&&notes.exact_csv_publication&&notes.ready_snapshot_cancellation_cleanup&&notes.last_warning_then_timing_release&&notes.final_reserved_bytes===0,'Public warning/timing lifetime failed');
         const timingOwner=result.analysis_timings;
-        assert(timingOwner?.local_shared_edges===6&&timingOwner.required_bytes>0&&timingOwner.node_allowance_bytes>0&&timingOwner.shared_clone_and_last_drop&&timingOwner.competing_owner_retry&&timingOwner.caller_json_equal&&timingOwner.empty_no_allocation&&timingOwner.stack_observations_and_overwrite&&timingOwner.fourth_entry_rejected&&timingOwner.partial_key_copy_cleanup,'Timing admission/lifetime failed');
+        assert(timingOwner?.local_shared_edges===6&&timingOwner.required_bytes>0&&timingOwner.node_allowance_bytes>0&&timingOwner.shared_clone_and_last_drop&&timingOwner.competing_owner_retry&&timingOwner.caller_json_equal&&timingOwner.empty_no_allocation&&timingOwner.stack_observations_and_overwrite&&timingOwner.sixth_entry_rejected&&timingOwner.partial_key_copy_cleanup,'Timing admission/lifetime failed');
         const automatic=result.automatic_memory;
         assert(automatic?.live_grants&&automatic.numeric_preserved&&automatic.final_reserved_bytes===0,'Automatic memory ledger contract failed');
         const manual=result.manual_memory;
