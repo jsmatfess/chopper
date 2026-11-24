@@ -393,7 +393,7 @@ for(const hosted of [true])test(`${hosted?'hosted':'native'} paired operations s
     const {page,errors}=await harness(browser,hosted);
     await page.locator('#import-file').setInputFiles({name:'job.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify({...defaults,input:'source.csv',output:'destination'}))});
     await page.waitForFunction(()=>document.getElementById('input').value==='source.csv');
-    assert.deepEqual(await page.locator('#new-operation option').evaluateAll(options=>options.map(option=>option.value)),['partition','balanced','assign','shuffle']);
+    assert.deepEqual(await page.locator('#new-operation option').evaluateAll(options=>options.map(option=>option.value)),['partition','balanced','assign','shuffle','calculate']);
     await page.locator('#new-operation').selectOption('balanced');await page.locator('#add-operation').click();
     assert.equal(await page.locator('[data-step="0"] input[value="balanced"]').isChecked(),true);
     await page.locator('[data-step="0"] [data-field="files"]').fill('5');
