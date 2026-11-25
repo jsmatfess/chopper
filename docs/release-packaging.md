@@ -160,3 +160,47 @@ against the frozen candidate before cutting the tag. Keep the docs output in its
 own directory and package the hosted app with the explicit release docs origin.
 After the approved GitHub release is public, publish the tagged docs and verify
 the live deep links, search and app link before recording release completion.
+
+## Release status and forecasts
+
+Use the owning release issue's acceptance checklist and the exact candidate's
+receipts. Report the candidate and identify the next unresolved gate. For
+each milestone, record its status (complete, current, or blocked), the check
+that decides it, and the receipt or missing prerequisite. A merged harness
+change makes a check available. Completion requires a receipt with matching
+source, artifacts, runtime, and workload scope.
+
+Keep separately verified output visible when the attempt failed. Record what
+the output proves, the failed controller or cleanup step, and the independent
+review that permits any narrow reuse. Leave the original attempt's status and
+receipt intact.
+
+Estimate engineering work, machine time, external waits, and publication
+approval separately. For each estimate, state the next gate, assumptions,
+what could add a retry, and the event that would change the estimate. Use
+recorded durations from comparable attempts. Label an estimate unknown when
+coverage, access, or retry cost is unresolved. A machine-time estimate gives
+the owner a planning input for a named check. Publication timing also depends
+on approval and the subsequent live checks.
+
+### Worked status report from retained evidence
+
+Historical checkpoint for the selected 0.2.0 candidate (`639d1fe`), after
+Chrome G's copied-profile review and before publication approval. The
+[acceptance checklist](releases/0.2.0-review.md) lists the selected gates. The
+[browser scale receipt](releases/0.2.0-browser-scale-acceptance.json) records
+the original failure and the separate recovery.
+
+| Milestone | Status and scoped evidence |
+| --- | --- |
+| Chrome G export | Complete for the selected 1 GB fixture. The copied-profile review independently verified 999,999 rows, 112 chunks, and the 10,000,000-byte cap without a new product Run. The original attempt remains failed on its required physical spill and merge reporting assertion. The recovered export supports the output claim and supplies no completed-only merge metric. |
+| Version and publication approval | Current gate at this checkpoint. The candidate review records both approvals as false. |
+| Served-asset verification | Blocked on approval and publication of the selected bytes. A live asset or smoke mismatch would require investigation and another check. |
+
+Remaining engineering on Chrome G at this checkpoint is zero for the
+already accepted output scope, assuming the package and scope stay fixed.
+The machine-time estimate for served verification is unknown until there is a
+deployment to verify and a scoped run plan. The owner approval wait has no
+duration estimate. Reforecast when the owner approves the candidate, the
+candidate changes, or a live check fails. The later release's actual
+publication record owns the final outcome.
