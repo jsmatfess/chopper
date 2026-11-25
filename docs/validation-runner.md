@@ -6,6 +6,9 @@ Release acceptance is held for the prerequisites in [specification #176](history
 Run preparation on the intended host before qualifying a complete tiny journey;
 then freeze the qualified harness for its batch. The active order is in [GitHub Issues](https://github.com/jsmatfess/chopper/issues).
 Preflight and tiny receipts do not replace scale acceptance or authorize publication.
+Use the [repeated acceptance failure review](maintainer/acceptance-failure-review.md)
+before seeking authorization for another attempt after two failures in the same
+fault area.
 
 ```sh
 python -B scripts/acceptance-preflight.py preflight REQUEST.json FRESH_EVIDENCE_DIRECTORY
