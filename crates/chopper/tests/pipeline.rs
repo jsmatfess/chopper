@@ -337,20 +337,26 @@ fn calculated_dependency_preparation_keeps_preview_errors_local() -> Result<()> 
         {"operation": 3, "name": "left_cycle", "expression": "right_cycle"},
         {"operation": 4, "name": "right_cycle", "expression": "left_cycle"},
         {"operation": 8, "name": "unbound", "expression": "missing"},
-        {"operation": 9, "name": "independent", "expression": "42"}
+        {"operation": 9, "name": "independent", "expression": "42"},
+        {"operation": 10, "name": "dependent", "expression": "unbound + 1"}
     ]);
-    let request = serde_json::to_vec(&serde_json::json!({
-        "header": ["amount"],
-        "columns": 1,
-        "rows": [["3"]],
-        "calculations": definitions,
-        "target": 7,
-        "include_references": true
-    }))?;
-    let preview = engine::formula_preview_json(request.as_slice(), request.len() as u64)?;
-    let preview = serde_json::to_value(preview)?;
-    let steps = preview["steps"].as_array().unwrap();
-    assert_eq!(steps.len(), 6);
+    let preview = |target| -> Result<serde_json::Value> {
+        let request = serde_json::to_vec(&serde_json::json!({
+            "header": ["amount"],
+            "columns": 1,
+            "rows": [["3"]],
+            "calculations": definitions,
+            "target": target,
+            "include_references": true
+        }))?;
+        Ok(serde_json::to_value(engine::formula_preview_json(
+            request.as_slice(),
+            request.len() as u64,
+        )?)?)
+    };
+    let targeted = preview(7)?;
+    let steps = targeted["steps"].as_array().unwrap();
+    assert_eq!(steps.len(), 7);
     assert_eq!(steps[0]["operation"], 7);
     assert_eq!(steps[0]["rows"][0]["value"], "5");
     assert_eq!(steps[0]["references"], serde_json::json!([0]));
@@ -360,20 +366,59 @@ fn calculated_dependency_preparation_keeps_preview_errors_local() -> Result<()> 
     }
     assert!(steps[4]["error"].as_str().unwrap().contains("missing"));
     assert_eq!(steps[5]["rows"], serde_json::json!([]));
+    let dependent = preview(10)?;
+    assert!(dependent["steps"][6]["rows"][0]["error"]
+        .as_str()
+        .unwrap()
+        .contains("A referenced calculated column has no value for this row"));
 
     job.calculated_columns = definitions
         .as_array()
         .unwrap()
         .iter()
-        .take(4)
         .map(|definition| CalculatedColumn {
             name: definition["name"].as_str().unwrap().into(),
             expression: definition["expression"].as_str().unwrap().into(),
         })
         .collect();
+    let failure = prepare(job.clone())
+        .err()
+        .expect("Run rejects missing bindings");
+    assert!(format!("{failure:#}").contains("preparing calculated column \"unbound\""));
+    job.calculated_columns.truncate(4);
     let failure = prepare(job).err().expect("Run rejects a cyclic Job");
     assert!(format!("{failure:#}")
         .contains("cyclic calculated column dependency involving \"left_cycle\""));
+    Ok(())
+}
+
+#[test]
+fn calculated_dependency_order_handles_the_final_slot() -> Result<()> {
+    let (dir, mut job) = fixture("source\n3\n");
+    job.calculated_columns = (0..64)
+        .map(|index| CalculatedColumn {
+            name: format!("calc_{index}"),
+            expression: "0".into(),
+        })
+        .collect();
+    job.calculated_columns[63].expression = "calc_63".into();
+    let failure = prepare(job.clone())
+        .err()
+        .expect("Run rejects the final-slot cycle");
+    assert!(format!("{failure:#}")
+        .contains("cyclic calculated column dependency involving \"calc_63\""));
+
+    job.calculated_columns[0].expression = "calc_63 + 1".into();
+    job.calculated_columns[63].expression = "7".into();
+    prepare(job)?.execute()?;
+    let csv = fs::read_to_string(dir.path().join("result/part-00000001.csv"))?;
+    let rows: Vec<_> = csv.lines().collect();
+    let header: Vec<_> = rows[0].split(',').collect();
+    let values: Vec<_> = rows[1].split(',').collect();
+    assert_eq!(header.len(), 65);
+    assert_eq!((header[1], header[64]), ("calc_0", "calc_63"));
+    assert_eq!(values.len(), 65);
+    assert_eq!((values[1], values[64]), ("8", "7"));
     Ok(())
 }
 
