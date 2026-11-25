@@ -147,6 +147,54 @@ class LocalCiTests(unittest.TestCase):
         load.assert_not_called()
         self.assertEqual(self.git('symbolic-ref', 'HEAD'), 'refs/heads/main')
 
+    def test_windows_handoff_preserves_a_paused_merge_with_no_file_changes(self):
+        self.git('push', '-q', 'origin', 'HEAD:refs/heads/feature')
+        self.git('switch', '-qc', 'empty-change', self.base)
+        self.git('commit', '--allow-empty', '-qm', 'merge without file changes')
+        self.git('switch', '-q', 'main')
+        self.git('merge', '--no-commit', '--no-ff', 'empty-change')
+        merge_head = self.git('rev-parse', 'MERGE_HEAD')
+        self.assertEqual(self.git('status', '--porcelain'), '')
+
+        with (patch.object(ci, 'host_profile', return_value='windows'),
+              patch.object(ci, 'host_lock_path', return_value=self.root.parent / 'windows-ci.lock'),
+              patch.object(ci.runpy, 'run_path') as load):
+            with self.assertRaises(subprocess.CalledProcessError):
+                ci.check_windows_revision(self.root, self.head, self.base, 'refs/heads/feature')
+        load.assert_not_called()
+        self.assertEqual(self.git('symbolic-ref', 'HEAD'), 'refs/heads/main')
+        self.assertEqual(self.git('rev-parse', 'MERGE_HEAD'), merge_head)
+
+    def test_windows_dispatch_success_requires_an_exact_receipt(self):
+        self.git('config', 'chopper.windowsCheckout', str(self.root))
+        invoke = subprocess.run
+        capture = subprocess.check_output
+        dispatches = []
+
+        def run(argv, **kwargs):
+            if argv[1] == str(self.root / 'scripts/windows-native.py'):
+                dispatches.append(argv)
+                return subprocess.CompletedProcess(argv, 0)
+            return invoke(argv, **kwargs)
+
+        def check_output(argv, **kwargs):
+            if argv[0] == 'wslpath':
+                return str(self.root / 'scripts/local-ci.py')
+            return capture(argv, **kwargs)
+
+        receipt = ci.receipt_path(self.root, self.head, self.base, 'windows')
+        with (patch.object(ci.subprocess, 'run', side_effect=run),
+              patch.object(ci.subprocess, 'check_output', side_effect=check_output)):
+            with self.assertRaisesRegex(ValueError, 'No intact local CI pass'):
+                ci.check_windows(self.root)
+            receipt.parent.mkdir(parents=True)
+            receipt.write_text(json.dumps({'version': 1, 'head': self.head,
+                                           'base': self.head, 'profile': 'windows'}))
+            with self.assertRaisesRegex(ValueError, 'No intact local CI pass'):
+                ci.check_windows(self.root)
+        self.assertEqual(len(dispatches), 2)
+        self.assertEqual(dispatches[0][-3:], [self.head, self.base, 'refs/heads/feature'])
+
     @unittest.skipUnless(ci.host_profile() == 'linux', 'Evidence checks belong to the Linux profile')
     def test_evidence_cache_is_verified_staged_and_selected_by_workflow_scope(self):
         source = self.root.parent / 'frozen'

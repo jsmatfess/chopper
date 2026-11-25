@@ -160,10 +160,10 @@ For PR validation, run `python3 scripts/local-ci.py check-windows` from a clean,
 pushed WSL branch. The Windows checkout must already contain the native
 dispatcher. Under the Windows CI lock, the handoff fetches the same base and
 branch from Windows `origin`, checks out the pinned head detached, and runs
-native CI. It refuses dirty inputs, ignored files that checkout would overwrite,
-and a mismatched head or base. The native check prints the receipt path, and the
-WSL caller verifies that receipt before returning success. Use `--full` to run
-all checks in the Windows profile.
+native CI. It refuses dirty inputs, an in-progress merge, ignored files that
+checkout would overwrite, and a mismatched head or base. The native check prints
+the receipt path, and the WSL caller verifies that receipt before returning
+success. Use `--full` to run all checks in the Windows profile.
 
 The dispatcher launches Windows PowerShell commands and Windows Python, restores
 Windows PATH/PATHEXT for that child, and uses the selected Windows checkout as

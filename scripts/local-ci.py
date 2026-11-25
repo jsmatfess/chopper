@@ -322,7 +322,7 @@ def check_windows_revision(root, head, base, branch, full=False):
             raise ValueError('Push the current branch to origin before running native Windows CI.')
         require_ancestor(root, base, head)
         clean_head(root)
-        subprocess.run(['git', '-C', str(root), 'checkout', '--detach', '--no-overwrite-ignore', head],
+        subprocess.run(['git', '-C', str(root), 'switch', '--detach', '--no-overwrite-ignore', head],
                        check=True)
         # Run validation from the selected Windows revision and keep the native
         # CI lock across both checkout and receipt creation.
