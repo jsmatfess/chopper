@@ -143,7 +143,7 @@ for(const stage of ['lock','storage','engine']){
 test('request send failure retires the failed Run; cancellation rejects every pending inspection',async()=>{
   let fail=true;
   const h=harness({sendFailure:(_,data)=>fail&&data.type==='run-direct'});
-  await h.api('run-direct',job());await tick();
+  assert.deepEqual(await h.api('run-direct',job()),{dispatched:false});await tick();
   assert.equal(h.lifecycle.snapshot().status,'failed');assert.match(h.lifecycle.snapshot().error,/send failed/);assert.equal(h.locks,0);
   fail=false;
   const a=h.api('columns',job()),b=h.api('sniff',job());
