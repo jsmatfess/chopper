@@ -8,6 +8,7 @@ import os
 import platform
 import re
 from pathlib import Path
+import runpy
 import shlex
 import shutil
 import subprocess
@@ -193,11 +194,17 @@ def stage_evidence(root, source, base, head, full=False):
     return staged
 
 
-def check(root, full=False):
-    head = clean_head(root)
+def fetch_base(root):
     subprocess.run(['git', '-C', str(root), 'fetch', '--no-tags', 'origin',
                     '+refs/heads/main:refs/remotes/origin/main'], check=True)
-    base = git(root, 'rev-parse', 'refs/remotes/origin/main')
+    return git(root, 'rev-parse', 'refs/remotes/origin/main')
+
+
+def check(root, full=False, *, expected_head=None, expected_base=None):
+    head = clean_head(root, expected_head)
+    base = fetch_base(root)
+    if expected_base is not None and base != expected_base:
+        raise ValueError('origin/main advanced before native Windows CI. Update the branch and rerun.')
     require_ancestor(root, base, head)
     receipt = receipt_path(root, head, base)
     # A failed rerun must never leave an earlier pass usable.
@@ -294,19 +301,62 @@ def verify(root, head, base):
     verify_record(root, head, base, host_profile())
 
 
+def windows_checkout(root):
+    configured = subprocess.run(['git', '-C', str(root), 'config', '--get', 'chopper.windowsCheckout'],
+                                capture_output=True, text=True)
+    if configured.returncode or not configured.stdout.strip():
+        raise ValueError('Native Windows validation is required. Configure chopper.windowsCheckout '
+                         'to the clean native Windows validation checkout.')
+    return accessible_path(configured.stdout.strip())
+
+
+def check_windows_revision(root, head, base, branch, full=False):
+    if host_profile() != 'windows':
+        raise ValueError('Revision transfer must run under native Windows Python.')
+    with host_lock():
+        clean_head(root)
+        if fetch_base(root) != base:
+            raise ValueError('Native Windows origin/main differs from the WSL base. Update the branch and rerun.')
+        subprocess.run(['git', '-C', str(root), 'fetch', '--no-tags', 'origin', branch], check=True)
+        if git(root, 'rev-parse', 'FETCH_HEAD') != head:
+            raise ValueError('Push the current branch to origin before running native Windows CI.')
+        require_ancestor(root, base, head)
+        clean_head(root)
+        subprocess.run(['git', '-C', str(root), 'checkout', '--detach', '--no-overwrite-ignore', head],
+                       check=True)
+        # Run validation from the selected Windows revision and keep the native
+        # CI lock across both checkout and receipt creation.
+        selected = runpy.run_path(str(root / 'scripts/local-ci.py'))
+        selected['check'](root, full, expected_head=head, expected_base=base)
+
+
+def check_windows(root, full=False):
+    checkout = windows_checkout(root)
+    head = clean_head(root)
+    branch = git(root, 'symbolic-ref', 'HEAD')
+    base = fetch_base(root)
+    require_ancestor(root, base, head)
+    script = subprocess.check_output(['wslpath', '-w', str(root / 'scripts/local-ci.py')], text=True).strip()
+    # The existing dispatcher can enter a Windows checkout that still has an
+    # older version of local-ci.py. Bootstrap the handoff from WSL.
+    dispatch = (
+        "import runpy, sys; from pathlib import Path; "
+        "runpy.run_path(sys.argv[1])['check_windows_revision']("
+        "Path.cwd(), *sys.argv[2:5], full='--full' in sys.argv[5:])"
+    )
+    command = [sys.executable, str(root / 'scripts/windows-native.py'), '--checkout', str(checkout),
+               'python', '--', '-c', dispatch, script, head, base, branch]
+    subprocess.run(command + (['--full'] if full else []), check=True)
+    verify_record(checkout, head, base, 'windows')
+
+
 def verify_delivery(root, head, base):
     verify(root, head, base)
     if host_profile() != 'linux':
         raise ValueError('Deliver from the Linux/WSL checkout, where Linux and Windows receipts are combined.')
     _, selected = scope_module().revision_scope(base, head, root=root, platform='windows')
     if any(selected.values()):
-        configured = subprocess.run(['git', '-C', str(root), 'config', '--get', 'chopper.windowsCheckout'],
-                                    capture_output=True, text=True)
-        if configured.returncode or not configured.stdout.strip():
-            raise ValueError('Native Windows validation is required. Configure chopper.windowsCheckout '
-                             'and run local-ci.py check in that clean Windows checkout at the same commit.')
-        windows = accessible_path(configured.stdout.strip())
-        verify_record(windows, head, base, 'windows')
+        verify_record(windows_checkout(root), head, base, 'windows')
 
 
 def pre_push(root, stream):
@@ -355,7 +405,7 @@ def land(root, full=False):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['check', 'land', 'install-hooks', 'pre-push'])
+    parser.add_argument('command', choices=['check', 'check-windows', 'land', 'install-hooks', 'pre-push'])
     parser.add_argument('--full', action='store_true', help='Run every workflow check instead of path routing')
     args = parser.parse_args()
     root = Path(git(Path.cwd(), 'rev-parse', '--show-toplevel'))
@@ -364,6 +414,8 @@ def main():
             install_hooks(root)
         elif args.command == 'pre-push':
             pre_push(root, sys.stdin)
+        elif args.command == 'check-windows':
+            check_windows(root, args.full)
         else:
             # Acquire before hook installation, fetch, receipt revocation or
             # workflow execution; retain through teardown, verification/push.

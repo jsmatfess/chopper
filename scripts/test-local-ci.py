@@ -108,6 +108,45 @@ class LocalCiTests(unittest.TestCase):
             executable.touch()
             self.assertEqual(ci.git_bash_directory(executable), install / 'bin')
 
+    def test_windows_handoff_checks_out_pushed_head_under_native_lock(self):
+        self.git('push', '-q', 'origin', 'HEAD:refs/heads/feature')
+        self.git('switch', '-q', 'main')
+        lock = self.root.parent / 'windows-ci.lock'
+
+        def validate(root, full, *, expected_head, expected_base):
+            self.assertEqual((root, full, expected_head, expected_base),
+                             (self.root, True, self.head, self.base))
+            self.assertEqual(self.git('rev-parse', 'HEAD'), self.head)
+            self.assertEqual(self.git('rev-parse', 'refs/heads/main'), self.base)
+            with self.assertRaisesRegex(ValueError, 'Cannot acquire host lock'):
+                with ci.host_lock():
+                    self.fail('handoff must hold the native CI lock during validation')
+
+        with (patch.object(ci, 'host_profile', return_value='windows'),
+              patch.object(ci, 'host_lock_path', return_value=lock),
+              patch.object(ci.runpy, 'run_path', return_value={'check': validate}) as load):
+            ci.check_windows_revision(self.root, self.head, self.base, 'refs/heads/feature', full=True)
+        load.assert_called_once_with(str(self.root / 'scripts/local-ci.py'))
+
+    def test_windows_handoff_preserves_head_on_dirty_checkout_or_revision_mismatch(self):
+        self.git('push', '-q', 'origin', 'HEAD:refs/heads/feature')
+        self.git('switch', '-q', 'main')
+        dirty = self.root / 'untracked'
+        dirty.write_text('keep')
+        with (patch.object(ci, 'host_profile', return_value='windows'),
+              patch.object(ci, 'host_lock_path', return_value=self.root.parent / 'windows-ci.lock'),
+              patch.object(ci.runpy, 'run_path') as load):
+            with self.assertRaisesRegex(ValueError, 'uncommitted'):
+                ci.check_windows_revision(self.root, self.head, self.base, 'refs/heads/feature')
+            self.assertEqual(dirty.read_text(), 'keep')
+            dirty.unlink()
+            with self.assertRaisesRegex(ValueError, 'differs from the WSL base'):
+                ci.check_windows_revision(self.root, self.head, self.head, 'refs/heads/feature')
+            with self.assertRaisesRegex(ValueError, 'Push the current branch'):
+                ci.check_windows_revision(self.root, self.base, self.base, 'refs/heads/feature')
+        load.assert_not_called()
+        self.assertEqual(self.git('symbolic-ref', 'HEAD'), 'refs/heads/main')
+
     @unittest.skipUnless(ci.host_profile() == 'linux', 'Evidence checks belong to the Linux profile')
     def test_evidence_cache_is_verified_staged_and_selected_by_workflow_scope(self):
         source = self.root.parent / 'frozen'

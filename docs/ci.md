@@ -36,9 +36,17 @@ python3 scripts/local-ci.py check
 ```
 
 Replace the Windows checkout path with the actual independent NTFS checkout.
-Follow the [two-checkout workflow](windows-wsl-workflow.md) for native prerequisites,
-safe revision transfer and dispatch. In a native Windows terminal at that clean
-checkout, at the **same committed revision**:
+Follow the [two-checkout workflow](windows-wsl-workflow.md) for native prerequisites.
+With your clean feature branch pushed to `origin`, prepare the native Windows
+receipt from WSL:
+
+```sh
+python3 scripts/local-ci.py check-windows
+```
+
+This uses the configured Windows validation checkout and verifies the receipt
+against the WSL branch's exact head and base. For manual validation in a native
+Windows terminal, run the following at the **same committed revision**:
 
 ```powershell
 python scripts/local-ci.py check
@@ -145,6 +153,9 @@ Do not report a local receipt as a hosted `CI result` success. If a ruleset requ
 that hosted check, record its configuration and temporarily remove only that
 requirement; restore it after hosted acceptance. Private-repository plans can
 restrict access to these settings.
+
+While local CI is the delivery gate, note that in the PR description and record
+Linux and applicable native Windows pass results for the landed head and base.
 
 Gate runs reject user/project `.actrc` overrides, which could select one job or
 a dry run, and accept no arbitrary act flags. Default `.env`, `.vars`, `.input`
