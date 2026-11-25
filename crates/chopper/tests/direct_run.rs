@@ -149,6 +149,51 @@ fn clean(dir: &Path, job: &Job) -> Result<()> {
 }
 
 #[test]
+fn observed_run_reports_the_route_that_publishes_output() -> Result<()> {
+    for (operations, compression, expected) in [
+        (vec![], Compression::None, "streaming"),
+        (
+            vec![Operation::Balanced { files: 2 }],
+            Compression::None,
+            "private_terminal",
+        ),
+        (
+            vec![Operation::Balanced { files: 2 }],
+            Compression::Zip,
+            "snapshot",
+        ),
+    ] {
+        let (_dir, mut job) = setup(b"id\n1\n2\n3\n4\n")?;
+        job.operations = operations;
+        job.compression = compression;
+        let analysis = if job.operations.is_empty() {
+            engine::run_observed(
+                job.clone(),
+                Arc::new(AtomicBool::new(false)),
+                Arc::new(|_| {}),
+                &mut |_| true,
+            )?
+        } else {
+            engine::run_with_observations(
+                job.clone(),
+                Arc::new(AtomicBool::new(false)),
+                Arc::new(|_| {}),
+                Arc::new(|_| true),
+            )?
+        };
+        let report = serde_json::to_value(analysis.auto_plan)?;
+        assert_eq!(report["physical_plan"], expected);
+        assert_eq!(report["direct_preflight_fallback"], false);
+        assert_eq!(analysis.rows, 4);
+        assert_eq!(
+            csvs(&job.output, job.compression)?.len() as u64,
+            analysis.output_files
+        );
+    }
+    Ok(())
+}
+
+#[test]
 fn formats_caps_fields_digest_names_and_manifest_parity() -> Result<()> {
     for compression in [Compression::None, Compression::Gzip, Compression::Zip] {
         let (_dir, mut job) = setup(

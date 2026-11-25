@@ -305,6 +305,13 @@ destination must still be available at staging and at the no-replace rename.
 Explicit snapshot preparation keeps its destination check at publication.
 Absolute-path discovery remains transient at preflight.
 
+The [Run route module](../crates/chopper/src/engine/run_route.rs) carries an
+accepted direct plan together with its admitted Context. A retained route carries
+the destination witness and its publication mode, including any native merge or
+retained exact writer choice. The Auto report reads that selection and retained
+processing uses it when setting up its Context. See the
+[route prerequisites diagram](execution-decisions.md#run-route-prerequisites).
+
 The identity check and removal are separate filesystem calls. A concurrent
 replacement between those calls can still be removed if it is empty. A
 replacement after removal is protected by the native no-replace rename.

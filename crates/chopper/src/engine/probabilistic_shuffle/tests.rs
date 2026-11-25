@@ -61,10 +61,7 @@ fn execute(
         notify,
         pool,
         physical,
-        false,
-        false,
-        None,
-        output::RunDestination::Unchecked,
+        ProcessingMode::Prepare,
         |job, ctx, p, b, s| {
             input_reads += 1;
             with_input(job, Reservation::new(ctx), |mut source| {

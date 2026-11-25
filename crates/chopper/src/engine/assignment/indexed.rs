@@ -108,10 +108,7 @@ mod tests {
             Arc::new(|_| {}),
             pool.clone(),
             None,
-            false,
-            false,
-            None,
-            output::RunDestination::Unchecked,
+            ProcessingMode::Prepare,
             |job, ctx, partitions, balanced, streaming| {
                 visits += 1;
                 with_input(job, Reservation::new(ctx), |mut source| {

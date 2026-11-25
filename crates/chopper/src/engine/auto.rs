@@ -838,10 +838,6 @@ impl AutoPlan {
         self.native_merge_fan_in = ceiling;
     }
 
-    pub(super) fn native_merge_fan_in(&self) -> Option<usize> {
-        self.native_merge_fan_in
-    }
-
     pub(super) fn memory_targets_mb(&self) -> [u64; 2] {
         self.memory_plan.map_or([256, 256], |plan| {
             let lower = if plan.target_mb == 2048 && plan.interior_sort_bytes.is_some() {

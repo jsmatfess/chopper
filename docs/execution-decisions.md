@@ -112,6 +112,28 @@ after successful engine publication and is separate from the manifest snapshot.
 It counts a retained-exact preparation denial when the engine retries with
 ordinary exact allocation.
 
+### Run route prerequisites
+
+```mermaid
+flowchart TD
+    Validated[Validated Run Job] --> Destination[Native destination witness or hosted unchecked destination]
+    Destination --> Candidate{Direct candidate for this Job and observation mode?}
+    Candidate -->|Yes| Context{Build the candidate Context and check live headroom}
+    Context -->|Construction error| Fail[Fail the Run before input consumption]
+    Context -->|Ready| Direct[Dispatch the direct plan with its Context and destination]
+    Context -->|Headroom declined| Drop[Drop the tentative Context and retain the destination witness]
+    Drop --> Retained[Select retained publication mode]
+    Candidate -->|No| Retained
+    Retained --> Policy[Snapshot, grouped private output, native merge, or retained exact writers]
+    Policy --> Process[Build the retained Context from the selected mode and Auto resource targets]
+    Direct --> Report[Report the selected route after successful publication]
+    Process --> Report
+```
+
+Explicit preparation builds a snapshot Context without selecting a Run route.
+Retained-parent retries and publication errors remain governed by the selected
+execution path.
+
 ### Current gzip and ZIP compression
 
 ```mermaid

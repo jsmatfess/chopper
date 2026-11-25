@@ -58,6 +58,7 @@ mod resource_contracts;
     feature = "experimental-partition-balanced"
 ))]
 mod retained_execution;
+mod run_route;
 mod shuffle_assignment;
 mod shuffle_elision;
 mod shuffle_partition;
@@ -78,6 +79,7 @@ use chopper_core::{
 };
 use domain_cache::DomainCache;
 use keys::OperationKey;
+use run_route::{ProcessingMode, RunRoute};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::{
@@ -281,100 +283,25 @@ fn run_using(
     snapshot: Option<crate::observation::Sink<'_>>,
     physical: Option<crate::observation::physical::Sink>,
 ) -> Result<Analysis> {
-    use auto::Route;
     let observed = snapshot.is_some() || physical.is_some();
     let started = std::time::Instant::now();
     job.validate_for_execution()?;
-    #[cfg(not(target_os = "wasi"))]
-    let mut destination = output::RunDestination::preflight(&job)?;
-    #[cfg(target_os = "wasi")]
-    let mut destination = output::RunDestination::Unchecked;
-    let calculates = !job.calculated_columns.is_empty();
-    let mut direct_plan = if calculates {
-        None
-    } else if job.operations.is_empty() {
-        Some(direct::Plan::Streaming)
-    } else if observed {
-        None
-    } else {
-        direct::select(&job, &pool)
-    };
-    let proposed_direct = direct_plan.is_some();
-    let direct_context = if let Some(mode) = direct_plan {
-        #[cfg(target_os = "wasi")]
-        job.validate_output()?;
-        let ctx = Context::with_run_limits(
-            &job.resources,
-            cancel.clone(),
-            notify.clone(),
-            pool.clone(),
-            if output::parallel_direct_compression(&job) {
-                usize::MAX
-            } else {
-                1
-            },
-            mode.memory_targets(),
-        )?;
-        if mode.ready(&ctx) {
-            *ctx.run_destination() = std::mem::take(&mut destination);
-            Some(ctx)
-        } else {
-            // No destination or parser has started. Reuse the ordinary plan.
-            direct_plan = None;
-            None
-        }
-    } else {
-        None
-    };
-    let merge = (!calculates && !observed && direct_plan.is_none())
-        .then(|| auto::native_terminal_merge(&job, &pool))
-        .flatten();
-    let try_retained_exact = !calculates
-        && !observed
-        && direct_plan.is_none()
-        && merge.is_none()
-        && auto::native_retained_exact(&job, &pool);
-    let route = if let Some(plan) = direct_plan {
-        plan.route()
-    } else if !calculates {
-        if merge.is_some()
-            || try_retained_exact
-            || terminal_direct_eligible(&job)
-            || (!observed && native_shuffle_direct_eligible(&job))
-        {
-            Route::PrivateTerminal
-        } else {
-            Route::Snapshot
-        }
-    } else if !observed && large_calculation_direct_eligible(&job) {
-        Route::PrivateTerminal
-    } else {
-        Route::Snapshot
-    };
-    let mut plan = auto::AutoPlan::start(&job, &pool, hint, route, preview);
-    plan.set_native_merge_fan_in(merge);
-    plan.try_retained_exact = try_retained_exact;
-    plan.direct_preflight_fallback = proposed_direct && direct_plan.is_none();
-    let published = match route {
-        Route::Streaming | Route::Counted | Route::BoundedWriters => direct::run(
-            job,
-            direct_context.expect("direct context"),
-            (snapshot, physical),
-            direct_plan.expect("direct route"),
-            started,
-        )?,
-        Route::PrivateTerminal | Route::Snapshot => {
+    let route = RunRoute::select(&job, &cancel, &notify, &pool, observed)?;
+    let plan = route.report(&job, &pool, hint, preview);
+    let (published, strategy) = match route {
+        RunRoute::Direct { mode, context } => (
+            direct::run(job, context, (snapshot, physical), mode, started)?,
+            mode.strategy(),
+        ),
+        RunRoute::Retained(route) => {
             let observe_input = physical.is_some();
-            process_using(
+            let published = process_using(
                 job,
                 cancel,
                 notify,
                 pool,
                 physical,
-                matches!(route, Route::PrivateTerminal),
-                !observed,
-                Some(&plan),
-                destination,
+                ProcessingMode::Run(route, &plan),
                 |job, ctx, p, b, s| {
                     if observe_input {
                         with_input_observed(job, Reservation::new(ctx), ctx, |source, input_ctx| {
@@ -387,16 +314,13 @@ fn run_using(
                     }
                 },
             )?
-            .publish()?
+            .publish()?;
+            (published, None)
         }
     };
     let measurements = published.measurements;
     let mut analysis = published.into_analysis();
-    plan.finish(
-        &mut analysis,
-        measurements,
-        direct_plan.and_then(direct::Plan::strategy),
-    );
+    plan.finish(&mut analysis, measurements, strategy);
     Ok(analysis)
 }
 
@@ -511,10 +435,7 @@ fn prepare_using(
         notify,
         pool,
         physical,
-        false,
-        false,
-        None,
-        output::RunDestination::Unchecked,
+        ProcessingMode::Prepare,
         read_input,
     )? {
         Processed::Snapshot(prepared) => Ok(prepared),
@@ -522,42 +443,11 @@ fn prepare_using(
     }
 }
 
-fn large_calculation_direct_eligible(job: &Job) -> bool {
-    // The measured benefit came from avoiding a large serialized snapshot.
-    // Keep the existing path for smaller, evaluator-heavy exports.
-    const MINIMUM_SOURCE_BYTES: u64 = 128 * 1024 * 1024;
-    cfg!(target_os = "linux")
-        && job.operations.is_empty()
-        && job.compression == chopper_core::Compression::None
-        && std::fs::metadata(&job.input)
-            .is_ok_and(|source| source.is_file() && source.len() >= MINIMUM_SOURCE_BYTES)
-}
-
-fn native_shuffle_direct_eligible(job: &Job) -> bool {
-    cfg!(all(
-        feature = "experimental-terminal-shuffle",
-        not(target_os = "wasi")
-    )) && job.compression == chopper_core::Compression::None
-        && (matches!(job.operations.as_slice(), [Operation::Shuffle { .. }])
-            || matches!(job.operations.as_slice(), [shuffle, Operation::Partition { .. }] if uniform(shuffle)))
-}
-
 pub(crate) fn configured_writer_capacity(job: &Job) -> Option<usize> {
     direct::writer_capacity(job)
 }
 pub(crate) fn bounded_final_partition_shape(job: &Job) -> bool {
     direct::partition_eligible(job)
-}
-
-fn terminal_direct_eligible(job: &Job) -> bool {
-    job.compression == chopper_core::Compression::None
-        && (matches!(job.operations.as_slice(), [Operation::Balanced { .. }])
-            || (cfg!(feature = "experimental-terminal-shuffle")
-                && matches!(job.operations.as_slice(), [shuffle, Operation::Balanced { .. }] if uniform(shuffle)))
-            || (cfg!(all(
-                feature = "experimental-terminal-routing",
-                not(target_os = "wasi")
-            )) && matches!(job.operations.as_slice(), [operation] if streaming::eligible(operation) || matches!(operation, Operation::Partition { .. }) || matches!(operation, Operation::Assign { strata, .. } if !strata.is_empty()))))
 }
 
 // Keep synchronous owners inline: boxing would need a separate allocation grant.
@@ -587,37 +477,19 @@ impl Processed {
     }
 }
 
-#[allow(clippy::too_many_arguments)]
 fn process_using(
     job: Job,
     cancel: Arc<AtomicBool>,
     notify: Notify,
     pool: Arc<crate::resources::MemoryPool>,
     physical: Option<crate::observation::physical::Sink>,
-    direct_terminal: bool,
-    _unobserved_run: bool,
-    auto_plan: Option<&AutoPlan>,
-    destination: output::RunDestination,
+    mode: ProcessingMode<'_>,
     mut read_input: impl FnMut(&Job, &Context, bool, bool, bool) -> Result<Ingested>,
 ) -> Result<Processed> {
     let started = std::time::Instant::now();
-    let mut ctx = Context::with_run_limits(
-        &job.resources,
-        cancel,
-        notify,
-        pool,
-        auto_plan.map_or(usize::MAX, AutoPlan::automatic_worker_limit),
-        auto_plan.map_or([256, 256], AutoPlan::memory_targets_mb),
-    )?;
-    *ctx.run_destination() = destination;
-    ctx.physical = physical;
-    ctx.direct_terminal_output = direct_terminal;
-    ctx.auto_run = auto_plan.is_some();
-    ctx.auto_quota_index = ctx.auto_run
-        && matches!(job.operations.as_slice(), [Operation::Assign { strata, .. }] if strata.is_empty());
-    ctx.auto_merge_ceiling = auto_plan.and_then(AutoPlan::native_merge_fan_in);
-    ctx.auto_retained_exact = auto_plan.is_some_and(|plan| plan.try_retained_exact);
-    ctx.auto_final_writers = ctx.auto_retained_exact;
+    let _unobserved_run = mode.unobserved_run();
+    let ctx = mode.context(&job, cancel, notify, pool, physical)?;
+    let direct_terminal = ctx.direct_terminal_output;
 
     let job = PreparedJob::admit(job, Reservation::new(&ctx))?;
     ctx.event("Reading and validating CSV", 0)?;
