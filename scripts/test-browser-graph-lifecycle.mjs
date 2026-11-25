@@ -119,7 +119,7 @@ await withHostedBrowser({port:8425},async({context,url,browserVersion})=>{
   if(['marker_write','marker_close'].includes(mode)){assert.match(find('Save destination files'),/ · Completed/);assert.match(find('Confirm completion marker'),/ · Failed/);}
   if(mode==='marker_read'){assert.match(find('Confirm completion marker'),/ · Failed/);assert.match(await page.locator('#error').textContent(),/verify completion marker/);assert.equal(await page.evaluate(()=>window.graphReadbacks),1);}
   if(mode==='marker_confirmed'||mode==='marker_late')assert.match(find('Confirm completion marker'),/ · Completed · confirmed/);
-  if(mode==='marker_closed'){const marker=find('Confirm completion marker');if(marker){assert.match(marker,/interrupted|unknown/);assert.doesNotMatch(marker,/ · confirmed/);}assert.match(await page.locator('#execution-history summary').textContent(),/export unconfirmed/);}
+  if(mode==='marker_closed'){const marker=find('Confirm completion marker');if(marker){assert.match(marker,/ · (?:Interrupted|Unknown) · unconfirmed/);assert.doesNotMatch(marker,/ · confirmed/);}assert.match(await page.locator('#execution-history summary').textContent(),/export unconfirmed/);}
   if(mode==='processing_cancel'||mode==='new_generation_cancel'||mode==='cleanup_error_cancel'){assert.match(text,/Interrupted/);assert.match(text,/last observed/);}
   if(mode==='transport_throw'||mode==='render_throw')assert.match(note,/unavailable/i);
   if(mode==='loss_after_active'){assert.match(note,/unavailable/i);assert.match(text,/Unknown.*last observed/);assert.ok(nodes.every(node=>!node.includes(' · Completed')));}
