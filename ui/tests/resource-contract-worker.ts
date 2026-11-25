@@ -215,9 +215,11 @@ function inspectionContract(
     }
     const legacyIo=inspect('chopper_run',exact,true);
     const previewIo=inspect('chopper_preview',exact,true);
+    const ioReads=[[8192,8192],[8192,0],[8192,42]];
     assert(legacyIo.status===1&&previewIo.status===1&&typeof legacyIo.result.error==='string'&&
-      previewIo.result.error===legacyIo.result.error&&JSON.stringify(previewIo.reads)===JSON.stringify([[8192,8192],[8192,0]])&&
-      JSON.stringify(previewIo.reads)===JSON.stringify(legacyIo.reads)&&reserved()===baseline,'WASI source I/O error or second read changed');
+      previewIo.result.error===legacyIo.result.error&&JSON.stringify(legacyIo.reads)===JSON.stringify(ioReads)&&
+      JSON.stringify(previewIo.reads)===JSON.stringify(ioReads)&&reserved()===baseline,
+      'WASI source I/O error or second read changed: '+JSON.stringify({legacyIo,previewIo,reserved:reserved(),baseline}));
     paused=[];
     const borrow=inspect('chopper_formula_scan',job(''));
     assert(borrow.status===0&&paused.length===1&&reserved()===baseline,'Formula pause control failed');

@@ -36,7 +36,6 @@ pub use stages::Stages;
 mod input_sniff;
 mod input_zip;
 mod job_owner;
-#[cfg(not(target_os = "wasi"))]
 pub(crate) use job_owner::capacity as job_capacity;
 pub use job_owner::PreparedJob;
 mod keys;
