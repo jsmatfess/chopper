@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "e62338275b0fb1cfe112c93cf574b99a394a9ef9acd1a5f0f32c76dcfaf717e5"
+    "sha256": "b98037751587d8277531f69f67c30f5eb463d627bf8c60242ac5ec9e659f9c9a"
   },
   "experiments": [
     {
@@ -4500,6 +4500,20 @@
       "narrative": {
         "path": "docs/performance/investigations/standalone-uniform-direct-publication-2026-11-25.md",
         "sha256": "3201876dd7c04a27a51f3e746aa257d7264a0299beaf280f17604ec23e5b2516",
+        "topic": "ownership-and-lifecycle"
+      }
+    },
+    {
+      "title": "Standalone Uniform final reader admission (2026-11-25)",
+      "evidence": "docs/performance.md#standalone-uniform-final-reader-admission-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/standalone-uniform-narrow-final-reader-2026-11-25.patch",
+        "docs/benchmarks/standalone-uniform-narrow-final-reader-check-2026-11-25.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/standalone-uniform-final-reader-admission-2026-11-25.md",
+        "sha256": "4ebc73a95ebe02678d4d89733f5c0dfe331033a5b02837524bb428d9843ab25e",
         "topic": "ownership-and-lifecycle"
       }
     }
@@ -36421,6 +36435,45 @@
       ]
     },
     {
+      "path": "docs/benchmarks/standalone-uniform-narrow-final-reader-2026-11-25.patch",
+      "sha256": "c05f309f7b999faae292c772157862129103c8e295a0f5c0b66cbdafa3be1280",
+      "bytes": 7258,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#standalone-uniform-final-reader-admission-2026-11-25"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/standalone-uniform-narrow-final-reader-check-2026-11-25.json",
+      "sha256": "87503cb828b00f064982633d482b58ad92714c061459b0de836712b503d9a342",
+      "bytes": 2673,
+      "format": "json",
+      "record_counts": {
+        "derived_component_summary": 1
+      },
+      "fields": [
+        "base_commit",
+        "build_toolchains",
+        "candidate_source_sha256",
+        "excluded_attempt",
+        "holdout_fixed_peer_bytes",
+        "known_fixed_peer_bytes",
+        "outcome",
+        "replay_patch_sha256",
+        "runs",
+        "type",
+        "validation",
+        "workspace"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#standalone-uniform-final-reader-admission-2026-11-25"
+      ]
+    },
+    {
       "path": "docs/benchmarks/standalone-uniform-publication-summary-2026-11-25.json",
       "sha256": "87c35f7b6a4681c4eceac64e86d2d91001157d9e661aeb73da2f46ad567125ad",
       "bytes": 55604,
@@ -36443,8 +36496,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "8a05408fed35033c2b922efa37e2bedd5216f00bd4e85b726a1bcfbd2760503b",
-      "bytes": 1725448,
+      "sha256": "fa15a1edbeef21e3fa60a5f06980fa2fa77902fa4737cd6b2b7540615e5bcff9",
+      "bytes": 1728116,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -40771,7 +40824,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "62e2701d2739840dbda04014414cdf56f9d45204a9769355ddd1a50a81ba5397"
+    "sha256": "a983c6a2b1a9735d4c9977d41d3e4302aeb0a2d562a7090266cb6b1893a0baa0"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

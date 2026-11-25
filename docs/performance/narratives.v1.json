@@ -9099,6 +9099,19 @@
       "original_section_sha256": "896a258351c6e326fab2738d889ae6e6d0c8df4fd1436c36bdc7acab6d121fe8",
       "sha256": "3201876dd7c04a27a51f3e746aa257d7264a0299beaf280f17604ec23e5b2516",
       "relocations": []
+    },
+    {
+      "id": "standalone-uniform-final-reader-admission-2026-11-25",
+      "title": "Standalone Uniform final reader admission (2026-11-25)",
+      "anchor": "standalone-uniform-final-reader-admission-2026-11-25",
+      "path": "docs/performance/investigations/standalone-uniform-final-reader-admission-2026-11-25.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "standalone-uniform-final-reader-admission-2026-11-25"
+      ],
+      "original_section_sha256": "9d60c0be1b327b5213a1c944e1c0ab655e887f1cbccda025069d6df2d49b6293",
+      "sha256": "4ebc73a95ebe02678d4d89733f5c0dfe331033a5b02837524bb428d9843ab25e",
+      "relocations": []
     }
   ],
   "migrated_count": 193

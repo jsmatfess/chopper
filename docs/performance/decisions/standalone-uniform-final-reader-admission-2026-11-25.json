@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "standalone-uniform-final-reader-admission-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Keep wider standalone final readers bounded by actual run count",
+  "subsystem": "storage",
+  "question": "Does a 12 KiB raw buffer preserve the ordinary standalone final reader and sink admission boundary?",
+  "disposition": "block-promotion",
+  "outcome": "diagnostic",
+  "delivery": "unapplied",
+  "summary": "The 96- and 164-run controls fit the original peer and lower live cursor bytes. At 128 runs, the existing cursor holds only 131,880 bytes. The wider cursor holds 1,618,780 and hits typed encoding denial under the same tighter peer.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "96, 128 and 164 controlled raw runs, 256 MiB job, 512 MiB shared pool, feature-free test build."
+    ],
+    "measurement": "diagnostic"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "The same fixed peer is admitted on both arms of each comparison. Exact row order, successful encoding or typed sink denial, and staging and reservation release pass."
+  },
+  "limitations": [
+    "Controlled spill frames and focus on the final cursor/writer overlap.",
+    "The 128-run tighter peer comes from its measured wider ownership and is held unchanged for both encoders."
+  ],
+  "exclusions": [
+    "Complete-job time, real competing process RSS, browser and native Windows applicability."
+  ],
+  "reopen_when": "Bound admission for pending intake runs and the final cursor alongside output. Show the ordinary merge fallback for 128 runs before row emission and replay the 164-run complete-job test only after the pressure controls pass.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#standalone-uniform-final-reader-admission-2026-11-25",
+      "sha256": "9d60c0be1b327b5213a1c944e1c0ab655e887f1cbccda025069d6df2d49b6293"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/standalone-uniform-narrow-final-reader-check-2026-11-25.json",
+      "sha256": "87503cb828b00f064982633d482b58ad92714c061459b0de836712b503d9a342"
+    },
+    {
+      "path": "docs/benchmarks/standalone-uniform-narrow-final-reader-2026-11-25.patch",
+      "sha256": "c05f309f7b999faae292c772157862129103c8e295a0f5c0b66cbdafa3be1280"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/resource-policy-research.md",
+    "docs/direct-execution.md"
+  ]
+}

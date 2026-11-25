@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "3cf33355867b3f8a210eb62bad031a11226a10f0fd137deca7422e0da8e3d2f6",
+  "catalog_sha256": "fae33c219c3510a8fa473f39063006ea85bb52f33a620f345707bd7e84cc80d6",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -8078,6 +8078,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/standalone-uniform-narrow-final-reader-check-2026-11-25.json",
+      "source_sha256": "87503cb828b00f064982633d482b58ad92714c061459b0de836712b503d9a342",
+      "aliases": [
+        "docs/benchmarks/standalone-uniform-narrow-final-reader-check-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/auto-chromium-thresholds-and-resource-calibration-2026-11-21-summary.json",
       "source_sha256": "8775a8fbbd010b8f9bee17044ca66ecc6555ddc949f2e86c6addda7cc7054355",
       "aliases": [
@@ -8235,19 +8248,6 @@
         "unclassified": 8
       },
       "coverage": "adapted"
-    },
-    {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "8a05408fed35033c2b922efa37e2bedd5216f00bd4e85b726a1bcfbd2760503b",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/allocation-ranges-summary-2026-10-19.json",
@@ -11413,6 +11413,19 @@
         "unclassified": 4
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/standalone-uniform-narrow-final-reader-2026-11-25.patch",
+      "source_sha256": "c05f309f7b999faae292c772157862129103c8e295a0f5c0b66cbdafa3be1280",
+      "aliases": [
+        "docs/benchmarks/standalone-uniform-narrow-final-reader-2026-11-25.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/zip-metadata-owner-cross-runtime-2026-10-21.json",
@@ -15033,6 +15046,19 @@
         "measurement": 30
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "fa15a1edbeef21e3fa60a5f06980fa2fa77902fa4737cd6b2b7540615e5bcff9",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/analysis-preview-owner-package-identities-2026-10-23.json",

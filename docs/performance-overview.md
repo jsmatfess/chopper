@@ -13,7 +13,7 @@ Measured outcome, decision and delivery are independent fields. Favorable eviden
 does not imply default activation. Scope applies to the recorded builds/workloads;
 current contracts remain authoritative. Older baselines stay in the historical log.
 
-Registry coverage: 78 records; latest recorded decision 2026-11-25.
+Registry coverage: 79 records; latest recorded decision 2026-11-25.
 16 superseded records remain queryable but are omitted below.
 
 ## Delivered in default builds
@@ -71,6 +71,7 @@ Registry coverage: 78 records; latest recorded decision 2026-11-25.
 | --- | --- | --- |
 | [Keep the current random-key sorter target after the fixed-budget screen](performance/decisions/uniform-sort-retention-at-a-fixed-budget-2026-11-25.json) | inconclusive; native-linux. Both builds spill twice. Median wall time is 0.927 seconds at the quarter target and 0.952 seconds at three eighths. Peak tracked reservations rise by about 62 MiB. | [Evidence](performance/investigations/uniform-sort-retention-at-a-fixed-budget-2026-11-25.md) |
 | [Hold wide merge for standalone Uniform at the late admission boundary](performance/decisions/standalone-uniform-wide-merge-2026-11-25.json) | mixed; native-linux. Three verified native pairs save 9.231–12.321 seconds, but a matched late peer allows snapshot encoding and yields a typed sink denial with the widened cursor. | [Evidence](performance/investigations/standalone-uniform-direct-publication-2026-11-25.md) |
+| [Keep wider standalone final readers bounded by actual run count](performance/decisions/standalone-uniform-final-reader-admission-2026-11-25.json) | diagnostic; native-linux. The 96- and 164-run controls fit the original peer and lower live cursor bytes. At 128 runs, the existing cursor holds only 131,880 bytes. The wider cursor holds 1,618,780 and hits typed encoding denial under the same tighter peer. | [Evidence](performance/investigations/standalone-uniform-final-reader-admission-2026-11-25.md) |
 | [Keep snapshot publication for the tested standalone Uniform route](performance/decisions/standalone-uniform-direct-publication-2026-11-25.json) | mixed; native-linux. The 8 GiB screen removes 8.59 GB of managed reads and writes each and passes the late peer control. Paired elapsed changes are +3.852 and −0.349 seconds saved. It misses the wall-time gate. | [Evidence](performance/investigations/standalone-uniform-direct-publication-2026-11-25.md) |
 | [Reject broad counted Balanced digest overlap](performance/decisions/counted-balanced-digest-overlap-2026-11-22.json) | mixed; native-linux. The isolated 512-byte fixture benefits, but narrower and very-wide records miss the wall target and a 4 KiB pair reverses. Preserve the prototype as rejected evidence. | [Evidence](performance/investigations/input-prefetch-native-publication-and-digest-overlap-2026-11-22.md) |
 | [Screen larger final merge application buffers](performance/decisions/terminal-uniform-merge-read-buffers-2026-11-21.json) | unfavorable; native-linux. 256 KiB buffers increased complete-job elapsed 4.81% and CPU 4.69%. All three pairs regressed on both measures. Managed spill bytes and merge count matched. File-cache refaults rose 11.58%. | [Evidence](performance/investigations/terminal-uniform-merge-read-buffers-2026-11-21.md) |

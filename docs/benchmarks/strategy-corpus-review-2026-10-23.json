@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "af550affb9834e13d93957ca96a6379d6c772a005dd9d8e82f0ea10313d8edcd",
+  "analysis_script_sha256": "05ac5d9c1cf118cfb168a983ac7b6a4d53ba6462f33cc26373bb72f1df5cf1c1",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "e62338275b0fb1cfe112c93cf574b99a394a9ef9acd1a5f0f32c76dcfaf717e5"
+    "sha256": "b98037751587d8277531f69f67c30f5eb463d627bf8c60242ac5ec9e659f9c9a"
   },
   "families": [
     "adaptive-routing",
@@ -4782,6 +4782,21 @@
       "narrative": {
         "path": "docs/performance/investigations/standalone-uniform-direct-publication-2026-11-25.md",
         "sha256": "3201876dd7c04a27a51f3e746aa257d7264a0299beaf280f17604ec23e5b2516",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Standalone Uniform final reader admission (2026-11-25)",
+      "evidence": "docs/performance.md#standalone-uniform-final-reader-admission-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/standalone-uniform-narrow-final-reader-2026-11-25.patch",
+        "docs/benchmarks/standalone-uniform-narrow-final-reader-check-2026-11-25.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/standalone-uniform-final-reader-admission-2026-11-25.md",
+        "sha256": "4ebc73a95ebe02678d4d89733f5c0dfe331033a5b02837524bb428d9843ab25e",
         "topic": "ownership-and-lifecycle"
       },
       "family": "ownership-and-lifecycle"
@@ -54402,6 +54417,64 @@
       ],
       "record_bounds_by_kind": {
         "validation": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/standalone-uniform-narrow-final-reader-2026-11-25.patch",
+      "sha256": "c05f309f7b999faae292c772157862129103c8e295a0f5c0b66cbdafa3be1280",
+      "bytes": 7258,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#standalone-uniform-final-reader-admission-2026-11-25"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/standalone-uniform-narrow-final-reader-check-2026-11-25.json",
+      "sha256": "87503cb828b00f064982633d482b58ad92714c061459b0de836712b503d9a342",
+      "bytes": 2673,
+      "format": "json",
+      "record_counts": {
+        "derived_component_summary": 1
+      },
+      "fields": [
+        "base_commit",
+        "build_toolchains",
+        "candidate_source_sha256",
+        "excluded_attempt",
+        "holdout_fixed_peer_bytes",
+        "known_fixed_peer_bytes",
+        "outcome",
+        "replay_patch_sha256",
+        "runs",
+        "type",
+        "validation",
+        "workspace"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#standalone-uniform-final-reader-admission-2026-11-25"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "derived_component_summary": {
           "first": {
             "pointer": ""
           },

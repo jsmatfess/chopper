@@ -1,0 +1,176 @@
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -764,10 +764,10 @@
+ }
+ impl DiskFile {
+     pub fn reader(&self) -> Result<BufReader<DiskReader>> {
+-        Ok(BufReader::with_capacity(
+-            DISK_READ_BUFFER,
+-            self.unbuffered_reader()?,
+-        ))
++        self.reader_with_raw_capacity(DISK_READ_BUFFER)
++    }
++    fn reader_with_raw_capacity(&self, capacity: usize) -> Result<BufReader<DiskReader>> {
++        Ok(BufReader::with_capacity(capacity, self.unbuffered_reader()?))
+     }
+     /// Independent offset and the same controlled temporary file identity.
+     pub(crate) fn unbuffered_reader(&self) -> Result<DiskReader> {
+@@ -2550,14 +2550,16 @@
+ }
+ struct RunReader {
+     reader: Option<BufReader<SpillReader>>,
++    read_capacity: usize,
+     // Close the descriptor before releasing its file, including on Windows.
+     current: Option<SpillFile>,
+     remaining: catalog::CatalogIter<SpillFile>,
+ }
+ impl RunReader {
+-    fn new(run: SortRun) -> Self {
++    fn new(run: SortRun, read_capacity: usize) -> Self {
+         Self {
+             reader: None,
++            read_capacity,
+             current: None,
+             remaining: run.0.into_iter(),
+         }
+@@ -2574,7 +2576,7 @@
+             let Some(file) = self.remaining.next() else {
+                 return Ok(None);
+             };
+-            self.reader = Some(file.reader()?);
++            self.reader = Some(file.reader_with_raw_capacity(self.read_capacity)?);
+             self.current = Some(file);
+         }
+     }
+@@ -2623,8 +2625,9 @@
+         let mut reservation = Reservation::new(ctx);
+         // Reader buffers and metadata arrays are separate from row-owned decode
+         // charges. No largest-row allowance is multiplied or retained here.
++        let read_capacity = if ctx.auto_merge_ceiling == Some(256) && observe { 12 * 1024 } else { DISK_READ_BUFFER };
+         reservation.resize(
+-            files.len() * DISK_READ_BUFFER
++            files.len() * read_capacity
+                 + std::mem::size_of::<SortOrder>()
+                 + 3 * std::mem::size_of::<usize>(),
+         )?;
+@@ -2650,7 +2653,7 @@
+         let order = Arc::new(order);
+         for (run, file) in files.into_iter().enumerate() {
+             ctx.check()?;
+-            let mut reader = RunReader::new(file);
++            let mut reader = RunReader::new(file, read_capacity);
+             if let Some(row) = reader.header(ctx.max_record, &reservation)? {
+                 heads.push(Head {
+                     row,
+@@ -4993,3 +4996,111 @@
+         Ok(())
+     }
+ }
++
++#[cfg(all(test, target_os = "linux"))]
++#[test]
++fn standalone_uniform_narrow_final_reader_bound() -> Result<()> {
++    use crate::{output::PlanWriter, resources::MemoryPool};
++    use chopper_core::{Job, Operation, Resources, Shuffle};
++
++    const MIB: usize = 1024 * 1024;
++    const CAPACITY: usize = 512 * MIB;
++    assert!(wide_merge_handles_available());
++
++    fn run(rows: u64, wide: bool, peer_bytes: usize) -> Result<(u64, u64, Result<u64>)> {
++        let fixture = tempfile::tempdir()?;
++        let root = fixture.path();
++        let scratch = root.join("temp");
++        std::fs::create_dir(&scratch)?;
++        let input = root.join("input.csv");
++        std::fs::write(&input, "id\n")?;
++        let job = Job {
++            input: input.to_string_lossy().into_owned(),
++            output: root.join("result").to_string_lossy().into_owned(),
++            operations: vec![Operation::Shuffle { strategy: Shuffle::Uniform }],
++            resources: Resources {
++                memory_mb: 256.into(),
++                workers: 1,
++                max_record_bytes: 131_072,
++                temp_dir: Some(scratch.to_string_lossy().into_owned()),
++                ..Default::default()
++            },
++            ..Default::default()
++        };
++        let pool = Arc::new(MemoryPool::new(CAPACITY as u64));
++        let mut ctx = Context::with_memory_pool(
++            &job.resources, Arc::new(AtomicBool::new(false)), Arc::new(|_| {}), pool.clone(),
++        )?;
++        if wide {
++            ctx.direct_terminal_output = true;
++            ctx.auto_merge_ceiling = Some(256);
++        }
++        let mut sorter = Sorter::new(&ctx, SortOrder::Random([0; 32]));
++        for id in (0..rows).rev() {
++            sorter.push(Row {
++                id, ordinal: id, key: u128::from(id).to_be_bytes().to_vec(),
++                fields: vec![id.to_string()],
++            })?;
++            sorter.flush()?;
++        }
++        let sorted = sorter.finish()?;
++        let owned = pool.usage().reserved_bytes;
++        let fan_in = ctx.budget.peak_merge_fan_in.load(AtomicOrdering::Relaxed);
++        let mut peer = Reservation::for_workspace(Arc::new(Workspace::shared(CAPACITY, pool.clone())));
++        peer.resize(peer_bytes)?;
++        let result = (|| -> Result<u64> {
++            let mut writer = if wide {
++                PlanWriter::direct_grouped(&job, None, &ctx)?
++            } else {
++                PlanWriter::new(&job, None, &ctx)?
++            };
++            let mut group = writer.begin(Vec::new(), false);
++            let mut count = 0;
++            sorted.try_for_each_packed(|row| {
++                assert_eq!(row.id, count);
++                writer.packed_row_ref(&mut group, row)?;
++                count += 1;
++                Ok(())
++            })?;
++            writer.end(group)?;
++            if wide {
++                drop(writer.finish_direct()?);
++            } else {
++                drop(writer.finish()?);
++            }
++            Ok(count)
++        })();
++        drop(ctx);
++        assert_eq!(pool.usage().reserved_bytes, peer_bytes as u64);
++        drop(peer);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        assert!(!std::path::Path::new(&job.output).exists());
++        assert_eq!(std::fs::read_dir(root)?.count(), 2);
++        assert_eq!(std::fs::read_dir(scratch)?.count(), 0);
++        Ok((owned, fan_in, result))
++    }
++
++    const PEER: usize = 530_512_996;
++    for rows in [96, 164] {
++        let (old_live, old_fan_in, old) = run(rows, false, PEER)?;
++        let (new_live, new_fan_in, new) = run(rows, true, PEER)?;
++        assert_eq!(old?, rows);
++        assert_eq!(new?, rows);
++        assert_eq!(old_fan_in, 64);
++        assert_eq!(new_fan_in, rows);
++        assert!(new_live <= old_live);
++        eprintln!("runs {rows}, ordinary {old_live} B, wider {new_live} B, identical peer {PEER} encoded both");
++    }
++    let (old_live, _, old) = run(128, false, PEER)?;
++    let (new_live, _, new) = run(128, true, PEER)?;
++    assert_eq!(old?, 128);
++    assert_eq!(new?, 128);
++    assert!(new_live > old_live);
++    let holdout_peer = CAPACITY - new_live as usize - 32 * 1024;
++    assert_eq!(run(128, false, holdout_peer)?.2?, 128);
++    let denial = run(128, true, holdout_peer)?.2.expect_err("expected typed sink denial");
++    assert!(matches!(denial.downcast_ref::<crate::resources::MemoryAdmission>(),
++                      Some(crate::resources::MemoryAdmission::Shared { .. })));
++    eprintln!("128-run holdout, ordinary {old_live} B, wider {new_live} B, identical {holdout_peer} B peer; old encodes and wider is denied cleanly");
++    Ok(())
++}
