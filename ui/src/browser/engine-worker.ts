@@ -14,7 +14,7 @@ let root:DiskDirectory;
 let bridge:DiskBridge;
 let instance:WebAssembly.Instance;
 const compression=new CompressionWorkers();
-let last:Record<string,unknown>={};
+let last:Record<string,unknown>|undefined;
 let inputPath='';
 let observations:ObservationDelivery|null=null;
 let physicalHistory=new PhysicalHistory();
@@ -27,7 +27,21 @@ function accountExport(bytes:number,start:number){
   bridge.record('destination_write',bytes,start);
   bridge.call('account_export',{length:bytes});
 }
-function invoke(name:string){last={};(instance.exports[name] as ()=>number)();if(last.error)throw new Error(String(last.error));return last;}
+function invoke(name:string){
+  last=undefined;
+  try{
+    (instance.exports[name] as ()=>number)();
+    const reply:Record<string,unknown>=last??{};
+    if(reply.error)throw new Error(String(reply.error));
+    return reply;
+  }finally{last=undefined;}
+}
+function invokeJob(name:string,job:Job){
+  try{
+    root.contents.set('job.json',new MemoryFile(encoder.encode(JSON.stringify(job)),{readonly:true}));
+    return invoke(name);
+  }finally{root.contents.delete('job.json');}
+}
 scope.onmessage=async({data})=>{
   const {id,type}=data;
   if(type==='compression-init'){await initCompression(data.module);return;}
@@ -73,8 +87,7 @@ scope.onmessage=async({data})=>{
         const file:File=data.file;
         const path='input'+(file.name.match(/\.[^.]+$/)?.[0]??'.csv');
         root.contents.set(path,new DiskFile(bridge,file));
-        root.contents.set('job.json',new MemoryFile(encoder.encode(JSON.stringify({...data.job,input:'/'+path})),{readonly:true}));
-        invoke('chopper_formula_scan');
+        invokeJob('chopper_formula_scan',{...data.job,input:'/'+path});
         return;
       }
       compression.init(loaded.module,instance.exports);
@@ -111,7 +124,6 @@ scope.onmessage=async({data})=>{
       }
       const job:Job={...data.job,input:'/'+inputPath,output:'/results',resources:{...data.job.resources,temp_dir:'/tmp'}};
       root.contents.set('observe',new MemoryFile(new Uint8Array([observations?1:0]),{readonly:true}));
-      root.contents.set('job.json',new MemoryFile(encoder.encode(JSON.stringify(job)),{readonly:true}));
       root.contents.delete('auto-observations.json');
       root.contents.delete('preview-observations.json');
       if(type==='run-direct'&&data.previewObservations){
@@ -125,7 +137,7 @@ scope.onmessage=async({data})=>{
         &&job.resources.workers!==1&&data.file.size>=2*1024*1024){
         await compression.begin(job.resources.workers);
       }
-      result=invoke(type==='profile'?'chopper_analyze':type==='preview'?'chopper_preview':type==='sniff'?'chopper_sniff':'chopper_run');
+      result=invokeJob(type==='profile'?'chopper_analyze':type==='preview'?'chopper_preview':type==='sniff'?'chopper_sniff':'chopper_run',job);
       compression.close();
     }
     if(type==='run-direct'){
