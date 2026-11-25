@@ -126,7 +126,7 @@ export class DiskFile extends Inode {
     const fd=new DiskFd(this);if(flags&wasi.FDFLAGS_APPEND)fd.position=this.size;
     return {ret:0,fd_obj:fd};
   }
-  read(offset:number,length:number):Uint8Array {
+  read(offset:number,length:number,borrowBridgeSlot=false):Uint8Array {
     length=Math.min(length,this.bridge.bytes.length,Math.max(0,this.size-offset));
     if(!length)return new Uint8Array();
     if(this.source) {
@@ -147,7 +147,7 @@ export class DiskFile extends Inode {
       return bytes.subarray(0,length);
     }
     const n=this.call('read',{offset,length});
-    return this.bridge.bytes.slice(0,n);
+    return borrowBridgeSlot?this.bridge.bytes.subarray(0,n):this.bridge.bytes.slice(0,n);
   }
   write(offset:number,data:Uint8Array):number {
     if(this.source)throw new Error('Input is read-only.');
@@ -174,7 +174,8 @@ class DiskFd extends Fd {
     this.position=pos;return this.fd_tell();
   }
   fd_read(size:number){const result=this.fd_pread(size,BigInt(this.position));this.position+=result.data.length;return result;}
-  fd_pread(size:number,offset:bigint){return {ret:0,data:this.file.read(Number(offset),size)};}
+  // The pinned WASI shim copies each iovec before reusing the bridge slot.
+  fd_pread(size:number,offset:bigint){return {ret:0,data:this.file.read(Number(offset),size,true)};}
   fd_write(data:Uint8Array){const result=this.fd_pwrite(data,BigInt(this.position));this.position+=result.nwritten;return result;}
   fd_pwrite(data:Uint8Array,offset:bigint){return {ret:0,nwritten:this.file.write(Number(offset),data)};}
 }

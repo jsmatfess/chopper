@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {Worker} from 'node:worker_threads';
+import {WASI,wasi} from '@bjorn3/browser_wasi_shim';
 import {build} from 'esbuild';
 const bundle=await build({entryPoints:['src/browser/fs.ts'],bundle:true,write:false,format:'esm',platform:'node'});
 const {DiskFile,DiskBridge}=await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString('base64')}`);
@@ -38,6 +39,62 @@ test('source read-ahead bounds physical reads and preserves seeks, partial reads
     file.path_open(0,0n,0).fd_obj.fd_read(4);
     assert.equal(reads.length,count+1,'closing the last descriptor releases read-ahead');
   } finally {globalThis.FileReaderSync=original;}
+});
+
+test('WASI copies a borrowed OPFS slot into each iovec before reuse',()=>{
+  const contents=Uint8Array.of(1,2,3,4,5,6,7,8);
+  let denied=false;
+  let reads=0;
+  const bridge=new DiskBridge({},new SharedArrayBuffer(16+8));
+  bridge.call=(operation,{offset,length}={})=>{
+    if(operation==='create')return 0;
+    assert.equal(operation,'read');
+    if(denied)throw new Error('storage denied');
+    const data=contents.subarray(offset,offset+length);
+    reads++;
+    bridge.bytes.fill(0xbb);
+    bridge.bytes.set(data);
+    return data.length;
+  };
+  const file=new DiskFile(bridge);
+  file.size=contents.length;
+  const fd=file.path_open(0,0n,0).fd_obj;
+  const owned=file.read(6,2);
+  assert.ok(owned.buffer instanceof ArrayBuffer);
+  assert.equal(fd.fd_pread(3,0n).data.buffer,bridge.bytes.buffer);
+
+  const shim=new WASI([],[],[fd]);
+  const memory=new WebAssembly.Memory({initial:1});
+  shim.initialize({exports:{memory}});
+  const view=new DataView(memory.buffer), bytes=new Uint8Array(memory.buffer);
+  for(const [index,address] of [24,32].entries()){
+    view.setUint32(index*8,address,true);
+    view.setUint32(index*8+4,3,true);
+  }
+  const {fd_read,fd_pread}=shim.wasiImport;
+  assert.equal(fd_read(0,0,2,16),0);
+  assert.equal(view.getUint32(16,true),6);
+  assert.deepEqual([...bytes.subarray(24,27),...bytes.subarray(32,35)],[1,2,3,4,5,6]);
+  assert.equal(fd_pread(0,0,2,2n,16),0);
+  assert.equal(view.getUint32(16,true),6);
+  assert.deepEqual([...bytes.subarray(24,27),...bytes.subarray(32,35)],[3,4,5,6,7,8]);
+  assert.equal(fd.fd_tell().offset,6n);
+  assert.deepEqual([...owned],[7,8]);
+
+  bytes.fill(0xaa,24,35);
+  const beforeShort=reads;
+  assert.equal(fd_read(0,0,2,16),0);
+  assert.equal(view.getUint32(16,true),2);
+  assert.deepEqual([...bytes.subarray(24,27),...bytes.subarray(32,35)],[7,8,0xaa,0xaa,0xaa,0xaa]);
+  assert.equal(fd_read(0,0,2,16),0);
+  assert.equal(view.getUint32(16,true),0);
+  assert.equal(reads,beforeShort+1,'short read stops at the first iovec and EOF skips the bridge');
+
+  fd.fd_seek(0n,wasi.WHENCE_SET);
+  denied=true;
+  assert.throws(()=>fd_read(0,0,2,16),/storage denied/);
+  assert.equal(fd.fd_tell().offset,0n);
+  fd.fd_close();
 });
 
 for(const status of [1,-1]) test(`storage bridge waits for completion before ${status===1?'returning bytes':'reporting storage errors'}`,async()=>{
