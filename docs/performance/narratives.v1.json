@@ -9060,6 +9060,19 @@
       "original_section_sha256": "2e6e983f50bab7931b3146df1d96466e0f20ecdc41d0384a85176e768f5aa32a",
       "sha256": "3f154b58e963247b8d8f720417d8bc3cd03e2f4658d40a77ca448483d1a689db",
       "relocations": []
+    },
+    {
+      "id": "uniform-sort-retention-at-a-fixed-budget-2026-11-25",
+      "title": "Uniform sort retention at a fixed budget (2026-11-25)",
+      "anchor": "uniform-sort-retention-at-a-fixed-budget-2026-11-25",
+      "path": "docs/performance/investigations/uniform-sort-retention-at-a-fixed-budget-2026-11-25.md",
+      "topic": "external-and-resident-shuffle",
+      "legacy_anchors": [
+        "uniform-sort-retention-at-a-fixed-budget-2026-11-25"
+      ],
+      "original_section_sha256": "00848da8640d8f3acba43ef1b205b3c7bbd21e5a095bb879cbfddf00eec2ab99",
+      "sha256": "00a5b5fe2312cd595f378b2185be4afc4ee1cca19f5b036fd0aab7194d3e9d83",
+      "relocations": []
     }
   ],
   "migrated_count": 193

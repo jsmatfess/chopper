@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "0ad2020f40a0f45a2b78d1657b49bf1f735037d803e32fb339b48675f5afa191",
+  "catalog_sha256": "1cd30be6af062b3df7565979d781bdc08d35198e54608e2cd74a720afa6cbf10",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -8125,6 +8125,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/uniform-sort-retention-screen-2026-11-25.json",
+      "source_sha256": "88f54cb48dcb6597c7db6c67d4f312f08abb5c04cfc4428acbf22831e0e9c419",
+      "aliases": [
+        "docs/benchmarks/uniform-sort-retention-screen-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/shuffle-swarm-adaptive-native-2026-11-15.jsonl",
       "source_sha256": "892212d4bbe72dcd7bfa7fde7379e83494c5d4238672cfee5ccd4e523f2d11dc",
       "aliases": [
@@ -10214,6 +10227,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "ad05eaf234d56cb829df1c2b99f8cd7c8a62bb03889d526d072b95a7d5f79ce8",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/execution-graph-diagnostic-001-summary-2026-11-05.json",
       "source_sha256": "ad107efe97d102009bedcf154af1683266b486ce63086f225d114eb2eb6917e4",
       "aliases": [
@@ -11591,19 +11617,6 @@
         "contract-duration": 23
       },
       "coverage": "adapted"
-    },
-    {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "c42e6cb6401f8333ab4afd0872ebe1e13ed08281dc6daaee8942de490b50cfcd",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/csv-marker-cache-2026-11-05-native.py",

@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "dc475e3549f0b8f91bb2fb2da5d8b7cf89cc83627ce3c8147a1775571ba996c2",
+  "analysis_script_sha256": "8f6500cafc852708b2c275d2ca9ce1af82b46da97cd9c779e3796bb4ed88ce5e",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "bcd1c4f4b96112ab021a7bc07e053eef68c6ff3832b47f107f3c764dcd1d9e7c"
+    "sha256": "0fae5e374cfbd999040550447aa1539d098c37ca9581e570d0cc3f8f0ca117e5"
   },
   "families": [
     "adaptive-routing",
@@ -4736,6 +4736,23 @@
         "topic": "profiling"
       },
       "family": "profiling"
+    },
+    {
+      "title": "Uniform sort retention at a fixed budget (2026-11-25)",
+      "evidence": "docs/performance.md#uniform-sort-retention-at-a-fixed-budget-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/uniform-sort-retention-screen-2026-11-25.json"
+      ],
+      "scripts": [
+        "scripts/benchmark-data-movement.py",
+        "scripts/verify-shuffle-swarm.py"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/uniform-sort-retention-at-a-fixed-budget-2026-11-25.md",
+        "sha256": "00a5b5fe2312cd595f378b2185be4afc4ee1cca19f5b036fd0aab7194d3e9d83",
+        "topic": "external-and-resident-shuffle"
+      },
+      "family": "external-and-resident-shuffle"
     }
   ],
   "sources": [
@@ -57342,6 +57359,50 @@
       ],
       "record_bounds_by_kind": {
         "uniform_balanced_cross_tool_40gib": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/uniform-sort-retention-screen-2026-11-25.json",
+      "sha256": "88f54cb48dcb6597c7db6c67d4f312f08abb5c04cfc4428acbf22831e0e9c419",
+      "bytes": 29841,
+      "format": "json",
+      "record_counts": {
+        "derived_screen_summary": 1
+      },
+      "fields": [
+        "base_commit",
+        "build_sha256",
+        "decision",
+        "fixture",
+        "measured_stats",
+        "median_paired_seconds_saved",
+        "paired_seconds_saved",
+        "request",
+        "runner_receipts",
+        "runtime",
+        "source_pins",
+        "thresholds",
+        "toolchain",
+        "type",
+        "verified_attempts"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#uniform-sort-retention-at-a-fixed-budget-2026-11-25"
+      ],
+      "families": [
+        "external-and-resident-shuffle"
+      ],
+      "record_bounds_by_kind": {
+        "derived_screen_summary": {
           "first": {
             "pointer": ""
           },

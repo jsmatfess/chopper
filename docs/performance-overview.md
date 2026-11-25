@@ -13,7 +13,7 @@ Measured outcome, decision and delivery are independent fields. Favorable eviden
 does not imply default activation. Scope applies to the recorded builds/workloads;
 current contracts remain authoritative. Older baselines stay in the historical log.
 
-Registry coverage: 74 records; latest recorded decision 2026-11-24.
+Registry coverage: 75 records; latest recorded decision 2026-11-25.
 16 superseded records remain queryable but are omitted below.
 
 ## Delivered in default builds
@@ -68,6 +68,7 @@ Registry coverage: 74 records; latest recorded decision 2026-11-24.
 
 | Decision record | Outcome and scope | Interpretation |
 | --- | --- | --- |
+| [Keep the current random-key sorter target after the fixed-budget screen](performance/decisions/uniform-sort-retention-at-a-fixed-budget-2026-11-25.json) | inconclusive; native-linux. Both builds spill twice. Median wall time is 0.927 seconds at the quarter target and 0.952 seconds at three eighths. Peak tracked reservations rise by about 62 MiB. | [Evidence](performance/investigations/uniform-sort-retention-at-a-fixed-budget-2026-11-25.md) |
 | [Reject broad counted Balanced digest overlap](performance/decisions/counted-balanced-digest-overlap-2026-11-22.json) | mixed; native-linux. The isolated 512-byte fixture benefits, but narrower and very-wide records miss the wall target and a 4 KiB pair reverses. Preserve the prototype as rejected evidence. | [Evidence](performance/investigations/input-prefetch-native-publication-and-digest-overlap-2026-11-22.md) |
 | [Screen larger final merge application buffers](performance/decisions/terminal-uniform-merge-read-buffers-2026-11-21.json) | unfavorable; native-linux. 256 KiB buffers increased complete-job elapsed 4.81% and CPU 4.69%. All three pairs regressed on both measures. Managed spill bytes and merge count matched. File-cache refaults rose 11.58%. | [Evidence](performance/investigations/terminal-uniform-merge-read-buffers-2026-11-21.md) |
 | [Reject suppressed kernel read-ahead on wide Uniform spill readers](performance/decisions/terminal-uniform-kernel-read-ahead-2026-11-21.json) | unfavorable; native-linux. Median elapsed rose 57.29% and process CPU rose 6.34%. File-cache refault events fell 92.74% with unchanged managed spill traffic. Removed the opt-in candidate. | [Evidence](performance/investigations/terminal-uniform-kernel-read-ahead-2026-11-21.md) |

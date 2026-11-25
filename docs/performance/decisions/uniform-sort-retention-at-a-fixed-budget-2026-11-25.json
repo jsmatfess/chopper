@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "uniform-sort-retention-at-a-fixed-budget-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Keep the current random-key sorter target after the fixed-budget screen",
+  "subsystem": "resources",
+  "question": "Does three eighths of a 512 MiB job budget avoid the Uniform sorter spill for the synthetic Balanced consumer?",
+  "disposition": "block-promotion",
+  "outcome": "inconclusive",
+  "delivery": "unapplied",
+  "summary": "Both builds spill twice. Median wall time is 0.927 seconds at the quarter target and 0.952 seconds at three eighths. Peak tracked reservations rise by about 62 MiB.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "524,291 synthetic rows, plain Uniform Shuffle followed by Balanced(8), 512 MiB, one worker, WSL2 ext4."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Three matched measured pairs and both warmups pass independent field and row conservation, exact quotas, lineage, manifest, byte and row caps, and workspace cleanup."
+  },
+  "limitations": [
+    "Neither arm reached resident execution. The initial runner invalidation is recorded separately and excluded from these samples.",
+    "One synthetic shape on one WSL host with uncontrolled warm cache. Random runs are independently verified and use distinct permutations."
+  ],
+  "exclusions": [
+    "Fisher\u2013Yates, browser, native Windows, physical-device I/O and lower-headroom and competing-owner safety."
+  ],
+  "reopen_when": "Derive a plausible in-budget resident boundary from retained rows and overlap, then test matched jobs with meaningful absolute elapsed benefit and separate admission controls.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#uniform-sort-retention-at-a-fixed-budget-2026-11-25",
+      "sha256": "00848da8640d8f3acba43ef1b205b3c7bbd21e5a095bb879cbfddf00eec2ab99"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/uniform-sort-retention-screen-2026-11-25.json",
+      "sha256": "88f54cb48dcb6597c7db6c67d4f312f08abb5c04cfc4428acbf22831e0e9c419"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/resource-policy-research.md"
+  ]
+}
