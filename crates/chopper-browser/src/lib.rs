@@ -113,13 +113,6 @@ mod reactor {
         )
     }
     #[no_mangle]
-    pub extern "C" fn chopper_columns() -> i32 {
-        report((|| {
-            let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
-            engine::input_columns(&job)
-        })())
-    }
-    #[no_mangle]
     pub extern "C" fn chopper_preview() -> i32 {
         report((|| {
             let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;

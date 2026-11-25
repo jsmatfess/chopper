@@ -662,20 +662,6 @@ impl Context {
     pub fn remaining_temp(&self) -> u64 {
         self.budget.maximum.saturating_sub(self.used())
     }
-    pub fn map_batch<T: Sync, R: Send>(
-        &self,
-        items: &[T],
-        f: impl Fn(&T) -> R + Sync + Send,
-    ) -> Vec<R> {
-        #[cfg(not(target_os = "wasi"))]
-        {
-            self.pool.install(|| items.par_iter().map(f).collect())
-        }
-        #[cfg(target_os = "wasi")]
-        {
-            items.iter().map(f).collect()
-        }
-    }
     /// Run already-admitted batch slots without allocating a collected result Vec.
     pub(crate) fn for_each_batch<T: Send>(
         &self,

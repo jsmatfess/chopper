@@ -63,7 +63,7 @@ This research neither reruns nor expands that terminal study. [Current parser][C
 
 Chopper already creates a job-local native Rayon pool, with resolved worker count
 and 1-MiB thread stacks. `for_each_batch` executes admitted mutable slots without
-collecting another result vector; `map_batch` collects one. Reusing this pool is
+collecting another result vector. Reusing this pool is
 the relevant native seam. The optional profile implementation is only a precedent
 for admitted ordered slots: it parses serially and parallelizes hashes in its own
 profile pool, not Run ingestion. [Context/pool methods][C-storage],

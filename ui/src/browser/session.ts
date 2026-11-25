@@ -1,4 +1,4 @@
-import {sourceIdentity,resultOrigin,ownedResult,belongsToSource,type ResultOrigin,type OwnedResult,type RunAcknowledgement} from '../result-ownership';
+import {sourceIdentity,resultOrigin,ownedResult,belongsToSource,type OwnedResult,type RunAcknowledgement} from '../result-ownership';
 import {verifyPublication,type VerifiedPublication} from './publication';
 import type {Job,State,Analysis,InputProfile} from '../app';
 import {ExecutionHistory,type Observation} from './execution-history';
@@ -281,7 +281,7 @@ export class BrowserLifecycle {
       await this.setup(session.start(),current);
       return session.request(path,{preview:data});
     }
-    if(path==='columns'||path==='preview'||path==='sniff'){
+    if(path==='preview'||path==='sniff'){
       data=structuredClone(data);
       if(!this.input)throw new Error('Choose an input file with Browse to load its columns.');
       if(this.active())throw new Error('Wait for the active job to finish before loading columns.');

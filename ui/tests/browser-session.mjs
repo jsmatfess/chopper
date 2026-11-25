@@ -146,9 +146,9 @@ test('request send failure retires the failed Run; cancellation rejects every pe
   assert.deepEqual(await h.api('run-direct',job()),{dispatched:false});await tick();
   assert.equal(h.lifecycle.snapshot().status,'failed');assert.match(h.lifecycle.snapshot().error,/send failed/);assert.equal(h.locks,0);
   fail=false;
-  const a=h.api('columns',job()),b=h.api('sniff',job());
+  const a=h.api('preview',job()),b=h.api('sniff',job());
   const settled=Promise.allSettled([a,b]);await tick();
-  assert.equal(h.workers.at(-1).messages.filter(m=>['columns','sniff'].includes(m.type)).length,2);
+  assert.equal(h.workers.at(-1).messages.filter(m=>['preview','sniff'].includes(m.type)).length,2);
   await h.api('cancel');
   for(const result of await settled){assert.equal(result.status,'rejected');assert.match(String(result.reason),/Cancelled/);}
   assert.equal(h.locks,0);
@@ -179,8 +179,9 @@ test('retired same-Run facts enrich retained history without acknowledging a rep
 
 test('defaults, inspection and profiling reuse a session and invalidate profile cache for a new file',async()=>{
   const h=harness();await h.api('defaults');assert.equal(h.workers.length,2);
-  const inspect=h.api('columns',job());await tick();let request=h.workers.at(-1).messages.at(-1);
-  h.workers.at(-1).reply({id:request.id,result:{columns:['a']}});assert.deepEqual(await inspect,{columns:['a']});
+  const inspect=h.api('preview',job());await tick();let request=h.workers.at(-1).messages.at(-1);
+  const preview={columns:1,header:['a'],preview:[]};
+  h.workers.at(-1).reply({id:request.id,result:preview});assert.deepEqual(await inspect,preview);
   for(const reset of [true,false,true]){
     if(reset&&h.lifecycle.snapshot().status==='profiled')h.lifecycle.selectInput({name:'new.csv'});
     await h.api('profile',job());request=h.workers.at(-1).messages.at(-1);assert.equal(request.resetProfile,reset);
@@ -189,7 +190,7 @@ test('defaults, inspection and profiling reuse a session and invalidate profile 
   assert.equal(h.workers.length,2);assert.equal(h.locks,1);await h.api('cancel');assert.equal(h.locks,0);
 });
 
-for(const type of ['profile','columns','preview','sniff']){
+for(const type of ['profile','preview','sniff']){
   test(`${type} freezes submitted settings across startup waits`,async()=>{
     const gate=deferred(),h=harness({effects:{estimate:()=>gate.promise}}),submitted=job();
     const pending=h.api(type,submitted);submitted.limits.rows=999;gate.resolve({quota:1024**3});await tick();
@@ -231,7 +232,7 @@ for(const phase of ['idle','profiled'])for(const workerType of ['storage','engin
   });
 }
 
-for(const type of ['columns','sniff'])for(const workerType of ['storage','engine']){
+for(const type of ['preview','sniff'])for(const workerType of ['storage','engine']){
   test(`${workerType} failure during ${type} rejects inspection and permits a replacement`,async()=>{
     const h=harness();await h.api('defaults');
     const pending=h.api(type,job()),rejection=assert.rejects(pending,/inspection worker died/);await tick();
@@ -244,7 +245,7 @@ for(const type of ['columns','sniff'])for(const workerType of ['storage','engine
   });
 }
 
-for(const type of ['columns','sniff']){
+for(const type of ['preview','sniff']){
   test(`${type} send failure retires its session`,async()=>{
     const h=harness({sendFailure:(_,data)=>data.type===type});await h.api('defaults');
     await assert.rejects(h.api(type,job()),/send failed/);await tick();
@@ -305,11 +306,11 @@ test('Run freezes source and destination before permissions and never reuses ana
   assert.equal(request.output,fresh);assert.deepEqual(request.job,changed);await h.api('cancel');assert.equal(h.locks,0);
 });
 
-for(const type of ['columns','preview'])test(`${type} freezes its selected source before startup`,async()=>{
+test('preview freezes its selected source before startup',async()=>{
   const gate=deferred(),h=harness({effects:{estimate:()=>gate.promise}});
-  const pending=h.api(type,job());h.lifecycle.selectInput({name:'new.csv'});gate.resolve({quota:1024**3});await tick();
+  const pending=h.api('preview',job());h.lifecycle.selectInput({name:'new.csv'});gate.resolve({quota:1024**3});await tick();
   const engine=h.workers.at(-1),request=engine.messages.at(-1);assert.equal(request.file,h.file);
-  engine.reply({id:request.id,result:{columns:[]}});await pending;await h.api('cancel');assert.equal(h.locks,0);
+  engine.reply({id:request.id,result:{columns:0,preview:[]}});await pending;await h.api('cancel');assert.equal(h.locks,0);
 });
 
  test('startup does not turn a quota estimate into a default temporary-space cap',async()=>{

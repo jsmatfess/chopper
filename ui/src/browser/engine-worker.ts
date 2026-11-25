@@ -83,7 +83,7 @@ scope.onmessage=async({data})=>{
       root.contents.set('formula-preview.json',new MemoryFile(encoder.encode(JSON.stringify(data.preview)),{readonly:true}));
       try{result=invoke('chopper_formula_preview');}
       finally{root.contents.delete('formula-preview.json');}
-    } else if(type==='run-direct'||type==='columns'||type==='preview'||type==='sniff'||type==='profile'){
+    } else if(type==='run-direct'||type==='preview'||type==='sniff'||type==='profile'){
       physicalHistory=new PhysicalHistory();stages=new StageCompletions();physicalLastSent=0;
       observations=type==='run-direct'&&data.observationCredit?new ObservationDelivery(data.observationRun,new Int32Array(data.observationCredit),message=>scope.postMessage(message)):null;
       let destinationStarted=false;
@@ -125,7 +125,7 @@ scope.onmessage=async({data})=>{
         &&job.resources.workers!==1&&data.file.size>=2*1024*1024){
         await compression.begin(job.resources.workers);
       }
-      result=invoke(type==='profile'?'chopper_analyze':type==='columns'?'chopper_columns':type==='preview'?'chopper_preview':type==='sniff'?'chopper_sniff':'chopper_run');
+      result=invoke(type==='profile'?'chopper_analyze':type==='preview'?'chopper_preview':type==='sniff'?'chopper_sniff':'chopper_run');
       compression.close();
     }
     if(type==='run-direct'){
@@ -149,7 +149,7 @@ scope.onmessage=async({data})=>{
         });
       }
       result={...(result as object),analysis};
-    } else if(!['init','columns','preview','sniff','profile','formula-preview'].includes(type))throw new Error('Unknown engine request');
+    } else if(!['init','preview','sniff','profile','formula-preview'].includes(type))throw new Error('Unknown engine request');
     if(bridge?.profiling)scope.postMessage({profile:{phase:type==='run-direct'?'export':type,metrics:bridge.metrics}});
     collectPhysical(true);
     scope.postMessage({id,result,observationFinal:observations?.snapshot(),observationRun:data.observationRun});
