@@ -68,7 +68,7 @@ mod reactor {
     #[no_mangle]
     pub extern "C" fn chopper_analyze() -> i32 {
         report((|| {
-            let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
+            let job = read_job()?;
             validate_resources(&job)?;
             PROFILE.with(|p| {
                 p.borrow_mut().profile(
@@ -115,7 +115,7 @@ mod reactor {
     #[no_mangle]
     pub extern "C" fn chopper_preview() -> i32 {
         report((|| {
-            let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
+            let job = read_job()?;
             engine::input_preview(&job)
         })())
     }
@@ -123,7 +123,7 @@ mod reactor {
     pub extern "C" fn chopper_formula_scan() -> i32 {
         use std::io::{Read, Write};
         let result = (|| {
-            let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
+            let job = read_job()?;
             engine::sample_formula_rows(
                 &job,
                 |batch| {
@@ -153,7 +153,7 @@ mod reactor {
     #[no_mangle]
     pub extern "C" fn chopper_sniff() -> i32 {
         report((|| {
-            let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
+            let job = read_job()?;
             engine::sniff_csv(&job)
         })())
     }
@@ -166,7 +166,7 @@ mod reactor {
         }
 
         report((|| {
-            let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
+            let job = read_job()?;
             validate_resources(&job)?;
             fn emit(value: impl serde::Serialize, prefix: &str) -> bool {
                 // Fixed stack serialization; no growing JSON/value allocation.
@@ -239,6 +239,11 @@ mod reactor {
             })
         })())
     }
+    fn read_job() -> anyhow::Result<Job> {
+        let reader = std::io::BufReader::with_capacity(8 * 1024, std::fs::File::open("/job.json")?);
+        Ok(serde_json::from_reader(reader)?)
+    }
+
     fn validate_resources(job: &Job) -> anyhow::Result<()> {
         anyhow::ensure!(
             job.resources.memory_mb.as_mib().is_none_or(|mb| mb <= 2048),
