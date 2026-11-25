@@ -171,7 +171,11 @@ FileSystemFileHandle.prototype.createWritable=async function(...args){
     if(mode==='write-error' && name.endsWith('00000002.csv'))throw new DOMException('Injected destination write error','QuotaExceededError');
     if(mode==='marker-error' && name==='CHOPPER-COMPLETE.json')throw new Error('Injected marker write error');
     if(mode.endsWith('marker-mismatch-error')&&name==='CHOPPER-COMPLETE.json'){
-      return write(JSON.stringify({complete:true,files:999,engine:'chopper-browser',version:1}));
+      const text=new TextDecoder().decode(data);
+      const wrongCount=text.replace(/("files":)([0-9])/,(_,field,digit)=>field+(digit==='9'?'8':'9'));
+      const bytes=new TextEncoder().encode(wrongCount);
+      if(wrongCount===text||bytes.length!==data.byteLength)throw new Error('Expected a same-length marker mismatch');
+      return write(bytes);
     }
     if(mode==='cancel' && name.endsWith('00000002.csv')){
       await (await navigator.storage.getDirectory()).getFileHandle('direct-contract-inflight',{create:true});
@@ -226,6 +230,7 @@ FileSystemFileHandle.prototype.getFile=async function(...args){
         return true;
       });
       if(mode.endsWith('error')&&mode!=='late-input-error')assert.match(await page.locator('#error').textContent(),/Injected|Could not verify completion marker/);
+      if(mode.endsWith('marker-mismatch-error'))assert.match(await page.locator('#error').textContent(),/Could not verify completion marker: content did not match/);
       const result=await page.evaluate(async()=>{
         const root=await navigator.storage.getDirectory(),parent=await root.getDirectoryHandle(window.parentName);
         const folders=[];

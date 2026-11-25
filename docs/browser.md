@@ -1360,7 +1360,10 @@ an exact match returns a destination-bound publication receipt. The page validat
 its folder, output path, version and file count before obtaining a typed verified
 publication and entering Complete. Missing, malformed or stale receipts fail the
 Run. Readback failure can leave valid files and a marker on disk, but cannot
-claim verified success. Cleanup checks ownership and preserves results with a committed marker.
+claim verified success. Cleanup compares directory handles with `isSameEntry()`
+and preserves results with a committed marker. Chromium OPFS can report the same
+entry after a directory is deleted and recreated at the same path, so the handle
+comparison alone cannot protect that replacement from cleanup.
 Cancellation and cleanup retain their existing policies, including a retained
 same-Run confirmation without resurrecting cancelled job state.
 

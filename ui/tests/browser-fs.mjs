@@ -101,7 +101,7 @@ test('publication counts only successful closes and validates the count before c
   await assert.rejects(publication.finish(2,()=>{}),/still open or missing/);
 });
 
-test('publication cleanup leaves a replacement folder in place',async()=>{
+test('publication cleanup skips a folder when isSameEntry returns false',async()=>{
   const replacement={getFileHandle:()=>assert.fail('must only inspect the owned folder')};
   const directory={isSameEntry:async entry=>entry===directory};
   let current;
