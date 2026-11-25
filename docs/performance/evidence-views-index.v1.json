@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "b51b34eb5cd3b5c89a5ff71fcfb7dae1c0b83db5e1ff2ea43678bff843095d70",
+  "catalog_sha256": "f721df01348b0e6829455003ee7ec9d17615148bf884228883d5615ab90e617b",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -4370,6 +4370,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/wasi-run-job-handoff-timing-2026-11-25.json",
+      "source_sha256": "4a771aeeb8e7d1123642879146a3ea4228389a71e48b4b43f2e24bbd19d78f9c",
+      "aliases": [
+        "docs/benchmarks/wasi-run-job-handoff-timing-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/compact-multilevel-2026-10-13.jsonl",
       "source_sha256": "4a7d1418d32aca34e8a6918c27cc2b57d86d05e4b0fbe4dd8bd1478c9c441d4a",
       "aliases": [
@@ -4410,6 +4423,19 @@
         "docs/benchmarks/shuffle-partition-trap-global-control-2026-10-16.jsonl"
       ],
       "format": "jsonl",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/same-origin-uniform-run-overlap-2026-11-25.json",
+      "source_sha256": "4b2afe2c45a73384709d02cdc12e58bbc3cf8e6c8b48a260b877c209814a0df9",
+      "aliases": [
+        "docs/benchmarks/same-origin-uniform-run-overlap-2026-11-25.json"
+      ],
+      "format": "json",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -13096,19 +13122,6 @@
       "coverage": "adapted"
     },
     {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "d6fcf440f616ee0bc7abc74968207e4b0692578ec76166a3b9e99abc98276945",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
       "source": "docs/benchmarks/analysis-preview-owner-linux-validation-2026-10-23.json",
       "source_sha256": "d6fd3a0bc904d0bef1856eea5e87077c48da27197d64f37e34bdffbe5c397b58",
       "aliases": [
@@ -13210,6 +13223,19 @@
         "measurement": 2
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "d866f5365d847321f29a4678a848395122b390720e65011fb494eb6d1ca050c6",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/compact-external-multilevel-2026-10-14.jsonl",
@@ -15566,6 +15592,12 @@
       "section": "docs/validation.md#pr-22-ci-follow-up-2026-11-01",
       "title": "PR 22 CI follow-up (2026-11-01)",
       "section_sha256": "abb54ca76f2d82fd1e8591dfbf4d990854916b12aaf6db8a7dcf6f05e0d2b555",
+      "status": "not-inferred-from-prose"
+    },
+    {
+      "section": "docs/validation.md#browser-opfs-workspace-deletion-conflict",
+      "title": "Browser OPFS workspace deletion conflict",
+      "section_sha256": "da09ac0e81e62eb88f4c462a27e7480f33aa0444319974556005f46b21fa3749",
       "status": "not-inferred-from-prose"
     },
     {

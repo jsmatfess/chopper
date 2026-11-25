@@ -1,0 +1,265 @@
+{
+  "type": "paired-summary",
+  "issue": 79,
+  "scope": "Bundled Chromium on WSL Linux through usable same-origin OPFS publication and workspace cleanup",
+  "hosted_runtime": "156.0.8078.4",
+  "baseline": {
+    "source_commit": "2be30f391ad46bfde86bdf478301ffe27c26b84f",
+    "wasm_sha256": "752b17ba6e0ffaf3d0d6f9e82cb0d5a84f3ab9e6ebfa758aa979bb29a6726208"
+  },
+  "candidate": {
+    "source_commit": "f3597f11a064e35c38c9707a0f62806f1372e25c",
+    "verified_contract_commit": "f29d13e570e9a0f2896a33923859df980aad849d",
+    "wasm_sha256": "e99da52f1f0e61ae031e4680a6ba6a9af97506d7ab6fe7ac6c0cb45c684a033c"
+  },
+  "shared_workers_sha256": {
+    "engine-worker": "8a1f2943507835c200dd080bbe3221e9e1a4d707dc96c4062ddb097ce7127908",
+    "storage-worker": "a357a9e3e8d3ba21c2e9c08f143712f56f1deb5357c1d93454002950c94ab0ac"
+  },
+  "chromium_executable_sha256": "4fa61f0ba0b4f89b7bec242c32ca16d3bccf69dbfef0651924a9ba8fede5f9d6",
+  "micro_gates": {
+    "max_compact_added_seconds": 0.03,
+    "max_large_added_seconds": 0.05,
+    "file_reads_equal": true,
+    "exact_export_caps_and_error_parity": true
+  },
+  "micro": {
+    "pairs": {
+      "compact": [
+        {
+          "baseline": 0.08732500004768372,
+          "candidate": 0.08860500001907348,
+          "saved": -0.0012799999713897642
+        },
+        {
+          "candidate": 0.08531500005722045,
+          "baseline": 0.07679500007629395,
+          "saved": -0.008519999980926507
+        },
+        {
+          "baseline": 0.07430499982833862,
+          "candidate": 0.08520499992370606,
+          "saved": -0.010900000095367443
+        }
+      ],
+      "large": [
+        {
+          "baseline": 0.14185000014305116,
+          "candidate": 0.1515550000667572,
+          "saved": -0.009704999923706048
+        },
+        {
+          "candidate": 0.15570500016212463,
+          "baseline": 0.14145500016212464,
+          "saved": -0.014249999999999985
+        },
+        {
+          "baseline": 0.1413600001335144,
+          "candidate": 0.16618499994277955,
+          "saved": -0.02482499980926514
+        }
+      ]
+    },
+    "reads": {
+      "baseline": {
+        "calls": 128,
+        "bytes": 1034770
+      },
+      "candidate": {
+        "calls": 128,
+        "bytes": 1034770
+      }
+    },
+    "errors": {
+      "baseline": "Error: unknown field `unexpected_job_key`, expected one of `version`, `input`, `output`, `zip_member`, `input_csv`, `output_csv`, `compression`, `operations`, `limits`, `resources`, `full_shuffle_rng`, `full_shuffle_algorithm`, `calculated_columns` at line 1 column 1034791",
+      "candidate": "Error: unknown field `unexpected_job_key`, expected one of `version`, `input`, `output`, `zip_member`, `input_csv`, `output_csv`, `compression`, `operations`, `limits`, `resources`, `full_shuffle_rng`, `full_shuffle_algorithm`, `calculated_columns` at line 1 column 1034791"
+    },
+    "median_added_seconds": {
+      "compact": 0.008519999980926507,
+      "large": 0.014249999999999985
+    },
+    "passes": true
+  },
+  "guard_fixture": {
+    "type": "fixture",
+    "name": "shuffle-large",
+    "rows": 800000,
+    "groups": 8,
+    "operations": [
+      {
+        "type": "shuffle",
+        "strategy": "uniform"
+      }
+    ],
+    "payload_bytes": 240,
+    "bytes": 199888905,
+    "sha256": "88a17fab4636b32987631598c516a16dd87c02eaec4dbc660e68f3a1e66d6145"
+  },
+  "guard_gates": {
+    "both_arms_must_be_resident": true,
+    "maximum_pair_added_seconds": 0.8,
+    "maximum_median_added_seconds": 0.35
+  },
+  "guard": {
+    "type": "summary",
+    "pairs": [
+      {
+        "round": 0,
+        "baseline_seconds": 7.1004299998283384,
+        "candidate_seconds": 7.001629999876022,
+        "seconds_saved": 0.09879999995231614
+      },
+      {
+        "round": 1,
+        "baseline_seconds": 7.057244999885559,
+        "candidate_seconds": 6.969835000038147,
+        "seconds_saved": 0.08740999984741205
+      },
+      {
+        "round": 2,
+        "baseline_seconds": 6.98621499991417,
+        "candidate_seconds": 6.973110000133515,
+        "seconds_saved": 0.013104999780654936
+      }
+    ],
+    "median_seconds_saved": 0.08740999984741205,
+    "gate": {
+      "baseline_resident": true,
+      "candidate_resident": true,
+      "maximum_pair_added_seconds": true,
+      "median_added_seconds": true
+    },
+    "screen_passed": true
+  },
+  "guard_samples": [
+    {
+      "arm": "candidate",
+      "round": -1,
+      "warmup": true,
+      "elapsed_seconds": 7.003184999942779,
+      "output_files": 48,
+      "output_csv_bytes": 199889610,
+      "sort_runs": 0,
+      "merge_operations": 0,
+      "peak_workspace_reserved_bytes": 298954324,
+      "manifest_sha256": "6ac484453bac077dbd89e863ab55aff3f8e1fda4d4e781ba1d87ce51a4656e85",
+      "completion_marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad"
+    },
+    {
+      "arm": "baseline",
+      "round": -1,
+      "warmup": true,
+      "elapsed_seconds": 7.072804999828339,
+      "output_files": 48,
+      "output_csv_bytes": 199889610,
+      "sort_runs": 0,
+      "merge_operations": 0,
+      "peak_workspace_reserved_bytes": 298954120,
+      "manifest_sha256": "66c8600de01ef17e6e3f52ac2a8716bf702576dae5d15fe4e6c43aeedaa9c85f",
+      "completion_marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad"
+    },
+    {
+      "arm": "baseline",
+      "round": 0,
+      "warmup": false,
+      "elapsed_seconds": 7.1004299998283384,
+      "output_files": 48,
+      "output_csv_bytes": 199889610,
+      "sort_runs": 0,
+      "merge_operations": 0,
+      "peak_workspace_reserved_bytes": 298954120,
+      "manifest_sha256": "e754316180e86b61ac4ea86eb2bd40f097ec76f90530bf2cfb12aaabcff53dc4",
+      "completion_marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad"
+    },
+    {
+      "arm": "candidate",
+      "round": 0,
+      "warmup": false,
+      "elapsed_seconds": 7.001629999876022,
+      "output_files": 48,
+      "output_csv_bytes": 199889610,
+      "sort_runs": 0,
+      "merge_operations": 0,
+      "peak_workspace_reserved_bytes": 298954120,
+      "manifest_sha256": "5ad95b97ab7c6abc1daf31ceae4e91208bef64089af01d52d30ecc621b7da8b6",
+      "completion_marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad"
+    },
+    {
+      "arm": "candidate",
+      "round": 1,
+      "warmup": false,
+      "elapsed_seconds": 6.969835000038147,
+      "output_files": 48,
+      "output_csv_bytes": 199889610,
+      "sort_runs": 0,
+      "merge_operations": 0,
+      "peak_workspace_reserved_bytes": 298954120,
+      "manifest_sha256": "fcf43393d0e3e1cf9c3895b52d416533b7fd575b6f4cadb3ebfc2d57211dfcbe",
+      "completion_marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad"
+    },
+    {
+      "arm": "baseline",
+      "round": 1,
+      "warmup": false,
+      "elapsed_seconds": 7.057244999885559,
+      "output_files": 48,
+      "output_csv_bytes": 199889610,
+      "sort_runs": 0,
+      "merge_operations": 0,
+      "peak_workspace_reserved_bytes": 298954324,
+      "manifest_sha256": "ecd8b338c2a748c9eb41ebcdfedb52380a2dc284efddf3adccb269358f31df39",
+      "completion_marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad"
+    },
+    {
+      "arm": "baseline",
+      "round": 2,
+      "warmup": false,
+      "elapsed_seconds": 6.98621499991417,
+      "output_files": 48,
+      "output_csv_bytes": 199889610,
+      "sort_runs": 0,
+      "merge_operations": 0,
+      "peak_workspace_reserved_bytes": 298954324,
+      "manifest_sha256": "bc191c88a06e69acd3ca7b5a673bdad1669b9678eabc4aa41067c13d34a500e2",
+      "completion_marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad"
+    },
+    {
+      "arm": "candidate",
+      "round": 2,
+      "warmup": false,
+      "elapsed_seconds": 6.973110000133515,
+      "output_files": 48,
+      "output_csv_bytes": 199889610,
+      "sort_runs": 0,
+      "merge_operations": 0,
+      "peak_workspace_reserved_bytes": 298954120,
+      "manifest_sha256": "7d126adb8c0ba4e7afba1d24315bb7959041244c402d0ae0c47d6d648c70b4a9",
+      "completion_marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad"
+    }
+  ],
+  "resource_contract": {
+    "handoff": {
+      "local_shared_edges": 15,
+      "mismatched_pool_denied": true
+    },
+    "auto_targets_mib": [
+      2048,
+      256,
+      1024
+    ],
+    "virtual_direct": [
+      {
+        "bytes": 1048575,
+        "source_reads": 129
+      },
+      {
+        "bytes": 1048577,
+        "source_reads": 130
+      }
+    ]
+  },
+  "retained_receipt_sha256": {
+    "guard": "f18144f3ff0b280f3f969a595e073583bbd8cbba49c73fc33706c5878537c79b",
+    "config": "6dcbf54b494091d6b99f564e8241b0c53d0030c8d185f8a7f1a8dfb2bb8e6fd8"
+  }
+}

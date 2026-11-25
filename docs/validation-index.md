@@ -48,6 +48,7 @@ These routes index all existing validation sections without converting prose int
 | [Prepared hosted execution graph (2026-11-04)](validation.md#prepared-hosted-execution-graph-2026-11-04) | Not inferred from prose |
 | [Limits-only hosted execution graph (2026-11-03)](validation.md#limits-only-hosted-execution-graph-2026-11-03) | Not inferred from prose |
 | [PR 22 CI follow-up (2026-11-01)](validation.md#pr-22-ci-follow-up-2026-11-01) | Not inferred from prose |
+| [Browser OPFS workspace deletion conflict](validation.md#browser-opfs-workspace-deletion-conflict) | Not inferred from prose |
 | [First workload baseline harness (2026-10-31)](validation.md#first-workload-baseline-harness-2026-10-31) | Not inferred from prose |
 | [Portable Progress phase ownership (2026-10-28)](validation.md#portable-progress-phase-ownership-2026-10-28) | Not inferred from prose |
 | [Native static status source (2026-10-28)](validation.md#native-static-status-source-2026-10-28) | Not inferred from prose |

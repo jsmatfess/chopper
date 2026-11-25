@@ -57,6 +57,12 @@ before and after successful destination writes and [one real deletion refusal](v
 while a same-origin worker holds an open sync access handle. Device and installed
 browser acceptance have separate evidence requirements.
 
+The [same-origin two-Run comparison](performance/investigations/same-origin-hosted-uniform-run-overlap-2026-11-25.md)
+found that concurrent dispatch finished two guarded Uniform jobs 6.423
+seconds sooner at the paired median. Both policies completed every attempt.
+Keep independent dispatch in this measured case. A cross-instance lease
+requires a workload with evidence of a completion or resource benefit.
+
 ### Bounded ownership changes
 
 The completed [publication destination child](https://github.com/jsmatfess/chopper/issues/9)

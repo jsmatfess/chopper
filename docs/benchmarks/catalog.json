@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "21b7b2cdc95cef808a2e08871f2da12043a6edbf229faa4ffef269a8de3b8b92"
+    "sha256": "17bcb2f5931888b5f8560d368b465b4def070fbbec04d885e7932e75fae20308"
   },
   "experiments": [
     {
@@ -4589,6 +4589,32 @@
       "narrative": {
         "path": "docs/performance/investigations/wasi-inspection-job-admission-cost-2026-11-25.md",
         "sha256": "35653118eb39f058024445674e4a2e430116e819e9e049e4eac3f2e02b7d5446",
+        "topic": "ownership-and-lifecycle"
+      }
+    },
+    {
+      "title": "WASI Run Job handoff cost (2026-11-25)",
+      "evidence": "docs/performance.md#wasi-run-job-handoff-cost-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/wasi-run-job-handoff-timing-2026-11-25.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/wasi-run-job-handoff-cost-2026-11-25.md",
+        "sha256": "d61eda40c1749eba70749adbff454052b6b72521e108470cff021252ed5b5730",
+        "topic": "ownership-and-lifecycle"
+      }
+    },
+    {
+      "title": "Same-origin hosted Uniform Run overlap (2026-11-25)",
+      "evidence": "docs/performance.md#same-origin-hosted-uniform-run-overlap-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/same-origin-uniform-run-overlap-2026-11-25.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/same-origin-hosted-uniform-run-overlap-2026-11-25.md",
+        "sha256": "f38954a990d126749f7a013a6e710030d26c496e60abedfb8602eb15a5114728",
         "topic": "ownership-and-lifecycle"
       }
     }
@@ -32552,6 +32578,35 @@
       ]
     },
     {
+      "path": "docs/benchmarks/same-origin-uniform-run-overlap-2026-11-25.json",
+      "sha256": "4b2afe2c45a73384709d02cdc12e58bbc3cf8e6c8b48a260b877c209814a0df9",
+      "bytes": 30908,
+      "format": "json",
+      "record_counts": {
+        "paired-summary": 1
+      },
+      "fields": [
+        "browser",
+        "client_source_commit",
+        "first_usable_medians_seconds",
+        "fixture",
+        "issue",
+        "median_seconds_saved_by_simultaneous",
+        "observations",
+        "paired_result",
+        "proof",
+        "raw_receipt_sha256",
+        "schedule",
+        "threshold",
+        "timing",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#same-origin-hosted-uniform-run-overlap-2026-11-25"
+      ]
+    },
+    {
       "path": "docs/benchmarks/scale-2026-10-11.jsonl",
       "sha256": "26081041b3e180972d3341ab0ea7c83fc18b07ba5004327296254d4c68871971",
       "bytes": 1382,
@@ -36785,8 +36840,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "d6fcf440f616ee0bc7abc74968207e4b0692578ec76166a3b9e99abc98276945",
-      "bytes": 1743634,
+      "sha256": "d866f5365d847321f29a4678a848395122b390720e65011fb494eb6d1ca050c6",
+      "bytes": 1747315,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -38874,6 +38929,37 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#wasi-retained-parent-retry-acceptance-2026-10-21"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/wasi-run-job-handoff-timing-2026-11-25.json",
+      "sha256": "4a771aeeb8e7d1123642879146a3ea4228389a71e48b4b43f2e24bbd19d78f9c",
+      "bytes": 8763,
+      "format": "json",
+      "record_counts": {
+        "paired-summary": 1
+      },
+      "fields": [
+        "baseline",
+        "candidate",
+        "chromium_executable_sha256",
+        "guard",
+        "guard_fixture",
+        "guard_gates",
+        "guard_samples",
+        "hosted_runtime",
+        "issue",
+        "micro",
+        "micro_gates",
+        "resource_contract",
+        "retained_receipt_sha256",
+        "scope",
+        "shared_workers_sha256",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#wasi-run-job-handoff-cost-2026-11-25"
       ]
     },
     {
@@ -41139,7 +41225,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "f0882913b54006f84a2860a766b1f3fa2dc4daa4faa45ef01e2cb5fddf5e54a8"
+    "sha256": "9f563a8880add7f71b614fad3e2182c7cd6411fa36d9511f3f8e7aef731a3a4d"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

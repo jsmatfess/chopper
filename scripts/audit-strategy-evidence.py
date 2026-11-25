@@ -79,6 +79,8 @@ SECTIONS = {
     'Hosted Uniform retention at a fixed 1024 MiB (2026-11-25)': 'external-and-resident-shuffle',
     'Guarded hosted Uniform retention at 1024 MiB (2026-11-25)': 'external-and-resident-shuffle',
     'WASI inspection Job admission cost (2026-11-25)': 'ownership-and-lifecycle',
+    'WASI Run Job handoff cost (2026-11-25)': 'ownership-and-lifecycle',
+    'Same-origin hosted Uniform Run overlap (2026-11-25)': 'ownership-and-lifecycle',
     'Standalone Uniform direct publication (2026-11-25)': 'ownership-and-lifecycle',
     'Hosted Job JSON buffering (2026-11-25)': 'ownership-and-lifecycle',
     'Uniform sort retention at a fixed budget (2026-11-25)': 'external-and-resident-shuffle',

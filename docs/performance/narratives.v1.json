@@ -9177,6 +9177,32 @@
       "original_section_sha256": "dceb78e589079d2fe4b881441a04b90e4dd644292ba2def7f8c92e14accc01bd",
       "sha256": "35653118eb39f058024445674e4a2e430116e819e9e049e4eac3f2e02b7d5446",
       "relocations": []
+    },
+    {
+      "id": "wasi-run-job-handoff-cost-2026-11-25",
+      "title": "WASI Run Job handoff cost (2026-11-25)",
+      "anchor": "wasi-run-job-handoff-cost-2026-11-25",
+      "path": "docs/performance/investigations/wasi-run-job-handoff-cost-2026-11-25.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "wasi-run-job-handoff-cost-2026-11-25"
+      ],
+      "original_section_sha256": "4bafd43d1ab097d1cc723849308a7b6404ed56621422844bf135af68d2a69c3a",
+      "sha256": "d61eda40c1749eba70749adbff454052b6b72521e108470cff021252ed5b5730",
+      "relocations": []
+    },
+    {
+      "id": "same-origin-hosted-uniform-run-overlap-2026-11-25",
+      "title": "Same-origin hosted Uniform Run overlap (2026-11-25)",
+      "anchor": "same-origin-hosted-uniform-run-overlap-2026-11-25",
+      "path": "docs/performance/investigations/same-origin-hosted-uniform-run-overlap-2026-11-25.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "same-origin-hosted-uniform-run-overlap-2026-11-25"
+      ],
+      "original_section_sha256": "734a8f4c317fdb092606e114d220dd40f42ebd4aa83358f4c6e9e6a7158b7b20",
+      "sha256": "f38954a990d126749f7a013a6e710030d26c496e60abedfb8602eb15a5114728",
+      "relocations": []
     }
   ],
   "migrated_count": 193

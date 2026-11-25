@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "1e5a2e53eb1cdf9caad63e26692f3ff31584bd99ae7c382477489448a2b241b1",
+  "analysis_script_sha256": "a09ab6d793156d58aaef8724e92ab51aa88e5dbd578c5f79a8a956782bb4ddaf",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "21b7b2cdc95cef808a2e08871f2da12043a6edbf229faa4ffef269a8de3b8b92"
+    "sha256": "17bcb2f5931888b5f8560d368b465b4def070fbbec04d885e7932e75fae20308"
   },
   "families": [
     "adaptive-routing",
@@ -4877,6 +4877,34 @@
       "narrative": {
         "path": "docs/performance/investigations/wasi-inspection-job-admission-cost-2026-11-25.md",
         "sha256": "35653118eb39f058024445674e4a2e430116e819e9e049e4eac3f2e02b7d5446",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "WASI Run Job handoff cost (2026-11-25)",
+      "evidence": "docs/performance.md#wasi-run-job-handoff-cost-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/wasi-run-job-handoff-timing-2026-11-25.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/wasi-run-job-handoff-cost-2026-11-25.md",
+        "sha256": "d61eda40c1749eba70749adbff454052b6b72521e108470cff021252ed5b5730",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Same-origin hosted Uniform Run overlap (2026-11-25)",
+      "evidence": "docs/performance.md#same-origin-hosted-uniform-run-overlap-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/same-origin-uniform-run-overlap-2026-11-25.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/same-origin-hosted-uniform-run-overlap-2026-11-25.md",
+        "sha256": "f38954a990d126749f7a013a6e710030d26c496e60abedfb8602eb15a5114728",
         "topic": "ownership-and-lifecycle"
       },
       "family": "ownership-and-lifecycle"
@@ -48469,6 +48497,49 @@
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
+      "path": "docs/benchmarks/same-origin-uniform-run-overlap-2026-11-25.json",
+      "sha256": "4b2afe2c45a73384709d02cdc12e58bbc3cf8e6c8b48a260b877c209814a0df9",
+      "bytes": 30908,
+      "format": "json",
+      "record_counts": {
+        "paired-summary": 1
+      },
+      "fields": [
+        "browser",
+        "client_source_commit",
+        "first_usable_medians_seconds",
+        "fixture",
+        "issue",
+        "median_seconds_saved_by_simultaneous",
+        "observations",
+        "paired_result",
+        "proof",
+        "raw_receipt_sha256",
+        "schedule",
+        "threshold",
+        "timing",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#same-origin-hosted-uniform-run-overlap-2026-11-25"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "paired-summary": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
       "path": "docs/benchmarks/scale-2026-10-11.jsonl",
       "sha256": "26081041b3e180972d3341ab0ea7c83fc18b07ba5004327296254d4c68871971",
       "bytes": 1382,
@@ -58187,6 +58258,51 @@
       ],
       "record_bounds_by_kind": {
         "contract": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/wasi-run-job-handoff-timing-2026-11-25.json",
+      "sha256": "4a771aeeb8e7d1123642879146a3ea4228389a71e48b4b43f2e24bbd19d78f9c",
+      "bytes": 8763,
+      "format": "json",
+      "record_counts": {
+        "paired-summary": 1
+      },
+      "fields": [
+        "baseline",
+        "candidate",
+        "chromium_executable_sha256",
+        "guard",
+        "guard_fixture",
+        "guard_gates",
+        "guard_samples",
+        "hosted_runtime",
+        "issue",
+        "micro",
+        "micro_gates",
+        "resource_contract",
+        "retained_receipt_sha256",
+        "scope",
+        "shared_workers_sha256",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#wasi-run-job-handoff-cost-2026-11-25"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "paired-summary": {
           "first": {
             "pointer": ""
           },
