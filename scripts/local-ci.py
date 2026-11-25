@@ -175,7 +175,8 @@ def stage_evidence(root, source, base, head, full=False):
     caches = sorted(path for path in caches if path.is_dir())
     if not caches:
         return []
-    _, selected = scope_module().revision_scope(base, head, root=root, full=full, platform=host_profile())
+    _, selected = scope_module().revision_scope(
+        base, head, root=root, full=full, platform=host_profile(), env=git_environment())
     if not selected['evidence']:
         return []
     spec = importlib.util.spec_from_file_location('evidence_resolver', Path(__file__).with_name('evidence-resolver.py'))
@@ -318,6 +319,12 @@ def check_windows_revision(root, head, base, branch, full=False):
     if host_profile() != 'windows':
         raise ValueError('Revision transfer must run under native Windows Python.')
     with host_lock():
+        git_root = Path(git(root, 'rev-parse', '--show-toplevel'))
+        if git_root.resolve() != root.resolve():
+            raise ValueError('Configure chopper.windowsCheckout to the root of the native Windows Git checkout.')
+        bisect_start = Path(git(root, 'rev-parse', '--path-format=absolute', '--git-path', 'BISECT_START'))
+        if bisect_start.exists():
+            raise ValueError('Use a Windows validation checkout with no active Git bisect.')
         clean_head(root)
         if fetch_base(root) != base:
             raise ValueError('Native Windows origin/main differs from the WSL base. Update the branch and rerun.')
@@ -357,7 +364,8 @@ def verify_delivery(root, head, base):
     verify(root, head, base)
     if host_profile() != 'linux':
         raise ValueError('Deliver from the Linux/WSL checkout, where Linux and Windows receipts are combined.')
-    _, selected = scope_module().revision_scope(base, head, root=root, platform='windows')
+    _, selected = scope_module().revision_scope(
+        base, head, root=root, platform='windows', env=git_environment())
     if any(selected.values()):
         verify_record(windows_checkout(root), head, base, 'windows')
 
@@ -384,8 +392,7 @@ def hook_text():
 
 
 def install_hooks(root):
-    if subprocess.run(['git', '-C', str(root), 'config', '--get', 'core.hooksPath'],
-                      stdout=subprocess.DEVNULL).returncode == 0:
+    if run_git(root, 'config', '--get', 'core.hooksPath', stdout=subprocess.DEVNULL).returncode == 0:
         raise ValueError('core.hooksPath is already configured. Integrate the pre-push guard there; '
                          'existing hooks were not changed. See docs/ci.md.')
     hook = Path(git(root, 'rev-parse', '--path-format=absolute', '--git-path', 'hooks')) / 'pre-push'
@@ -403,7 +410,7 @@ def land(root, full=False):
     install_hooks(root)
     head, base = check(root, full)
     verify_delivery(root, head, base)
-    subprocess.run(['git', '-C', str(root), 'push', 'origin', f'{head}:refs/heads/main'], check=True)
+    run_git(root, 'push', 'origin', f'{head}:refs/heads/main', check=True)
 
 
 def main():

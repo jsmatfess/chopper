@@ -86,18 +86,18 @@ def classify(paths, full=False, platform='all'):
     return {job: job in selected and job in PLATFORM_JOBS[platform] for job in JOBS}
 
 
-def changed_paths(base, head, *, root=None):
+def changed_paths(base, head, *, root=None, env=None):
     # Both names of a rename/copy must participate in routing. NUL delimiting
     # preserves spaces and newlines; no GitHub API file-count truncation applies.
     command = ['git']
     if root is not None:
         command.extend(['-C', str(root)])
-    data = subprocess.check_output(command + ['diff', '--no-renames', '--name-only', '-z', base, head, '--'])
+    data = subprocess.check_output(command + ['diff', '--no-renames', '--name-only', '-z', base, head, '--'], env=env)
     return [name.decode('utf-8', errors='surrogateescape') for name in data.split(b'\0') if name]
 
 
-def revision_scope(base, head, *, root=None, full=False, platform='all'):
-    paths = [] if full else changed_paths(base, head, root=root)
+def revision_scope(base, head, *, root=None, full=False, platform='all', env=None):
+    paths = [] if full else changed_paths(base, head, root=root, env=env)
     return paths, classify(paths, full=full, platform=platform)
 
 

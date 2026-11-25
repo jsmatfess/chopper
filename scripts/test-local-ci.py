@@ -170,6 +170,23 @@ class LocalCiTests(unittest.TestCase):
         self.assertEqual(self.git('symbolic-ref', 'HEAD'), 'refs/heads/main')
         self.assertEqual(self.git('rev-parse', 'MERGE_HEAD'), merge_head)
 
+    def test_windows_handoff_refuses_nested_paths_and_active_bisects(self):
+        self.git('push', '-q', 'origin', 'HEAD:refs/heads/feature')
+        self.git('switch', '-q', 'main')
+        with (patch.object(ci, 'host_profile', return_value='windows'),
+              patch.object(ci, 'host_lock_path', return_value=self.root.parent / 'windows-ci.lock'),
+              patch.object(ci.runpy, 'run_path') as load):
+            with self.assertRaisesRegex(ValueError, 'root of the native Windows Git checkout'):
+                ci.check_windows_revision(self.root / 'scripts', self.head, self.base, 'refs/heads/feature')
+            self.assertEqual(self.git('symbolic-ref', 'HEAD'), 'refs/heads/main')
+            self.git('bisect', 'start')
+            head = self.git('rev-parse', 'HEAD')
+            with self.assertRaisesRegex(ValueError, 'active Git bisect'):
+                ci.check_windows_revision(self.root, self.head, self.base, 'refs/heads/feature')
+            self.assertEqual(self.git('rev-parse', 'HEAD'), head)
+            self.assertTrue((self.root / '.git/BISECT_START').exists())
+        load.assert_not_called()
+
     def test_windows_dispatch_success_requires_an_exact_receipt(self):
         self.git('config', 'chopper.windowsCheckout', str(self.root))
         self.git('update-ref', 'refs/remotes/origin/main', self.head)
@@ -329,6 +346,26 @@ class LocalCiTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'failed'):
                 ci.land(self.root)
         run.assert_not_called()
+
+    @unittest.skipUnless(ci.host_profile() == 'linux', 'Delivery hooks run in Linux/WSL')
+    def test_land_routes_and_pushes_in_the_selected_repository(self):
+        self.check()
+        receipt = json.loads(ci.receipt_path(self.root, self.head, self.base).read_text())
+        receipt['profile'] = 'windows'
+        ci.receipt_path(self.root, self.head, self.base, 'windows').write_text(json.dumps(receipt))
+        self.git('config', 'chopper.windowsCheckout', str(self.root))
+
+        foreign = self.root.parent / 'foreign'
+        foreign_remote = self.root.parent / 'foreign.git'
+        subprocess.run(['git', 'clone', '-q', '--bare', str(self.remote), str(foreign_remote)], check=True)
+        subprocess.run(['git', 'clone', '-q', str(self.root), str(foreign)], check=True)
+        ci.git(foreign, 'remote', 'set-url', 'origin', str(foreign_remote))
+        ci.git(foreign, 'config', 'core.hooksPath', 'unrelated-hooks')
+        with (patch.dict(os.environ, {'GIT_DIR': str(foreign / '.git'), 'GIT_WORK_TREE': str(foreign)}),
+              patch.object(ci, 'check', return_value=(self.head, self.base))):
+            ci.land(self.root)
+        self.assertEqual(ci.git(self.remote, 'rev-parse', 'main'), self.head)
+        self.assertEqual(ci.git(foreign_remote, 'rev-parse', 'main'), self.base)
 
 
 class LocalCiInvocationTests(unittest.TestCase):
