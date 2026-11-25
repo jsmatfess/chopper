@@ -28,6 +28,8 @@ mod census;
 mod prefix;
 #[cfg(all(test, not(target_os = "wasi")))]
 mod tests;
+#[cfg(all(test, target_os = "linux"))]
+pub(crate) use census::observed_allocation_requests;
 #[cfg(all(test, not(target_os = "wasi")))]
 pub(crate) use census::{
     begin as start_allocation_observation, end as finish_allocation_observation,

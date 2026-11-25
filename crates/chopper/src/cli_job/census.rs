@@ -17,6 +17,8 @@ pub(super) struct Census {
     grant: usize,
     pub(super) live: usize,
     peak: usize,
+    #[cfg(all(test, target_os = "linux"))]
+    requested: usize,
     violations: usize,
     pub(super) first_request: usize,
     blocks: [Block; 32768],
@@ -24,6 +26,8 @@ pub(super) struct Census {
 thread_local! {
     static CENSUS: RefCell<Census> = const { RefCell::new(Census {
         enabled: false, checking: false, grant: 0, live: 0, peak: 0, violations: 0, first_request: 0,
+        #[cfg(all(test, target_os = "linux"))]
+        requested: 0,
         blocks: [Block { pointer: 0, size: 0 }; 32768],
     }) };
 }
@@ -52,6 +56,10 @@ fn allocated(pointer: *mut u8, size: usize) {
             size,
         };
         c.live += size;
+        #[cfg(all(test, target_os = "linux"))]
+        {
+            c.requested += size;
+        }
         c.peak = c.peak.max(c.live);
         c.violations += usize::from(c.live > c.grant);
     });
@@ -119,6 +127,10 @@ pub(crate) fn begin() {
         c.checking = true;
         c.grant = 0;
         c.peak = 0;
+        #[cfg(all(test, target_os = "linux"))]
+        {
+            c.requested = 0;
+        }
         c.violations = 0;
         c.first_request = 0;
     });
@@ -131,4 +143,12 @@ pub(crate) fn end() -> (usize, usize, usize) {
         result = (c.live, c.peak, c.violations);
     });
     result
+}
+
+/// Successful allocation and replacement layouts requested in this observation.
+#[cfg(all(test, target_os = "linux"))]
+pub(crate) fn observed_allocation_requests() -> usize {
+    let mut requested = 0;
+    census(|c| requested = c.requested);
+    requested
 }

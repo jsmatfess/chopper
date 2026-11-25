@@ -108,9 +108,10 @@ fn linux_cgroup() -> (Option<u64>, Result<(), String>) {
             .lines()
             .find_map(|line| line.strip_prefix("0::"))
             .ok_or("cgroup v2 membership absent")?;
-        let mounts = read(Path::new("/proc/self/mountinfo"))?;
-        let (leaf, mount, root) =
-            resolve_mount(member, &mounts).ok_or("cgroup v2 mount/root unresolved")?;
+        let (leaf, mount, root) = {
+            let mounts = read(Path::new("/proc/self/mountinfo"))?;
+            resolve_mount(member, &mounts).ok_or("cgroup v2 mount/root unresolved")?
+        };
         // The actual hierarchy root has no memory-controller files. A mounted
         // subtree must retain its own limits, and hidden ancestors stay unknown.
         // https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files
@@ -324,12 +325,13 @@ fn resolve_mount(
         if right.split_whitespace().next() != Some("cgroup2") {
             continue;
         }
-        let fields: Vec<_> = left.split_whitespace().collect();
-        if fields.len() < 6 {
+        let mut fields = left.split_whitespace().skip(3);
+        let (Some(root), Some(mount), Some(_)) = (fields.next(), fields.next(), fields.next())
+        else {
             continue;
-        }
-        let root = PathBuf::from(unescape_mount(fields[3])?);
-        let mount = PathBuf::from(unescape_mount(fields[4])?);
+        };
+        let root = PathBuf::from(unescape_mount(root)?);
+        let mount = PathBuf::from(unescape_mount(mount)?);
         if !root.is_absolute()
             || !mount.is_absolute()
             || root
@@ -411,8 +413,53 @@ mod tests {
                 "/".into()
             ))
         );
+        let later_equal_root = format!("{mounts}\n3 1 0:1 /jobs /later rw - cgroup2 cgroup rw");
+        assert_eq!(
+            resolve_mount("/jobs/a", &later_equal_root),
+            resolve_mount("/jobs/a", mounts)
+        );
+        let short = r"3 1 0:1 bad\999 /unused - cgroup2 cgroup rw";
+        assert_eq!(
+            resolve_mount("/jobs/a", &format!("{short}\n{mounts}")),
+            resolve_mount("/jobs/a", mounts)
+        );
+        assert!(resolve_mount("/jobs/a", &format!("{mounts}\nmissing separator")).is_none());
+        let invalid = r"3 1 0:1 relative bad\999 rw - cgroup2 cgroup rw";
+        assert!(resolve_mount("/jobs/a", &format!("{mounts}\n{invalid}")).is_none());
         assert!(resolve_mount("/../other", mounts).is_none());
         assert!(resolve_mount("relative", mounts).is_none());
+    }
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn linux_mount_optional_fields_add_no_allocation_traffic() {
+        use crate::cli_job::{
+            finish_allocation_observation, observed_allocation_requests,
+            start_allocation_observation,
+        };
+        use std::path::PathBuf;
+
+        let prefix = r"1 0 0:1 /jobs /nested\040mount rw";
+        let suffix = " - cgroup2 cgroup rw";
+        let short = format!("{prefix}{suffix}");
+        let long = format!("{prefix}{}{suffix}", " shared:123".repeat(8192));
+        let expected = Some((
+            PathBuf::from("/nested mount/a"),
+            PathBuf::from("/nested mount"),
+            PathBuf::from("/jobs"),
+        ));
+        let requested = [short.as_str(), long.as_str()].map(|mounts| {
+            start_allocation_observation();
+            let resolved = resolve_mount("/jobs/a", mounts);
+            let matches_expected = resolved == expected;
+            drop(resolved);
+            let requested = observed_allocation_requests();
+            let (live, _, _) = finish_allocation_observation();
+            assert!(matches_expected);
+            assert_eq!(live, 0);
+            requested
+        });
+        assert!(requested[0] > 0);
+        assert_eq!(requested[0], requested[1]);
     }
     #[cfg(not(target_os = "linux"))]
     #[test]
