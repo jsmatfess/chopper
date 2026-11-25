@@ -83,3 +83,38 @@ for(const rejection of ['existing','create-denied'])test(`export ${rejection} re
   }),rejection==='existing'?/already exists/:/create denied/);
   assert.deepEqual(events,rejection==='existing'?['lookup','failed']:['lookup','create','failed']);
 });
+
+const publicationBundle=await build({entryPoints:['src/browser/publication.ts'],bundle:true,write:false,format:'esm',platform:'node'});
+const {DestinationPublication}=await import(`data:text/javascript;base64,${Buffer.from(publicationBundle.outputFiles[0].text).toString('base64')}`);
+
+test('publication counts only successful closes and validates the count before creating a marker',async()=>{
+  const directory={getFileHandle:()=>assert.fail('must reject before opening the marker')};
+  const parent={getDirectoryHandle:async(_name,options)=>{
+    if(options?.create)return directory;
+    throw new DOMException('absent','NotFoundError');
+  }};
+  const publication=new DestinationPublication(parent,'result');
+  await publication.open();
+  await publication.closeFile({close:async()=>{}});
+  await assert.rejects(publication.closeFile({close:async()=>{throw new Error('close denied');}}),/close denied/);
+  assert.equal(publication.closedFiles,1);
+  await assert.rejects(publication.finish(2,()=>{}),/still open or missing/);
+});
+
+test('publication cleanup leaves a replacement folder in place',async()=>{
+  const replacement={getFileHandle:()=>assert.fail('must only inspect the owned folder')};
+  const directory={isSameEntry:async entry=>entry===directory};
+  let current;
+  const parent={
+    async getDirectoryHandle(_name,options){
+      if(options?.create)current=directory;
+      if(!current)throw new DOMException('absent','NotFoundError');
+      return current;
+    },
+    removeEntry:()=>assert.fail('must only remove the owned folder'),
+  };
+  const publication=new DestinationPublication(parent,'result');
+  await publication.open();
+  current=replacement;
+  assert.equal(await publication.cleanup(),'result');
+});

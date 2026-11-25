@@ -10,31 +10,67 @@ export function verifyPublication(result:unknown,folder:string,output:string):Ve
 }
 
 const markerName='CHOPPER-COMPLETE.json';
-export async function createDestination(parent:FileSystemDirectoryHandle,name:string){
-  try{await parent.getDirectoryHandle(name);throw new Error('Result folder already exists. Analyze again.');}
-  catch(error){if(!(error instanceof DOMException&&error.name==='NotFoundError'))throw error;}
-  return await parent.getDirectoryHandle(name,{create:true});
-}
 
-export async function completeDestination(destination:FileSystemDirectoryHandle,files:number,account:(bytes:number,start:number)=>void,preserveMarker:(preserve:boolean)=>void){
-  const markerHandle=await destination.getFileHandle(markerName,{create:true});
-  const marker=await markerHandle.createWritable();
-  const text=JSON.stringify({complete:true,files,engine:'chopper-browser',version:1})+'\n';
-  const bytes=new TextEncoder().encode(text);
-  try{const start=performance.now();await marker.write(bytes);account(bytes.length,start);await marker.close();preserveMarker(true);}
-  catch(error){await marker.abort().catch(()=>{});throw error;}
-  try{
-    const file=await markerHandle.getFile();
-    if(file.size===bytes.length&&await file.text()===text)return;
-  }catch(error){
-    if(error instanceof DOMException&&error.name==='NotFoundError')preserveMarker(false);
-    throw new Error('Could not verify completion marker',{cause:error});
+export class DestinationPublication {
+  private directory?:FileSystemDirectoryHandle;
+  private closed=0;
+  private preserveMarker=false;
+
+  constructor(private readonly parent:FileSystemDirectoryHandle,readonly name:string){}
+
+  get closedFiles(){return this.closed;}
+
+  async open(onCreate?:()=>void){
+    if(!this.directory){
+      try{await this.parent.getDirectoryHandle(this.name);throw new Error('Result folder already exists. Analyze again.');}
+      catch(error){if(!(error instanceof DOMException&&error.name==='NotFoundError'))throw error;}
+      this.directory=await this.parent.getDirectoryHandle(this.name,{create:true});
+      onCreate?.();
+    }
+    return this.directory;
   }
-  preserveMarker(false);
-  throw new Error('Could not verify completion marker: content did not match');
+
+  async removeFile(name:string){
+    await this.directory?.removeEntry(name);
+  }
+
+  async closeFile(writer:FileSystemWritableFileStream){
+    await writer.close();
+    this.closed++;
+  }
+
+  async finish(expectedFiles:number,account:(bytes:number,start:number)=>void){
+    if(!this.directory||this.closed!==expectedFiles)throw new Error('Destination files are still open or missing');
+    const markerHandle=await this.directory.getFileHandle(markerName,{create:true});
+    const marker=await markerHandle.createWritable();
+    const text=JSON.stringify({complete:true,files:this.closed,engine:'chopper-browser',version:1})+'\n';
+    const bytes=new TextEncoder().encode(text);
+    try{
+      const start=performance.now();
+      await marker.write(bytes);
+      account(bytes.length,start);
+      await marker.close();
+      this.preserveMarker=true;
+    }catch(error){await marker.abort().catch(()=>{});throw error;}
+    try{
+      const file=await markerHandle.getFile();
+      if(file.size===bytes.length&&await file.text()===text)return this.closed;
+    }catch(error){
+      if(error instanceof DOMException&&error.name==='NotFoundError')this.preserveMarker=false;
+      throw new Error('Could not verify completion marker',{cause:error});
+    }
+    this.preserveMarker=false;
+    throw new Error('Could not verify completion marker: content did not match');
+  }
+
+  async cleanup(){
+    if(!this.directory)return undefined;
+    if(!this.preserveMarker&&await removeIncompleteDestination(this.parent,this.name,this.directory,this.closed))return null;
+    return this.name;
+  }
 }
 
-export async function removeIncompleteDestination(parent:FileSystemDirectoryHandle,name:string,owned:FileSystemDirectoryHandle,files:number){
+async function removeIncompleteDestination(parent:FileSystemDirectoryHandle,name:string,owned:FileSystemDirectoryHandle,files:number){
   try{
     const current=await parent.getDirectoryHandle(name);
     if(!await owned.isSameEntry(current))return false;

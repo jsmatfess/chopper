@@ -1,5 +1,5 @@
 import {DESTINATION_BLOCK,SOURCE_WINDOW,STREAMING_IO_BYTES} from './streaming-io';
-import {createDestination,completeDestination,removeIncompleteDestination} from './publication';
+import {DestinationPublication} from './publication';
 type Access={getSize():number;read(b:Uint8Array,o:{at:number}):number;write(b:Uint8Array,o:{at:number}):number;truncate(n:number):void;flush():void;close():void};
 type Handle=FileSystemFileHandle & {createSyncAccessHandle():Promise<Access>};
 const scope=globalThis as unknown as {onmessage:(e:MessageEvent)=>void;postMessage:(v:unknown)=>void};
@@ -32,8 +32,7 @@ async function access(id:string){
   if(!sizes.has(id)){const actual=h.getSize();sizes.set(id,actual);used+=actual;observeSpace();}
   return h;
 }
-type Destination = {parent:FileSystemDirectoryHandle;name:string;directory?:FileSystemDirectoryHandle;closed:number;preserveMarker?:boolean};
-let destination:Destination|undefined;
+let destination:DestinationPublication|undefined;
 const writers=new Map<string,FileSystemWritableFileStream>();
 let block:{bytes:Uint8Array<ArrayBuffer>;id:string;offset:number;length:number}|undefined;
 async function flushBlock(){
@@ -58,32 +57,28 @@ async function bufferWrite(m:{id:string;offset:number;length:number},bytes:Uint8
 async function destinationOperation(m:any,bytes:Uint8Array):Promise<number>{
   if(m.op==='destination_init'){
     if(destination)throw new Error('Destination already configured');
-    destination={parent:m.parent,name:m.folder,closed:0};
+    destination=new DestinationPublication(m.parent,m.folder);
     return 0;
   }
-  if(!destination)throw new Error('Destination is unavailable');
+  const target=destination;
+  if(!target)throw new Error('Destination is unavailable');
   if(block?.length)await flushBlock();
   const writer=writers.get(m.id);
   switch(m.op){
     case 'destination_create': {
       if(writers.size>=64)throw new Error('Too many open destination writers');
-      if(!destination.directory){
-        destination.directory=await createDestination(destination.parent,destination.name);
-        scope.postMessage({exporting:destination.name});
-      }
-      const file=await destination.directory.getFileHandle(m.name,{create:true});
+      const folder=await target.open(()=>scope.postMessage({exporting:target.name}));
+      const file=await folder.getFileHandle(m.name,{create:true});
       writers.set(m.id,await file.createWritable());
       return 0;
     }
     case 'destination_delete':
       if(writer){await writer.abort();writers.delete(m.id);}
-      if(destination.directory)await destination.directory.removeEntry(m.name);
+      await target.removeFile(m.name);
       return 0;
     case 'destination_finish':
-      if(writers.size||!destination.directory||destination.closed!==m.files)throw new Error('Destination files are still open or missing');
-      const finished=destination;
-      await completeDestination(finished.directory!,finished.closed,bytes=>{destinationBytes+=bytes;observeSpace();},preserve=>{finished.preserveMarker=preserve;});
-      return destination.closed;
+      if(writers.size)throw new Error('Destination files are still open or missing');
+      return await target.finish(m.files,bytes=>{destinationBytes+=bytes;observeSpace();});
   }
   if(!writer)throw new Error('Destination writer is closed');
   switch(m.op){
@@ -94,7 +89,7 @@ async function destinationOperation(m:any,bytes:Uint8Array):Promise<number>{
       return m.length;
     case 'destination_truncate': await writer.truncate(m.size);return 0;
     case 'destination_flush': return 0; // The writable commits when the last engine descriptor closes.
-    case 'destination_close': await writer.close();writers.delete(m.id);destination.closed++;return 0;
+    case 'destination_close': await target.closeFile(writer);writers.delete(m.id);return 0;
     default: throw new Error('Unsupported destination operation');
   }
 }
@@ -102,10 +97,7 @@ async function cleanup(){
   try{
     for(const writer of writers.values())await writer.abort().catch(()=>{});
     writers.clear();
-    if(destination?.directory){
-      if(!destination.preserveMarker&&await removeIncompleteDestination(destination.parent,destination.name,destination.directory,destination.closed))return null;
-      return destination.name;
-    }
+    return await destination?.cleanup();
   }finally{
     for(const h of handles.values())h.close();
     handles.clear();if(root&&jobId)await root.removeEntry(jobId,{recursive:true});used=0;sizes.clear();

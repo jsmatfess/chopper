@@ -60,7 +60,9 @@ describes future behavior; [GitHub Issues](https://github.com/jsmatfess/chopper/
    session retains its worker pair, pending replies and workspace lock; the
    [client](../ui/src/browser/client.ts) adapts browser file access, UI operations
    and history rendering. Browser
-   [export](../ui/src/browser/export.ts) commits through completion markers;
+   [publication](../ui/src/browser/publication.ts) owns the result folder, closed
+   file count, marker verification and destination cleanup for direct writes and
+   [staged export](../ui/src/browser/export.ts). Browser workspace
    [cleanup](../ui/src/browser/cleanup.ts) respects workspace owners. Native atomic
    directory publication and browser commit semantics are separate contracts.
 
