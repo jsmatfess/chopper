@@ -581,6 +581,21 @@ and coverage checks, their four/six parser/resolver tests, and the unchanged
 resolved originals in ignored scratch, keeping confidential aliases out of the
 public working tree.
 
+## Browser OPFS workspace deletion conflict
+
+The [browser cleanup contract](../scripts/test-browser-cleanup.mjs) exercises a
+same-origin worker with an open OPFS sync access handle inside an otherwise
+abandoned workspace. The cleaner can take the Chopper Web Lock, but Chromium
+rejects recursive workspace deletion with `NoModificationAllowedError`. The
+production sweep removes a separate abandoned workspace, reports one remaining,
+and preserves the occupied workspace and its sentinel. After the worker closes
+the handle, the production retry removes the last abandoned workspace.
+
+The harness uses a disposable browser context and real OPFS methods for this
+case. It also retains the active-owner and injected UI retry controls. This
+covers the Chromium lock conflict. Filesystem permission changes, hardware
+failure and power loss have separate acceptance requirements.
+
 ## First workload baseline harness (2026-10-31)
 
 The [baseline slice](maintainer/workload-baselines.md) passes 14 small Python controls for

@@ -51,8 +51,11 @@ tabs still have no common memory admission policy. A proposal needs a lease
 lifetime and recovery behavior before implementation. Keep actual
 quota/deletion/destination behavior scoped to the [filesystem acceptance
 record](history/prior-issues.md#issue-87) and the
-[browser limits](browser.md#processing-and-limits). Injection establishes the
-fault path exercised by the test.
+[browser limits](browser.md#processing-and-limits). The bundled Chromium
+controls reproduce [origin quota failures](../scripts/test-browser-quota.mjs)
+before and after successful destination writes and [one real deletion refusal](validation.md#browser-opfs-workspace-deletion-conflict)
+while a same-origin worker holds an open sync access handle. Device and installed
+browser acceptance have separate evidence requirements.
 
 ### Bounded ownership changes
 
