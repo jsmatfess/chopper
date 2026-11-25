@@ -1346,7 +1346,11 @@ submission; a later Run captures the new draft. Analyze retains only advisory
 input statistics, with source/configuration origins for invalidation. Internal
 engine snapshots retain their exact encoded-byte contract.
 
-State polls are ordered within a command epoch. A late response cannot overwrite
+The page-side result owner in `result-ownership.ts` orders state polls within a
+command epoch and accepts a successful Run acknowledgement for its submitted
+draft revision. The workbench renders accepted state and uses the owner to decide
+whether results belong in the current source's column explorer.
+A late state snapshot cannot overwrite
 a newer response or cross a Run/Analyze/Cancel acknowledgement. Starting
 a newer poll does not discard an older response while the newer one is pending.
 Worker generation checks independently reject messages from retired sessions.

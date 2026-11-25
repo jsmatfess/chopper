@@ -1,7 +1,7 @@
 import {job_values as jobValues} from '../../docs/cli-reference-data.json';
-import {sourceIdentity,resultOrigin,belongsToSource,type ResultOrigin} from './result-ownership';
+import {HostedResultOwnership,type ResultOrigin} from './result-ownership';
 import {operationColor,operationName} from './step-labels';
-import {browserApi,configureBrowserUI,invalidateBrowserDraft,startFormulaScan} from './browser/client';
+import {browserApi as api,configureBrowserUI,invalidateBrowserDraft,startFormulaScan} from './browser/client';
 import {percentageUnits} from './plan';
 import {bindColumnPickers,withCalculatedColumns,pickerMarkup,type ColumnSchema} from './column-picker';
 import {populateMemory,updateMemory,readMemory} from './memory';
@@ -40,16 +40,8 @@ const setValue = (id: string, v: unknown) => { $<HTMLInputElement>(id).value = v
 const escape = (s: unknown) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));
 const format = (n: number) => n.toLocaleString();
 const size = (n: number) => n >= 1073741824 ? `${(n/1073741824).toFixed(2)} GiB` : n >= 1048576 ? `${(n/1048576).toFixed(1)} MiB` : n >= 1024 ? `${(n/1024).toFixed(1)} KiB` : `${n} B`;
-let inputSelectionRevision=0;
-let job: Job; let status = 'idle'; let dirty = true; let editRevision = 0; let lastAnalysis = '';
-let requestEpoch=0,activeCommands=0,pollSerial=0,lastAppliedPoll=0;
-async function api<T = unknown>(path: string, data?: unknown): Promise<T> {
-  const mutation=['profile','run-direct','cancel'].includes(path);
-  if(mutation){requestEpoch++;activeCommands++;}
-  try {
-  return await browserApi<T>(path,data);
-  } finally {if(mutation){activeCommands--;requestEpoch++;}}
-}
+const results=new HostedResultOwnership();
+let job: Job; let status = 'idle'; let lastAnalysis = '';
 function error(e: unknown) {
   const message=e instanceof Error?e.message:String(e);
   if($('error').textContent!==message)$('error').textContent=message;
@@ -65,7 +57,7 @@ let inputSample: FormulaSample | null = null;
 let columnMessage = 'Choose an input file to load its columns.';
 let columnSource = '', columnRequest = 0;
 const pickerSchema = () => withCalculatedColumns(columnSchema, job.calculated_columns ?? []);
-function sourceKey() { return sourceIdentity(inputSelectionRevision,{input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input')}); }
+function sourceKey() { return results.sourceKey({input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input')}); }
 function renderPickers() {
   $('operations').querySelectorAll<HTMLElement>('[data-column-field]').forEach(picker=>{
     const step=Number(picker.closest<HTMLElement>('[data-step]')!.dataset.step);
@@ -225,14 +217,14 @@ function updateFields() {
   $<HTMLButtonElement>('add-operation').disabled=(job?.operations.length||0)>=64;
 }
 function markDirty() {
-  profileDirty=!belongsToSource(profileOrigin,sourceKey());
-  if(profileDirty){lastProfileData=null;$('input-profile').hidden=true;}
   const source=sourceKey();
+  const {profile,profileCurrent}=results.editDraft(source);
+  if(!profileCurrent)$('input-profile').hidden=true;
   if(columnSource!==source)hostedWorkspace?.resetColumnExplorer();
   else if(inspectionSource!==source)hostedWorkspace?.values([],null,'',0);
-  if(lastProfileData&&!profileDirty)renderProfile(lastProfileData);
+  if(profile)renderProfile(profile,source);
   updateFields();
-  editRevision++;invalidateBrowserDraft(sourceKey()); dirty = true; updateRunControl();
+  invalidateBrowserDraft(source);updateRunControl();
   if(job) planLinks.render(effectiveOperations(),{rows:value('max-rows'),bytes:sizeText('max-bytes'),compressed:sizeText('compressed-bytes')},value('compression'));
   const finalGrouping = job?.operations.filter(op=>op.type!=='shuffle').at(-1);
   const conflict = ['balanced','interleaved'].includes(finalGrouping?.type||'') && !!(value('max-rows')||value('max-bytes'));
@@ -246,18 +238,18 @@ function updateDraft() {
   hostedWorkspace?.draft(draft,job.operations.length);
   planLinks.summary();
 }
-function renderProfile(p:InputProfile){
+function renderProfile(p:InputProfile,source:string){
   $('input-profile').hidden=false;$('empty-plan').hidden=true;
-  let changed=true;try{changed=profileOrigin?.configuration!==JSON.stringify(readJob());}catch{/* Keep incomplete edits editable. */}
-  inspectionSource=profileOrigin?.source??null;hostedWorkspace?.values(p.column_values,p.header,'Full-file input analysis',p.rows);
+  let changed=true;try{changed=!results.profileMatchesJob(readJob());}catch{/* Keep incomplete edits editable. */}
+  inspectionSource=source;hostedWorkspace?.values(p.column_values,p.header,'Full-file input analysis',p.rows);
   const key=JSON.stringify([p,changed]);if(key===lastProfile)return;lastProfile=key;
   const memoryTarget=!changed&&p.suggested_run_memory_mb!=null
     ?`<div><dt>Run memory target · estimated</dt><dd>${size(p.suggested_run_memory_mb*2**20)}</dd></div>`:'';
   $('input-profile').innerHTML=`<h3>Input analysis</h3><dl class="profile-facts"><div><dt>Records · exact</dt><dd>${format(p.rows)}</dd></div><div><dt>Columns</dt><dd>${format(p.columns)}</dd></div>${memoryTarget}</dl><p class="profile-duration">Scanned in ${p.seconds.toFixed(2)} s${p.cache_hit?' · reused profile':''}</p>${changed?'<p class="profile-context">Input unchanged. Analyze again to refresh pipeline estimates.</p>':''}${!changed&&p.stages.length?`<details><summary>Pipeline estimates</summary><ul class="profile-stages">${p.stages.map(stage=>`<li>Step ${stage.operation}: ${escape(stage.strategy)}${stage.input_distinct_keys===null?'':` · ${stage.distinct_exact?'':'~'}${format(stage.input_distinct_keys)} distinct keys (${stage.distinct_exact?'exact':'estimated'})`}</li>`).join('')}</ul></details>`:''}<details><summary>Coverage & methodology</summary><p>${escape(p.accuracy)}</p><p>Statistics cover every input column. Value lists show at most 100 values per column and 256 KiB in total. Run reports the final exact group counts and file sizes. Analyzing input does not create output files.</p></details>`;
 }
-function renderAnalysis(a: Analysis) {
-  if((!lastProfileData||profileDirty)&&belongsToSource(analysisOrigin,sourceKey())){
-    inspectionSource=analysisOrigin?.source??null;
+function renderAnalysis(a: Analysis,source:string|null) {
+  if(source!==null){
+    inspectionSource=source;
     hostedWorkspace?.values(a.column_values||[],a.header,'Completed output analysis',a.rows);
   }
   const key = JSON.stringify(a); if(key===lastAnalysis) return; lastAnalysis=key;
@@ -331,14 +323,14 @@ function renderPreview(a: {header:string[]|null;columns:number;preview:string[][
   $('preview-card').hidden=!a.preview.length;
   $('preview').innerHTML=`<table aria-label="Input preview sample"><thead><tr>${(a.header||Array.from({length:a.columns},(_,i)=>`Column ${i}`)).map(c=>`<th>${escape(c)}</th>`).join('')}</tr></thead><tbody>${a.preview.map(row=>`<tr>${row.map(c=>`<td>${escape(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 }
-let lastProfile='';let profileDirty=true;let profileOrigin:ResultOrigin|null=null,analysisOrigin:ResultOrigin|null=null,inspectionSource:string|null=null;let resultSerial=0;let lastProfileData:InputProfile|null=null;
+let lastProfile='';let inspectionSource:string|null=null;
 let progressPhase='', progressStatus='', progressStarted=0, progressRows=0, progressStopped:number|null=0;
 async function poll() {
   try {
-    const ticket=++pollSerial,epoch=requestEpoch;if(activeCommands)return;
-    const s = await api<State>('state');if(ticket<=lastAppliedPoll||epoch!==requestEpoch||activeCommands)return;lastAppliedPoll=ticket;
-    if(s.origins?.profile)profileOrigin=s.origins.profile;if(s.origins?.analysis)analysisOrigin=s.origins.analysis;
-    profileDirty=!belongsToSource(profileOrigin,sourceKey());
+    const ticket=results.beginPoll();if(!ticket)return;
+    const s=await api<State>('state');
+    const source=sourceKey(),accepted=results.acceptPoll(ticket,s,source);
+    if(!accepted)return;
     status=s.status;
     $('connection').hidden=true;
     const busy = ['profiling','running'].includes(status);
@@ -352,12 +344,12 @@ async function poll() {
     $('progress-detail').textContent=`${format(s.progress.rows)} rows · ${size(s.progress.temp_bytes)} temporary · ${Math.floor(seconds)} s in phase${seconds>=1&&rate>0?` · ${format(Math.round(rate))} rows/s`:''}`;
     updateRunControl();$<HTMLButtonElement>('profile').disabled=busy;
     $('cancel').hidden=!['profiling','running'].includes(status);
-    if(s.profile&&!profileDirty){lastProfileData=s.profile;renderProfile(s.profile);}
+    if(accepted.profile)renderProfile(accepted.profile,source);
     else if(s.profile&&status==='profiled'){lastProfile='';$('input-profile').hidden=false;$('input-profile').textContent='Analysis finished for a different input or parsing configuration. Analyze input again for the current source.';}
 
-    if(s.analysis) renderAnalysis(s.analysis);
+    if(s.analysis) renderAnalysis(s.analysis,accepted.analysisSource);
     if(s.error) error(s.error);
-    hostedWorkspace?.state(s,dirty);
+    hostedWorkspace?.state(s,results.dirty);
   } catch(e) { $('connection').hidden=false;$('connection').textContent=e instanceof Error?e.message:String(e); }
 }
 bindColumnPickers($('operations'),picker=>{
@@ -508,8 +500,7 @@ $('profile').onclick=async()=>{
   if(!validation.check(false))return;
   try{
     const submitted=readJob();clearError();
-    if(!lastProfileData||profileDirty)profileOrigin=resultOrigin(sourceKey(),submitted,editRevision,++resultSerial);
-    await api('profile',submitted);
+    await results.analyze(submitted,sourceKey(),()=>api('profile',submitted));
     lastProfile='';lastAnalysis='';$('analysis').hidden=true;await poll();
   }catch(e){error(e);}
 };
@@ -517,10 +508,7 @@ async function startJob(){
   if(!validation.check())return;
   try{
     const submitted=readJob();updateDraft();clearError();
-    const submittedRevision=editRevision;analysisOrigin=resultOrigin(sourceKey(),submitted,editRevision,++resultSerial);
-    await api('run-direct',submitted);
-    // Acknowledgement validates only the draft revision that was submitted.
-    if(submittedRevision===editRevision)dirty=false;
+    await results.run(submitted,sourceKey(),()=>api('run-direct',submitted));
     lastAnalysis='';$('analysis').hidden=true;
     $('empty-plan').hidden=true;await poll();
   }catch(e){
@@ -539,7 +527,7 @@ $('job-form').onsubmit=async e=>{
   if(!validation.check())return;
   await startJob();
 };
-$('cancel').onclick=async()=>{try{await api('cancel',{});await poll();}catch(e){error(e);}};
+$('cancel').onclick=async()=>{try{await results.cancel(()=>api('cancel',{}));await poll();}catch(e){error(e);}};
 $('export').onclick=()=>{try{const blob=new Blob([JSON.stringify(readJob(),null,2)+'\n'],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='chopper-job.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){error(e);}};
 $('import').onclick=()=>$<HTMLInputElement>('import-file').click();
 $<HTMLInputElement>('import-file').onchange=async e=>{try{const file=(e.target as HTMLInputElement).files?.[0];if(!file)return;if(file.size>1048576)throw new Error('Job JSON exceeds 1 MiB.');const config=JSON.parse(await file.text());if(config.compression==='zstd')throw new Error('Zstandard output is no longer supported. Change compression to gzip, zip, or none in the job JSON.');if(Object.hasOwn(config,"seed")||Object.hasOwn(config,"random_seed"))throw new Error("Seed settings are no longer supported. Remove the seed field from the job JSON.");const defaults=await api<Job>('defaults');job={...defaults,...config,input_csv:{...defaults.input_csv,...config.input_csv},output_csv:{...defaults.output_csv,...config.output_csv},limits:{...defaults.limits,...config.limits},resources:{...defaults.resources,...config.resources}};
@@ -547,13 +535,13 @@ const manual=typeof config.resources?.memory_mb==='number'||job.resources.worker
   ||job.operations.some(op=>op.type==='shuffle'&&op.strategy&&op.strategy!=='auto');
 $<HTMLInputElement>('execution-mode').checked=manual;populate();}catch(e){error(e);}};
 function updateSelectedPath(mode:string,path:string){
-  if(mode==='input')inputSelectionRevision++;
+  if(mode==='input')results.selectInput();
   setValue(mode,path);markDirty();
   if(mode==='input')void loadColumns();
 }
 const sampleButton=$<HTMLButtonElement>('try-sample');
 sampleButton.onclick=async()=>{
-  if(sampleButton.disabled||activeCommands||$<HTMLButtonElement>('browse-input').disabled)return;
+  if(sampleButton.disabled||results.commandPending||$<HTMLButtonElement>('browse-input').disabled)return;
   if((value('input')||value('zip-member')||value('max-rows'))&&!window.confirm('Load the sample CSV and replace the current input and row limit? Your other job settings will stay in place.'))return;
   try{
     const rows=Number(sampleButton.dataset.rows);

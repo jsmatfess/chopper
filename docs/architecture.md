@@ -13,10 +13,10 @@ describes future behavior; [GitHub Issues](https://github.com/jsmatfess/chopper/
    [Run CLI parser](../crates/chopper/src/run_cli.rs) accepts JSON via
    the admitted decode owner or appends explicit `--step` blocks to a caller-owned
    Job, without changing the fixed-order `split` interface; see its
-   [reference](run-cli.md). The shared UI tracks
-   edits by revision: a successful Run/Analyze acknowledgement clears changed
-   settings only if no invalidation occurred since submission. In-place operation
-   edits, imports and edits subsequently reverted still require new preparation.
+   [reference](run-cli.md). The [hosted result owner](../ui/src/result-ownership.ts)
+   tracks edits by revision. A successful Run acknowledgement clears changed
+   settings only if no edit occurred since submission. In-place operation edits,
+   imports and edits subsequently reverted still require a new Run.
    New executions obtain internal entropy; no user seed remains in the draft.
    The native interface is the CLI; there is no native HTTP server or embedded
    UI. The hosted interface runs in the browser and communicates with its WASI
