@@ -43,6 +43,10 @@ describes future behavior; [GitHub Issues](https://github.com/jsmatfess/chopper/
    Each caller retains its own selection and fallback rules; raw ingestion and
    retained-parent preparation/retry keep their separate owners.
    [Rewrite rules](pipeline-rewrites.md) govern which paths can be combined.
+   [Calculated-column preparation](../crates/chopper/src/engine/calculation.rs)
+   shares reference binding and dependency ordering between Run and formula
+   preview. Run rejects invalid dependencies and preview retains per-formula
+   diagnostics alongside valid results.
 4. [Storage](../crates/chopper/src/storage.rs) owns intermediate datasets, sorts,
    merge traversal and temporary accounting. Its
    [adaptive primitives](../crates/chopper/src/storage/adaptive.rs) own resident

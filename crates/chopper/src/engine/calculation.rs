@@ -3,7 +3,7 @@ use chopper_core::expression::{Expression, Value};
 use std::borrow::Cow;
 
 pub(crate) struct Plan {
-    programs: [Option<Program>; 64],
+    programs: BoundPrograms,
     order: [usize; 64],
     referenced_results: u64,
     width: usize,
@@ -45,13 +45,97 @@ fn prepare(
     })
 }
 
-fn ready(programs: &[Option<Program>], completed: u64) -> Option<usize> {
-    programs.iter().enumerate().position(|(index, program)| {
-        completed & (1 << index) == 0
-            && program
-                .as_ref()
-                .is_none_or(|program| program.dependencies & !completed == 0)
-    })
+struct BoundPrograms {
+    entries: [Option<Program>; 64],
+    len: usize,
+}
+
+impl BoundPrograms {
+    fn bind<T>(
+        definitions: &[T],
+        mut bind: impl FnMut(usize, &T) -> Result<Option<Program>>,
+    ) -> Result<Self> {
+        let mut entries = [const { None }; 64];
+        for (index, (entry, definition)) in entries[..definitions.len()]
+            .iter_mut()
+            .zip(definitions)
+            .enumerate()
+        {
+            *entry = bind(index, definition)?;
+        }
+        Ok(Self {
+            entries,
+            len: definitions.len(),
+        })
+    }
+
+    fn get(&self, index: usize) -> Option<&Program> {
+        self.entries[index].as_ref()
+    }
+
+    fn referenced_results(&self) -> u64 {
+        self.entries[..self.len]
+            .iter()
+            .flatten()
+            .fold(0, |mask, program| mask | program.dependencies)
+    }
+
+    fn dependency_closure(&self, mut mask: u64) -> u64 {
+        let mut pending = mask;
+        while pending != 0 {
+            let index = pending.trailing_zeros() as usize;
+            pending &= pending - 1;
+            if let Some(program) = self.get(index) {
+                pending |= program.dependencies & !mask;
+                mask |= program.dependencies;
+            }
+        }
+        mask
+    }
+
+    fn dependency_order(&self) -> DependencyOrder<'_> {
+        DependencyOrder {
+            programs: &self.entries[..self.len],
+            completed: 0,
+        }
+    }
+}
+
+struct DependencyOrder<'a> {
+    programs: &'a [Option<Program>],
+    completed: u64,
+}
+
+impl DependencyOrder<'_> {
+    fn is_completed(&self, index: usize) -> bool {
+        self.completed & (1 << index) != 0
+    }
+
+    fn first_blocked(&self) -> Option<usize> {
+        let index = self.completed.trailing_ones() as usize;
+        (index < self.programs.len()).then_some(index)
+    }
+}
+
+impl Iterator for DependencyOrder<'_> {
+    type Item = usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // A preview binding error still occupies its definition index. Yield
+        // it so dependent previews can report the missing value for each row.
+        let index = self
+            .programs
+            .iter()
+            .enumerate()
+            .position(|(index, program)| {
+                !self.is_completed(index)
+                    && program
+                        .as_ref()
+                        .is_none_or(|program| program.dependencies & !self.completed == 0)
+            })?;
+        self.completed |= 1 << index;
+        Some(index)
+    }
 }
 
 pub(crate) fn schema(
@@ -85,37 +169,29 @@ impl Plan {
         memory: Reservation,
     ) -> Result<Self> {
         let expanded = schema(job, header, width, memory.sibling())?;
-        let mut programs = [const { None }; 64];
         let mut order = [0; 64];
-        let count = job.calculated_columns.len();
-        for (index, column) in job.calculated_columns.iter().enumerate() {
-            programs[index] = Some(
-                prepare(
-                    &column.expression,
-                    &expanded,
-                    width,
-                    if header.is_none() { width } else { 0 },
-                    memory.sibling(),
-                    &mut |_| {},
-                )
-                .with_context(|| format!("preparing calculated column {:?}", column.name))?,
-            );
-        }
-        let referenced_results = programs[..count]
-            .iter()
-            .flatten()
-            .fold(0, |mask, program| mask | program.dependencies);
-        let mut completed = 0;
-        for slot in &mut order[..count] {
-            let index = ready(&programs[..count], completed).with_context(|| {
-                let blocked = completed.trailing_ones() as usize;
-                format!(
-                    "cyclic calculated column dependency involving {:?}",
-                    job.calculated_columns[blocked].name
-                )
-            })?;
+        let programs = BoundPrograms::bind(&job.calculated_columns, |_, column| {
+            prepare(
+                &column.expression,
+                &expanded,
+                width,
+                if header.is_none() { width } else { 0 },
+                memory.sibling(),
+                &mut |_| {},
+            )
+            .map(Some)
+            .with_context(|| format!("preparing calculated column {:?}", column.name))
+        })?;
+        let referenced_results = programs.referenced_results();
+        let mut dependency_order = programs.dependency_order();
+        for (slot, index) in order.iter_mut().zip(dependency_order.by_ref()) {
             *slot = index;
-            completed |= 1 << index;
+        }
+        if let Some(blocked) = dependency_order.first_blocked() {
+            anyhow::bail!(
+                "cyclic calculated column dependency involving {:?}",
+                job.calculated_columns[blocked].name
+            );
         }
         let mut boundary = job.operations.len();
         for (index, operation) in job.operations.iter().enumerate() {
@@ -267,22 +343,19 @@ impl<'a> RowEvaluator<'a> {
                 Value::from_stored(text, *kind)
             };
             let mut resource_failure = None;
-            let result = plan.programs[index]
-                .as_ref()
-                .unwrap()
-                .evaluate_retaining_scalar(
-                    &field,
-                    plan.referenced_results & (1 << index) != 0,
-                    &mut |bytes| {
-                        ctx.check()
-                            .and_then(|()| reserve_scratch_bytes(&mut scratch, bytes))
-                            .map_err(|error| {
-                                let message = error.to_string();
-                                resource_failure = Some(error);
-                                message
-                            })
-                    },
-                );
+            let result = plan.programs.get(index).unwrap().evaluate_retaining_scalar(
+                &field,
+                plan.referenced_results & (1 << index) != 0,
+                &mut |bytes| {
+                    ctx.check()
+                        .and_then(|()| reserve_scratch_bytes(&mut scratch, bytes))
+                        .map_err(|error| {
+                            let message = error.to_string();
+                            resource_failure = Some(error);
+                            message
+                        })
+                },
+            );
             let (scalar, result_kind, rendered) = result
                 .map_err(|error| resource_failure.unwrap_or(error))
                 .with_context(|| {
@@ -455,10 +528,9 @@ fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
         calculations.iter().map(|column| column.name.as_str()),
         memory.sibling(),
     )?;
-    let mut programs = [const { None }; 64];
     let mut direct_references: [Vec<usize>; 64] = std::array::from_fn(|_| Vec::new());
     let mut display_bytes = 0;
-    for (index, calculation) in calculations.iter().enumerate() {
+    let programs = BoundPrograms::bind(&calculations, |index, calculation| {
         let mut reference_error = None;
         let direct = &mut direct_references[index];
         let program = if calculation.name.is_empty() {
@@ -489,12 +561,9 @@ fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
         if let Some(error) = reference_error {
             return Err(error);
         }
-        let error = match program {
-            Ok(program) => {
-                programs[index] = Some(program);
-                None
-            }
-            Err(error) => Some(copy_preview_error(&mut memory, &error)?),
+        let (program, error) = match program {
+            Ok(program) => (Some(program), None),
+            Err(error) => (None, Some(copy_preview_error(&mut memory, &error)?)),
         };
         steps.push(PreviewStep {
             operation: calculation.operation,
@@ -502,32 +571,20 @@ fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
             rows: Vec::new(),
             references: Vec::new(),
         });
-    }
-    let dependency_closure = |mut mask: u64| {
-        let mut pending = mask;
-        while pending != 0 {
-            let index = pending.trailing_zeros() as usize;
-            pending &= pending - 1;
-            if let Some(program) = &programs[index] {
-                pending |= program.dependencies & !mask;
-                mask |= program.dependencies;
-            }
-        }
-        mask
-    };
+        Ok(program)
+    })?;
     let needed = if let Some(operation) = target {
         let index = steps
             .iter()
             .position(|step| step.operation == operation)
             .context("unknown formula preview target")?;
-        dependency_closure(1 << index)
+        programs.dependency_closure(1 << index)
     } else {
         u64::MAX
     };
-    let mut completed = 0;
-    while let Some(index) = ready(&programs[..steps.len()], completed) {
-        completed |= 1 << index;
-        let Some(program) = programs[index].as_ref() else {
+    let mut dependency_order = programs.dependency_order();
+    for index in dependency_order.by_ref() {
+        let Some(program) = programs.get(index) else {
             continue;
         };
         if needed & (1 << index) == 0 {
@@ -535,7 +592,7 @@ fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
         }
         let mut references = Vec::new();
         if include_references {
-            let mut dependencies = dependency_closure(1 << index);
+            let mut dependencies = programs.dependency_closure(1 << index);
             while dependencies != 0 {
                 let dependency = dependencies.trailing_zeros() as usize;
                 dependencies &= dependencies - 1;
@@ -617,7 +674,7 @@ fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
         steps[index] = step;
     }
     for (index, step) in steps.iter_mut().enumerate() {
-        if completed & (1 << index) == 0 {
+        if !dependency_order.is_completed(index) {
             step.error = Some(memory.copy_string("Cyclic calculated column dependency. Edit a formula to remove its reference back to this column")?);
         }
     }

@@ -329,6 +329,55 @@ fn calculated_column_binding_follows_the_available_schema() -> Result<()> {
 }
 
 #[test]
+fn calculated_dependency_preparation_keeps_preview_errors_local() -> Result<()> {
+    let (_dir, mut job) = fixture("amount\n3\n");
+    let definitions = serde_json::json!([
+        {"operation": 7, "name": "total", "expression": "adjusted + 1"},
+        {"operation": 2, "name": "adjusted", "expression": "NUMBER(amount) + 1"},
+        {"operation": 3, "name": "left_cycle", "expression": "right_cycle"},
+        {"operation": 4, "name": "right_cycle", "expression": "left_cycle"},
+        {"operation": 8, "name": "unbound", "expression": "missing"},
+        {"operation": 9, "name": "independent", "expression": "42"}
+    ]);
+    let request = serde_json::to_vec(&serde_json::json!({
+        "header": ["amount"],
+        "columns": 1,
+        "rows": [["3"]],
+        "calculations": definitions,
+        "target": 7,
+        "include_references": true
+    }))?;
+    let preview = engine::formula_preview_json(request.as_slice(), request.len() as u64)?;
+    let preview = serde_json::to_value(preview)?;
+    let steps = preview["steps"].as_array().unwrap();
+    assert_eq!(steps.len(), 6);
+    assert_eq!(steps[0]["operation"], 7);
+    assert_eq!(steps[0]["rows"][0]["value"], "5");
+    assert_eq!(steps[0]["references"], serde_json::json!([0]));
+    assert_eq!(steps[1]["rows"][0]["value"], "4");
+    for step in &steps[2..4] {
+        assert!(step["error"].as_str().unwrap().contains("Cyclic"));
+    }
+    assert!(steps[4]["error"].as_str().unwrap().contains("missing"));
+    assert_eq!(steps[5]["rows"], serde_json::json!([]));
+
+    job.calculated_columns = definitions
+        .as_array()
+        .unwrap()
+        .iter()
+        .take(4)
+        .map(|definition| CalculatedColumn {
+            name: definition["name"].as_str().unwrap().into(),
+            expression: definition["expression"].as_str().unwrap().into(),
+        })
+        .collect();
+    let failure = prepare(job).err().expect("Run rejects a cyclic Job");
+    assert!(format!("{failure:#}")
+        .contains("cyclic calculated column dependency involving \"left_cycle\""));
+    Ok(())
+}
+
+#[test]
 fn calculation_growth_and_cancellation_clean_temporary_output() -> Result<()> {
     for cancel in [false, true] {
         let (dir, mut job) = fixture("source\naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n");
