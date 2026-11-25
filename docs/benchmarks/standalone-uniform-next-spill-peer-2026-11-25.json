@@ -1,0 +1,40 @@
+{
+  "type": "derived_component_summary",
+  "issue": 20,
+  "base_commit": "e0fe0320a2a2da03c67be890ed35988f111e81ef",
+  "runtime": "Linux WSL2/ext4, feature-free storage control",
+  "job_memory_mib": 256,
+  "shared_pool_mib": 512,
+  "existing_raw_runs": 96,
+  "next_rows": 1,
+  "peer_bytes": 536788041,
+  "peer_rule": "Leave 65,535 available bytes alongside the measured wider idle state. Replay the same absolute request in all pressured arms.",
+  "arms": [
+    {
+      "mode": "ordinary",
+      "held_runs": 33,
+      "working_bytes": 7737,
+      "spill": "completed"
+    },
+    {
+      "mode": "wider",
+      "held_runs": 96,
+      "working_bytes": 17336,
+      "spill": "typed shared denial before writer"
+    },
+    {
+      "mode": "force_ordinary_drain",
+      "held_runs": 96,
+      "working_bytes": 17336,
+      "spill": "typed shared denial reopening ordinary hierarchy"
+    }
+  ],
+  "verification": "Unpressured wider and pressured ordinary paths finish each of 97 exact ordered IDs and fields after releasing the early peer. Both denials release managed files and shared reservations.",
+  "receipt_identity": {
+    "status.json": "ae0d2f0b3e79179189982a9c8cfa1a2ad0f9fd956b66225bd257e760cfc8ca1f",
+    "manifest.json": "17a7917631b0993c57f5d60da4de60c4d3077ece1ed2377abdb7f289b7a502a7",
+    "1-stdout.log": "125b0665077f3f4f2b7bed84e3dd59ebe96888c798178fa64ff149cc003c919b",
+    "1-stderr.log": "dbf7263adb8bd5b2d24f3eb8b2a1b34ac52046a685c1172b561d6d2befcf5a13"
+  },
+  "patch_sha256": "d7aed325b8d0643a9e9a277ec696c4601e8042744066f074e49de988cd4cd5bd"
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "standalone-uniform-intermediate-merge-heap-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Keep the current intermediate merge queue",
+  "subsystem": "storage",
+  "question": "Does in-place replacement of the winning heap slot save verified 8 GiB Run time at the same fan-in?",
+  "disposition": "reject",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "The two paired effects are 5.459 seconds saved and 4.308 seconds added, a 0.576-second median saving. The reversed pair ends the screen.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "8 GiB standalone Uniform, 256 MiB, one worker, ordinary snapshot and 64-way fan-in."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Four exact field/ID/export and cleanup checks pass. Storage and multiway collision controls pass. Managed traffic and hierarchy match."
+  },
+  "limitations": [
+    "Two pairs on WSL Linux with uncontrolled host cache."
+  ],
+  "exclusions": [
+    "Native Windows, browser and smaller workloads."
+  ],
+  "reopen_when": "Reopen for a different merge-cost hypothesis with an independently timed benefit.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#standalone-uniform-intermediate-merge-heap-2026-11-25",
+      "sha256": "eac336ff900e84216e8b5bcfdc181e498f4915af3dc885e16fa1bfe5c109a4cf"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/standalone-uniform-merge-heap-screen-2026-11-25.json",
+      "sha256": "bae856109bedb02fba08174356f105a981351a5e5675804ef45497cd6238c2b4"
+    },
+    {
+      "path": "docs/benchmarks/standalone-uniform-merge-heap-replacement-2026-11-25.patch",
+      "sha256": "3fe957c471cd799e07a16b6c393f55c8000cb2c9481baed14c57e8ee524cbf79"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

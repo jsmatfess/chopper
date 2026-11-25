@@ -1,0 +1,167 @@
+{
+  "type": "derived_component_summary",
+  "issue": 78,
+  "base_commit": "e0fe0320a2a2da03c67be890ed35988f111e81ef",
+  "challenger_commit": "0f41127368238457d639ccaddf28231f995cf259",
+  "environment": {
+    "type": "environment",
+    "browserVersion": "156.0.8078.4",
+    "asset_sha256": {
+      "baseline": "2656a4528678bc04758dd3c0a2f6bdcc70515a0038ce4752e28221aa8e8d835a",
+      "candidate": "b430393584546cbf362e3499ab5e1099ec88568e4edd964f4e8eedcaf6a3e5e8",
+      "worker": "8a1f2943507835c200dd080bbe3221e9e1a4d707dc96c4062ddb097ce7127908",
+      "storage": "a357a9e3e8d3ba21c2e9c08f143712f56f1deb5357c1d93454002950c94ab0ac"
+    },
+    "clock": "post Preview request through exact worker reply",
+    "fixture": "2 rows and 63 maximal expression strings for the large job",
+    "gate": {
+      "compact_added_median_seconds": 0.008,
+      "large_added_median_seconds": 0.05
+    }
+  },
+  "samples": [
+    {
+      "arm": "candidate",
+      "round": -1,
+      "kind": "compact",
+      "seconds": 0.008934999942779541,
+      "verified": true
+    },
+    {
+      "arm": "candidate",
+      "round": -1,
+      "kind": "large",
+      "seconds": 0.036869999885559085,
+      "verified": true
+    },
+    {
+      "arm": "baseline",
+      "round": -1,
+      "kind": "compact",
+      "seconds": 0.009485000133514405,
+      "verified": true
+    },
+    {
+      "arm": "baseline",
+      "round": -1,
+      "kind": "large",
+      "seconds": 0.022329999923706056,
+      "verified": true
+    },
+    {
+      "arm": "baseline",
+      "round": 0,
+      "kind": "compact",
+      "seconds": 0.00871499991416931,
+      "verified": true
+    },
+    {
+      "arm": "baseline",
+      "round": 0,
+      "kind": "large",
+      "seconds": 0.019384999990463257,
+      "verified": true
+    },
+    {
+      "arm": "candidate",
+      "round": 0,
+      "kind": "compact",
+      "seconds": 0.008740000009536742,
+      "verified": true
+    },
+    {
+      "arm": "candidate",
+      "round": 0,
+      "kind": "large",
+      "seconds": 0.031745000123977664,
+      "verified": true
+    },
+    {
+      "arm": "candidate",
+      "round": 1,
+      "kind": "compact",
+      "seconds": 0.008914999961853028,
+      "verified": true
+    },
+    {
+      "arm": "candidate",
+      "round": 1,
+      "kind": "large",
+      "seconds": 0.03164000010490418,
+      "verified": true
+    },
+    {
+      "arm": "baseline",
+      "round": 1,
+      "kind": "compact",
+      "seconds": 0.009289999961853028,
+      "verified": true
+    },
+    {
+      "arm": "baseline",
+      "round": 1,
+      "kind": "large",
+      "seconds": 0.023505000114440917,
+      "verified": true
+    },
+    {
+      "arm": "baseline",
+      "round": 2,
+      "kind": "compact",
+      "seconds": 0.008399999856948852,
+      "verified": true
+    },
+    {
+      "arm": "baseline",
+      "round": 2,
+      "kind": "large",
+      "seconds": 0.022045000076293945,
+      "verified": true
+    },
+    {
+      "arm": "candidate",
+      "round": 2,
+      "kind": "compact",
+      "seconds": 0.009700000047683717,
+      "verified": true
+    },
+    {
+      "arm": "candidate",
+      "round": 2,
+      "kind": "large",
+      "seconds": 0.034335000038146976,
+      "verified": true
+    }
+  ],
+  "result": {
+    "type": "summary",
+    "byKind": {
+      "compact": {
+        "added_seconds": [
+          2.5000095367431682e-05,
+          -0.00037500000000000033,
+          0.0013000001907348645
+        ],
+        "median_added_seconds": 2.5000095367431682e-05,
+        "passed": true
+      },
+      "large": {
+        "added_seconds": [
+          0.012360000133514407,
+          0.00813499999046326,
+          0.01228999996185303
+        ],
+        "median_added_seconds": 0.01228999996185303,
+        "passed": true
+      }
+    },
+    "screen_passed": true
+  },
+  "correctness_receipt_sha256": "2bc22265c0ff1ddf872401b1e475eae7ff55b428d00500a86f2682283e773498",
+  "io_assertion_failure": {
+    "receipt_sha256": "4612bca59a2098ee2686566f77d2b87239b24581e3ccc331cb045370f6b346c8",
+    "reason": "Both implementations probed once more after the second-fill I/O error. Updated the assertion to require the same full trace and error in both."
+  },
+  "receipt_sha256": "d2db66fbfe46f497fee3275c322c341d1decbe496072468e5e27c587f3da8aca",
+  "validation_status_sha256": "34dc5e3fa1ec72201b07ac808dfb4b631118de485c2f50d211d75e035a60bd89"
+}

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "pending-standalone-uniform-spill-admission-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Preserve the ordinary spill under an existing competing owner",
+  "subsystem": "storage",
+  "question": "Does an ordinary drain before the next spill recover the original admission boundary of a wider merge?",
+  "disposition": "block-promotion",
+  "outcome": "diagnostic",
+  "delivery": "unapplied",
+  "summary": "At 96 initial runs, the same 536,788,041-byte peer allows the ordinary next spill. Both the wider spill and an immediate ordinary drain are denied.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "96 tiny spill runs followed by one buffered record, fixed 256 MiB job and 512 MiB pool."
+    ],
+    "measurement": "diagnostic"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "The successful path verifies all 97 rows. Both denied paths return typed shared errors and clear temporary files and reservations."
+  },
+  "limitations": [
+    "An injected peer tests early resource overlap in the feature-free Linux sorter."
+  ],
+  "exclusions": [
+    "Production input parsing and complete-job elapsed time."
+  ],
+  "reopen_when": "Show that the pending-run and optional fallback owners fit before the spill writer starts, then preserve late sink admission separately.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#pending-standalone-uniform-spill-admission-2026-11-25",
+      "sha256": "01b23d5ce63eae00d65ba18d7e0c4f0eba4b9d55d5847bf25ba737b185a0a74c"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/standalone-uniform-next-spill-peer-2026-11-25.json",
+      "sha256": "58efe24e1811d1f01b4e1d0477f176dba23e9d57e5a654814d4a825f26c26809"
+    },
+    {
+      "path": "docs/benchmarks/standalone-uniform-next-spill-peer-2026-11-25.patch",
+      "sha256": "d7aed325b8d0643a9e9a277ec696c4601e8042744066f074e49de988cd4cd5bd"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

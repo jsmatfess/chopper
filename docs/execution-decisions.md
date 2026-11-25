@@ -422,6 +422,9 @@ needed. At sorter creation, retained-row capacity targets the smaller of one
 quarter of the numeric job budget and half the current shared admission ceiling.
 This leaves room for separately admitted spill construction/I/O; observing the
 ceiling grants nothing and does not change the requested/reported numeric budget.
+At the leading hosted Uniform sort, the explicit 1024 MiB Run guard
+can select 320 MiB with at least 448 MiB of available working capacity.
+It returns to the ordinary ceiling after the first spill.
 Concurrent owners or later pressure can still deny allocations. Explicit
 Fisher-Yates requires resident capacity and fails when infeasible.
 Pressure checks at supported safe boundaries constrain future growth while live
@@ -664,7 +667,7 @@ flowchart TD
     Job[Ordered job and explicit limits] --> Estimate[Choose baseline or estimate eligible hosted sort tier]
     Analyze[Optional matching Analyze observations] -.-> Estimate
     Estimate --> Budget[Resolve memory and worker settings against current headroom]
-    Budget --> Validate[Read and validate the current CSV]
+    Budget --> Validate[Validate current input and bound the leading sorter]
     Validate --> Eligible{Retained pipeline meets a calibrated fusion gate?}
     Eligible -->|Yes| Try[Prepare fused partition-child shuffle under current admission]
     Try -->|Typed denial before emission| Standard[Run existing stages on retained data]

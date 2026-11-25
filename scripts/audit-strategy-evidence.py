@@ -74,6 +74,11 @@ def main():
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
     'Standalone Uniform final reader admission (2026-11-25)': 'ownership-and-lifecycle',
+    'Pending standalone Uniform spill admission (2026-11-25)': 'ownership-and-lifecycle',
+    'Standalone Uniform intermediate merge heap (2026-11-25)': 'external-and-resident-shuffle',
+    'Hosted Uniform retention at a fixed 1024 MiB (2026-11-25)': 'external-and-resident-shuffle',
+    'Guarded hosted Uniform retention at 1024 MiB (2026-11-25)': 'external-and-resident-shuffle',
+    'WASI inspection Job admission cost (2026-11-25)': 'ownership-and-lifecycle',
     'Standalone Uniform direct publication (2026-11-25)': 'ownership-and-lifecycle',
     'Hosted Job JSON buffering (2026-11-25)': 'ownership-and-lifecycle',
     'Uniform sort retention at a fixed budget (2026-11-25)': 'external-and-resident-shuffle',

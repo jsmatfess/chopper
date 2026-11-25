@@ -1,0 +1,153 @@
+{
+  "type": "derived_screen_summary",
+  "issue": 20,
+  "fixture": {
+    "rows": 16777216,
+    "total_bytes": 8589934607,
+    "row_bytes": 512,
+    "keys": 8,
+    "sha256": "a7aa9ee11fe155750928598308c1aca16d248be017a1aa72533f79199c425347"
+  },
+  "request": {
+    "memory_mb": 256,
+    "workers": 1,
+    "grouping": "auto",
+    "max_files": 8,
+    "max_record_bytes": 131072,
+    "cap": 1258291200,
+    "temp_bytes": 34359738368
+  },
+  "base_commit": "e0fe0320a2a2da03c67be890ed35988f111e81ef",
+  "candidate_patch_sha256": "3fe957c471cd799e07a16b6c393f55c8000cb2c9481baed14c57e8ee524cbf79",
+  "binary_sha256": {
+    "baseline": "e43825ca8f2fdd959a6ab3c9ede4b47bb1e91a730bab0f6396074c84f74bf8dc",
+    "candidate": "17606188c49141c1f325223ca9601d8bd930e213148d86b4a92a5c7e1f2ce95f"
+  },
+  "runtime": "Linux WSL2/ext4, ordinary host headroom in a dedicated user scope with no swap, warm uncontrolled host cache, no concurrent validation builds or timed jobs",
+  "clock": "GNU time / CLI launch through publication, cleanup and exit, verification out of clock.",
+  "stop_rule": "Any correctness/resource/cleanup or route mismatch stops immediately. Complete the third pair only if both first pairs save time. Qualify only if all three save time with median at least 1 second and median process CPU <=1.03x. No I/O, sorter hierarchy or publication changes.",
+  "median_savings_gate_seconds": 1.0,
+  "median_paired_saved_seconds": 0.5755550905596465,
+  "elapsed_pairs_saved_seconds": [
+    5.458838257938623,
+    -4.3077280768193305
+  ],
+  "eligible_for_qualification": false,
+  "pair_order": [
+    [
+      "baseline",
+      "candidate"
+    ],
+    [
+      "candidate",
+      "baseline"
+    ]
+  ],
+  "samples": [
+    {
+      "pair": 1,
+      "arm": "baseline",
+      "elapsed_seconds": 61.02075673406944,
+      "cpu_seconds": 51.6,
+      "peak_rss_bytes": 75354112,
+      "working_diagnostics": {
+        "sort_runs": 164,
+        "merge_operations": 3,
+        "merge_inputs": 166,
+        "peak_workspace_reserved_bytes": 67397724,
+        "temporary_bytes_read": 17386866560,
+        "temporary_bytes_written": 25976802147,
+        "peak_temporary_files": 68
+      },
+      "physical_plan": "snapshot",
+      "peak_merge_fan_in": 64,
+      "verified_rows": 16777216,
+      "verified_csvs": 7,
+      "verification_sha256": "af57ec6e8bdc1181175445bbed7b06859de5aff4459801844f01d18e522a7eec",
+      "process_sha256": "402d97b659272eba38acce7559edbf68c787793e3158e06f4880b042736d850b",
+      "manifest_sha256": "a3754d6da10b0ba0ea2ad36fc4ad907f280bb329597b95fb471856d263451054",
+      "temp_and_staging_clear": true
+    },
+    {
+      "pair": 1,
+      "arm": "candidate",
+      "elapsed_seconds": 55.56191847613081,
+      "cpu_seconds": 48.379999999999995,
+      "peak_rss_bytes": 75583488,
+      "working_diagnostics": {
+        "sort_runs": 164,
+        "merge_operations": 3,
+        "merge_inputs": 166,
+        "peak_workspace_reserved_bytes": 67397724,
+        "temporary_bytes_read": 17386866560,
+        "temporary_bytes_written": 25976802147,
+        "peak_temporary_files": 68
+      },
+      "physical_plan": "snapshot",
+      "peak_merge_fan_in": 64,
+      "verified_rows": 16777216,
+      "verified_csvs": 7,
+      "verification_sha256": "6739c0671668375d52f3300bfd4391204626ade8f4687743a38dde61ce3e456f",
+      "process_sha256": "6433a0ba4f370856ff23b6331c921220110ff2331c7a53449c27264ee1fa33f8",
+      "manifest_sha256": "75f6390e8f2b04fc3c9045b0fd258744942a17332864a0e6c878ddaf3705fa38",
+      "temp_and_staging_clear": true
+    },
+    {
+      "pair": 2,
+      "arm": "baseline",
+      "elapsed_seconds": 52.35600080806762,
+      "cpu_seconds": 46.66,
+      "peak_rss_bytes": 75587584,
+      "working_diagnostics": {
+        "sort_runs": 164,
+        "merge_operations": 3,
+        "merge_inputs": 166,
+        "peak_workspace_reserved_bytes": 67397724,
+        "temporary_bytes_read": 17386866560,
+        "temporary_bytes_written": 25976802147,
+        "peak_temporary_files": 68
+      },
+      "physical_plan": "snapshot",
+      "peak_merge_fan_in": 64,
+      "verified_rows": 16777216,
+      "verified_csvs": 7,
+      "verification_sha256": "57beeecb9b165697bf16570c613ca08ba752b1f99ed9d539010558009bba75a5",
+      "process_sha256": "a4aba410d98d3e22467e77507e443bf1a64d49abdfdc85c0a94fe507b5fa02f8",
+      "manifest_sha256": "ac5a7ca0f14ea4ca7f3cf095e68d8d02e4294a39eca95f466b8c834e12c180bb",
+      "temp_and_staging_clear": true
+    },
+    {
+      "pair": 2,
+      "arm": "candidate",
+      "elapsed_seconds": 56.66372888488695,
+      "cpu_seconds": 49.989999999999995,
+      "peak_rss_bytes": 75624448,
+      "working_diagnostics": {
+        "sort_runs": 164,
+        "merge_operations": 3,
+        "merge_inputs": 166,
+        "peak_workspace_reserved_bytes": 67397724,
+        "temporary_bytes_read": 17386866560,
+        "temporary_bytes_written": 25976802147,
+        "peak_temporary_files": 68
+      },
+      "physical_plan": "snapshot",
+      "peak_merge_fan_in": 64,
+      "verified_rows": 16777216,
+      "verified_csvs": 7,
+      "verification_sha256": "7cafd1d33946451e057ce760748a3f0a7b03908ed518062c396f2e7ebcce0b50",
+      "process_sha256": "427b1c0ff4a9a428c5752d6ef98d484d3577538717e4d12b1c93bbd634c10d67",
+      "manifest_sha256": "4d7d7d457b30ce8f5bc9d6e8d83c0133a84adfda148d0956aaa5c20a1583c98f",
+      "temp_and_staging_clear": true
+    }
+  ],
+  "runner_logs": {
+    "build_sha256": "a6bce95046a63ef2990c76721da35aee47b779e91ac6a90429b7398d0ff9e9ee",
+    "measurement_sha256": "61c1fa36adbeb38233fd895056e4b9dc258c6bd8be1db3138ab1fd92314a91e6",
+    "environment_sha256": "b23b4cf48be1960721f4dd91dff8f8e5762d7dc729c992493d3feebaa4783e8a",
+    "native_screen_sha256": "8065889e697dc4b1ff45c6c46b56b092381ba04c13189002505e7324e2bad851",
+    "prior_harness_sha256": "3a0d295702193e0a07ae80f1e6b9a6eba3849d863126ed6664e3e405fe46537a",
+    "prior_driver_sha256": "1c31ccb24b0eb03bc130e5c7a6d4aede75e9149d05eea1136e749ac578ee5574"
+  },
+  "validation": "76 isolated native storage tests, one locked multiway collision refinement integration test, and four independently verified complete Linux CLI exports"
+}

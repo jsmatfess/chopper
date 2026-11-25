@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "id": "hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Measure the hosted fixed-budget Uniform crossover",
+  "subsystem": "storage",
+  "question": "Can more retained capacity avoid the OPFS spill within an unchanged 1024 MiB Run request?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "The broad 384 MiB target saves 7.664\u20137.941 seconds in three matched browser pairs. A separate native Fisher\u2013Yates control crosses capacity between 8 and 12 MiB retained at the same 32 MiB job.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium",
+      "native-linux"
+    ],
+    "workloads": [
+      "800,000-row standalone hosted Uniform at 1024 MiB, one worker, 4 MiB cap.",
+      "72 wide-row explicit native Fisher\u2013Yates at 32 MiB under 16 MiB and 8 MiB shared ceilings."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium",
+      "native-linux"
+    ],
+    "summary": "Every successful output verifies IDs, fields, caps and manifest. Native capacity denials and hosted success clean up. Browser also verifies markers."
+  },
+  "limitations": [
+    "The browser time applies to one mode, fixture and bundled browser. Fisher\u2013Yates capacity has no matched elapsed time."
+  ],
+  "exclusions": [
+    "Default promotion of the broad random-sort target, platform generalization and physical I/O or RSS claims."
+  ],
+  "reopen_when": "Evaluate a bounded leading-sorter guard and actual pressure before promoting any path.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25",
+      "sha256": "16c7204871d3f5913f409f7622463065e3828d04cc80469ca583c231c7e488ea"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/hosted-uniform-fixed-1024-retention-summary-2026-11-25.json",
+      "sha256": "23e312e32926a974be9d6b0b2be152b2298606602a8deda85776652c8260348a"
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-retention-three-eighths-2026-11-25.patch",
+      "sha256": "e6edc27c1bd353b88ada5342b35d94ea8585489af77f3527aa74dfe41202d7bb"
+    },
+    {
+      "path": "docs/benchmarks/fisher-yates-fixed-budget-control-2026-11-25.json",
+      "sha256": "cd71d8638e7741b455ad1e33794406d5f4967c67407bd8c21ea626be441b60bf"
+    },
+    {
+      "path": "docs/benchmarks/fisher-yates-three-eighths-2026-11-25.patch",
+      "sha256": "6bf205ef293fab58ea974ced57ea45213f309bfa958db56b29544391cd13af9c"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

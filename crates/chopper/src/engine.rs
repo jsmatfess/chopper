@@ -92,6 +92,13 @@ use streaming::StreamingGroups;
 /// This entry point never changes admission in the production engine.
 #[cfg(feature = "resource-contract-tests")]
 pub fn run_resource_contracts() -> Result<serde_json::Value> {
+    #[cfg(target_os = "wasi")]
+    {
+        let mut report = resource_contracts::input_adapters()?;
+        report["hosted_uniform_retention"] = crate::storage::hosted_uniform_retention_contract()?;
+        Ok(report)
+    }
+    #[cfg(not(target_os = "wasi"))]
     resource_contracts::input_adapters()
 }
 
@@ -1462,6 +1469,26 @@ fn ingest_records(
         }
     }
     let mut sorter = domain.map(|domain| Sorter::new(ctx, SortOrder::Random(domain)));
+    #[cfg(target_os = "wasi")]
+    if ctx.auto_run
+        && job.resources.memory_mb.as_mib() == Some(1024)
+        && ctx.max_record <= 8 * 1024 * 1024
+        && job.resources.grouping == chopper_core::Grouping::Auto
+        && job.compression == chopper_core::Compression::None
+        && job.input_csv.encoding.eq_ignore_ascii_case("utf-8")
+        && job.output_csv.encoding.eq_ignore_ascii_case("utf-8")
+        && matches!(
+            initial_operations,
+            [Operation::Shuffle {
+                strategy: Shuffle::Uniform
+            }]
+        )
+        && input_is_plain_csv(job).unwrap_or(false)
+    {
+        if let Some(sorter) = &mut sorter {
+            sorter.prefer_hosted_resident();
+        }
+    }
     if first_partition.is_some() {
         sorter = Some(Sorter::new(
             ctx,

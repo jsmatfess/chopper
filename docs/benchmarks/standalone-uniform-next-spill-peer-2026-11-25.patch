@@ -1,0 +1,124 @@
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+index 748bd94..64bb4a9 100644
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -4993,3 +4993,119 @@ mod merge_tests {
+         Ok(())
+     }
+ }
++
++#[cfg(all(test, target_os = "linux", not(feature = "experimental-spill-blocks")))]
++#[test]
++fn standalone_uniform_pending_runs_spill_peer() -> Result<()> {
++    use crate::resources::{MemoryAdmission, MemoryPool};
++    use chopper_core::Resources;
++
++    const MIB: usize = 1024 * 1024;
++    const POOL_LIMIT: usize = 512 * MIB;
++    const RUNS: u64 = 96;
++
++    #[derive(Clone, Copy, Debug)]
++    enum Mode {
++        Ordinary,
++        Wide,
++        DrainBeforeSpill,
++    }
++
++    fn run(mode: Mode, peer_bytes: usize) -> Result<(u64, Result<()>)> {
++        let fixture = tempfile::tempdir()?;
++        let root = fixture.path();
++        let pool = Arc::new(MemoryPool::new(POOL_LIMIT as u64));
++        let mut ctx = Context::with_memory_pool(
++            &Resources {
++                memory_mb: 256.into(),
++                workers: 1,
++                max_record_bytes: 131_072,
++                temp_dir: Some(root.to_string_lossy().into_owned()),
++                ..Default::default()
++            },
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        ctx.direct_terminal_output = true;
++        if !matches!(mode, Mode::Ordinary) {
++            ctx.auto_merge_ceiling = Some(256);
++        }
++        let mut sorter = Sorter::new(&ctx, SortOrder::Random([0; 32]));
++        let make_row = |id: u64| Row {
++            id,
++            ordinal: id,
++            key: u128::from(id).to_be_bytes().to_vec(),
++            fields: vec![id.to_string()],
++        };
++        for id in (0..RUNS).rev() {
++            sorter.push(make_row(id))?;
++            sorter.flush()?;
++        }
++        sorter.push(make_row(RUNS))?;
++        let owned = pool.usage().reserved_bytes;
++        let held_runs: usize = sorter.levels.iter().map(|runs| runs.len()).sum();
++        let expected = if matches!(mode, Mode::Ordinary) {
++            (RUNS - 63) as usize
++        } else {
++            RUNS as usize
++        };
++        assert_eq!(held_runs, expected);
++        let mut peer =
++            Reservation::for_workspace(Arc::new(Workspace::shared(POOL_LIMIT, pool.clone())));
++        peer.resize(peer_bytes)?;
++        let result = (|| -> Result<()> {
++            if matches!(mode, Mode::DrainBeforeSpill) {
++                sorter.ctx.auto_merge_ceiling = None;
++                let pending = std::mem::replace(&mut sorter.levels, Catalog::new(&ctx));
++                for level in pending {
++                    for run in level {
++                        sorter.add_run(run, 0).context("ordinary drain")?;
++                    }
++                }
++            }
++            sorter.flush().context("next spill writer")?;
++            Ok(())
++        })();
++        eprintln!(
++            "{mode:?}: {held_runs} held runs, {owned} B working reservations, {peer_bytes} B peer, result {result:?}"
++        );
++        drop(peer);
++        if result.is_ok() {
++            let mut expected_id = 0;
++            sorter.finish()?.try_for_each_packed(|row| {
++                assert_eq!(row.id, expected_id);
++                assert_eq!(row.fields().next(), Some(expected_id.to_string().as_str()));
++                expected_id += 1;
++                Ok(())
++            })?;
++            assert_eq!(expected_id, RUNS + 1);
++        } else {
++            drop(sorter);
++        }
++        assert_eq!(ctx.used(), 0);
++        drop(ctx);
++        assert_eq!(pool.usage().reserved_bytes, 0);
++        assert_eq!(std::fs::read_dir(root)?.count(), 0);
++        Ok((owned, result))
++    }
++
++    let (wide_owned, wide_unpressured) = run(Mode::Wide, 0)?;
++    wide_unpressured?;
++    let peer = POOL_LIMIT - wide_owned as usize - (DISK_READ_BUFFER - 1);
++    run(Mode::Ordinary, peer)?.1?;
++    for (mode, context) in [
++        (Mode::Wide, "next spill writer"),
++        (Mode::DrainBeforeSpill, "ordinary drain"),
++    ] {
++        let denied = run(mode, peer)?
++            .1
++            .expect_err("expected typed shared denial");
++        assert_eq!(denied.to_string(), context);
++        assert!(matches!(
++            denied.downcast_ref::<MemoryAdmission>(),
++            Some(MemoryAdmission::Shared { .. })
++        ));
++    }
++    Ok(())
++}

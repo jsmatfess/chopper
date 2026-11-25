@@ -1,0 +1,151 @@
+diff --git a/crates/chopper/src/engine.rs b/crates/chopper/src/engine.rs
+index b22dc66..14e7263 100644
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -93,6 +93,13 @@ use streaming::StreamingGroups;
+ /// This entry point never changes admission in the production engine.
+ #[cfg(feature = "resource-contract-tests")]
+ pub fn run_resource_contracts() -> Result<serde_json::Value> {
++    #[cfg(target_os = "wasi")]
++    {
++        let mut report = resource_contracts::input_adapters()?;
++        report["hosted_uniform_retention"] = crate::storage::hosted_uniform_retention_contract()?;
++        Ok(report)
++    }
++    #[cfg(not(target_os = "wasi"))]
+     resource_contracts::input_adapters()
+ }
+ 
+@@ -1463,6 +1470,26 @@ fn ingest_records(
+         }
+     }
+     let mut sorter = domain.map(|domain| Sorter::new(ctx, SortOrder::Random(domain)));
++    #[cfg(target_os = "wasi")]
++    if ctx.auto_run
++        && job.resources.memory_mb.as_mib() == Some(1024)
++        && ctx.max_record <= 8 * 1024 * 1024
++        && job.resources.grouping == chopper_core::Grouping::Auto
++        && job.compression == chopper_core::Compression::None
++        && job.input_csv.encoding.eq_ignore_ascii_case("utf-8")
++        && job.output_csv.encoding.eq_ignore_ascii_case("utf-8")
++        && matches!(
++            initial_operations,
++            [Operation::Shuffle {
++                strategy: Shuffle::Uniform
++            }]
++        )
++        && input_is_plain_csv(job).unwrap_or(false)
++    {
++        if let Some(sorter) = &mut sorter {
++            sorter.prefer_hosted_resident();
++        }
++    }
+     if first_partition.is_some() {
+         sorter = Some(Sorter::new(
+             ctx,
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+index 748bd94..007562c 100644
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -1862,6 +1862,17 @@ impl Sorter {
+             spill_mode: SortSpillMode::Ordinary,
+         }
+     }
++    #[cfg(target_os = "wasi")]
++    pub(crate) fn prefer_hosted_resident(&mut self) {
++        let target = self
++            .ctx
++            .workspace
++            .sort_buffer_limit(self.ctx.memory / 16 * 5);
++        // Leave space for the live input and output owners in the half-job ledger.
++        if self.ctx.working_headroom() >= (target + self.ctx.memory / 8) as u64 {
++            self.buffer_limit = target;
++        }
++    }
+     #[cfg(any(target_os = "linux", target_os = "wasi"))]
+     pub(crate) fn probabilistic_shuffle(ctx: &Context) -> Result<Self> {
+         let mut sorter = Self::new(ctx, SortOrder::GroupRandom);
+@@ -2170,6 +2181,11 @@ impl Sorter {
+             span.finish_counts(observed_rows, 1, None);
+         }
+         self.add_run(run, 0)?;
++        #[cfg(target_os = "wasi")]
++        if matches!(self.order, SortOrder::Random(_)) {
++            // A spill rules out the resident path for this job.
++            self.buffer_limit = self.buffer_limit.min(self.ctx.memory / 4);
++        }
+         #[cfg(any(target_os = "linux", target_os = "wasi"))]
+         if renew_prepared {
+             self.spill_mode = SortSpillMode::Prepared(PreparedSpill::new(&self.ctx)?);
+@@ -4993,3 +5009,71 @@ mod merge_tests {
+         Ok(())
+     }
+ }
++
++#[cfg(all(target_os = "wasi", feature = "resource-contract-tests"))]
++pub(crate) fn hosted_uniform_retention_contract() -> Result<serde_json::Value> {
++    use crate::resources::MemoryPool;
++
++    const MIB: usize = 1024 * 1024;
++    const EFFECTIVE: usize = 1024 * MIB;
++    const EXTENDED: usize = 320 * MIB;
++    const ORDINARY: usize = 256 * MIB;
++    const HEADROOM: usize = 448 * MIB;
++
++    let mut cases = Vec::new();
++    for available in [HEADROOM - 1, HEADROOM] {
++        let pool = Arc::new(MemoryPool::new(EFFECTIVE as u64));
++        let ctx = Context::with_memory_pool(
++            &chopper_core::Resources {
++                memory_mb: 1024.into(),
++                workers: 1,
++                temp_dir: Some("/tmp".into()),
++                ..Default::default()
++            },
++            Arc::new(AtomicBool::new(false)),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let mut peer =
++            Reservation::for_workspace(Arc::new(Workspace::shared(EFFECTIVE, pool.clone())));
++        peer.resize(EFFECTIVE - available - pool.usage().reserved_bytes as usize)?;
++        ensure!(ctx.working_headroom() == available as u64);
++        let mut sorter = Sorter::new(&ctx, SortOrder::Random([0; 32]));
++        sorter.prefer_hosted_resident();
++        let selected = sorter.buffer_limit;
++        ensure!(
++            selected
++                == if available == HEADROOM {
++                    EXTENDED
++                } else {
++                    ORDINARY
++                }
++        );
++        sorter.push(Row {
++            id: 0,
++            ordinal: 0,
++            key: 0u128.to_be_bytes().to_vec(),
++            fields: vec!["retained".into()],
++        })?;
++        sorter.flush()?;
++        ensure!(sorter.buffer_limit == ORDINARY);
++        let mut rows = 0;
++        sorter.finish()?.try_for_each_packed(|row| {
++            ensure!(row.id == 0 && row.fields().next() == Some("retained"));
++            rows += 1;
++            Ok(())
++        })?;
++        ensure!(rows == 1 && ctx.used() == 0);
++        drop(ctx);
++        ensure!(pool.usage().reserved_bytes == peer.bytes());
++        drop(peer);
++        ensure!(pool.usage().reserved_bytes == 0);
++        cases.push(serde_json::json!({
++            "available_bytes": available,
++            "selected_sort_target_bytes": selected,
++            "sort_target_bytes_after_spill": ORDINARY,
++            "cleaned": true,
++        }));
++    }
++    Ok(serde_json::json!(cases))
++}

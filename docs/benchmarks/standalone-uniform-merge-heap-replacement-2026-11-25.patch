@@ -1,0 +1,43 @@
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+index 748bd94..230ccd0 100644
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -2686,6 +2686,9 @@ impl MergeRows {
+         if let Some(row) = self.readers[run].header(self.ctx.max_record, &self._reservation)? {
+             self.heads.push(Head { row, run, order });
+         }
++        self.record_advance()
++    }
++    fn record_advance(&mut self) -> Result<()> {
+         self.merged += 1;
+         if let Some(attempt) = &mut self.observation {
+             attempt.rows_processed(self.merged);
+@@ -2698,7 +2701,7 @@ impl MergeRows {
+     /// Intermediate merges keep the existing framing and validate every field,
+     /// but never reconstruct a Vec<String> or copy fields into decode scratch.
+     fn copy_next(&mut self, output: &mut impl Write) -> Result<bool> {
+-        let Some(head) = self.heads.pop() else {
++        let Some(mut head) = self.heads.peek_mut() else {
+             self.finish_observation();
+             return Ok(false);
+         };
+@@ -2723,7 +2726,18 @@ impl MergeRows {
+                 .with_context(|| format!("reading field {} for row {}", index + 1, head.row.id))?;
+             remaining -= length as usize;
+         }
+-        self.advance(head.run, head.order)?;
++        // Replace the winner in place so the heap restores its order once.
++        let next = self.readers[head.run].header(self.ctx.max_record, &self._reservation)?;
++        let retired = if let Some(row) = next {
++            let retired = std::mem::replace(&mut head.row, row);
++            drop(head);
++            retired
++        } else {
++            std::collections::binary_heap::PeekMut::pop(head).row
++        };
++        self.record_advance()?;
++        // Keep the previous key's charge through the same observation boundary.
++        drop(retired);
+         Ok(true)
+     }
+ }

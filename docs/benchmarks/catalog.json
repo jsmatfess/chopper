@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "b98037751587d8277531f69f67c30f5eb463d627bf8c60242ac5ec9e659f9c9a"
+    "sha256": "21b7b2cdc95cef808a2e08871f2da12043a6edbf229faa4ffef269a8de3b8b92"
   },
   "experiments": [
     {
@@ -4514,6 +4514,81 @@
       "narrative": {
         "path": "docs/performance/investigations/standalone-uniform-final-reader-admission-2026-11-25.md",
         "sha256": "4ebc73a95ebe02678d4d89733f5c0dfe331033a5b02837524bb428d9843ab25e",
+        "topic": "ownership-and-lifecycle"
+      }
+    },
+    {
+      "title": "Hosted Uniform retention at a fixed 1024 MiB (2026-11-25)",
+      "evidence": "docs/performance.md#hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/fisher-yates-fixed-budget-control-2026-11-25.json",
+        "docs/benchmarks/fisher-yates-three-eighths-2026-11-25.patch",
+        "docs/benchmarks/hosted-uniform-fixed-1024-retention-summary-2026-11-25.json",
+        "docs/benchmarks/hosted-uniform-retention-three-eighths-2026-11-25.patch"
+      ],
+      "scripts": [
+        "scripts/benchmark-browser-auto-resources.mjs",
+        "scripts/build-browser.mjs"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25.md",
+        "sha256": "215884f65d8ac6c638519d8dd7c464cc6f730a11820d579b093071814e46e6df",
+        "topic": "external-and-resident-shuffle"
+      }
+    },
+    {
+      "title": "Pending standalone Uniform spill admission (2026-11-25)",
+      "evidence": "docs/performance.md#pending-standalone-uniform-spill-admission-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/standalone-uniform-next-spill-peer-2026-11-25.json",
+        "docs/benchmarks/standalone-uniform-next-spill-peer-2026-11-25.patch"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/pending-standalone-uniform-spill-admission-2026-11-25.md",
+        "sha256": "8c82682a2680d564598880b4b4c145264f4400eefa705afc7d7d2854bc3e99e7",
+        "topic": "ownership-and-lifecycle"
+      }
+    },
+    {
+      "title": "Standalone Uniform intermediate merge heap (2026-11-25)",
+      "evidence": "docs/performance.md#standalone-uniform-intermediate-merge-heap-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/standalone-uniform-merge-heap-replacement-2026-11-25.patch",
+        "docs/benchmarks/standalone-uniform-merge-heap-screen-2026-11-25.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/standalone-uniform-intermediate-merge-heap-2026-11-25.md",
+        "sha256": "62bc114f6f07d9764a8cc315605ad4695900b26945c79933059160cf7e5320d3",
+        "topic": "external-and-resident-shuffle"
+      }
+    },
+    {
+      "title": "Guarded hosted Uniform retention at 1024 MiB (2026-11-25)",
+      "evidence": "docs/performance.md#guarded-hosted-uniform-retention-at-1024-mib-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/hosted-uniform-retention-guard-320-2026-11-25.patch",
+        "docs/benchmarks/hosted-uniform-retention-guard-320-summary-2026-11-25.json",
+        "docs/benchmarks/hosted-uniform-retention-guard-contract-2026-11-25.patch"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/guarded-hosted-uniform-retention-at-1024-mib-2026-11-25.md",
+        "sha256": "4a745e9ba5ab4e6d8c86ed98781323f187126c4213f3455eb0851d729d644206",
+        "topic": "external-and-resident-shuffle"
+      }
+    },
+    {
+      "title": "WASI inspection Job admission cost (2026-11-25)",
+      "evidence": "docs/performance.md#wasi-inspection-job-admission-cost-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/wasi-inspection-job-admission-preview-cost-2026-11-25.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/wasi-inspection-job-admission-cost-2026-11-25.md",
+        "sha256": "35653118eb39f058024445674e4a2e430116e819e9e049e4eac3f2e02b7d5446",
         "topic": "ownership-and-lifecycle"
       }
     }
@@ -17079,6 +17154,45 @@
       ]
     },
     {
+      "path": "docs/benchmarks/fisher-yates-fixed-budget-control-2026-11-25.json",
+      "sha256": "cd71d8638e7741b455ad1e33794406d5f4967c67407bd8c21ea626be441b60bf",
+      "bytes": 2015,
+      "format": "json",
+      "record_counts": {
+        "derived_component_summary": 1
+      },
+      "fields": [
+        "base_commit",
+        "binaries",
+        "fixture",
+        "issue",
+        "replay_patch_sha256",
+        "request",
+        "results",
+        "runner_status_sha256",
+        "runtime",
+        "target_retention_mib",
+        "type",
+        "verification_source_sha256"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/fisher-yates-three-eighths-2026-11-25.patch",
+      "sha256": "6bf205ef293fab58ea974ced57ea45213f309bfa958db56b29544391cd13af9c",
+      "bytes": 500,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25"
+      ]
+    },
+    {
       "path": "docs/benchmarks/flexible-policy-browser-2026-10-18.json",
       "sha256": "f2c3197db67613036266d5871deaf002c97d1924f378caed00e303b171e60459",
       "bytes": 2832,
@@ -18179,6 +18293,95 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#hosted-memory-ceiling-2026-11-16"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-fixed-1024-retention-summary-2026-11-25.json",
+      "sha256": "23e312e32926a974be9d6b0b2be152b2298606602a8deda85776652c8260348a",
+      "bytes": 10379,
+      "format": "json",
+      "record_counts": {
+        "derived_screen_summary": 1
+      },
+      "fields": [
+        "base_commit",
+        "build",
+        "comparison",
+        "configuration",
+        "decision_rule",
+        "fixture",
+        "issue",
+        "order",
+        "raw_receipt",
+        "runtime",
+        "samples",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-retention-guard-320-2026-11-25.patch",
+      "sha256": "2bdf1db56ff011e1fc0a94f027108d10a63e249feeb5f61919b31a47c1dcf13e",
+      "bytes": 2645,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-uniform-retention-at-1024-mib-2026-11-25"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-retention-guard-320-summary-2026-11-25.json",
+      "sha256": "947622e235864da6dc60dd49d02def1fae136cef91bd578aeee206e51873abb5",
+      "bytes": 14425,
+      "format": "json",
+      "record_counts": {
+        "derived_screen_summary": 1
+      },
+      "fields": [
+        "assets",
+        "base_commit",
+        "build_receipt_sha256",
+        "external_holdout",
+        "issue",
+        "main",
+        "runtime",
+        "scope",
+        "shared_headroom",
+        "type",
+        "validity_controls"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-uniform-retention-at-1024-mib-2026-11-25"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-retention-guard-contract-2026-11-25.patch",
+      "sha256": "a189973bd2087646b2e966d046cfff38d9029ea53213affbbeaa99b060a32fbb",
+      "bytes": 5766,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-uniform-retention-at-1024-mib-2026-11-25"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-retention-three-eighths-2026-11-25.patch",
+      "sha256": "e6edc27c1bd353b88ada5342b35d94ea8585489af77f3527aa74dfe41202d7bb",
+      "bytes": 916,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25"
       ]
     },
     {
@@ -36435,6 +36638,51 @@
       ]
     },
     {
+      "path": "docs/benchmarks/standalone-uniform-merge-heap-replacement-2026-11-25.patch",
+      "sha256": "3fe957c471cd799e07a16b6c393f55c8000cb2c9481baed14c57e8ee524cbf79",
+      "bytes": 1901,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#standalone-uniform-intermediate-merge-heap-2026-11-25"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/standalone-uniform-merge-heap-screen-2026-11-25.json",
+      "sha256": "bae856109bedb02fba08174356f105a981351a5e5675804ef45497cd6238c2b4",
+      "bytes": 6134,
+      "format": "json",
+      "record_counts": {
+        "derived_screen_summary": 1
+      },
+      "fields": [
+        "base_commit",
+        "binary_sha256",
+        "candidate_patch_sha256",
+        "clock",
+        "elapsed_pairs_saved_seconds",
+        "eligible_for_qualification",
+        "fixture",
+        "issue",
+        "median_paired_saved_seconds",
+        "median_savings_gate_seconds",
+        "pair_order",
+        "request",
+        "runner_logs",
+        "runtime",
+        "samples",
+        "stop_rule",
+        "type",
+        "validation"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#standalone-uniform-intermediate-merge-heap-2026-11-25"
+      ]
+    },
+    {
       "path": "docs/benchmarks/standalone-uniform-narrow-final-reader-2026-11-25.patch",
       "sha256": "c05f309f7b999faae292c772157862129103c8e295a0f5c0b66cbdafa3be1280",
       "bytes": 7258,
@@ -36474,6 +36722,47 @@
       ]
     },
     {
+      "path": "docs/benchmarks/standalone-uniform-next-spill-peer-2026-11-25.json",
+      "sha256": "58efe24e1811d1f01b4e1d0477f176dba23e9d57e5a654814d4a825f26c26809",
+      "bytes": 1564,
+      "format": "json",
+      "record_counts": {
+        "derived_component_summary": 1
+      },
+      "fields": [
+        "arms",
+        "base_commit",
+        "existing_raw_runs",
+        "issue",
+        "job_memory_mib",
+        "next_rows",
+        "patch_sha256",
+        "peer_bytes",
+        "peer_rule",
+        "receipt_identity",
+        "runtime",
+        "shared_pool_mib",
+        "type",
+        "verification"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#pending-standalone-uniform-spill-admission-2026-11-25"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/standalone-uniform-next-spill-peer-2026-11-25.patch",
+      "sha256": "d7aed325b8d0643a9e9a277ec696c4601e8042744066f074e49de988cd4cd5bd",
+      "bytes": 4476,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#pending-standalone-uniform-spill-admission-2026-11-25"
+      ]
+    },
+    {
       "path": "docs/benchmarks/standalone-uniform-publication-summary-2026-11-25.json",
       "sha256": "87c35f7b6a4681c4eceac64e86d2d91001157d9e661aeb73da2f46ad567125ad",
       "bytes": 55604,
@@ -36496,8 +36785,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "fa15a1edbeef21e3fa60a5f06980fa2fa77902fa4737cd6b2b7540615e5bcff9",
-      "bytes": 1728116,
+      "sha256": "d6fcf440f616ee0bc7abc74968207e4b0692578ec76166a3b9e99abc98276945",
+      "bytes": 1743634,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -38525,6 +38814,32 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#wasi-group-denial-and-cleanup-publication-contracts-2026-10-21"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/wasi-inspection-job-admission-preview-cost-2026-11-25.json",
+      "sha256": "b629daa00df24066e3ad2960cbc10ab5d8160e0a98465c0255bf57bbe03242be",
+      "bytes": 4329,
+      "format": "json",
+      "record_counts": {
+        "derived_component_summary": 1
+      },
+      "fields": [
+        "base_commit",
+        "challenger_commit",
+        "correctness_receipt_sha256",
+        "environment",
+        "io_assertion_failure",
+        "issue",
+        "receipt_sha256",
+        "result",
+        "samples",
+        "type",
+        "validation_status_sha256"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#wasi-inspection-job-admission-cost-2026-11-25"
       ]
     },
     {
@@ -40824,7 +41139,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "a983c6a2b1a9735d4c9977d41d3e4302aeb0a2d562a7090266cb6b1893a0baa0"
+    "sha256": "f0882913b54006f84a2860a766b1f3fa2dc4daa4faa45ef01e2cb5fddf5e54a8"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

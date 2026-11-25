@@ -1,0 +1,13 @@
+diff --git a/crates/chopper/src/storage/adaptive.rs b/crates/chopper/src/storage/adaptive.rs
+index 288f5d3..9960989 100644
+--- a/crates/chopper/src/storage/adaptive.rs
++++ b/crates/chopper/src/storage/adaptive.rs
+@@ -893,7 +893,7 @@ impl ResidentShuffle {
+             &mut self.rows,
+             bytes,
+             &mut self.reservation,
+-            self.ctx.memory / 4,
++            self.ctx.memory / 8 * 3,
+             std::mem::size_of::<Self>(),
+         )? {
+             return Ok(false);

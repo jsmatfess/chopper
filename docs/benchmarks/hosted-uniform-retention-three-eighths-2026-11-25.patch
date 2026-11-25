@@ -1,0 +1,18 @@
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+index 748bd94..d10d438 100644
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -1834,7 +1834,12 @@ impl Sorter {
+         // at most half that ceiling for rows so spill construction and I/O can
+         // still obtain their own grants before retained rows are released.
+         // This is a feasibility target, not a grant or a changed job budget.
+-        let buffer_limit = ctx.workspace.sort_buffer_limit(ctx.memory / 4);
++        let target = if matches!(order, SortOrder::Random(_)) {
++            ctx.memory / 8 * 3
++        } else {
++            ctx.memory / 4
++        };
++        let buffer_limit = ctx.workspace.sort_buffer_limit(target);
+         let routing_candidate =
+             matches!(order, SortOrder::Key) && ctx.grouping == chopper_core::Grouping::Auto;
+         #[cfg(target_os = "linux")]

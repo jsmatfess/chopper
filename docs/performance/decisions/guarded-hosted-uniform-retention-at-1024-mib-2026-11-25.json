@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "id": "guarded-hosted-uniform-retention-at-1024-mib-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Use a guarded 320 MiB target for eligible hosted Uniform Runs",
+  "subsystem": "storage",
+  "question": "Can less retained capacity in the narrowly scoped chooser preserve the fixed-budget crossover and the already-external control?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "The guarded sorter saves 7.582\u20137.678 seconds in three verified pairs. Two already-external pairs add a median 0.077 seconds within the 0.6-second gate.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Explicit 1024 MiB standalone Uniform with Auto grouping and plain UTF-8, 800,000 rows.",
+      "1.1 million row external holdout with one late quoted field, plus resident, cap and cancellation cases."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "Exact CSV, manifest, marker and cleanup check through OPFS. Competing grants check the exact 448 MiB selection edge and the first-spill transition."
+  },
+  "limitations": [
+    "Measured bundled Chromium on one host. The ledger checks share one WASI instance."
+  ],
+  "exclusions": [
+    "Native, grouped and automatic sizing policy changes, renderer RSS and physical OPFS traffic."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#guarded-hosted-uniform-retention-at-1024-mib-2026-11-25",
+      "sha256": "07e81e0d3a667e3e68850d513dad2570fd3be75b09ded4184343b5e2b18f9241"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/hosted-uniform-retention-guard-320-summary-2026-11-25.json",
+      "sha256": "947622e235864da6dc60dd49d02def1fae136cef91bd578aeee206e51873abb5"
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-retention-guard-320-2026-11-25.patch",
+      "sha256": "2bdf1db56ff011e1fc0a94f027108d10a63e249feeb5f61919b31a47c1dcf13e"
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-retention-guard-contract-2026-11-25.patch",
+      "sha256": "a189973bd2087646b2e966d046cfff38d9029ea53213affbbeaa99b060a32fbb"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "type": "derived_component_summary",
+  "issue": 29,
+  "base_commit": "e0fe0320a2a2da03c67be890ed35988f111e81ef",
+  "runtime": "Linux WSL2/ext4, default target features, no elapsed comparison",
+  "target_retention_mib": {
+    "ordinary": 8,
+    "larger": 12
+  },
+  "fixture": {
+    "rows": 72,
+    "bytes": 9432289,
+    "sha256": "eb69c2b0e5ebcc4f0d62ce8e77b27c4ca8b912422b75bfc167a71a968c4b3a06"
+  },
+  "request": {
+    "memory_mib": 32,
+    "workers": 1,
+    "strict_output_cap_bytes": 1048576
+  },
+  "binaries": {
+    "ordinary": "e43825ca8f2fdd959a6ab3c9ede4b47bb1e91a730bab0f6396074c84f74bf8dc",
+    "larger": "ce37b3a74c618a9705738b67d17e9183fd1aa1f1bc0911166f3d038e13c2ff03"
+  },
+  "results": [
+    {
+      "route": "ordinary",
+      "shared_ceiling_mib": 16,
+      "status": 1,
+      "expected": "resident ceiling",
+      "cleanup_verified": true,
+      "diagnostic": "exceeds resident shuffle memory budget"
+    },
+    {
+      "route": "larger",
+      "shared_ceiling_mib": 16,
+      "status": 0,
+      "expected": "complete",
+      "cleanup_verified": true,
+      "verified_rows": 72,
+      "verified_files": 9,
+      "manifest_sha256": "edcb9c30942821745842203aca1538488ab3447928f6615ee09d7588678d4a53",
+      "peak_workspace_reserved_bytes": 10041806
+    },
+    {
+      "route": "ordinary",
+      "shared_ceiling_mib": 8,
+      "status": 1,
+      "expected": "shared denial",
+      "cleanup_verified": true,
+      "diagnostic": "shared process memory admission limit exceeded"
+    },
+    {
+      "route": "larger",
+      "shared_ceiling_mib": 8,
+      "status": 1,
+      "expected": "shared denial",
+      "cleanup_verified": true,
+      "diagnostic": "shared process memory admission limit exceeded"
+    }
+  ],
+  "runner_status_sha256": "8a2aa0ddfaf820ec845e7e9ce044b0111e97c7ff9969f7eedf316d9cc9b41ac8",
+  "replay_patch_sha256": "6bf205ef293fab58ea974ced57ea45213f309bfa958db56b29544391cd13af9c",
+  "verification_source_sha256": "31ce0183eef1c8ebc304276850074ff0f0387f2058b15770502abca7e616c684"
+}

@@ -9112,6 +9112,71 @@
       "original_section_sha256": "9d60c0be1b327b5213a1c944e1c0ab655e887f1cbccda025069d6df2d49b6293",
       "sha256": "4ebc73a95ebe02678d4d89733f5c0dfe331033a5b02837524bb428d9843ab25e",
       "relocations": []
+    },
+    {
+      "id": "hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25",
+      "title": "Hosted Uniform retention at a fixed 1024 MiB (2026-11-25)",
+      "anchor": "hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25",
+      "path": "docs/performance/investigations/hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25.md",
+      "topic": "external-and-resident-shuffle",
+      "legacy_anchors": [
+        "hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25"
+      ],
+      "original_section_sha256": "16c7204871d3f5913f409f7622463065e3828d04cc80469ca583c231c7e488ea",
+      "sha256": "215884f65d8ac6c638519d8dd7c464cc6f730a11820d579b093071814e46e6df",
+      "relocations": []
+    },
+    {
+      "id": "pending-standalone-uniform-spill-admission-2026-11-25",
+      "title": "Pending standalone Uniform spill admission (2026-11-25)",
+      "anchor": "pending-standalone-uniform-spill-admission-2026-11-25",
+      "path": "docs/performance/investigations/pending-standalone-uniform-spill-admission-2026-11-25.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "pending-standalone-uniform-spill-admission-2026-11-25"
+      ],
+      "original_section_sha256": "01b23d5ce63eae00d65ba18d7e0c4f0eba4b9d55d5847bf25ba737b185a0a74c",
+      "sha256": "8c82682a2680d564598880b4b4c145264f4400eefa705afc7d7d2854bc3e99e7",
+      "relocations": []
+    },
+    {
+      "id": "standalone-uniform-intermediate-merge-heap-2026-11-25",
+      "title": "Standalone Uniform intermediate merge heap (2026-11-25)",
+      "anchor": "standalone-uniform-intermediate-merge-heap-2026-11-25",
+      "path": "docs/performance/investigations/standalone-uniform-intermediate-merge-heap-2026-11-25.md",
+      "topic": "external-and-resident-shuffle",
+      "legacy_anchors": [
+        "standalone-uniform-intermediate-merge-heap-2026-11-25"
+      ],
+      "original_section_sha256": "eac336ff900e84216e8b5bcfdc181e498f4915af3dc885e16fa1bfe5c109a4cf",
+      "sha256": "62bc114f6f07d9764a8cc315605ad4695900b26945c79933059160cf7e5320d3",
+      "relocations": []
+    },
+    {
+      "id": "guarded-hosted-uniform-retention-at-1024-mib-2026-11-25",
+      "title": "Guarded hosted Uniform retention at 1024 MiB (2026-11-25)",
+      "anchor": "guarded-hosted-uniform-retention-at-1024-mib-2026-11-25",
+      "path": "docs/performance/investigations/guarded-hosted-uniform-retention-at-1024-mib-2026-11-25.md",
+      "topic": "external-and-resident-shuffle",
+      "legacy_anchors": [
+        "guarded-hosted-uniform-retention-at-1024-mib-2026-11-25"
+      ],
+      "original_section_sha256": "07e81e0d3a667e3e68850d513dad2570fd3be75b09ded4184343b5e2b18f9241",
+      "sha256": "4a745e9ba5ab4e6d8c86ed98781323f187126c4213f3455eb0851d729d644206",
+      "relocations": []
+    },
+    {
+      "id": "wasi-inspection-job-admission-cost-2026-11-25",
+      "title": "WASI inspection Job admission cost (2026-11-25)",
+      "anchor": "wasi-inspection-job-admission-cost-2026-11-25",
+      "path": "docs/performance/investigations/wasi-inspection-job-admission-cost-2026-11-25.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "wasi-inspection-job-admission-cost-2026-11-25"
+      ],
+      "original_section_sha256": "dceb78e589079d2fe4b881441a04b90e4dd644292ba2def7f8c92e14accc01bd",
+      "sha256": "35653118eb39f058024445674e4a2e430116e819e9e049e4eac3f2e02b7d5446",
+      "relocations": []
     }
   ],
   "migrated_count": 193

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "fae33c219c3510a8fa473f39063006ea85bb52f33a620f345707bd7e84cc80d6",
+  "catalog_sha256": "b51b34eb5cd3b5c89a5ff71fcfb7dae1c0b83db5e1ff2ea43678bff843095d70",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -2227,6 +2227,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-uniform-fixed-1024-retention-summary-2026-11-25.json",
+      "source_sha256": "23e312e32926a974be9d6b0b2be152b2298606602a8deda85776652c8260348a",
+      "aliases": [
+        "docs/benchmarks/hosted-uniform-fixed-1024-retention-summary-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [
+        "projected-sample-references"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "summary": 8
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/pipeline-publication-summary-2026-11-18.json",
       "source_sha256": "244d2e891dd899bc65e643a20b08346e727496e030a4f56088faea8196e46742",
       "aliases": [
@@ -2755,6 +2772,19 @@
         "contract-duration": 24
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-uniform-retention-guard-320-2026-11-25.patch",
+      "source_sha256": "2bdf1db56ff011e1fc0a94f027108d10a63e249feeb5f61919b31a47c1dcf13e",
+      "aliases": [
+        "docs/benchmarks/hosted-uniform-retention-guard-320-2026-11-25.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/overlap-followup-2026-11-22-digest-very-wide-retry.jsonl",
@@ -3716,6 +3746,19 @@
         "docs/benchmarks/nested-lineage-and-final-validation-2026-10-22.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/standalone-uniform-merge-heap-replacement-2026-11-25.patch",
+      "source_sha256": "3fe957c471cd799e07a16b6c393f55c8000cb2c9481baed14c57e8ee524cbf79",
+      "aliases": [
+        "docs/benchmarks/standalone-uniform-merge-heap-replacement-2026-11-25.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -5231,6 +5274,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/standalone-uniform-next-spill-peer-2026-11-25.json",
+      "source_sha256": "58efe24e1811d1f01b4e1d0477f176dba23e9d57e5a654814d4a825f26c26809",
+      "aliases": [
+        "docs/benchmarks/standalone-uniform-next-spill-peer-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/fast-rng-summary-2026-10-18.json",
       "source_sha256": "58eff2503464a5dcc927fc45181375146402862397aad769495f69d6aa7fbf3c",
       "aliases": [
@@ -6528,6 +6584,19 @@
         "unclassified": 4
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/fisher-yates-three-eighths-2026-11-25.patch",
+      "source_sha256": "6bf205ef293fab58ea974ced57ea45213f309bfa958db56b29544391cd13af9c",
+      "aliases": [
+        "docs/benchmarks/fisher-yates-three-eighths-2026-11-25.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/consecutive-partitions-chain-2026-10-17.jsonl",
@@ -8888,6 +8957,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-uniform-retention-guard-320-summary-2026-11-25.json",
+      "source_sha256": "947622e235864da6dc60dd49d02def1fae136cef91bd578aeee206e51873abb5",
+      "aliases": [
+        "docs/benchmarks/hosted-uniform-retention-guard-320-summary-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/zip-metadata-owner-final-build-2026-10-21.json",
       "source_sha256": "950ad72f3d4aa98b7da36aac02979539ddcbd91d442b5b3f41734b913fec156e",
       "aliases": [
@@ -9705,6 +9787,19 @@
         "docs/benchmarks/streaming-chain-initial-sources-2026-10-18.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-uniform-retention-guard-contract-2026-11-25.patch",
+      "source_sha256": "a189973bd2087646b2e966d046cfff38d9029ea53213affbbeaa99b060a32fbb",
+      "aliases": [
+        "docs/benchmarks/hosted-uniform-retention-guard-contract-2026-11-25.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -10781,6 +10876,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/wasi-inspection-job-admission-preview-cost-2026-11-25.json",
+      "source_sha256": "b629daa00df24066e3ad2960cbc10ab5d8160e0a98465c0255bf57bbe03242be",
+      "aliases": [
+        "docs/benchmarks/wasi-inspection-job-admission-preview-cost-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [
+        "projected-sample-references"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "summary": 16
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/packed-row-buffered-copy-2026-11-05-verify.py",
       "source_sha256": "b6b7cedbb1ba0494b7bb57f4b798195e69c0c9e2de1c4f96cebb4e99ac2909c7",
       "aliases": [
@@ -11030,6 +11142,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/standalone-uniform-merge-heap-screen-2026-11-25.json",
+      "source_sha256": "bae856109bedb02fba08174356f105a981351a5e5675804ef45497cd6238c2b4",
+      "aliases": [
+        "docs/benchmarks/standalone-uniform-merge-heap-screen-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [
+        "projected-sample-references"
+      ],
+      "observation_records": 4,
+      "validation_records": 0,
+      "classes": {
+        "summary": 4
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/shuffle-partition-temporary-replay-2026-10-17.jsonl",
@@ -12329,6 +12458,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/fisher-yates-fixed-budget-control-2026-11-25.json",
+      "source_sha256": "cd71d8638e7741b455ad1e33794406d5f4967c67407bd8c21ea626be441b60bf",
+      "aliases": [
+        "docs/benchmarks/fisher-yates-fixed-budget-control-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/native-job-conversion-allocation-probe-2026-10-23.json",
       "source_sha256": "cd94d0919076c1abac5f1af12567dd604f412867f787db2ecec40a14f0cd73de",
       "aliases": [
@@ -12954,6 +13096,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "d6fcf440f616ee0bc7abc74968207e4b0692578ec76166a3b9e99abc98276945",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/analysis-preview-owner-linux-validation-2026-10-23.json",
       "source_sha256": "d6fd3a0bc904d0bef1856eea5e87077c48da27197d64f37e34bdffbe5c397b58",
       "aliases": [
@@ -13007,6 +13162,19 @@
         "docs/benchmarks/domain-cache-summary-2026-10-16.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/standalone-uniform-next-spill-peer-2026-11-25.patch",
+      "source_sha256": "d7aed325b8d0643a9e9a277ec696c4601e8042744066f074e49de988cd4cd5bd",
+      "aliases": [
+        "docs/benchmarks/standalone-uniform-next-spill-peer-2026-11-25.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -13907,6 +14075,19 @@
         "unclassified": 8
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-uniform-retention-three-eighths-2026-11-25.patch",
+      "source_sha256": "e6edc27c1bd353b88ada5342b35d94ea8585489af77f3527aa74dfe41202d7bb",
+      "aliases": [
+        "docs/benchmarks/hosted-uniform-retention-three-eighths-2026-11-25.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/plain-publication-production-transfer-2026-11-05.json",
@@ -15046,19 +15227,6 @@
         "measurement": 30
       },
       "coverage": "adapted"
-    },
-    {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "fa15a1edbeef21e3fa60a5f06980fa2fa77902fa4737cd6b2b7540615e5bcff9",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/analysis-preview-owner-package-identities-2026-10-23.json",

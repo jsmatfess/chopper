@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "wasi-inspection-job-admission-cost-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Bound WASI inspection Job decode ownership",
+  "subsystem": "input",
+  "question": "Does pre-admitting typed inspection Jobs preserve buffered source behavior at a practical Preview cost?",
+  "disposition": "adopt",
+  "outcome": "acceptance-only",
+  "delivery": "default",
+  "summary": "Matched Preview adds about 0.012 seconds on a near-1 MiB Job and clears the 0.050-second gate. Exact and adjacent resource controls, read-ahead, raw errors and held Job lifetime pass.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Matched two-row hosted Preview with a compact and a near-1 MiB 63-formula Job."
+    ],
+    "measurement": "diagnostic"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "Three matched pairs per shape, same pinned worker assets and exact reply. Resource-contract reactor exercises early and second-fill denial, raw I/O parity, >1 MiB virtual Job and formula pause."
+  },
+  "limitations": [
+    "Component latency and requested allocation layouts. The consuming Run uses a separate entry and owner."
+  ],
+  "exclusions": [
+    "Whole-job elapsed gain and total process memory."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#wasi-inspection-job-admission-cost-2026-11-25",
+      "sha256": "dceb78e589079d2fe4b881441a04b90e4dd644292ba2def7f8c92e14accc01bd"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/wasi-inspection-job-admission-preview-cost-2026-11-25.json",
+      "sha256": "b629daa00df24066e3ad2960cbc10ab5d8160e0a98465c0255bf57bbe03242be"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/resource-policy-research.md",
+    "docs/validation.md"
+  ]
+}

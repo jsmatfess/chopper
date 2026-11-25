@@ -270,6 +270,13 @@ that concurrency, and 1 selects serial compression. Browser numeric budgets
 are bounded to 2048 MiB. Default record size remains 8 MiB, so a small
 automatic budget can require an explicit lower record limit.
 
+An explicit hosted Uniform Run at 1024 MiB can start with a 320 MiB
+retained-row target when it has one shuffle step, plain UTF-8 input and
+output, Auto grouping, no calculated columns, a record allowance up to
+8 MiB, and at least 448 MiB of available working capacity. The target
+returns to the ordinary ceiling after the first spill. Admission still
+covers actual capacities and overlap. [Measured hosted guard](performance/investigations/guarded-hosted-uniform-retention-at-1024-mib-2026-11-25.md)
+
 Hosted Run can target a 512, 1024, or 2048 MiB automatic budget for plain
 output with automatic grouping and a standalone uniform shuffle or
 Partition → Uniform Shuffle. The planner uses a rough estimate from file
