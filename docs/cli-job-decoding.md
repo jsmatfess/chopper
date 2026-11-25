@@ -197,6 +197,8 @@ retry. It reports requested Rust allocation layouts, including old and new
 layouts at scratch growth, and confirms that 8,224 retained bytes fit after
 construction. Error carriers after denial, allocator overhead, runtime state,
 stacks, virtual file storage and browser JS buffers remain separate owners.
+Browser controls compare source reads and malformed errors, check a virtual
+file on each side of 1 MiB, and sample the live charge at the formula pause.
 
 ## WASI Run
 
@@ -215,5 +217,6 @@ charge from shared usage. This preserves the eligible 2048 MiB target with an
 otherwise available ledger. Every unrelated owner still counts against that
 target. All allocation decisions use the full ledger, and explicit memory
 requests retain their numeric budget.
-Browser controls compare source reads and malformed errors, check a virtual
-file on each side of 1 MiB, and sample the live charge at the formula pause.
+The browser controls compare Run with the prior buffered decoder on malformed
+JSON and source I/O failure. They also exercise direct Run with virtual Jobs
+on both sides of 1 MiB and retained Run with a competing shared grant.

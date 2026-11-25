@@ -206,9 +206,12 @@ function inspectionContract(
   const calls=['chopper_analyze','chopper_preview','chopper_sniff','chopper_formula_scan'];
   try{
     const malformed='{"input":"/input.csv","output":]';
+    const bufferedError=inspect('chopper_test_buffered_job_decode',malformed);
     const runError=inspect('chopper_run',malformed);
     assert(runError.status===1&&runError.result.error==='expected value at line 1 column '+(malformed.indexOf(']')+1),
       'Raw Run JSON error or position changed: '+runError.result.error);
+    assert(bufferedError.status===1&&bufferedError.result.error===runError.result.error&&
+      JSON.stringify(bufferedError.reads)===JSON.stringify(runError.reads),'Run changed buffered JSON error or source reads');
     for(const entry of calls){
       const rejected=inspect(entry,malformed);
       assert(rejected.status===1&&rejected.result.error===runError.result.error,'WASI error or position changed in '+entry);
@@ -216,12 +219,13 @@ function inspectionContract(
     }
     const runIo=inspect('chopper_run',exact,true);
     const previewIo=inspect('chopper_preview',exact,true);
+    const bufferedIo=inspect('chopper_test_buffered_job_decode',exact,true);
     const ioReads=[[8192,8192],[8192,0],[8192,42]];
-    assert(runIo.status===1&&previewIo.status===1&&typeof runIo.result.error==='string'&&
-      /(?:I\/O|input\/output) error/i.test(runIo.result.error)&&!runIo.result.error.startsWith('read job JSON')&&
+    assert(runIo.status===1&&previewIo.status===1&&bufferedIo.status===1&&typeof bufferedIo.result.error==='string'&&
+      runIo.result.error===bufferedIo.result.error&&
       previewIo.result.error===runIo.result.error&&JSON.stringify(runIo.reads)===JSON.stringify(ioReads)&&
-      JSON.stringify(previewIo.reads)===JSON.stringify(ioReads)&&reserved()===baseline,
-      'WASI source I/O error or second read changed: '+JSON.stringify({runIo,previewIo,reserved:reserved(),baseline}));
+      JSON.stringify(previewIo.reads)===JSON.stringify(ioReads)&&JSON.stringify(bufferedIo.reads)===JSON.stringify(ioReads)&&
+      reserved()===baseline,'WASI source I/O error or second read changed: '+JSON.stringify({runIo,previewIo,bufferedIo,reserved:reserved(),baseline}));
     paused=[];
     const borrow=inspect('chopper_formula_scan',job(''));
     assert(borrow.status===0&&paused.length===1&&reserved()===baseline,'Formula pause control failed');

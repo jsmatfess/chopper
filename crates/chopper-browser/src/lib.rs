@@ -112,6 +112,16 @@ mod reactor {
     pub extern "C" fn chopper_test_inspection_reserved_bytes() -> usize {
         DecodedJob::inspection_reserved_bytes().expect("test process ledger")
     }
+    #[cfg(feature = "resource-contract-tests")]
+    #[no_mangle]
+    pub extern "C" fn chopper_test_buffered_job_decode() -> i32 {
+        report((|| {
+            let file = std::fs::File::open("/job.json")?;
+            let reader = std::io::BufReader::with_capacity(8 * 1024, file);
+            serde_json::from_reader::<_, Job>(reader)?;
+            Ok(())
+        })())
+    }
     #[no_mangle]
     pub extern "C" fn chopper_defaults() -> i32 {
         report(
