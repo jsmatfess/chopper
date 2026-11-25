@@ -275,6 +275,8 @@ async function main(){
     const config=job({limits:{rows:2,bytes:21,compressed_bytes:null}});
     const direct=await run(source,config,true);
     const prepared=await run(source,config);
+    assert(direct.plan.auto_plan?.physical_plan==='streaming'&&prepared.plan.auto_plan?.physical_plan==='streaming',
+      'Limits-only Run left the direct preparation route');
     assert(direct.plan.rows===3&&direct.plan.output_files===2,'direct exact-fit byte boundary or final counts changed');
     assert(JSON.stringify(await texts(direct.files))===JSON.stringify(await texts(prepared.files)),'Run-only/Analyze-then-Run output differs');
     assert(direct.files.filter(f=>f.name.endsWith('.csv')).every(f=>f.size<=21),'direct byte cap exceeded');
@@ -284,6 +286,8 @@ async function main(){
     const source=csv('id,key\n1,a\n2,b\n3,a\n4,b\n');
     const config=job({operations:[{type:'partition',columns:['key']},{type:'shuffle',strategy:'uniform'}]});
     const direct=await run(source,config,true),prepared=await run(source,config);
+    assert(direct.plan.auto_plan?.physical_plan==='snapshot'&&prepared.plan.auto_plan?.physical_plan==='snapshot',
+      'Partition and Shuffle left the retained preparation route');
     await verifyPlainRows(direct.files,source);await verifyPlainRows(prepared.files,source);
     assert(direct.plan.rows===4&&direct.plan.output_files===2,'direct fallback final analysis missing');
   });
@@ -291,6 +295,7 @@ async function main(){
     const source=csv('id,key\n1,a\n2,界\n3,"a,b"\n');
     for(const compression of ['gzip','zip'] as const){
       const encoded=await run(source,job({compression}),true);
+      assert(encoded.plan.auto_plan?.physical_plan==='streaming','Archive Run left the direct preparation route');
       const file=encoded.files.find(f=>f.name.endsWith(compression==='gzip'?'.gz':'.zip'));
       assert(file,'missing direct compressed output');
       const decoded=await run(file!,job(),true);

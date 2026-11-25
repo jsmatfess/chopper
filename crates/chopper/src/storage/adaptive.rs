@@ -135,6 +135,28 @@ impl Reservation {
     pub(crate) fn bytes(&self) -> u64 {
         self.bytes
     }
+    #[cfg(any(target_os = "wasi", test))]
+    pub(crate) fn accept_shared(
+        &mut self,
+        bytes: usize,
+        source_pool: &Arc<crate::resources::MemoryPool>,
+        source_bytes: usize,
+    ) -> Result<()> {
+        ensure!(
+            self.workspace
+                .pool
+                .as_ref()
+                .is_some_and(|pool| Arc::ptr_eq(pool, source_pool)),
+            "decoded Job and preparation use different memory pools"
+        );
+        ensure!(self.bytes == 0, "Job reservation already in use");
+        let delta = bytes
+            .checked_sub(source_bytes)
+            .context("decoded Job exceeds preparation capacity")?;
+        self.grow(bytes as u64, delta as u64)?;
+        self.bytes = bytes as u64;
+        Ok(())
+    }
     /// Grow one allocation within an aggregate reservation, including both old
     /// and replacement capacities during reallocation. Payload charges already
     /// in this reservation are preserved.
@@ -192,31 +214,35 @@ impl Reservation {
     fn resize_changed(&mut self, bytes: u64) -> Result<()> {
         if bytes > self.bytes {
             let extra = bytes - self.bytes;
-            let old = self
-                .workspace
-                .used
-                .try_update(AtomicOrdering::Relaxed, AtomicOrdering::Relaxed, |used| {
-                    used.checked_add(extra)
-                        .filter(|n| *n <= self.workspace.limit)
-                })
-                .map_err(|_| crate::resources::MemoryAdmission::Local)?;
-            if let Some(pool) = &self.workspace.pool {
-                if let Err(error) = pool.acquire(extra) {
-                    // The local grant has not escaped this call. Roll it back
-                    // transactionally when aggregate admission is denied.
-                    self.workspace
-                        .used
-                        .fetch_sub(extra, AtomicOrdering::Relaxed);
-                    return Err(error);
-                }
-            }
-            self.workspace
-                .peak
-                .fetch_max(old + extra, AtomicOrdering::Relaxed);
+            self.grow(extra, extra)?;
         } else {
             self.workspace.release(self.bytes - bytes);
         }
         self.bytes = bytes;
+        Ok(())
+    }
+
+    fn grow(&self, local: u64, shared: u64) -> Result<()> {
+        let old = self
+            .workspace
+            .used
+            .try_update(AtomicOrdering::Relaxed, AtomicOrdering::Relaxed, |used| {
+                used.checked_add(local)
+                    .filter(|n| *n <= self.workspace.limit)
+            })
+            .map_err(|_| crate::resources::MemoryAdmission::Local)?;
+        if let Some(pool) = self.workspace.pool.as_ref().filter(|_| shared != 0) {
+            if let Err(error) = pool.acquire(shared) {
+                // Roll back the local charge before it escapes this call.
+                self.workspace
+                    .used
+                    .fetch_sub(local, AtomicOrdering::Relaxed);
+                return Err(error);
+            }
+        }
+        self.workspace
+            .peak
+            .fetch_max(old + local, AtomicOrdering::Relaxed);
         Ok(())
     }
 }

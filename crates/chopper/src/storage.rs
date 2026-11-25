@@ -282,6 +282,7 @@ impl Context {
             memory_pool,
             automatic_worker_limit,
             [256, 256],
+            0,
         )
     }
 
@@ -292,11 +293,13 @@ impl Context {
         memory_pool: Arc<crate::resources::MemoryPool>,
         automatic_worker_limit: usize,
         auto_memory_targets_mb: [u64; 2],
+        job_credit: u64,
     ) -> Result<Self> {
         #[cfg(target_os = "wasi")]
         let _ = automatic_worker_limit;
         ensure!(!cancel.load(AtomicOrdering::Relaxed), "job cancelled");
-        let memory_mb = memory_pool.resolve_memory_for_run(resources, auto_memory_targets_mb)?;
+        let memory_mb =
+            memory_pool.resolve_memory_for_run(resources, auto_memory_targets_mb, job_credit)?;
         let workspace = Arc::new(Workspace::shared(
             (memory_mb * 1024 * 1024 / 2) as usize,
             memory_pool,

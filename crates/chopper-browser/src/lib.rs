@@ -176,8 +176,8 @@ mod reactor {
         }
 
         report((|| {
-            let job = read_job()?;
-            validate_resources(&job)?;
+            let job = DecodedJob::read_hosted()?;
+            validate_resources(job.job())?;
             fn emit(value: impl serde::Serialize, prefix: &str) -> bool {
                 // Fixed stack serialization; no growing JSON/value allocation.
                 struct Buffer {
@@ -241,19 +241,15 @@ mod reactor {
                     Arc::new(|fact| emit(fact, "{\"physical\":"));
                 (snapshot, physical)
             });
-            let analysis =
-                engine::run_hosted_with_preview(job, cancel, notify, hint, preview, observers)?;
+            let analysis = engine::run_decoded_hosted_with_preview(
+                job, cancel, notify, hint, preview, observers,
+            )?;
             Ok(RunReport {
                 analysis,
                 complete: true,
             })
         })())
     }
-    fn read_job() -> anyhow::Result<Job> {
-        let reader = std::io::BufReader::with_capacity(8 * 1024, std::fs::File::open("/job.json")?);
-        Ok(serde_json::from_reader(reader)?)
-    }
-
     fn validate_resources(job: &Job) -> anyhow::Result<()> {
         anyhow::ensure!(
             job.resources.memory_mb.as_mib().is_none_or(|mb| mb <= 2048),

@@ -1,6 +1,7 @@
 //! Run route selection and ownership of the prerequisites for dispatch.
 use super::{
     auto, direct, output, streaming, uniform, AutoObservations, AutoPlan, PreviewObservations,
+    RunJob,
 };
 use crate::{
     observation::physical,
@@ -78,7 +79,7 @@ impl RetainedPublication {
 
 impl RunRoute {
     pub(super) fn select(
-        job: &Job,
+        job: &RunJob,
         cancel: &Arc<AtomicBool>,
         notify: &Notify,
         pool: &Arc<MemoryPool>,
@@ -112,6 +113,7 @@ impl RunRoute {
                     1
                 },
                 mode.memory_targets(),
+                job.memory_credit(pool),
             )?;
             if mode.ready(&context) {
                 *context.run_destination() = destination;
@@ -130,20 +132,23 @@ impl RunRoute {
 
     pub(super) fn report(
         &self,
-        job: &Job,
+        job: &RunJob,
         pool: &MemoryPool,
         hint: Option<AutoObservations>,
         preview: Option<PreviewObservations>,
     ) -> AutoPlan {
+        let job_credit = job.memory_credit(pool);
         match self {
-            Self::Direct { mode, .. } => AutoPlan::start(job, pool, hint, mode.route(), preview),
+            Self::Direct { mode, .. } => {
+                AutoPlan::start(job, pool, hint, mode.route(), preview, job_credit)
+            }
             Self::Retained(run) => {
                 let route = if run.publication.is_terminal() {
                     auto::Route::PrivateTerminal
                 } else {
                     auto::Route::Snapshot
                 };
-                let mut report = AutoPlan::start(job, pool, hint, route, preview);
+                let mut report = AutoPlan::start(job, pool, hint, route, preview, job_credit);
                 report.set_native_merge_fan_in(run.publication.merge_fan_in());
                 report.try_retained_exact = run.publication.try_retained_exact();
                 report.direct_preflight_fallback = run.direct_preflight_fallback;
@@ -165,7 +170,7 @@ impl ProcessingMode<'_> {
 
     pub(super) fn context(
         self,
-        job: &Job,
+        job: &RunJob,
         cancel: Arc<AtomicBool>,
         notify: Notify,
         pool: Arc<MemoryPool>,
@@ -175,6 +180,7 @@ impl ProcessingMode<'_> {
             Self::Prepare => (usize::MAX, [256, 256]),
             Self::Run(_, plan) => (plan.automatic_worker_limit(), plan.memory_targets_mb()),
         };
+        let job_credit = job.memory_credit(&pool);
         let mut context = Context::with_run_limits(
             &job.resources,
             cancel,
@@ -182,6 +188,7 @@ impl ProcessingMode<'_> {
             pool,
             worker_limit,
             memory_targets,
+            job_credit,
         )?;
         context.physical = physical;
         if let Self::Run(run, _) = self {
@@ -272,6 +279,7 @@ mod tests {
         });
         let cancel = Arc::new(AtomicBool::new(false));
         let notify: Notify = Arc::new(|_| {});
+        let job = RunJob::from(job);
         let route = RunRoute::select(&job, &cancel, &notify, &pool, false)?;
         let plan = route.report(&job, &pool, None, None);
         let report = serde_json::to_value(plan)?;

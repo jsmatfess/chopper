@@ -232,10 +232,15 @@ impl DecodedJob {
 
 #[cfg(target_os = "wasi")]
 impl DecodedJob {
-    /// Read the browser inspection Job with the existing WASI source buffer.
-    pub fn read_inspection() -> Result<Self> {
+    /// Read the browser Job with the existing WASI source buffer.
+    pub fn read_hosted() -> Result<Self> {
         let file = std::fs::File::open("/job.json")?;
         Self::decode_buffered(file, process_memory()?)
+    }
+
+    /// Read the browser inspection Job with the existing WASI source buffer.
+    pub fn read_inspection() -> Result<Self> {
+        Self::read_hosted()
     }
 
     fn decode_buffered(source: impl Read, pool: Arc<MemoryPool>) -> Result<Self> {
@@ -250,6 +255,53 @@ impl DecodedJob {
     #[cfg(feature = "resource-contract-tests")]
     pub fn inspection_reserved_bytes() -> Result<usize> {
         Ok(process_memory()?.reservation_counts().0 as usize)
+    }
+}
+
+#[cfg(any(target_os = "wasi", test))]
+impl DecodedJob {
+    #[cfg(any(test, feature = "resource-contract-tests"))]
+    pub(crate) fn decode_for_run_test(source: impl Read, pool: Arc<MemoryPool>) -> Result<Self> {
+        #[cfg(target_os = "wasi")]
+        {
+            Self::decode_buffered(source, pool)
+        }
+        #[cfg(not(target_os = "wasi"))]
+        {
+            Self::decode(source, pool, false)
+        }
+    }
+
+    #[cfg(any(test, feature = "resource-contract-tests"))]
+    pub(crate) fn with_test_seed(mut self) -> Result<Self> {
+        let seed = "seed";
+        self._grant.grow(self._grant.bytes + seed.len())?;
+        self.job.random_seed = Some(seed.into());
+        Ok(self)
+    }
+
+    #[cfg(target_os = "wasi")]
+    pub(crate) fn pool(&self) -> &Arc<MemoryPool> {
+        &self._grant.pool
+    }
+
+    pub(crate) fn memory_credit(&self, pool: &MemoryPool) -> u64 {
+        if std::ptr::eq(Arc::as_ptr(&self._grant.pool), pool) {
+            self._grant.bytes as u64
+        } else {
+            0
+        }
+    }
+
+    pub(crate) fn into_workspace(
+        mut self,
+        memory: &mut crate::storage::Reservation,
+        bytes: usize,
+    ) -> Result<Job> {
+        memory.accept_shared(bytes, &self._grant.pool, self._grant.bytes)?;
+        // The workspace now owns the original charge and any seed delta.
+        self._grant.bytes = 0;
+        Ok(self.job)
     }
 }
 

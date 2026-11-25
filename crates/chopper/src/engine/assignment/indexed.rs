@@ -103,7 +103,7 @@ mod tests {
         job.validate()?;
         let mut visits = 0;
         let result = process_using(
-            job,
+            job.into(),
             Arc::new(AtomicBool::new(false)),
             Arc::new(|_| {}),
             pool.clone(),

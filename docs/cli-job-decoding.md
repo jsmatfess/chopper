@@ -1,4 +1,4 @@
-# Scripted and hosted inspection Job decoding ownership
+# Scripted and hosted Job decoding ownership
 
 [#151](history/prior-issues.md#issue-151), child of #86, covers only
 native scripted `analyze` and `run` decode-origin payloads. The
@@ -181,8 +181,7 @@ reader. The allowance adds those buffer bytes to every prefix. The buffer still
 reads ahead from the virtual file in 8 KiB requests. There is no metadata size
 check or path tracking, and source and serde errors retain their raw text and
 positions when admission succeeds. The browser's existing import limit applies
-at the UI boundary. The consuming Run loader keeps its existing handoff into
-PreparedJob pending a grant transfer that preserves the 2048 MiB Auto target.
+at the UI boundary.
 
 The typed decoder drops its scratch and partial values before the reader drops.
 The owner then shrinks the reservation to the retained Job capacity and holds it
@@ -198,5 +197,23 @@ retry. It reports requested Rust allocation layouts, including old and new
 layouts at scratch growth, and confirms that 8,224 retained bytes fit after
 construction. Error carriers after denial, allocator overhead, runtime state,
 stacks, virtual file storage and browser JS buffers remain separate owners.
+
+## WASI Run
+
+[Issue #79](https://github.com/jsmatfess/chopper/issues/79) uses the same
+decoder for Run and carries the immutable owner through validation, route
+selection and Context creation. At the direct or retained preparation seam,
+the workspace verifies that the decode grant belongs to its shared pool. It
+charges the full retained capacity and any 64-byte generated seed allowance
+locally, and charges only the seed delta to the shared pool. A shared denial
+rolls back the local charge. On success, the source grant is disarmed and
+PreparedJob owns the configuration and reservation before seed generation.
+The configuration drops before its grant on either path.
+
+When resolving a numeric Auto target, Run deducts its own verified decode
+charge from shared usage. This preserves the eligible 2048 MiB target with an
+otherwise available ledger. Every unrelated owner still counts against that
+target. All allocation decisions use the full ledger, and explicit memory
+requests retain their numeric budget.
 Browser controls compare source reads and malformed errors, check a virtual
 file on each side of 1 MiB, and sample the live charge at the formula pause.

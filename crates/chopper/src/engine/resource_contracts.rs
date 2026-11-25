@@ -256,6 +256,8 @@ pub(super) fn input_adapters() -> Result<serde_json::Value> {
     let report = {
         let mut report = report;
         report["auto_fusion"] = auto_fusion()?;
+        report["decoded_run_transfer"] = job_owner::transfer_contracts::run()?;
+        report["decoded_run_automatic_memory"] = job_owner::transfer_contracts::wasi_auto()?;
         report
     };
     #[cfg(feature = "experimental-spill-blocks")]

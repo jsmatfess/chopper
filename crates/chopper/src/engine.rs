@@ -38,6 +38,7 @@ mod input_zip;
 mod job_owner;
 pub(crate) use job_owner::capacity as job_capacity;
 pub use job_owner::PreparedJob;
+use job_owner::RunJob;
 mod keys;
 #[cfg(feature = "experimental-nested-balanced")]
 mod nested_balanced;
@@ -277,11 +278,11 @@ pub fn run_with_auto(
     pool: Arc<crate::resources::MemoryPool>,
     hint: Option<AutoObservations>,
 ) -> Result<Analysis> {
-    run_using(job, cancel, notify, pool, (hint, None), None, None)
+    run_using(job.into(), cancel, notify, pool, (hint, None), None, None)
 }
 
 fn run_using(
-    job: Job,
+    job: RunJob,
     cancel: Arc<AtomicBool>,
     notify: Notify,
     pool: Arc<crate::resources::MemoryPool>,
@@ -338,7 +339,7 @@ pub fn run_observed(
     sink: crate::observation::Sink<'_>,
 ) -> Result<Analysis> {
     run_using(
-        job,
+        job.into(),
         cancel,
         notify,
         crate::resources::process_memory()?,
@@ -383,16 +384,52 @@ pub fn run_hosted_with_preview(
         crate::observation::physical::Sink,
     )>,
 ) -> Result<Analysis> {
-    let (snapshot, physical) = observers.map_or((None, None), |(s, p)| (Some(s), Some(p)));
-    run_using(
-        job,
+    run_hosted_job(
+        job.into(),
         cancel,
         notify,
         crate::resources::process_memory()?,
         (hint, preview),
-        snapshot,
-        physical,
+        observers,
     )
+}
+
+#[cfg(target_os = "wasi")]
+pub fn run_decoded_hosted_with_preview(
+    job: crate::cli_job::DecodedJob,
+    cancel: Arc<AtomicBool>,
+    notify: Notify,
+    hint: Option<AutoObservations>,
+    preview: Option<PreviewObservations>,
+    observers: Option<(
+        crate::observation::Sink<'_>,
+        crate::observation::physical::Sink,
+    )>,
+) -> Result<Analysis> {
+    let pool = job.pool().clone();
+    run_hosted_job(
+        RunJob::Decoded(job),
+        cancel,
+        notify,
+        pool,
+        (hint, preview),
+        observers,
+    )
+}
+
+fn run_hosted_job(
+    job: RunJob,
+    cancel: Arc<AtomicBool>,
+    notify: Notify,
+    pool: Arc<crate::resources::MemoryPool>,
+    advice: (Option<AutoObservations>, Option<PreviewObservations>),
+    observers: Option<(
+        crate::observation::Sink<'_>,
+        crate::observation::physical::Sink,
+    )>,
+) -> Result<Analysis> {
+    let (snapshot, physical) = observers.map_or((None, None), |(s, p)| (Some(s), Some(p)));
+    run_using(job, cancel, notify, pool, advice, snapshot, physical)
 }
 /// Prepare against a caller-owned aggregate capacity ledger. Retained profiles,
 /// returned copies and prepared jobs can share this pool without sharing a job limit.
@@ -424,7 +461,15 @@ pub fn run_with_observations(
 ) -> Result<Analysis> {
     let pool = crate::resources::process_memory()?;
     let physical = (!job.operations.is_empty()).then_some(sink);
-    run_using(job, cancel, notify, pool, (None, None), None, physical)
+    run_using(
+        job.into(),
+        cancel,
+        notify,
+        pool,
+        (None, None),
+        None,
+        physical,
+    )
 }
 fn prepare_using(
     job: Job,
@@ -436,7 +481,7 @@ fn prepare_using(
 ) -> Result<Prepared> {
     job.validate_for_execution()?;
     match process_using(
-        job,
+        job.into(),
         cancel,
         notify,
         pool,
@@ -484,7 +529,7 @@ impl Processed {
 }
 
 fn process_using(
-    job: Job,
+    job: RunJob,
     cancel: Arc<AtomicBool>,
     notify: Notify,
     pool: Arc<crate::resources::MemoryPool>,

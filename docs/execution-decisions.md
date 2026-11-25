@@ -116,7 +116,7 @@ ordinary exact allocation.
 
 ```mermaid
 flowchart TD
-    Validated[Validated Run Job] --> Destination[Native destination witness or hosted unchecked destination]
+    Validated[Validated Run Job with hosted decode owner still live] --> Destination[Native destination witness or hosted unchecked destination]
     Destination --> Candidate{Direct candidate for this Job and observation mode?}
     Candidate -->|Yes| Hosted{WASI direct candidate?}
     Hosted -->|Yes| Output{Valid job output path?}
@@ -130,8 +130,9 @@ flowchart TD
     Candidate -->|No| Retained
     Retained --> Policy[Snapshot, grouped private output, native merge, or retained exact writers]
     Policy --> Process[Build the retained Context from the selected mode and Auto resource targets]
-    Direct --> Report[Report the selected route after successful publication]
-    Process --> Report
+    Direct --> JobAdmission[Admit PreparedJob and transfer any hosted decode grant]
+    Process --> JobAdmission
+    JobAdmission --> Report[Report the selected route after successful publication]
 ```
 
 Explicit preparation builds a snapshot Context without selecting a Run route.
@@ -326,6 +327,9 @@ rules or browser worker/marker behavior.
 flowchart TD
     Scripted[Native scripted Analyze/Run] --> Metadata[Metadata size check then open]
     Metadata --> Defaults{Shared defaults grant available?}
+    HostedJob[Hosted Job] --> HostedOpen[Open virtual file and admit defaults plus 8 KiB buffer]
+    HostedOpen --> Decode
+    HostedOpen -->|Denied| DecodeError
     Defaults -->|No| DecodeError[Admission error; drop partial payload before grant]
     Defaults -->|Yes| Decode[Direct typed reader; admit lexical prefix before byte delivery]
     Decode -->|Denied| Sticky[Sticky denial; no further source reads]
@@ -339,7 +343,7 @@ flowchart TD
     Memory -->|Integer| Numeric[Use explicit numeric budget]
     Memory -->|auto| Observe[Refresh pressure; observe shared admission headroom]
     Observe --> Target[Hosted Run: eligible shuffle uses file size, matching preview, bounded interior widths or gzip trailer, and matching Analyze]
-    Target --> Resolve[Resolve available Run target and fallback tier]
+    Target --> Resolve[Resolve Run target and fallback tier; credit only this same-pool hosted Job for sizing]
     Observe --> LinuxTarget[Linux shuffle: matching Analyze can target 384 MiB to avoid an extra merge]
     LinuxTarget --> Resolve
     Numeric --> Validate[Validate budget, record limit and workers]
@@ -350,6 +354,9 @@ flowchart TD
     BrowserPool --> Context[Create Context; prepared execution reuses it]
     Hosted -->|No| Context
     Context --> Next[Next bounded allocation or growth]
+    Context -->|Hosted Run preparation| Transfer[Verify pool identity, admit full local capacity and only the shared seed delta]
+    Transfer -->|Success| Work
+    Transfer -->|Denial; roll back tentative local charge| Error
     Context -.-> Observation[Hosted direct/prepared Run: optional bounded observation]
     Observation --> ObservationGrant{8192-byte callback grant available?}
     ObservationGrant -->|Yes| Snapshot[Emit bounded snapshot; release grant before CSV work]

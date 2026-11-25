@@ -207,7 +207,7 @@ fn count(source: &mut dyn Read, job: &Job, ctx: &Context, partition: bool) -> Re
 }
 
 pub(super) fn run(
-    job: Job,
+    job: RunJob,
     mut ctx: Context,
     (sink, physical): (
         Option<crate::observation::Sink<'_>>,

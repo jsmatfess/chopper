@@ -113,20 +113,22 @@ impl MemoryPool {
 
     /// Resolve without granting the observed free capacity.
     pub(crate) fn resolve_memory(&self, resources: &chopper_core::Resources) -> Result<u64> {
-        self.resolve_memory_for_run(resources, [256, 256])
+        self.resolve_memory_for_run(resources, [256, 256], 0)
     }
 
     pub(crate) fn resolve_memory_for_run(
         &self,
         resources: &chopper_core::Resources,
         auto_targets_mb: [u64; 2],
+        job_credit: u64,
     ) -> Result<u64> {
         self.recheck_pressure();
         let mb = resources.memory_mb.as_mib().unwrap_or_else(|| {
             self.with_usage(|usage| {
+                // The live, same-pool Job credit affects sizing only.
                 let available_mb = usage
                     .admission_limit_bytes
-                    .saturating_sub(usage.reserved_bytes)
+                    .saturating_sub(usage.reserved_bytes.saturating_sub(job_credit))
                     / (1024 * 1024 / 2);
                 // A target needs its full working allowance. Reuse a
                 // calibrated lower tier when it still fits.
@@ -818,7 +820,10 @@ mod automatic_memory_tests {
             (512 * MIB - 1, [2048, 1024], 256),
         ] {
             let pool = MemoryPool::new(free);
-            assert_eq!(pool.resolve_memory_for_run(&resources, wanted)?, resolved);
+            assert_eq!(
+                pool.resolve_memory_for_run(&resources, wanted, 0)?,
+                resolved
+            );
             assert_eq!(pool.reservation_counts().0, 0);
         }
         let explicit = Resources {
@@ -826,7 +831,7 @@ mod automatic_memory_tests {
             ..resources
         };
         assert_eq!(
-            MemoryPool::new(1).resolve_memory_for_run(&explicit, [2048, 1024])?,
+            MemoryPool::new(1).resolve_memory_for_run(&explicit, [2048, 1024], 0)?,
             512
         );
         Ok(())

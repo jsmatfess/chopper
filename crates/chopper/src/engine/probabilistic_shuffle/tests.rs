@@ -56,7 +56,7 @@ fn execute(
     job.validate()?;
     let mut input_reads = 0;
     let result = process_using(
-        job,
+        job.into(),
         cancel,
         notify,
         pool,

@@ -3,6 +3,42 @@ use super::*;
 
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(super) mod resource_contracts;
+#[cfg(any(test, all(target_os = "wasi", feature = "resource-contract-tests")))]
+pub(super) mod transfer_contracts;
+
+pub(super) enum RunJob {
+    Caller(Job),
+    #[cfg(any(target_os = "wasi", test))]
+    Decoded(crate::cli_job::DecodedJob),
+}
+
+impl From<Job> for RunJob {
+    fn from(job: Job) -> Self {
+        Self::Caller(job)
+    }
+}
+
+impl std::ops::Deref for RunJob {
+    type Target = Job;
+
+    fn deref(&self) -> &Job {
+        match self {
+            Self::Caller(job) => job,
+            #[cfg(any(target_os = "wasi", test))]
+            Self::Decoded(job) => job.job(),
+        }
+    }
+}
+
+impl RunJob {
+    pub(super) fn memory_credit(&self, _pool: &crate::resources::MemoryPool) -> u64 {
+        match self {
+            Self::Caller(_) => 0,
+            #[cfg(any(target_os = "wasi", test))]
+            Self::Decoded(job) => job.memory_credit(_pool),
+        }
+    }
+}
 
 /// Immutable configuration retained by a prepared snapshot. Borrow it through
 /// Deref/Serialize. An explicit Job clone is caller-owned and has no shared grant.
@@ -22,14 +58,21 @@ impl PreparedJob {
         self._memory.bytes()
     }
 
-    pub(super) fn admit(job: Job, mut memory: Reservation) -> Result<Self> {
+    pub(super) fn admit(job: impl Into<RunJob>, mut memory: Reservation) -> Result<Self> {
+        let job = job.into();
         let bytes = capacity(&job)?;
         let generated = usize::from(job.random_seed.is_none()) * 64;
-        memory.resize(
-            bytes
-                .checked_add(generated)
-                .context("job capacity overflow")?,
-        )?;
+        let bytes = bytes
+            .checked_add(generated)
+            .context("job capacity overflow")?;
+        let job = match job {
+            RunJob::Caller(job) => {
+                memory.resize(bytes)?;
+                job
+            }
+            #[cfg(any(target_os = "wasi", test))]
+            RunJob::Decoded(job) => job.into_workspace(&mut memory, bytes)?,
+        };
         let mut owner = Self {
             value: job,
             _memory: memory,

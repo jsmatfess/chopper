@@ -299,7 +299,9 @@ Analyze at the top tier. Analyze estimates beyond that range keep the starting
 target. Run uses a higher tier only when shared free capacity is at least half
 that tier. When interior sampling raises the target to 2048 MiB, Run can fall
 back to the original 1024 MiB tier if that tier fits. All allocations require
-admission.
+admission. Hosted Run's Auto target calculation deducts only its existing
+same-pool decoded Job charge from shared usage. Allocations still count the
+full charge, and competing owners reduce headroom for both sizing and admission.
 
 On Linux, an existing matching Analyze can target 384 MiB for a standalone
 uniform shuffle of a UTF-8 CSV with uncompressed output and automatic grouping.

@@ -206,20 +206,22 @@ function inspectionContract(
   const calls=['chopper_analyze','chopper_preview','chopper_sniff','chopper_formula_scan'];
   try{
     const malformed='{"input":"/input.csv","output":]';
-    const legacyError=inspect('chopper_run',malformed);
-    assert(legacyError.status===1&&typeof legacyError.result.error==='string','Invalid legacy error fixture');
+    const runError=inspect('chopper_run',malformed);
+    assert(runError.status===1&&runError.result.error==='expected value at line 1 column '+(malformed.indexOf(']')+1),
+      'Raw Run JSON error or position changed: '+runError.result.error);
     for(const entry of calls){
       const rejected=inspect(entry,malformed);
-      assert(rejected.status===1&&rejected.result.error===legacyError.result.error,'WASI error or position changed in '+entry);
-      assert(JSON.stringify(rejected.reads)===JSON.stringify(legacyError.reads),'Malformed source read-ahead changed in '+entry);
+      assert(rejected.status===1&&rejected.result.error===runError.result.error,'WASI error or position changed in '+entry);
+      assert(JSON.stringify(rejected.reads)===JSON.stringify(runError.reads),'Malformed source read-ahead changed in '+entry);
     }
-    const legacyIo=inspect('chopper_run',exact,true);
+    const runIo=inspect('chopper_run',exact,true);
     const previewIo=inspect('chopper_preview',exact,true);
     const ioReads=[[8192,8192],[8192,0],[8192,42]];
-    assert(legacyIo.status===1&&previewIo.status===1&&typeof legacyIo.result.error==='string'&&
-      previewIo.result.error===legacyIo.result.error&&JSON.stringify(legacyIo.reads)===JSON.stringify(ioReads)&&
+    assert(runIo.status===1&&previewIo.status===1&&typeof runIo.result.error==='string'&&
+      /(?:I\/O|input\/output) error/i.test(runIo.result.error)&&!runIo.result.error.startsWith('read job JSON')&&
+      previewIo.result.error===runIo.result.error&&JSON.stringify(runIo.reads)===JSON.stringify(ioReads)&&
       JSON.stringify(previewIo.reads)===JSON.stringify(ioReads)&&reserved()===baseline,
-      'WASI source I/O error or second read changed: '+JSON.stringify({legacyIo,previewIo,reserved:reserved(),baseline}));
+      'WASI source I/O error or second read changed: '+JSON.stringify({runIo,previewIo,reserved:reserved(),baseline}));
     paused=[];
     const borrow=inspect('chopper_formula_scan',job(''));
     assert(borrow.status===0&&paused.length===1&&reserved()===baseline,'Formula pause control failed');
@@ -244,7 +246,27 @@ function inspectionContract(
       assert(reserved()===baseline,'Virtual Job retained a grant');
       return {bytes,source_reads:reads.length};
     });
-    return {calls,source_reads:expectedReads,malformed_error:legacyError.result.error,source_io_error:legacyIo.result.error,formula_pause_job_bytes:paused[0]-shortPause,virtual};
+    const runVirtual=[1024*1024-1,1024*1024+1].map(bytes=>{
+      const name='run-job-'+bytes;
+      const config=job('/'+name);
+      const wire=config.padEnd(bytes);
+      try{
+        const {status,result,reads}=inspect('chopper_run',wire);
+        const expected=Array.from({length:Math.ceil(bytes/8192)+1},(_,i)=>[8192,Math.max(0,Math.min(8192,bytes-i*8192))]);
+        const analysis=result.analysis as {rows?:number;auto_plan?:{physical_plan?:string}}|undefined;
+        assert(status===0&&result.complete===true&&analysis?.rows===513&&analysis.auto_plan?.physical_plan==='streaming',
+          'Virtual Job direct Run failed: '+result.error);
+        assert(JSON.stringify(reads)===JSON.stringify(expected)&&reserved()===baseline,'Direct Run changed buffered reads or retained a grant');
+        return {bytes,source_reads:reads.length};
+      }finally{
+        const folder=root.contents.get(name);
+        if(folder instanceof DiskDirectory){
+          for(const node of folder.contents.values())if(node instanceof DiskFile)node.unlink();
+          root.contents.delete(name);
+        }
+      }
+    });
+    return {calls,source_reads:expectedReads,malformed_error:runError.result.error,source_io_error:runIo.result.error,formula_pause_job_bytes:paused[0]-shortPause,virtual,run_virtual:runVirtual};
   }finally{
     root.contents.delete('input.csv');
     stdin.fd_read=readStdin;

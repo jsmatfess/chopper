@@ -275,7 +275,7 @@ pub(super) fn native_direct_candidate(
                 && *files <= linux_live_descriptors() as u64
                 && available >= 512 * MIB
                 && pool
-                    .resolve_memory_for_run(&job.resources, [1024, 256])
+                    .resolve_memory_for_run(&job.resources, [1024, 256], 0)
                     .ok()?
                     >= 1024
                 && job.resources.max_record_bytes <= 4 * 1024
@@ -740,6 +740,7 @@ impl AutoPlan {
         hint: Option<AutoObservations>,
         route: Route,
         preview: Option<PreviewObservations>,
+        job_credit: u64,
     ) -> Self {
         let input_file_bytes = std::fs::metadata(&job.input)
             .ok()
@@ -765,7 +766,9 @@ impl AutoPlan {
         } else {
             None
         };
-        let memory_mb = pool.resolve_memory(&job.resources).ok().unwrap_or(0);
+        let memory_mb = pool
+            .resolve_memory_for_run(&job.resources, [256, 256], job_credit)
+            .unwrap_or(0);
         let memory_bytes = memory_mb * 1024 * 1024;
         let worker_limit_from_analyze = !cfg!(target_os = "wasi")
             && job.resources.workers == 0
@@ -1278,7 +1281,7 @@ mod tests {
             .profile(&job, cancel.clone(), notify.clone())?
             .auto_observations
             .unwrap();
-        let plan = AutoPlan::start(&job, &pool, Some(observations), Route::Snapshot, None);
+        let plan = AutoPlan::start(&job, &pool, Some(observations), Route::Snapshot, None, 0);
         assert_eq!(plan.analysis_status, Advice::Matched);
         assert_eq!(plan.analyzed_rows, Fact::exact(3));
         assert_eq!(plan.decoded_field_bytes, Fact::exact(17));
@@ -1289,18 +1292,18 @@ mod tests {
 
         job.operations.clear();
         let changed_operations =
-            AutoPlan::start(&job, &pool, Some(observations), Route::Streaming, None);
+            AutoPlan::start(&job, &pool, Some(observations), Route::Streaming, None, 0);
         assert_eq!(changed_operations.analyzed_rows, Fact::exact(3));
         assert_eq!(changed_operations.partition_joint_keys, Fact::unknown());
 
         job.input_csv.delimiter = ';';
         let changed_parser =
-            AutoPlan::start(&job, &pool, Some(observations), Route::Streaming, None);
+            AutoPlan::start(&job, &pool, Some(observations), Route::Streaming, None, 0);
         assert_eq!(changed_parser.analysis_status, Advice::Unverified);
         job.input_csv.delimiter = ',';
         std::fs::write(&job.input, "bad CSV\n\x22unterminated")?;
         let changed_input =
-            AutoPlan::start(&job, &pool, Some(observations), Route::Streaming, None);
+            AutoPlan::start(&job, &pool, Some(observations), Route::Streaming, None, 0);
         assert_eq!(changed_input.analysis_status, Advice::Unverified);
         let output = job.output.clone();
         assert!(run_with_auto(job, cancel, notify, pool, Some(observations)).is_err());
