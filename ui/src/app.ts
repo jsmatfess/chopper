@@ -1,5 +1,5 @@
 import {job_values as jobValues} from '../../docs/cli-reference-data.json';
-import {HostedResultOwnership,type ResultOrigin} from './result-ownership';
+import {HostedResultOwnership,type ResultOrigin,type RunAcknowledgement} from './result-ownership';
 import {operationColor,operationName} from './step-labels';
 import {browserApi as api,configureBrowserUI,invalidateBrowserDraft,startFormulaScan} from './browser/client';
 import {percentageUnits} from './plan';
@@ -508,7 +508,8 @@ async function startJob(){
   if(!validation.check())return;
   try{
     const submitted=readJob();updateDraft();clearError();
-    await results.run(submitted,sourceKey(),()=>api('run-direct',submitted));
+    const dispatched=await results.run(submitted,sourceKey(),()=>api<RunAcknowledgement>('run-direct',submitted));
+    if(!dispatched){await poll();return;}
     lastAnalysis='';$('analysis').hidden=true;
     $('empty-plan').hidden=true;await poll();
   }catch(e){

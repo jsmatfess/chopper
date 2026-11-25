@@ -1,6 +1,7 @@
 import type {InputProfile,Job,State} from './app';
 export type ResultOrigin=Readonly<{source:string;configuration:string;revision:number;run:number}>;
 export type OwnedResult<T>=Readonly<{origin:ResultOrigin;value:T}>;
+export type RunAcknowledgement=Readonly<{dispatched:boolean}>;
 type SourceConfig=Pick<Job,'input'|'zip_member'|'input_csv'>;
 export function sourceIdentity(selection:number,job:SourceConfig){return JSON.stringify([selection,job.input??'',job.zip_member??null,job.input_csv]);}
 export function resultOrigin(source:string,configuration:Job,revision:number,run:number):ResultOrigin {
@@ -49,12 +50,15 @@ export class HostedResultOwnership {
     return this.command(submit);
   }
 
-  run(job:Job,source:string,submit:()=>Promise<unknown>){
+  run(job:Job,source:string,submit:()=>Promise<RunAcknowledgement>){
     const revision=this.revision;
-    this.analysisOrigin=resultOrigin(source,job,revision,++this.resultSerial);
+    const origin=resultOrigin(source,job,revision,++this.resultSerial);
     return this.command(async()=>{
-      await submit();
+      const {dispatched}=await submit();
+      if(!dispatched)return false;
+      this.analysisOrigin=origin;
       if(revision===this.revision)this.acknowledgedRevision=revision;
+      return true;
     });
   }
 
@@ -62,10 +66,10 @@ export class HostedResultOwnership {
     return this.command(submit);
   }
 
-  private async command(submit:()=>Promise<unknown>){
+  private async command<T>(submit:()=>Promise<T>){
     this.commandEpoch++;
     this.activeCommands++;
-    try{await submit();}
+    try{return await submit();}
     finally{
       this.activeCommands--;
       this.commandEpoch++;

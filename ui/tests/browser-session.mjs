@@ -272,6 +272,23 @@ test('a delayed Run permission cannot replace profiling admitted during the wait
   engine.reply({id:request.id,result:{rows:3}});await tick();assert.equal(h.lifecycle.snapshot().status,'profiled');await h.api('cancel');assert.equal(h.locks,0);
 });
 
+test('a superseded permission-pending Run reports that it never dispatched',async()=>{
+  const h=harness(),first=deferred(),second=deferred();
+  h.output.requestPermission=()=>first.promise;
+  const original=h.api('run-direct',job());
+  h.output.requestPermission=()=>second.promise;
+  const edited={...job(),limits:{rows:17}};
+  const replacement=h.api('run-direct',edited);
+  first.resolve('granted');
+  assert.deepEqual(await original,{dispatched:true});
+  second.resolve('granted');
+  assert.deepEqual(await replacement,{dispatched:false});
+  const requests=h.workers.flatMap(worker=>worker.messages.filter(message=>message.type==='run-direct'));
+  assert.equal(requests.length,1);
+  assert.notDeepEqual(requests[0].job,edited);
+  await h.api('cancel');
+});
+
 test('Run freezes source and destination before permissions and never reuses analysis settings',async()=>{
   const h=harness(),permission=deferred();h.output.requestPermission=()=>permission.promise;
   const waiting=h.api('run-direct',job());

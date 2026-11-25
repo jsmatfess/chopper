@@ -39,7 +39,7 @@ test('Run acknowledgement clears only its submitted draft revision',async()=>{
   const results=new HostedResultOwnership();
   const source=results.sourceKey(draft);
   let acknowledge;
-  const submitted=results.run(draft,source,()=>new Promise(resolve=>{acknowledge=resolve;}));
+  const submitted=results.run(draft,source,()=>new Promise(resolve=>{acknowledge=()=>resolve({dispatched:true});}));
   results.editDraft(source);
   acknowledge();
   await submitted;
@@ -47,8 +47,27 @@ test('Run acknowledgement clears only its submitted draft revision',async()=>{
   await assert.rejects(results.run(draft,source,async()=>{throw new Error('denied');}),/denied/);
   assert.equal(results.dirty,true);
   assert.equal(results.commandPending,false);
-  await results.run(draft,source,async()=>{});
+  assert.equal(await results.run(draft,source,async()=>({dispatched:false})),false);
+  assert.equal(results.dirty,true);
+  await results.run(draft,source,async()=>({dispatched:true}));
   assert.equal(results.dirty,false);
+});
+
+test('polls resume only after overlapping commands settle and an undispatched Run leaves the draft dirty',async()=>{
+  const results=new HostedResultOwnership();
+  const source=results.sourceKey(draft);
+  let finishFirst,finishSecond;
+  const first=results.run(draft,source,()=>new Promise(resolve=>{finishFirst=resolve;}));
+  results.editDraft(source);
+  const second=results.run({...draft,limits:{rows:2}},source,()=>new Promise(resolve=>{finishSecond=resolve;}));
+  assert.equal(results.beginPoll(),null);
+  finishFirst({dispatched:true});
+  assert.equal(await first,true);
+  assert.equal(results.beginPoll(),null);
+  finishSecond({dispatched:false});
+  assert.equal(await second,false);
+  assert.ok(results.beginPoll());
+  assert.equal(results.dirty,true);
 });
 
 test('profiles follow the source and prior Run results cannot populate a replacement source',async()=>{
@@ -67,6 +86,6 @@ test('profiles follow the source and prior Run results cannot populate a replace
   assert.notEqual(replacement,source);
   assert.deepEqual(results.editDraft(replacement),{profileCurrent:false,profile:null});
   assert.deepEqual(results.acceptPoll(results.beginPoll(),{profile,origins},replacement),{profile:null,analysisSource:null});
-  await results.run(draft,replacement,async()=>{});
+  await results.run(draft,replacement,async()=>({dispatched:true}));
   assert.equal(results.acceptPoll(results.beginPoll(),{},replacement).analysisSource,replacement);
 });

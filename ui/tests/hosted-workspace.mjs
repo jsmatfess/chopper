@@ -32,7 +32,7 @@ async function bundle(){
         if(path==='pick-path')return {path:data.mode==='sample'?'customers.csv':data.mode==='input'?'source.csv':'destination'};
         if(path==='sniff')return {settings:{...data.input_csv,delimiter:';'},note:'Fixture detection; no scan'};
         if(path==='profile'){if(window.deferAnalysisAck)await new Promise(resolve=>window.releaseAnalysisAck=resolve);const finish=()=>window.fixtureState={...window.fixtureState,status:'profiled',profile:window.profileFixture??{rows:4,columns:2,header:['country','note'],seconds:1,accuracy:'Exact fixture input count',stages:[],column_values:[]}};if(window.deferProfile){window.fixtureState={...window.fixtureState,status:'profiling',profile:null};window.finishProfile=finish;}else finish();return {};}
-        if(path==='run-direct'){if(window.runError)throw new Error(window.runError);window.fixtureState={...window.fixtureState,status:'running',error:null,progress:{phase:'Fixture processing',rows:1,temp_bytes:0}};return {};}
+        if(path==='run-direct'){if(window.runError)throw new Error(window.runError);window.fixtureState={...window.fixtureState,status:'running',error:null,progress:{phase:'Fixture processing',rows:1,temp_bytes:0}};return {dispatched:true};}
         if(path==='cancel'){window.fixtureState={...window.fixtureState,status:'cancelled',analysis:null};return {};}
         throw new Error('Unexpected mock client action '+path);
       }`}));
@@ -79,6 +79,34 @@ test('results describe the published archive and copy its subfolder name',async(
   await page.getByRole('button',{name:'Copy folder name'}).click();
   assert.equal(await page.evaluate(()=>window.copiedResult),'chopper-results-test');
   await page.locator('#result-copy-feedback').filter({hasText:'Folder name copied.'}).waitFor();
+  assert.deepEqual(errors,[]);
+ }finally{await browser.close();}
+});
+
+test('a same-name input replacement retains the previous export without its column values',async()=>{
+ const browser=await chromium.launch();
+ try{
+  const {page,errors}=await harness(browser,true,true);await choose(page);
+  await page.locator('#run-direct').click();
+  await page.evaluate(()=>{
+   window.fixtureState={...window.fixtureState,status:'complete',
+    analysis:{...window.analysis,column_values:[{column:0,values:['from old input'],truncated:false}]},
+    output:'destination/previous-results'};
+  });
+  await page.clock.runFor(1000);
+  await page.locator('#result-message').filter({hasText:'Export complete.'}).waitFor();
+  await page.locator('#input-values .column-values-row>summary').first().click();
+  const oldValue=page.locator('#input-values .value-label').getByText('from old input',{exact:true});
+  await oldValue.waitFor();
+
+  await page.locator('#browse-input').click();
+  assert.equal(await page.locator('#input').inputValue(),'source.csv');
+  await page.clock.runFor(1000);
+  await page.locator('#result-message').filter({hasText:'Previous export complete.'}).waitFor();
+  assert.equal(await page.locator('#published-output').isVisible(),true);
+  assert.equal(await page.locator('#result-parent').textContent(),'destination');
+  assert.equal(await page.locator('#result-folder').textContent(),'previous-results');
+  assert.equal(await oldValue.count(),0);
   assert.deepEqual(errors,[]);
  }finally{await browser.close();}
 });

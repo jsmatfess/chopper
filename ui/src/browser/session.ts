@@ -1,4 +1,4 @@
-import {sourceIdentity,resultOrigin,ownedResult,belongsToSource,type ResultOrigin,type OwnedResult} from '../result-ownership';
+import {sourceIdentity,resultOrigin,ownedResult,belongsToSource,type ResultOrigin,type OwnedResult,type RunAcknowledgement} from '../result-ownership';
 import {verifyPublication,type VerifiedPublication} from './publication';
 import type {Job,State,Analysis,InputProfile} from '../app';
 import {ExecutionHistory,type Observation} from './execution-history';
@@ -329,7 +329,8 @@ export class BrowserLifecycle {
         ?this.state.profile?.auto_observations:undefined;
       const previewObservations=this.previewAdvice?.source===origin.source
         &&this.previewAdvice.facts.max_record_bytes===data.resources.max_record_bytes?this.previewAdvice.facts:undefined;
-      const permissionGeneration=this.generation;await this.permission(output);if(permissionGeneration!==this.generation)return {};
+      const permissionGeneration=this.generation;await this.permission(output);
+      if(permissionGeneration!==this.generation)return {dispatched:false} satisfies RunAcknowledgement;
       if(this.active())throw new Error('A job is active.');
       this.state.status='running';this.state.error=null;
       this.state.progress={phase:'',rows:0,temp_bytes:0};
@@ -340,7 +341,7 @@ export class BrowserLifecycle {
         const session=this.start();if(this.history){try{session.beginObservation();}catch{this.history=null;}}
         await session.start();
       })(),current);
-      if(current!==this.generation)return {};
+      if(current!==this.generation)return {dispatched:false} satisfies RunAcknowledgement;
       this.folder='chopper-results-'+this.effects.uuid();this.exporting=false;
       this.state.status='running';this.state.error=null;this.clearRunResults();this.state.output=null;
       for(const key of Object.keys(this.diagnostics))delete this.diagnostics[key];
@@ -351,7 +352,8 @@ export class BrowserLifecycle {
         analysis.warnings.push('Browser export is not atomic. A valid CHOPPER-COMPLETE.json record marks successful completion.');
         this.setAnalysis(ownedResult(origin,analysis));
         await this.completeRun(verifyPublication(result,this.folder,session.exportPath(this.folder)),data.compression);
-      }).catch(error=>this.fail(error,current));return {};
+      }).catch(error=>this.fail(error,current));
+      return {dispatched:current===this.generation} satisfies RunAcknowledgement;
     }
     if(path==='cancel'){
       this.history?.interrupt('interrupted');this.showHistory();

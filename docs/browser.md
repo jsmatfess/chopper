@@ -1347,7 +1347,7 @@ input statistics, with source/configuration origins for invalidation. Internal
 engine snapshots retain their exact encoded-byte contract.
 
 The page-side result owner in `result-ownership.ts` orders state polls within a
-command epoch and accepts a successful Run acknowledgement for its submitted
+command epoch. Only a Run dispatched to a worker can acknowledge its submitted
 draft revision. The workbench renders accepted state and uses the owner to decide
 whether results belong in the current source's column explorer.
 A late state snapshot cannot overwrite
