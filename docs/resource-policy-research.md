@@ -708,7 +708,8 @@ this before inspecting the destination or creating staging. Snapshot publication
 holds the owner through commit, and direct publication carries it in its
 publication object through final use or abandonment. The path drops before
 its grant. A failed admission returns the typed memory error before filesystem
-inspection or staging.
+inspection or staging. Already-requested cancellation takes precedence over
+admission.
 
 Native preflight's transient resolution, absolute-path construction, opaque
 standard-library scratch and OS conversion retain their existing boundaries.

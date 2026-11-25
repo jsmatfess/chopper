@@ -142,7 +142,9 @@ execution path.
 
 ```mermaid
 flowchart TD
-    Start[Direct publication setup or snapshot execution] --> Resolve[Resolve absolute destination]
+    Start[Direct publication setup or snapshot execution] --> Cancel{Cancelled?}
+    Cancel -->|Yes| Stop[Return cancellation]
+    Cancel -->|No| Resolve[Resolve absolute destination]
     Resolve --> Admit{Admit retained path capacity in the Context}
     Admit -->|Denied| Return[Drop path and return admission error before inspecting destination]
     Admit -->|Granted| Check[Check destination and parent]

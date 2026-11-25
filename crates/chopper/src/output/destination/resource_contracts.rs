@@ -201,10 +201,18 @@ fn publication_controls() -> Result<()> {
                 && pool.usage().reserved_bytes == held,
             "staging denial leaked a destination charge: {error:#}"
         );
-        peer.resize(0)?;
+        peer.resize((limit - retained) as usize)?;
+        let held = pool.usage().reserved_bytes;
         cancel.store(true, Ordering::Relaxed);
-        ensure!(try_publication(direct).is_err() && pool.usage().reserved_bytes == retained);
+        let error = try_publication(direct)
+            .err()
+            .context("expected cancellation")?;
+        ensure!(
+            format!("{error:#}").contains("job cancelled") && pool.usage().reserved_bytes == held,
+            "destination admission took priority over cancellation: {error:#}"
+        );
         cancel.store(false, Ordering::Relaxed);
+        peer.resize(0)?;
         ensure!(!output.try_exists()?);
         no_stage()?;
     }
@@ -239,6 +247,7 @@ pub(crate) fn run() -> Result<serde_json::Value> {
         "windows_prefixes": cfg!(windows),
         "independent_owners_and_peer_retry": true,
         "snapshot_and_direct_denial_cleanup": true,
+        "cancellation_under_pressure": true,
         "direct_abandonment": true,
         "final_reserved_bytes": 0,
     }))

@@ -75,6 +75,7 @@ impl DestinationPath {
 }
 
 pub(super) fn staging_destination(job: &Job, ctx: &Context) -> Result<(DestinationPath, bool)> {
+    ctx.check()?;
     let path = std::path::absolute(&job.output)?;
     let destination = DestinationPath::admit(path, Reservation::new(ctx))?;
     let existing_empty = ctx.run_destination().check(destination.as_path())?;
