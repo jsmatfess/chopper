@@ -63,14 +63,22 @@ def host_lock():
         os.close(descriptor)
 
 
-def git(root, *args):
+def git_environment():
     # Hooks export repository-local Git variables. Clear Git's authoritative
     # list before -C, especially when locating another checkout's receipts.
     environment = dict(os.environ)
     local_variables = subprocess.check_output(['git', 'rev-parse', '--local-env-vars'], text=True).splitlines()
     for name in local_variables:
         environment.pop(name, None)
-    return subprocess.check_output(['git', '-C', str(root), *args], text=True, env=environment).strip()
+    return environment
+
+
+def git(root, *args):
+    return subprocess.check_output(['git', '-C', str(root), *args], text=True, env=git_environment()).strip()
+
+
+def run_git(root, *args, **options):
+    return subprocess.run(['git', '-C', str(root), *args], env=git_environment(), **options)
 
 
 def clean_head(root, expected=None):
@@ -95,7 +103,7 @@ def receipt_path(root, head, base, profile=None):
 
 
 def require_ancestor(root, base, head):
-    if subprocess.run(['git', '-C', str(root), 'merge-base', '--is-ancestor', base, head]).returncode:
+    if run_git(root, 'merge-base', '--is-ancestor', base, head).returncode:
         raise ValueError('Merge or rebase current origin/main into this branch, then rerun local CI.')
 
 
@@ -195,8 +203,7 @@ def stage_evidence(root, source, base, head, full=False):
 
 
 def fetch_base(root):
-    subprocess.run(['git', '-C', str(root), 'fetch', '--no-tags', 'origin',
-                    '+refs/heads/main:refs/remotes/origin/main'], check=True)
+    run_git(root, 'fetch', '--no-tags', 'origin', '+refs/heads/main:refs/remotes/origin/main', check=True)
     return git(root, 'rev-parse', 'refs/remotes/origin/main')
 
 
@@ -229,15 +236,13 @@ def check(root, full=False, *, expected_head=None, expected_base=None):
     source = directory / 'source'
     # A normal clone freezes the committed inputs and gives act a self-contained
     # .git directory even when the caller uses a linked worktree.
-    subprocess.run(['git', 'clone', '--quiet', '--no-hardlinks', '--no-checkout',
-                    str(root), str(source)], check=True)
-    subprocess.run(['git', '-C', str(source), 'checkout', '--quiet', '-B', 'local-ci-validation', head], check=True)
-    subprocess.run(['git', '-C', str(source), 'remote', 'set-url', 'origin',
-                    git(root, 'remote', 'get-url', 'origin')], check=True)
+    run_git(root, 'clone', '--quiet', '--no-hardlinks', '--no-checkout', str(root), str(source), check=True)
+    run_git(source, 'checkout', '--quiet', '-B', 'local-ci-validation', head, check=True)
+    run_git(source, 'remote', 'set-url', 'origin', git(root, 'remote', 'get-url', 'origin'), check=True)
     staged = stage_evidence(root, source, base, head, full)
     (directory / 'empty').write_text('', encoding='utf-8')
     command = act_command(act, base, directory, full)
-    files = subprocess.check_output(['git', '-C', str(source), 'ls-files', '-z']).decode().split('\0')[:-1]
+    files = run_git(source, 'ls-files', '-z', stdout=subprocess.PIPE, check=True).stdout.decode().split('\0')[:-1]
     files = sorted(set(files + staged))
     plan = {'root': str(source), 'batch_timeout_seconds': 7200,
             'estimated_seconds': 3600, 'estimated_disk_bytes': 20 * 1024**3,
@@ -302,8 +307,7 @@ def verify(root, head, base):
 
 
 def windows_checkout(root):
-    configured = subprocess.run(['git', '-C', str(root), 'config', '--get', 'chopper.windowsCheckout'],
-                                capture_output=True, text=True)
+    configured = run_git(root, 'config', '--get', 'chopper.windowsCheckout', capture_output=True, text=True)
     if configured.returncode or not configured.stdout.strip():
         raise ValueError('Native Windows validation is required. Configure chopper.windowsCheckout '
                          'to the clean native Windows validation checkout.')
@@ -317,13 +321,12 @@ def check_windows_revision(root, head, base, branch, full=False):
         clean_head(root)
         if fetch_base(root) != base:
             raise ValueError('Native Windows origin/main differs from the WSL base. Update the branch and rerun.')
-        subprocess.run(['git', '-C', str(root), 'fetch', '--no-tags', 'origin', branch], check=True)
+        run_git(root, 'fetch', '--no-tags', 'origin', branch, check=True)
         if git(root, 'rev-parse', 'FETCH_HEAD') != head:
             raise ValueError('Push the current branch to origin before running native Windows CI.')
         require_ancestor(root, base, head)
         clean_head(root)
-        subprocess.run(['git', '-C', str(root), 'switch', '--detach', '--no-overwrite-ignore', head],
-                       check=True)
+        run_git(root, 'switch', '--detach', '--no-overwrite-ignore', head, check=True)
         # Run validation from the selected Windows revision and keep the native
         # CI lock across both checkout and receipt creation.
         selected = runpy.run_path(str(root / 'scripts/local-ci.py'))
@@ -334,7 +337,7 @@ def check_windows(root, full=False):
     checkout = windows_checkout(root)
     head = clean_head(root)
     branch = git(root, 'symbolic-ref', 'HEAD')
-    base = fetch_base(root)
+    base, _ = git(root, 'ls-remote', '--exit-code', 'origin', 'refs/heads/main').split()
     require_ancestor(root, base, head)
     script = subprocess.check_output(['wslpath', '-w', str(root / 'scripts/local-ci.py')], text=True).strip()
     # The existing dispatcher can enter a Windows checkout that still has an
@@ -346,7 +349,7 @@ def check_windows(root, full=False):
     )
     command = [sys.executable, str(root / 'scripts/windows-native.py'), '--checkout', str(checkout),
                'python', '--', '-c', dispatch, script, head, base, branch]
-    subprocess.run(command + (['--full'] if full else []), check=True)
+    subprocess.run(command + (['--full'] if full else []), env=git_environment(), check=True)
     verify_record(checkout, head, base, 'windows')
 
 

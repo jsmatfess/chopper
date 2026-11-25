@@ -112,6 +112,8 @@ class LocalCiTests(unittest.TestCase):
         self.git('push', '-q', 'origin', 'HEAD:refs/heads/feature')
         self.git('switch', '-q', 'main')
         lock = self.root.parent / 'windows-ci.lock'
+        foreign = self.root.parent / 'foreign'
+        subprocess.run(['git', 'clone', '-q', '--branch', 'main', str(self.remote), str(foreign)], check=True)
 
         def validate(root, full, *, expected_head, expected_base):
             self.assertEqual((root, full, expected_head, expected_base),
@@ -124,9 +126,12 @@ class LocalCiTests(unittest.TestCase):
 
         with (patch.object(ci, 'host_profile', return_value='windows'),
               patch.object(ci, 'host_lock_path', return_value=lock),
+              patch.dict(os.environ, {'GIT_DIR': str(foreign / '.git'), 'GIT_WORK_TREE': str(foreign)}),
               patch.object(ci.runpy, 'run_path', return_value={'check': validate}) as load):
             ci.check_windows_revision(self.root, self.head, self.base, 'refs/heads/feature', full=True)
         load.assert_called_once_with(str(self.root / 'scripts/local-ci.py'))
+        self.assertEqual(ci.git(foreign, 'rev-parse', 'HEAD'), self.base)
+        self.assertFalse((foreign / '.git/FETCH_HEAD').exists())
 
     def test_windows_handoff_preserves_head_on_dirty_checkout_or_revision_mismatch(self):
         self.git('push', '-q', 'origin', 'HEAD:refs/heads/feature')
@@ -167,6 +172,7 @@ class LocalCiTests(unittest.TestCase):
 
     def test_windows_dispatch_success_requires_an_exact_receipt(self):
         self.git('config', 'chopper.windowsCheckout', str(self.root))
+        self.git('update-ref', 'refs/remotes/origin/main', self.head)
         invoke = subprocess.run
         capture = subprocess.check_output
         dispatches = []
@@ -191,9 +197,12 @@ class LocalCiTests(unittest.TestCase):
             receipt.write_text(json.dumps({'version': 1, 'head': self.head,
                                            'base': self.head, 'profile': 'windows'}))
             with self.assertRaisesRegex(ValueError, 'No intact local CI pass'):
-                ci.check_windows(self.root)
+                ci.check_windows(self.root, full=True)
         self.assertEqual(len(dispatches), 2)
-        self.assertEqual(dispatches[0][-3:], [self.head, self.base, 'refs/heads/feature'])
+        revisions = [self.head, self.base, 'refs/heads/feature']
+        self.assertEqual(dispatches[0][-3:], revisions)
+        self.assertEqual(dispatches[1][-4:], [*revisions, '--full'])
+        self.assertEqual(self.git('rev-parse', 'refs/remotes/origin/main'), self.head)
 
     @unittest.skipUnless(ci.host_profile() == 'linux', 'Evidence checks belong to the Linux profile')
     def test_evidence_cache_is_verified_staged_and_selected_by_workflow_scope(self):
