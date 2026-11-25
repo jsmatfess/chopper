@@ -252,7 +252,7 @@ function inspectionContract(
     });
     const runVirtual=[1024*1024-1,1024*1024+1].map(bytes=>{
       const name='run-job-'+bytes;
-      const config=job('/'+name);
+      const config=JSON.stringify({input:'/input.csv',output:'/'+name,resources:{temp_dir:'/tmp'}});
       const wire=config.padEnd(bytes);
       try{
         const {status,result,reads}=inspect('chopper_run',wire);
