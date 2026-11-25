@@ -1,9 +1,9 @@
 """Contract tests for which platform/ownership checks can be skipped."""
-from contextlib import chdir
 import importlib.util
 import json
 import os
 from pathlib import Path
+import shlex
 import shutil
 import subprocess
 import sys
@@ -293,9 +293,21 @@ class ScopeTests(unittest.TestCase):
                             '-qm', 'base', '--allow-empty'], check=True)
             bin_dir = caller / 'bin'
             bin_dir.mkdir()
-            (bin_dir / 'git').symlink_to(Path(shutil.which('git')).resolve())
-            with chdir(caller), patch.dict(os.environ, {'PATH': 'bin'}):
-                paths, jobs = scope.revision_scope('HEAD', 'HEAD', root=root)
+            launcher = bin_dir / 'git'
+            git_path = Path(shutil.which('git')).absolute()
+            original_path = os.environ.get('PATH', os.defpath)
+            # Resolve the launcher through the relative PATH entry, then allow
+            # the discovered Git to find its own shell and other dependencies.
+            launcher.write_text(f'#!/bin/sh\nexport PATH={shlex.quote(original_path)}\n'
+                                f'exec {shlex.quote(str(git_path))} "$@"\n', encoding='utf-8')
+            launcher.chmod(0o755)
+            previous = Path.cwd()
+            try:
+                os.chdir(caller)
+                with patch.dict(os.environ, {'PATH': 'bin'}):
+                    paths, jobs = scope.revision_scope('HEAD', 'HEAD', root=root)
+            finally:
+                os.chdir(previous)
             self.assertEqual(paths, [])
             self.assertFalse(any(jobs.values()))
 
