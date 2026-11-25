@@ -348,6 +348,7 @@ async function poll() {
     else if(s.profile&&status==='profiled'){lastProfile='';$('input-profile').hidden=false;$('input-profile').textContent='Analysis finished for a different input or parsing configuration. Analyze input again for the current source.';}
 
     if(s.analysis) renderAnalysis(s.analysis,accepted.analysisSource);
+    else {lastAnalysis='';$('analysis').hidden=true;}
     if(s.error) error(s.error);
     hostedWorkspace?.state(s,results.dirty);
   } catch(e) { $('connection').hidden=false;$('connection').textContent=e instanceof Error?e.message:String(e); }

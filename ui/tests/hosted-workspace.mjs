@@ -32,7 +32,15 @@ async function bundle(){
         if(path==='pick-path')return {path:data.mode==='sample'?'customers.csv':data.mode==='input'?'source.csv':'destination'};
         if(path==='sniff')return {settings:{...data.input_csv,delimiter:';'},note:'Fixture detection; no scan'};
         if(path==='profile'){if(window.deferAnalysisAck)await new Promise(resolve=>window.releaseAnalysisAck=resolve);const finish=()=>window.fixtureState={...window.fixtureState,status:'profiled',profile:window.profileFixture??{rows:4,columns:2,header:['country','note'],seconds:1,accuracy:'Exact fixture input count',stages:[],column_values:[]}};if(window.deferProfile){window.fixtureState={...window.fixtureState,status:'profiling',profile:null};window.finishProfile=finish;}else finish();return {};}
-        if(path==='run-direct'){if(window.runError)throw new Error(window.runError);window.fixtureState={...window.fixtureState,status:'running',error:null,progress:{phase:'Fixture processing',rows:1,temp_bytes:0}};return {dispatched:true};}
+        if(path==='run-direct'){
+          if(window.runError)throw new Error(window.runError);
+          if(window.failRunDispatch){
+            window.fixtureState={...window.fixtureState,status:'failed',analysis:null,output:null,error:'Run dispatch failed'};
+            return {dispatched:false};
+          }
+          window.fixtureState={...window.fixtureState,status:'running',error:null,progress:{phase:'Fixture processing',rows:1,temp_bytes:0}};
+          return {dispatched:true};
+        }
         if(path==='cancel'){window.fixtureState={...window.fixtureState,status:'cancelled',analysis:null};return {};}
         throw new Error('Unexpected mock client action '+path);
       }`}));
@@ -107,6 +115,32 @@ test('a same-name input replacement retains the previous export without its colu
   assert.equal(await page.locator('#result-parent').textContent(),'destination');
   assert.equal(await page.locator('#result-folder').textContent(),'previous-results');
   assert.equal(await oldValue.count(),0);
+  assert.deepEqual(errors,[]);
+ }finally{await browser.close();}
+});
+
+test('failed Run dispatch clears the previous analysis and a retry can display identical metrics',async()=>{
+ const browser=await chromium.launch();
+ try{
+  const {page,errors}=await harness(browser,true,true);await choose(page);
+  const run=page.locator('#run-direct'),analysisPanel=page.locator('#analysis');
+  const complete=async()=>{
+   await page.evaluate(()=>window.fixtureState={...window.fixtureState,status:'complete',analysis:window.analysis,output:'destination/results'});
+   await page.clock.runFor(1000);
+   await analysisPanel.waitFor();
+  };
+  await run.click();
+  await complete();
+
+  await page.evaluate(()=>window.failRunDispatch=true);
+  await run.click();
+  await page.locator('#status').filter({hasText:'FAILED'}).waitFor();
+  assert.equal(await analysisPanel.isHidden(),true);
+  assert.equal(await page.locator('#published-output').isHidden(),true);
+
+  await page.evaluate(()=>window.failRunDispatch=false);
+  await run.click();
+  await complete();
   assert.deepEqual(errors,[]);
  }finally{await browser.close();}
 });

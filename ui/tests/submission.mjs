@@ -58,15 +58,19 @@ test('polls resume only after overlapping commands settle and an undispatched Ru
   const source=results.sourceKey(draft);
   let finishFirst,finishSecond;
   const first=results.run(draft,source,()=>new Promise(resolve=>{finishFirst=resolve;}));
-  results.editDraft(source);
-  const second=results.run({...draft,limits:{rows:2}},source,()=>new Promise(resolve=>{finishSecond=resolve;}));
+  results.selectInput();
+  const replacement=results.sourceKey(draft);
+  assert.notEqual(replacement,source);
+  results.editDraft(replacement);
+  const second=results.run(draft,replacement,()=>new Promise(resolve=>{finishSecond=resolve;}));
   assert.equal(results.beginPoll(),null);
   finishFirst({dispatched:true});
   assert.equal(await first,true);
   assert.equal(results.beginPoll(),null);
   finishSecond({dispatched:false});
   assert.equal(await second,false);
-  assert.ok(results.beginPoll());
+  assert.equal(results.acceptPoll(results.beginPoll(),{},source).analysisSource,source);
+  assert.equal(results.acceptPoll(results.beginPoll(),{},replacement).analysisSource,null);
   assert.equal(results.dirty,true);
 });
 
