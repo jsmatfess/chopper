@@ -138,6 +138,18 @@ Explicit preparation builds a snapshot Context without selecting a Run route.
 Retained-parent retries and publication errors remain governed by the selected
 execution path.
 
+### Engine output staging
+
+```mermaid
+flowchart TD
+    Start[Direct publication setup or snapshot execution] --> Resolve[Resolve absolute destination]
+    Resolve --> Admit{Admit retained path capacity in the Context}
+    Admit -->|Denied| Return[Drop path and return admission error before inspecting destination]
+    Admit -->|Granted| Check[Check destination and parent]
+    Check --> Stage[Create private staging]
+    Stage --> Hold[Retain path and grant through final destination use or abandonment]
+```
+
 ### Current gzip and ZIP compression
 
 ```mermaid

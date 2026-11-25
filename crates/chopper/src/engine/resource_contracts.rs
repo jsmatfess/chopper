@@ -224,6 +224,7 @@ pub(super) fn input_adapters() -> Result<serde_json::Value> {
         "gzip_codec": input_gzip::resource_contracts::run()?,
         "output_deflate_codec": crate::output::deflate_contracts::run()?,
         "directory_paths": crate::storage::directory_resource_contracts()?,
+        "publication_destination": crate::output::destination_contracts::run()?,
         "publication_metadata": crate::output::publication_metadata_contracts::run()?,
         "publication_paths": crate::output::publication_path_contracts::run()?,
         "planned_metadata": crate::output::planned_metadata_contracts::run()?,

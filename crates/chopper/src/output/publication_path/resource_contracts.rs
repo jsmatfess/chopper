@@ -217,7 +217,7 @@ fn publication_controls() -> Result<serde_json::Value> {
     std::fs::write(&input, "id,key\n1,\u{754c}\n2,a\n")?;
     let mut cases = Vec::new();
     for compression in [Compression::None, Compression::Gzip, Compression::Zip] {
-        let output = root.join(format!("result-{compression:?}"));
+        let output = root.join(format!("result-界-{compression:?}"));
         let job = Job {
             input: input.to_string_lossy().into_owned(),
             output: output.to_string_lossy().into_owned(),
@@ -242,14 +242,17 @@ fn publication_controls() -> Result<serde_json::Value> {
             pool.clone(),
         )?;
         let retained = pool.usage().reserved_bytes;
+        let destination_capacity = std::path::absolute(&output)?.capacity() as u64;
         let stage = prepared.ctx.staging_directory(&root)?;
         let stage_grant = pool.usage().reserved_bytes - retained;
         let manifest_capacity = stage.path().as_os_str().len() + 1 + "manifest.jsonl".len();
         drop(stage);
         let mut pressure =
             Reservation::for_workspace(Arc::new(Workspace::shared(limit as usize, pool.clone())));
-        pressure
-            .resize((limit - retained - stage_grant - manifest_capacity as u64 + 1) as usize)?;
+        pressure.resize(
+            (limit - retained - destination_capacity - stage_grant - manifest_capacity as u64 + 1)
+                as usize,
+        )?;
         let held = pool.usage().reserved_bytes;
         let error = execute(&prepared)
             .err()

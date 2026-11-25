@@ -200,10 +200,11 @@ fn observed_run_reports_the_route_that_publishes_output() -> Result<()> {
 #[test]
 fn formats_caps_fields_digest_names_and_manifest_parity() -> Result<()> {
     for compression in [Compression::None, Compression::Gzip, Compression::Zip] {
-        let (_dir, mut job) = setup(
+        let (dir, mut job) = setup(
             "id,text\n1,\"comma,quote\"\"\"\n2,\"line\nbreak\"\n3,\u{754c}\u{1f600}\n4,\n"
                 .as_bytes(),
         )?;
+        job.output = dir.path().join("direct-界").to_string_lossy().into();
         job.compression = compression;
         job.limits.rows = Some(2);
         job.limits.bytes = Some(55);

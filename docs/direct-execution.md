@@ -303,7 +303,11 @@ Windows opens the witness with delete sharing so a rename can proceed, and
 closes it after non-recursive removal and before publication. An initially absent
 destination must still be available at staging and at the no-replace rename.
 Explicit snapshot preparation keeps its destination check at publication.
-Absolute-path discovery remains transient at preflight.
+Absolute-path discovery remains transient at preflight. When engine
+publication begins, the direct and snapshot paths move the newly resolved
+absolute path into an owner that admits its actual retained capacity through
+the final path use or abandonment. Admission precedes destination inspection and
+staging. See the [resource contract](resource-policy-research.md#retained-absolute-publication-destination).
 
 The [Run route module](../crates/chopper/src/engine/run_route.rs) carries an
 accepted direct plan together with its admitted Context. A retained route carries

@@ -19,8 +19,10 @@ pub(crate) use parallel_deflate::direct_candidate as parallel_direct_compression
 #[cfg(target_os = "wasi")]
 pub(crate) use parallel_deflate::hosted::Lease as HostedDeflateLease;
 mod destination;
-use destination::staging_destination;
+#[cfg(any(test, feature = "resource-contract-tests"))]
+pub(crate) use destination::resource_contracts as destination_contracts;
 pub(crate) use destination::RunDestination;
+use destination::{staging_destination, DestinationPath};
 mod direct;
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(crate) use deflate::resource_contracts as deflate_contracts;
@@ -952,7 +954,10 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
     } = prepared;
     ctx.pressure_boundary();
     let (destination, existing_empty) = staging_destination(job, ctx)?;
-    let parent = destination.parent().expect("checked output parent");
+    let parent = destination
+        .as_path()
+        .parent()
+        .expect("checked output parent");
     let available = available_space(parent)?;
     ensure!(
         available
@@ -1145,7 +1150,7 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
     manifest.sync_all()?;
     drop(manifest);
     finish_archive(archive, manifest_path.as_ref(), ctx)?;
-    commit_directory(&mut stage, &destination, existing_empty, ctx)?;
+    commit_directory(&mut stage, destination.as_path(), existing_empty, ctx)?;
     // Publication is the commit point: a later cancellation must not turn success into failure.
     (ctx.notify)(Progress {
         phase: crate::storage::ProgressPhase::literal("Complete"),

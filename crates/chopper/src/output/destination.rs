@@ -1,6 +1,9 @@
 use super::*;
 use std::{fs, path::PathBuf};
 
+#[cfg(any(test, feature = "resource-contract-tests"))]
+pub(crate) mod resource_contracts;
+
 #[derive(Default)]
 pub(crate) enum RunDestination {
     #[default]
@@ -50,10 +53,32 @@ impl RunDestination {
     }
 }
 
-pub(super) fn staging_destination(job: &Job, ctx: &Context) -> Result<(PathBuf, bool)> {
-    let destination = std::path::absolute(&job.output)?;
-    let existing_empty = ctx.run_destination().check(&destination)?;
-    check_parent(&destination)?;
+pub(super) struct DestinationPath {
+    path: PathBuf,
+    // The resolved allocation drops before its grant, including on error.
+    memory: Reservation,
+}
+
+impl DestinationPath {
+    fn admit(path: PathBuf, memory: Reservation) -> Result<Self> {
+        let mut destination = Self { path, memory };
+        destination
+            .memory
+            .resize(destination.path.capacity())
+            .context("reserve absolute publication destination")?;
+        Ok(destination)
+    }
+
+    pub(super) fn as_path(&self) -> &Path {
+        &self.path
+    }
+}
+
+pub(super) fn staging_destination(job: &Job, ctx: &Context) -> Result<(DestinationPath, bool)> {
+    let path = std::path::absolute(&job.output)?;
+    let destination = DestinationPath::admit(path, Reservation::new(ctx))?;
+    let existing_empty = ctx.run_destination().check(destination.as_path())?;
+    check_parent(destination.as_path())?;
     Ok((destination, existing_empty))
 }
 

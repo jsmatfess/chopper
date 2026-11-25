@@ -107,7 +107,7 @@ pub(crate) struct DirectPublication {
     #[cfg(target_os = "linux")]
     sync: deferred_sync::Queue,
     _records_buffer: Reservation,
-    destination: std::path::PathBuf,
+    destination: DestinationPath,
     existing_empty: bool,
     // Destroy all open handles before removing an abandoned staging directory.
     stage: JobDirectory,
@@ -251,7 +251,10 @@ impl DirectPublication {
     }
     fn with_records(job: &Job, ctx: &Context, capacity: Option<usize>) -> Result<Self> {
         let (destination, existing_empty) = staging_destination(job, ctx)?;
-        let parent = destination.parent().expect("checked output parent");
+        let parent = destination
+            .as_path()
+            .parent()
+            .expect("checked output parent");
         let stage = ctx.staging_directory(parent)?;
         let mut buffer = Reservation::new(ctx);
         let records = if let Some(capacity) = capacity {
@@ -482,7 +485,12 @@ impl DirectPublication {
         manifest.sync_all()?;
         drop(manifest);
         finish_archive(self.archive.take(), manifest_path.as_ref(), ctx)?;
-        commit_directory(&mut self.stage, &self.destination, self.existing_empty, ctx)?;
+        commit_directory(
+            &mut self.stage,
+            self.destination.as_path(),
+            self.existing_empty,
+            ctx,
+        )?;
         // Publication is the commit point, as for prepared execution.
         (ctx.notify)(Progress {
             phase: crate::storage::ProgressPhase::literal("Complete"),
