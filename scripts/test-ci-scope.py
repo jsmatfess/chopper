@@ -1,8 +1,10 @@
 """Contract tests for which platform/ownership checks can be skipped."""
+from contextlib import chdir
 import importlib.util
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -261,23 +263,41 @@ class ScopeTests(unittest.TestCase):
                          '--base', base, '--head', head, '--platform', platform], cwd=root, text=True)
                     self.assertEqual(json.loads(result), {'paths': paths, 'jobs': jobs})
 
-    @unittest.skipUnless(os.name == 'posix', 'Git filenames with non-UTF-8 bytes require POSIX')
     def test_revision_scope_preserves_non_utf8_and_newline_in_path(self):
         with tempfile.TemporaryDirectory() as directory:
-            def git(*args):
-                return subprocess.check_output(['git', *args], cwd=directory, text=True).strip()
+            def git(*args, data=None):
+                return subprocess.check_output(['git', *args], cwd=directory, input=data).strip()
             git('init', '-q')
             git('config', 'user.name', 'CI test')
             git('config', 'user.email', 'ci-test@example.invalid')
             git('commit', '-qm', 'base', '--allow-empty')
-            base = git('rev-parse', 'HEAD')
-            name = os.fsdecode(b'unclassified-\xff\npath')
-            (Path(directory) / name).write_text('fixture\n')
-            git('add', '.')
-            git('commit', '-qm', 'add path')
-            paths, jobs = scope.revision_scope(base, 'HEAD', root=directory)
-            self.assertEqual([os.fsencode(path) for path in paths], [os.fsencode(name)])
+            base = git('rev-parse', 'HEAD').decode('ascii')
+            # Store the name in a tree so the host filesystem need not accept it.
+            name = b'unclassified-\xff\npath'
+            blob = git('hash-object', '-w', '--stdin', data=b'fixture\n')
+            tree = git('mktree', '-z', data=b'100644 blob ' + blob + b'\t' + name + b'\0').decode('ascii')
+            head = git('commit-tree', tree, '-p', base, '-m', 'add path').decode('ascii')
+            paths, jobs = scope.revision_scope(base, head, root=directory)
+            self.assertEqual([path.encode('utf-8', errors='surrogateescape') for path in paths], [name])
             self.assertTrue(all(jobs.values()))
+
+    @unittest.skipUnless(os.name == 'posix', 'Relative PATH resolution follows POSIX subprocess rules')
+    def test_explicit_root_preserves_relative_git_lookup_from_caller(self):
+        with tempfile.TemporaryDirectory() as directory:
+            caller = Path(directory)
+            root = caller / 'repo'
+            root.mkdir()
+            subprocess.run(['git', '-C', str(root), 'init', '-q'], check=True)
+            subprocess.run(['git', '-C', str(root), '-c', 'user.name=CI test',
+                            '-c', 'user.email=ci-test@example.invalid', 'commit',
+                            '-qm', 'base', '--allow-empty'], check=True)
+            bin_dir = caller / 'bin'
+            bin_dir.mkdir()
+            (bin_dir / 'git').symlink_to(Path(shutil.which('git')).resolve())
+            with chdir(caller), patch.dict(os.environ, {'PATH': 'bin'}):
+                paths, jobs = scope.revision_scope('HEAD', 'HEAD', root=root)
+            self.assertEqual(paths, [])
+            self.assertFalse(any(jobs.values()))
 
     def test_full_scope_selects_platform_jobs_without_diffing(self):
         with patch.object(scope, 'changed_paths', side_effect=AssertionError('unexpected diff')):

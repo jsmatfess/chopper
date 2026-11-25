@@ -89,8 +89,10 @@ def classify(paths, full=False, platform='all'):
 def changed_paths(base, head, *, root=None):
     # Both names of a rename/copy must participate in routing. NUL delimiting
     # preserves spaces and newlines; no GitHub API file-count truncation applies.
-    data = subprocess.check_output(['git', 'diff', '--no-renames', '--name-only', '-z', base, head, '--'],
-                                   cwd=root)
+    command = ['git']
+    if root is not None:
+        command.extend(['-C', str(root)])
+    data = subprocess.check_output(command + ['diff', '--no-renames', '--name-only', '-z', base, head, '--'])
     return [name.decode('utf-8', errors='surrogateescape') for name in data.split(b'\0') if name]
 
 
