@@ -261,14 +261,20 @@ mod tests {
         // Selecting the candidate can use the full shared headroom. Creating
         // its Context admits the job path, taking it below that same threshold.
         let pool = Arc::new(MemoryPool::new(auto::NATIVE_DIRECT_HEADROOM_BYTES));
-        let route = RunRoute::select(
-            &job,
-            &Arc::new(AtomicBool::new(false)),
-            &(Arc::new(|_| {}) as Notify),
-            &pool,
-            false,
-        )?;
-        let report = serde_json::to_value(route.report(&job, &pool, None, None))?;
+        let original = dir.path().join("original-result");
+        let _hook = crate::storage::context_test_hook::install({
+            let output = output.clone();
+            let original = original.clone();
+            move |_, _| {
+                fs::rename(&output, original).expect("move witnessed destination");
+                fs::create_dir(output).expect("create replacement destination");
+            }
+        });
+        let cancel = Arc::new(AtomicBool::new(false));
+        let notify: Notify = Arc::new(|_| {});
+        let route = RunRoute::select(&job, &cancel, &notify, &pool, false)?;
+        let plan = route.report(&job, &pool, None, None);
+        let report = serde_json::to_value(plan)?;
         let RunRoute::Retained(run) = route else {
             panic!("direct Context should lose eligibility");
         };
@@ -279,7 +285,19 @@ mod tests {
         assert_eq!(report["physical_plan"], "private_terminal");
         assert_eq!(report["direct_preflight_fallback"], true);
         assert_eq!(pool.reservation_counts().0, 0);
-        assert_eq!(fs::read_dir(temp)?.count(), 0);
+        assert_eq!(fs::read_dir(&temp)?.count(), 0);
+
+        let context =
+            ProcessingMode::Run(run, &plan).context(&job, cancel, notify, pool.clone(), None)?;
+        let error = output::PlanWriter::direct_grouped(&job, None, &context)
+            .err()
+            .expect("retained staging must reject a replacement destination");
+        assert!(format!("{error:#}").contains("output destination changed during Run"));
+        drop(context);
+        assert_eq!(pool.reservation_counts().0, 0);
+        for path in [original, output, temp] {
+            assert_eq!(fs::read_dir(path)?.count(), 0);
+        }
         Ok(())
     }
 }

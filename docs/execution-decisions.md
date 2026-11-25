@@ -118,7 +118,11 @@ ordinary exact allocation.
 flowchart TD
     Validated[Validated Run Job] --> Destination[Native destination witness or hosted unchecked destination]
     Destination --> Candidate{Direct candidate for this Job and observation mode?}
-    Candidate -->|Yes| Context{Build the candidate Context and check live headroom}
+    Candidate -->|Yes| Hosted{WASI direct candidate?}
+    Hosted -->|Yes| Output{Valid job output path?}
+    Hosted -->|No| Context{Build the candidate Context and check live headroom}
+    Output -->|Yes| Context
+    Output -->|No| Fail
     Context -->|Construction error| Fail[Fail the Run before input consumption]
     Context -->|Ready| Direct[Dispatch the direct plan with its Context and destination]
     Context -->|Headroom declined| Drop[Drop the tentative Context and retain the destination witness]
