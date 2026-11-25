@@ -320,17 +320,23 @@ async function main(){
   });
   await test('Prepared gzip files can compress concurrently and finish in manifest order',async()=>{
     const source=csv('id,payload\n'+Array.from({length:8192},(_,row)=>row+','+'abc123'.repeat(88)+'\n').join(''));
-    const encoded=await run(source,job({compression:'gzip',operations:[{type:'balanced',files:4}]}),true);
+    const target=64;
+    const encoded=await run(source,job({compression:'gzip',operations:[{type:'balanced',files:4}],
+      limits:{rows:null,bytes:null,compressed_bytes:target}}),true);
     const measurements=encoded.plan.auto_plan?.measurements;
     if(navigator.hardwareConcurrency>=3){
       assert((measurements?.peak_deflate_workers??0)>=2,'Prepared outputs did not dispatch codec workers');
       assert((measurements?.peak_writer_slots??0)>=2,'Prepared outputs did not overlap files');
     }
     const manifest=await encoded.files.find(file=>file.name==='manifest.jsonl')!.text();
-    const names=manifest.trim().split('\n').map(line=>JSON.parse(line)).filter(line=>line.type==='output').map(line=>line.path);
+    const records=manifest.trim().split('\n').map(line=>JSON.parse(line)).filter(line=>line.type==='output');
     const decoded:string[]=[];
-    for(const name of names){
-      const stream=encoded.files.find(file=>file.name===name)!.stream().pipeThrough(new DecompressionStream('gzip'));
+    for(const record of records){
+      const file=encoded.files.find(file=>file.name===record.path)!;
+      assert(file.size>target,`Expected ${record.path} to exceed the advisory compressed target`);
+      assert(record.stored_bytes===file.size,`Wrong stored byte count for ${record.path}`);
+      assert(record.compressed_target_exceeded===true,`Missing compressed target overrun for ${record.path}`);
+      const stream=file.stream().pipeThrough(new DecompressionStream('gzip'));
       decoded.push(await new Response(stream).text());
     }
     assert(decoded.length===4,'Balanced job did not produce four files');

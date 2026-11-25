@@ -87,15 +87,16 @@ its optional decoder enabled. Select a fresh output directory for each run.
 ```sh
 mkdir -p scratch/mutation/core
 .tools/mutation/bin/cargo-mutants mutants -p chopper-core --all-features \
-  --output scratch/mutation/core -- --locked
+  --cargo-arg=--locked --output scratch/mutation/core
 ```
 
 On Windows, create the directory with `New-Item -ItemType Directory` and invoke
 `.\.tools\mutation\bin\cargo-mutants.exe`.
 The tool checks an unmodified copy before testing mutants. Use `--list` to
 inspect the inventory, `--file` to scope to a file, and `--re` to rerun matching
-mutations. Use `--test-workspace true` when a portable change needs tests from
-dependent crates.
+mutations. To test a portable mutation through the native crate, add
+`--cargo-arg=--package=chopper` to the portable command above. Add
+`--cargo-arg=--test=pipeline` to select the native pipeline tests.
 
 Read `mutants.out/missed.txt`, `outcomes.json`, and the relevant diff and test
 log together. Check a survivor against the specification and show an input

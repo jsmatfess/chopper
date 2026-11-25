@@ -312,6 +312,10 @@ fn calculated_column_binding_follows_the_available_schema() -> Result<()> {
         ("name", "missing or ambiguous"),
         ("copy", "cyclic"),
         ("$3", "cyclic"),
+        (
+            "$4",
+            "column index $4 is outside the 4-column formula schema",
+        ),
     ] {
         job.calculated_columns[0].expression = invalid.into();
         let failure = prepare(job.clone()).err().unwrap();

@@ -97,28 +97,62 @@ fn new_and_empty_destinations_accept_output() -> Result<()> {
     Ok(())
 }
 
-#[cfg(unix)]
+#[test]
+fn file_destination_is_rejected_before_input() -> Result<()> {
+    let dir = tempfile::tempdir()?;
+    let root = dir.path();
+    let output = root.join("results");
+    fs::write(&output, b"existing output\n")?;
+    reject_file_or_link_before_input(root, "results")?;
+    assert_eq!(fs::read(output)?, b"existing output\n");
+    assert_eq!(fs::read_dir(root)?.count(), 1);
+    Ok(())
+}
+
+fn reject_file_or_link_before_input(root: &Path, output: &str) -> Result<()> {
+    for prepared in [false, true] {
+        let result = run_cli(root, output, prepared)?;
+        let stderr = String::from_utf8(result.stderr)?;
+        assert!(!result.status.success());
+        assert!(stderr.contains("not a file or link"), "{stderr}");
+        assert!(
+            !stderr.contains("open input") && !stderr.contains("Reading"),
+            "{stderr}"
+        );
+    }
+    Ok(())
+}
+
+#[cfg(any(unix, windows))]
 #[test]
 fn destination_link_is_rejected_before_input_even_with_trailing_separator() -> Result<()> {
-    use std::os::unix::fs::symlink;
-
     let dir = tempfile::tempdir()?;
     let root = dir.path();
     fs::create_dir(root.join("target"))?;
-    symlink("target", root.join("results"))?;
-    for prepared in [false, true] {
-        for output in ["results", "results/"] {
-            let result = run_cli(root, output, prepared)?;
-            let stderr = String::from_utf8(result.stderr)?;
-            assert!(!result.status.success());
-            assert!(stderr.contains("not a file or link"), "{stderr}");
-            assert!(
-                !stderr.contains("open input") && !stderr.contains("Reading"),
-                "{stderr}"
-            );
-        }
+    #[cfg(unix)]
+    std::os::unix::fs::symlink("target", root.join("results"))?;
+    #[cfg(windows)]
+    {
+        let junction = Command::new("cmd.exe")
+            .current_dir(root)
+            .args(["/d", "/c", "mklink", "/J", "results", "target"])
+            .output()?;
+        assert!(
+            junction.status.success(),
+            "could not create junction: {}",
+            String::from_utf8_lossy(&junction.stderr)
+        );
     }
+    for output in ["results", "results/"] {
+        reject_file_or_link_before_input(root, output)?;
+    }
+    #[cfg(unix)]
     assert_eq!(fs::read_link(root.join("results"))?, Path::new("target"));
+    #[cfg(windows)]
+    assert_eq!(
+        root.join("results").canonicalize()?,
+        root.join("target").canonicalize()?
+    );
     assert_eq!(fs::read_dir(root.join("target"))?.count(), 0);
     assert_eq!(fs::read_dir(root)?.count(), 2);
     Ok(())
