@@ -224,6 +224,84 @@ class ViewTests(unittest.TestCase):
         for status in ('new-unsupported-status', {'state': 'incomplete'}):
             self.assertEqual(views.normalized_status({'status': status, 'ok': True}), 'unknown')
 
+    def test_retained_chrome_export_stays_verified_after_controller_failure(self):
+        review = views.ROOT / 'docs/performance/attempt-reviews/chrome-g-export.json'
+        out = io.StringIO()
+        args = ['attempt', '--review', str(review)]
+        with mock.patch('sys.stdout', out):
+            self.assertEqual(views.main(args), 0)
+        row = json.loads(out.getvalue())
+        self.assertEqual(row['status'], 'failed')
+        self.assertIs(row['original_status']['value'], False)
+        self.assertEqual(row['product_observation']['receipts'][0]['value'], 'complete')
+        self.assertEqual(row['independent_verification']['status'], 'verified')
+        self.assertEqual(row['controller_completion']['status'], 'failed')
+        self.assertEqual(row['cleanup']['status'], 'passed')
+        self.assertIn('without another product Run', row['reviewed_reuse']['reuse_reason'])
+        summary = io.StringIO()
+        with mock.patch('sys.stdout', summary):
+            self.assertEqual(views.main([*args, '--summary']), 0)
+        self.assertIn('FAILED (original failed)', summary.getvalue())
+        self.assertIn('Verification [verified]', summary.getvalue())
+        self.assertIn('Reviewed claim only', summary.getvalue())
+
+    def test_cancel_verification_cannot_promote_an_attempt_and_references_are_pinned(self):
+        review_path = self.root / 'review.json'
+        controller = self.artifact('controller.json', {'accepted': True, 'closed': False})
+        product = self.artifact('worker.json', {'terminal': 'cancelled'})
+        verifier = self.artifact('verification.json', {'destination_exists': False})
+
+        def ref(name, pointer):
+            return {'receipt': name, 'pointer': pointer}
+
+        def section(status, name, pointer):
+            return {'status': status, 'scope': 'One Windows Native UI Cancel fixture.',
+                    'receipts': [ref(name, pointer)]}
+
+        review = {'schema_version': 1, 'attempt': 'Native Cancel control',
+                  'receipts': {name: {'source': entry['path'], 'sha256': entry['sha256']}
+                               for name, entry in [('controller', controller), ('worker', product), ('verifier', verifier)]},
+                  'original_status': ref('controller', '/accepted'),
+                  'product_observation': section('observed', 'worker', '/terminal'),
+                  'independent_verification': section('verified', 'verifier', '/destination_exists'),
+                  'controller_completion': section('passed', 'controller', '/accepted'),
+                  'cleanup': section('failed', 'controller', '/closed'),
+                  'reviewed_reuse': {'claim': 'The cancelled run did not publish a destination.',
+                                     'relevance': 'The verifier inspected the same job destination.',
+                                     'reuse_reason': 'The filesystem observation is independent of controller teardown.'}}
+
+        def project():
+            review_path.write_text(json.dumps(review), encoding='utf-8')
+            return views.attempt_evidence(review_path, self.root)
+
+        row = project()
+        self.assertEqual(row['status'], 'failed')
+        self.assertEqual(row['product_observation']['receipts'][0]['value'], 'cancelled')
+        self.assertIs(row['independent_verification']['receipts'][0]['value'], False)
+        self.assertIn('reviewed_reuse', row)
+        review['cleanup']['status'] = 'unknown'
+        self.assertEqual(project()['status'], 'incomplete')
+        review['controller_completion']['status'] = 'failed'
+        self.assertEqual(project()['status'], 'failed')
+        review['controller_completion']['status'] = 'passed'
+        clean_receipt = self.artifact('clean.json', {'closed': True})
+        review['receipts']['clean'] = {'source': clean_receipt['path'], 'sha256': clean_receipt['sha256']}
+        review['cleanup'] = section('passed', 'clean', '/closed')
+        self.assertEqual(project()['status'], 'passed')
+        review['original_status'] = ref('controller', '/closed')
+        self.assertEqual(project()['status'], 'failed')
+        review['independent_verification']['status'] = 'unknown'
+        with self.assertRaisesRegex(ValueError, 'requires a named claim and independent verification'):
+            project()
+        del review['reviewed_reuse']
+        review['product_observation']['receipts'][0]['pointer'] = '/different_job'
+        with self.assertRaisesRegex(ValueError, 'Missing receipt pointer'):
+            project()
+        review['product_observation']['receipts'][0]['pointer'] = '/terminal'
+        (self.root / product['path']).write_text('{"terminal":"complete"}', encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'Receipt identity changed'):
+            project()
+
     def test_validation_binding_pins_source_and_exact_check(self):
         entry = self.artifact('checks.json', {'checks': [{'id': 'focused', 'status': 'passed'}]})
         self.config['validation_bindings'] = [{

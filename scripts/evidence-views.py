@@ -44,14 +44,15 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def read_json(path):
+def read_json(path, content=None):
     def pairs(values):
         result = {}
         for key, value in values:
             require(key not in result, f'Duplicate JSON key in {path}: {key}')
             result[key] = value
         return result
-    return json.loads(path.read_text(encoding='utf-8'), object_pairs_hook=pairs)
+    return json.loads(path.read_text(encoding='utf-8') if content is None else content.decode('utf-8'),
+                      object_pairs_hook=pairs)
 
 
 def escape(value):
@@ -456,6 +457,82 @@ def runner_receipts(directory):
             yield row
 
 
+def attempt_evidence(review_path, receipt_root):
+    """Project a reviewer-authored annotation over exact retained receipt bytes."""
+    review_bytes = review_path.read_bytes()
+    review = read_json(review_path, review_bytes)
+    require(review['schema_version'] == 1, 'Unsupported attempt review version')
+
+    def note(value):
+        require(isinstance(value, str) and value.strip() and value.isprintable(),
+                'Expected a nonempty, single-line review note')
+        return value
+
+    @functools.cache
+    def checked_receipt(name):
+        source = review['receipts'][name]
+        require(set(source) == {'source', 'sha256'}, 'Invalid attempt receipt source')
+        relative = Path(source['source'])
+        require(relative.parts and not relative.anchor and '..' not in relative.parts,
+                'Expected a path relative to the receipt root')
+        path = receipt_root / relative
+        data = path.read_bytes()
+        require(hashlib.sha256(data).hexdigest() == source['sha256'], 'Receipt identity changed: ' + str(path))
+        return source, read_json(path, data)
+
+    def receipt(ref):
+        require(set(ref) == {'receipt', 'pointer'}, 'Invalid attempt receipt reference')
+        source, data = checked_receipt(ref['receipt'])
+        value = pointer(data, ref['pointer'])
+        require(value is not MISSING, 'Missing receipt pointer: ' + source['source'] + ref['pointer'])
+        return {**source, 'pointer': ref['pointer'], 'value': value}
+
+    original = receipt(review['original_status'])
+    raw = original['value']
+    status = normalized_status({'status': raw})
+    if type(raw) is bool:
+        status = 'passed' if raw else 'failed'
+    row = {'schema_version': 1, 'attempt': note(review['attempt']),
+           'review': {'source': str(review_path), 'sha256': hashlib.sha256(review_bytes).hexdigest()},
+           'original_status': {**original, 'status': status}}
+    integrity_statuses = ('passed', 'failed', 'incomplete', 'unknown')
+    for field, statuses in (
+            ('product_observation', ('observed', 'unknown')),
+            ('independent_verification', ('verified', 'failed', 'unknown')),
+            ('controller_completion', integrity_statuses),
+            ('cleanup', integrity_statuses)):
+        section = review[field]
+        require(set(section) == {'status', 'scope', 'receipts'} and section['status'] in statuses
+                and isinstance(section['receipts'], list), 'Invalid attempt review field: ' + field)
+        require(section['receipts'] or section['status'] == 'unknown', 'Missing receipts for ' + field)
+        row[field] = {'status': section['status'], 'scope': note(section['scope']),
+                      'receipts': [receipt(ref) for ref in section['receipts']]}
+    mandatory = (status, row['controller_completion']['status'], row['cleanup']['status'])
+    row['status'] = 'incomplete'
+    if 'failed' in mandatory:
+        row['status'] = 'failed'
+    elif all(value == 'passed' for value in mandatory):
+        row['status'] = 'passed'
+    if 'reviewed_reuse' in review:
+        reuse = review['reviewed_reuse']
+        require(set(reuse) == {'claim', 'relevance', 'reuse_reason'}
+                and row['product_observation']['status'] == 'observed'
+                and row['independent_verification']['status'] == 'verified',
+                'Reviewed reuse requires a named claim and independent verification of the observation')
+        row['reviewed_reuse'] = {key: note(value) for key, value in reuse.items()}
+    return row
+
+
+def attempt_summary(row):
+    return '\n'.join([
+        f'{row["attempt"]} — {row["status"].upper()} (original {row["original_status"]["status"]})',
+        *(f'  {label} [{row[field]["status"]}] {row[field]["scope"]}' for field, label in (
+            ('product_observation', 'Product'), ('independent_verification', 'Verification'),
+            ('controller_completion', 'Controller'), ('cleanup', 'Cleanup'))),
+        *([f'  Reviewed claim only — {row["reviewed_reuse"]["claim"]}'] if 'reviewed_reuse' in row else []),
+    ])
+
+
 def generate_index(root):
     verify_reviewed_comparisons(root)
     output = {'schema_version': 1, 'type': 'derived_evidence_view_inventory',
@@ -556,7 +633,7 @@ def render_validation_index(root, index):
 
 def main(argv=None, root=ROOT):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('view', nargs='?', choices=['observations', 'validation', 'coverage', 'record'], default='observations')
+    parser.add_argument('view', nargs='?', choices=['observations', 'validation', 'coverage', 'record', 'attempt'], default='observations')
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--build', action='store_true')
     mode.add_argument('--check', action='store_true')
@@ -568,6 +645,9 @@ def main(argv=None, root=ROOT):
     parser.add_argument('--runtime')
     parser.add_argument('--status')
     parser.add_argument('--batch', type=Path)
+    parser.add_argument('--review', type=Path, help='Separate review of an attempt and its receipt references')
+    parser.add_argument('--receipt-root', type=Path, help='Root for relative attempt receipt references (default: repository root)')
+    parser.add_argument('--summary', action='store_true', help='Print a concise attempt summary instead of JSON')
     parser.add_argument('--pointer', default='')
     parser.add_argument('--line', type=int)
     parser.add_argument('--limit', type=int, default=25)
@@ -577,7 +657,16 @@ def main(argv=None, root=ROOT):
         parser.error('Positive result limit required')
     if (args.pointer or args.line is not None) and args.view != 'record':
         parser.error('--pointer and --line require record view')
+    if (args.review or args.receipt_root or args.summary) and args.view != 'attempt':
+        parser.error('--review, --receipt-root and --summary require attempt view')
     try:
+        if args.view == 'attempt':
+            if not args.review or args.batch or args.build or args.check or args.source != '*' or any((
+                    args.classification, args.metric, args.comparison, args.contract, args.runtime, args.status)):
+                parser.error('attempt requires --review and supports --receipt-root and --summary')
+            row = attempt_evidence(args.review, args.receipt_root or root)
+            print(attempt_summary(row) if args.summary else json.dumps(row, ensure_ascii=False, allow_nan=False, sort_keys=True))
+            return 0
         if args.build or args.check:
             require(not args.batch, 'Batch imports are not committed corpus inputs')
             index = generate_index(root)

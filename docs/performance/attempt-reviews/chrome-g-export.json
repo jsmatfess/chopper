@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "attempt": "Windows Chrome 157.0.8103.51 G 1 GB export",
+  "receipts": {
+    "release-record": {
+      "source": "docs/releases/0.2.0-browser-scale-acceptance.json",
+      "sha256": "0d7edef7b9e83a7d25457dfb1acd9134f4d288254ad2e8024b3edb5f86fd274c"
+    }
+  },
+  "original_status": {
+    "receipt": "release-record",
+    "pointer": "/chrome/G/original_session_passed"
+  },
+  "product_observation": {
+    "status": "observed",
+    "scope": "The original hosted Run reported complete for the pinned G fixture on Windows Chrome.",
+    "receipts": [
+      {"receipt": "release-record", "pointer": "/chrome/G/completed_public_status"},
+      {"receipt": "release-record", "pointer": "/chrome/G/completed_public_state_sha256"},
+      {"receipt": "release-record", "pointer": "/chrome/G/fixture_sha256"},
+      {"receipt": "release-record", "pointer": "/selected_product"},
+      {"receipt": "release-record", "pointer": "/workload/input_bytes_each"}
+    ]
+  },
+  "independent_verification": {
+    "status": "verified",
+    "scope": "A read-only copy of the closed profile yielded 999,999 independently verified rows in 112 CSV chunks, with manifests and completion markers checked.",
+    "receipts": [
+      {"receipt": "release-record", "pointer": "/chrome/G/verified_report_sha256"},
+      {"receipt": "release-record", "pointer": "/chrome/G/extraction_receipt_sha256"},
+      {"receipt": "release-record", "pointer": "/chrome/G/recovery_independent_sha256"},
+      {"receipt": "release-record", "pointer": "/chrome/G/rows"},
+      {"receipt": "release-record", "pointer": "/chrome/G/chunks"},
+      {"receipt": "release-record", "pointer": "/chrome/G/maximum_chunk_bytes"},
+      {"receipt": "release-record", "pointer": "/chrome/G/recovery_product_runs"}
+    ]
+  },
+  "controller_completion": {
+    "status": "failed",
+    "scope": "The original harness rejected the reported spill/merge metrics after the product Run completed.",
+    "receipts": [
+      {"receipt": "release-record", "pointer": "/chrome/G/original_failure"},
+      {"receipt": "release-record", "pointer": "/chrome/G/original_failed_browser_receipt_sha256"},
+      {"receipt": "release-record", "pointer": "/chrome/G/original_failed_independent_sha256"}
+    ]
+  },
+  "cleanup": {
+    "status": "passed",
+    "scope": "The original session recorded normal Original release and no normal-cleanup errors.",
+    "receipts": [
+      {"receipt": "release-record", "pointer": "/chrome/G/original_normal_release_sha256"},
+      {"receipt": "release-record", "pointer": "/chrome/G/original_normal_cleanup_errors"}
+    ]
+  },
+  "reviewed_reuse": {
+    "claim": "The pinned Chrome G export satisfies the recorded CSV, manifest and marker checks.",
+    "relevance": "The verifier inspected the completed export from the original closed profile for the same product, fixture and installed browser.",
+    "reuse_reason": "The read-only recovery ran the streaming verifier on the retained export without another product Run or scale claim. Reuse covers these export checks only."
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "attempt": "Windows Native UI processing Cancel r5",
+  "receipts": {
+    "controller": {
+      "source": "native105-smoke-processing-cancel-r5/attempt1/receipt.json",
+      "sha256": "988f86661498c1d5252ba48ebc3bafaf1d528f4f09b06da4f383cdfc11879eaf"
+    },
+    "worker": {
+      "source": "native105-smoke-processing-cancel-r5/attempt1/worker-result.json",
+      "sha256": "72308adc102513192c4adb54e4fcc075fda0fc29c5ad3a0f97bfe1a5ea012710"
+    },
+    "after-exit": {
+      "source": "native105-smoke-processing-cancel-r5/after-exit/result.json",
+      "sha256": "20fce2817e9c1762ba7233bf96d846762bc918101ba7410de19044a763e11339"
+    }
+  },
+  "original_status": {
+    "receipt": "controller",
+    "pointer": "/acceptance"
+  },
+  "product_observation": {
+    "status": "observed",
+    "scope": "A trusted public Cancel during CSV validation at 65,536 rows returned HTTP 200. The worker recorded cancelled state, absent destination and empty staging and temp.",
+    "receipts": [
+      {"receipt": "worker", "pointer": "/chromeVersion"},
+      {"receipt": "worker", "pointer": "/cases/0/cancelClick/trusted"},
+      {"receipt": "worker", "pointer": "/cases/0/activeBeforeCancel/progress"},
+      {"receipt": "worker", "pointer": "/cases/0/cancelHTTP"},
+      {"receipt": "worker", "pointer": "/cases/0/state/status"},
+      {"receipt": "worker", "pointer": "/finalFileObservation"},
+      {"receipt": "controller", "pointer": "/windowsVersion"},
+      {"receipt": "controller", "pointer": "/configSha256"}
+    ]
+  },
+  "independent_verification": {
+    "status": "unknown",
+    "scope": "The retained after-exit proof inspected process and lock ownership. The product result comes from the original worker observations.",
+    "receipts": [
+      {"receipt": "after-exit", "pointer": "/receiptSha256"},
+      {"receipt": "after-exit", "pointer": "/case_qualification_passed"},
+      {"receipt": "after-exit", "pointer": "/qualification"}
+    ]
+  },
+  "controller_completion": {
+    "status": "failed",
+    "scope": "The controller rejected the case. The terminal progress had zero rows in preparation, while the recorded pre-click CSV-validation progress had 65,536 rows.",
+    "receipts": [
+      {"receipt": "controller", "pointer": "/acceptance"},
+      {"receipt": "controller", "pointer": "/privateChildExitCodes"},
+      {"receipt": "worker", "pointer": "/cases/0/state/progress"},
+      {"receipt": "worker", "pointer": "/cases/0/qualifies"}
+    ]
+  },
+  "cleanup": {
+    "status": "passed",
+    "scope": "Private captures and browser-helper cleanup completed. The independent after-exit receipt confirmed the original lock was available.",
+    "receipts": [
+      {"receipt": "controller", "pointer": "/privateCleanup/complete"},
+      {"receipt": "controller", "pointer": "/browserHelperCleanup/complete"},
+      {"receipt": "controller", "pointer": "/originalReservationClosedAfterQuiescence"},
+      {"receipt": "after-exit", "pointer": "/receiptSha256"},
+      {"receipt": "after-exit", "pointer": "/status"},
+      {"receipt": "after-exit", "pointer": "/original_byte0_available"},
+      {"receipt": "after-exit", "pointer": "/probe_closed"}
+    ]
+  }
+}

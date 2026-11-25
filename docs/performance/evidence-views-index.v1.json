@@ -7,7 +7,7 @@
   "adapter_sources": [
     {
       "path": "scripts/evidence-views.py",
-      "sha256": "1c0aca4513e1a1726f6df9489c46b68944c9327c6b9275466ba47fc00feb20f9"
+      "sha256": "98f0a4a0f2342c8dd915cbdb0699b525aa94740e6e4bbca4c7139791e073a36b"
     },
     {
       "path": "scripts/benchmark-catalog.py",

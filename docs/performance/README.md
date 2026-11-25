@@ -250,3 +250,37 @@ remains unknown. Existing historical receipts with unavailable builds/logs retai
 their source references and limitations; importing them does not hydrate or recreate
 the missing artifacts. Test durations never become performance gains, and test counts
 from different passes are not added.
+
+### Review product observations from a failed attempt
+
+Use the attempt view to read a historical acceptance attempt alongside its
+independent verification, controller completion and cleanup records.
+
+```sh
+python3 scripts/evidence-views.py attempt --review docs/performance/attempt-reviews/chrome-g-export.json --summary
+```
+
+Omit `--summary` for JSON with each selected receipt value, path, SHA-256 and
+JSON pointer. A review is a separate annotation. It pins the retained JSON
+receipts (or a committed release record that identifies private receipts) and
+records the reviewer’s interpretation and coverage for each field. The view
+checks the selected source bytes and pointers and preserves the original
+outcome. Treat unavailable proof as `unknown`. An attempt passes only when the
+original outcome, controller completion and cleanup all passed. A failure in
+any of those fields makes the attempt failed, and missing mandatory proof
+leaves it incomplete.
+
+Add `reviewed_reuse` only with a specific independently verified claim, its
+relevance to the original attempt and the reason its verifier evidence can be
+reused. The Chrome G review credits the retained export checks on that exact
+fixture, product and browser. Its original controller failure remains visible.
+The command exits successfully when it renders the evidence, so use the JSON
+`status` field to inspect the attempt outcome.
+
+The [Native UI Cancel review](attempt-reviews/native-processing-cancel.json)
+uses the privately retained Windows r5 receipts. Run the same command with its
+review path and `--receipt-root` pointing to the local directory containing
+`native105-smoke-processing-cancel-r5`. That attempt has separate after-exit
+process and lock proof. The cancellation observation is supported by the worker
+receipt. Keep private receipt bytes and exports in the appropriate storage.
+[Evidence storage policy](../evidence-storage.md)
