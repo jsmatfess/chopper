@@ -1,7 +1,7 @@
 //! WASI reactor: the same engine used by the CLI, hosted in a browser worker.
 #[cfg(target_os = "wasi")]
 mod reactor {
-    use chopper::{core::Job, engine};
+    use chopper::{core::Job, engine, DecodedJob};
     use std::{
         cell::RefCell,
         sync::{atomic::AtomicBool, Arc},
@@ -68,11 +68,12 @@ mod reactor {
     #[no_mangle]
     pub extern "C" fn chopper_analyze() -> i32 {
         report((|| {
-            let job = read_job()?;
-            validate_resources(&job)?;
+            let decoded = DecodedJob::read_inspection()?;
+            let job = decoded.job();
+            validate_resources(job)?;
             PROFILE.with(|p| {
                 p.borrow_mut().profile(
-                    &job,
+                    job,
                     Arc::new(AtomicBool::new(false)),
                     Arc::new(|p| println!("{}", serde_json::json!({"progress":p}))),
                 )
@@ -100,7 +101,16 @@ mod reactor {
     #[cfg(feature = "resource-contract-tests")]
     #[no_mangle]
     pub extern "C" fn chopper_resource_contracts() -> i32 {
-        report(engine::run_resource_contracts())
+        report((|| {
+            let mut result = engine::run_resource_contracts()?;
+            result["inspection_job_decode"] = DecodedJob::resource_contracts()?;
+            Ok(result)
+        })())
+    }
+    #[cfg(feature = "resource-contract-tests")]
+    #[no_mangle]
+    pub extern "C" fn chopper_test_inspection_reserved_bytes() -> usize {
+        DecodedJob::inspection_reserved_bytes().expect("test process ledger")
     }
     #[no_mangle]
     pub extern "C" fn chopper_defaults() -> i32 {
@@ -115,17 +125,17 @@ mod reactor {
     #[no_mangle]
     pub extern "C" fn chopper_preview() -> i32 {
         report((|| {
-            let job = read_job()?;
-            engine::input_preview(&job)
+            let decoded = DecodedJob::read_inspection()?;
+            engine::input_preview(decoded.job())
         })())
     }
     #[no_mangle]
     pub extern "C" fn chopper_formula_scan() -> i32 {
         use std::io::{Read, Write};
         let result = (|| {
-            let job = read_job()?;
+            let decoded = DecodedJob::read_inspection()?;
             engine::sample_formula_rows(
-                &job,
+                decoded.job(),
                 |batch| {
                     let mut stdout = std::io::stdout().lock();
                     serde_json::to_writer(&mut stdout, batch)?;
@@ -153,8 +163,8 @@ mod reactor {
     #[no_mangle]
     pub extern "C" fn chopper_sniff() -> i32 {
         report((|| {
-            let job = read_job()?;
-            engine::sniff_csv(&job)
+            let decoded = DecodedJob::read_inspection()?;
+            engine::sniff_csv(decoded.job())
         })())
     }
     #[no_mangle]

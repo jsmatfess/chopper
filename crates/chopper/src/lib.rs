@@ -1,5 +1,10 @@
 #[cfg(not(target_os = "wasi"))]
 pub mod cli_job;
+#[cfg(target_os = "wasi")]
+mod cli_job;
+#[cfg(target_os = "wasi")]
+#[doc(hidden)]
+pub use cli_job::DecodedJob;
 mod csv_intake;
 mod digest;
 pub mod engine;

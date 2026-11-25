@@ -1,4 +1,4 @@
-# Native scripted Job decoding ownership
+# Scripted and hosted inspection Job decoding ownership
 
 [#151](history/prior-issues.md#issue-151), child of #86, covers only
 native scripted `analyze` and `run` decode-origin payloads. The
@@ -169,5 +169,34 @@ by the prepared-configuration resource contracts.
 Error objects, validation/formatting internals, allocator bookkeeping/usable size,
 RSS, stacks, source File/OS paths/handles, ledger/bootstrap control owners,
 prompts/framing and unrelated caller construction remain outside this envelope.
-Guide/split/flag-built Run caller-owned construction, HTTP and WASI retain their existing accounting boundaries. #86,
-#81/#94, frozen release and platform acceptance remain separate.
+Guide/split/flag-built Run caller-owned construction and HTTP retain their
+existing accounting boundaries.
+
+## WASI inspection
+
+[Issue #78](https://github.com/jsmatfess/chopper/issues/78) applies the same
+prefix proof to the reactor's Analyze, Preview, Sniff and formula scan. The
+process pool admits 8,192 buffer bytes and the defaults before constructing the
+reader. The allowance adds those buffer bytes to every prefix. The buffer still
+reads ahead from the virtual file in 8 KiB requests. There is no metadata size
+check or path tracking, and source and serde errors retain their raw text and
+positions when admission succeeds. The browser's existing import limit applies
+at the UI boundary. The consuming Run loader keeps its existing handoff into
+PreparedJob pending a grant transfer that preserves the 2048 MiB Auto target.
+
+The typed decoder drops its scratch and partial values before the reader drops.
+The owner then shrinks the reservation to the retained Job capacity and holds it
+through the borrowed inspection call, including the formula scan's stdin pause.
+The Job drops before its retained grant.
+
+The WASI resource control checks C=16, L=12 and U=32. Its fixture with an 8,200-byte
+output string requires 41,209 ledger bytes (8,192 buffer, 28 defaults, 8,221
+string origins, 24,576 scratch growth overlap and 192 object slots). The
+one-byte-short control denies the final output byte during the second fill. The
+same reactor checks pre-buffer denial, live competing grants, cleanup, and
+retry. It reports requested Rust allocation layouts, including old and new
+layouts at scratch growth, and confirms that 8,224 retained bytes fit after
+construction. Error carriers after denial, allocator overhead, runtime state,
+stacks, virtual file storage and browser JS buffers remain separate owners.
+Browser controls compare source reads and malformed errors, check a virtual
+file on each side of 1 MiB, and sample the live charge at the formula pause.

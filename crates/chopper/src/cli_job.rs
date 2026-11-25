@@ -1,24 +1,47 @@
-//! Native scripted CLI decode-origin payload owner. See docs/cli-job-decoding.md.
+//! Decode-origin payload owner. See docs/cli-job-decoding.md.
 use crate::{
     engine,
     resources::{process_memory, MemoryAdmission, MemoryPool},
-    storage::Notify,
 };
-use anyhow::{ensure, Context, Result};
-use chopper_core::{Job, MemoryBudget};
+use anyhow::{ensure, Result};
+use chopper_core::Job;
 use std::{
     io::{self, Read},
-    path::Path,
-    sync::{atomic::AtomicBool, Arc},
+    sync::Arc,
 };
+#[cfg(not(target_os = "wasi"))]
+use {
+    crate::storage::Notify,
+    anyhow::Context,
+    chopper_core::MemoryBudget,
+    std::{path::Path, sync::atomic::AtomicBool},
+};
+#[cfg(not(target_os = "wasi"))]
 mod diagnostics;
+#[cfg(not(target_os = "wasi"))]
 pub use diagnostics::JobJsonPath;
+#[cfg(any(
+    all(test, not(target_os = "wasi")),
+    all(target_os = "wasi", feature = "resource-contract-tests")
+))]
+mod census;
 mod prefix;
-#[cfg(test)]
+#[cfg(all(test, not(target_os = "wasi")))]
 mod tests;
-#[cfg(test)]
-pub(crate) use tests::{
+#[cfg(all(test, not(target_os = "wasi")))]
+pub(crate) use census::{
     begin as start_allocation_observation, end as finish_allocation_observation,
+};
+#[cfg(all(target_os = "wasi", feature = "resource-contract-tests"))]
+mod wasi_contracts;
+#[cfg(target_os = "wasi")]
+const BUFFER_BYTES: usize = 8 * 1024;
+#[cfg(not(target_os = "wasi"))]
+const BUFFER_BYTES: usize = 0;
+const DECODE_ORIGIN: &str = if cfg!(target_os = "wasi") {
+    "Job"
+} else {
+    "CLI Job"
 };
 
 struct Grant {
@@ -34,14 +57,20 @@ impl Grant {
             self.pool.try_acquire((bytes - self.bytes) as u64)?;
             self.bytes = bytes;
         }
-        #[cfg(test)]
-        tests::observe_grant(self.bytes);
+        #[cfg(any(
+            all(test, not(target_os = "wasi")),
+            all(target_os = "wasi", feature = "resource-contract-tests")
+        ))]
+        census::observe_grant(self.bytes);
         Ok(())
     }
     fn shrink(&mut self, bytes: usize) {
         assert!(bytes <= self.bytes);
-        #[cfg(test)]
-        tests::observe_grant(bytes);
+        #[cfg(any(
+            all(test, not(target_os = "wasi")),
+            all(target_os = "wasi", feature = "resource-contract-tests")
+        ))]
+        census::observe_grant(bytes);
         self.pool.release((self.bytes - bytes) as u64);
         self.bytes = bytes;
     }
@@ -61,6 +90,7 @@ struct AdmittedReader<'a, R> {
     prefix: prefix::Prefix,
     grant: &'a mut Grant,
     denial: Option<Denial>,
+    #[cfg(not(target_os = "wasi"))]
     track_paths: bool,
 }
 impl<R: Read> Read for AdmittedReader<'_, R> {
@@ -75,7 +105,9 @@ impl<R: Read> Read for AdmittedReader<'_, R> {
         if self.source.read(&mut byte)? == 0 {
             return Ok(0);
         }
-        let allowance = self.prefix.advance(byte[0]).and_then(|required| {
+        let allowance = self.prefix.advance(byte[0]);
+        #[cfg(not(target_os = "wasi"))]
+        let allowance = allowance.and_then(|required| {
             if self.track_paths {
                 // A tracked seed can retain an active key and clone it into the deserializer.
                 let text_bound = if self.prefix.fallback {
@@ -88,7 +120,7 @@ impl<R: Read> Read for AdmittedReader<'_, R> {
                 Some(required)
             }
         });
-        match allowance {
+        match allowance.and_then(|bytes| bytes.checked_add(BUFFER_BYTES)) {
             None => self.denial = Some(Denial::Overflow),
             Some(required) => {
                 if let Err(error) = self.grant.grow(required) {
@@ -97,6 +129,8 @@ impl<R: Read> Read for AdmittedReader<'_, R> {
             }
         }
         if self.denial.is_some() {
+            #[cfg(all(target_os = "wasi", feature = "resource-contract-tests"))]
+            census::census(|c| c.enabled = false);
             return Err(io::ErrorKind::Other.into());
         }
         output[0] = byte[0];
@@ -115,8 +149,9 @@ impl<R: Read> Read for AdmittedReader<'_, R> {
 /// ```
 pub struct DecodedJob {
     job: Job,
-    grant: Grant,
+    _grant: Grant,
 }
+#[cfg(not(target_os = "wasi"))]
 impl DecodedJob {
     /// Preserve metadata-only 1 MiB rejection and metadata/open error ordering.
     pub fn read(path: impl AsRef<Path>) -> Result<Self> {
@@ -148,46 +183,7 @@ impl DecodedJob {
         Self::decode(file, pool()?, track_paths)
     }
     fn decode(source: impl Read, pool: Arc<MemoryPool>, track_paths: bool) -> Result<Self> {
-        let mut grant = Grant::new(pool);
-        grant.grow(prefix::DEFAULTS).context("read job JSON")?;
-        let mut reader = AdmittedReader {
-            source,
-            prefix: prefix::Prefix::default(),
-            grant: &mut grant,
-            denial: None,
-            track_paths,
-        };
-        let (result, path) = if track_paths {
-            diagnostics::decode(&mut reader)
-        } else {
-            (serde_json::from_reader::<_, Job>(&mut reader), None)
-        };
-        let denial = reader.denial.take();
-        drop(reader);
-        if let Some(denial) = denial {
-            // from_reader has destroyed scratch/partial values. Error carriers
-            // are excluded, and are constructed only after the sticky transport.
-            drop(result);
-            return match denial {
-                Denial::Shared(error) => Err(anyhow::Error::new(error)),
-                Denial::Overflow => Err(anyhow::anyhow!("CLI Job decoding capacity overflow")),
-            }
-            .context("read job JSON");
-        }
-        let job = match path {
-            Some(path) => result.context(JobJsonPath::from_serde(path)),
-            None => result.context("read job JSON"),
-        }?;
-        let retained = engine::job_capacity(&job)?;
-        ensure!(
-            retained <= grant.bytes,
-            "CLI Job decoder exceeded audited construction allowance"
-        );
-        grant.shrink(retained);
-        Ok(Self { job, grant })
-    }
-    pub fn job(&self) -> &Job {
-        &self.job
+        Self::decode_admitted(|| source, pool, track_paths)
     }
     pub fn resource_overrides(
         mut self,
@@ -212,7 +208,7 @@ impl DecodedJob {
         notify: Notify,
         hint: Option<engine::AutoObservations>,
     ) -> Result<engine::Analysis> {
-        let Self { job, grant } = self;
+        let Self { job, _grant: grant } = self;
         let result = engine::run_with_auto(job, cancel, notify, grant.pool.clone(), hint);
         drop(grant);
         result
@@ -223,11 +219,100 @@ impl DecodedJob {
         cancel: Arc<AtomicBool>,
         notify: Notify,
     ) -> Result<crate::profile::InputProfile> {
-        let Self { job, grant } = self;
+        let Self { job, _grant: grant } = self;
         let result = crate::profile::ProfileCache::with_memory_pool(grant.pool.clone())
             .profile(&job, cancel, notify);
         drop(job);
         drop(grant);
         result
+    }
+}
+
+#[cfg(target_os = "wasi")]
+impl DecodedJob {
+    /// Read the browser inspection Job with the existing WASI source buffer.
+    pub fn read_inspection() -> Result<Self> {
+        let file = std::fs::File::open("/job.json")?;
+        Self::decode_buffered(file, process_memory()?)
+    }
+
+    fn decode_buffered(source: impl Read, pool: Arc<MemoryPool>) -> Result<Self> {
+        Self::decode_admitted(|| io::BufReader::with_capacity(BUFFER_BYTES, source), pool)
+    }
+
+    #[cfg(feature = "resource-contract-tests")]
+    pub fn resource_contracts() -> Result<serde_json::Value> {
+        wasi_contracts::run()
+    }
+
+    #[cfg(feature = "resource-contract-tests")]
+    pub fn inspection_reserved_bytes() -> Result<usize> {
+        Ok(process_memory()?.reservation_counts().0 as usize)
+    }
+}
+
+impl DecodedJob {
+    fn decode_admitted<R: Read>(
+        open_reader: impl FnOnce() -> R,
+        pool: Arc<MemoryPool>,
+        #[cfg(not(target_os = "wasi"))] track_paths: bool,
+    ) -> Result<Self> {
+        let mut grant = Grant::new(pool);
+        let initial = grant.grow(prefix::DEFAULTS + BUFFER_BYTES);
+        #[cfg(all(target_os = "wasi", feature = "resource-contract-tests"))]
+        if initial.is_err() {
+            census::census(|c| c.enabled = false);
+        }
+        #[cfg(not(target_os = "wasi"))]
+        initial.context("read job JSON")?;
+        #[cfg(target_os = "wasi")]
+        initial?;
+        let mut reader = AdmittedReader {
+            source: open_reader(),
+            prefix: prefix::Prefix::default(),
+            grant: &mut grant,
+            denial: None,
+            #[cfg(not(target_os = "wasi"))]
+            track_paths,
+        };
+        #[cfg(not(target_os = "wasi"))]
+        let (result, path) = if track_paths {
+            diagnostics::decode(&mut reader)
+        } else {
+            (serde_json::from_reader::<_, Job>(&mut reader), None)
+        };
+        #[cfg(target_os = "wasi")]
+        let result = serde_json::from_reader::<_, Job>(&mut reader);
+        let denial = reader.denial.take();
+        drop(reader);
+        if let Some(denial) = denial {
+            // from_reader has destroyed scratch/partial values. Error carriers
+            // are excluded, and are constructed only after the sticky transport.
+            drop(result);
+            let error = match denial {
+                Denial::Shared(error) => anyhow::Error::new(error),
+                Denial::Overflow => anyhow::anyhow!("{DECODE_ORIGIN} decoding capacity overflow"),
+            };
+            #[cfg(not(target_os = "wasi"))]
+            let error = error.context("read job JSON");
+            return Err(error);
+        }
+        #[cfg(not(target_os = "wasi"))]
+        let job = match path {
+            Some(path) => result.context(JobJsonPath::from_serde(path)),
+            None => result.context("read job JSON"),
+        }?;
+        #[cfg(target_os = "wasi")]
+        let job = result?;
+        let retained = engine::job_capacity(&job)?;
+        ensure!(
+            retained <= grant.bytes,
+            "{DECODE_ORIGIN} decoder exceeded audited construction allowance"
+        );
+        grant.shrink(retained);
+        Ok(Self { job, _grant: grant })
+    }
+    pub fn job(&self) -> &Job {
+        &self.job
     }
 }

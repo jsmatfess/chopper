@@ -41,6 +41,11 @@ async function main(){
         const {result,diagnostics,browserExport}=await request(engine,{available,shared,port:channel.port2,exportDirectory},[channel.port2],'result');
         assert(result.auto_fusion?.pre_emission_retry&&result.auto_fusion?.cancellation_cleanup,'Active Auto fusion resource contract failed');
         assert(result.schema_version===1&&result.contract==='input-adapter-resource-contracts-v1','Wrong resource contract report');
+        const decode=result.inspection_job_decode, inspectionAdapter=result.inspection_job_adapter;
+        assert(decode?.construction_bytes===41209&&decode.retained_bytes===8224&&decode.malformed_error_parity&&
+          decode.cases.map((item:any)=>item.available_bytes).join(',')==='8219,41209,41208,41209','WASI Job decode edges failed');
+        assert(inspectionAdapter?.calls.length===4&&inspectionAdapter.formula_pause_job_bytes===8200&&
+          inspectionAdapter.virtual.map((item:any)=>item.bytes).join(',')==='1048575,1048577','WASI Job inspection adapter contract failed');
         if(new URLSearchParams(location.search).has('spill-blocks')){
           assert(result.spill_blocks?.contract==='spill-block-resource-contracts-v1','Missing actual spill-block contracts');
           assert(JSON.stringify(result.spill_blocks.cases)===JSON.stringify(['roundtrip_chunks_widths','footer_quota','wide_reader_lifetime','local_encoder_fallback_retry','malformed_truncated_utf8_terminal','shared_encoder_fallback_retry','reader_live_cancellation']),'Missing spill-block decode/admission/ownership cases');

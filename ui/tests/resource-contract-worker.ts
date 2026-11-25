@@ -1,6 +1,6 @@
 import {serialCompressionImports} from '../src/browser/compression';
 // Dedicated test reactor. The production worker has no resource-injection API.
-import {WASI, File as MemoryFile, ConsoleStdout} from '@bjorn3/browser_wasi_shim';
+import {WASI, File as MemoryFile, ConsoleStdout, wasi} from '@bjorn3/browser_wasi_shim';
 import {DiskBridge, DiskDirectory, DiskFile, RootFd} from '../src/browser/fs';
 import {exportResults} from '../src/browser/export';
 import type {Observation} from '../src/browser/execution-history';
@@ -160,14 +160,104 @@ async function browserExportContract(root:DiskDirectory,parent:FileSystemDirecto
 }
 
 const scope=globalThis as unknown as {onmessage:(e:MessageEvent)=>void;postMessage:(v:unknown)=>void};
+function inspectionContract(
+  root:DiskDirectory,
+  instance:WebAssembly.Instance,
+  stdin:ReturnType<MemoryFile['path_open']>['fd_obj'],
+  reply:()=>Record<string,unknown>,
+){
+  const invoke=(entry:string)=>{
+    const run=instance.exports[entry];
+    if(typeof run!=='function')throw new Error('Missing test reactor export '+entry);
+    return run() as number;
+  };
+  const reserved=()=>invoke('chopper_test_inspection_reserved_bytes');
+  const baseline=reserved();
+  const encoder=new TextEncoder();
+  const job=(output:string)=>JSON.stringify({input:'/input.csv',output});
+  const exact=job('x'.repeat(8200));
+  const expectedReads=[[8192,8192],[8192,42],[8192,0]];
+  let paused:number[]=[];
+  const readStdin=stdin.fd_read;
+  stdin.fd_read=()=>{
+    paused.push(reserved());
+    return {ret:0,data:new Uint8Array()};
+  };
+  root.contents.set('input.csv',new MemoryFile(encoder.encode('id,value\n'+'1,a\n'.repeat(513)),{readonly:true}));
+  const inspect=(entry:string,wire:string,failSecondRead=false)=>{
+    const reads:number[][]=[];
+    const source=new MemoryFile(encoder.encode(wire),{readonly:true});
+    const open=source.path_open.bind(source);
+    source.path_open=(...args)=>{
+      const result=open(...args);
+      const fd=result.fd_obj;
+      const read=fd.fd_read.bind(fd);
+      fd.fd_read=size=>{
+        const chunk=failSecondRead&&reads.length===1?{ret:wasi.ERRNO_IO,data:new Uint8Array()}:read(size);
+        reads.push([size,chunk.data.length]);
+        return chunk;
+      };
+      return result;
+    };
+    root.contents.set('job.json',source);
+    try{return {status:invoke(entry),result:reply(),reads};}
+    finally{root.contents.delete('job.json');}
+  };
+  const calls=['chopper_analyze','chopper_preview','chopper_sniff','chopper_formula_scan'];
+  try{
+    const malformed='{"input":"/input.csv","output":]';
+    const legacyError=inspect('chopper_run',malformed);
+    assert(legacyError.status===1&&typeof legacyError.result.error==='string','Invalid legacy error fixture');
+    for(const entry of calls){
+      const rejected=inspect(entry,malformed);
+      assert(rejected.status===1&&rejected.result.error===legacyError.result.error,'WASI error or position changed in '+entry);
+      assert(JSON.stringify(rejected.reads)===JSON.stringify(legacyError.reads),'Malformed source read-ahead changed in '+entry);
+    }
+    const legacyIo=inspect('chopper_run',exact,true);
+    const previewIo=inspect('chopper_preview',exact,true);
+    assert(legacyIo.status===1&&previewIo.status===1&&typeof legacyIo.result.error==='string'&&
+      previewIo.result.error===legacyIo.result.error&&JSON.stringify(previewIo.reads)===JSON.stringify([[8192,8192],[8192,0]])&&
+      JSON.stringify(previewIo.reads)===JSON.stringify(legacyIo.reads)&&reserved()===baseline,'WASI source I/O error or second read changed');
+    paused=[];
+    const borrow=inspect('chopper_formula_scan',job(''));
+    assert(borrow.status===0&&paused.length===1&&reserved()===baseline,'Formula pause control failed');
+    const shortPause=paused[0];
+    paused=[];
+    const valid=calls.map(entry=>{
+      const attempt=inspect(entry,exact);
+      assert(attempt.status===0&&!attempt.result.error,'Inspection failed in '+entry+': '+attempt.result.error);
+      assert(JSON.stringify(attempt.reads)===JSON.stringify(expectedReads),'Buffered source read sizes changed in '+entry);
+      if(entry==='chopper_analyze')invoke('chopper_clear_profile');
+      assert(reserved()===baseline,'Inspection retained a grant after returning from '+entry);
+      return attempt.result;
+    });
+    assert(valid[0].rows===513&&valid[1].columns===2&&(valid[2].settings as {delimiter?:string})?.delimiter===','&&
+      Array.isArray(valid[3].rows)&&valid[3].rows.length===512&&valid[3].done===false,'Inspection response changed');
+    assert(paused.length===1&&paused[0]-shortPause===8200,'Formula pause lost the retained Job charge');
+    const virtual=[1024*1024-1,1024*1024+1].map(bytes=>{
+      const wire=job('x'.repeat(bytes-job('').length));
+      const {status,result,reads}=inspect('chopper_preview',wire);
+      const expected=Array.from({length:Math.ceil(bytes/8192)+1},(_,i)=>[8192,Math.max(0,Math.min(8192,bytes-i*8192))]);
+      assert(status===0&&result.columns===2&&JSON.stringify(reads)===JSON.stringify(expected),'Virtual Job lost buffered reads or hit a file size cap');
+      assert(reserved()===baseline,'Virtual Job retained a grant');
+      return {bytes,source_reads:reads.length};
+    });
+    return {calls,source_reads:expectedReads,malformed_error:legacyError.result.error,source_io_error:legacyIo.result.error,formula_pause_job_bytes:paused[0]-shortPause,virtual};
+  }finally{
+    root.contents.delete('input.csv');
+    stdin.fd_read=readStdin;
+  }
+}
+
 scope.onmessage=async({data})=>{
   const diagnostics:string[]=[];
   try{
     const bridge=new DiskBridge(data.port,data.shared),root=new DiskDirectory(bridge);
     root.contents.set('tmp',new DiskDirectory(bridge));
     let result:Record<string,unknown>={};
+    const stdin=new MemoryFile([]).path_open(0,0n,0).fd_obj;
     const wasi=new WASI(['chopper-resource-contracts'],['TMPDIR=/tmp',`CHOPPER_DISK_AVAILABLE=${data.available}`],[
-      new MemoryFile([]).path_open(0,0n,0).fd_obj,
+      stdin,
       ConsoleStdout.lineBuffered(line=>{result=JSON.parse(line);}),
       ConsoleStdout.lineBuffered(line=>{diagnostics.push(line);scope.postMessage({diagnostic:line});}),
       new RootFd(root)
@@ -178,8 +268,10 @@ scope.onmessage=async({data})=>{
     if(typeof contract!=='function')throw new Error('Resource-contract test export is missing');
     const status=contract();
     if(status!==0||result.error)throw new Error(String(result.error||'Resource contract failed'));
-    const publication=(result.shuffle_partition as any)?.publication;
+    const contracts=result;
+    contracts.inspection_job_adapter=inspectionContract(root,instance,stdin,()=>result);
+    const publication=(contracts.shuffle_partition as any)?.publication;
     const browserExport=publication?await browserExportContract(root,data.exportDirectory,publication):undefined;
-    scope.postMessage({result,diagnostics,browserExport});
+    scope.postMessage({result:contracts,diagnostics,browserExport});
   }catch(error){scope.postMessage({error:[error instanceof Error?error.message:String(error),...diagnostics].join('\n')});}
 };

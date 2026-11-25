@@ -553,7 +553,8 @@ node scripts/test-browser.mjs --resource-contracts --shuffle-partition
 npm --prefix ui run build:hosted
 ```
 
-The nondefault `resource-contract-tests` feature adds one test-only export.
+The nondefault `resource-contract-tests` feature adds a test report export and
+a ledger probe used at the formula scan pause.
 `--resource-contracts` writes `ui/dist/engine-resource-tests.wasm`; when Cargo
 features enable `experimental-shuffle-partition`, it instead writes
 `ui/dist/engine-resource-tests-shuffle-partition.wasm`. Repeated `--features`,
