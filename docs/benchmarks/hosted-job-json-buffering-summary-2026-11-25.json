@@ -1,0 +1,567 @@
+{
+  "type": "derived_screen_summary",
+  "experiment": {
+    "issue": 74,
+    "base": "428b83b0b464402358c396b8d6da536e3758b4e4",
+    "created_at_utc": "2026-11-25T20:36:30.607366+00:00",
+    "question": "Will buffering typed WASI Job JSON reduce complete Run latency while preserving the current schema and limits?",
+    "candidate": "Use one shared typed Job loader with an 8192-byte BufReader at each of the five /job.json entry points.",
+    "clock": "Production hosted client Run through complete state, completed marker and workspace retirement. Fixture setup and byte verification excluded.",
+    "fixtures": {
+      "input_bytes_ascii": "id\n1\n2\n",
+      "compact": {
+        "row_cap": 1,
+        "csv_byte_cap": 5
+      },
+      "large": {
+        "calculated_columns": 63,
+        "per_formula": "1 plus 16383 spaces",
+        "row_cap": 1,
+        "csv_byte_cap": 383
+      },
+      "large_virtual": {
+        "calculated_columns": 64,
+        "csv_byte_cap": 389,
+        "memory_mb": 512
+      },
+      "runtime": "Bundled Chromium in disposable contexts, real WASI and OPFS, 256 MiB/one worker"
+    },
+    "timing": "One warmup per arm and three alternating measured pairs for the two success shapes. FD read counts collected in separate untimed diagnostics.",
+    "gate": "All output bytes/marker/manifest checks pass, at least 0.10 seconds median paired savings for the large configuration with every pair favorable, no compact-job median regression beyond 0.03 seconds. Preserve exact first malformed error and byte-cap no-marker failure. Confirm >1 MiB virtual Job succeeds. Keep time, allocator accounting, and counts separate.",
+    "limits": "One per-job deadline of 40 seconds, controlled small OPFS outputs, one browser at a time, no external service.",
+    "control_revision": "The baseline denied preparation of the 64th maximal formula in the 256 MiB job. The larger virtual file is a decode-compatibility control with a 512 MiB request. Both timed shapes stay at 256 MiB."
+  },
+  "toolchains": {
+    "python": "3.14.4",
+    "node": "v22.23.4",
+    "rust": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1"
+  },
+  "environment": {
+    "browser": "156.0.8078.4",
+    "engines": {
+      "baseline": "8bfe1c977e9f622ef5c9e7b44ec8cc3ee8b71153a3678ee3627c0ef9cd7ae02b",
+      "candidate": "2656a4528678bc04758dd3c0a2f6bdcc70515a0038ce4752e28221aa8e8d835a"
+    },
+    "assets": {
+      "driver.js": "2724a17209a7b6f079238affae868cb6c4e9c3672c7501f529ef31bdf135f7e6",
+      "engine-worker.js": "1d3329977b5c6647b6b421186d9c10b733555272ee65694e7c83ab73c51cdfa8",
+      "storage-worker.js": "a357a9e3e8d3ba21c2e9c08f143712f56f1deb5357c1d93454002950c94ab0ac",
+      "input.csv": "1d1c91d15ace6e21ea5f551e16e717f326992bdf800f6696628859be29b906bf"
+    },
+    "decision_sha256": "a82578b6003448a17d73b85b9f83795b7f51bb0514e075409d3f0736fe13cb8f",
+    "driver_source_sha256": "b39f008342d474d62211f4d723969eebbe0015f61ff909873d2f8eda25e2735d",
+    "harness_sha256": "0c1fd6de19a8717b1d7ff43507ab371b6c977ef1d8f930375cd65c7d6a92c674"
+  },
+  "output_checks_and_elapsed": [
+    {
+      "shape": "compact",
+      "repeat": -1,
+      "warmup": true,
+      "arm": "baseline",
+      "seconds": 0.08561500000953674,
+      "rows": 2,
+      "output_csv_bytes": 10,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "7cde7fb64fd82bd152710cf238e017b9ab46c0592483edc067ba4f6c75fac108",
+        "4ece338a824893ad18a76a3173acce24b5e60addef0d55bf47ea13070ea88daa"
+      ],
+      "manifest_sha256": "e3a55063415db64d03305e212878d2d53af238cdf44bc6c12389c7cfceb01d50",
+      "receipt_sha256": "839f80c38ff63c740c6a8341d650883ec31997a851217e3f3221b1582130a648"
+    },
+    {
+      "shape": "compact",
+      "repeat": -1,
+      "warmup": true,
+      "arm": "candidate",
+      "seconds": 0.08773000001907348,
+      "rows": 2,
+      "output_csv_bytes": 10,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "7cde7fb64fd82bd152710cf238e017b9ab46c0592483edc067ba4f6c75fac108",
+        "4ece338a824893ad18a76a3173acce24b5e60addef0d55bf47ea13070ea88daa"
+      ],
+      "manifest_sha256": "f6e06cbb720fe52a70b1585c7abaca52a86c3dc92278538674161045e5916e3e",
+      "receipt_sha256": "4d350d091c898da02f048ab4a7096da90a6ffffe5ffc4c620ae5996078ebd96e"
+    },
+    {
+      "shape": "compact",
+      "repeat": 0,
+      "warmup": false,
+      "arm": "baseline",
+      "seconds": 0.08608500003814697,
+      "rows": 2,
+      "output_csv_bytes": 10,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "7cde7fb64fd82bd152710cf238e017b9ab46c0592483edc067ba4f6c75fac108",
+        "4ece338a824893ad18a76a3173acce24b5e60addef0d55bf47ea13070ea88daa"
+      ],
+      "manifest_sha256": "81caadfaed11158e87f74121b8130bddd77ad0e70f72087900d477152283dc9b",
+      "receipt_sha256": "c77f73f9fdace6c25f5d97e1be7c08faef9b52253d374587f849d2adbdbf8aaf"
+    },
+    {
+      "shape": "compact",
+      "repeat": 0,
+      "warmup": false,
+      "arm": "candidate",
+      "seconds": 0.0960900001525879,
+      "rows": 2,
+      "output_csv_bytes": 10,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "7cde7fb64fd82bd152710cf238e017b9ab46c0592483edc067ba4f6c75fac108",
+        "4ece338a824893ad18a76a3173acce24b5e60addef0d55bf47ea13070ea88daa"
+      ],
+      "manifest_sha256": "e98ae52b09a433f9a4ab3d5f7468a656592144a44f8eaa9ff52d8a6c580ba0f7",
+      "receipt_sha256": "0d1c681576c559b76f3e226065fe2c830abb353d2f92c45b9da523906f11e949"
+    },
+    {
+      "shape": "compact",
+      "repeat": 1,
+      "warmup": false,
+      "arm": "baseline",
+      "seconds": 0.07405000019073486,
+      "rows": 2,
+      "output_csv_bytes": 10,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "7cde7fb64fd82bd152710cf238e017b9ab46c0592483edc067ba4f6c75fac108",
+        "4ece338a824893ad18a76a3173acce24b5e60addef0d55bf47ea13070ea88daa"
+      ],
+      "manifest_sha256": "634455fa28511fa3c8bb82b8c310e2b14d16c1ff0ddd9cf908dd6d94bc131b6f",
+      "receipt_sha256": "f705cbcbd822931028dce00a3504f74dbf99fbeaff7c8466b2147565fe9afb6b"
+    },
+    {
+      "shape": "compact",
+      "repeat": 1,
+      "warmup": false,
+      "arm": "candidate",
+      "seconds": 0.07860500001907349,
+      "rows": 2,
+      "output_csv_bytes": 10,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "7cde7fb64fd82bd152710cf238e017b9ab46c0592483edc067ba4f6c75fac108",
+        "4ece338a824893ad18a76a3173acce24b5e60addef0d55bf47ea13070ea88daa"
+      ],
+      "manifest_sha256": "fa7538a9466fe8d1adabc70084deffc5417ac676a003deb274eeb0135571a05f",
+      "receipt_sha256": "83d5698491a090e70497b163f7dbe2a4abbc94b63f6933470c2ac6dc7f2692ef"
+    },
+    {
+      "shape": "compact",
+      "repeat": 2,
+      "warmup": false,
+      "arm": "baseline",
+      "seconds": 0.08551999998092652,
+      "rows": 2,
+      "output_csv_bytes": 10,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "7cde7fb64fd82bd152710cf238e017b9ab46c0592483edc067ba4f6c75fac108",
+        "4ece338a824893ad18a76a3173acce24b5e60addef0d55bf47ea13070ea88daa"
+      ],
+      "manifest_sha256": "355be43e4bdd2237a9921a3657ecd5bdc617a458462ad437258f4f0eabda5899",
+      "receipt_sha256": "1c935d91ff8c8351f585a177ffe97c1d954b1cc75a291b0381911741a10d0331"
+    },
+    {
+      "shape": "compact",
+      "repeat": 2,
+      "warmup": false,
+      "arm": "candidate",
+      "seconds": 0.08579500007629394,
+      "rows": 2,
+      "output_csv_bytes": 10,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "7cde7fb64fd82bd152710cf238e017b9ab46c0592483edc067ba4f6c75fac108",
+        "4ece338a824893ad18a76a3173acce24b5e60addef0d55bf47ea13070ea88daa"
+      ],
+      "manifest_sha256": "01aaf39f671729874f33802140de6835de871191fbddf85ae62570f3f1f91402",
+      "receipt_sha256": "439a7e94416a470feb02f77602c1c4769314301e8563619854dc2f44b23d7290"
+    },
+    {
+      "shape": "large",
+      "repeat": -1,
+      "warmup": true,
+      "arm": "baseline",
+      "seconds": 0.3869749999046326,
+      "rows": 2,
+      "output_csv_bytes": 766,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "897632b2fd89b4bcbc904a680233959a0e854f58f72d63700d8a2cd111687ca6",
+        "b41d029d97ed2c0c6904570d49aad7f3d1efc57a9a155a14f65ce8f1285f251d"
+      ],
+      "manifest_sha256": "d7985009e28c70ad8b93c4abc91b6d46fd6728dec6be01b426495a376eedab94",
+      "receipt_sha256": "02148d36d044c9c4435b85de93b709f00272d2188c7a3074249be39f59fa3c3f"
+    },
+    {
+      "shape": "large",
+      "repeat": -1,
+      "warmup": true,
+      "arm": "candidate",
+      "seconds": 0.15371500015258788,
+      "rows": 2,
+      "output_csv_bytes": 766,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "897632b2fd89b4bcbc904a680233959a0e854f58f72d63700d8a2cd111687ca6",
+        "b41d029d97ed2c0c6904570d49aad7f3d1efc57a9a155a14f65ce8f1285f251d"
+      ],
+      "manifest_sha256": "69b5c2ab4a3e835bd296ab412124468c6ddf14c9c9566ddd238c1b007386f664",
+      "receipt_sha256": "cd190dd99b8cce439404f2044d62351ca916277b7e5a7c45c49b5824f048633e"
+    },
+    {
+      "shape": "large",
+      "repeat": 0,
+      "warmup": false,
+      "arm": "baseline",
+      "seconds": 0.39322000002861024,
+      "rows": 2,
+      "output_csv_bytes": 766,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "897632b2fd89b4bcbc904a680233959a0e854f58f72d63700d8a2cd111687ca6",
+        "b41d029d97ed2c0c6904570d49aad7f3d1efc57a9a155a14f65ce8f1285f251d"
+      ],
+      "manifest_sha256": "dc7440a8a2418e893909a47ee333481175b64f9af0ad42643a240a0b757fc49f",
+      "receipt_sha256": "0846a05ab321e2b9c1c2504e7913688ae79478fdcc0f9cac9fc8ac71b4aaf923"
+    },
+    {
+      "shape": "large",
+      "repeat": 0,
+      "warmup": false,
+      "arm": "candidate",
+      "seconds": 0.14218499994277953,
+      "rows": 2,
+      "output_csv_bytes": 766,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "897632b2fd89b4bcbc904a680233959a0e854f58f72d63700d8a2cd111687ca6",
+        "b41d029d97ed2c0c6904570d49aad7f3d1efc57a9a155a14f65ce8f1285f251d"
+      ],
+      "manifest_sha256": "bb8fc5c461a4fa9755fb8af0955a9a754a0980658c1191fc23c1ce9621917015",
+      "receipt_sha256": "abaea7d3e852909490817f87e953e96538ba532b294bdad5d3ccbea75c94e00f"
+    },
+    {
+      "shape": "large",
+      "repeat": 1,
+      "warmup": false,
+      "arm": "baseline",
+      "seconds": 0.40719000005722045,
+      "rows": 2,
+      "output_csv_bytes": 766,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "897632b2fd89b4bcbc904a680233959a0e854f58f72d63700d8a2cd111687ca6",
+        "b41d029d97ed2c0c6904570d49aad7f3d1efc57a9a155a14f65ce8f1285f251d"
+      ],
+      "manifest_sha256": "bc2032befae8a8048626802c487a3b83325eb08424ea8254d4d26161e05fc3df",
+      "receipt_sha256": "310b472bc619831a7fb97853119363286b184f604ed9ba8b9ca895aa941ada5c"
+    },
+    {
+      "shape": "large",
+      "repeat": 1,
+      "warmup": false,
+      "arm": "candidate",
+      "seconds": 0.14202500009536742,
+      "rows": 2,
+      "output_csv_bytes": 766,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "897632b2fd89b4bcbc904a680233959a0e854f58f72d63700d8a2cd111687ca6",
+        "b41d029d97ed2c0c6904570d49aad7f3d1efc57a9a155a14f65ce8f1285f251d"
+      ],
+      "manifest_sha256": "28b247c2ba2aa29ccf84ce5f62d329ee5f84bc6e9676df2ad89f2ace98adccbc",
+      "receipt_sha256": "e544699d32aff53b65ce048b18f1bfde2279bb10130358bbef59f22702ce6a5f"
+    },
+    {
+      "shape": "large",
+      "repeat": 2,
+      "warmup": false,
+      "arm": "baseline",
+      "seconds": 0.37939999985694883,
+      "rows": 2,
+      "output_csv_bytes": 766,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "897632b2fd89b4bcbc904a680233959a0e854f58f72d63700d8a2cd111687ca6",
+        "b41d029d97ed2c0c6904570d49aad7f3d1efc57a9a155a14f65ce8f1285f251d"
+      ],
+      "manifest_sha256": "92a60ad26ac5c9a50bb9d2a96c94682ae7cb7eed10f6780461afb2aa6e5767bd",
+      "receipt_sha256": "d56db3ebcf08f89cdd4811f797d2886993297d780ab2806b3f1a66fb0b616729"
+    },
+    {
+      "shape": "large",
+      "repeat": 2,
+      "warmup": false,
+      "arm": "candidate",
+      "seconds": 0.14450500011444092,
+      "rows": 2,
+      "output_csv_bytes": 766,
+      "marker": {
+        "complete": true,
+        "files": 3,
+        "engine": "chopper-browser",
+        "version": 1
+      },
+      "csv_sha256": [
+        "897632b2fd89b4bcbc904a680233959a0e854f58f72d63700d8a2cd111687ca6",
+        "b41d029d97ed2c0c6904570d49aad7f3d1efc57a9a155a14f65ce8f1285f251d"
+      ],
+      "manifest_sha256": "a7f4e9d1d52273b638c0f1b6f1fecb44207c46952743920c41aa995509ea768e",
+      "receipt_sha256": "8600fdaea50cee063e951f9b53c14e21d3c2013fd1689ff8794ecc8d04e527d7"
+    }
+  ],
+  "measured_pairs": {
+    "compact": [
+      {
+        "baseline": 0.08608500003814697,
+        "candidate": 0.0960900001525879,
+        "saved": -0.010005000114440929
+      },
+      {
+        "candidate": 0.07860500001907349,
+        "baseline": 0.07405000019073486,
+        "saved": -0.004554999828338624
+      },
+      {
+        "baseline": 0.08551999998092652,
+        "candidate": 0.08579500007629394,
+        "saved": -0.00027500009536741976
+      }
+    ],
+    "large": [
+      {
+        "baseline": 0.39322000002861024,
+        "candidate": 0.14218499994277953,
+        "saved": 0.2510350000858307
+      },
+      {
+        "candidate": 0.14202500009536742,
+        "baseline": 0.40719000005722045,
+        "saved": 0.26516499996185305
+      },
+      {
+        "baseline": 0.37939999985694883,
+        "candidate": 0.14450500011444092,
+        "saved": 0.2348949997425079
+      }
+    ]
+  },
+  "untimed_controls": [
+    {
+      "name": "read-count",
+      "arm": "baseline",
+      "receipt_sha256": "dfebac3f2b7432e32e5ef0bf7c1985d8ce51554ef72459e4e2ca0b4d96c64b17",
+      "verified": true,
+      "read_counts": [
+        {
+          "calls": 1034771,
+          "bytes": 1034770
+        }
+      ]
+    },
+    {
+      "name": "read-count",
+      "arm": "candidate",
+      "receipt_sha256": "844bf094c3191a8ea3b2a4a26b5bfdd28177cbea78e38fe48701a8b22570b799",
+      "verified": true,
+      "read_counts": [
+        {
+          "calls": 128,
+          "bytes": 1034770
+        }
+      ]
+    },
+    {
+      "name": "large-virtual",
+      "arm": "baseline",
+      "receipt_sha256": "71cb4e749cedd42ce53b2dd988a14c74e2c69efc984db9c3cacc6168224e17b0",
+      "verified": true,
+      "read_counts": [
+        {
+          "calls": 1051186,
+          "bytes": 1051185
+        }
+      ]
+    },
+    {
+      "name": "large-virtual",
+      "arm": "candidate",
+      "receipt_sha256": "7e12738a61fe4ffbfc7e8e1cf0ec94778e9c7fa639767e2d6ca8ca120653a17d",
+      "verified": true,
+      "read_counts": [
+        {
+          "calls": 130,
+          "bytes": 1051185
+        }
+      ]
+    },
+    {
+      "name": "malformed",
+      "arm": "baseline",
+      "receipt_sha256": "1afbabb4902321001f094d1746344eeb153c42eb5e5dc4ed03cbab18814c2486",
+      "error": "Error: unknown field `unexpected_job_key`, expected one of `version`, `input`, `output`, `zip_member`, `input_csv`, `output_csv`, `compression`, `operations`, `limits`, `resources`, `full_shuffle_rng`, `full_shuffle_algorithm`, `calculated_columns` at line 1 column 1034791",
+      "marker_present": false
+    },
+    {
+      "name": "malformed",
+      "arm": "candidate",
+      "receipt_sha256": "1afbabb4902321001f094d1746344eeb153c42eb5e5dc4ed03cbab18814c2486",
+      "error": "Error: unknown field `unexpected_job_key`, expected one of `version`, `input`, `output`, `zip_member`, `input_csv`, `output_csv`, `compression`, `operations`, `limits`, `resources`, `full_shuffle_rng`, `full_shuffle_algorithm`, `calculated_columns` at line 1 column 1034791",
+      "marker_present": false
+    },
+    {
+      "name": "cap",
+      "arm": "baseline",
+      "receipt_sha256": "893a730c9c69851254cd4c82a0bb74e7966e38a43d82091b6c5de52f14170388",
+      "error": "Error: one row plus header exceeds output byte limit",
+      "marker_present": false
+    },
+    {
+      "name": "cap",
+      "arm": "candidate",
+      "receipt_sha256": "893a730c9c69851254cd4c82a0bb74e7966e38a43d82091b6c5de52f14170388",
+      "error": "Error: one row plus header exceeds output byte limit",
+      "marker_present": false
+    }
+  ],
+  "runner": {
+    "timed_status_sha256": "ce343d3cc6986fd262a95f3fcaaa3651b6b9eaef00178b215a4d99d27a6b3108",
+    "timed_summary_sha256": "4a7a5f4d9fd1d595bebfcdf3e2c992e2b02153009afbd5f983f046325e24aa91",
+    "build_status_sha256": "aaba4cc777349e668265a77bf32958865db074caae943bff4692658b3d6cd1b5",
+    "timed_plan_sha256": "d01c36197f912df88c1207d4bd2db8db47e15d807202a559500c6e730e776d82"
+  },
+  "excluded_preflights": [
+    {
+      "batch": "batch-preflight",
+      "status": "failed",
+      "status_sha256": "33dd786c38be5755a139268663c0d53c983cd46acc259d0e6f0d41e99f385379",
+      "reason": "Older streaming owner census excluded catalog and destination."
+    },
+    {
+      "batch": "batch-preflight-current",
+      "status": "failed",
+      "status_sha256": "c81a6f4429903ebf773003729ba6459d806f94c8351bd120c68aa94d35466239",
+      "reason": "The updated census included the catalog only."
+    },
+    {
+      "batch": "batch-controls",
+      "status": "failed",
+      "status_sha256": "5d27b480d2974bd162f9d9328a4d3b3637ebd285868d4aaf3d69d12a4da9c0cb",
+      "reason": "The 64th maximal formula exceeded the 256 MiB job budget in baseline preparation."
+    }
+  ],
+  "candidate_source_sha256": "c68f1610a5aae3f60f7aaed587edd94e19813944164cf2b4b2b3dd85eeaf2d37",
+  "production_import_control": {
+    "browserVersion": "156.0.8078.4",
+    "receipts": [
+      {
+        "arm": "baseline",
+        "engine_sha256": "8bfe1c977e9f622ef5c9e7b44ec8cc3ee8b71153a3678ee3627c0ef9cd7ae02b",
+        "uploaded_job_bytes": 1034412,
+        "marker": {
+          "complete": true,
+          "files": 3,
+          "engine": "chopper-browser",
+          "version": 1
+        },
+        "exact_csv": true,
+        "oversized_import_rejected": true
+      },
+      {
+        "arm": "candidate",
+        "engine_sha256": "2656a4528678bc04758dd3c0a2f6bdcc70515a0038ce4752e28221aa8e8d835a",
+        "uploaded_job_bytes": 1034412,
+        "marker": {
+          "complete": true,
+          "files": 3,
+          "engine": "chopper-browser",
+          "version": 1
+        },
+        "exact_csv": true,
+        "oversized_import_rejected": true
+      }
+    ],
+    "receipt_sha256": "0c4a3dbb3b19ce93213a63e2659e2b8b80ee5530ef2c5b1430526c051c034146",
+    "status_sha256": "3b790557ba8356a49823bf7fe44e31c445194cfa57f4c5cc91dfc29d91a2c2ce"
+  }
+}

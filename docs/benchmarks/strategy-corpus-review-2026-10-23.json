@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "8f6500cafc852708b2c275d2ca9ce1af82b46da97cd9c779e3796bb4ed88ce5e",
+  "analysis_script_sha256": "af550affb9834e13d93957ca96a6379d6c772a005dd9d8e82f0ea10313d8edcd",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "0fae5e374cfbd999040550447aa1539d098c37ca9581e570d0cc3f8f0ca117e5"
+    "sha256": "e62338275b0fb1cfe112c93cf574b99a394a9ef9acd1a5f0f32c76dcfaf717e5"
   },
   "families": [
     "adaptive-routing",
@@ -4753,6 +4753,38 @@
         "topic": "external-and-resident-shuffle"
       },
       "family": "external-and-resident-shuffle"
+    },
+    {
+      "title": "Hosted Job JSON buffering (2026-11-25)",
+      "evidence": "docs/performance.md#hosted-job-json-buffering-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/hosted-job-json-buffering-summary-2026-11-25.json"
+      ],
+      "scripts": [
+        "scripts/build-browser.mjs"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-job-json-buffering-2026-11-25.md",
+        "sha256": "0025e9246580e1b64c0efa98353d820957f80853d9ccf9a3a928c38ff4bd6672",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Standalone Uniform direct publication (2026-11-25)",
+      "evidence": "docs/performance.md#standalone-uniform-direct-publication-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/standalone-uniform-publication-summary-2026-11-25.json"
+      ],
+      "scripts": [
+        "scripts/benchmark-auto-contention.py"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/standalone-uniform-direct-publication-2026-11-25.md",
+        "sha256": "3201876dd7c04a27a51f3e746aa257d7264a0299beaf280f17604ec23e5b2516",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
     }
   ],
   "sources": [
@@ -25984,6 +26016,46 @@
       ],
       "record_bounds_by_kind": {
         "validation": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-job-json-buffering-summary-2026-11-25.json",
+      "sha256": "0e600f0b0848a7ecd09fcebbf6825c5d251a8e5cf17965e22c698393bfeb1ae4",
+      "bytes": 20115,
+      "format": "json",
+      "record_counts": {
+        "derived_screen_summary": 1
+      },
+      "fields": [
+        "candidate_source_sha256",
+        "environment",
+        "excluded_preflights",
+        "experiment",
+        "measured_pairs",
+        "output_checks_and_elapsed",
+        "production_import_control",
+        "runner",
+        "toolchains",
+        "type",
+        "untimed_controls"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-job-json-buffering-2026-11-25"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "derived_screen_summary": {
           "first": {
             "pointer": ""
           },
@@ -54330,6 +54402,41 @@
       ],
       "record_bounds_by_kind": {
         "validation": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/standalone-uniform-publication-summary-2026-11-25.json",
+      "sha256": "87c35f7b6a4681c4eceac64e86d2d91001157d9e661aeb73da2f46ad567125ad",
+      "bytes": 55604,
+      "format": "json",
+      "record_counts": {
+        "derived_screen_summary": 1
+      },
+      "fields": [
+        "build_toolchains",
+        "direct_only",
+        "excluded_hard_limit_attempt",
+        "late_peer_controls",
+        "type",
+        "wide_and_direct"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#standalone-uniform-direct-publication-2026-11-25"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "derived_screen_summary": {
           "first": {
             "pointer": ""
           },

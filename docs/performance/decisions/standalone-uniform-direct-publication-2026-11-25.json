@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "standalone-uniform-direct-publication-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Keep snapshot publication for the tested standalone Uniform route",
+  "subsystem": "execution",
+  "question": "Does terminal publication alone save repeatable elapsed time with the ordinary merge width?",
+  "disposition": "block-promotion",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "The 8 GiB screen removes 8.59 GB of managed reads and writes each and passes the late peer control. Paired elapsed changes are +3.852 and −0.349 seconds saved. It misses the wall-time gate.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "8 GiB standalone Uniform Shuffle, one worker and explicit 256 MiB, WSL2 ext4 and ordinary host headroom."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Both matched pairs independently verify seven strict-cap CSVs and cleanup. Both ordinary-width encoders complete with the same 530,512,996-byte late peer."
+  },
+  "limitations": [
+    "Two verified pairs before the declared stop. Ordinary host headroom and uncontrolled cache on one WSL host."
+  ],
+  "exclusions": [
+    "Native Windows, WASI and physical device I/O."
+  ],
+  "reopen_when": "Identify a standalone workload with a repeatable, meaningful absolute elapsed benefit from publication alone or qualify a safe merge change under the same late admission conditions.",
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md"
+  ],
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#standalone-uniform-direct-publication-2026-11-25",
+      "sha256": "896a258351c6e326fab2738d889ae6e6d0c8df4fd1436c36bdc7acab6d121fe8"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/standalone-uniform-publication-summary-2026-11-25.json",
+      "sha256": "87c35f7b6a4681c4eceac64e86d2d91001157d9e661aeb73da2f46ad567125ad"
+    }
+  ]
+}

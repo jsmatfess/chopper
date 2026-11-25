@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "1cd30be6af062b3df7565979d781bdc08d35198e54608e2cd74a720afa6cbf10",
+  "catalog_sha256": "3cf33355867b3f8a210eb62bad031a11226a10f0fd137deca7422e0da8e3d2f6",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -862,6 +862,19 @@
         "unclassified": 4
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-job-json-buffering-summary-2026-11-25.json",
+      "source_sha256": "0e600f0b0848a7ecd09fcebbf6825c5d251a8e5cf17965e22c698393bfeb1ae4",
+      "aliases": [
+        "docs/benchmarks/hosted-job-json-buffering-summary-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/execution-graph-validation-summary-2026-11-05.json",
@@ -8078,6 +8091,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/standalone-uniform-publication-summary-2026-11-25.json",
+      "source_sha256": "87c35f7b6a4681c4eceac64e86d2d91001157d9e661aeb73da2f46ad567125ad",
+      "aliases": [
+        "docs/benchmarks/standalone-uniform-publication-summary-2026-11-25.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/e5-memory-source-identities-2026-10-28.json",
       "source_sha256": "87e03cf86d8788b01818913f2c9d3a02b7e98e4d6a1474f2cc3d5e4b54fa7904",
       "aliases": [
@@ -8209,6 +8235,19 @@
         "unclassified": 8
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "8a05408fed35033c2b922efa37e2bedd5216f00bd4e85b726a1bcfbd2760503b",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/allocation-ranges-summary-2026-10-19.json",
@@ -10218,19 +10257,6 @@
       "source_sha256": "ad017fe46ef03159202ea93e7fc030fca2a58b4198191d51aafadf2e4c8da7fb",
       "aliases": [
         "docs/benchmarks/cross-tool-checks-summary-2026-11-18.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "ad05eaf234d56cb829df1c2b99f8cd7c8a62bb03889d526d072b95a7d5f79ce8",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
       ],
       "format": "json",
       "layouts": [],

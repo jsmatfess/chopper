@@ -5,9 +5,9 @@ The current public tracker uses [issue #21](https://github.com/jsmatfess/chopper
 ## Local development and transitional delivery gate
 
 GitHub CI is **disabled by owner decision** because Actions minutes are exhausted.
-The repository workflow state is `disabled_manually`; do not enable it, dispatch
-hosted jobs or treat release selection as permission to restore it. The owner
-must explicitly request restoration before the procedure below applies.
+The pause is enforced by repository-level Actions permissions. The owner must
+explicitly request restoration before enabling or dispatching hosted jobs.
+Release work uses the local delivery gate during the pause.
 
 `.github/workflows/ci.yml` retains its PR/main/manual trigger declarations and
 complete matrix so the same commands remain available locally. Disabled GitHub

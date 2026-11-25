@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "hosted-job-json-buffering-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Batch typed Job JSON reads in the WASI adapter",
+  "subsystem": "input",
+  "question": "How much complete Run time does an 8 KiB read buffer save on a large supported hosted Job?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Bundled Chromium saves a median paired 0.251 seconds on the 1,034,770-byte Job. Untimed instrumentation counts 1,034,771 versus 128 reads of the same bytes. Compact median paired cost is 0.005 seconds.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Two-row CSV with a compact Job and a near-1 MiB 63-formula Job, 256 MiB and one worker."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "Three matched pairs per shape and warmups verify exact CSV bytes, manifest, caps, completion marker and cleanup. Matched malformed error, cap-failure, larger virtual Job and production import controls pass."
+  },
+  "limitations": [
+    "One machine and bundled Chromium. Tiny CSVs isolate configuration overhead. Elapsed samples cover Run."
+  ],
+  "exclusions": [
+    "Other browsers and direct claims about total job RSS, Analyze and preview latency, or large CSV throughput."
+  ],
+  "reopen_when": null,
+  "contracts": [
+    "docs/specification.md",
+    "docs/browser.md",
+    "docs/resource-policy-research.md"
+  ],
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#hosted-job-json-buffering-2026-11-25",
+      "sha256": "595b14cda88e681a1a2a7eb91172782c0ff6a461d96c33ad9347d05598c09bfa"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/hosted-job-json-buffering-summary-2026-11-25.json",
+      "sha256": "0e600f0b0848a7ecd09fcebbf6825c5d251a8e5cf17965e22c698393bfeb1ae4"
+    }
+  ]
+}

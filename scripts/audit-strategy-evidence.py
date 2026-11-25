@@ -73,6 +73,8 @@ def main():
 
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
+    'Standalone Uniform direct publication (2026-11-25)': 'ownership-and-lifecycle',
+    'Hosted Job JSON buffering (2026-11-25)': 'ownership-and-lifecycle',
     'Uniform sort retention at a fixed budget (2026-11-25)': 'external-and-resident-shuffle',
     'Calculated columns followed by Partition (2026-11-24)': 'profiling',
     'Calculated-column evaluation and terminal publication (2026-11-24)': 'profiling',

@@ -9073,6 +9073,32 @@
       "original_section_sha256": "00848da8640d8f3acba43ef1b205b3c7bbd21e5a095bb879cbfddf00eec2ab99",
       "sha256": "00a5b5fe2312cd595f378b2185be4afc4ee1cca19f5b036fd0aab7194d3e9d83",
       "relocations": []
+    },
+    {
+      "id": "hosted-job-json-buffering-2026-11-25",
+      "title": "Hosted Job JSON buffering (2026-11-25)",
+      "anchor": "hosted-job-json-buffering-2026-11-25",
+      "path": "docs/performance/investigations/hosted-job-json-buffering-2026-11-25.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "hosted-job-json-buffering-2026-11-25"
+      ],
+      "original_section_sha256": "595b14cda88e681a1a2a7eb91172782c0ff6a461d96c33ad9347d05598c09bfa",
+      "sha256": "0025e9246580e1b64c0efa98353d820957f80853d9ccf9a3a928c38ff4bd6672",
+      "relocations": []
+    },
+    {
+      "id": "standalone-uniform-direct-publication-2026-11-25",
+      "title": "Standalone Uniform direct publication (2026-11-25)",
+      "anchor": "standalone-uniform-direct-publication-2026-11-25",
+      "path": "docs/performance/investigations/standalone-uniform-direct-publication-2026-11-25.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "standalone-uniform-direct-publication-2026-11-25"
+      ],
+      "original_section_sha256": "896a258351c6e326fab2738d889ae6e6d0c8df4fd1436c36bdc7acab6d121fe8",
+      "sha256": "3201876dd7c04a27a51f3e746aa257d7264a0299beaf280f17604ec23e5b2516",
+      "relocations": []
     }
   ],
   "migrated_count": 193

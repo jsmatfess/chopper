@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "0fae5e374cfbd999040550447aa1539d098c37ca9581e570d0cc3f8f0ca117e5"
+    "sha256": "e62338275b0fb1cfe112c93cf574b99a394a9ef9acd1a5f0f32c76dcfaf717e5"
   },
   "experiments": [
     {
@@ -4471,6 +4471,36 @@
         "path": "docs/performance/investigations/uniform-sort-retention-at-a-fixed-budget-2026-11-25.md",
         "sha256": "00a5b5fe2312cd595f378b2185be4afc4ee1cca19f5b036fd0aab7194d3e9d83",
         "topic": "external-and-resident-shuffle"
+      }
+    },
+    {
+      "title": "Hosted Job JSON buffering (2026-11-25)",
+      "evidence": "docs/performance.md#hosted-job-json-buffering-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/hosted-job-json-buffering-summary-2026-11-25.json"
+      ],
+      "scripts": [
+        "scripts/build-browser.mjs"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-job-json-buffering-2026-11-25.md",
+        "sha256": "0025e9246580e1b64c0efa98353d820957f80853d9ccf9a3a928c38ff4bd6672",
+        "topic": "ownership-and-lifecycle"
+      }
+    },
+    {
+      "title": "Standalone Uniform direct publication (2026-11-25)",
+      "evidence": "docs/performance.md#standalone-uniform-direct-publication-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/standalone-uniform-publication-summary-2026-11-25.json"
+      ],
+      "scripts": [
+        "scripts/benchmark-auto-contention.py"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/standalone-uniform-direct-publication-2026-11-25.md",
+        "sha256": "3201876dd7c04a27a51f3e746aa257d7264a0299beaf280f17604ec23e5b2516",
+        "topic": "ownership-and-lifecycle"
       }
     }
   ],
@@ -18081,6 +18111,32 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#existing-cloudflare-deployment-acceptance-2026-10-22"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-job-json-buffering-summary-2026-11-25.json",
+      "sha256": "0e600f0b0848a7ecd09fcebbf6825c5d251a8e5cf17965e22c698393bfeb1ae4",
+      "bytes": 20115,
+      "format": "json",
+      "record_counts": {
+        "derived_screen_summary": 1
+      },
+      "fields": [
+        "candidate_source_sha256",
+        "environment",
+        "excluded_preflights",
+        "experiment",
+        "measured_pairs",
+        "output_checks_and_elapsed",
+        "production_import_control",
+        "runner",
+        "toolchains",
+        "type",
+        "untimed_controls"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-job-json-buffering-2026-11-25"
       ]
     },
     {
@@ -36365,9 +36421,30 @@
       ]
     },
     {
+      "path": "docs/benchmarks/standalone-uniform-publication-summary-2026-11-25.json",
+      "sha256": "87c35f7b6a4681c4eceac64e86d2d91001157d9e661aeb73da2f46ad567125ad",
+      "bytes": 55604,
+      "format": "json",
+      "record_counts": {
+        "derived_screen_summary": 1
+      },
+      "fields": [
+        "build_toolchains",
+        "direct_only",
+        "excluded_hard_limit_attempt",
+        "late_peer_controls",
+        "type",
+        "wide_and_direct"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#standalone-uniform-direct-publication-2026-11-25"
+      ]
+    },
+    {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "ad05eaf234d56cb829df1c2b99f8cd7c8a62bb03889d526d072b95a7d5f79ce8",
-      "bytes": 1721885,
+      "sha256": "8a05408fed35033c2b922efa37e2bedd5216f00bd4e85b726a1bcfbd2760503b",
+      "bytes": 1725448,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -40694,7 +40771,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "c53404b14dbf4098493ecfbbb2dd04622e4ef20d54c123d693b66ccea6f3d58d"
+    "sha256": "62e2701d2739840dbda04014414cdf56f9d45204a9769355ddd1a50a81ba5397"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

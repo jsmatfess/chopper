@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "standalone-uniform-wide-merge-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Hold wide merge for standalone Uniform at the late admission boundary",
+  "subsystem": "execution",
+  "question": "Can the wider terminal merge transfer safely to standalone Uniform?",
+  "disposition": "block-promotion",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "Three verified native pairs save 9.231–12.321 seconds, but a matched late peer allows snapshot encoding and yields a typed sink denial with the widened cursor.",
+  "scope": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "workloads": [
+      "8 GiB standalone Uniform Shuffle, one worker and explicit 256 MiB, WSL2 ext4 and ordinary host headroom."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux"
+    ],
+    "summary": "Seven exact-cap CSVs, manifest, IDs/fields and cleanup pass in each timed arm. Both modes admit the same peer in the 96-run test. Only the existing path completes encoding. Denial releases staging and tracked capacity."
+  },
+  "limitations": [
+    "One synthetic 8 GiB cohort. The shared-owner regression is a focused cursor/encoding component test.",
+    "The separate 1 GiB hard-cgroup baseline attempt denied admission before publication."
+  ],
+  "exclusions": [
+    "Native Windows, WASI, physical device I/O, and wider replay guarantees."
+  ],
+  "reopen_when": "Prove a measured terminal cursor and final-writer owner that completes under the same admitted competitor requests, then repeat matched usable output timing.",
+  "contracts": [
+    "docs/specification.md",
+    "docs/direct-execution.md",
+    "docs/resource-policy-research.md"
+  ],
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#standalone-uniform-direct-publication-2026-11-25",
+      "sha256": "896a258351c6e326fab2738d889ae6e6d0c8df4fd1436c36bdc7acab6d121fe8"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/standalone-uniform-publication-summary-2026-11-25.json",
+      "sha256": "87c35f7b6a4681c4eceac64e86d2d91001157d9e661aeb73da2f46ad567125ad"
+    }
+  ]
+}
