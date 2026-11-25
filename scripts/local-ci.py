@@ -256,7 +256,7 @@ def check(root, full=False, *, expected_head=None, expected_base=None):
     runner.write_json(plan_path, plan)
     print(f'Running {WORKFLOW} ({profile} profile). Full logs: {directory / "batch"}', flush=True)
     try:
-        result = runner.run(plan_path, directory / 'batch')
+        result = runner.run(plan_path, directory / 'batch', child_env=git_environment())
     finally:
         if profile == 'linux':
             # The durable runner reaps act, but Docker children outlive that

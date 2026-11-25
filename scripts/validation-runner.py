@@ -259,13 +259,14 @@ class StatusObservation(NamedTuple):
 
 
 def run(plan_path, directory, guard=None, observe: Callable[[StatusObservation], None] | None = None,
-        on_process=None):
+        on_process=None, *, child_env=None):
     """Emit optional detached checkpoints after durable writes; callback errors propagate.
 
     Observation work scales with attempts, never with input/artifact map sizes.
     Optional on_process receives None immediately before Popen and the returned
     object immediately afterward, so an owning caller can fence uncertain spawn
-    and retain handles until its cleanup. Defaults preserve standalone behavior.
+    and retain handles until its cleanup. child_env optionally sets the
+    environment inherited by step processes.
     """
     plan = json.loads(plan_path.read_text(encoding='utf-8'))
     root = Path(plan['root']).resolve()
@@ -356,6 +357,7 @@ def run(plan_path, directory, guard=None, observe: Callable[[StatusObservation],
                 with (directory / f'{number}-stdout.log').open('wb') as stdout, (directory / f'{number}-stderr.log').open('wb') as stderr, input_stream as stdin:
                     if on_process is not None:on_process(None)
                     process = subprocess.Popen([executable or command, *step['argv'][1:]], cwd=root, stdin=stdin, stdout=stdout, stderr=stderr,
+                                               env=child_env,
                                                start_new_session=os.name != 'nt',
                                                creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
                     if on_process is not None:on_process(process)

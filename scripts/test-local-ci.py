@@ -57,7 +57,7 @@ class LocalCiTests(unittest.TestCase):
         self.git('add', '.')
         self.git('commit', '-qm', message)
 
-    def check(self, code=0):
+    def check(self, code=0, *, workflow=None):
         # The runner still executes a real child and writes durable records;
         # unit tests substitute only act/Docker, not the Git or receipt checks.
         run = subprocess.run
@@ -76,7 +76,8 @@ class LocalCiTests(unittest.TestCase):
 
         with (patch.object(ci, 'reject_act_config'),
               patch.object(ci.shutil, 'which', side_effect=lambda name: sys.executable if name == 'act' else which(name)),
-              patch.object(ci, 'act_command', return_value=[sys.executable, '-c', f'raise SystemExit({code})']),
+              patch.object(ci, 'act_command', return_value=[
+                  sys.executable, '-c', workflow if workflow is not None else f'raise SystemExit({code})']),
               patch.object(ci.subprocess, 'run', side_effect=docker_run),
               patch.object(ci.subprocess, 'check_output', side_effect=docker_capture)):
             return ci.check(self.root)
@@ -132,6 +133,22 @@ class LocalCiTests(unittest.TestCase):
         load.assert_called_once_with(str(self.root / 'scripts/local-ci.py'))
         self.assertEqual(ci.git(foreign, 'rev-parse', 'HEAD'), self.base)
         self.assertFalse((foreign / '.git/FETCH_HEAD').exists())
+
+    def test_native_workflow_runs_git_in_the_frozen_checkout(self):
+        foreign = self.root.parent / 'foreign'
+        subprocess.run(['git', 'clone', '-q', '--branch', 'main', str(self.remote), str(foreign)], check=True)
+        workflow = (
+            "import subprocess\n"
+            "subprocess.run(['git', 'config', '--local', 'chopper.workflowFixture', 'checked'], check=True)\n"
+        )
+        with (patch.dict(os.environ, {'GIT_DIR': str(foreign / '.git'), 'GIT_WORK_TREE': str(foreign)}),
+              patch.object(ci, 'host_profile', return_value='windows'),
+              patch.object(ci, 'git_bash_directory', return_value=Path(sys.executable).parent)):
+            self.assertEqual(self.check(workflow=workflow), (self.head, self.base))
+        source, = ci.storage(self.root).glob('attempt-*/source')
+        self.assertEqual(ci.git(source, 'config', '--local', 'chopper.workflowFixture'), 'checked')
+        foreign_config = (foreign / '.git/config').read_text()
+        self.assertNotIn('workflowFixture', foreign_config)
 
     def test_windows_handoff_preserves_head_on_dirty_checkout_or_revision_mismatch(self):
         self.git('push', '-q', 'origin', 'HEAD:refs/heads/feature')
