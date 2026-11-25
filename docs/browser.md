@@ -455,6 +455,16 @@ This covers deletion coordination, not shared memory admission across instances,
 engine cancellation or export interruption. The harness serves its scripts from
 test-only request routes; it adds no assets to the deployable build.
 
+`node scripts/test-browser-quota.mjs` lowers the real OPFS origin quota through
+Chromium's DevTools Protocol in a disposable context. The production Run fails
+before a successful destination write at 48 KiB. At 220 KiB it fails after
+writing destination data. Each failure removes incomplete output and retires
+its workspace. With quota reset, the same page and Job must produce the exact
+CSV rows within the serialized byte cap, a matching manifest and a valid
+completion marker. The local browser workflow runs this check on bundled
+Chromium using the production assets. Marker finalization, installed browser
+acceptance, external disk exhaustion and native pickers have separate checks.
+
 `node scripts/test-browser-direct-destination.mjs` exercises direct destination
 publication with real WASI and OPFS, including late input failure, destination
 write/close failure, confirmed invalid markers, unknown readback outcomes and

@@ -199,6 +199,7 @@ jobs:
       - run: python3 scripts/test-execution-graph-extension.py
       - run: node scripts/test-browser-bridge.mjs
       - run: node scripts/test-browser-cleanup.mjs
+      - run: node scripts/test-browser-quota.mjs
       - run: node scripts/test-browser-termination.mjs
       - run: node scripts/test-browser-termination.mjs --persistent
       - run: node scripts/test-browser-termination.mjs --persistent --process-kill
