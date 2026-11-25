@@ -71,11 +71,11 @@ mod reactor {
             let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
             validate_resources(&job)?;
             PROFILE.with(|p| {
-                Ok(serde_json::to_value(p.borrow_mut().profile(
+                p.borrow_mut().profile(
                     &job,
                     Arc::new(AtomicBool::new(false)),
                     Arc::new(|p| println!("{}", serde_json::json!({"progress":p}))),
-                )?)?)
+                )
             })
         })())
     }
@@ -159,6 +159,12 @@ mod reactor {
     }
     #[no_mangle]
     pub extern "C" fn chopper_run() -> i32 {
+        #[derive(serde::Serialize)]
+        struct RunReport {
+            analysis: engine::Analysis,
+            complete: bool,
+        }
+
         report((|| {
             let job: Job = serde_json::from_reader(std::fs::File::open("/job.json")?)?;
             validate_resources(&job)?;
@@ -227,7 +233,10 @@ mod reactor {
             });
             let analysis =
                 engine::run_hosted_with_preview(job, cancel, notify, hint, preview, observers)?;
-            Ok(serde_json::json!({"analysis":analysis,"complete":true}))
+            Ok(RunReport {
+                analysis,
+                complete: true,
+            })
         })())
     }
     fn validate_resources(job: &Job) -> anyhow::Result<()> {
