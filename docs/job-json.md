@@ -1,17 +1,17 @@
 # Saved Job JSON
 
 A saved Job describes the input, output, ordered operations and limits that
-Chopper should use. These fields describe Chopper **0.6.0**. The release number
+Chopper should use. These fields describe Chopper **0.6.1**. The release number
 selects the editor schema, while the Job's own `version` field selects the
 configuration format, currently `1`.
 
 ## Editor setup
 
-Check the installed version with `chopper --version`. For 0.6.0, use the
-[release-pinned Job schema](https://raw.githubusercontent.com/jsmatfess/chopper/v0.6.0/schemas/0.6.0/job.schema.json).
+Check the installed version with `chopper --version`. For 0.6.1, use the
+[release-pinned Job schema](https://raw.githubusercontent.com/jsmatfess/chopper/v0.6.1/schemas/0.6.1/job.schema.json).
 Both native archives include the same `job.schema.json` at their root.
 For offline use, use the included copy, save the download, or copy it from the
-[matching source checkout](../schemas/0.6.0/job.schema.json).
+[matching source checkout](../schemas/0.6.1/job.schema.json).
 
 To associate the schema in VS Code, open the repository folder and add this
 entry to its `.vscode/settings.json`. Change `fileMatch` for your own Job files.
@@ -24,7 +24,7 @@ If the schema is at the workspace root, set `url` to
   "json.schemas": [
     {
       "fileMatch": ["/examples/job.json"],
-      "url": "https://raw.githubusercontent.com/jsmatfess/chopper/v0.6.0/schemas/0.6.0/job.schema.json"
+      "url": "https://raw.githubusercontent.com/jsmatfess/chopper/v0.6.1/schemas/0.6.1/job.schema.json"
     }
   ]
 }
