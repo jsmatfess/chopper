@@ -1,4 +1,6 @@
 //! WASI reactor: the same engine used by the CLI, hosted in a browser worker.
+#[cfg(any(test, target_os = "wasi"))]
+mod report;
 #[cfg(target_os = "wasi")]
 mod reactor {
     use chopper::{core::Job, engine, DecodedJob};
@@ -82,21 +84,7 @@ mod reactor {
     }
 
     fn report<T: serde::Serialize>(result: anyhow::Result<T>) -> i32 {
-        match result {
-            Ok(value) => {
-                use std::io::Write;
-                let mut stdout = std::io::stdout().lock();
-                if serde_json::to_writer(&mut stdout, &value).is_err() || writeln!(stdout).is_err()
-                {
-                    return 1;
-                }
-                0
-            }
-            Err(error) => {
-                println!("{}", serde_json::json!({"error":format!("{error:#}")}));
-                1
-            }
-        }
+        super::report::write_report(&mut std::io::stdout().lock(), result)
     }
     #[cfg(feature = "resource-contract-tests")]
     #[no_mangle]

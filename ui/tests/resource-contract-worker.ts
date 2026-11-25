@@ -226,6 +226,11 @@ function inspectionContract(
       previewIo.result.error===runIo.result.error&&JSON.stringify(runIo.reads)===JSON.stringify(ioReads)&&
       JSON.stringify(previewIo.reads)===JSON.stringify(ioReads)&&JSON.stringify(bufferedIo.reads)===JSON.stringify(ioReads)&&
       reserved()===baseline,'WASI source I/O error or second read changed: '+JSON.stringify({runIo,previewIo,bufferedIo,reserved:reserved(),baseline}));
+    const invalidBudget='雪🦀\n\t"\\'.repeat(8192);
+    const longError=inspect('chopper_run',JSON.stringify({resources:{memory_mb:invalidBudget}}));
+    assert(longError.status===1&&typeof longError.result.error==='string'&&
+      longError.result.error.includes(JSON.stringify(invalidBudget))&&reserved()===baseline,
+      'WASI stdout lost part of the escaped error or its Job grant');
     paused=[];
     const borrow=inspect('chopper_formula_scan',job(''));
     assert(borrow.status===0&&paused.length===1&&reserved()===baseline,'Formula pause control failed');
@@ -270,7 +275,9 @@ function inspectionContract(
         }
       }
     });
-    return {calls,source_reads:expectedReads,malformed_error:runError.result.error,source_io_error:runIo.result.error,formula_pause_job_bytes:paused[0]-shortPause,virtual,run_virtual:runVirtual};
+    return {calls,source_reads:expectedReads,malformed_error:runError.result.error,source_io_error:runIo.result.error,
+      long_error_utf8_bytes:encoder.encode(longError.result.error as string).length,
+      formula_pause_job_bytes:paused[0]-shortPause,virtual,run_virtual:runVirtual};
   }finally{
     root.contents.delete('input.csv');
     stdin.fd_read=readStdin;

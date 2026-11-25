@@ -50,6 +50,7 @@ async function main(){
           result.decoded_run_automatic_memory?.join(',')==='2048,256,1024','WASI Run Job transfer or Auto budget contract failed');
         assert(inspectionAdapter.run_virtual.map((item:any)=>item.bytes).join(',')==='1048575,1048577',
           'WASI Run virtual Job contract failed');
+        assert(inspectionAdapter.long_error_utf8_bytes>100*1024,'Long WASI stdout diagnostic was truncated');
         if(new URLSearchParams(location.search).has('spill-blocks')){
           assert(result.spill_blocks?.contract==='spill-block-resource-contracts-v1','Missing actual spill-block contracts');
           assert(JSON.stringify(result.spill_blocks.cases)===JSON.stringify(['roundtrip_chunks_widths','footer_quota','wide_reader_lifetime','local_encoder_fallback_retry','malformed_truncated_utf8_terminal','shared_encoder_fallback_retry','reader_live_cancellation']),'Missing spill-block decode/admission/ownership cases');
