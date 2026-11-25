@@ -135,7 +135,6 @@ impl Reservation {
     pub(crate) fn bytes(&self) -> u64 {
         self.bytes
     }
-    #[cfg(any(target_os = "wasi", test))]
     pub(crate) fn accept_shared(
         &mut self,
         bytes: usize,

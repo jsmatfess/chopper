@@ -610,6 +610,125 @@ fn source_lifetime_profile_run_prepare_cancel_and_unwind() -> Result<()> {
 }
 
 #[test]
+fn saved_run_transfers_on_direct_and_snapshot_routes() -> Result<()> {
+    use std::{
+        fs,
+        sync::atomic::{AtomicU64, Ordering},
+    };
+
+    const MIB: u64 = 1024 * 1024;
+    const LIMIT: u64 = 32 * MIB;
+    let dir = tempfile::tempdir()?;
+    let config = dir.path().join("job.json");
+    let input = dir.path().join("input.csv");
+    let output = dir.path().join("result");
+    let temp = dir.path().join("scratch");
+    fs::create_dir(&temp)?;
+    let cancel = Arc::new(AtomicBool::new(false));
+    let notify: Notify = Arc::new(|_| {});
+
+    for (route, columns, cap, expected) in [
+        (
+            "streaming",
+            serde_json::json!([]),
+            5,
+            ["id\n1\n", "id\n2\n"],
+        ),
+        (
+            "snapshot",
+            serde_json::json!([{"name":"copy","expression":"id"}]),
+            12,
+            ["id,copy\n1,1\n", "id,copy\n2,2\n"],
+        ),
+    ] {
+        fs::write(&input, b"id\n1\n2\n")?;
+        fs::write(
+            &config,
+            serde_json::to_vec(&serde_json::json!({
+                "input": input, "output": output, "calculated_columns": columns,
+                "limits": {"bytes": cap},
+                "resources": {"temp_dir":temp, "max_record_bytes":1024, "workers":1}
+            }))?,
+        )?;
+        let pool = Arc::new(MemoryPool::new(LIMIT));
+        let read = || DecodedJob::read_path(&config, || Ok(pool.clone()), false);
+        let mut peer = Grant::new(pool.clone());
+        // Exactly 33 MiB nominal before decoding. Native preflight still
+        // counts the saved Job and resolves 32 MiB.
+        peer.grow((LIMIT - 33 * MIB / 2) as usize)?;
+        let owner = read()?;
+        let retained = owner._grant.bytes as u64;
+        let context_bytes = Arc::new(AtomicU64::new(0));
+        let _context_probe = crate::storage::context_test_hook::install({
+            let context_bytes = context_bytes.clone();
+            move |workspace, _| context_bytes.store(workspace.used(), Ordering::Relaxed)
+        });
+        let analysis = owner.run(cancel.clone(), notify.clone())?;
+        assert_eq!(analysis.memory_budget_bytes, 32 * MIB);
+        assert_eq!(
+            serde_json::to_value(analysis.auto_plan)?["physical_plan"],
+            route
+        );
+        assert_eq!(
+            analysis.diagnostics["prepared_job_reserved_bytes"],
+            retained + 64
+        );
+        assert_eq!(analysis.output_files, 2);
+        assert_eq!(analysis.output_csv_bytes, cap * 2);
+        for (index, csv) in expected.into_iter().enumerate() {
+            let actual = fs::read(output.join(format!("part-{:08}.csv", index + 1)))?;
+            assert_eq!(actual, csv.as_bytes());
+        }
+        let context = context_bytes.load(Ordering::Relaxed);
+        assert!(context > 0);
+        assert!(pool.reservation_counts().0 > peer.bytes as u64);
+        drop(analysis);
+        assert_eq!(pool.reservation_counts().0, peer.bytes as u64);
+        assert_eq!(fs::read_dir(&temp)?.count(), 0);
+
+        fs::remove_dir_all(&output)?;
+        fs::remove_file(&input)?;
+        for (short, old_overlap) in [(0, false), (1, false), (0, true)] {
+            peer.shrink(0);
+            let owner = read()?.resource_overrides(Some(32.into()), None);
+            assert_eq!(owner._grant.bytes as u64, retained);
+            // At preparation there is exactly enough for the directory and
+            // seed, or one byte less. Keep this peer fixed throughout Run.
+            peer.grow((LIMIT - retained - context - 64 + short) as usize)?;
+            let result = if old_overlap {
+                // The previous facade held the source grant and ran an
+                // ordinary caller Job, charging its full capacity again.
+                let DecodedJob { job, _grant: grant } = owner;
+                let result =
+                    engine::run_with_auto(job, cancel.clone(), notify.clone(), pool.clone(), None);
+                drop(grant);
+                result
+            } else {
+                owner.run(cancel.clone(), notify.clone())
+            };
+            let error = result.expect_err("boundary control must reject");
+            if short != 0 || old_overlap {
+                assert!(
+                    matches!(
+                        error.downcast_ref::<MemoryAdmission>(),
+                        Some(MemoryAdmission::Shared { .. })
+                    ),
+                    "{route} (short by {short}, old overlap {old_overlap}): {error:#}"
+                );
+            } else {
+                assert_eq!(error.to_string(), "open input", "{route}: {error:#}");
+            }
+            assert_eq!(pool.reservation_counts().0, peer.bytes as u64);
+            assert!(!output.exists());
+            assert_eq!(fs::read_dir(&temp)?.count(), 0);
+        }
+        drop(peer);
+        assert_eq!(pool.reservation_counts().0, 0);
+    }
+    Ok(())
+}
+
+#[test]
 fn every_enabling_prefix_boundary_and_no_denial_allocation() -> Result<()> {
     let wire =
         br#"{"input":"123456789\u96ea","operations":[{"columns":[0,1,2,3,4],"type":"partition"}]}"#;

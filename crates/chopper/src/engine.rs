@@ -281,6 +281,25 @@ pub fn run_with_auto(
     run_using(job.into(), cancel, notify, pool, (hint, None), None, None)
 }
 
+#[cfg(not(target_os = "wasi"))]
+pub(crate) fn run_decoded_native(
+    job: crate::cli_job::DecodedJob,
+    cancel: Arc<AtomicBool>,
+    notify: Notify,
+    hint: Option<AutoObservations>,
+) -> Result<Analysis> {
+    let pool = job.pool().clone();
+    run_using(
+        RunJob::Decoded(job),
+        cancel,
+        notify,
+        pool,
+        (hint, None),
+        None,
+        None,
+    )
+}
+
 fn run_using(
     job: RunJob,
     cancel: Arc<AtomicBool>,

@@ -154,12 +154,12 @@ are different quantities; no performance, scale or RSS claim follows.
 
 After from_reader destroys scratch/Content, the existing exhaustive Job capacity
 walker must fit E; only then shrink to actual retained String/Vec capacity.
-DecodedJob declares Job before its grant. Immutable borrowing, scalar resource
-overrides and consuming Run/Analyze methods retain source capacity through
-prompts, profiling and the whole engine call. PreparedJob independently admits its
-configuration; intentional overlap can deny work or reduce Auto's observed free
-headroom. No early release, bare extraction, Clone, general mutation or generic
-reservation export exists. Ordinary engine/core APIs remain unchanged.
+DecodedJob declares Job before its grant. Immutable borrowing and scalar
+resource overrides retain the source charge through prompts and profiling.
+Analyze holds it through the entire inspection call. Run transfers it at
+preparation. There is no early release, bare extraction, Clone, general mutation
+or generic reservation export. Ordinary engine/core APIs still accept
+caller-owned Jobs and admit their retained capacity at preparation.
 
 CLI decoding does not construct or retain a user seed. The Job schema rejects
 `seed`; the engine's retained-configuration owner admits internal entropy before
@@ -200,11 +200,12 @@ stacks, virtual file storage and browser JS buffers remain separate owners.
 Browser controls compare source reads and malformed errors, check a virtual
 file on each side of 1 MiB, and sample the live charge at the formula pause.
 
-## WASI Run
+## Saved Job Run
 
-[Issue #79](https://github.com/jsmatfess/chopper/issues/79) uses the same
-decoder for Run and carries the immutable owner through validation, route
-selection and Context creation. At the direct or retained preparation seam,
+[Hosted Run (#79)](https://github.com/jsmatfess/chopper/issues/79) and
+[native saved Run (#89)](https://github.com/jsmatfess/chopper/issues/89) carry
+the immutable decoded owner through validation, route selection and Context
+creation. At the direct or retained preparation seam,
 the workspace verifies that the decode grant belongs to its shared pool. It
 charges the full retained capacity and any 64-byte generated seed allowance
 locally, and charges only the seed delta to the shared pool. A shared denial
@@ -212,11 +213,21 @@ rolls back the local charge. On success, the source grant is disarmed and
 PreparedJob owns the configuration and reservation before seed generation.
 The configuration drops before its grant on either path.
 
-When resolving a numeric Auto target, Run deducts its own verified decode
+When resolving a numeric Auto target, WASI Run deducts its own verified decode
 charge from shared usage. This preserves the eligible 2048 MiB target with an
 otherwise available ledger. Every unrelated owner still counts against that
-target. All allocation decisions use the full ledger, and explicit memory
-requests retain their numeric budget.
+target. Native Run includes the live decode charge in Auto sizing and route
+eligibility at preflight. All allocation decisions use the full ledger, and
+explicit memory requests retain their numeric budget.
+
+Native saved-Job controls use a fixed shared pool and a live peer. They check
+native Auto sizing and exact capped CSV output on the direct and snapshot
+routes. At preparation, with exactly 64 shared bytes left after admitting the
+directory and decoded Job, transfer reaches input validation. One byte less
+rejects preparation. The prior overlap rejects even with all 64 bytes
+available because it needs the full configuration capacity again. The
+controls check grant and directory cleanup after rejection and success.
+
 The browser controls compare Run with the prior buffered decoder on malformed
 JSON and source I/O failure. They also exercise direct Run with virtual Jobs
 on both sides of 1 MiB and retained Run with a competing shared grant.

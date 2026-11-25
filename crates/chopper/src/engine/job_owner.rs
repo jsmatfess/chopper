@@ -8,7 +8,6 @@ pub(super) mod transfer_contracts;
 
 pub(super) enum RunJob {
     Caller(Job),
-    #[cfg(any(target_os = "wasi", test))]
     Decoded(crate::cli_job::DecodedJob),
 }
 
@@ -24,7 +23,6 @@ impl std::ops::Deref for RunJob {
     fn deref(&self) -> &Job {
         match self {
             Self::Caller(job) => job,
-            #[cfg(any(target_os = "wasi", test))]
             Self::Decoded(job) => job.job(),
         }
     }
@@ -32,11 +30,12 @@ impl std::ops::Deref for RunJob {
 
 impl RunJob {
     pub(super) fn memory_credit(&self, _pool: &crate::resources::MemoryPool) -> u64 {
-        match self {
-            Self::Caller(_) => 0,
-            #[cfg(any(target_os = "wasi", test))]
-            Self::Decoded(job) => job.memory_credit(_pool),
+        // Native preflight includes the live decode grant in shared usage.
+        #[cfg(target_os = "wasi")]
+        if let Self::Decoded(job) = self {
+            return job.memory_credit(_pool);
         }
+        0
     }
 }
 
@@ -70,7 +69,6 @@ impl PreparedJob {
                 memory.resize(bytes)?;
                 job
             }
-            #[cfg(any(target_os = "wasi", test))]
             RunJob::Decoded(job) => job.into_workspace(&mut memory, bytes)?,
         };
         let mut owner = Self {

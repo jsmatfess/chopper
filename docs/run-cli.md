@@ -33,7 +33,8 @@ Wrong-scope options, duplicate scalar step settings and unknown options fail;
 they never leak forward or change another step. Repeated global settings fail.
 Defaults and semantic validation come from the existing Job types. Flag-built Run
 constructs a caller-owned Job as `split` does; JSON Run retains its existing
-admitted decoded owner through confirmation and execution. Flag construction
+admitted decoded owner through confirmation, then transfers its charge to
+the prepared configuration during execution. Flag construction
 does not use or extend the
 [scripted JSON decode-origin admission envelope](cli-job-decoding.md).
 

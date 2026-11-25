@@ -116,7 +116,7 @@ ordinary exact allocation.
 
 ```mermaid
 flowchart TD
-    Validated[Validated Run Job with hosted decode owner still live] --> Destination[Native destination witness or hosted unchecked destination]
+    Validated[Validated Run Job with any decode owner still live] --> Destination[Native destination witness or hosted unchecked destination]
     Destination --> Candidate{Direct candidate for this Job and observation mode?}
     Candidate -->|Yes| Hosted{WASI direct candidate?}
     Hosted -->|Yes| Output{Valid job output path?}
@@ -130,12 +130,15 @@ flowchart TD
     Candidate -->|No| Retained
     Retained --> Policy[Snapshot, grouped private output, native merge, or retained exact writers]
     Policy --> Process[Build the retained Context from the selected mode and Auto resource targets]
-    Direct --> JobAdmission[Admit PreparedJob and transfer any hosted decode grant]
+    Direct --> JobAdmission[Admit PreparedJob and transfer any decode grant]
     Process --> JobAdmission
     JobAdmission --> Report[Report the selected route after successful publication]
 ```
 
 Explicit preparation builds a snapshot Context without selecting a Run route.
+Native preflight includes the live decode charge when sizing Auto or checking
+route headroom. Saved native and hosted Run both transfer that charge after
+Context creation. See the [saved Job ownership contract](cli-job-decoding.md#saved-job-run).
 Retained-parent retries and publication errors remain governed by the selected
 execution path.
 

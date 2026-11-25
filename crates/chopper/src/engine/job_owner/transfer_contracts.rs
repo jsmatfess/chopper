@@ -72,6 +72,7 @@ pub(in crate::engine) fn run() -> Result<serde_json::Value> {
     let pool = Arc::new(MemoryPool::new(64 * 1024));
     let foreign = Arc::new(MemoryPool::new(64 * 1024));
     let owner = RunJob::Decoded(decode(b"{}", &pool)?);
+    #[cfg(target_os = "wasi")]
     ensure!(owner.memory_credit(&foreign) == 0 && owner.memory_credit(&pool) > 0);
     let workspace = Arc::new(Workspace::shared(1024, foreign.clone()));
     let error = PreparedJob::admit(owner, Reservation::for_workspace(workspace.clone()))

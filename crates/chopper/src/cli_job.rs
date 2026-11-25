@@ -157,20 +157,24 @@ pub struct DecodedJob {
 impl DecodedJob {
     /// Preserve metadata-only 1 MiB rejection and metadata/open error ordering.
     pub fn read(path: impl AsRef<Path>) -> Result<Self> {
-        Self::read_path(path.as_ref(), false)
+        Self::read_path(path.as_ref(), process_memory, false)
     }
 
     /// Decode the same Job with field-path context for JSON data errors.
     pub fn read_with_diagnostics(path: impl AsRef<Path>) -> Result<Self> {
-        Self::read_path(path.as_ref(), true)
+        Self::read_path(path.as_ref(), process_memory, true)
     }
 
-    fn read_path(path: &Path, track_paths: bool) -> Result<Self> {
+    fn read_path(
+        path: &Path,
+        pool: impl FnOnce() -> Result<Arc<MemoryPool>>,
+        track_paths: bool,
+    ) -> Result<Self> {
         let metadata = std::fs::metadata(path)?;
         Self::open_after_metadata(
             metadata.len(),
             || std::fs::File::open(path),
-            process_memory,
+            pool,
             track_paths,
         )
     }
@@ -200,7 +204,7 @@ impl DecodedJob {
         }
         self
     }
-    /// Retain the source grant until all consuming engine work returns.
+    /// Transfer the decoded configuration and its shared grant at Run preparation.
     pub fn run(self, cancel: Arc<AtomicBool>, notify: Notify) -> Result<engine::Analysis> {
         self.run_advised(cancel, notify, None)
     }
@@ -210,10 +214,7 @@ impl DecodedJob {
         notify: Notify,
         hint: Option<engine::AutoObservations>,
     ) -> Result<engine::Analysis> {
-        let Self { job, _grant: grant } = self;
-        let result = engine::run_with_auto(job, cancel, notify, grant.pool.clone(), hint);
-        drop(grant);
-        result
+        engine::run_decoded_native(self, cancel, notify, hint)
     }
     /// Inspect input while retaining the decoded configuration's shared grant.
     pub fn analyze(
@@ -279,12 +280,14 @@ impl DecodedJob {
         self.job.random_seed = Some(seed.into());
         Ok(self)
     }
+}
 
-    #[cfg(target_os = "wasi")]
+impl DecodedJob {
     pub(crate) fn pool(&self) -> &Arc<MemoryPool> {
         &self._grant.pool
     }
 
+    #[cfg(target_os = "wasi")]
     pub(crate) fn memory_credit(&self, pool: &MemoryPool) -> u64 {
         if std::ptr::eq(Arc::as_ptr(&self._grant.pool), pool) {
             self._grant.bytes as u64
@@ -303,9 +306,6 @@ impl DecodedJob {
         self._grant.bytes = 0;
         Ok(self.job)
     }
-}
-
-impl DecodedJob {
     fn decode_admitted<R: Read>(
         open_reader: impl FnOnce() -> R,
         pool: Arc<MemoryPool>,
