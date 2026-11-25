@@ -1,7 +1,10 @@
 """Contract tests for which platform/ownership checks can be skipped."""
 import importlib.util
+import json
+import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -219,7 +222,6 @@ class ScopeTests(unittest.TestCase):
             self.assertEqual(self.selected('scripts/evidence-migration.py'), {'evidence'})
 
     def test_invalid_diff_fails_without_publishing_outputs(self):
-        import sys
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / 'outputs'
             result = subprocess.run([sys.executable, str(Path(__file__).with_name('ci-scope.py')),
@@ -237,19 +239,51 @@ class ScopeTests(unittest.TestCase):
             git('init', '-q')
             git('config', 'user.name', 'CI test')
             git('config', 'user.email', 'ci-test@example.invalid')
-            (root / 'old name.txt').write_text('same content\n')
+            old = Path('ui/old name.ts')
+            new = Path('docs/benchmarks/new name.json')
+            (root / old).parent.mkdir(parents=True)
+            (root / new).parent.mkdir(parents=True)
+            (root / old).write_text('same content\n')
             git('add', '.')
             git('commit', '-qm', 'base')
             base = git('rev-parse', 'HEAD')
-            (root / 'old name.txt').rename(root / 'new name.txt')
+            (root / old).rename(root / new)
             git('add', '-A')
             git('commit', '-qm', 'rename')
-            # Exercise the actual CLI so its cwd is the test repository.
-            import json
-            import sys
-            result = subprocess.check_output([sys.executable, str(Path(__file__).with_name('ci-scope.py').resolve()),
-                       '--base', base], cwd=root, text=True)
-            self.assertEqual(set(json.loads(result)['paths']), {'old name.txt', 'new name.txt'})
+            head = git('rev-parse', 'HEAD')
+            for platform, expected in {'linux': {'native', 'browser', 'evidence'}, 'windows': {'native'}}.items():
+                with self.subTest(platform=platform):
+                    paths, jobs = scope.revision_scope(base, head, root=root, platform=platform)
+                    self.assertEqual(set(paths), {old.as_posix(), new.as_posix()})
+                    self.assertEqual({job for job, enabled in jobs.items() if enabled}, expected)
+                    result = subprocess.check_output(
+                        [sys.executable, str(Path(__file__).with_name('ci-scope.py').resolve()),
+                         '--base', base, '--head', head, '--platform', platform], cwd=root, text=True)
+                    self.assertEqual(json.loads(result), {'paths': paths, 'jobs': jobs})
+
+    @unittest.skipUnless(os.name == 'posix', 'Git filenames with non-UTF-8 bytes require POSIX')
+    def test_revision_scope_preserves_non_utf8_and_newline_in_path(self):
+        with tempfile.TemporaryDirectory() as directory:
+            def git(*args):
+                return subprocess.check_output(['git', *args], cwd=directory, text=True).strip()
+            git('init', '-q')
+            git('config', 'user.name', 'CI test')
+            git('config', 'user.email', 'ci-test@example.invalid')
+            git('commit', '-qm', 'base', '--allow-empty')
+            base = git('rev-parse', 'HEAD')
+            name = os.fsdecode(b'unclassified-\xff\npath')
+            (Path(directory) / name).write_text('fixture\n')
+            git('add', '.')
+            git('commit', '-qm', 'add path')
+            paths, jobs = scope.revision_scope(base, 'HEAD', root=directory)
+            self.assertEqual([os.fsencode(path) for path in paths], [os.fsencode(name)])
+            self.assertTrue(all(jobs.values()))
+
+    def test_full_scope_selects_platform_jobs_without_diffing(self):
+        with patch.object(scope, 'changed_paths', side_effect=AssertionError('unexpected diff')):
+            paths, jobs = scope.revision_scope(None, 'HEAD', full=True, platform='windows')
+        self.assertEqual(paths, [])
+        self.assertEqual({job for job, enabled in jobs.items() if enabled}, {'native', 'tooling'})
 
 
 if __name__ == '__main__':

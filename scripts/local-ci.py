@@ -105,6 +105,13 @@ def runner_module():
     return module
 
 
+def scope_module():
+    spec = importlib.util.spec_from_file_location('ci_scope', Path(__file__).with_name('ci-scope.py'))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def act_command(act, base, directory, full=False, profile=None):
     # No check commands or job list live here. act reads steps, needs and routing
     # directly from the same workflow used by GitHub.
@@ -159,12 +166,8 @@ def stage_evidence(root, source, base, head, full=False):
     caches = sorted(path for path in caches if path.is_dir())
     if not caches:
         return []
-    spec = importlib.util.spec_from_file_location('ci_scope', Path(__file__).with_name('ci-scope.py'))
-    scope = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(scope)
-    paths = subprocess.check_output(['git', '-C', str(root), 'diff', '--no-renames',
-                                     '--name-only', '-z', base, head, '--']).decode().split('\0')[:-1]
-    if not scope.classify(paths, full=full, platform=host_profile())['evidence']:
+    _, selected = scope_module().revision_scope(base, head, root=root, full=full, platform=host_profile())
+    if not selected['evidence']:
         return []
     spec = importlib.util.spec_from_file_location('evidence_resolver', Path(__file__).with_name('evidence-resolver.py'))
     resolver = importlib.util.module_from_spec(spec)
@@ -295,12 +298,7 @@ def verify_delivery(root, head, base):
     verify(root, head, base)
     if host_profile() != 'linux':
         raise ValueError('Deliver from the Linux/WSL checkout, where Linux and Windows receipts are combined.')
-    spec = importlib.util.spec_from_file_location('ci_scope', Path(__file__).with_name('ci-scope.py'))
-    scope = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(scope)
-    paths = subprocess.check_output(['git', '-C', str(root), 'diff', '--no-renames',
-                                     '--name-only', '-z', base, head, '--']).decode().split('\0')[:-1]
-    selected = scope.classify(paths, platform='windows')
+    _, selected = scope_module().revision_scope(base, head, root=root, platform='windows')
     if any(selected.values()):
         configured = subprocess.run(['git', '-C', str(root), 'config', '--get', 'chopper.windowsCheckout'],
                                     capture_output=True, text=True)

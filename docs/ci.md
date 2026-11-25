@@ -179,8 +179,9 @@ the planner; a missing base/new branch falls back to full validation. Manual
 dispatch without `base_sha` selects every job in the chosen platform profile.
 Existing base objects need no network fetch.
 
-`scripts/ci-scope.py` owns the path rules. Selected checks are the union of all
-changed paths:
+`scripts/ci-scope.py` owns the revision diff, filename decoding, and path rules
+used by the workflow planner, local evidence staging, and the Windows receipt
+gate. Selected checks are the union of all changed paths:
 
 | Changes | Selected jobs |
 | --- | --- |

@@ -86,11 +86,17 @@ def classify(paths, full=False, platform='all'):
     return {job: job in selected and job in PLATFORM_JOBS[platform] for job in JOBS}
 
 
-def changed_paths(base, head):
+def changed_paths(base, head, *, root=None):
     # Both names of a rename/copy must participate in routing. NUL delimiting
     # preserves spaces and newlines; no GitHub API file-count truncation applies.
-    data = subprocess.check_output(['git', 'diff', '--no-renames', '--name-only', '-z', base, head, '--'])
+    data = subprocess.check_output(['git', 'diff', '--no-renames', '--name-only', '-z', base, head, '--'],
+                                   cwd=root)
     return [name.decode('utf-8', errors='surrogateescape') for name in data.split(b'\0') if name]
+
+
+def revision_scope(base, head, *, root=None, full=False, platform='all'):
+    paths = [] if full else changed_paths(base, head, root=root)
+    return paths, classify(paths, full=full, platform=platform)
 
 
 def failed_jobs(results):
@@ -120,8 +126,7 @@ def main():
         return int(bool(failed))
     if not args.full and not args.base:
         parser.error('--base is required unless --full')
-    paths = [] if args.full else changed_paths(args.base, args.head)
-    result = classify(paths, full=args.full, platform=args.platform)
+    paths, result = revision_scope(args.base, args.head, full=args.full, platform=args.platform)
     print(json.dumps({'paths': paths, 'jobs': result}, indent=2))
     if args.output:
         with args.output.open('a', encoding='utf-8') as output:
