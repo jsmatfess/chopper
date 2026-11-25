@@ -30,6 +30,8 @@ fn text_functions_keep_unicode_and_null_contracts() {
         (r#"IS_BLANK(NULL) AND IS_BLANK("　 ")"#, 'b', "true"),
         (r#"LTRIM("　x　")"#, 't', "x　"),
         (r#"RTRIM("　x　")"#, 't', "　x"),
+        (r#"REPEAT("é", 0)"#, 't', ""),
+        (r#"REPEAT("", 4)"#, 't', ""),
         (r#"STRIP_PREFIX("éx", "é")"#, 't', "x"),
         (r#"STRIP_SUFFIX("éx", "x")"#, 't', "é"),
         (r#"STRIP_SUFFIX("éx", "z")"#, 't', "éx"),
@@ -119,6 +121,12 @@ fn typed_predicates_and_numeric_functions() {
         (r#"FLOOR(-1.25)"#, 'f', "-2"),
         (r#"CEIL(-1.25)"#, 'f', "-1"),
         (r#"TRUNC(-1.25)"#, 'f', "-1"),
+        ("10 - 2", 'f', "8"),
+        ("9 * 2", 'f', "18"),
+        ("7 / 2", 'f', "3.5"),
+        ("8 % 3", 'f', "2"),
+        ("1 + NULL", 'n', ""),
+        ("3 > 2 AND 2 <> 3 AND NOT (2 > 2)", 'b', "true"),
         (
             r#"BETWEEN(1, 1, 2) AND BETWEEN("west", "east", "west")"#,
             'b',
@@ -216,6 +224,21 @@ fn date_and_timestamp_arithmetic_handles_calendar_and_epoch_edges() {
             "0.000000001",
         ),
         (
+            r#"TEXT(TIMESTAMP_PARSE("2024-02-27T23:30:00-01:00"))"#,
+            't',
+            "2024-02-28T00:30:00Z",
+        ),
+        (
+            r#"TEXT(TIMESTAMP_TRUNC(TIMESTAMP_PARSE("2024-02-29T12:59:59.9Z"), "minute"))"#,
+            't',
+            "2024-02-29T12:59:00Z",
+        ),
+        (
+            r#"TIMESTAMP_PARSE("2024-02-29T00:30:00+01:00") = TIMESTAMP_PARSE("2024-02-28T23:30:00Z")"#,
+            'b',
+            "true",
+        ),
+        (
             r#"TIMESTAMP_FORMAT(TIMESTAMP_ADD_SECONDS(TIMESTAMP_PARSE("2024-12-31T23:59:59.75+02:00"), 0.5), "%Y-%m-%d %H:%M:%S %z", "local")"#,
             't',
             "2025-01-01 00:00:00 +02:00",
@@ -230,8 +253,77 @@ fn date_and_timestamp_arithmetic_handles_calendar_and_epoch_edges() {
 }
 
 #[test]
+fn stored_timestamp_keeps_its_local_offset_in_dependent_formulas() {
+    let source = Expression::parse(r#"TIMESTAMP_PARSE("2024-02-29T00:30:00+01:00")"#).unwrap();
+    let value = source.evaluate(&|_| None, &mut |_| Ok(())).unwrap();
+    let kind = value.kind();
+    let utc = value.rendered(&mut |_| Ok(())).unwrap();
+    assert_eq!(utc, "2024-02-28T23:30:00Z");
+    assert!(Value::from_stored(&utc, 'x').is_none());
+
+    let mut dependent =
+        Expression::parse(r#"TIMESTAMP_FORMAT($0, "%Y-%m-%d %H:%M %z", "local")"#).unwrap();
+    dependent.bind(None, 1, 0).unwrap();
+    let value = dependent
+        .evaluate(
+            &|index| {
+                assert_eq!(index, 0);
+                Value::from_stored(&utc, kind)
+            },
+            &mut |_| Ok(()),
+        )
+        .unwrap();
+    assert_eq!(
+        value.rendered(&mut |_| Ok(())).unwrap(),
+        "2024-02-29 00:30 +01:00"
+    );
+}
+
+#[test]
+fn stored_boolean_keeps_its_type_and_rejects_invalid_values() {
+    assert!(matches!(
+        Value::from_stored("false", 'b'),
+        Some(Value::Bool(false))
+    ));
+    assert!(matches!(
+        Value::from_stored("true", 'b'),
+        Some(Value::Bool(true))
+    ));
+    assert!(Value::from_stored("truthy", 'b').is_none());
+}
+
+#[test]
+fn formula_size_limit_counts_utf8_bytes() {
+    let mut source = format!("\"{}\"", "é".repeat(8191));
+    assert!(Expression::parse(&source).is_ok());
+    source.push(' ');
+    assert!(Expression::parse(&source)
+        .unwrap_err()
+        .contains("exceeds 16384 bytes"));
+}
+
+#[test]
+fn compiled_patterns_contribute_to_the_admitted_formula_workspace() {
+    let short = r#"REGEX_MATCH("abc", "a")"#;
+    let long = r#"REGEX_MATCH("abc", "abc")"#;
+    let short_bytes = Expression::parse(short).unwrap().workspace_bytes();
+    let long_bytes = Expression::parse(long).unwrap().workspace_bytes();
+    assert!(short_bytes > 0 && long_bytes > short_bytes);
+    let combined = Expression::parse(&format!("SAFE({short} AND {long})")).unwrap();
+    assert_eq!(combined.workspace_bytes(), short_bytes + long_bytes);
+    let argument_list = Expression::parse(&format!("IF({short}, {long}, FALSE)")).unwrap();
+    assert_eq!(argument_list.workspace_bytes(), short_bytes + long_bytes);
+    let membership = Expression::parse(&format!("{short} IN ({long})")).unwrap();
+    assert_eq!(membership.workspace_bytes(), short_bytes + long_bytes);
+}
+
+#[test]
 fn regex_extract_reuses_capture_semantics_and_binds_group_expressions() {
     check(&[
+        (r#"REGEX_MATCH("-", "[a-]")"#, 'b', "true"),
+        (r#"REGEX_MATCH("z", "[a-]")"#, 'b', "false"),
+        (r#"REGEX_MATCH("_", "^\w$")"#, 'b', "true"),
+        (r#"REGEX_MATCH("-", "^\w$")"#, 'b', "false"),
         (
             r#"REGEX_EXTRACT("é ABC-123 DEF-456", "([A-Z]+)-([0-9]+)")"#,
             't',
@@ -346,7 +438,7 @@ fn every_reference_function_names_its_arguments_and_shows_working_examples() {
 }
 
 #[test]
-fn comparison_diagnostics_suggest_the_matching_conversion() {
+fn type_diagnostics_suggest_the_matching_conversion() {
     for (source, expected) in [
         (
             r#""1" < 1000000"#,
@@ -360,6 +452,8 @@ fn comparison_diagnostics_suggest_the_matching_conversion() {
             r#""1970-01-01T00:00:00Z" IN (TIMESTAMP_FROM_UNIX(0))"#,
             "Use TIMESTAMP_PARSE(",
         ),
+        (r#"IF(1, "yes", "no")"#, "compare it to 0 with <>"),
+        (r#"IF("yes", 1, 0)"#, "Compare the text explicitly"),
     ] {
         let expression = Expression::parse(source).unwrap();
         let error = expression.evaluate(&|_| None, &mut |_| Ok(())).unwrap_err();

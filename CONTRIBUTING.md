@@ -72,6 +72,38 @@ For unattended sequential checks with durable logs and conservative resume, use
 the [local validation runner](docs/validation-runner.md); declare the batch's inputs,
 artifacts, toolchains and scheduling limits before launch.
 
+## Rust mutation testing
+
+Install [cargo-mutants](https://mutants.rs/) into the ignored checkout tooling
+directory from the repository root.
+
+```sh
+cargo install --locked --root .tools/mutation --version 27.1.0 cargo-mutants
+```
+
+Use the installed binary directly. This example tests the portable crate with
+its optional decoder enabled. Select a fresh output directory for each run.
+
+```sh
+mkdir -p scratch/mutation/core
+.tools/mutation/bin/cargo-mutants mutants -p chopper-core --all-features \
+  --output scratch/mutation/core -- --locked
+```
+
+On Windows, create the directory with `New-Item -ItemType Directory` and invoke
+`.\.tools\mutation\bin\cargo-mutants.exe`.
+The tool checks an unmodified copy before testing mutants. Use `--list` to
+inspect the inventory, `--file` to scope to a file, and `--re` to rerun matching
+mutations. Use `--test-workspace true` when a portable change needs tests from
+dependent crates.
+
+Read `mutants.out/missed.txt`, `outcomes.json`, and the relevant diff and test
+log together. Check a survivor against the specification and show an input
+that distinguishes it before adding a regression test. Record timeouts and
+unbuildable mutations separately. Native campaigns can list WASI-only or
+other platform code. Exercise those paths with their owning platform harness
+before drawing a coverage conclusion.
+
 ## Evidence and project metadata
 
 The repository includes the [chopper-benchmarks skill](.agents/skills/chopper-benchmarks/SKILL.md)

@@ -980,6 +980,39 @@ mod tests {
         .is_err());
     }
     #[test]
+    fn response_retries_interrupted_reads_and_propagates_other_io_errors() -> Result<()> {
+        struct FaultOnce {
+            fault: Option<io::ErrorKind>,
+            remaining: &'static [u8],
+        }
+        impl Read for FaultOnce {
+            fn read(&mut self, output: &mut [u8]) -> io::Result<usize> {
+                if let Some(kind) = self.fault.take() {
+                    return Err(kind.into());
+                }
+                self.remaining.read(output)
+            }
+        }
+
+        let cancel = AtomicBool::new(false);
+        let mut reader = FaultOnce {
+            fault: Some(io::ErrorKind::Interrupted),
+            remaining: b"yes\r\n",
+        };
+        assert_eq!(read_line(&mut reader, &cancel, || Ok(true))?, "yes");
+        let mut reader = FaultOnce {
+            fault: Some(io::ErrorKind::PermissionDenied),
+            remaining: b"yes\n",
+        };
+        let error = read_line(&mut reader, &cancel, || Ok(true)).unwrap_err();
+        assert_eq!(
+            error.downcast_ref::<io::Error>().unwrap().kind(),
+            io::ErrorKind::PermissionDenied
+        );
+        assert_eq!(reader.remaining, b"yes\n");
+        Ok(())
+    }
+    #[test]
     fn console_repeats_preserve_characters_and_surrogate_pairs() {
         let mut high = None;
         assert_eq!(

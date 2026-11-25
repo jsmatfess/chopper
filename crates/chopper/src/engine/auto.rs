@@ -1018,6 +1018,35 @@ mod tests {
             job.limits.rows = Some(1024);
             assert!(native_direct_candidate(&job, &automatic).is_none());
         }
+
+        source.as_file().set_len(1536 * MIB)?;
+        job.resources.memory_mb = 256.into();
+        job.resources.max_record_bytes = MIB as usize;
+        job.resources.max_files = 16;
+        job.limits.rows = None;
+        job.operations = vec![Operation::Interleaved { files: 16 }];
+        for (encoding, expected) in [
+            (
+                "utf-16le",
+                cfg!(target_os = "linux") && descriptor_writer_ceiling(2) >= 16,
+            ),
+            ("utf-16be", false),
+            ("windows-1252", false),
+            ("utf-8", false),
+        ] {
+            job.output_csv.encoding = encoding.into();
+            assert_eq!(
+                matches!(
+                    native_direct_candidate(&job, &pool),
+                    Some(Plan::Fanout {
+                        chain: false,
+                        automatic: true
+                    })
+                ),
+                expected,
+                "{encoding}"
+            );
+        }
         Ok(())
     }
 

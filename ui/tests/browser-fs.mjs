@@ -101,6 +101,44 @@ test('publication counts only successful closes and validates the count before c
   await assert.rejects(publication.finish(2,()=>{}),/still open or missing/);
 });
 
+test('a same-size marker with changed content fails verification and is cleaned up', async () => {
+  let markerBytes;
+  const marker = {
+    createWritable: async () => ({
+      write: async bytes => {
+        const original = new TextDecoder().decode(bytes);
+        markerBytes = new Blob([original.replace('"complete":true', '"complete":null')]);
+        assert.equal(markerBytes.size, bytes.length);
+      },
+      close: async () => {},
+    }),
+    getFile: async () => markerBytes,
+  };
+  const directory = {
+    getFileHandle: async () => marker,
+    isSameEntry: async entry => entry === directory,
+  };
+  let current;
+  const parent = {
+    async getDirectoryHandle(_name, options) {
+      if (options?.create) current = directory;
+      if (!current) throw new DOMException('absent', 'NotFoundError');
+      return current;
+    },
+    async removeEntry(name, options) {
+      assert.equal(name, 'result');
+      assert.equal(options.recursive, true);
+      current = undefined;
+    },
+  };
+  const publication = new DestinationPublication(parent, 'result');
+  await publication.open();
+  await publication.closeFile({close: async () => {}});
+  await assert.rejects(publication.finish(1, () => {}), /content did not match/);
+  assert.equal(await publication.cleanup(), null);
+  assert.equal(current, undefined);
+});
+
 test('publication cleanup skips a folder when isSameEntry returns false',async()=>{
   const replacement={getFileHandle:()=>assert.fail('must only inspect the owned folder')};
   const directory={isSameEntry:async entry=>entry===directory};

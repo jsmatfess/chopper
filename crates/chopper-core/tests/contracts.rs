@@ -302,16 +302,28 @@ fn strict_csv_handles_multiline_quotes_empty_and_crlf() {
 #[test]
 fn encoding_and_serialization_roundtrip_strictly() {
     let fields = vec!["café".into(), "a,\"b\"\nline".into(), "".into()];
-    for enc in ["utf-8", "utf-16le", "utf-16be", "windows-1252"] {
+    for (enc, signature) in [
+        ("utf-8", &[0xef, 0xbb, 0xbf][..]),
+        ("utf-16le", &[0xff, 0xfe][..]),
+        ("utf-16be", &[0xfe, 0xff][..]),
+        ("windows-1252", &[][..]),
+    ] {
         let s = CsvSettings {
             encoding: enc.into(),
-            bom: enc.starts_with("utf"),
+            bom: !signature.is_empty(),
             ..CsvSettings::default()
         };
         let mut data = csv::bom(&s).unwrap();
+        assert_eq!(data, signature, "{enc}");
         data.extend(csv::serialize(&fields, &s).unwrap());
         assert_eq!(parse(&data, s).unwrap(), vec![fields.clone()]);
     }
+    assert!(csv::bom(&CsvSettings {
+        encoding: "windows-1252".into(),
+        bom: true,
+        ..Default::default()
+    })
+    .is_err());
     assert!(csv::encode("漢字", "windows-1252").is_err());
     assert!(parse(&[0xff, 0xff], CsvSettings::default()).is_err());
 }
@@ -475,16 +487,97 @@ fn reusable_serializer_clears_previous_record_and_preserves_encoding() {
     }
 }
 #[test]
-fn byte_units_and_columns() {
-    assert_eq!(parse_bytes("64MiB").unwrap(), 67_108_864);
-    assert_eq!(parse_bytes("100 MB").unwrap(), 100_000_000);
-    assert!(parse_bytes("99999999999999999TiB").is_err());
-    assert!(resolve_columns(
-        &[Column::Name("a".into())],
-        Some(&["a".into(), "a".into()]),
-        2
-    )
-    .is_err());
+fn byte_units_preserve_decimal_and_binary_scales_and_reject_overflow() -> anyhow::Result<()> {
+    for (input, expected) in [
+        ("42", 42),
+        ("2 B", 2),
+        ("2 kB", 2_000),
+        ("100 MB", 100_000_000),
+        ("2Gb", 2_000_000_000),
+        ("2 TB", 2_000_000_000_000),
+        ("2 KiB", 2 * 1024),
+        ("64MiB", 64 * 1024_u64.pow(2)),
+        ("2 GiB", 2 * 1024_u64.pow(3)),
+        ("2TiB", 2 * 1024_u64.pow(4)),
+    ] {
+        assert_eq!(parse_bytes(input)?, expected, "{input}");
+    }
+    for input in ["2PB", "1.5GiB", "99999999999999999TiB"] {
+        assert!(parse_bytes(input).is_err(), "{input}");
+    }
+    assert_eq!(parse_bytes("18446744073709551615 B")?, u64::MAX);
+    Ok(())
+}
+
+#[test]
+fn column_selection_preserves_exact_names_and_requested_order() -> anyhow::Result<()> {
+    let header = ["First", "Key", "Key", "Last"].map(String::from);
+    let selected = [
+        Column::Name("Last".into()),
+        Column::Index(2),
+        Column::Name("First".into()),
+        Column::Index(2),
+    ];
+    assert_eq!(
+        resolve_columns(&selected, Some(&header), header.len())?,
+        [3, 2, 0, 2]
+    );
+    assert_eq!(resolve_column(&Column::Index(3), None, header.len())?, 3);
+    assert!(resolve_column(&Column::Index(4), Some(&header), header.len()).is_err());
+    assert!(resolve_column(&Column::Name("Last".into()), None, header.len()).is_err());
+    for name in ["first", "Key"] {
+        let error =
+            resolve_column(&Column::Name(name.into()), Some(&header), header.len()).unwrap_err();
+        assert!(
+            error.to_string().contains("missing or ambiguous"),
+            "{error:#}"
+        );
+    }
+    Ok(())
+}
+
+#[test]
+fn invalid_job_config_reports_the_exact_json_field() {
+    for (fields, pointer) in [
+        (
+            serde_json::json!({"resources": {"temp_bytes": 0}}),
+            "/resources/temp_bytes",
+        ),
+        (
+            serde_json::json!({"output_csv": {"encoding": "not-an-encoding"}}),
+            "/output_csv/encoding",
+        ),
+        (
+            serde_json::json!({"calculated_columns": [
+                {"name": "ok", "expression": "1"},
+                {"name": "bad", "expression": "("}
+            ]}),
+            "/calculated_columns/1/expression",
+        ),
+    ] {
+        let mut job: Job = serde_json::from_value(fields).unwrap();
+        job.input = "in.csv".into();
+        let error = job.validate().unwrap_err();
+        let cause = error.downcast_ref::<JobValidationError>().unwrap();
+        assert_eq!(cause.path(), pointer);
+        assert!(!cause.to_string().is_empty());
+    }
+}
+
+#[test]
+fn input_only_configuration_requires_a_destination_for_publication() -> anyhow::Result<()> {
+    let mut job = Job {
+        input: "in.csv".into(),
+        ..Default::default()
+    };
+    job.validate()?;
+    let error = job.validate_output().unwrap_err();
+    assert_eq!(
+        error.downcast_ref::<JobValidationError>().unwrap().path(),
+        "/output"
+    );
+    job.output = "out".into();
+    job.validate_output()
 }
 
 #[test]

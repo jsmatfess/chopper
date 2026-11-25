@@ -29,12 +29,20 @@ fn quoted_spans_preserve_literal_escape_bytes_and_admitted_retry() -> anyhow::Re
         let mut serializer = Serializer::new(&settings)?;
         let mut held = 0;
         let mut peak = 0;
+        let mut first_growth = None;
         let actual = serializer.serialize_fields_reserved([field], &mut |bytes| {
+            if bytes != 0 {
+                first_growth.get_or_insert(bytes);
+            }
             held = bytes;
             peak = peak.max(bytes);
             Ok(())
         })?;
         assert_eq!(actual, expected.as_bytes());
+        // The initial reservation includes multibyte escapes before any growth.
+        if expected.len() > 8 {
+            assert_eq!(first_growth, Some(expected.len()));
+        }
         assert_eq!(held, serializer.capacity());
         let mut denied = Serializer::new(&settings)?;
         let mut admitted = 0;

@@ -149,13 +149,20 @@ pub(crate) fn resource_contracts() -> anyhow::Result<serde_json::Value> {
     assert_eq!(pool.usage().reserved_bytes, occupied);
     ctx.check()?;
     drop(held);
+    let emissions = std::cell::Cell::new(0);
     let mut sink = |_| {
         assert_eq!(pool.usage().reserved_bytes, before + 8192);
+        emissions.set(emissions.get() + 1);
         true
     };
     let mut observer = Observer::new(&ctx, &mut sink).expect("8192 bytes admitted");
     assert_eq!(pool.usage().reserved_bytes, before);
+    // Place the last emission beyond the test's monotonic time window.
+    observer.last = Instant::now() + Duration::from_secs(60);
+    observer.update(false, Status::Active, 0, false);
+    assert_eq!(emissions.get(), 0);
     observer.update(false, Status::Active, 0, true);
+    assert_eq!(emissions.get(), 1);
     assert_eq!(pool.usage().reserved_bytes, before);
     drop(observer);
     assert_eq!(pool.usage().reserved_bytes, before);

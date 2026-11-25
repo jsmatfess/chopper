@@ -70,3 +70,56 @@ impl<T> Drop for Shared<T> {
         }
     }
 }
+
+#[cfg(all(test, not(target_os = "wasi")))]
+mod tests {
+    use super::*;
+    use crate::{
+        cli_job::{finish_allocation_observation, start_allocation_observation},
+        resources::MemoryPool,
+    };
+    use std::cell::Cell;
+
+    #[test]
+    fn last_clone_deallocates_controller_before_dropping_admitted_payload() -> Result<()> {
+        type Snapshot = Option<(usize, usize, u64)>;
+        struct ObserveDrop<'a> {
+            observation: &'a Cell<Snapshot>,
+            pool: &'a MemoryPool,
+        }
+        impl Drop for ObserveDrop<'_> {
+            fn drop(&mut self) {
+                let (controller_bytes, peak, _) = finish_allocation_observation();
+                self.observation.set(Some((
+                    controller_bytes,
+                    peak,
+                    self.pool.reservation_counts().0,
+                )));
+            }
+        }
+
+        let pool = Arc::new(MemoryPool::new(1024));
+        let reservation =
+            Reservation::for_workspace(Arc::new(Workspace::shared(1024, pool.clone())));
+        let observation = Cell::new(None);
+        start_allocation_observation();
+        let shared = Shared::admit(
+            ObserveDrop {
+                observation: &observation,
+                pool: &pool,
+            },
+            reservation,
+        )?;
+        let last = shared.clone();
+        let grant = shared.reserved_bytes();
+        drop(shared);
+        assert_eq!(observation.get(), None);
+        drop(last);
+        let (controller_bytes, peak, held_at_payload_drop) = observation.get().unwrap();
+        assert!(peak > 0);
+        assert_eq!(controller_bytes, 0);
+        assert_eq!(held_at_payload_drop, grant);
+        assert_eq!(pool.reservation_counts().0, 0);
+        Ok(())
+    }
+}

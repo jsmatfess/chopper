@@ -114,7 +114,7 @@ pub(super) fn observe_grant(bytes: usize) {
         }
     });
 }
-fn begin() {
+pub(crate) fn begin() {
     census(|c| {
         assert_eq!(c.live, 0);
         c.enabled = true;
@@ -125,7 +125,7 @@ fn begin() {
         c.first_request = 0;
     });
 }
-fn end() -> (usize, usize, usize) {
+pub(crate) fn end() -> (usize, usize, usize) {
     let mut result = (0, 0, 0);
     census(|c| {
         c.enabled = false;

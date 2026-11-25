@@ -114,6 +114,7 @@ fn non_json_scalar_and_wrapper_forms_match_original() {
         }};
     }
     compare!(value::U64Deserializer::<value::Error>::new(u64::MAX));
+    compare!(value::I64Deserializer::<value::Error>::new(7));
     compare!(value::I64Deserializer::<value::Error>::new(-1));
     compare!(value::I128Deserializer::<value::Error>::new(1));
     compare!(value::U128Deserializer::<value::Error>::new(1));
@@ -132,6 +133,12 @@ fn non_json_scalar_and_wrapper_forms_match_original() {
         de: value::BorrowedStrDeserializer::<value::Error>::new("name"),
         some: false
     });
+    for some in [true, false] {
+        compare!(Wrapped {
+            de: &mut serde_json::Deserializer::from_str(r#"["\ud800"]"#),
+            some
+        });
+    }
 }
 
 struct Wrapped<D> {

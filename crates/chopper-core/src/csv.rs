@@ -1357,28 +1357,36 @@ mod direct_decoder_contracts {
             Ok(n)
         }
     }
-    fn frames<const DIRECT: bool>(
-        bytes: &[u8],
-        encoding: &str,
-        fragment: usize,
-        sizes: &[usize],
-    ) -> Vec<Result<Vec<u8>, io::ErrorKind>> {
-        let mut decoder = DecodeReader::new(Fragmented { bytes, fragment }, encoding).unwrap();
-        let mut frames = Vec::new();
+    fn compare_frames(bytes: &[u8], encoding: &str, fragment: usize, sizes: &[usize]) {
+        let mut direct = DecodeReader::new(Fragmented { bytes, fragment }, encoding).unwrap();
+        let mut buffered = DecodeReader::new(Fragmented { bytes, fragment }, encoding).unwrap();
+        let capacity = *sizes.iter().max().unwrap();
+        let mut direct_out = vec![0; capacity];
+        let mut buffered_out = vec![0; capacity];
         for index in 0..bytes.len() * 2 + 100 {
-            let mut out = vec![0; sizes[index % sizes.len()]];
-            match decoder.read_decoded::<DIRECT>(&mut out) {
+            let size = sizes[index % sizes.len()];
+            let actual = direct
+                .read_decoded::<true>(&mut direct_out[..size])
+                .map_err(|error| error.kind());
+            let expected = buffered
+                .read_decoded::<false>(&mut buffered_out[..size])
+                .map_err(|error| error.kind());
+            assert_eq!(
+                actual, expected,
+                "{encoding}, fragment {fragment}, read {index} ({size} bytes)"
+            );
+            match actual {
                 Ok(n) => {
-                    out.truncate(n);
-                    frames.push(Ok(out));
-                    if n == 0 && sizes[index % sizes.len()] != 0 {
-                        return frames;
+                    assert_eq!(
+                        &direct_out[..n],
+                        &buffered_out[..n],
+                        "{encoding}, fragment {fragment}, read {index}"
+                    );
+                    if n == 0 && size != 0 {
+                        return;
                     }
                 }
-                Err(e) => {
-                    frames.push(Err(e.kind()));
-                    return frames;
-                }
+                Err(_) => return,
             }
         }
         panic!("decoder failed to finish");
@@ -1441,11 +1449,7 @@ mod direct_decoder_contracts {
                         &[0, 1, 65536, 2, 32768][..],
                         &[32767, 32768, 3][..],
                     ] {
-                        assert_eq!(
-                            frames::<true>(input, encoding, fragment, sizes),
-                            frames::<false>(input, encoding, fragment, sizes),
-                            "{encoding} fragment={fragment} sizes={sizes:?}"
-                        );
+                        compare_frames(input, encoding, fragment, sizes);
                     }
                 }
             }

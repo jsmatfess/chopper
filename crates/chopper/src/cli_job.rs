@@ -16,6 +16,10 @@ pub use diagnostics::JobJsonPath;
 mod prefix;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+pub(crate) use tests::{
+    begin as start_allocation_observation, end as finish_allocation_observation,
+};
 
 struct Grant {
     pool: Arc<MemoryPool>,

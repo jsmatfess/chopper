@@ -436,7 +436,7 @@ mod lifecycle_tests {
         profile::ProfileCache,
         storage::{Reservation, Workspace},
     };
-    use std::sync::atomic::AtomicBool;
+    use std::{fmt::Write as _, sync::atomic::AtomicBool};
 
     #[test]
     fn mid_ingestion_pressure_spills_with_exact_order_and_row_conservation() -> Result<()> {
@@ -448,21 +448,18 @@ mod lifecycle_tests {
         }
         text.push('\n');
         for id in 0..count {
-            text.push_str(&format!(
-                "{id},\"界,{}{}\"",
-                id % 7,
-                if id.is_multiple_of(1000) {
-                    "\nquoted"
-                } else {
-                    ""
-                }
-            ));
+            write!(text, "{id},\"界,{}", id % 7)?;
+            if id.is_multiple_of(1000) {
+                text.push_str("\nquoted");
+            }
+            text.push('"');
             for c in 1..32 {
                 if id == 80000 && c == 1 {
                     text.push(',');
                     text.push_str(&"界".repeat(600000));
                 } else {
-                    text.push_str(&format!(",{}", (id + c) % 10));
+                    text.push(',');
+                    text.push((b'0' + ((id + c) % 10) as u8) as char);
                 }
             }
             text.push('\n');

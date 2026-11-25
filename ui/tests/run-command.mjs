@@ -13,6 +13,18 @@ test('all Job settings generate the argv fixture consumed by the native parser',
  assert.equal(runCommand(fixture.job).usesJson,false);
  assert.equal(fixture.args.filter(arg=>arg.startsWith('--step=')).length,7);
 });
+test('absent options stay out of argv while explicit zero and false survive', () => {
+ const job = structuredClone(fixture.job);
+ job.zip_member = null;
+ job.limits.rows = null;
+ delete job.resources.temp_bytes;
+ job.resources.workers = 0;
+ job.output_csv.headers = false;
+ const args = runArguments(job);
+ assert.ok(!args.some(arg => /^--(zip-member|rows|temp-bytes)=/.test(arg)));
+ assert.ok(args.includes('--workers=0'));
+ assert.ok(args.includes('--output-headers=false'));
+});
 test('PowerShell literals preserve quotes, interpolation and delimiters as data',()=>{
  const command=runCommand(fixture.job).command;
  assert.ok(command.includes(String.raw`'--input=C:\O''Brien\$(touch ignored) input.csv'`));

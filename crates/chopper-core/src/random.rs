@@ -184,6 +184,16 @@ mod tests {
     use super::*;
 
     #[test]
+    fn primary_key_ties_use_the_next_row_key_and_compare_equal_ids_once() {
+        let domain = domain("row-key-tie", 2, "[]");
+        let expected = block(&domain, 12, 1).cmp(&block(&domain, 37, 1));
+        assert_ne!(expected, Ordering::Equal);
+        assert_eq!(compare_ties(&domain, 12, 37), expected);
+        assert_eq!(compare_ties(&domain, 37, 12), expected.reverse());
+        assert_eq!(compare_ties(&domain, 12, 12), Ordering::Equal);
+    }
+
+    #[test]
     fn streamed_json_domains_match_v1_for_escaped_and_large_scopes() {
         for scope in [
             serde_json::json!([]),

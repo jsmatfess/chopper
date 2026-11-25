@@ -51,6 +51,10 @@ pub(in crate::engine) fn run() -> Result<serde_json::Value> {
     ];
     let mut cases = Vec::new();
     for (entry, expected_entry) in entries.iter().zip(expected_entries) {
+        ensure!(
+            entry.allowance()? == expected_entry.json_capacity()?,
+            "child allowance differs from the independent canonical entry"
+        );
         let mut expected = parent.lineage.clone();
         expected.push(expected_entry);
         let canonical = serde_json::to_vec(&expected)?;

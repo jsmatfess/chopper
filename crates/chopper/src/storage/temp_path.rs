@@ -5,13 +5,15 @@ use std::path::{Path, PathBuf};
 const RANDOM_BYTES: usize = TEMP_FILE_RANDOM_BYTES;
 const ATTEMPTS: usize = 128;
 
-fn random_name() -> Result<[u8; RANDOM_BYTES]> {
+fn random_name(
+    mut fill_entropy: impl FnMut(&mut [u8]) -> Result<(), getrandom::Error>,
+) -> Result<[u8; RANDOM_BYTES]> {
     const ALPHABET: &[u8; 62] = b"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let mut name = [0; RANDOM_BYTES];
     let mut filled = 0;
     while filled < name.len() {
         let mut entropy = [0; 32];
-        getrandom::getrandom(&mut entropy)
+        fill_entropy(&mut entropy)
             .map_err(|error| anyhow::anyhow!("temporary-name randomness failed: {error}"))?;
         for byte in entropy {
             // Rejection avoids modulo bias, with one stack batch normally enough.
@@ -108,15 +110,23 @@ pub(super) fn directory(
     prefix: &str,
     memory: Reservation,
 ) -> Result<(Box<Path>, Reservation)> {
-    let ((), path, memory) = create_with(parent, prefix, memory, random_name, |path| {
-        std::fs::DirBuilder::new().create(path)
-    })?;
+    let ((), path, memory) = create_with(
+        parent,
+        prefix,
+        memory,
+        || random_name(getrandom::getrandom),
+        |path| std::fs::DirBuilder::new().create(path),
+    )?;
     Ok((path, memory))
 }
 
 pub(super) fn file(parent: &Path, memory: Reservation) -> Result<(NamedTempFile, Reservation)> {
-    let (file, path, memory) =
-        create_with(parent, TEMP_FILE_PREFIX, memory, random_name, |path| {
+    let (file, path, memory) = create_with(
+        parent,
+        TEMP_FILE_PREFIX,
+        memory,
+        || random_name(getrandom::getrandom),
+        |path| {
             let mut options = std::fs::OpenOptions::new();
             options.read(true).write(true).create_new(true);
             #[cfg(all(unix, not(target_os = "wasi")))]
@@ -132,7 +142,8 @@ pub(super) fn file(parent: &Path, memory: Reservation) -> Result<(NamedTempFile,
                 );
             }
             options.open(path)
-        })?;
+        },
+    )?;
     // The absolute boxed path transfers into TempPath without discovery, joins
     // or a shrink allocation. Platform identity-preserving reopen is below.
     let path = tempfile::TempPath::try_from_path(path.into_path_buf())
@@ -186,3 +197,22 @@ pub(super) fn reopen(file: &NamedTempFile) -> io::Result<File> {
 
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(super) mod resource_contracts;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn temporary_names_reject_biased_entropy_and_refill() -> Result<()> {
+        let mut usable = [255; 32];
+        usable[..RANDOM_BYTES].copy_from_slice(&[0, 61, 62, 123, 124, 247]);
+        let mut batches = [[248; 32], usable].into_iter();
+        let name = random_name(|out| {
+            out.copy_from_slice(&batches.next().expect("requested unexpected entropy"));
+            Ok(())
+        })?;
+        assert_eq!(name, *b"a9a9a9");
+        assert!(batches.next().is_none());
+        Ok(())
+    }
+}

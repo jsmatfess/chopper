@@ -96,11 +96,15 @@ fn stable(analysis: &Analysis) -> Result<Value> {
 }
 fn parity(job: Job) -> Result<Analysis> {
     let direct = run(job.clone())?;
+    assert_snapshot_parity(&job, &direct)?;
+    Ok(direct)
+}
+fn assert_snapshot_parity(job: &Job, direct: &Analysis) -> Result<()> {
     let direct_manifest = manifest(&job.output)?;
     assert_eq!(direct_manifest[0]["type"], "job");
     // Compare parsed wire JSON on both sides; fractional timings can shift by
     // one float step in serde_json's default parser.
-    let mut report = serde_json::from_slice::<Value>(&serde_json::to_vec(&direct)?)?;
+    let mut report = serde_json::from_slice::<Value>(&serde_json::to_vec(direct)?)?;
     assert!(report
         .as_object_mut()
         .unwrap()
@@ -115,7 +119,7 @@ fn parity(job: Job) -> Result<Analysis> {
         Arc::new(|_| {}),
     )?
     .execute()?;
-    assert_eq!(stable(&direct)?, stable(&prepared)?);
+    assert_eq!(stable(direct)?, stable(&prepared)?);
     assert_eq!(
         csvs(&job.output, job.compression)?,
         csvs(&prepared_job.output, job.compression)?
@@ -135,7 +139,7 @@ fn parity(job: Job) -> Result<Analysis> {
         normalize(direct_manifest),
         normalize(manifest(&prepared_job.output)?)
     );
-    Ok(direct)
+    Ok(())
 }
 fn clean(dir: &Path, job: &Job) -> Result<()> {
     assert!(!Path::new(&job.output).exists());
@@ -251,11 +255,18 @@ fn late_wide_rows_and_soft_compressed_targets_match() -> Result<()> {
     let text = format!("a,b\n1,x\n2,{}\n3,z\n", "q".repeat(40000));
     let (_dir, mut job) = setup(text.as_bytes())?;
     job.limits.bytes = Some(41000);
-    job.limits.compressed_bytes = Some(300);
+    // A gzip member with CSV data cannot fit in its 20-byte framing alone.
+    let soft_target = 20;
+    job.limits.compressed_bytes = Some(soft_target);
     job.compression = Compression::Gzip;
-    let analysis = parity(job)?;
+    let analysis = parity(job.clone())?;
     assert_eq!(analysis.rows, 3);
     assert_eq!(analysis.largest_record_bytes, 40001);
+    let records = manifest(&job.output)?;
+    assert!(records.iter().skip(1).any(|record| {
+        record["stored_bytes"].as_u64().unwrap() > soft_target
+            && record["compressed_target_exceeded"] == true
+    }));
     Ok(())
 }
 
@@ -902,7 +913,7 @@ fn counted_balanced_output_codecs_preserve_snapshot_bytes_and_terminal_cleanup()
             job.limits.bytes = Some(4096);
             let counted = Arc::new(AtomicBool::new(false));
             let seen = counted.clone();
-            engine::run(
+            let direct = engine::run(
                 job.clone(),
                 Arc::new(AtomicBool::new(false)),
                 Arc::new(move |p| {
@@ -912,8 +923,7 @@ fn counted_balanced_output_codecs_preserve_snapshot_bytes_and_terminal_cleanup()
                 }),
             )?;
             assert!(counted.load(Ordering::SeqCst));
-            fs::remove_dir_all(&job.output)?;
-            parity(job)?;
+            assert_snapshot_parity(&job, &direct)?;
         }
         for mode in ["invalid", "cancel", "caps", "memory"] {
             let (dir, mut job) = setup(text.as_bytes())?;
@@ -1194,9 +1204,9 @@ fn unstratified_exact_assignment_keeps_snapshot_fallback() -> Result<()> {
     )?;
     assert_eq!(phases.load(Ordering::Relaxed), 1);
     assert_eq!((analysis.rows, analysis.groups), (3, 3));
+    assert_snapshot_parity(&job, &analysis)?;
     fs::remove_dir_all(&job.output)?;
     clean(dir.path(), &job)?;
-    parity(job)?;
     Ok(())
 }
 
@@ -1301,8 +1311,7 @@ fn memory_final_writers_preserve_high_fanout_bytes_and_budget_selection() -> Res
             "{memory} MiB/{files} writers"
         );
         assert_eq!(result.groups, files);
-        fs::remove_dir_all(&job.output)?;
-        parity(job.clone())?;
+        assert_snapshot_parity(&job, &result)?;
         fs::remove_dir_all(&job.output)?;
         clean(dir.path(), &job)?;
     }
@@ -1474,8 +1483,7 @@ fn bounded_final_partition_preserves_tuple_order_caps_headerless_and_empty_outpu
             )?;
             assert!(selected.load(Ordering::SeqCst));
             assert_eq!((result.rows, result.groups), (257, 24));
-            fs::remove_dir_all(&job.output)?;
-            parity(job.clone())?;
+            assert_snapshot_parity(&job, &result)?;
             fs::remove_dir_all(&job.output)?;
             clean(dir.path(), &job)?;
         }
@@ -1583,7 +1591,7 @@ fn bounded_final_partition_limits_denial_races_and_declines_never_publish_partia
         }
         let selected = Arc::new(AtomicBool::new(false));
         let observed = selected.clone();
-        engine::run(
+        let result = engine::run(
             job.clone(),
             Arc::new(AtomicBool::new(false)),
             Arc::new(move |p| {
@@ -1593,8 +1601,7 @@ fn bounded_final_partition_limits_denial_races_and_declines_never_publish_partia
             }),
         )?;
         assert!(!selected.load(Ordering::SeqCst), "{mode}");
-        fs::remove_dir_all(&job.output)?;
-        parity(job.clone())?;
+        assert_snapshot_parity(&job, &result)?;
         fs::remove_dir_all(&job.output)?;
         clean(dir.path(), &job)?;
     }
@@ -1889,15 +1896,18 @@ fn final_writer_chains_errors_declines_and_empty_parent_rules() -> Result<()> {
     for mode in ["fanout", "depth", "sort", "codec"] {
         let (dir, mut job) = setup(format!("id,text\n{}", "1,x\n".repeat(1025)).as_bytes())?;
         job.operations = if mode == "fanout" {
+            let (parents, children) = if cfg!(feature = "experimental-single-catalog-capacity") {
+                (9, 57)
+            } else if cfg!(feature = "experimental-small-final-buffers") {
+                (6, 43)
+            } else if cfg!(feature = "experimental-memory-final-writers") {
+                (3, 43)
+            } else {
+                (3, 6)
+            };
             vec![
-                Operation::Interleaved { files: 16 },
-                Operation::Interleaved {
-                    files: if cfg!(feature = "experimental-single-catalog-capacity") {
-                        64
-                    } else {
-                        32
-                    },
-                },
+                Operation::Interleaved { files: parents },
+                Operation::Interleaved { files: children },
             ]
         } else if mode == "depth" {
             vec![Operation::Interleaved { files: 1 }; 5]
@@ -1912,7 +1922,7 @@ fn final_writer_chains_errors_declines_and_empty_parent_rules() -> Result<()> {
         }
         let selected = Arc::new(AtomicBool::new(false));
         let observed = selected.clone();
-        engine::run(
+        let result = engine::run(
             job.clone(),
             Arc::new(AtomicBool::new(false)),
             Arc::new(move |p| {
@@ -1922,8 +1932,7 @@ fn final_writer_chains_errors_declines_and_empty_parent_rules() -> Result<()> {
             }),
         )?;
         assert!(!selected.load(Ordering::SeqCst), "{mode}");
-        fs::remove_dir_all(&job.output)?;
-        parity(job)?;
+        assert_snapshot_parity(&job, &result)?;
         assert_eq!(fs::read_dir(dir.path().join("temp"))?.count(), 0);
     }
     Ok(())
@@ -2221,8 +2230,7 @@ fn retained_exact_writers_match_snapshot_for_strata_rounding_text_and_named_zero
             assert_eq!(analysis.groups, 4);
             let entries = manifest(&job.output)?;
             assert_eq!(entries[1]["rows"], 0);
-            fs::remove_dir_all(&job.output)?;
-            parity(job)?;
+            assert_snapshot_parity(&job, &analysis)?;
         }
     }
     for encoding in ["utf-8", "utf-16le"] {
@@ -2402,9 +2410,7 @@ fn uncapped_single_catalog_capacity_preserves_512_writers_and_513_fallback() -> 
         )?;
         assert_eq!(direct.load(Ordering::SeqCst), expected_direct);
         assert_eq!(result.groups, files);
-        fs::remove_dir_all(&job.output)?;
-        clean(dir.path(), &job)?;
-        parity(job.clone())?;
+        assert_snapshot_parity(&job, &result)?;
         fs::remove_dir_all(&job.output)?;
         clean(dir.path(), &job)?;
     }
