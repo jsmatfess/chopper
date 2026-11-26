@@ -9320,6 +9320,32 @@
       "original_section_sha256": "bdf31d5b96ef502497c0f30a5c26381fab08ebc2c31f6cbcdb0eb51027af86cb",
       "sha256": "f7cd485babfc38dc6f203edfccad5512f2d17fe162c8d26d252875e56f82ccd4",
       "relocations": []
+    },
+    {
+      "id": "hosted-shuffle-then-partition-buffered-output-2026-11-26",
+      "title": "Hosted Shuffle then Partition buffered output (2026-11-26)",
+      "anchor": "hosted-shuffle-then-partition-buffered-output-2026-11-26",
+      "path": "docs/performance/investigations/hosted-shuffle-then-partition-buffered-output-2026-11-26.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "hosted-shuffle-then-partition-buffered-output-2026-11-26"
+      ],
+      "original_section_sha256": "b023e78c157c2ec723caf4880d879f873054efbf7fd6bff4512e595e196677f3",
+      "sha256": "2a873d60331c7fba20c7c7cdbc355b00b1947cd8bae386bf40d59c1fd3d70d23",
+      "relocations": []
+    },
+    {
+      "id": "hosted-opfs-write-size-lookup-2026-11-26",
+      "title": "Hosted OPFS write size lookup (2026-11-26)",
+      "anchor": "hosted-opfs-write-size-lookup-2026-11-26",
+      "path": "docs/performance/investigations/hosted-opfs-write-size-lookup-2026-11-26.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "hosted-opfs-write-size-lookup-2026-11-26"
+      ],
+      "original_section_sha256": "8e206e029941854b0f4b5fe5ec508ee3ac3d2414ed41673973e5abedcdd885fa",
+      "sha256": "304e0eaa0df8ba1532598dfc3a15bb5a3be9a1d6b49041820a7f1b3e6a53bbac",
+      "relocations": []
     }
   ],
   "migrated_count": 193

@@ -1,0 +1,38 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -133,7 +133,7 @@
+ }
+ function jobFor(fixture) {
+   return {
+-    operations:[{type:'partition',columns:['key']},{type:'shuffle',strategy:fixture.shuffle??'uniform'}],
++    operations:[{type:'shuffle',strategy:fixture.shuffle??'uniform'},{type:'partition',columns:['key']}],
+     compression:'none',
+     resources:{memory_mb:fixture.memory,workers:1,max_record_bytes:fixture.recordCap??1048576,grouping:'auto',
+       max_files:fixture.maxFiles??8192,temp_bytes:fixture.tempBytes??null},
+@@ -147,7 +147,7 @@
+   assert.equal(head.type,'job');
+   assert.equal(head.analysis.rows,fixture.rows);
+   assert.deepEqual(head.analysis.stages.map(stage=>[stage.operation,stage.input_groups,stage.output_groups]),
+-    [[1,1,fixture.keys],[2,fixture.keys,fixture.keys]]);
++    [[1,1,1],[2,1,fixture.keys]]);
+   const expectedFiles = ['manifest.jsonl','CHOPPER-COMPLETE.json',...entries.map(entry=>entry.path)].sort();
+   assert.deepEqual((await readdir(directory)).sort(),expectedFiles);
+   assert.deepEqual(result.files.map(file=>file.name).sort(),expectedFiles);
+@@ -161,7 +161,7 @@
+     assert.equal(entry.type,'output');
+     const key = entry.lineage[0].values[0];
+     assert.equal(entry.path,'key-'+key+'-part-'+String(index+1).padStart(8,'0')+'.csv');
+-    assert.deepEqual(entry.lineage,[{operation:0,values:[key]}]);
++    assert.deepEqual(entry.lineage,[{operation:1,values:[key]}]);
+     assert.equal(entry.compressed_target_exceeded,false);
+     assert(entry.rows>0 && entry.rows<=rowCap && entry.csv_bytes<=byteCap);
+     const path = join(directory,entry.path);
+@@ -285,7 +285,7 @@
+         const row={kind:'measurement',cell:fixture.name,pair,variant:active,seconds:result.elapsed_seconds,
+           checks,physical_plan,measurements,effective_memory_bytes,memory_plan:{...memory_plan},
+           peak_temp_bytes:result.analysis.peak_temp_bytes,storage:result.diagnostics.storage,
+-          bridge:{destination_write:result.diagnostics.execute.destination_write,source_read:result.diagnostics.execute.source_read},
++          bridge:{write:result.diagnostics.execute.write,read:result.diagnostics.execute.read,destination_write:result.diagnostics.execute.destination_write,source_read:result.diagnostics.execute.source_read},
+           sort:{sort_runs,merge_operations,resident_sorts},physical,marker:observed.marker};
+         await emit(row);
+         console.log(JSON.stringify({cell:row.cell,pair,variant:active,seconds:row.seconds,placement:physical_plan,sort_runs}));

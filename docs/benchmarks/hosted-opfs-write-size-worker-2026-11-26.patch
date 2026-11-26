@@ -1,0 +1,12 @@
+--- a/ui/src/browser/storage-worker.ts
++++ b/ui/src/browser/storage-worker.ts
+@@ -158,7 +158,8 @@
+                 const next=m.op==='write'?Math.max(old,m.offset+m.length):m.size;
+                 if(used-old+next>maximum)throw new Error('Browser storage budget exhausted, including staged output. Free storage or reduce the job size.');
+                 if(m.op==='write')n=h.write(bytes.subarray(0,m.length),{at:m.offset});else h.truncate(m.size);
+-                const actual=h.getSize();used+=actual-old;sizes.set(m.id,actual);observeSpace();
++                // Full nonempty writes on our exclusive handle extend the tracked file to next.
++                const actual=m.op==='write'&&n>0&&n===m.length?next:h.getSize();used+=actual-old;sizes.set(m.id,actual);observeSpace();
+               }
+               else if(m.op==='flush')h.flush();
+               else if(m.op!=='create')throw new Error('Unknown storage operation');

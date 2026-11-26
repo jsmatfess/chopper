@@ -1,0 +1,63 @@
+{
+  "id": "hosted-opfs-write-size-lookup-2026-11-26",
+  "title": "Retain the OPFS size query after complete writes",
+  "subsystem": "storage",
+  "question": "Can the size from an acknowledged full OPFS write save complete-Run time with the storage ledger intact?",
+  "disposition": "reject",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "The three 1.265 GB paired effects range from a 0.149-second cost to a 0.086-second saving. The median saving is 0.007 seconds, below the frozen 0.200-second gate.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Persistent bundled Chromium on WSL2 ext4 with the same feature-free WASM in both arms. Fixed 32 MiB small snapshot and 128 MiB, 49-run Uniform then Partition spill."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "Independent output readback verifies exact fields, IDs, partition membership, manifest, row and byte limits, marker and workspace retirement. Large pairs retain matching sort and cumulative logical temporary bytes."
+  },
+  "limitations": [
+    "Persistent Chromium on one host, with uncontrolled warm caches and synthetic fixtures. Aggregate bridge counters give operation counts and bytes."
+  ],
+  "exclusions": [
+    "Individual size query elapsed time, incognito and other OPFS backends, native timing and physical device I/O."
+  ],
+  "reopen_when": null,
+  "contracts": [
+    "docs/browser.md",
+    "docs/specification.md#resources-publication-and-interfaces"
+  ],
+  "schema_version": 1,
+  "date": "2026-11-26",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#hosted-opfs-write-size-lookup-2026-11-26",
+      "sha256": "8e206e029941854b0f4b5fe5ec508ee3ac3d2414ed41673973e5abedcdd885fa"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/hosted-opfs-write-size-harness-2026-11-26.patch",
+      "sha256": "48c03152e574a8ffa2e56b01f06350ef6e7f91eb2e08aa66fce0aefbb133f94f"
+    },
+    {
+      "path": "docs/benchmarks/hosted-opfs-write-size-screen-2026-11-26.jsonl",
+      "sha256": "895159480cf82ecb1c6579fc268d7d062270e74d4dd7e1f1ae2801c3db1ac4a2"
+    },
+    {
+      "path": "docs/benchmarks/hosted-opfs-write-size-verify-2026-11-26.py",
+      "sha256": "28a15e1c085520fb84f20af56037946a5fabaf672dca72bea15247e437679c9a"
+    },
+    {
+      "path": "docs/benchmarks/hosted-opfs-write-size-worker-2026-11-26.patch",
+      "sha256": "509fe675d25a1d9bb7a00e0b0b912734a8c6e3569249b19959987f6f91c93506"
+    }
+  ]
+}

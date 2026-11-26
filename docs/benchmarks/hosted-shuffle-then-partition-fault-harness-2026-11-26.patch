@@ -1,0 +1,29 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -105,7 +105,7 @@
+   return Buffer.from(blocks.join(''));
+ };
+ function config(memory, limits = {}) {
+-  return {operations:[{type:'partition',columns:['key']},{type:'shuffle',strategy:'uniform'}],
++  return {operations:[{type:'shuffle',strategy:'uniform'},{type:'partition',columns:['key']}],
+     compression:'none', resources:{memory_mb:memory,workers:1,max_record_bytes:1048576, grouping:'auto'},
+     limits:{rows:rowCap,bytes:byteCap,compressed_bytes:null,...limits}};
+ }
+@@ -125,7 +125,7 @@
+   assert.deepEqual(marker,{complete:true,files:entries.length+1,engine:'chopper-browser',version:1});
+   assert.equal(head.type, 'job');
+   assert.equal(head.analysis.rows, rows);
+-  assert.deepEqual(head.analysis.stages.map(stage=>[stage.operation,stage.input_groups,stage.output_groups]), [[1,1,keys],[2,keys,keys]]);
++  assert.deepEqual(head.analysis.stages.map(stage=>[stage.operation,stage.input_groups,stage.output_groups]), [[1,1,1],[2,1,keys]]);
+   assert.equal(result.analysis.groups, keys);
+   assert.equal(result.analysis.output_files, entries.length);
+   assert.deepEqual(result.files.map(file=>file.name).sort(), ['manifest.jsonl','CHOPPER-COMPLETE.json', ...entries.map(entry=>entry.path)].sort());
+@@ -141,7 +141,7 @@
+     const key = entry.lineage[0].values[0];
+     const digits = String(index+1).padStart(8,'0');
+     assert.equal(entry.path,'key-'+key+'-part-'+digits+'.csv');
+-    assert.deepEqual(entry.lineage,[{operation:0,values:[key]}]);
++    assert.deepEqual(entry.lineage,[{operation:1,values:[key]}]);
+     const buffer = await read(entry.path);
+     assert.equal(buffer.length,entry.csv_bytes);
+     assert.equal(buffer.length,entry.stored_bytes);

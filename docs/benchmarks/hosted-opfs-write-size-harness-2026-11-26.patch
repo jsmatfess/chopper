@@ -1,0 +1,18 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -67,0 +68,8 @@
++const workerVariants = new Map(await Promise.all(Object.entries(options.storageWorkers)
++  .map(async ([variant,path]) => {
++    const workers = await build({
++      stdin:{contents:await readFile(path,'utf8'),sourcefile:'ui/src/browser/storage-worker.ts',
++        resolveDir:'ui/src/browser',loader:'ts'},bundle:true,format:'esm',write:false,
++    });
++    return [variant,workers.outputFiles[0].contents];
++  })));
+@@ -90,0 +99,3 @@
++    } else if (path === 'storage-worker.js') {
++      res.setHeader('Content-Type','application/javascript');
++      res.end(workerVariants.get(active));
+@@ -246 +257 @@
+-    assets:Object.fromEntries([...engines,...assets].map(([name,bytes])=>[name,sha(bytes)]))});
++    assets:Object.fromEntries([...engines,...assets,...Array.from(workerVariants,([name,bytes])=>['worker:'+name,bytes])].map(([name,bytes])=>[name,sha(bytes)]))});

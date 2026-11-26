@@ -1,0 +1,87 @@
+{
+  "id": "hosted-shuffle-then-partition-buffered-output-2026-11-26",
+  "title": "Use buffered direct output for large hosted Shuffle then Partition",
+  "subsystem": "output",
+  "question": "Can the existing hosted buffered writer avoid the encoded snapshot for the fused reverse pipeline with faster complete Runs and the same producer?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "All eleven eligible pairs improved. The 1.265 GB skewed Auto job saved 3.652 seconds at the paired median and reduced each direction of tracked temporary traffic by 1.265 GB at its original 256 MiB working tier.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium",
+      "wasi-chrome-persistent"
+    ],
+    "workloads": [
+      "Exactly Uniform or Auto Shuffle followed by Partition, plain UTF-8 output, Auto grouping and one worker. Matched fixed 32 to 128 MiB and automatic 256 MiB working settings.",
+      "Persistent bundled Chromium screen, cutoff neighbours and a 1.265 GB skewed Auto spill. Installed Chrome holdout with 211 keys and 34 spill runs."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium",
+      "wasi-chrome-persistent"
+    ],
+    "summary": "Fresh complete Runs verify membership, conserved IDs and fields, order within the unchanged producer contract, lineage, serialized caps, output names, the marker and workspace retirement. Both writers clean up across seven failure cases. The buffered route completes under a 190 MiB managed cap that rejects the snapshot."
+  },
+  "limitations": [
+    "One WSL2 ext4 host with synthetic fixtures, persistent profiles and uncontrolled caches. The installed Chrome trial used actual OPFS handles through the benchmark adapter.",
+    "The active writer can overlap the final spill readers. Peak reservations matched in the measured spill cells, and combined logical storage remained near the prior peak on the large Auto case."
+  ],
+  "exclusions": [
+    "Native timing, physical device traffic, renderer RSS and real-picker performance for this direction.",
+    "Compressed output, calculated columns, Fisher–Yates and other pipeline shapes."
+  ],
+  "reopen_when": "A representative eligible workload shows a timing or admission regression with the reused writer.",
+  "contracts": [
+    "docs/specification.md#auto-planning",
+    "docs/specification.md#resources-publication-and-interfaces",
+    "docs/pipeline-rewrites.md",
+    "docs/direct-execution.md#shared-implementation-responsibilities",
+    "docs/execution-decisions.md"
+  ],
+  "schema_version": 1,
+  "date": "2026-11-26",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#hosted-shuffle-then-partition-buffered-output-2026-11-26",
+      "sha256": "b023e78c157c2ec723caf4880d879f873054efbf7fd6bff4512e595e196677f3"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/hosted-shuffle-then-partition-chrome-2026-11-26.jsonl",
+      "sha256": "8eb1f69b88167f1dd775121b6adbb8e4abbc7384e06b963617a8b9fb23233b9f"
+    },
+    {
+      "path": "docs/benchmarks/hosted-shuffle-then-partition-fault-harness-2026-11-26.patch",
+      "sha256": "7321a67be994d2a1e6375f1d613ee4682ddd14d7b6f62e5d3fc5884ac9be0b38"
+    },
+    {
+      "path": "docs/benchmarks/hosted-shuffle-then-partition-faults-2026-11-26.jsonl",
+      "sha256": "cb7ec22e626df463af316f95a6203c019d745477c9dec497ce3639bb32b71693"
+    },
+    {
+      "path": "docs/benchmarks/hosted-shuffle-then-partition-harness-2026-11-26.patch",
+      "sha256": "af08400b8965983a21f089f5ae7c33ba838839a2b573e9206e592268b819d05d"
+    },
+    {
+      "path": "docs/benchmarks/hosted-shuffle-then-partition-heldout-2026-11-26.jsonl",
+      "sha256": "54161fa58f91c530192bebef087ed6e62817a692d4aa2e65223bbebe9648280d"
+    },
+    {
+      "path": "docs/benchmarks/hosted-shuffle-then-partition-quota-2026-11-26.jsonl",
+      "sha256": "56c6fe8713a770ba0bdf36dd400614fed20ceaf670165ca688626f274f08be0f"
+    },
+    {
+      "path": "docs/benchmarks/hosted-shuffle-then-partition-screen-2026-11-26.jsonl",
+      "sha256": "c819aad8143fe2490704e08d3e7c1a9ca4e6181f1f5c09a1c4425e3bc336666d"
+    },
+    {
+      "path": "docs/benchmarks/hosted-shuffle-then-partition-verify-2026-11-26.py",
+      "sha256": "d30225b7cebfc644e1f7acd446d5e8b2830e2fa32ea493a26ce606b25ed4cb09"
+    }
+  ]
+}

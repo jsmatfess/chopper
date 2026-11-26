@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "894ff6777cc039d3894f0b5adaab5e6e5431b56fa6bc47647d29b91d9cf70583",
+  "catalog_sha256": "26b5a95ffbd73ec4769a2975eefe6d6da0f7c9009d227a86a3403990a073a214",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -2618,6 +2618,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-opfs-write-size-verify-2026-11-26.py",
+      "source_sha256": "28a15e1c085520fb84f20af56037946a5fabaf672dca72bea15247e437679c9a",
+      "aliases": [
+        "docs/benchmarks/hosted-opfs-write-size-verify-2026-11-26.py"
+      ],
+      "format": "py",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/streaming-state-engines-2026-10-16.jsonl",
       "source_sha256": "28aaea7de03b0cba416a3f18dcc9ff9bb54da273ebc5ad558198f5fe3ebc1b65",
       "aliases": [
@@ -4404,6 +4417,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-opfs-write-size-harness-2026-11-26.patch",
+      "source_sha256": "48c03152e574a8ffa2e56b01f06350ef6e7f91eb2e08aa66fce0aefbb133f94f",
+      "aliases": [
+        "docs/benchmarks/hosted-opfs-write-size-harness-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/fast-rng-micro-2026-10-18.jsonl",
       "source_sha256": "48d199533cf8129d570495ab12e24720a83a9163cfde75c36d569d123b536d37",
       "aliases": [
@@ -4978,6 +5004,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-opfs-write-size-worker-2026-11-26.patch",
+      "source_sha256": "509fe675d25a1d9bb7a00e0b0b912734a8c6e3569249b19959987f6f91c93506",
+      "aliases": [
+        "docs/benchmarks/hosted-opfs-write-size-worker-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/ascii-quoted-escapes-2026-11-05-fixtures.py",
       "source_sha256": "50aed8b352b3e83e788e95a1806ae48e110a09dbdd2c2f20196bfcee91681273",
       "aliases": [
@@ -5127,6 +5166,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-shuffle-then-partition-heldout-2026-11-26.jsonl",
+      "source_sha256": "54161fa58f91c530192bebef087ed6e62817a692d4aa2e65223bbebe9648280d",
+      "aliases": [
+        "docs/benchmarks/hosted-shuffle-then-partition-heldout-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 16
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/strategy-partition-2026-10-11.jsonl",
@@ -5404,6 +5460,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-shuffle-then-partition-quota-2026-11-26.jsonl",
+      "source_sha256": "56c6fe8713a770ba0bdf36dd400614fed20ceaf670165ca688626f274f08be0f",
+      "aliases": [
+        "docs/benchmarks/hosted-shuffle-then-partition-quota-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 1,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 1
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/retained-current-calibration-no-sampler-2026-10-21.jsonl",
@@ -6789,6 +6862,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "6b2fff094d4d876febceb76f6ba3ce343b2d1d37f7a08a71948de08524458591",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/auto-followup-2026-11-21-linux-writer-low.jsonl",
       "source_sha256": "6b3e9186aa8f39e606e6d02a581832bc4e7a1ae06631548f8c79ed8dcc6c75b5",
       "aliases": [
@@ -7318,6 +7404,19 @@
         "docs/benchmarks/reservation-entry-2026-11-05-native-lock.py"
       ],
       "format": "py",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-shuffle-then-partition-fault-harness-2026-11-26.patch",
+      "source_sha256": "7321a67be994d2a1e6375f1d613ee4682ddd14d7b6f62e5d3fc5884ac9be0b38",
+      "aliases": [
+        "docs/benchmarks/hosted-shuffle-then-partition-fault-harness-2026-11-26.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -8594,6 +8693,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-opfs-write-size-screen-2026-11-26.jsonl",
+      "source_sha256": "895159480cf82ecb1c6579fc268d7d062270e74d4dd7e1f1ae2801c3db1ac4a2",
+      "aliases": [
+        "docs/benchmarks/hosted-opfs-write-size-screen-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 14,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 14
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/terminal-uniform-short-tail-summary-2026-11-21.json",
       "source_sha256": "8961946e649ef320a5b0af00efa77b923b4a1df63f15498bbcda5868b4a33d84",
       "aliases": [
@@ -9006,6 +9122,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-shuffle-then-partition-chrome-2026-11-26.jsonl",
+      "source_sha256": "8eb1f69b88167f1dd775121b6adbb8e4abbc7384e06b963617a8b9fb23233b9f",
+      "aliases": [
+        "docs/benchmarks/hosted-shuffle-then-partition-chrome-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/resident-parent-retry-comparison-2026-11-03.json",
@@ -10885,6 +11018,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-shuffle-then-partition-harness-2026-11-26.patch",
+      "source_sha256": "af08400b8965983a21f089f5ae7c33ba838839a2b573e9206e592268b819d05d",
+      "aliases": [
+        "docs/benchmarks/hosted-shuffle-then-partition-harness-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/bounded-parent-decision-audit-builds-2026-10-21.json",
       "source_sha256": "af39c8187560b6e720e5031e275a7b26fce0ff08150a1d38c42d9e472e351ae1",
       "aliases": [
@@ -12537,6 +12683,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-shuffle-then-partition-screen-2026-11-26.jsonl",
+      "source_sha256": "c819aad8143fe2490704e08d3e7c1a9ca4e6181f1f5c09a1c4425e3bc336666d",
+      "aliases": [
+        "docs/benchmarks/hosted-shuffle-then-partition-screen-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 16
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/public-preparation-cross-runtime-2026-10-21.json",
       "source_sha256": "c8b7fa1de7e8bc7a4dd9ec434b9163091670fb82e6ea8a8de5b99a9409ed8390",
       "aliases": [
@@ -12725,6 +12888,19 @@
         "docs/benchmarks/wasi-retained-parent-contracts-2026-10-21.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-shuffle-then-partition-faults-2026-11-26.jsonl",
+      "source_sha256": "cb7ec22e626df463af316f95a6203c019d745477c9dec497ce3639bb32b71693",
+      "aliases": [
+        "docs/benchmarks/hosted-shuffle-then-partition-faults-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -13008,19 +13184,6 @@
       "coverage": "adapted"
     },
     {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "cebb10d1376787861cbc2433d95d6f4bafda2cffff17955808e19edac462b4a7",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
       "source": "docs/benchmarks/output-buffers-engines-2026-10-16.jsonl",
       "source_sha256": "cf36ae97f21d6390248efc3d137726ee3046d89c4218467ee1b526646c62e461",
       "aliases": [
@@ -13256,6 +13419,19 @@
         "docs/benchmarks/resident-allocation-admission-control-2026-11-02-private-narrative.md"
       ],
       "format": "md",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-shuffle-then-partition-verify-2026-11-26.py",
+      "source_sha256": "d30225b7cebfc644e1f7acd446d5e8b2830e2fa32ea493a26ce606b25ed4cb09",
+      "aliases": [
+        "docs/benchmarks/hosted-shuffle-then-partition-verify-2026-11-26.py"
+      ],
+      "format": "py",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
