@@ -22,6 +22,10 @@ let stages=new StageCompletions();
 let physicalLastSent=0;
 function collectPhysical(force=false){if(!observations||(!physicalHistory.summaries.size&&!physicalHistory.unavailable))return;const now=performance.now();if(!force&&physicalLastSent&&now-physicalLastSent<100)return;physicalLastSent=now;try{observations.update({physical:physicalHistory.snapshot(),unavailable:physicalHistory.unavailable||observations.unavailable});}catch{observations.update({unavailable:true});}}
 const encoder=new TextEncoder();
+function readonlyJsonFile(value:unknown){
+  // The shim views the fresh buffer but copies a Uint8Array argument.
+  return new MemoryFile(encoder.encode(JSON.stringify(value)).buffer,{readonly:true});
+}
 function accountExport(bytes:number,start:number){
   if(!bridge.profiling)return;
   bridge.record('destination_write',bytes,start);
@@ -38,7 +42,7 @@ function invoke(name:string){
 }
 function invokeJob(name:string,job:Job){
   try{
-    root.contents.set('job.json',new MemoryFile(encoder.encode(JSON.stringify(job)),{readonly:true}));
+    root.contents.set('job.json',readonlyJsonFile(job));
     return invoke(name);
   }finally{root.contents.delete('job.json');}
 }
@@ -93,7 +97,7 @@ scope.onmessage=async({data})=>{
       compression.init(loaded.module,instance.exports);
       result=invoke('chopper_defaults');
     } else if(type==='formula-preview'){
-      root.contents.set('formula-preview.json',new MemoryFile(encoder.encode(JSON.stringify(data.preview)),{readonly:true}));
+      root.contents.set('formula-preview.json',readonlyJsonFile(data.preview));
       try{result=invoke('chopper_formula_preview');}
       finally{root.contents.delete('formula-preview.json');}
     } else if(type==='run-direct'||type==='preview'||type==='sniff'||type==='profile'){
@@ -127,10 +131,10 @@ scope.onmessage=async({data})=>{
       root.contents.delete('auto-observations.json');
       root.contents.delete('preview-observations.json');
       if(type==='run-direct'&&data.previewObservations){
-        root.contents.set('preview-observations.json',new MemoryFile(encoder.encode(JSON.stringify(data.previewObservations)),{readonly:true}));
+        root.contents.set('preview-observations.json',readonlyJsonFile(data.previewObservations));
       }
       if(type==='run-direct'&&data.autoObservations){
-        root.contents.set('auto-observations.json',new MemoryFile(encoder.encode(JSON.stringify(data.autoObservations)),{readonly:true}));
+        root.contents.set('auto-observations.json',readonlyJsonFile(data.autoObservations));
       }
       if(data.resetProfile)invoke('chopper_clear_profile');
       if(type==='run-direct'&&['gzip','zip'].includes(job.compression)
