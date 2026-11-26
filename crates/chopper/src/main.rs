@@ -87,12 +87,7 @@ impl CliJob {
         }
     }
 }
-fn run_job(
-    source: CliJob,
-    yes: bool,
-    advice: Option<&std::path::Path>,
-    summary: bool,
-) -> Result<()> {
+fn run_job(source: CliJob, yes: bool, advice: Option<PathBuf>, summary: bool) -> Result<()> {
     let job = source.job();
     if !yes {
         ensure!(
@@ -132,7 +127,7 @@ fn run_job(
             "execution declined"
         );
     }
-    let hint = advice.and_then(|path| match read_advice(path) {
+    let hint = advice.and_then(|path| match read_advice(&path) {
         Ok(hint) => hint,
         Err(error) => {
             let _ = writeln!(io::stderr(), "Analyze advice unavailable: {error:#}");
@@ -220,7 +215,7 @@ fn print_command_help(arguments: &clap::ArgMatches) -> Result<()> {
 }
 
 fn main_result() -> Result<()> {
-    let matches = cli_command()
+    let mut matches = cli_command()
         .subcommand(clap::Command::new("reference-json").hide(true))
         .get_matches();
     if matches.subcommand_name() == Some("reference-json") {
@@ -229,16 +224,18 @@ fn main_result() -> Result<()> {
     if let Some(("help", arguments)) = matches.subcommand() {
         return print_command_help(arguments);
     }
-    if let Some(("run", arguments)) = matches.subcommand() {
-        let source = run_cli::source(arguments)?;
-        return run_job(
-            source,
-            arguments.get_flag("yes"),
-            arguments
-                .get_one::<PathBuf>("analysis")
-                .map(PathBuf::as_path),
-            arguments.get_flag("summary"),
-        );
+    if matches.subcommand_name() == Some("run") {
+        let (_, mut arguments) = matches
+            .remove_subcommand()
+            .expect("selected Run subcommand");
+        let source = run_cli::source(&arguments)?;
+        let yes = arguments.get_flag("yes");
+        let advice = arguments.remove_one::<PathBuf>("analysis");
+        let summary = arguments.get_flag("summary");
+        // The Job now owns its settings. Release clap's parsed values before Run.
+        drop(arguments);
+        drop(matches);
+        return run_job(source, yes, advice, summary);
     }
     match Cli::from_arg_matches(&matches)?.command {
         Command::Guide { config } => guide::run(config)?,
