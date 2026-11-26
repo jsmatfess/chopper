@@ -1,0 +1,251 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -1,10 +1,14 @@
+ import assert from 'node:assert/strict';
+ import {createHash} from 'node:crypto';
+-import {createReadStream, createWriteStream} from 'node:fs';
++import {execFile, spawn} from 'node:child_process';
++import {once} from 'node:events';
++import {setTimeout as delay} from 'node:timers/promises';
++import {promisify} from 'node:util';
++import {createReadStream, createWriteStream, openSync, closeSync} from 'node:fs';
+ import {appendFile, mkdir, readFile, readdir, rm, stat} from 'node:fs/promises';
+ import {createServer} from 'node:http';
+ import {cpus, release, totalmem} from 'node:os';
+-import {join, resolve} from 'node:path';
++import {basename, join, resolve} from 'node:path';
+ import {createInterface} from 'node:readline';
+ import {Readable} from 'node:stream';
+ import {pipeline} from 'node:stream/promises';
+@@ -39,6 +43,10 @@
+   'diagnostics.workspace_reserved_bytes === owners.reduce',
+   "diagnostics.workspace_reserved_bytes === Number((done.analysis as any).auto_plan.physical_plan === 'private_terminal') * (8192 + '/results'.length) + owners.reduce",
+ );
++replaceDriver(
++  'root = await navigator.storage.getDirectory();',
++  'root = (window as any).desktopRoot;',
++);
+ replaceDriver('  swarmCollect:', [
+   '  importFixture: async (name: string) => {',
+   "    const source = await (await navigator.storage.getDirectory()).getFileHandle(name, {create:true});",
+@@ -56,6 +64,24 @@
+   '  },',
+   '  swarmCollect:',
+ ].join('\n'));
++driver += [
++  '',
++  'const showOpen = (window as any).showOpenFilePicker.bind(window);',
++  'const showDirectory = (window as any).showDirectoryPicker.bind(window);',
++  "document.getElementById('pick-source')!.onclick = async () => {",
++  '  try {',
++  '    const [handle] = await showOpen({multiple:false});',
++  '    (window as any).fixtureFile = await handle.getFile();',
++  '  } catch(error) { (window as any).pickerError = String(error); }',
++  '};',
++  "document.getElementById('pick-destination')!.onclick = async () => {",
++  '  try {',
++  "    const handle = await showDirectory({mode:'readwrite'});",
++  "    (window as any).directoryPermission = await handle.queryPermission({mode:'readwrite'});",
++  '    (window as any).desktopRoot = handle;',
++  '  } catch(error) { (window as any).pickerError = String(error); }',
++  '};',
++].join('\n');
+ const assets = new Map();
+ for (const asset of (await build({
+   entryPoints: ['ui/src/browser/engine-worker.ts','ui/src/browser/storage-worker.ts'],
+@@ -82,7 +108,7 @@
+     const path = req.url.slice(1);
+     if (path === '') {
+       res.setHeader('Content-Type','text/html');
+-      res.end('<!doctype html><main class="editor"></main><script src="/driver.js"></script>');
++      res.end('<!doctype html><button id="pick-source">Choose input</button><button id="pick-destination">Choose output</button><main class="editor"></main><script src="/driver.js"></script>');
+     } else if (path === 'engine.wasm') {
+       res.setHeader('Content-Type','application/wasm');
+       res.end(engines.get(active));
+@@ -222,15 +248,105 @@
+     ordered_csv_sha256:hashes.digest('hex'),logical_digest:result.analysis.logical_digest,marker};
+ }
+
+-let browser;
++let browser, display, chrome;
++const exec = promisify(execFile);
++const desktopRoot = join(output,'desktop-destination');
++const displayEnv = {...process.env,DISPLAY:':97',GTK_USE_PORTAL:'0',GSETTINGS_BACKEND:'memory',XDG_SESSION_TYPE:'x11',
++  XDG_CONFIG_HOME:join(output,'chrome-config'),XDG_CACHE_HOME:join(output,'chrome-cache')};
++function displayCommand(command,args) {
++  return exec(command,args,{env:displayEnv,timeout:6000,maxBuffer:32*1024});
++}
++async function startDisplay() {
++  const log = openSync(join(output,'xvfb.log'),'wx');
++  try {
++    display=spawn(options.xvfb,[':97','-screen','0','1280x900x24','-nolisten','tcp','-noreset','-ac'],
++      {env:displayEnv,stdio:['ignore',log,log]});
++    display.on('error',error=>console.error(error));
++  } finally { closeSync(log); }
++  for(let retry=0;retry<50;retry++) {
++    try { await displayCommand('/usr/bin/xset',['q']); return; }
++    catch(error) {
++      if(display.exitCode!==null || retry===49) throw error;
++      await delay(100);
++    }
++  }
++}
++async function pick(page, selector, label, target, success) {
++  await page.locator(selector).click();
++  let windowId;
++  for(let retry=0;retry<50;retry++) {
++    try {
++      const {stdout} = await displayCommand(options.xdotool,['search','--onlyvisible','--name',label]);
++      windowId=stdout.trim().split('\n').at(-1);
++      if(windowId) break;
++    } catch(error) {
++      if(error.code!=='ENOENT' && error.code!==1) throw error;
++      await delay(100);
++    }
++  }
++  if(!windowId) {
++    const {stdout}=await displayCommand('/usr/bin/xwininfo',['-root','-tree']);
++    console.error(stdout, await page.evaluate(()=>window.pickerError));
++    console.error(await page.evaluate(()=>({visible:document.visibilityState,outer:window.outerWidth})));
++    throw new Error('Desktop chooser did not open for '+selector);
++  }
++  const capture=tag=>displayCommand('/usr/bin/ffmpeg',['-hide_banner','-loglevel','error','-f','x11grab','-framerate','1','-video_size','1280x900','-i',displayEnv.DISPLAY,'-frames:v','1','-y',join(output,selector.slice(1)+'-'+tag+'.png')]);
++  await displayCommand(options.xdotool,['windowfocus','--sync',windowId]);
++  await delay(400);
++  await displayCommand(options.xdotool,['key','--clearmodifiers','ctrl+l']);
++  await delay(500);
++  await displayCommand(options.xdotool,['type','--clearmodifiers','--delay','1','--',target]);
++  await delay(550);
++  const {stdout:geometry}=await displayCommand(options.xdotool,['getwindowgeometry','--shell',windowId]);
++  const width=Number(geometry.match(/^WIDTH=(\d+)$/m)[1]);
++  const height=Number(geometry.match(/^HEIGHT=(\d+)$/m)[1]);
++  await displayCommand(options.xdotool,['mousemove','--window',windowId,String(width-48),String(height-23),'click','1']);
++  if (selector==='#pick-destination') {
++    // The isolated 1200×800 Chrome window shows its edit-permission modal.
++    await delay(800);
++    await displayCommand(options.xdotool,['mousemove','758','224','click','1']);
++  }
++  try {
++    await page.waitForFunction(success,basename(target),{timeout:5000,polling:100});
++  } catch(error) {
++    console.error(await displayCommand('/usr/bin/xwininfo',['-root','-tree']));
++    console.error(await displayCommand(options.xdotool,['getwindowfocus','getwindowname']).catch(e=>String(e)));
++    await capture('timeout').catch(e=>console.error(e));
++    throw error;
++  }
++  const error=await page.evaluate(()=>window.pickerError);
++  if(error) throw new Error(error);
++}
+ try {
++  await mkdir(desktopRoot);
++  await startDisplay();
+   await new Promise((ok,fail)=>{server.once('error',fail);server.listen(0,'127.0.0.1',ok);});
+   const origin='http://127.0.0.1:'+server.address().port;
+-  browser=await chromium.launchPersistentContext(join(output,'profile'),{
+-    headless:true,executablePath:options.browser,
+-    args:['--no-zygote','--disable-breakpad','--disable-crash-reporter'],
+-  });
+-  const page=await browser.newPage();
++  const profile=join(output,'profile');
++  await mkdir(profile);
++  const chromeLog=openSync(join(output,'chrome.log'),'wx');
++  try {
++    chrome=spawn(options.browser,[
++      '--user-data-dir='+profile,'--remote-debugging-port=0','--ozone-platform=x11',
++      '--no-first-run','--no-default-browser-check','--disable-background-networking',
++      '--no-sandbox','--no-zygote','--disable-breakpad','--disable-crash-reporter',
++      '--disable-gpu','--window-size=1200,800','--new-window','about:blank',
++    ],{env:displayEnv,stdio:['ignore',chromeLog,chromeLog]});
++    chrome.on('error',error=>console.error(error));
++  } finally { closeSync(chromeLog); }
++  let devtoolsPort;
++  for(let retry=0;retry<80;retry++) {
++    try {
++      devtoolsPort=Number((await readFile(join(profile,'DevToolsActivePort'),'utf8')).split('\n')[0]);
++      break;
++    } catch(error) {
++      if(chrome.exitCode!==null||retry===79) throw error;
++      await delay(100);
++    }
++  }
++  browser=await chromium.connectOverCDP('http://127.0.0.1:'+devtoolsPort);
++  const page=browser.contexts()[0].pages()[0];
++  await page.bringToFront();
+   page.on('pageerror',error=>console.error(error));
+   await page.addInitScript(()=>{
+     class MeasuredWorker extends Worker {
+@@ -243,8 +359,8 @@
+     }
+     window.Worker=MeasuredWorker;
+   });
+-  await emit({kind:'environment',browser:browser.browser().version(),
+-    source_and_destination:'OPFS on WSL ext4 with warm uncontrolled caches',
++  await emit({kind:'environment',browser:browser.version(),
++    source_and_destination:'Actual GTK file and directory pickers, files on WSL ext4, OPFS intermediate storage, warm uncontrolled caches',
+     scope:'Request through verified output marker and workspace retirement including worker startup. Fixture import, verification, and successful result removal outside timing.',
+     os:release(),cpu:cpus()[0].model,cpus:cpus().length,memory_bytes:totalmem(),node:process.version,
+     config_sha256:sha(configBytes),script_sha256:await fileHash(new URL(import.meta.url)),
+@@ -263,21 +379,23 @@
+     const job=jobFor(fixture);
+     await page.goto(origin);
+     await page.waitForFunction(()=>typeof window.swarmRun==='function');
+-    await page.evaluate(name=>window.importFixture(name),fileName);
+-    await emit({kind:'fixture',...fixture,bytes:input.bytes,sha256:await fileHash(fixturePath),job});
++    await pick(page,'#pick-source','^(Open( files?)?|Select a file this site can read)$',fixturePath,name=>window.pickerError||window.fixtureFile?.name===name);
++    await pick(page,'#pick-destination','^(Open|Select|Choose).*',desktopRoot,
++      name=>window.pickerError||window.desktopRoot?.name===name);
++    const permission=await page.evaluate(()=>window.directoryPermission);
++    assert.equal(permission,'granted');
++    await emit({kind:'fixture',...fixture,bytes:input.bytes,sha256:await fileHash(fixturePath),job,permission});
+     const arms=fixture.variants??variants;
+     for(let pair=fixture.warmup ? -1 : 0;pair<fixture.pairs;pair++) for (const index of arms.keys()) {
+       active=arms[(index+pair+arms.length)%arms.length];
+       const name=fixture.name+'-'+pair+'-'+active;
+-      const directory=join(output,name);
+-      await mkdir(directory);
+       try {
+         const result=await page.evaluate(([job,timeout])=>window.swarmRun(job,timeout),[job,options.runTimeout]);
+         const observed=await page.evaluate(()=>window.finalObservation);
+-        capture={directory,files:new Map(result.files.map(({name,size})=>[name,size]))};
+-        await page.evaluate(()=>window.sendExport());
+-        assert.equal(capture.files.size,0);
+-        capture=null;
++        const subfolder=result.output.split('/').at(-1);
++        assert(/^swarm-[a-f0-9-]+$/.test(result.owned_destination));
++        assert(/^chopper-results-[a-f0-9-]+$/.test(subfolder));
++        const directory=join(desktopRoot,result.owned_destination,subfolder);
+         const checks=await verify(directory,result,fixture,job);
+         const {physical_plan,measurements,effective_memory_bytes,memory_plan}=result.analysis.auto_plan;
+         const expected=fixture.expect?.[active]??(active==='baseline'?'snapshot':'private_terminal');
+@@ -290,7 +408,7 @@
+         assert.equal(observed.marker.status,'completed');
+         assert.equal(observed.unavailable,false);
+         await page.evaluate(()=>window.swarmCleanup());
+-        await rm(directory,{recursive:true});
++        assert.deepEqual(await readdir(desktopRoot),[]);
+         const {sort_runs,merge_operations,resident_sorts}=result.analysis.diagnostics;
+         const row={kind:'measurement',cell:fixture.name,pair,variant:active,seconds:result.elapsed_seconds,
+           checks,physical_plan,measurements,effective_memory_bytes,memory_plan:{...memory_plan},
+@@ -307,7 +425,21 @@
+     }
+   }
+ } finally {
+-  await browser?.close();
++  try {
++    if(browser?.isConnected()) {
++      const cdp=await browser.newBrowserCDPSession().catch(()=>null);
++      await cdp?.send('Browser.close').catch(()=>{});
++      await browser.close();
++    }
++  } finally {
++    for(const child of [chrome,display]) {
++      if(child && child.exitCode===null && child.signalCode===null) {
++        const exited=once(child,'exit');
++        child.kill('SIGTERM');
++        await exited;
++      }
++    }
++  }
+   server.closeAllConnections();
+   await new Promise(ok=>server.close(ok));
+ }

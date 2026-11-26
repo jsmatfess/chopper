@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "1bd4d42f326072a212ca034ac0d07e0dcb5146eefab160b97a0d7a5f550fa54e",
+  "analysis_script_sha256": "d61324fa815bd3fa863db1d1ae13330730a440d6409782c1b2d8f6a993a43c45",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "18bd1c75a37a0bace90a9f37e447334a5c455a91365d3d3e985dafca915e3886"
+    "sha256": "768dc5a5ffdfb27a2ece3ce8c08147707b578eecc6fb84c41c3d073f841b5151"
   },
   "families": [
     "adaptive-routing",
@@ -5045,6 +5045,32 @@
       "narrative": {
         "path": "docs/performance/investigations/hosted-partition-shuffle-direct-output-2026-11-26.md",
         "sha256": "8a5379d5ff9bba9e0a75f111c0f3b30bb3cdfdfff52673e8a4b5e4aa4657dcd5",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Guarded hosted partition shuffle publication (2026-11-26)",
+      "evidence": "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-desktop-2026-11-26.jsonl",
+        "docs/benchmarks/guarded-hosted-partition-shuffle-faults-2026-11-26.jsonl",
+        "docs/benchmarks/guarded-hosted-partition-shuffle-harness-2026-11-26.mjs",
+        "docs/benchmarks/guarded-hosted-partition-shuffle-harness-controls-2026-11-26.patch",
+        "docs/benchmarks/guarded-hosted-partition-shuffle-harness-desktop-2026-11-26.patch",
+        "docs/benchmarks/guarded-hosted-partition-shuffle-harness-heldout-2026-11-26.patch",
+        "docs/benchmarks/guarded-hosted-partition-shuffle-qualifier-2026-11-26.jsonl",
+        "docs/benchmarks/guarded-hosted-partition-shuffle-quota-2026-11-26.jsonl",
+        "docs/benchmarks/guarded-hosted-partition-shuffle-scale-2026-11-26.jsonl",
+        "docs/benchmarks/guarded-hosted-partition-shuffle-screen-2026-11-26.jsonl",
+        "docs/benchmarks/guarded-hosted-partition-shuffle-verify-pairs-2026-11-26.py"
+      ],
+      "scripts": [
+        "scripts/build-browser.mjs"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/guarded-hosted-partition-shuffle-publication-2026-11-26.md",
+        "sha256": "f7cd485babfc38dc6f203edfccad5512f2d17fe162c8d26d252875e56f82ccd4",
         "topic": "ownership-and-lifecycle"
       },
       "family": "ownership-and-lifecycle"
@@ -26101,6 +26127,487 @@
           }
         }
       },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-desktop-2026-11-26.jsonl",
+      "sha256": "57128b2111c0acdaec503bda999088a9be5503da235cd73ab2a6cbe756ac6790",
+      "bytes": 19496,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 10
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "permission",
+        "physical",
+        "physical_plan",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "skewEvery",
+        "sort",
+        "source_and_destination",
+        "storage",
+        "variant",
+        "warmup",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 10
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-faults-2026-11-26.jsonl",
+      "sha256": "22367f919a6e2e414b9f3074db683c22ad0cd268f25e7158b8acde3ee9688595",
+      "bytes": 20290,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 15
+      },
+      "fields": [
+        "assets",
+        "browser",
+        "browser_executable_sha256",
+        "context",
+        "cpu",
+        "cpus",
+        "harness_sha256",
+        "inspect",
+        "kind",
+        "markerOpened",
+        "memory_bytes",
+        "node",
+        "os",
+        "reached",
+        "result",
+        "runEvents",
+        "scope",
+        "stock_driver_sha256",
+        "test",
+        "variant"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 15
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-2026-11-26.mjs",
+      "sha256": "1f617cdb46742f59106d5f9055d6f9576dd6f3efbc868e0bb67286d478cd9d79",
+      "bytes": 15030,
+      "format": "mjs",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-controls-2026-11-26.patch",
+      "sha256": "f918b000050e374cb57056c46f8b3fffb1b9b0157048f13694fa6e31a9420e24",
+      "bytes": 3374,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-desktop-2026-11-26.patch",
+      "sha256": "3eaeee782f632cd5e825c9a103e0abf0d52c98995c40bf91a09f83746a67e026",
+      "bytes": 12553,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-heldout-2026-11-26.patch",
+      "sha256": "a32221ec48aad7b483abf9026560047e4e6e8b23eb7c87bbecedbea624fe7d42",
+      "bytes": 3497,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-qualifier-2026-11-26.jsonl",
+      "sha256": "06ec4068d96e9e7a3b90d284b03afabce5b4ab8d90a1eaa0ff87101e67e62038",
+      "bytes": 49462,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 26
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "expect",
+        "gzip",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "recordCap",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shuffle",
+        "sort",
+        "source_and_destination",
+        "storage",
+        "variant",
+        "wideLast",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 26
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-quota-2026-11-26.jsonl",
+      "sha256": "834fd60f01310d232f9b83a8423abf9badae87a7f1ccf27b0e786848c6f29222",
+      "bytes": 5037,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 4
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "browser_executable_sha256",
+        "bytes",
+        "cell",
+        "checks",
+        "completedStages",
+        "context",
+        "cpu",
+        "cpus",
+        "error",
+        "export",
+        "harness_sha256",
+        "inspect",
+        "job",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_storage",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "resources",
+        "rows",
+        "runEvents",
+        "scope",
+        "seconds",
+        "sha256",
+        "stock_driver_sha256",
+        "tempBytes",
+        "unavailable",
+        "variant",
+        "width"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 4
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-scale-2026-11-26.jsonl",
+      "sha256": "efa52bea51878815247d4081fb1ba6a8469dedc0bea46cf396428ea20afa4f7e",
+      "bytes": 15115,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 8
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "skewEvery",
+        "sort",
+        "source_and_destination",
+        "storage",
+        "variant",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 8
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-screen-2026-11-26.jsonl",
+      "sha256": "ac4fba1257fc653c20d8bc35b9fe80471c2807196f9d04a32d7bc9aa8074fc78",
+      "bytes": 52341,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 26
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "skewEvery",
+        "sort",
+        "source_and_destination",
+        "storage",
+        "variant",
+        "warmup",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 26
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-verify-pairs-2026-11-26.py",
+      "sha256": "d38ac08c0b443704e8ef006b28cd7aaa420f07ef898ef1c5ddcaee021d1e6a4d",
+      "bytes": 2175,
+      "format": "py",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {

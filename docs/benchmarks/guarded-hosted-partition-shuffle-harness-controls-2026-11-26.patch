@@ -1,0 +1,52 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -7,8 +7,8 @@
+ import {build, stop} from '../../ui/node_modules/esbuild/lib/main.js';
+ import {chromium} from '../../ui/node_modules/playwright/index.mjs';
+
+-const [baseline, direct256, direct512, destination, mode, browserExecutable] = process.argv.slice(2);
+-assert(baseline && direct256 && direct512 && destination && browserExecutable && ['smoke', 'measure', 'faults', 'quota'].includes(mode));
++const [baseline, selector, destination, mode, browserExecutable] = process.argv.slice(2);
++assert(baseline && selector && destination && browserExecutable && ['smoke', 'measure', 'faults', 'quota'].includes(mode));
+ const output = resolve(destination);
+ const script = new URL(import.meta.url);
+ const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+@@ -36,7 +36,7 @@
+ const assets = Object.fromEntries(workers.outputFiles.map(file=>[file.path.split('/').at(-1),file.contents]));
+ assets['driver.js'] = compiled.outputFiles[0].contents;
+ await stop();
+-const engines = {baseline:await readFile(baseline),direct256:await readFile(direct256),direct512:await readFile(direct512)};
++const engines = {baseline:await readFile(baseline),selector:await readFile(selector)};
+ const variants = Object.keys(engines);
+ const storageWrapper = `import '/storage-worker-production.js';
+ const open = FileSystemFileHandle.prototype.createWritable;
+@@ -230,9 +230,9 @@
+     assets:Object.fromEntries(Object.entries({...engines,...assets}).map(([name,bytes])=>[name,sha(bytes)])),
+     scope:'Run request through verified completion marker and worker retirement. Excludes fixture import, output verification and successful-result removal.'});
+   if (mode === 'faults') {
+-    const source = rowsFor(30001, 240);
++    const source = rowsFor(420003, 240);
+     for (const variant of variants) for (const test of ['write','marker','marker-content','cancel','file-limit','byte-cap','malformed']) {
+-      fixture = test === 'malformed' ? Buffer.concat([source,Buffer.from('30001,g1\n')]) : source;
++      fixture = test === 'malformed' ? Buffer.concat([source,Buffer.from('420003,g3\n')]) : source;
+       active = variant;
+       fault = ['write','marker','marker-content','cancel'].includes(test) ? test : null;
+       await page.goto(origin);
+@@ -240,7 +240,7 @@
+       const job = config(32, test === 'byte-cap' ? {bytes:64} : {});
+       if (test === 'file-limit') job.resources.max_files = 2;
+       const running = page.evaluate(async job => {
+-        try { await window.swarmRun(job, 20); return {success:true}; }
++        try { await window.swarmRun(job, 60); return {success:true}; }
+         catch(error) { return {error:String(error)}; }
+       },job);
+       if (test === 'cancel') {
+@@ -256,7 +256,7 @@
+       assert.equal(inspect.diagnostics.storage.workspace_bytes_after_cleanup,0);
+       assert.equal(inspect.state.status,test === 'cancel' ? 'cancelled' : 'failed');
+       if (fault) assert(reached?.closedCsv > 0);
+-      if (test === 'marker' || test === 'marker-content') assert.deepEqual(markerOpened,{openFiles:[],closedCsv:16});
++      if (test === 'marker' || test === 'marker-content') assert.deepEqual(markerOpened,{openFiles:[],closedCsv:208});
+       else assert.equal(markerOpened,undefined);
+       if (test === 'malformed') assert(!runEvents.includes('destination-opened'));
+       assert(!result.success);

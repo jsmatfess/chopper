@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "9c91c4cf1f58cc01a5b12a872303a160955ed375ec50ec585c89a56f60900bb3",
+  "catalog_sha256": "894ff6777cc039d3894f0b5adaab5e6e5431b56fa6bc47647d29b91d9cf70583",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -377,6 +377,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-qualifier-2026-11-26.jsonl",
+      "source_sha256": "06ec4068d96e9e7a3b90d284b03afabce5b4ab8d90a1eaa0ff87101e67e62038",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-qualifier-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 20,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 20
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/dynamic-pressure-browser-2026-10-16.json",
@@ -1886,6 +1903,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-2026-11-26.mjs",
+      "source_sha256": "1f617cdb46742f59106d5f9055d6f9576dd6f3efbc868e0bb67286d478cd9d79",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-harness-2026-11-26.mjs"
+      ],
+      "format": "mjs",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/zip-metadata-probe-summary-2026-10-21.json",
       "source_sha256": "1f78c97ed9e0776b11a3c2eb6d84486e22761bc58d373a55243f1d06af53ca5d",
       "aliases": [
@@ -2102,6 +2132,19 @@
         "unclassified": 8
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-faults-2026-11-26.jsonl",
+      "source_sha256": "22367f919a6e2e414b9f3074db683c22ad0cd268f25e7158b8acde3ee9688595",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-faults-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/native-auto-bounds-2026-11-22-smoke.json",
@@ -3792,6 +3835,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-desktop-2026-11-26.patch",
+      "source_sha256": "3eaeee782f632cd5e825c9a103e0abf0d52c98995c40bf91a09f83746a67e026",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-harness-desktop-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/execution-graph-diagnostic-002-summary-2026-11-05.json",
       "source_sha256": "3ecc5a5ae235afe1ccfdc16e69ad44974823475096797a121b4e01eaaf195185",
       "aliases": [
@@ -5362,6 +5418,23 @@
       "observation_records": 0,
       "validation_records": 1,
       "classes": {},
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-desktop-2026-11-26.jsonl",
+      "source_sha256": "57128b2111c0acdaec503bda999088a9be5503da235cd73ab2a6cbe756ac6790",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-desktop-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
       "coverage": "adapted"
     },
     {
@@ -8177,6 +8250,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-quota-2026-11-26.jsonl",
+      "source_sha256": "834fd60f01310d232f9b83a8423abf9badae87a7f1ccf27b0e786848c6f29222",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-quota-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 1,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 1
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/auto-followup-2026-11-21-browser-merge-pass.jsonl",
       "source_sha256": "8352d990b11001741b6a96a847034874087ee7355f3de6e0e4c5fd8e12a7b6f3",
       "aliases": [
@@ -10147,6 +10237,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-heldout-2026-11-26.patch",
+      "source_sha256": "a32221ec48aad7b483abf9026560047e4e6e8b23eb7c87bbecedbea624fe7d42",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-harness-heldout-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/profile-rows-summary-2026-10-16.json",
       "source_sha256": "a3489abcf7bdfec0322e2bfd9028261c2ed1be602a66f017163c5a7a3aec58b6",
       "aliases": [
@@ -10551,6 +10654,23 @@
       "classes": {
         "allocation-census": 36,
         "measurement": 108
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-screen-2026-11-26.jsonl",
+      "source_sha256": "ac4fba1257fc653c20d8bc35b9fe80471c2807196f9d04a32d7bc9aa8074fc78",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-screen-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 22,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 22
       },
       "coverage": "adapted"
     },
@@ -12888,6 +13008,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "cebb10d1376787861cbc2433d95d6f4bafda2cffff17955808e19edac462b4a7",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/output-buffers-engines-2026-10-16.jsonl",
       "source_sha256": "cf36ae97f21d6390248efc3d137726ee3046d89c4218467ee1b526646c62e461",
       "aliases": [
@@ -13153,6 +13286,19 @@
         "docs/benchmarks/prepared-job-owner-validation-2026-10-23.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-verify-pairs-2026-11-26.py",
+      "source_sha256": "d38ac08c0b443704e8ef006b28cd7aaa420f07ef898ef1c5ddcaee021d1e6a4d",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-verify-pairs-2026-11-26.py"
+      ],
+      "format": "py",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -13554,19 +13700,6 @@
         "measurement": 2
       },
       "coverage": "adapted"
-    },
-    {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "d8ac48af8bb1a4986548732a657ac2d82f2858e0f9e45d4dce6ffbfbdba5d784",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/compact-external-multilevel-2026-10-14.jsonl",
@@ -14987,6 +15120,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-scale-2026-11-26.jsonl",
+      "source_sha256": "efa52bea51878815247d4081fb1ba6a8469dedc0bea46cf396428ea20afa4f7e",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-scale-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 6,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 6
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/shared-memory-browser-2026-10-16.json",
       "source_sha256": "efbc4249fb48c488c6fd8d2edc4d2811f6978b43817d20a3b38cb64d199ac6ea",
       "aliases": [
@@ -15644,6 +15794,19 @@
         "docs/benchmarks/shuffle-partition-trap-repro-8m-2026-10-16.jsonl"
       ],
       "format": "jsonl",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-controls-2026-11-26.patch",
+      "source_sha256": "f918b000050e374cb57056c46f8b3fffb1b9b0157048f13694fa6e31a9420e24",
+      "aliases": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-harness-controls-2026-11-26.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,

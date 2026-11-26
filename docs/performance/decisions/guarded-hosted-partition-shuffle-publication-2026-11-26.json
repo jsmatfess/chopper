@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "id": "guarded-hosted-partition-shuffle-publication-2026-11-26",
+  "title": "Adopt buffered direct output for qualifying hosted partition shuffles",
+  "date": "2026-11-26",
+  "subsystem": "output",
+  "question": "Can the hosted planner choose direct output cheaply and reliably for large partition shuffles while preserving the existing sort and publication contracts?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Select a capped 512 KiB writer at the final traversal for qualifying hosted Partition then Uniform or Auto, at a validated output lower bound of 96 MiB and sufficient live headroom. A 3.253 GB spill job saved a paired median 9.764 s and reduced peak managed temporary storage from 6.781 GB to 3.529 GB.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium",
+      "wasi-chrome-persistent"
+    ],
+    "workloads": [
+      "Plain UTF-8 output, one worker, automatic grouping. Matched synthetic external and resident Runs, 32 MiB through 384 MiB fixed and applicable Auto memory tiers.",
+      "Held-out below and above the cutoff, 1,536 groups with a 64 KiB cap, a late wide record, and a 7.46 MB gzip input with 260.8 MB validated plain output.",
+      "Three 3.253 GB OPFS pairs with a 38-way merge. Three 563.1 MB desktop Chrome pairs with an actual ext4 destination and 22-way merge."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium",
+      "wasi-chrome-persistent"
+    ],
+    "summary": "Every measured export verifies exact payloads, membership, names and caps. Observed routes, matched sort topology and memory tiers, marker ordering and cleanup passed. Fourteen injected or input failure cases, a late writer admission recipe with a held peer grant, and a 190 MiB managed quota control passed."
+  },
+  "limitations": [
+    "One WSL2 ext4 host with warm uncontrolled caches and synthetic layouts. Bundled Chromium used OPFS handles and desktop Chrome used actual picker grants in an isolated display.",
+    "The 96 MiB floor is a conservative selection boundary tested on this panel. Other workload crossovers can differ.",
+    "Spilling jobs retained nearly the same combined logical storage peak. The late shared-memory boundary models live owner overlap with controlled grants."
+  ],
+  "exclusions": [
+    "Native throughput, RSS, CPU time, physical device traffic, compressed output, formulas, and other pipeline shapes.",
+    "Concurrent browser timing, other browser families, and other storage devices."
+  ],
+  "reopen_when": "Additional output shapes qualify for a dedicated overlap and export assessment, or representative larger jobs show a different elapsed-time or admission boundary.",
+  "supersedes": [
+    "hosted-partition-shuffle-direct-output-2026-11-26"
+  ],
+  "sources": [
+    {
+      "section": "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26",
+      "sha256": "bdf31d5b96ef502497c0f30a5c26381fab08ebc2c31f6cbcdb0eb51027af86cb"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-desktop-2026-11-26.jsonl",
+      "sha256": "57128b2111c0acdaec503bda999088a9be5503da235cd73ab2a6cbe756ac6790"
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-faults-2026-11-26.jsonl",
+      "sha256": "22367f919a6e2e414b9f3074db683c22ad0cd268f25e7158b8acde3ee9688595"
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-2026-11-26.mjs",
+      "sha256": "1f617cdb46742f59106d5f9055d6f9576dd6f3efbc868e0bb67286d478cd9d79"
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-controls-2026-11-26.patch",
+      "sha256": "f918b000050e374cb57056c46f8b3fffb1b9b0157048f13694fa6e31a9420e24"
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-desktop-2026-11-26.patch",
+      "sha256": "3eaeee782f632cd5e825c9a103e0abf0d52c98995c40bf91a09f83746a67e026"
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-harness-heldout-2026-11-26.patch",
+      "sha256": "a32221ec48aad7b483abf9026560047e4e6e8b23eb7c87bbecedbea624fe7d42"
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-qualifier-2026-11-26.jsonl",
+      "sha256": "06ec4068d96e9e7a3b90d284b03afabce5b4ab8d90a1eaa0ff87101e67e62038"
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-quota-2026-11-26.jsonl",
+      "sha256": "834fd60f01310d232f9b83a8423abf9badae87a7f1ccf27b0e786848c6f29222"
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-scale-2026-11-26.jsonl",
+      "sha256": "efa52bea51878815247d4081fb1ba6a8469dedc0bea46cf396428ea20afa4f7e"
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-screen-2026-11-26.jsonl",
+      "sha256": "ac4fba1257fc653c20d8bc35b9fe80471c2807196f9d04a32d7bc9aa8074fc78"
+    },
+    {
+      "path": "docs/benchmarks/guarded-hosted-partition-shuffle-verify-pairs-2026-11-26.py",
+      "sha256": "d38ac08c0b443704e8ef006b28cd7aaa420f07ef898ef1c5ddcaee021d1e6a4d"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md#auto-planning",
+    "docs/specification.md#resources-publication-and-interfaces",
+    "docs/pipeline-rewrites.md",
+    "docs/direct-execution.md#shared-implementation-responsibilities",
+    "docs/execution-decisions.md"
+  ]
+}

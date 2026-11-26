@@ -9307,6 +9307,19 @@
       "original_section_sha256": "70167fd8d3baf5221e7e2a474a0b2c735c9e9b7d6f1fe98165226674d34939d9",
       "sha256": "8a5379d5ff9bba9e0a75f111c0f3b30bb3cdfdfff52673e8a4b5e4aa4657dcd5",
       "relocations": []
+    },
+    {
+      "id": "guarded-hosted-partition-shuffle-publication-2026-11-26",
+      "title": "Guarded hosted partition shuffle publication (2026-11-26)",
+      "anchor": "guarded-hosted-partition-shuffle-publication-2026-11-26",
+      "path": "docs/performance/investigations/guarded-hosted-partition-shuffle-publication-2026-11-26.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "guarded-hosted-partition-shuffle-publication-2026-11-26"
+      ],
+      "original_section_sha256": "bdf31d5b96ef502497c0f30a5c26381fab08ebc2c31f6cbcdb0eb51027af86cb",
+      "sha256": "f7cd485babfc38dc6f203edfccad5512f2d17fe162c8d26d252875e56f82ccd4",
+      "relocations": []
     }
   ],
   "migrated_count": 193

@@ -1,0 +1,72 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -8,6 +8,7 @@
+ import {createInterface} from 'node:readline';
+ import {Readable} from 'node:stream';
+ import {pipeline} from 'node:stream/promises';
++import {createGzip} from 'node:zlib';
+ import {build, stop} from '../../ui/node_modules/esbuild/lib/main.js';
+ import {chromium} from '../../ui/node_modules/playwright/index.mjs';
+
+@@ -39,8 +40,8 @@
+   "diagnostics.workspace_reserved_bytes === Number((done.analysis as any).auto_plan.physical_plan === 'private_terminal') * (8192 + '/results'.length) + owners.reduce",
+ );
+ replaceDriver('  swarmCollect:', [
+-  '  importFixture: async () => {',
+-  "    const source = await (await navigator.storage.getDirectory()).getFileHandle('fixture.csv', {create:true});",
++  '  importFixture: async (name: string) => {',
++  "    const source = await (await navigator.storage.getDirectory()).getFileHandle(name, {create:true});",
+   "    const response = await fetch('/input.csv');",
+   "    check(response.ok, 'Fixture fetch failed');",
+   '    await response.body!.pipeTo(await source.createWritable());',
+@@ -119,6 +120,11 @@
+     : 'g0000';
+ }
+ const payloadFor = (id,width) => String.fromCharCode(97+id%26).repeat(width);
++function fixturePayload(id,fixture,payloads) {
++  return fixture.wideLast && id===fixture.rows-1
++    ? payloadFor(id,fixture.wideLast)
++    : payloads[id%payloads.length][id%26];
++}
+ function* csv(fixture) {
+   const widths = fixture.widths;
+   const payloads = widths.map(width => Array.from({length:26},(_,id)=>payloadFor(id,width)));
+@@ -126,7 +132,7 @@
+   for(let offset=0;offset<fixture.rows;offset+=1024) {
+     const block = [];
+     for(let id=offset;id<Math.min(offset+1024,fixture.rows);id++) {
+-      block.push(id+','+keyFor(id,fixture)+','+payloads[id%widths.length][id%26]+'\n');
++      block.push(id+','+keyFor(id,fixture)+','+fixturePayload(id,fixture,payloads)+'\n');
+     }
+     yield block.join('');
+   }
+@@ -190,7 +196,7 @@
+         assert.equal(fieldKey,key);
+         assert.equal(fieldKey,keyFor(id,fixture));
+         assert.equal(extra,undefined);
+-        assert.equal(payload,payloads[id%payloads.length][id%26]);
++        assert.equal(payload,fixturePayload(id,fixture,payloads));
+         seen[id]=1;
+         descents += Number(id<previous);
+         previous=id;
+@@ -247,13 +253,17 @@
+   for (const fixture of options.cases) {
+     assert(/^[a-z0-9-]+$/.test(fixture.name));
+     active='baseline';
+-    const fixturePath=join(output,fixture.name+'.csv');
+-    await pipeline(Readable.from(csv(fixture)),createWriteStream(fixturePath,{flags:'wx'}));
++    const fileName=fixture.name+'.csv'+(fixture.gzip?'.gz':'');
++    const fixturePath=join(output,fileName);
++    const source=Readable.from(csv(fixture));
++    const file=createWriteStream(fixturePath,{flags:'wx'});
++    if(fixture.gzip) await pipeline(source,createGzip({level:1}),file);
++    else await pipeline(source,file);
+     input={path:fixturePath,bytes:(await stat(fixturePath)).size};
+     const job=jobFor(fixture);
+     await page.goto(origin);
+     await page.waitForFunction(()=>typeof window.swarmRun==='function');
+-    await page.evaluate(()=>window.importFixture());
++    await page.evaluate(name=>window.importFixture(name),fileName);
+     await emit({kind:'fixture',...fixture,bytes:input.bytes,sha256:await fileHash(fixturePath),job});
+     const arms=fixture.variants??variants;
+     for(let pair=fixture.warmup ? -1 : 0;pair<fixture.pairs;pair++) for (const index of arms.keys()) {
