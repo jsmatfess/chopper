@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "f721df01348b0e6829455003ee7ec9d17615148bf884228883d5615ab90e617b",
+  "catalog_sha256": "2c80e78cd1108c33f07bb9dd5449b6e228687812c1a1e54d1a666ab78cb27faa",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -3185,6 +3185,19 @@
         "docs/benchmarks/ascii-quote-detection-2026-11-05.py"
       ],
       "format": "py",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-opfs-spill-read-copy-2026-11-25-summary.json",
+      "source_sha256": "346f1c85878dde13ecc3acaa4067e7413ccd9b7fa8103f44e59104c03d5de913",
+      "aliases": [
+        "docs/benchmarks/hosted-opfs-spill-read-copy-2026-11-25-summary.json"
+      ],
+      "format": "json",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -6998,6 +7011,19 @@
         "measurement": 108
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "71bc15588e64f0924a8553c3939445be541762e2a78a7269c634dca14c66038d",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/job-manifest-cross-runtime-2026-10-21.json",
@@ -13225,19 +13251,6 @@
       "coverage": "adapted"
     },
     {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "d866f5365d847321f29a4678a848395122b390720e65011fb494eb6d1ca050c6",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
       "source": "docs/benchmarks/compact-external-multilevel-2026-10-14.jsonl",
       "source_sha256": "d8bedb532f8a920caf8bb35f04722605ab6439c8f01bfcbf04acd1aff5f5158a",
       "aliases": [
@@ -15598,6 +15611,12 @@
       "section": "docs/validation.md#browser-opfs-workspace-deletion-conflict",
       "title": "Browser OPFS workspace deletion conflict",
       "section_sha256": "da09ac0e81e62eb88f4c462a27e7480f33aa0444319974556005f46b21fa3749",
+      "status": "not-inferred-from-prose"
+    },
+    {
+      "section": "docs/validation.md#browser-opfs-selected-destination-removal",
+      "title": "Browser OPFS selected destination removal",
+      "section_sha256": "04ab3dddbfe8a5221a5671f2ad56fef7b6b881198b54949be18c996154b6f54e",
       "status": "not-inferred-from-prose"
     },
     {

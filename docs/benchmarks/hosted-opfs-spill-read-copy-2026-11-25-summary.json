@@ -1,0 +1,957 @@
+{
+  "type": "paired-summary",
+  "issue": 90,
+  "cells": [
+    {
+      "fixture": {
+        "name": "external-uniform",
+        "rows": 800000,
+        "groups": 8,
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "uniform"
+          }
+        ],
+        "payload_bytes": 240,
+        "bytes": 199888905,
+        "sha256": "88a17fab4636b32987631598c516a16dd87c02eaec4dbc660e68f3a1e66d6145"
+      },
+      "clock": "Run command through marker close and workspace retirement, independent byte and row checks outside clock",
+      "limits": {
+        "maximum_pair_added_seconds": 0.5,
+        "maximum_median_added_seconds": 0.1,
+        "minimum_median_improvement_seconds": 0.1
+      },
+      "work_shape": {
+        "sort_runs": 3,
+        "merge_operations": 1,
+        "merge_inputs": 3,
+        "resident_sorts": 0,
+        "temporary_bytes_read": 255088890,
+        "temporary_bytes_written": 454984352,
+        "temporary_files_created": 7,
+        "bridge_read_calls": 4659,
+        "bridge_read_bytes": 454984352
+      },
+      "median_paired_seconds_saved": 0.34470999979972916,
+      "savings_range_seconds": [
+        0.28444499993324435,
+        0.3830599999427804
+      ],
+      "arm_seconds": {
+        "baseline": {
+          "median": 14.534295000076295,
+          "range": [
+            14.529049999952317,
+            14.608649999856949
+          ]
+        },
+        "candidate": {
+          "median": 14.244605000019073,
+          "range": [
+            14.151235000133514,
+            14.26394000005722
+          ]
+        }
+      },
+      "pairs": [
+        {
+          "round": 0,
+          "baseline_seconds": 14.529049999952317,
+          "candidate_seconds": 14.244605000019073,
+          "seconds_saved": 0.28444499993324435,
+          "workspace_peak_bytes": [
+            134485443,
+            134485443
+          ]
+        },
+        {
+          "round": 1,
+          "baseline_seconds": 14.534295000076295,
+          "candidate_seconds": 14.151235000133514,
+          "seconds_saved": 0.3830599999427804,
+          "workspace_peak_bytes": [
+            134485443,
+            134485443
+          ]
+        },
+        {
+          "round": 2,
+          "baseline_seconds": 14.608649999856949,
+          "candidate_seconds": 14.26394000005722,
+          "seconds_saved": 0.34470999979972916,
+          "workspace_peak_bytes": [
+            134485443,
+            134485443
+          ]
+        }
+      ],
+      "runs": [
+        {
+          "receipt_line": 5,
+          "round": -1,
+          "arm": "candidate",
+          "warmup": true,
+          "elapsed_seconds": 14.158305000066758,
+          "peak_workspace_reserved_bytes": 134485443,
+          "sort_runs": 3,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 255088890,
+          "engine_temporary_write_bytes": 454984352,
+          "bridge_read_calls": 4659,
+          "bridge_read_bytes": 454984352,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 454812102,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 7,
+            "profiled_destination_bytes": 199902484,
+            "workspace_and_destination_peak_bytes": 454812102,
+            "peak_open_handles": 7,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 800000,
+            "nonidentity": true,
+            "outputBytes": 199889610,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 49,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad",
+            "manifest_sha256": "c2e4d63a1fd23df6200cc7fa45309112e9a3001d5b079a6f7de0691947da3679"
+          },
+          "output_files": 48
+        },
+        {
+          "receipt_line": 7,
+          "round": -1,
+          "arm": "baseline",
+          "warmup": true,
+          "elapsed_seconds": 14.543950000047683,
+          "peak_workspace_reserved_bytes": 134485443,
+          "sort_runs": 3,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 255088890,
+          "engine_temporary_write_bytes": 454984352,
+          "bridge_read_calls": 4659,
+          "bridge_read_bytes": 454984352,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 454812363,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 7,
+            "profiled_destination_bytes": 199902480,
+            "workspace_and_destination_peak_bytes": 454812363,
+            "peak_open_handles": 7,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 800000,
+            "nonidentity": true,
+            "outputBytes": 199889610,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 49,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad",
+            "manifest_sha256": "355878d47a029963467e7dd86b633c8c8aca03494b05c07bbc0f5c524db941a8"
+          },
+          "output_files": 48
+        },
+        {
+          "receipt_line": 9,
+          "round": 0,
+          "arm": "baseline",
+          "warmup": false,
+          "elapsed_seconds": 14.529049999952317,
+          "peak_workspace_reserved_bytes": 134485443,
+          "sort_runs": 3,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 255088890,
+          "engine_temporary_write_bytes": 454984352,
+          "bridge_read_calls": 4659,
+          "bridge_read_bytes": 454984352,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 454812853,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 7,
+            "profiled_destination_bytes": 199902483,
+            "workspace_and_destination_peak_bytes": 454812853,
+            "peak_open_handles": 7,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 800000,
+            "nonidentity": true,
+            "outputBytes": 199889610,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 49,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad",
+            "manifest_sha256": "a102c8d66b169489a360848aa8a1ca0b76e0ecb9d1d88a27c4305806e98e6e6a"
+          },
+          "output_files": 48
+        },
+        {
+          "receipt_line": 11,
+          "round": 0,
+          "arm": "candidate",
+          "warmup": false,
+          "elapsed_seconds": 14.244605000019073,
+          "peak_workspace_reserved_bytes": 134485443,
+          "sort_runs": 3,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 255088890,
+          "engine_temporary_write_bytes": 454984352,
+          "bridge_read_calls": 4659,
+          "bridge_read_bytes": 454984352,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 454812602,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 7,
+            "profiled_destination_bytes": 199902479,
+            "workspace_and_destination_peak_bytes": 454812602,
+            "peak_open_handles": 7,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 800000,
+            "nonidentity": true,
+            "outputBytes": 199889610,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 49,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad",
+            "manifest_sha256": "7ea2e0d82e0bd552ee27e0ae9fd3a51c4c2173a9eb5098ddd6c1d440d5bfcc79"
+          },
+          "output_files": 48
+        },
+        {
+          "receipt_line": 13,
+          "round": 1,
+          "arm": "candidate",
+          "warmup": false,
+          "elapsed_seconds": 14.151235000133514,
+          "peak_workspace_reserved_bytes": 134485443,
+          "sort_runs": 3,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 255088890,
+          "engine_temporary_write_bytes": 454984352,
+          "bridge_read_calls": 4659,
+          "bridge_read_bytes": 454984352,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 454812583,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 7,
+            "profiled_destination_bytes": 199902482,
+            "workspace_and_destination_peak_bytes": 454812583,
+            "peak_open_handles": 7,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 800000,
+            "nonidentity": true,
+            "outputBytes": 199889610,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 49,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad",
+            "manifest_sha256": "cab469fd8bc4fc92da1fee399053504cd6b1a2b0b3ada26687c2de1926ee2b1b"
+          },
+          "output_files": 48
+        },
+        {
+          "receipt_line": 15,
+          "round": 1,
+          "arm": "baseline",
+          "warmup": false,
+          "elapsed_seconds": 14.534295000076295,
+          "peak_workspace_reserved_bytes": 134485443,
+          "sort_runs": 3,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 255088890,
+          "engine_temporary_write_bytes": 454984352,
+          "bridge_read_calls": 4659,
+          "bridge_read_bytes": 454984352,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 454812344,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 7,
+            "profiled_destination_bytes": 199902483,
+            "workspace_and_destination_peak_bytes": 454812344,
+            "peak_open_handles": 7,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 800000,
+            "nonidentity": true,
+            "outputBytes": 199889610,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 49,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad",
+            "manifest_sha256": "0c092ff5a5bac35323a31b7b2a31f9cfbedec26a003d2cf18a9ed515b4b9ae0c"
+          },
+          "output_files": 48
+        },
+        {
+          "receipt_line": 17,
+          "round": 2,
+          "arm": "baseline",
+          "warmup": false,
+          "elapsed_seconds": 14.608649999856949,
+          "peak_workspace_reserved_bytes": 134485443,
+          "sort_runs": 3,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 255088890,
+          "engine_temporary_write_bytes": 454984352,
+          "bridge_read_calls": 4659,
+          "bridge_read_bytes": 454984352,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 454812840,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 7,
+            "profiled_destination_bytes": 199902483,
+            "workspace_and_destination_peak_bytes": 454812840,
+            "peak_open_handles": 7,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 800000,
+            "nonidentity": true,
+            "outputBytes": 199889610,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 49,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad",
+            "manifest_sha256": "fad01cc926fde7d826fc29adf9626a21fd57ed6610fdb603f946cbdf522b9500"
+          },
+          "output_files": 48
+        },
+        {
+          "receipt_line": 19,
+          "round": 2,
+          "arm": "candidate",
+          "warmup": false,
+          "elapsed_seconds": 14.26394000005722,
+          "peak_workspace_reserved_bytes": 134485443,
+          "sort_runs": 3,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 255088890,
+          "engine_temporary_write_bytes": 454984352,
+          "bridge_read_calls": 4659,
+          "bridge_read_bytes": 454984352,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 454812836,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 7,
+            "profiled_destination_bytes": 199902481,
+            "workspace_and_destination_peak_bytes": 454812836,
+            "peak_open_handles": 7,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 800000,
+            "nonidentity": true,
+            "outputBytes": 199889610,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 49,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "6ca89b32b3d86b7cb56377e883d7e12db6015f9ac82c66f2e640bb96738687ad",
+            "manifest_sha256": "e338f5a4bed68ad5fb58cb4e1cd95533ab48da46a63dbe7d70163270ad608009"
+          },
+          "output_files": 48
+        }
+      ],
+      "raw_receipt": {
+        "sha256": "57a466d2bc929e24c77c765033de7d084d357a41b255910daff951716257c3c6",
+        "bytes": 140990
+      },
+      "harness": {
+        "sha256": "cb18fb0e083a0e9fd96ac9cba568977b6ac3041130a57afc2aeb321671309398",
+        "bytes": 19451
+      },
+      "proof_manifest": {
+        "sha256": "7b2303d84ccf228849d89a05dd59f48bd7cf23e481b8b551c726c42795a7459b",
+        "bytes": 3950
+      },
+      "runner_manifest": {
+        "sha256": "a677b43969dce942ed817557ca497a4e45e78491403b0bcb1abc84ec0445894f",
+        "bytes": 6189
+      },
+      "runtime": {
+        "browser": "156.0.8078.4",
+        "node": "v22.23.4",
+        "kernel": "6.18.33.1-microsoft-standard-WSL2",
+        "cpu": "AMD Ryzen 7 5800X 8-Core Processor"
+      },
+      "client_commit": "c5f9b8b2e3f2f423ba4965375d46fabbd67ed377",
+      "build_source_commits": {
+        "baseline": "c5f9b8b2e3f2f423ba4965375d46fabbd67ed377",
+        "candidate": "6dac24d781e9ffe57ee3ae5dc635cf24d5359212"
+      },
+      "build_sha256": {
+        "baseline": "8a1f2943507835c200dd080bbe3221e9e1a4d707dc96c4062ddb097ce7127908",
+        "candidate": "b3c80542645f447a4d5053e92d73c87e7c9b1496d48d79972e5c4d81f4925047",
+        "engine": "799b98e7d247ae68e6e31f30ded4e808848dfcf451b62e85f4eaa0f0aba62b22",
+        "storage-worker": "a357a9e3e8d3ba21c2e9c08f143712f56f1deb5357c1d93454002950c94ab0ac",
+        "chromium": "4fa61f0ba0b4f89b7bec242c32ca16d3bccf69dbfef0651924a9ba8fede5f9d6"
+      },
+      "driver_sha256": "2c7b4d04106b80d7f8bba819f5ced042b73a80a4ccc4455982498e8db001ef1f"
+    },
+    {
+      "fixture": {
+        "name": "external-uniform",
+        "rows": 3200000,
+        "groups": 8,
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "uniform"
+          }
+        ],
+        "payload_bytes": 240,
+        "bytes": 802088905,
+        "sha256": "ece65ce6a0947261774dcb53df4f83514d10bf3515b22dd4581c68dc6e42f0e4"
+      },
+      "clock": "Run command through marker close and workspace retirement, independent byte and row checks outside clock",
+      "limits": {
+        "maximum_pair_added_seconds": 0.5,
+        "maximum_median_added_seconds": 0.1,
+        "minimum_median_improvement_seconds": 0.1
+      },
+      "work_shape": {
+        "sort_runs": 10,
+        "merge_operations": 1,
+        "merge_inputs": 10,
+        "resident_sorts": 0,
+        "temporary_bytes_read": 1022888890,
+        "temporary_bytes_written": 1825004448,
+        "temporary_files_created": 14,
+        "bridge_read_calls": 18676,
+        "bridge_read_bytes": 1825004448
+      },
+      "median_paired_seconds_saved": 1.5734250001907384,
+      "savings_range_seconds": [
+        1.4250299999713931,
+        1.6259649999141672
+      ],
+      "arm_seconds": {
+        "baseline": {
+          "median": 58.58197500014305,
+          "range": [
+            58.37413000011444,
+            58.677394999980926
+          ]
+        },
+        "candidate": {
+          "median": 57.008549999952315,
+          "range": [
+            56.94910000014305,
+            57.05143000006676
+          ]
+        }
+      },
+      "pairs": [
+        {
+          "round": 0,
+          "baseline_seconds": 58.677394999980926,
+          "candidate_seconds": 57.05143000006676,
+          "seconds_saved": 1.6259649999141672,
+          "workspace_peak_bytes": [
+            134486193,
+            134486193
+          ]
+        },
+        {
+          "round": 1,
+          "baseline_seconds": 58.58197500014305,
+          "candidate_seconds": 57.008549999952315,
+          "seconds_saved": 1.5734250001907384,
+          "workspace_peak_bytes": [
+            134486193,
+            134486193
+          ]
+        },
+        {
+          "round": 2,
+          "baseline_seconds": 58.37413000011444,
+          "candidate_seconds": 56.94910000014305,
+          "seconds_saved": 1.4250299999713931,
+          "workspace_peak_bytes": [
+            134486193,
+            134486193
+          ]
+        }
+      ],
+      "runs": [
+        {
+          "receipt_line": 5,
+          "round": -1,
+          "arm": "candidate",
+          "warmup": true,
+          "elapsed_seconds": 57.374480000019076,
+          "peak_workspace_reserved_bytes": 134486193,
+          "sort_runs": 10,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 1022888890,
+          "engine_temporary_write_bytes": 1825004448,
+          "bridge_read_calls": 18676,
+          "bridge_read_bytes": 1825004448,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 1824956935,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 14,
+            "profiled_destination_bytes": 802126110,
+            "workspace_and_destination_peak_bytes": 1824956935,
+            "peak_open_handles": 14,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 3200000,
+            "nonidentity": true,
+            "outputBytes": 802091770,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 193,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "974eabc0ebe19d321fea23397bae704670439c1a09b08e0b27e5194e7b89015d",
+            "manifest_sha256": "9cc1e7a7de4cd16d7a0506e56aa9509a2e0fb0ecddabf7b3d2bed19c6df4c5eb"
+          },
+          "output_files": 192
+        },
+        {
+          "receipt_line": 7,
+          "round": -1,
+          "arm": "baseline",
+          "warmup": true,
+          "elapsed_seconds": 58.695664999961856,
+          "peak_workspace_reserved_bytes": 134486193,
+          "sort_runs": 10,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 1022888890,
+          "engine_temporary_write_bytes": 1825004448,
+          "bridge_read_calls": 18676,
+          "bridge_read_bytes": 1825004448,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 1824957929,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 14,
+            "profiled_destination_bytes": 802126111,
+            "workspace_and_destination_peak_bytes": 1824957929,
+            "peak_open_handles": 14,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 3200000,
+            "nonidentity": true,
+            "outputBytes": 802091770,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 193,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "974eabc0ebe19d321fea23397bae704670439c1a09b08e0b27e5194e7b89015d",
+            "manifest_sha256": "d62c62c8732e75ad0b62b50bda1d7a9ed5e53dec9f0046b80e0ca51d51feab1d"
+          },
+          "output_files": 192
+        },
+        {
+          "receipt_line": 9,
+          "round": 0,
+          "arm": "baseline",
+          "warmup": false,
+          "elapsed_seconds": 58.677394999980926,
+          "peak_workspace_reserved_bytes": 134486193,
+          "sort_runs": 10,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 1022888890,
+          "engine_temporary_write_bytes": 1825004448,
+          "bridge_read_calls": 18676,
+          "bridge_read_bytes": 1825004448,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 1824953926,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 14,
+            "profiled_destination_bytes": 802126112,
+            "workspace_and_destination_peak_bytes": 1824953926,
+            "peak_open_handles": 14,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 3200000,
+            "nonidentity": true,
+            "outputBytes": 802091770,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 193,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "974eabc0ebe19d321fea23397bae704670439c1a09b08e0b27e5194e7b89015d",
+            "manifest_sha256": "9df12b128b40fb702f4cf347c5630611eaa1be68edc7ee0ef95148d1a4100149"
+          },
+          "output_files": 192
+        },
+        {
+          "receipt_line": 11,
+          "round": 0,
+          "arm": "candidate",
+          "warmup": false,
+          "elapsed_seconds": 57.05143000006676,
+          "peak_workspace_reserved_bytes": 134486193,
+          "sort_runs": 10,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 1022888890,
+          "engine_temporary_write_bytes": 1825004448,
+          "bridge_read_calls": 18676,
+          "bridge_read_bytes": 1825004448,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 1824958191,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 14,
+            "profiled_destination_bytes": 802126110,
+            "workspace_and_destination_peak_bytes": 1824958191,
+            "peak_open_handles": 14,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 3200000,
+            "nonidentity": true,
+            "outputBytes": 802091770,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 193,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "974eabc0ebe19d321fea23397bae704670439c1a09b08e0b27e5194e7b89015d",
+            "manifest_sha256": "4ad9613fd954854e11758fcbd4997b05b6f0d49a411a20ab952404a7a008e780"
+          },
+          "output_files": 192
+        },
+        {
+          "receipt_line": 13,
+          "round": 1,
+          "arm": "candidate",
+          "warmup": false,
+          "elapsed_seconds": 57.008549999952315,
+          "peak_workspace_reserved_bytes": 134486193,
+          "sort_runs": 10,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 1022888890,
+          "engine_temporary_write_bytes": 1825004448,
+          "bridge_read_calls": 18676,
+          "bridge_read_bytes": 1825004448,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 1824954427,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 14,
+            "profiled_destination_bytes": 802126111,
+            "workspace_and_destination_peak_bytes": 1824954427,
+            "peak_open_handles": 14,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 3200000,
+            "nonidentity": true,
+            "outputBytes": 802091770,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 193,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "974eabc0ebe19d321fea23397bae704670439c1a09b08e0b27e5194e7b89015d",
+            "manifest_sha256": "62cc7b4a302daddcb83e544f6edf54763118f01f8f32815cb29c8db37e49766b"
+          },
+          "output_files": 192
+        },
+        {
+          "receipt_line": 15,
+          "round": 1,
+          "arm": "baseline",
+          "warmup": false,
+          "elapsed_seconds": 58.58197500014305,
+          "peak_workspace_reserved_bytes": 134486193,
+          "sort_runs": 10,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 1022888890,
+          "engine_temporary_write_bytes": 1825004448,
+          "bridge_read_calls": 18676,
+          "bridge_read_bytes": 1825004448,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 1824956187,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 14,
+            "profiled_destination_bytes": 802126112,
+            "workspace_and_destination_peak_bytes": 1824956187,
+            "peak_open_handles": 14,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 3200000,
+            "nonidentity": true,
+            "outputBytes": 802091770,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 193,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "974eabc0ebe19d321fea23397bae704670439c1a09b08e0b27e5194e7b89015d",
+            "manifest_sha256": "3d0af54c4873254e4015e31b8f4948797820587f87afdf001200b221bc833512"
+          },
+          "output_files": 192
+        },
+        {
+          "receipt_line": 17,
+          "round": 2,
+          "arm": "baseline",
+          "warmup": false,
+          "elapsed_seconds": 58.37413000011444,
+          "peak_workspace_reserved_bytes": 134486193,
+          "sort_runs": 10,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 1022888890,
+          "engine_temporary_write_bytes": 1825004448,
+          "bridge_read_calls": 18676,
+          "bridge_read_bytes": 1825004448,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 1824955937,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 14,
+            "profiled_destination_bytes": 802126112,
+            "workspace_and_destination_peak_bytes": 1824955937,
+            "peak_open_handles": 14,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 3200000,
+            "nonidentity": true,
+            "outputBytes": 802091770,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 193,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "974eabc0ebe19d321fea23397bae704670439c1a09b08e0b27e5194e7b89015d",
+            "manifest_sha256": "904a84225b598d8933ecf24dbbae7478a75a187b2f4ce644275a41e2ad34f63b"
+          },
+          "output_files": 192
+        },
+        {
+          "receipt_line": 19,
+          "round": 2,
+          "arm": "candidate",
+          "warmup": false,
+          "elapsed_seconds": 56.94910000014305,
+          "peak_workspace_reserved_bytes": 134486193,
+          "sort_runs": 10,
+          "merge_operations": 1,
+          "engine_temporary_read_bytes": 1022888890,
+          "engine_temporary_write_bytes": 1825004448,
+          "bridge_read_calls": 18676,
+          "bridge_read_bytes": 1825004448,
+          "storage": {
+            "version": "opfs-workspace-and-profiled-export-v1",
+            "maximum_workspace_bytes": 9007199254740991,
+            "workspace_peak_bytes": 1824956692,
+            "workspace_bytes_before_cleanup": 0,
+            "workspace_peak_files": 14,
+            "profiled_destination_bytes": 802126109,
+            "workspace_and_destination_peak_bytes": 1824956692,
+            "peak_open_handles": 14,
+            "streaming_io_buffer_limit_bytes": 0,
+            "scope": "Logical file sizes from successful workspace operations and profiled destination writes; metadata and implementation buffers excluded; destination may be on another volume",
+            "workspace_bytes_after_cleanup": 0
+          },
+          "verification": {
+            "rows": 3200000,
+            "nonidentity": true,
+            "outputBytes": 802091770,
+            "workspace_empty": true,
+            "marker": {
+              "complete": true,
+              "files": 193,
+              "engine": "chopper-browser",
+              "version": 1
+            },
+            "marker_sha256": "974eabc0ebe19d321fea23397bae704670439c1a09b08e0b27e5194e7b89015d",
+            "manifest_sha256": "b4bdfe58bdfbc5cae0dc30dd40fd3a15e2b5750573e6018a39ae42c230d7103c"
+          },
+          "output_files": 192
+        }
+      ],
+      "raw_receipt": {
+        "sha256": "a178b64dfdfa26b167927459ad74bd0d852169ffa75af66d7cd8f9ac48d9b5c2",
+        "bytes": 346416
+      },
+      "harness": {
+        "sha256": "cb18fb0e083a0e9fd96ac9cba568977b6ac3041130a57afc2aeb321671309398",
+        "bytes": 19451
+      },
+      "proof_manifest": {
+        "sha256": "e6699fd6e580c4e195dc52f83e4b5027aecf30d94915aee8e86dd0f7ff765032",
+        "bytes": 3954
+      },
+      "runner_manifest": {
+        "sha256": "f3e45155ff7ddef15fb975dc39fdc41e95b581ed021ec9adec493b1a1a3c1937",
+        "bytes": 6272
+      },
+      "runtime": {
+        "browser": "156.0.8078.4",
+        "node": "v22.23.4",
+        "kernel": "6.18.33.1-microsoft-standard-WSL2",
+        "cpu": "AMD Ryzen 7 5800X 8-Core Processor"
+      },
+      "client_commit": "c5f9b8b2e3f2f423ba4965375d46fabbd67ed377",
+      "build_source_commits": {
+        "baseline": "c5f9b8b2e3f2f423ba4965375d46fabbd67ed377",
+        "candidate": "6dac24d781e9ffe57ee3ae5dc635cf24d5359212"
+      },
+      "build_sha256": {
+        "baseline": "8a1f2943507835c200dd080bbe3221e9e1a4d707dc96c4062ddb097ce7127908",
+        "candidate": "b3c80542645f447a4d5053e92d73c87e7c9b1496d48d79972e5c4d81f4925047",
+        "engine": "799b98e7d247ae68e6e31f30ded4e808848dfcf451b62e85f4eaa0f0aba62b22",
+        "storage-worker": "a357a9e3e8d3ba21c2e9c08f143712f56f1deb5357c1d93454002950c94ab0ac",
+        "chromium": "4fa61f0ba0b4f89b7bec242c32ca16d3bccf69dbfef0651924a9ba8fede5f9d6"
+      },
+      "driver_sha256": "2c7b4d04106b80d7f8bba819f5ced042b73a80a4ccc4455982498e8db001ef1f"
+    }
+  ],
+  "delivered_patch": "7b69ec08243b87a550538c571d95f0ffaff81eb0",
+  "build_features": [],
+  "run_config": {
+    "memory_mib": 512,
+    "workers": 1,
+    "output_csv_cap_bytes": 4194304,
+    "grouping": "auto",
+    "compression": "none",
+    "operations": [
+      {
+        "type": "shuffle",
+        "strategy": "uniform"
+      }
+    ]
+  },
+  "comparison": "Identical WASM, storage worker, client and synthetic input for both arms. Only the engine-worker file changes.",
+  "read_copy_scope": "The old worker allocated an owned JS copy of the OPFS read payload for each successful bridge read. The candidate consumes the synchronous slot view, then the shim still copies into WASM.",
+  "timing": "Run request through complete state after publication and workspace retirement. Output verification and context disposal follow the clock.",
+  "first_cell_verifier_correction": {
+    "initial_error_log": {
+      "sha256": "b3e2f130062621f53f29b87894c792f717e3e52ea19a5be7caeac31a21313be5",
+      "bytes": 555
+    },
+    "correction": "The v1 summary assertion compared the marker file count to CSV count alone. The marker also counts the manifest. The corrected verification reread the unchanged eight job receipts without rerunning jobs or changing acceptance thresholds.",
+    "corrected_verifier": {
+      "sha256": "12289d935321ee2a36e3740d0edc122d150d61a8d460958a4d0a8da5ac944ce5",
+      "bytes": 4214
+    },
+    "corrected_summary": {
+      "sha256": "5d854e448fb300e02755016dcfd70d986d42a67793d02b8a75f90340e4186dcf",
+      "bytes": 3160
+    }
+  }
+}

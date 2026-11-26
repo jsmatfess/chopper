@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "17bcb2f5931888b5f8560d368b465b4def070fbbec04d885e7932e75fae20308"
+    "sha256": "8dbd8e705012aa995f08a7b27c7149ca8c462b284731d0ffbd4b1d5adf05d324"
   },
   "experiments": [
     {
@@ -4615,6 +4615,19 @@
       "narrative": {
         "path": "docs/performance/investigations/same-origin-hosted-uniform-run-overlap-2026-11-25.md",
         "sha256": "f38954a990d126749f7a013a6e710030d26c496e60abedfb8602eb15a5114728",
+        "topic": "ownership-and-lifecycle"
+      }
+    },
+    {
+      "title": "Hosted OPFS spill read copy (2026-11-25)",
+      "evidence": "docs/performance.md#hosted-opfs-spill-read-copy-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/hosted-opfs-spill-read-copy-2026-11-25-summary.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-opfs-spill-read-copy-2026-11-25.md",
+        "sha256": "700d294a070051551f0f240a1eebb89731dbe85c5b83361e5dd54c5a4b8cfa02",
         "topic": "ownership-and-lifecycle"
       }
     }
@@ -18319,6 +18332,31 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#hosted-memory-ceiling-2026-11-16"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-opfs-spill-read-copy-2026-11-25-summary.json",
+      "sha256": "346f1c85878dde13ecc3acaa4067e7413ccd9b7fa8103f44e59104c03d5de913",
+      "bytes": 38228,
+      "format": "json",
+      "record_counts": {
+        "paired-summary": 1
+      },
+      "fields": [
+        "build_features",
+        "cells",
+        "comparison",
+        "delivered_patch",
+        "first_cell_verifier_correction",
+        "issue",
+        "read_copy_scope",
+        "run_config",
+        "timing",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-opfs-spill-read-copy-2026-11-25"
       ]
     },
     {
@@ -36840,8 +36878,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "d866f5365d847321f29a4678a848395122b390720e65011fb494eb6d1ca050c6",
-      "bytes": 1747315,
+      "sha256": "71bc15588e64f0924a8553c3939445be541762e2a78a7269c634dca14c66038d",
+      "bytes": 1749020,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -41225,7 +41263,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "9f563a8880add7f71b614fad3e2182c7cd6411fa36d9511f3f8e7aef731a3a4d"
+    "sha256": "7d4b37ae00f47babf13619bcaccd1887e871ab19004f3755503bc75684e3791a"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

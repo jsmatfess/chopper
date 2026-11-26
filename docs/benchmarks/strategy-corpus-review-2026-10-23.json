@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "a09ab6d793156d58aaef8724e92ab51aa88e5dbd578c5f79a8a956782bb4ddaf",
+  "analysis_script_sha256": "d16827a142f736106a9fbdb618f09a9b1990facf37ff25ffc2fac0e2e242ddac",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "17bcb2f5931888b5f8560d368b465b4def070fbbec04d885e7932e75fae20308"
+    "sha256": "8dbd8e705012aa995f08a7b27c7149ca8c462b284731d0ffbd4b1d5adf05d324"
   },
   "families": [
     "adaptive-routing",
@@ -4905,6 +4905,20 @@
       "narrative": {
         "path": "docs/performance/investigations/same-origin-hosted-uniform-run-overlap-2026-11-25.md",
         "sha256": "f38954a990d126749f7a013a6e710030d26c496e60abedfb8602eb15a5114728",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Hosted OPFS spill read copy (2026-11-25)",
+      "evidence": "docs/performance.md#hosted-opfs-spill-read-copy-2026-11-25",
+      "artifacts": [
+        "docs/benchmarks/hosted-opfs-spill-read-copy-2026-11-25-summary.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-opfs-spill-read-copy-2026-11-25.md",
+        "sha256": "700d294a070051551f0f240a1eebb89731dbe85c5b83361e5dd54c5a4b8cfa02",
         "topic": "ownership-and-lifecycle"
       },
       "family": "ownership-and-lifecycle"
@@ -26279,6 +26293,45 @@
       ],
       "record_bounds_by_kind": {
         "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-opfs-spill-read-copy-2026-11-25-summary.json",
+      "sha256": "346f1c85878dde13ecc3acaa4067e7413ccd9b7fa8103f44e59104c03d5de913",
+      "bytes": 38228,
+      "format": "json",
+      "record_counts": {
+        "paired-summary": 1
+      },
+      "fields": [
+        "build_features",
+        "cells",
+        "comparison",
+        "delivered_patch",
+        "first_cell_verifier_correction",
+        "issue",
+        "read_copy_scope",
+        "run_config",
+        "timing",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-opfs-spill-read-copy-2026-11-25"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "paired-summary": {
           "first": {
             "pointer": ""
           },

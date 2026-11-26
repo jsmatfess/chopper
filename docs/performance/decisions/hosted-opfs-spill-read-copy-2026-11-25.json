@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "id": "hosted-opfs-spill-read-copy-2026-11-25",
+  "date": "2026-11-25",
+  "title": "Consume the OPFS read slot directly in synchronous hosted WASI reads",
+  "subsystem": "storage",
+  "question": "Does avoiding the additional JavaScript spill copy reduce complete external Uniform Run time?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Verified paired median savings of 0.345 seconds for 800,000 rows and 1.573 seconds for 3.2 million rows. All six measured pairs improved with matching spill topology and bridge traffic.",
+  "scope": {
+    "measurement": "complete-run",
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Standalone external Uniform, 800,000 and 3.2 million plain CSV rows, explicit 512 MiB, one worker and 4 MiB serialized output cap."
+    ]
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "All eight jobs per cell verified fields, conservation, file hashes, exact cap and manifest, marker and workspace retirement. Focused pinned-shim controls cover multiple iovecs, positioned/short reads, EOF, thrown reads and owned export buffers."
+  },
+  "limitations": [
+    "One WSL Linux host, bundled Chromium, disposable OPFS contexts with uncontrolled warm OS caches."
+  ],
+  "exclusions": [
+    "Renderer RSS, physical I/O, native execution and other browser channels."
+  ],
+  "reopen_when": null,
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#hosted-opfs-spill-read-copy-2026-11-25",
+      "sha256": "f89461b6366f08c1e7e3c525370d94ab50a8e0407c63b62b56a628dc75f44d78"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/hosted-opfs-spill-read-copy-2026-11-25-summary.json",
+      "sha256": "346f1c85878dde13ecc3acaa4067e7413ccd9b7fa8103f44e59104c03d5de913"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/browser.md",
+    "docs/resource-policy-research.md"
+  ]
+}

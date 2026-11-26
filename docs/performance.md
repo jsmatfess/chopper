@@ -283,3 +283,4 @@ Topics reuse the reviewed strategy-family assignments; they do not establish com
 | <a id="wasi-inspection-job-admission-cost-2026-11-25"></a>[WASI inspection Job admission cost (2026-11-25)](performance/investigations/wasi-inspection-job-admission-cost-2026-11-25.md) | ownership-and-lifecycle |
 | <a id="wasi-run-job-handoff-cost-2026-11-25"></a>[WASI Run Job handoff cost (2026-11-25)](performance/investigations/wasi-run-job-handoff-cost-2026-11-25.md) | ownership-and-lifecycle |
 | <a id="same-origin-hosted-uniform-run-overlap-2026-11-25"></a>[Same-origin hosted Uniform Run overlap (2026-11-25)](performance/investigations/same-origin-hosted-uniform-run-overlap-2026-11-25.md) | ownership-and-lifecycle |
+| <a id="hosted-opfs-spill-read-copy-2026-11-25"></a>[Hosted OPFS spill read copy (2026-11-25)](performance/investigations/hosted-opfs-spill-read-copy-2026-11-25.md) | ownership-and-lifecycle |

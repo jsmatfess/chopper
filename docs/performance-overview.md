@@ -13,7 +13,7 @@ Measured outcome, decision and delivery are independent fields. Favorable eviden
 does not imply default activation. Scope applies to the recorded builds/workloads;
 current contracts remain authoritative. Older baselines stay in the historical log.
 
-Registry coverage: 84 records; latest recorded decision 2026-11-25.
+Registry coverage: 85 records; latest recorded decision 2026-11-25.
 16 superseded records remain queryable but are omitted below.
 
 ## Delivered in default builds
@@ -21,6 +21,7 @@ Registry coverage: 84 records; latest recorded decision 2026-11-25.
 | Decision record | Outcome and scope | Interpretation |
 | --- | --- | --- |
 | [Bound WASI inspection Job decode ownership](performance/decisions/wasi-inspection-job-admission-cost-2026-11-25.json) | acceptance-only; wasi-chromium. Matched Preview adds about 0.012 seconds on a near-1 MiB Job and clears the 0.050-second gate. Exact and adjacent resource controls, read-ahead, raw errors and held Job lifetime pass. | [Evidence](performance/investigations/wasi-inspection-job-admission-cost-2026-11-25.md) |
+| [Consume the OPFS read slot directly in synchronous hosted WASI reads](performance/decisions/hosted-opfs-spill-read-copy-2026-11-25.json) | favorable; wasi-chromium. Verified paired median savings of 0.345 seconds for 800,000 rows and 1.573 seconds for 3.2 million rows. All six measured pairs improved with matching spill topology and bridge traffic. | [Evidence](performance/investigations/hosted-opfs-spill-read-copy-2026-11-25.md) |
 | [Batch typed Job JSON reads in the WASI adapter](performance/decisions/hosted-job-json-buffering-2026-11-25.json) | favorable; wasi-chromium. Bundled Chromium saves a median paired 0.251 seconds on the 1,034,770-byte Job. Untimed instrumentation counts 1,034,771 versus 128 reads of the same bytes. Compact median paired cost is 0.005 seconds. | [Evidence](performance/investigations/hosted-job-json-buffering-2026-11-25.md) |
 | [Use a guarded 320 MiB target for eligible hosted Uniform Runs](performance/decisions/guarded-hosted-uniform-retention-at-1024-mib-2026-11-25.json) | favorable; wasi-chromium. The guarded sorter saves 7.582–7.678 seconds in three verified pairs. Two already-external pairs add a median 0.077 seconds within the 0.6-second gate. | [Evidence](performance/investigations/guarded-hosted-uniform-retention-at-1024-mib-2026-11-25.md) |
 | [Feed calculated rows directly into a single Partition](performance/decisions/calculated-columns-followed-by-partition-2026-11-24.json) | mixed; native-linux. The retained Linux build improves matched 2M-row routed and spilling jobs by 3.10 and 2.56 seconds and removes 2.71–2.80 GB each of tracked temporary reads and writes. A formula-free direct elapsed signal reversed on repeat. The prior terminal export showed a small CPU tradeoff. | [Evidence](performance/investigations/calculated-columns-followed-by-partition-2026-11-24.md) |

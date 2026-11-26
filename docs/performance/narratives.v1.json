@@ -9203,6 +9203,19 @@
       "original_section_sha256": "734a8f4c317fdb092606e114d220dd40f42ebd4aa83358f4c6e9e6a7158b7b20",
       "sha256": "f38954a990d126749f7a013a6e710030d26c496e60abedfb8602eb15a5114728",
       "relocations": []
+    },
+    {
+      "id": "hosted-opfs-spill-read-copy-2026-11-25",
+      "title": "Hosted OPFS spill read copy (2026-11-25)",
+      "anchor": "hosted-opfs-spill-read-copy-2026-11-25",
+      "path": "docs/performance/investigations/hosted-opfs-spill-read-copy-2026-11-25.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "hosted-opfs-spill-read-copy-2026-11-25"
+      ],
+      "original_section_sha256": "f89461b6366f08c1e7e3c525370d94ab50a8e0407c63b62b56a628dc75f44d78",
+      "sha256": "700d294a070051551f0f240a1eebb89731dbe85c5b83361e5dd54c5a4b8cfa02",
+      "relocations": []
     }
   ],
   "migrated_count": 193

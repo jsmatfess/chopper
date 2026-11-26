@@ -73,6 +73,7 @@ def main():
 
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
+    'Hosted OPFS spill read copy (2026-11-25)': 'ownership-and-lifecycle',
     'Standalone Uniform final reader admission (2026-11-25)': 'ownership-and-lifecycle',
     'Pending standalone Uniform spill admission (2026-11-25)': 'ownership-and-lifecycle',
     'Standalone Uniform intermediate merge heap (2026-11-25)': 'external-and-resident-shuffle',
