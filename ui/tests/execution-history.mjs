@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {build} from 'esbuild';
-const bundle=await build({stdin:{contents:"export * from './src/browser/execution-history';export {PhysicalHistory} from './src/browser/physical-history';export * from './src/browser/execution-dag';export * from './src/browser/execution-timing';",resolveDir:process.cwd()},bundle:true,write:false,format:'esm',platform:'node'});
-const {ExecutionHistory,ObservationDelivery,PhysicalHistory,ExecutionDag,edgePath,MAX_DAG_NODES,MAX_DAG_EDGES,DAG_PADDING,DAG_NODE_WIDTH,observedSources,displayStepStatus,describeStep,summarizeStep,measurementParts,observedStrategy,ExecutionTiming,MAX_TIMING_WINDOWS,TIMING_GAPS_PER_BLOCK,TimingGapWriter,TimingGapLog}=await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString('base64')}`);
+const bundle=await build({stdin:{contents:"export * from './src/browser/execution-history';export {PhysicalHistory} from './src/browser/physical-history';export * from './src/browser/execution-dag';export * from './src/browser/execution-timing';export * from './src/browser/execution-explanations';export {kinds} from './src/browser/physical-history';",resolveDir:process.cwd()},bundle:true,write:false,format:'esm',platform:'node'});
+const {ExecutionHistory,explainStep,kinds,fixedStepKinds,captureExplanationSettings,ObservationDelivery,PhysicalHistory,ExecutionDag,edgePath,MAX_DAG_NODES,MAX_DAG_EDGES,DAG_PADDING,DAG_NODE_WIDTH,observedSources,displayStepStatus,describeStep,summarizeStep,measurementParts,observedStrategy,ExecutionTiming,MAX_TIMING_WINDOWS,TIMING_GAPS_PER_BLOCK,TimingGapWriter,TimingGapLog}=await import(`data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString('base64')}`);
 const job={operations:[],compression:'none',output_csv:{encoding:'utf-8',headers:true},limits:{rows:2,bytes:null,compressed_bytes:null}};
 test('timeline retains first start and latest attempt end without drifting on duplicate terminals',(t)=>{
  let ms=100;t.mock.method(performance,'now',()=>ms);const gaps=[],timing=new ExecutionTiming((...gap)=>gaps.push(gap));
@@ -377,4 +377,36 @@ test('serialization finalization does not finalize later publication or compress
  assert.equal(h.unavailable,false);assert.equal(h.steps.length,1);
  h.accept(992,{physical:[{id:1058,kind:'gzip_output',operations:[1],status:'completed',bytes:100,rows:0,seconds:1}]});assert.equal(displayStepStatus(h,h.steps[0]),'in_progress');
  h.accept(992,{processingComplete:true});assert.equal(displayStepStatus(h,h.steps[0]),'completed');
+});
+
+test('every displayed step has three explanation levels with sparse settings',()=>{
+ const settings=captureExplanationSettings(job);
+ const steps=[...kinds.map(kind=>({kind,id:1000,status:'unknown'})),...fixedStepKinds.map((_,id)=>({id,status:'unknown'}))];
+ for(const step of steps){
+  const versions=[0,1,2].map(level=>explainStep(settings,step,level,'unknown',[]).join(' '));
+  assert.equal(new Set(versions).size,3,step.kind??step.id);
+  for(const copy of versions)assert.doesNotMatch(copy,/undefined|NaN/);
+ }
+});
+test('explanations use frozen settings and distinguish observed spill causes',()=>{
+ const submitted={...job,input_csv:{delimiter:',',quote:'"',encoding:'utf-8'},operations:[{type:'partition',columns:['country']},{type:'shuffle',strategy:'auto'}],limits:{rows:10000}};
+ const history=new ExecutionHistory(1,submitted),worker=new PhysicalHistory();
+ submitted.operations[0].columns[0]='region';submitted.limits.rows=7;
+ const base={id:1040,kind:'spill',operations:[1,2],rows:500,seconds:1,runs:1,status:'completed',source_omitted:true};
+ worker.accept({...base,attempt:1,reason:'sort_buffer_limit'});
+ worker.accept({...base,attempt:2,reason:'final_batch'});
+ worker.accept({...base,attempt:3,reason:'sort_reservation',status:'interrupted'});
+ history.accept(1,{physical:worker.snapshot(),processingComplete:true});
+ const spill=explainStep(history.explanationSettings,history.steps[0],1,'completed',[]).join(' ');
+ assert.match(spill,/by “country” and then by a random value/);
+ assert.match(spill,/2 sorted chunks/);
+ assert.match(spill,/the next row would have exceeded the sort buffer limit/);
+ assert.match(spill,/finishing an external sort/);
+ assert.doesNotMatch(spill,/region|could not reserve/);
+ const current=explainStep(history.explanationSettings,{...history.steps[0],reasons:undefined},0,'interrupted',[]).join(' ');
+ assert.match(current,/confirmed attempts so far/);
+ assert.doesNotMatch(current,/would have exceeded/);
+ const csv=explainStep(history.explanationSettings,{kind:'serialize',id:1005,status:'active'},1,'in_progress',[]).join(' ');
+ assert.match(csv,/10,000 data rows/);
+ assert.doesNotMatch(csv,/7 data rows/);
 });

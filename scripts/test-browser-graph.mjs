@@ -86,6 +86,19 @@ await withHostedBrowser({port:8423},async({context,url,browserVersion})=>{
     assert.match(text,/confirmed/);if(fixture.input)assert.match(text,new RegExp(`${fixture.input_decoded_bytes??31} decoded CSV bytes`));
     if(fixture.compression==='zip'){const archive=(await panel.locator('.execution-list li>button').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-label')))).find(text=>text.startsWith('Build and finalize ZIP archive'));assert.match(archive,/receives data from Deflate CSV members/);assert.doesNotMatch(archive,/receives data from Write CSV/);}
     if(fixture.source==='fallback'){assert.ok(await panel.locator('[data-step][data-status="handed_off"]').count()>0);assert.match(text,/Handed Off/);assert.match(text,/receives data from .*Reuse already ordered grouping files/);assert.match(text,/no re-sort/);}
+    if(fixture.source==='external'||fixture.source==='fallback'){
+     const title=fixture.source==='external'?'Sort and write spill runs':'Grouping handed off to sorting';
+     await panel.locator('.execution-list button').filter({hasText:title}).first().click();
+     const explanation=panel.locator('.execution-explanation');
+     await explanation.getByText('Explain this step',{exact:true}).click();
+     const body=explanation.locator('.execution-explanation-copy');
+     await body.locator('p').first().waitFor();
+     const copy=await body.textContent();
+     if(fixture.source==='external'){
+      assert.match(copy,/the next row would have exceeded the sort buffer limit/);
+      assert.match(copy,/finishing an external sort/);
+     }else assert.match(copy,/a new group would have exceeded the routing memory limit/);
+    }
     if(fixture.source){assert.match(text,/sorted runs/);assert.ok(await panel.locator('.execution-list li').count()<32,'external summaries must not grow per group/file');}
     if(fixture.family==='allocation'){const nodes=await panel.locator('.execution-list li>button').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-label')));const strata=nodes.filter(text=>text.startsWith('Strata ·'));if(fixture.name.includes('probabilistic'))assert.equal(strata.length,0);for(const node of strata)assert.doesNotMatch(node,/operations \d+,/);
       const allocationNode=nodes.find(text=>text.startsWith('Exact allocation')||text.startsWith('Probabilistic allocation'));assert.ok(allocationNode?.includes('receives data from'),'membership input source must be observed');

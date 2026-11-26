@@ -57,3 +57,9 @@ test('engine and browser physical kind ordinals agree, including lifecycle metad
  const names=[...source.match(/pub enum Kind\s*\{([^}]+)\}/)[1].matchAll(/^\s*([A-Z]\w*)(?:\s*=\s*\d+)?\s*,?\s*$/gm)].map(match=>match[1]).map(name=>name.replace(/[A-Z]/g,(letter,index)=>(index?'_':'')+letter.toLowerCase()));
  assert.deepEqual(names,[...c.kinds,'stage_complete','omitted']);
 });
+
+test('engine and browser agree on recorded decision reasons',async()=>{
+ const {readFile}=await import('node:fs/promises');const source=await readFile('../crates/chopper/src/observation/physical.rs','utf8');
+ const names=[...source.match(/pub enum Reason\s*\{([^}]+)\}/)[1].matchAll(/^\s*([A-Z]\w*)\s*,/gm)].map(match=>match[1].replace(/[A-Z]/g,(letter,index)=>(index?'_':'')+letter.toLowerCase()));
+ assert.deepEqual(names,[...c.reasons]);
+});

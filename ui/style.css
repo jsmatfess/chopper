@@ -1160,3 +1160,33 @@ input:disabled,select:disabled{background:#edf0ec;color:#66736b;opacity:.7;curso
 .formula-example-fields textarea{display:block;width:100%;min-width:0;min-height:38px;margin-block-start:4px;padding:8px 10px;resize:vertical;font:inherit;color:var(--ink);background:var(--field);border:1px solid var(--input-line);border-radius:5px}
 .formula-example-fields textarea:focus-visible{outline:2px solid var(--green);outline-offset:1px}
 [data-formula-preview] output{display:block;margin-block:.35rem;white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* Optional explanations share the selected-step inspector in all execution views. */
+.hosted-workspace #execution-history .execution-inspector:has(.execution-explanation[open]:not([hidden])){max-height:none}
+.execution-explanation{margin-top:.65rem;border-top:1px solid var(--line)}
+.execution-explanation>summary{padding-block:.55rem;cursor:pointer;font-weight:650}
+.execution-explanation>summary:focus-visible,.execution-explanation input:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.execution-explanation-control{--detail-stop-inset:2.5rem;--detail-thumb-size:.625rem;max-width:20rem;margin-bottom:.65rem}
+.execution-explanation-control label{font-weight:650}
+.execution-detail-slider{position:relative}
+.execution-detail-track{position:absolute;inset-inline:var(--detail-stop-inset);top:50%;height:2px;translate:0 -50%;background:var(--muted);pointer-events:none}
+.execution-detail-track span{position:absolute;top:50%;width:1rem;height:1rem;translate:-50% -50%;border:2px solid var(--muted);border-radius:50%;background:var(--field)}
+.execution-detail-track span:first-child{left:0}
+.execution-detail-track span:nth-child(2){left:50%}
+.execution-detail-track span:last-child{left:100%}
+.execution-explanation .execution-detail-slider input{position:relative;appearance:none;display:block;width:calc(100% - 2 * var(--detail-stop-inset) + var(--detail-thumb-size));height:2.75rem;margin:0 auto;padding:0;border:0;background:transparent;cursor:pointer}
+.execution-detail-slider input::-webkit-slider-runnable-track{height:var(--detail-thumb-size);border:0;background:transparent}
+.execution-detail-slider input::-moz-range-track{height:var(--detail-thumb-size);border:0;background:transparent}
+.execution-detail-slider input::-webkit-slider-thumb{appearance:none;box-sizing:border-box;width:var(--detail-thumb-size);height:var(--detail-thumb-size);border:0;border-radius:50%;background:var(--green)}
+.execution-detail-slider input::-moz-range-thumb{box-sizing:border-box;width:var(--detail-thumb-size);height:var(--detail-thumb-size);border:0;border-radius:50%;background:var(--green)}
+.execution-explanation-labels{display:flex;justify-content:space-between;text-align:center}
+.execution-explanation-labels span{width:calc(2 * var(--detail-stop-inset))}
+@media(forced-colors:active){
+ .execution-detail-track{forced-color-adjust:none;background:CanvasText}
+ .execution-detail-track span{forced-color-adjust:none;background:Canvas;border-color:CanvasText}
+ .execution-detail-slider input::-webkit-slider-thumb{forced-color-adjust:none;background:Highlight}
+ .execution-detail-slider input::-moz-range-thumb{forced-color-adjust:none;background:Highlight}
+}
+.execution-explanation-labels .is-selected{font-weight:750}
+.execution-explanation-copy{max-width:70ch}
+.execution-explanation-copy p+p{margin-top:.6rem}

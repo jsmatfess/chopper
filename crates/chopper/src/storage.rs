@@ -1968,7 +1968,7 @@ impl Sorter {
         self.largest_row = self.largest_row.max(decoded_size);
         self.largest_key = self.largest_key.max(row.key.len());
         if let Some(router) = self.spill_mode.router_mut() {
-            if router.push(&row)? {
+            if router.push(&row)?.is_none() {
                 return Ok(Some(row));
             }
         }
@@ -1978,9 +1978,9 @@ impl Sorter {
     }
     fn push_packed(&mut self, mut row: PackedRow) -> Result<()> {
         if let Some(router) = self.spill_mode.router_mut() {
-            if router.push(&row)? {
+            let Some(reason) = router.push(&row)? else {
                 return Ok(());
-            }
+            };
             // A late key or reordered stratum invalidated direct routing. Each
             // retained bucket is already sorted: reuse it without replaying rows.
             self.ctx
@@ -2000,6 +2000,7 @@ impl Sorter {
                     None,
                 ],
             );
+            let observation = observation.map(|span| span.with_reason(Some(reason)));
             let runs = router.into_runs()?;
             if let Some(span) = observation {
                 span.finish_counts(0, runs.len() as u64, None);
@@ -2043,29 +2044,31 @@ impl Sorter {
             .bytes
             .checked_add(row.heap_bytes())
             .context("sort buffer size overflow")?;
-        if !reserve_row_capacity(
+        if let Some(reason) = reserve_row_capacity(
             &mut self.buffer,
             bytes,
             &mut self.reservation,
             self.buffer_limit,
             std::mem::size_of::<Self>(),
         )? {
-            self.flush()?;
+            self.flush_run(true, Some(reason))?;
             if let Some(router) = self.spill_mode.router_mut() {
-                if router.push(&row)? {
+                if router.push(&row)?.is_none() {
                     return Ok(());
                 }
                 // Let the same fallback path handle the threshold-crossing row.
                 return self.push_packed(row);
             }
             let bytes = row.heap_bytes();
-            if !reserve_row_capacity(
+            if reserve_row_capacity(
                 &mut self.buffer,
                 bytes,
                 &mut self.reservation,
                 self.buffer_limit,
                 std::mem::size_of::<Self>(),
-            )? {
+            )?
+            .is_some()
+            {
                 return Err(anyhow::Error::new(crate::resources::MemoryAdmission::Local)
                     .context("record cannot fit available sort workspace; increase memory_mb"));
             }
@@ -2110,15 +2113,23 @@ impl Sorter {
     /// Make room for growing ingestion buffers without changing random keys.
     pub(crate) fn reserve_input(&mut self, input: &mut Reservation, bytes: usize) -> Result<()> {
         if input.resize(bytes).is_err() {
-            self.flush()?;
+            self.flush_run(
+                true,
+                Some(crate::observation::physical::Reason::InputReservation),
+            )?;
             input.resize(bytes)?;
         }
         Ok(())
     }
+    #[cfg(any(test, feature = "resource-contract-tests"))]
     fn flush(&mut self) -> Result<()> {
-        self.flush_run(true)
+        self.flush_run(true, None)
     }
-    fn flush_run(&mut self, _may_spill_again: bool) -> Result<()> {
+    fn flush_run(
+        &mut self,
+        _may_spill_again: bool,
+        reason: Option<crate::observation::physical::Reason>,
+    ) -> Result<()> {
         self.ctx.pressure_boundary();
         if self.buffer.is_empty() {
             return Ok(());
@@ -2128,7 +2139,7 @@ impl Sorter {
             if Router::eligible(&self.buffer, &self.ctx) {
                 let mut router = Router::new(&self.ctx);
                 for row in &self.buffer {
-                    ensure!(router.push(row)?, "routing preflight mismatch");
+                    ensure!(router.push(row)?.is_none(), "routing preflight mismatch");
                 }
                 self.buffer = Vec::new();
                 self.bytes = 0;
@@ -2159,7 +2170,9 @@ impl Sorter {
             .sort_runs
             .fetch_add(1, AtomicOrdering::Relaxed);
         let observation_ctx = self.ctx.clone();
-        let observation = observation_ctx.physical_span(crate::observation::physical::Kind::Spill);
+        let observation = observation_ctx
+            .physical_span(crate::observation::physical::Kind::Spill)
+            .map(|span| span.with_reason(reason));
         let observed_rows = self.buffer.len() as u64;
         self.sort_buffer();
         let mut writer = match writer {
@@ -2357,7 +2370,10 @@ impl Sorter {
                 _reservation: self.reservation,
             }));
         }
-        self.flush_run(false)?;
+        self.flush_run(
+            false,
+            Some(crate::observation::physical::Reason::FinalBatch),
+        )?;
         #[cfg(any(target_os = "linux", target_os = "wasi"))]
         drop(self.spill_mode.take_prepared());
         let fan_in = self.fan_in();
@@ -2951,6 +2967,54 @@ impl PhysicalReporter {
 
 #[cfg(test)]
 mod merge_tests {
+    #[test]
+    fn sorter_observes_memory_spills_separately_from_the_final_batch() -> Result<()> {
+        use crate::observation::{
+            physical::{Kind, Reason},
+            Status,
+        };
+
+        let facts = Arc::new(std::sync::Mutex::new(Vec::new()));
+        let captured = facts.clone();
+        let mut ctx = Context::new(
+            &chopper_core::Resources::default(),
+            Arc::new(AtomicBool::new(false)),
+            Arc::new(|_| {}),
+        )?;
+        ctx.physical = Some(Arc::new(move |fact| {
+            captured.lock().unwrap().push(fact);
+            true
+        }));
+        let mut sorter = Sorter::new(&ctx, SortOrder::Random([0; 32]));
+        sorter.buffer_limit = 2048;
+        let mut pushed = 0;
+        for id in 0u64..32 {
+            sorter.push(Row {
+                id,
+                ordinal: id,
+                key: u128::from(id).to_be_bytes().to_vec(),
+                fields: vec!["x".repeat(512)],
+            })?;
+            pushed += 1;
+            if ctx.budget.sort_runs.load(AtomicOrdering::Relaxed) != 0 {
+                break;
+            }
+        }
+        assert!(pushed < 32);
+        assert_eq!(sorter.finish()?.collect::<Result<Vec<_>>>()?.len(), pushed);
+        assert_eq!(
+            facts
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|fact| fact.kind == Kind::Spill && fact.status == Status::Completed)
+                .map(|fact| fact.reason)
+                .collect::<Vec<_>>(),
+            [Some(Reason::SortBufferLimit), Some(Reason::FinalBatch)]
+        );
+        Ok(())
+    }
+
     #[test]
     fn temporary_space_is_unlimited_by_default_and_explicit_limits_still_apply() -> Result<()> {
         let resources = chopper_core::Resources::default();

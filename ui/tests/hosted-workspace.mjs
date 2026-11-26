@@ -843,7 +843,7 @@ test('execution view opens beside the plan once per Run and preserves inspection
     assert.match(await page.locator('#execution-counters').innerText(),/destination\/result · 1 warning/);
     await page.locator('#execution-results-link').click();
     assert.equal(await page.evaluate(()=>document.activeElement.id),'run-results');
-    await panel.locator('summary').click();
+    await panel.locator(':scope > summary').click();
     await page.evaluate(()=>{
       window.graphHistory.accept(1,{read:{status:'completed',rows:4,bytes:80,seconds:1}});
       GraphFixture.renderExecutionHistory(window.graphHistory);

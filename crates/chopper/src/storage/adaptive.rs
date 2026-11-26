@@ -1,5 +1,6 @@
 //! Bounded physical representations shared by native and browser execution.
 use super::*;
+use crate::observation::physical::Reason;
 use std::collections::BTreeMap;
 
 /// Tracks algorithm workspaces, retained temporary paths, intermediate dataset
@@ -818,7 +819,7 @@ pub(super) fn reserve_row_capacity(
     reservation: &mut Reservation,
     limit: usize,
     overhead: usize,
-) -> Result<bool> {
+) -> Result<Option<Reason>> {
     let old_capacity = rows.capacity();
     let len = rows.len() + 1;
     let descriptor = std::mem::size_of::<PackedRow>();
@@ -841,8 +842,11 @@ pub(super) fn reserve_row_capacity(
         0
     };
     let peak = base.saturating_add(capacity.saturating_add(overlap).saturating_mul(descriptor));
-    if peak > limit || reservation.resize(peak).is_err() {
-        return Ok(false);
+    if peak > limit {
+        return Ok(Some(Reason::SortBufferLimit));
+    }
+    if reservation.resize(peak).is_err() {
+        return Ok(Some(Reason::SortReservation));
     }
     if capacity > old_capacity {
         rows.try_reserve_exact(capacity - rows.len())?;
@@ -854,7 +858,7 @@ pub(super) fn reserve_row_capacity(
         "row descriptor capacity exceeds memory budget"
     );
     reservation.resize(actual)?;
-    Ok(true)
+    Ok(None)
 }
 pub struct ResidentRows {
     pub rows: std::vec::IntoIter<PackedRow>,
@@ -914,13 +918,15 @@ impl ResidentShuffle {
             .bytes
             .checked_add(row.heap_bytes())
             .context("shuffle size overflow")?;
-        if !reserve_row_capacity(
+        if reserve_row_capacity(
             &mut self.rows,
             bytes,
             &mut self.reservation,
             self.ctx.memory / 4,
             std::mem::size_of::<Self>(),
-        )? {
+        )?
+        .is_some()
+        {
             return Ok(false);
         }
         row.release_decode_reservation();
@@ -1048,19 +1054,20 @@ impl Router {
             observed_rows: 0,
         }
     }
-    /// False requests a one-way fallback. No row is written on that path.
-    pub fn push(&mut self, row: &PackedRow) -> Result<bool> {
+    /// Returns the reason for a one-way fallback before writing the row.
+    pub fn push(&mut self, row: &PackedRow) -> Result<Option<Reason>> {
         self.push_parts(&row.key, row.ordinal, |writer| row.write(writer))
     }
     pub fn push_row(&mut self, row: &Row) -> Result<bool> {
         self.push_parts(&row.key, row.ordinal, |writer| write_row(writer, row))
+            .map(|reason| reason.is_none())
     }
     fn push_parts(
         &mut self,
         key: &[u8],
         ordinal: u64,
         write: impl FnOnce(&mut BufWriter<SpillFile>) -> Result<()>,
-    ) -> Result<bool> {
+    ) -> Result<Option<Reason>> {
         self.ctx.check()?;
         if self.observed_rows == 0 {
             self.observation = self
@@ -1069,14 +1076,17 @@ impl Router {
         }
         if let Some(bucket) = self.buckets.get_mut(key) {
             if ordinal < bucket.last_ordinal {
-                return Ok(false);
+                return Ok(Some(Reason::RoutingOrder));
             }
             write(&mut bucket.writer)?;
             bucket.last_ordinal = ordinal;
         } else {
             let bytes = self.bytes + route_cost(key);
-            if self.buckets.len() == MAX_ROUTES || bytes > self.ctx.memory / 8 {
-                return Ok(false);
+            if self.buckets.len() == MAX_ROUTES {
+                return Ok(Some(Reason::RoutingWriters));
+            }
+            if bytes > self.ctx.memory / 8 {
+                return Ok(Some(Reason::RoutingMemory));
             }
             self.reservation.resize(bytes)?;
             self.bytes = bytes;
@@ -1094,7 +1104,7 @@ impl Router {
         if let Some(attempt) = &mut self.observation {
             attempt.rows_processed(self.observed_rows);
         }
-        Ok(true)
+        Ok(None)
     }
     fn flush(&mut self) -> Result<Catalog<SpillFile>> {
         let mut files = Catalog::new(&self.ctx);
@@ -1537,7 +1547,7 @@ mod tests {
                     limit,
                     overhead,
                 )?,
-                delta >= 0
+                (delta < 0).then_some(Reason::SortBufferLimit)
             );
             assert_eq!(
                 ctx.workspace.used(),
@@ -1550,21 +1560,14 @@ mod tests {
         let mut reservation = Reservation::new(&ctx);
         let heaps = rows[0].heap_bytes() + row.heap_bytes();
         let peak = heaps + 3 * descriptor + overhead;
-        assert!(!reserve_row_capacity(
-            &mut rows,
-            heaps,
-            &mut reservation,
-            peak - 1,
-            overhead
-        )?);
+        assert_eq!(
+            reserve_row_capacity(&mut rows, heaps, &mut reservation, peak - 1, overhead)?,
+            Some(Reason::SortBufferLimit)
+        );
         assert_eq!(ctx.workspace.used(), ctx.directory_reserved_bytes());
-        assert!(reserve_row_capacity(
-            &mut rows,
-            heaps,
-            &mut reservation,
-            peak,
-            overhead
-        )?);
+        assert!(
+            reserve_row_capacity(&mut rows, heaps, &mut reservation, peak, overhead)?.is_none()
+        );
         assert_eq!(
             ctx.workspace.peak(),
             ctx.directory_reserved_bytes() + peak as u64

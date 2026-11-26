@@ -132,8 +132,8 @@ These are current fixed capacities, independent of rows, files and duration
 | Adapter stdout | One observation line at most 1024 UTF-8 bytes. Static field names/statuses; no producer-controlled text. |
 | Worker retained state | One cumulative snapshot, four fixed direct/export categories plus at most 1152 prepared physical summaries. No per-file records. At most 128 significant events and a 1156-slot Uint16 deduplication mask (2312 bytes), described below. At most 1156 worker-clock timing windows retain first observed start (nullable), last activity, status and the latest attempt ID. The worker writes pause coordinates to a single current shared block of 1,024 entries and sends each block to the page when it starts filling it. |
 | Worker → page | One observation message outstanding, using one 4-byte shared credit. One pending cumulative snapshot replaces intermediate measurements. A terminal request reply may additionally contain one final cumulative snapshot; it never waits for credit. Each producer record is under 1024 serialized bytes. Prepared delivery batches are bounded by 4 MiB serialized observation content. Pauses use separate fixed-size shared blocks and continue to accumulate while observation credit is held. |
-| Page retained state | Four direct/export steps plus at most 1152 prepared summaries, up to four source edges per summary, 128 retained significant events, at most 1156 timing windows and one frozen configured flow. Coordinates for all observed pauses remain available until the next Run, so their memory usage grows with the number of pauses. Up to 16 operation projections (16 column names of 64 UTF-16 code units each), eight CSV setting values of at most 64 code units, and three numeric limits. Compression and strategy text are clipped to 64 code units; part counts and requested percentages to 32. Extra configuration detail is explicitly labeled omitted. No submitted Job or row payload is retained by the history. |
-| Presentation | One shared semantic list of at most 1156 selectable step cards, styled as graph/list, plus a lazily rendered Timeline table of at most 1156 selectable rows; at most 17 configured-operation buttons, one inspector and one warning/summary. Retained significant events are not rendered as event buttons. Generated measurement text has fixed structure and bounded numeric fields. Controlled observation strings, aggregate snapshots and DOM text stay within a conservative 32 MiB logical payload envelope across worker/page copies. Full pause coordinates are separate from that envelope. Dense rows draw their earlier segments in one bitmap. These bounds do not cap JS heap or RSS. |
+| Page retained state | Four direct/export steps plus at most 1152 prepared summaries, up to four source edges per summary, 128 retained significant events, at most 1156 timing windows and one frozen configured flow. Coordinates for all observed pauses remain available until the next Run, so their memory usage grows with the number of pauses. Up to 16 operation projections (16 column names of 64 UTF-16 code units each), eight CSV setting values of at most 64 code units, and three numeric limits. Compression and strategy text are clipped to 64 code units; part counts and requested percentages to 32. Extra configuration detail is explicitly labeled omitted. The explanation projection retains at most three selectors and allocation targets per operation, three calculated column names and excerpts, a selected ZIP member of 128 code units, and bounded input/output dialect settings and caps. No submitted Job or row payload is retained by the history. |
+| Presentation | One shared semantic list of at most 1156 selectable step cards, styled as graph/list, plus a lazily rendered Timeline table of at most 1156 selectable rows; at most 17 configured-operation buttons, one inspector with one optional explanation, and one warning/summary. Retained significant events are not rendered as event buttons. Generated measurement text has fixed structure and bounded numeric fields. Controlled observation strings, aggregate snapshots and DOM text stay within a conservative 32 MiB logical payload envelope across worker/page copies. Full pause coordinates are separate from that envelope. Dense rows draw their earlier segments in one bitmap. These bounds do not cap JS heap or RSS. |
 
 The direct schema saturates at four categories/three dependencies; the prepared extension has the additional fixed bounds below: additional
 work cannot append nodes, edges, text or categories. Repeated updates replace
@@ -258,6 +258,27 @@ uses real workers/WASI/OPFS and independently verifies CSV membership, order/par
 strict caps, manifest records and the valid marker with collection disabled.
 Default/advanced inspection, other
 advanced inspection and long-running overhead acceptance remain later work.
+
+## Execution explanations
+
+The selected-step inspector uses an exhaustive TypeScript mapping from physical
+kinds and fixed browser steps to Brief, Standard, and Detailed explanations.
+The same selection drives Graph, List, and Timeline. The closed disclosure
+defers producing explanation text. The content uses a bounded projection of
+the submitted settings and confirmed observations. It distinguishes completed
+attempts from the status of an aggregate step.
+
+Spill and fallback facts can carry one typed reason. Workers count reasons on
+confirmed completed attempts only, retaining at most eight counters per summary.
+The final flush of an external sort records its own reason, alongside cases
+where a sort buffer limit or reservation caused an earlier spill. Routing
+handoffs record the limit or ordering check that caused them. Missing reasons
+leave the general explanation in place.
+
+When an existing step changes its algorithm, trigger, inputs, outputs, or
+measurements, update its explanation and affected tests in the same change.
+New physical kinds must also pass the Rust-to-browser kind inventory check.
+The browser typecheck requires three levels of copy for each displayed kind.
 
 ## External sorting, fallback and ordered-file reuse
 

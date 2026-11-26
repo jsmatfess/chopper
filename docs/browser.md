@@ -365,7 +365,13 @@ The [native quickstart](../README.md#native-quickstart) lists supported packages
 Use the [release CLI reference](cli-reference.md) to check command availability
 and [Run modes](run-cli.md) for ordered flags and saved Jobs.
 
-Graph, List and Timeline share step selection and the inspector. Timeline uses
+Graph, List and Timeline share step selection and the inspector. Select an observed
+step and open **Explain this step** for an optional explanation. The **Level of
+detail** slider starts at Standard and keeps the selected level as you move
+between steps. Explanations use settings captured when Run began and measurements
+from that run, such as actual allocation counts or a recorded spill trigger.
+
+Timeline uses
 worker-observed elapsed time since processing began, captured before delivery
 coalescing. Its bars span the first observed start to the latest activity of each
 step; repeated groups can leave gaps inside that window. Measured work remains

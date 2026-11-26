@@ -8,10 +8,11 @@ import {PHYSICAL_ID_BASE,MAX_PHYSICAL_STEPS,physicalTitles,type PhysicalSummary}
 import type {Job} from '../app';
 import {ExecutionTiming,TimingGapLog,TimingGapWriter,MAX_TIMING_WINDOWS,validTiming,type TimingWindow} from './execution-timing';
 import {ExecutionTimeline,type TimelineRow} from './execution-timeline';
+import {captureExplanationSettings,explainStep,explanationLevels,fixedStepKinds} from './execution-explanations';
 export type StepStatus='unknown'|'active'|'completed'|'interrupted'|'failed'|'handed_off';
 export type Measurement={status:StepStatus;rows?:number;seconds?:number;files?:number};
 export type Observation={completedStages?:number[];processingComplete?:boolean;events?:ExecutionEvent[];eventsOmitted?:number;timeline?:TimingWindow[];timeline_seconds?:number;physical?:PhysicalSummary[];read?:Measurement;write?:Measurement;export?:Measurement;marker?:Measurement;unavailable?:boolean;deliveryCoalesced?:boolean};
-const keys=['read','write','export','marker'] as const;
+const keys=fixedStepKinds;
 const titles=['Read input','Write CSV','Save destination files','Confirm completion marker'];
 const statuses:StepStatus[]=['unknown','active','completed','interrupted','failed','handed_off'];
 function validMeasurement(value:Measurement){return value&&typeof value==='object'&&statuses.includes(value.status)&&[value.rows,value.files].every(count=>count===undefined||Number.isSafeInteger(count)&&count>=0)&&(value.seconds===undefined||Number.isFinite(value.seconds)&&value.seconds>=0);}
@@ -27,6 +28,7 @@ export class ExecutionHistory {
   readonly supported:boolean;
   readonly prepared:boolean;
   readonly allocationLabels:string[][];
+  readonly explanationSettings:ReturnType<typeof captureExplanationSettings>;
   deliveryCoalesced=false;
   active=true;
   processingComplete=false;
@@ -49,6 +51,7 @@ export class ExecutionHistory {
   }
   interruptedAs:'interrupted'|'unknown'='unknown';
   constructor(readonly run:number,job:Job){
+    this.explanationSettings=captureExplanationSettings(job);
     const settings:string[]=[];
     if(job.compression!=null)settings.push(`compression: ${String(job.compression).slice(0,64)}`);
     for(const key of ['encoding','headers','delimiter','quote','escape','line_ending','bom','skip_empty_lines'] as const){const value=job.output_csv[key];if(value!=null)settings.push(`${key}: ${String(value).slice(0,64)}`);}
@@ -160,7 +163,7 @@ export class ObservationDelivery {
   }
   snapshot(){return {...this.latest,events:this.events.items,eventsOmitted:this.events.omitted,timeline:this.timing.snapshot(),timeline_seconds:this.timing.seconds()};}
 }
-type ObservedStep=ExecutionHistory['steps'][number];
+export type ObservedStep=ExecutionHistory['steps'][number];
 export function observedStrategy(history:ExecutionHistory,operation:number):string|null{
  const isShuffle=(id:number)=>history.configured.find(item=>item.id===id)?.label.startsWith(`${id}. shuffle`)??false;
  const steps=history.steps.filter(step=>operationsFor(step).includes(operation)),kinds=new Set(steps.map(step=>step.kind));
@@ -398,7 +401,13 @@ export function renderExecutionHistory(history:ExecutionHistory|null){
  if(!history){shownHistory=null;updateTimelineTimer();return;}shownHistory=history;
  if(!panel){
   panel=document.createElement('details');panel.id='execution-history';panel.className='card';panel.style.setProperty('--dag-node-width',`${DAG_NODE_WIDTH}px`);panel.style.setProperty('--dag-node-height',`${DAG_NODE_HEIGHT}px`);
-  panel.innerHTML='<summary></summary><div class="execution-flow" aria-label="Configured Run operations"></div><p class="execution-note"></p><div class="execution-controls" role="toolbar" aria-label="Execution view controls"><span class="execution-view-switch" role="group" aria-label="View" focusgroup="toolbar wrap"><button type="button" data-view="graph">Graph view</button><button type="button" data-view="list">List view</button><button type="button" data-view="timeline">Timeline view</button></span><span class="execution-control-divider" role="separator" aria-orientation="vertical"></span><span class="execution-zoom-controls" role="group" aria-label="Graph controls"><label class="execution-auto-fit"><input type="checkbox" data-auto-fit checked>Auto-fit</label><label class="execution-zoom">Zoom<input type="range" data-graph-zoom min="1" max="150" step="1" value="100"></label></span></div><span class="sr-only" id="execution-operation-match">Matches the selected configured operation.</span><div class="execution-map-heading"><span>Observed execution</span><span class="execution-navigation-hint">Drag sideways to pan</span></div><div class="execution-viewport"><div class="execution-stage"><div class="execution-canvas"><svg class="execution-dag-edges" aria-hidden="true"><defs><marker id="execution-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" markerUnits="userSpaceOnUse" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8ba69d"></path></marker></defs></svg><ol class="execution-list execution-graph" aria-label="Observed execution steps"></ol></div></div></div><div class="execution-timeline" hidden></div><section class="execution-inspector" aria-label="Selected execution step"><p>Select a step or configured operation.</p></section>';
+  panel.innerHTML='<summary></summary><div class="execution-flow" aria-label="Configured Run operations"></div><p class="execution-note"></p><div class="execution-controls" role="toolbar" aria-label="Execution view controls"><span class="execution-view-switch" role="group" aria-label="View" focusgroup="toolbar wrap"><button type="button" data-view="graph">Graph view</button><button type="button" data-view="list">List view</button><button type="button" data-view="timeline">Timeline view</button></span><span class="execution-control-divider" role="separator" aria-orientation="vertical"></span><span class="execution-zoom-controls" role="group" aria-label="Graph controls"><label class="execution-auto-fit"><input type="checkbox" data-auto-fit checked>Auto-fit</label><label class="execution-zoom">Zoom<input type="range" data-graph-zoom min="1" max="150" step="1" value="100"></label></span></div><span class="sr-only" id="execution-operation-match">Matches the selected configured operation.</span><div class="execution-map-heading"><span>Observed execution</span><span class="execution-navigation-hint">Drag sideways to pan</span></div><div class="execution-viewport"><div class="execution-stage"><div class="execution-canvas"><svg class="execution-dag-edges" aria-hidden="true"><defs><marker id="execution-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" markerUnits="userSpaceOnUse" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8ba69d"></path></marker></defs></svg><ol class="execution-list execution-graph" aria-label="Observed execution steps"></ol></div></div></div><div class="execution-timeline" hidden></div><section class="execution-inspector" aria-label="Selected execution step"><p>Select a step or configured operation.</p><details class="execution-explanation" hidden><summary>Explain this step</summary><div class="execution-explanation-control"><label for="execution-detail-level">Level of detail</label><div class="execution-detail-slider"><div class="execution-detail-track" aria-hidden="true"><span></span><span></span><span></span></div><input id="execution-detail-level" type="range" min="0" max="2" step="1" value="1" aria-valuetext="Standard"></div><div class="execution-explanation-labels" aria-hidden="true"><span>Brief</span><span class="is-selected">Standard</span><span>Detailed</span></div></div><div class="execution-explanation-copy"></div></details></section>';
+  const explanation=panel.querySelector<HTMLDetailsElement>('.execution-explanation')!;
+  const updateExplanation=()=>{
+   if(shownHistory)renderExplanation(shownHistory,shownHistory.steps.find(step=>step.id===selectedStep));
+  };
+  explanation.addEventListener('toggle',updateExplanation);
+  explanation.querySelector('input')!.addEventListener('input',updateExplanation);
   panel.querySelector<HTMLElement>('.execution-map-heading')!.title='Arrows show observed data dependencies, not parallel workers.';
   if(document.body.classList.contains('hosted-workspace'))(document.querySelector('.execution-pane')??document.querySelector('.editor'))!.append(panel);
   else document.querySelector('.editor')!.prepend(panel);
@@ -436,6 +445,7 @@ export function renderExecutionHistory(history:ExecutionHistory|null){
  const redraw=()=>{renderedRevision=-1;renderExecutionHistory(history);};
  if(renderedRun!==history.run){
   panel.open=true;
+  panel.querySelector<HTMLDetailsElement>('.execution-explanation')!.open=false;
   if(document.body.classList.contains('hosted-workspace'))document.dispatchEvent(new Event('chopper-execution-start'));
   else panel.scrollIntoView({block:'start'});
   renderedRun=history.run;selectedStep=null;selectedOperation=null;motionObserver?.disconnect();cards.clear();for(const label of activityLabels.values())label.remove();activityLabels.clear();dag=new ExecutionDag();drawnRevision=-1;drawnSelection='';zoom=1;for(const edge of edges.values())edge.remove();edges.clear();
@@ -510,5 +520,29 @@ export function renderExecutionHistory(history:ExecutionHistory|null){
  const strategy=selectedOperation!==null?observedStrategy(history,selectedOperation):null;
  const details=selected?describeStep(history,selected)+(operationsFor(selected).length?'':' · Supporting work; no configured operation mapping.'):selectedOperation!==null?`${configuredLabel(history.configured.find(item=>item.id===selectedOperation)?.label??`Operation ${selectedOperation}`)}${strategy?` · Observed strategy: ${strategy}.`:''} · Matching physical steps are outlined.`:'Select a step or configured operation.';
  if(inspector.textContent!==details)inspector.textContent=details;
+ renderExplanation(history,selected);
  renderedRevision=history.revision;
+}
+
+function renderExplanation(history:ExecutionHistory,step:ObservedStep|undefined){
+ const details=panel!.querySelector<HTMLDetailsElement>('.execution-explanation')!;
+ details.hidden=!step;
+ const copy=details.querySelector('.execution-explanation-copy')!;
+ if(!step){copy.replaceChildren();return;}
+ if(!details.open)return;
+ const slider=details.querySelector<HTMLInputElement>('input')!;
+ const level=slider.valueAsNumber as 0|1|2;
+ slider.setAttribute('aria-valuetext',explanationLevels[level]);
+ for(const [index,label] of Array.from(details.querySelectorAll('.execution-explanation-labels > *')).entries()){
+  label.classList.toggle('is-selected',index===level);
+ }
+ const sourceIds=observedSources(history,step);
+ const sources=sourceIds.length?history.steps.filter(source=>sourceIds.includes(source.id)):[];
+ const paragraphs=explainStep(history.explanationSettings,step,level,displayStepStatus(history,step),sources);
+ if(copy.childElementCount===paragraphs.length&&paragraphs.every((text,index)=>copy.children[index].textContent===text))return;
+ copy.replaceChildren(...paragraphs.map(text=>{
+  const paragraph=document.createElement('p');
+  paragraph.textContent=text;
+  return paragraph;
+ }));
 }

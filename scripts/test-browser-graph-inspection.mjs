@@ -57,8 +57,62 @@ await withHostedBrowser({port:8427,viewport:{width:1280,height:900}},async({cont
   await page.getByRole('button',{name:'List view',exact:true}).click();assert.equal(await panel.locator('[data-step][data-selected="true"]').getAttribute('data-step'),selected);await step.focus();await step.press('Enter');assert.equal(await step.evaluate(el=>document.activeElement===el),true);
   await page.getByRole('button',{name:'Graph view',exact:true}).click();assert.equal(await panel.locator('[data-step][data-selected="true"]').getAttribute('data-step'),selected);
   assert.ok((await panel.locator('.execution-inspector').textContent()).includes('receives data from'));
+  if(shape==='fused'){
+   const fused=panel.locator('.execution-list li').filter({hasText:'Fused resident random-key sort'}).first();
+   if(await fused.getAttribute('data-selected')!=='true')await fused.locator('button').click();
+   const explanation=panel.locator('.execution-explanation');
+   const copy=explanation.locator('.execution-explanation-copy');
+   assert.equal(await explanation.getAttribute('open'),null);
+   await explanation.getByText('Explain this step',{exact:true}).click();
+   await copy.getByText(/“key”/).waitFor();
+   const detail=explanation.getByRole('slider',{name:'Level of detail'});
+   assert.equal(await detail.getAttribute('aria-valuetext'),'Standard');
+   await detail.press('End');
+   assert.equal(await detail.getAttribute('aria-valuetext'),'Detailed');
+   assert.match(await copy.textContent(),/sort keys/);
+   const alignedStops=()=>explanation.evaluate(el=>{
+    const center=node=>{const box=node.getBoundingClientRect();return box.left+box.width/2;};
+    const ticks=[...el.querySelectorAll('.execution-detail-track span')];
+    const labels=[...el.querySelectorAll('.execution-explanation-labels span')];
+    const input=el.querySelector('#execution-detail-level');
+    return getComputedStyle(input).backgroundColor==='rgba(0, 0, 0, 0)' &&
+     ticks.length===3&&ticks.every((tick,index)=>getComputedStyle(tick).borderRadius==='50%' && Math.abs(center(tick)-center(labels[index]))<1);
+   });
+   assert.ok(await alignedStops(),'three circular stops line up with their labels');
+   await panel.getByRole('button',{name:'Timeline view',exact:true}).click();
+   assert.equal(await detail.getAttribute('aria-valuetext'),'Detailed');
+   assert.match(await copy.textContent(),/“key”/);
+   await panel.getByRole('button',{name:'Graph view',exact:true}).click();
+   const screenshots=process.argv.find(arg=>arg.startsWith('--screenshots='))?.slice(14);
+   if(screenshots){
+    await mkdir(screenshots,{recursive:true});
+    await panel.locator('.execution-inspector').screenshot({path:screenshots+'/explanation-desktop.png'});
+    await page.setViewportSize({width:390,height:844});
+    assert.ok(await explanation.evaluate(el=>el.scrollWidth<=el.clientWidth),'open explanation fits on a phone');
+    assert.ok(await alignedStops(),'circular stops and labels line up on a phone');
+    await panel.locator('.execution-inspector').screenshot({path:screenshots+'/explanation-mobile.png'});
+    await page.setViewportSize({width:1280,height:900});
+   }
+   await detail.press('Home');
+   assert.equal(await detail.getAttribute('aria-valuetext'),'Brief');
+   const csv=panel.locator('.execution-list button').filter({hasText:'Serialize CSV'}).first();
+   await csv.click();
+   assert.match(await copy.textContent(),/100,000 data rows/);
+   assert.equal(await detail.getAttribute('aria-valuetext'),'Brief');
+   await explanation.getByText('Explain this step',{exact:true}).click();
+  }
   if(dense){const repeated=panel.locator('[data-step] button').filter({has:page.locator('.execution-node-title',{hasText:'Resident Fisher–Yates shuffle'})});await repeated.click();assert.match(await panel.locator('.execution-inspector').textContent(),/64 completed attempt/);}
   await revealFormControl(page,'#max-rows');await page.locator('#max-rows').fill('7');await page.locator('.workspace-view-controls [data-workspace-view=execution]').click();await page.waitForFunction(()=>document.body.dataset.workspaceView==='execution');assert.match(await panel.locator('.execution-flow button').evaluateAll(buttons=>buttons.map(button=>button.getAttribute('aria-label')).join(' ')),/rows: 100000/);assert.match(await panel.locator('.execution-flow button').evaluateAll(buttons=>buttons.map(button=>button.getAttribute('aria-label')).join(' ')),new RegExp(`${job.operations.length+1}\\. CSV output`));
+  if(shape==='fused'){
+   const serialized=panel.locator('.execution-list li').filter({hasText:'Serialize CSV'}).first();
+   if(await serialized.getAttribute('data-selected')!=='true')await serialized.locator('button').click();
+   const explanation=panel.locator('.execution-explanation');
+   await explanation.getByText('Explain this step',{exact:true}).click();
+   const copy=await explanation.locator('.execution-explanation-copy').textContent();
+   assert.match(copy,/100,000 data rows/);
+   assert.doesNotMatch(copy,/7 data rows/);
+   await explanation.getByText('Explain this step',{exact:true}).click();
+  }
   const independent=await page.evaluate(async({dense})=>{const parent=await(await navigator.storage.getDirectory()).getDirectoryHandle(window.inspectionParent),folder=document.getElementById('result-path').textContent.match(/chopper-results-[a-z0-9-]+/)[0],dir=await parent.getDirectoryHandle(folder),ids=[],groups=[];let marker,manifest,saved=0;for await(const [name,handle]of dir.entries()){const file=await handle.getFile();if(name!=='CHOPPER-COMPLETE.json')saved++;if(name.endsWith('.csv')){if(file.size>2097152)throw Error('CSV cap');const rows=(await file.text()).trimEnd().split('\n').slice(1).map(row=>row.split(','));ids.push(...rows.map(row=>Number(row[0])));groups.push(new Set(rows.map(row=>row[1])).size);}else if(name==='manifest.jsonl')manifest=(await file.text()).trim().split('\n').map(JSON.parse);else if(name==='CHOPPER-COMPLETE.json')marker=JSON.parse(await file.text());}await parent.removeEntry(folder,{recursive:true});return {ids:ids.sort((a,b)=>a-b),groups,marker,saved,rows:manifest.filter(x=>x.type==='output').reduce((n,x)=>n+x.rows,0)};},{dense});
   assert.deepEqual(independent.ids,Array.from({length:dense?100000:4},(_,i)=>dense?i:i+1));assert.ok(independent.groups.every(count=>count===1));assert.equal(independent.rows,dense?100000:4);assert.deepEqual(independent.marker,{complete:true,files:independent.saved,engine:'chopper-browser',version:1});
   const screenshots=process.argv.find(arg=>arg.startsWith('--screenshots='))?.slice(14);if(screenshots){await mkdir(screenshots,{recursive:true});await panel.screenshot({path:screenshots+`/inspection-${shape}-wide.png`});await page.setViewportSize({width:390,height:844});await panel.screenshot({path:screenshots+`/inspection-${shape}-narrow.png`});assert.ok(await panel.evaluate(el=>el.scrollWidth<=el.clientWidth),'narrow panel fits viewport');await page.setViewportSize({width:1280,height:900});await page.getByRole('button',{name:'List view',exact:true}).click();await panel.screenshot({path:screenshots+`/inspection-${shape}-list.png`});await page.getByRole('button',{name:'Graph view',exact:true}).click();}
@@ -68,7 +122,7 @@ await withHostedBrowser({port:8427,viewport:{width:1280,height:900}},async({cont
    await page.locator('.workspace-view-controls [data-workspace-view=execution]').click();
    await page.waitForFunction(()=>document.body.dataset.workspaceView==='execution');
   }
-  await panel.locator('summary').click();
+  await panel.locator(':scope > summary').click();
  }
  await page.evaluate(async()=>(await navigator.storage.getDirectory()).removeEntry(window.inspectionParent,{recursive:true}));
  const hashes={};for(const name of ['engine.wasm','engine-worker.js','storage-worker.js','app.js'])hashes[name]=createHash('sha256').update(await readFile(root+'ui/dist/'+name)).digest('hex');console.log(JSON.stringify({browserVersion,browserChannel,harness_sha256:createHash('sha256').update(await readFile(fileURLToPath(import.meta.url))).digest('hex'),wrapper_sha256:createHash('sha256').update(wrapper).digest('hex'),hashes,reports},null,2));

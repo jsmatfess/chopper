@@ -107,6 +107,19 @@ const _: () = assert!((Kind::Omitted as u32) < CATEGORY_SLOTS);
 fn empty_memberships(values: &[u64; MAX_MEMBERSHIPS]) -> bool {
     values.iter().all(|n| *n == 0)
 }
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+#[repr(u8)]
+pub enum Reason {
+    SortBufferLimit,
+    SortReservation,
+    InputReservation,
+    FinalBatch,
+    RoutingOrder,
+    RoutingWriters,
+    RoutingMemory,
+    PreparedShuffleAdmission,
+}
 #[derive(Clone, Copy, Debug, Serialize)]
 pub struct Fact {
     pub id: u32,
@@ -129,6 +142,8 @@ pub struct Fact {
     pub attempt: u64,
     pub runs: u64,
     pub level: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<Reason>,
 }
 #[derive(Clone, Copy, Default)]
 pub(crate) struct AllocationCounts {
@@ -261,6 +276,7 @@ impl Context {
             attempt: self.physical_attempt_id(),
             runs: 0,
             level: None,
+            reason: None,
         };
         let reporter = self.physical_reporter()?;
         if emit {
@@ -439,6 +455,11 @@ impl Drop for Attempt {
     }
 }
 impl Span<'_> {
+    pub(crate) fn with_reason(mut self, reason: Option<Reason>) -> Self {
+        self.attempt.fact.reason = reason;
+        self
+    }
+
     pub(crate) fn start(&mut self) {
         self.attempt.start();
     }
@@ -534,6 +555,7 @@ pub(crate) fn resource_contracts() -> anyhow::Result<serde_json::Value> {
         attempt: u64::MAX,
         runs: u64::MAX,
         level: Some(u32::MAX),
+        reason: Some(Reason::PreparedShuffleAdmission),
         groups: u64::MAX,
         empty_groups: u64::MAX,
         memberships: [u64::MAX; MAX_MEMBERSHIPS],

@@ -237,7 +237,10 @@ impl Plan {
                     ctx.event("Retrying probabilistic assignment and shuffle", parent.rows)?;
                     let span = ctx.physical_span(Kind::Fallback);
                     if let Some(span) = span {
-                        span.finish(0);
+                        span.with_reason(Some(
+                            crate::observation::physical::Reason::PreparedShuffleAdmission,
+                        ))
+                        .finish(0);
                     }
                     self.original(data, &parent, job, analysis, ctx, output)?;
                 }
