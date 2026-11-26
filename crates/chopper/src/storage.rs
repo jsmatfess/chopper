@@ -2121,7 +2121,7 @@ impl Sorter {
         }
         Ok(())
     }
-    #[cfg(any(test, feature = "resource-contract-tests"))]
+    #[cfg(any(test, all(target_os = "wasi", feature = "resource-contract-tests")))]
     fn flush(&mut self) -> Result<()> {
         self.flush_run(true, None)
     }
