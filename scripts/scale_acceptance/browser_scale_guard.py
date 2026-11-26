@@ -12,6 +12,7 @@ from .browser_scale_plan import documents, destination_path, GiB
 from .guard import Guard, DiskObservation, load_runner
 from .browser_scale_watchdog import Watchdog
 from .native_scale_host import module
+from .owner_retention import retain_owner
 from .verify import read_json, require, sha256, validate_job, unique_object, MAX_LINE
 
 
@@ -278,11 +279,7 @@ def finish_scale(ownership, windows, job, watchdog, disk, controls, stop_owned):
 
 
 def retain_original(runner, batch, report):
-    try:runner.write_json(batch/'owner-retained.json',report)
-    except BaseException:pass
-    while True:
-        try:time.sleep(1)
-        except BaseException:pass
+    retain_owner(lambda: runner.write_json(batch/'owner-retained.json',report))
 
 
 def record_cleanup(runner,batch,cleanup,ownership,original,lock,stamp,owner_birth):

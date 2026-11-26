@@ -1051,7 +1051,7 @@ class HostedPacketControls(unittest.TestCase):
         small_path=repo/'scripts/browser-small-runner.py';self.write_source(small_path,'def stamp(): return 1\ndef qualify(): return 1\n')
         windows=repo/'scripts/browser-small-windows.py';self.write_source(windows,'def process_identity(): return 1\n')
         writer=repo/'scripts/validation-runner.py';self.write_source(writer,'import os\ndef contain_session(): return 1\ndef write_json(path,value):\n temporary=path\n os.replace(temporary,path)\n')
-        consumer=repo/'scripts/scale_acceptance/browser_scale_guard.py';self.write_source(consumer,'def run_scale(): pass\n')
+        consumer=repo/'scripts/scale_acceptance/browser_scale_watchdog.py';self.write_source(consumer,'class Watchdog: pass\n')
         files=[common,producer,small_path,windows,writer,consumer]
         git('add','.');git('commit','-m','actual producer');commit=git('rev-parse','HEAD')
         observed=dict(preparation_code=[dict(path='//server/historical/'+p.relative_to(repo).as_posix(),
@@ -1060,11 +1060,11 @@ class HostedPacketControls(unittest.TestCase):
         self.write_source(small_path,'def stamp(): return 1\ndef qualify(): return 2\ndef command_specs(): pass\n')
         self.write_source(windows,'import stat\nfrom pathlib import Path\ndef process_identity(): return 1\ndef read_control_snapshot(): return 2\nclass ControlFileError(OSError): pass\n')
         self.write_source(writer,'import os\ndef contain_session(): return 1\ndef write_json(path,value,*,replace=None):\n temporary=path\n (os.replace if replace is None else replace)(temporary,path)\n')
-        consumer.write_bytes(SCRIPT.parent.joinpath('scale_acceptance/browser_scale_guard.py').read_bytes())
+        consumer.write_bytes(SCRIPT.parent.joinpath('scale_acceptance/browser_scale_watchdog.py').read_bytes())
         checker=SimpleNamespace(__file__=str(common),checker_sources=lambda:files)
         proof=self.q.host_implementation(observed,commit,repo,checker)
         self.assertEqual(proof['status'],'observer-and-metadata-helpers-identical')
-        self.assertIn('scripts/scale_acceptance/browser_scale_guard.py',proof['pinned_consumer_bodies'])
+        self.assertIn('scripts/scale_acceptance/browser_scale_watchdog.py',proof['pinned_consumer_bodies'])
         reviewed=consumer.read_bytes();consumer.write_bytes(reviewed+b'\nUNREVIEWED=True\n')
         with self.assertRaisesRegex(ValueError,'observer/helper implementation changed'):
             self.q.host_implementation(observed,commit,repo,checker)

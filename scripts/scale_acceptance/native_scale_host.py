@@ -21,6 +21,7 @@ from . import native_scale_windows as windows_bootstrap
 from .verify import require, read_json, unique_object
 from .native_scale_control import create
 from .native_scale_identity import stamp
+from .owner_retention import retain_owner
 
 HERE = Path(__file__).resolve().parents[1]
 _calls = set()
@@ -353,12 +354,7 @@ def lock_owner_loop(stream, reply, launch, stop, retain, observe, seal_capture=l
 
 
 def retain_host_lock(platform):
-    try:
-        os.write(2, (platform+' host lock retained: owned cleanup unproven; parent intervention required\n').encode())
-    except OSError:
-        pass
-    while True:
-        time.sleep(1)
+    retain_owner(lambda: os.write(2, (platform+' host lock retained: owned cleanup unproven; parent intervention required\n').encode()))
 
 
 def independent_windows_lock_owner(backend=None):

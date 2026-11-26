@@ -1168,6 +1168,12 @@ fit. Retirement does not reset this controller's conservative high-water charge.
 
 ## Verification, evidence and remaining gates
 
+When cleanup remains unproven, the Native, BrowserScale and SMALL controllers
+use a shared owner-retention wait. The owning controller attempts its existing
+recovery diagnostic once and keeps the original reservation held, including
+when reporting or waiting raises. Each controller still proves its own process,
+pipe, thread and filesystem cleanup before the release path becomes reachable.
+
 The existing independent streaming verifier checks strict decoded fields/IDs,
 disk-backed exact conservation, header/serialized caps, exact D order/chunk
 boundaries, G named quotas/lineage, version/config manifest, truncated/extra

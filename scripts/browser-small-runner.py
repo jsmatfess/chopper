@@ -1049,6 +1049,8 @@ def write_capacity(config):
 
 
 def supervise(plan_path, approval):
+    from scale_acceptance.owner_retention import retain_owner
+
     need(os.name == 'nt', 'Execution requires native Windows; no fallback')
     approval_identity = freeze(plan_path)
     need(approval_identity['sha256'] == approval, 'Exact plan approval SHA256 required')
@@ -1135,18 +1137,9 @@ def supervise(plan_path, approval):
         finally:
             cleanup = finish_supervision(plan, owned, process, job, reservation, watchdog, resources, failure)
         if not reservation.get('release_safe'):
-            try:
-                runner.write_json(owned / 'owner-retained.json', dict(reservation=plan['reservation'],
-                    pid=os.getpid(), release=False, reason='Owned cleanup/thread/Job quiescence not established'))
-            except BaseException:
-                pass  # Receipt failure cannot release the original descriptor.
-            # Process exit would release the original descriptor. Root must
-            # reconcile this owner just as for the actual-picker controller.
-            while True:
-                try:
-                    time.sleep(1)
-                except BaseException:
-                    pass
+            retain_owner(lambda: runner.write_json(owned / 'owner-retained.json', dict(
+                reservation=plan['reservation'], pid=os.getpid(), release=False,
+                reason='Owned cleanup/thread/Job quiescence not established')))
         code = 1 if failure is not None or cleanup else 0
     # The host_lock context has closed its original descriptor at this point.
     runner.write_json(owned / 'reservation-released.json', dict(

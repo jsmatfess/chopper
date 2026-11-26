@@ -59,6 +59,62 @@ class Controls(unittest.TestCase):
         self.addCleanup(self.monitor_lineage_patch.stop)
         self.addCleanup(self.runtime_patch.stop)
 
+    def test_retention_keeps_the_original_lock_after_reporting_and_wait_errors(self):
+        driver = """
+import sys
+from pathlib import Path
+from scale_acceptance import owner_retention
+from scale_acceptance.native_scale_host import module
+
+root = Path(sys.argv[1])
+ci = module('local-ci')
+ci.host_lock_path = lambda: root / 'original.lock'
+sleep = owner_retention.time.sleep
+interrupted = False
+
+def report():
+    with (root / 'report-attempts').open('a') as output:
+        output.write('attempted\\n')
+    raise OSError('diagnostic write failed')
+
+def wait(seconds):
+    global interrupted
+    if not interrupted:
+        interrupted = True
+        raise KeyboardInterrupt
+    (root / 'waiting').touch()
+    sleep(seconds)
+
+with ci.host_lock():
+    owner_retention.time.sleep = wait
+    owner_retention.retain_owner(report)
+"""
+        lock = self.work / 'original.lock'
+        lock.touch()
+        original = lock.stat()
+        ci = host.module('local-ci')
+        with (self.work / 'owner-stderr.log').open('wb') as stderr:
+            owner = subprocess.Popen([sys.executable, '-B', '-c', driver, str(self.work)],
+                                     cwd=host.HERE, stderr=stderr)
+            try:
+                deadline = time.monotonic() + 5
+                while not (self.work / 'waiting').is_file():
+                    self.assertIsNone(owner.poll(), 'retention owner exited before it could wait')
+                    self.assertLess(time.monotonic(), deadline, 'retention owner did not enter the wait')
+                    time.sleep(.02)
+                self.assertEqual((self.work / 'report-attempts').read_text(), 'attempted\n')
+                with patch.object(ci, 'host_lock_path', return_value=lock):
+                    with self.assertRaisesRegex(ValueError, 'Cannot acquire host lock'), ci.host_lock():
+                        self.fail('another owner took the original lock')
+                self.assertTrue(os.path.samestat(original, lock.stat()))
+            finally:
+                if owner.poll() is None:
+                    owner.kill()
+                owner.wait(timeout=5)
+        # The probe owns the test process and may stop it administratively.
+        with patch.object(ci, 'host_lock_path', return_value=lock), ci.host_lock():
+            self.assertTrue(os.path.samestat(original, lock.stat()))
+
     def tearDown(self):
         control.create(self.work/'raw-negative-controls.json', self.failures)
 
