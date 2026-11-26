@@ -204,3 +204,15 @@ deployment to verify and a scoped run plan. The owner approval wait has no
 duration estimate. Reforecast when the owner approves the candidate, the
 candidate changes, or a live check fails. The later release's actual
 publication record owns the final outcome.
+
+## Performance graphs in release notes
+
+For every release that changes performance, include detailed before-and-after
+graphs in the release notes and provide the graphs as downloadable assets.
+Use matched, verified workloads and identify the baseline and candidate builds,
+runtime, fixture, resource settings, and measurement boundary. Show individual
+elapsed-time samples and medians or ranges. Include relevant controls,
+regressions, and separate charts for resource effects such as temporary reads,
+writes, peak storage, and working reservations. Label measured prototypes
+separately from shipped changes. Link the underlying observations and keep a
+text summary alongside the graphs.

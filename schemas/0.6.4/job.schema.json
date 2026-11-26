@@ -1,0 +1,179 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/jsmatfess/chopper/v0.6.4/schemas/0.6.4/job.schema.json",
+  "title": "Chopper 0.6.4 saved Job",
+  "description": "Version-1 Job structure. Chopper checks configuration semantics and validates the actual input before processing.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "integer", "const": 1, "default": 1, "description": "Supported Job format version." },
+    "input": { "type": "string", "default": "", "description": "Input CSV, gzip or ZIP path. Chopper requires a nonempty path.", "examples": ["examples/customers.csv"] },
+    "output": { "type": "string", "default": "", "description": "New output directory for Run.", "examples": ["chopped-customers"] },
+    "zip_member": { "type": ["string", "null"], "default": null, "description": "Exact ZIP member name. Omit for automatic selection." },
+    "input_csv": { "$ref": "#/definitions/csv" },
+    "output_csv": { "$ref": "#/definitions/csv" },
+    "compression": { "enum": ["none", "gzip", "zip"], "default": "none", "description": "Output compression." },
+    "calculated_columns": {
+      "type": "array",
+      "default": [],
+      "maxItems": 64,
+      "description": "Current-row formulas in output column order. Formulas can refer to any input or calculated column.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "expression"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "expression": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "default": [],
+      "description": "Pipeline operations in execution order.",
+      "items": { "$ref": "#/definitions/operation" }
+    },
+    "limits": { "$ref": "#/definitions/limits" },
+    "resources": { "$ref": "#/definitions/resources" },
+    "full_shuffle_rng": { "const": "blake3_counter_v1", "default": "blake3_counter_v1", "description": "Versioned full-shuffle random source. Usually omitted." },
+    "full_shuffle_algorithm": { "const": "adaptive_v1", "default": "adaptive_v1", "description": "Versioned full-shuffle algorithm. Usually omitted." }
+  },
+  "definitions": {
+    "unsigned": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615,
+      "description": "Unsigned integer on supported 64-bit native builds. Use whole-number JSON syntax without a decimal point or exponent."
+    },
+    "nullable_unsigned": {
+      "anyOf": [{ "$ref": "#/definitions/unsigned" }, { "type": "null" }]
+    },
+    "character": { "type": "string", "minLength": 1, "maxLength": 1 },
+    "column": {
+      "description": "Zero-based numeric index or exact string header name. The string \"0\" refers to a header named 0.",
+      "anyOf": [{ "$ref": "#/definitions/unsigned" }, { "type": "string" }],
+      "examples": [0, "country", "0"]
+    },
+    "columns": { "type": "array", "items": { "$ref": "#/definitions/column" } },
+    "allocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "percent"],
+      "properties": {
+        "name": { "type": "string", "description": "Unique, nonempty group name.", "examples": ["treatment"] },
+        "percent": { "type": "string", "description": "Exact decimal percentage text without a % sign, up to six fractional digits.", "examples": ["62.5"] }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "description": "Named groups with percentages summing exactly to 100.",
+      "items": { "$ref": "#/definitions/allocation" }
+    },
+    "operation": {
+      "oneOf": [
+        {
+          "title": "Balanced split",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "files"],
+          "properties": {
+            "type": { "const": "balanced", "description": "Split each group into consecutive, balanced files." },
+            "files": { "$ref": "#/definitions/unsigned" }
+          }
+        },
+        {
+          "title": "Interleaved split",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "files"],
+          "properties": {
+            "type": { "const": "interleaved", "description": "Split each group into balanced files using round-robin membership." },
+            "files": { "$ref": "#/definitions/unsigned" }
+          }
+        },
+        {
+          "title": "Partition",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "columns"],
+          "properties": {
+            "type": { "const": "partition", "description": "Group by distinct tuples of selected column values." },
+            "columns": { "$ref": "#/definitions/columns" }
+          }
+        },
+        {
+          "title": "Exact assignment",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "groups"],
+          "properties": {
+            "type": { "const": "assign", "description": "Assign records to named groups with exact quotas." },
+            "groups": { "$ref": "#/definitions/groups" },
+            "strata": { "allOf": [{ "$ref": "#/definitions/columns" }], "default": [], "description": "Apply quotas independently within each stratum." }
+          }
+        },
+        {
+          "title": "Probabilistic assignment",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "groups"],
+          "properties": {
+            "type": { "const": "assign_probabilistic", "description": "Assign records to named groups by independent draws." },
+            "groups": { "$ref": "#/definitions/groups" },
+            "strata": { "allOf": [{ "$ref": "#/definitions/columns" }], "default": [], "description": "Optional columns whose values identify strata." }
+          }
+        },
+        {
+          "title": "Shuffle",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": {
+            "type": { "const": "shuffle", "description": "Fully permute records within each current group." },
+            "strategy": { "enum": ["uniform", "auto", "fisher_yates"], "default": "uniform", "description": "Full-shuffle implementation. Fisher–Yates requires resident memory." }
+          }
+        }
+      ]
+    },
+    "csv": {
+      "type": "object",
+      "additionalProperties": false,
+      "default": {},
+      "properties": {
+        "encoding": { "type": "string", "default": "utf-8", "description": "Case-insensitive character encoding label. WHATWG aliases for Chopper’s supported encodings are accepted.", "examples": ["utf-16le", "windows-1252"] },
+        "headers": { "type": "boolean", "default": true, "description": "Read a header from input or write a header in output." },
+        "delimiter": { "allOf": [{ "$ref": "#/definitions/character" }], "default": ",", "description": "ASCII field delimiter." },
+        "quote": { "allOf": [{ "$ref": "#/definitions/character" }], "default": "\"", "description": "ASCII quote character." },
+        "escape": { "anyOf": [{ "$ref": "#/definitions/character" }, { "type": "null" }], "default": null, "description": "ASCII escape character. Null uses doubled quotes." },
+        "line_ending": { "enum": ["lf", "crlf"], "default": "lf", "description": "CSV record line ending." },
+        "bom": { "type": "boolean", "default": false, "description": "Write an encoding-appropriate byte order mark in output." },
+        "skip_empty_lines": { "type": "boolean", "default": false, "description": "Skip bare blank records on input." }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "default": {},
+      "properties": {
+        "rows": { "allOf": [{ "$ref": "#/definitions/nullable_unsigned" }], "default": null, "description": "Maximum data records per physical file." },
+        "bytes": { "allOf": [{ "$ref": "#/definitions/nullable_unsigned" }], "default": null, "description": "Hard cap on serialized uncompressed CSV bytes per file." },
+        "compressed_bytes": { "allOf": [{ "$ref": "#/definitions/nullable_unsigned" }], "default": null, "description": "Advisory compressed-byte target per file. Requires output compression." }
+      }
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "default": {},
+      "properties": {
+        "memory_mb": { "anyOf": [{ "const": "auto" }, { "$ref": "#/definitions/unsigned" }], "default": "auto", "description": "Working allocation budget in MiB, or automatic sizing." },
+        "workers": { "allOf": [{ "$ref": "#/definitions/unsigned" }], "default": 0, "description": "Requested worker count. Zero selects automatically." },
+        "temp_dir": { "type": ["string", "null"], "default": null, "description": "Temporary workspace location. Null uses the system temporary directory." },
+        "temp_bytes": { "allOf": [{ "$ref": "#/definitions/nullable_unsigned" }], "default": null, "description": "Temporary storage cap in bytes. Null leaves it unset." },
+        "max_files": { "allOf": [{ "$ref": "#/definitions/unsigned" }], "default": 100000, "description": "Maximum output files." },
+        "max_record_bytes": { "allOf": [{ "$ref": "#/definitions/unsigned" }], "default": 8388608, "description": "Record limit in bytes." },
+        "grouping": { "enum": ["auto", "sort"], "default": "auto", "description": "Physical grouping policy." }
+      }
+    }
+  }
+}

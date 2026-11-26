@@ -9,7 +9,7 @@ not a supported release target. There is no native server or native UI.
 - [Try in browser](https://chopper-1rx.pages.dev/) with desktop Chrome or Edge.
   Follow the [browser sample walkthrough](docs/browser.md#try-a-sample-export)
   to make and verify your first export.
-- [Download the CLI for Windows or Linux](https://github.com/jsmatfess/chopper/releases/tag/v0.6.3).
+- [Download the CLI for Windows or Linux](https://github.com/jsmatfess/chopper/releases/tag/v0.6.4).
   The [native quickstart](#native-quickstart) walks through verifying the ZIP
   and running the bundled sample.
 
@@ -18,14 +18,14 @@ The [user guide](docs/user/README.md) covers saved Jobs, recipes, and upgrades.
 ## Native quickstart
 
 Download your platform ZIP and **SHA256SUMS** from the same
-[Chopper 0.6.3 release](https://github.com/jsmatfess/chopper/releases/tag/v0.6.3).
+[Chopper 0.6.4 release](https://github.com/jsmatfess/chopper/releases/tag/v0.6.4).
 Allow about five minutes to download and verify the bundled synthetic example.
 Open a terminal in the download directory.
 
 | Environment | Package and requirements |
 | --- | --- |
-| Windows x86-64 | `chopper-0.6.3-windows-x86_64.zip`. Use PowerShell. If Windows reports missing MSVC runtime DLLs, install or repair the [Microsoft Visual C++ v14 Redistributable for x64](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist/). |
-| Linux x86-64 | `chopper-0.6.3-linux-x86_64.zip`. Requires glibc 2.34 or later and shell tools including `unzip` and `sha256sum`. Check the host with `uname -m` and `getconf GNU_LIBC_VERSION`. |
+| Windows x86-64 | `chopper-0.6.4-windows-x86_64.zip`. Use PowerShell. If Windows reports missing MSVC runtime DLLs, install or repair the [Microsoft Visual C++ v14 Redistributable for x64](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist/). |
+| Linux x86-64 | `chopper-0.6.4-linux-x86_64.zip`. Requires glibc 2.34 or later and shell tools including `unzip` and `sha256sum`. Check the host with `uname -m` and `getconf GNU_LIBC_VERSION`. |
 | Hosted | [Desktop Chrome or Edge](docs/user/README.md#use-chopper-in-your-browser) with a secure, cross-origin-isolated page, File System Access, OPFS and Web Locks. Open the [hosted app](https://chopper-1rx.pages.dev/) directly. |
 | Other native platforms | macOS is source-only and unqualified. Native release packages are x86-64. |
 
@@ -38,8 +38,8 @@ Verify the downloaded ZIP, then extract it into a fresh directory. Change
 `$destination` if the directory already exists.
 
 ```powershell
-$archive = 'chopper-0.6.3-windows-x86_64.zip'
-$destination = 'chopper-0.6.3-windows-x86_64'
+$archive = 'chopper-0.6.4-windows-x86_64.zip'
+$destination = 'chopper-0.6.4-windows-x86_64'
 $pattern = '^([0-9a-f]{64})  ' + [regex]::Escape($archive) + '$'
 $record = @(Get-Content -LiteralPath SHA256SUMS | Where-Object { $_ -match $pattern })
 if ($record.Count -ne 1 -or (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne $record[0].Substring(0, 64)) {
@@ -51,7 +51,7 @@ Set-Location -LiteralPath $destination -ErrorAction Stop
 .\chopper.exe --version
 ```
 
-Confirm the version is `chopper 0.6.3`. From that same directory, run the Job
+Confirm the version is `chopper 0.6.4`. From that same directory, run the Job
 and inspect the CSVs and manifest.
 
 ```powershell
@@ -77,8 +77,8 @@ Verify the downloaded ZIP and extract it into a fresh directory. Change
 `destination` if the directory already exists.
 
 ```sh
-archive=chopper-0.6.3-linux-x86_64.zip
-destination=chopper-0.6.3-linux-x86_64
+archive=chopper-0.6.4-linux-x86_64.zip
+destination=chopper-0.6.4-linux-x86_64
 awk -v file="$archive" '$2 == file' SHA256SUMS | sha256sum --check &&
   mkdir "$destination" &&
   unzip "$archive" -d "$destination" &&
@@ -87,7 +87,7 @@ awk -v file="$archive" '$2 == file' SHA256SUMS | sha256sum --check &&
   ./chopper --version
 ```
 
-Confirm the version is `chopper 0.6.3`. From that same directory, run the Job
+Confirm the version is `chopper 0.6.4`. From that same directory, run the Job
 and inspect the CSVs and manifest.
 
 ```sh
