@@ -4118,7 +4118,7 @@ mod merge_tests {
 
     #[test]
     fn merge_catalogs_overlap_reader_allocation_and_live_until_drop() -> Result<()> {
-        let file_bytes = std::mem::size_of::<SpillFile>();
+        let file_bytes = std::mem::size_of::<RunFile>();
         let run_bytes = std::mem::size_of::<SortRun>();
         let reader_bytes = DISK_READ_BUFFER
             + std::mem::size_of::<RunReader>()
