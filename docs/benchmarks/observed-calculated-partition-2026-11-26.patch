@@ -1,0 +1,109 @@
+diff --git a/crates/chopper/src/engine.rs b/crates/chopper/src/engine.rs
+index 37f2431..8d27181 100644
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -672,9 +672,12 @@ fn process_using(
+             let mut step_ctx = ctx.physical_scope([index + 1, 0]);
+             step_ctx.physical_source = dataset.physical_source;
+             let started = std::time::Instant::now();
+-            #[cfg(target_os = "linux")]
+-            if _unobserved_run
+-                && !cfg!(feature = "experimental-constant-partition")
++            #[cfg(any(target_os = "linux", target_os = "wasi"))]
++            if (if cfg!(target_os = "wasi") {
++                ctx.auto_run
++            } else {
++                _unobserved_run
++            }) && !cfg!(feature = "experimental-constant-partition")
+                 && index == 0
+                 && dataset.groups == 1
+                 && source_metadata.len() >= 128 * 1024 * 1024
+@@ -2803,7 +2826,7 @@ fn partition(
+         ctx,
+     )
+ }
+-#[cfg(target_os = "linux")]
++#[cfg(any(target_os = "linux", target_os = "wasi"))]
+ #[cold]
+ #[inline(never)]
+ fn try_calculated_partition(
+@@ -2818,10 +2841,15 @@ fn try_calculated_partition(
+         .groups()?
+         .next()
+         .context("missing retained root group")??;
++    // Hosted calculation/Partition retains the ordinary encoded-output
++    // snapshot and admits its writer before constructing the grouping state.
++    #[cfg(target_os = "wasi")]
++    let mut writer = output::PlanWriter::new(job, Some(&plan.header), ctx)?;
+     let started = std::time::Instant::now();
+     let sorted = plan.sorted_partition(dataset, &parent, &columns, job, ctx)?;
+     let traversal_seconds = started.elapsed().as_secs_f64();
+     ctx.operation_event(1, 1)?;
++    #[cfg(target_os = "linux")]
+     let mut writer = output::PlanWriter::new(job, Some(&plan.header), ctx)?;
+     emit_partition(sorted, &parent, &columns, 0, false, &mut writer, ctx)?;
+     let stats = StageStats {
+diff --git a/crates/chopper/src/engine/calculation.rs b/crates/chopper/src/engine/calculation.rs
+index e351965..6729894 100644
+--- a/crates/chopper/src/engine/calculation.rs
++++ b/crates/chopper/src/engine/calculation.rs
+@@ -217,7 +217,7 @@ impl Plan {
+         })
+     }
+ 
+-    #[cfg(target_os = "linux")]
++    #[cfg(any(target_os = "linux", target_os = "wasi"))]
+     pub(super) fn sorted_partition(
+         &self,
+         dataset: &Dataset,
+@@ -226,19 +226,38 @@ impl Plan {
+         job: &Job,
+         ctx: &Context,
+     ) -> Result<SortedRows> {
+-        let mut sorter = Sorter::new(ctx, SortOrder::Key);
+-        let mut evaluator = RowEvaluator::new(self, job, ctx);
+-        let mut rows = dataset.rows(parent, ctx.max_record)?;
+-        let mut previous = None;
+-        while let Some(mut row) = rows.next_packed(previous.take())? {
+-            evaluator.append(&mut row, ctx)?;
+-            let key =
+-                OperationKey::tuple(row.fields(), columns, 0, Reservation::new(ctx), &mut sorter)?;
+-            let capacity = key.install(&mut row, &mut sorter)?;
+-            previous = sorter.push_compact_reusing(row, capacity)?;
++        use crate::observation::physical::Kind;
++        let mut observation = ctx.physical_span(Kind::Calculation);
++        let mut sort_ctx = ctx.clone();
++        if observation.is_some() {
++            sort_ctx.physical_source = ctx.physical_identity(Kind::Calculation);
++        }
++        let mut sorter = Sorter::new(&sort_ctx, SortOrder::Key);
++        let scan = (|| -> Result<()> {
++            let mut evaluator = RowEvaluator::new(self, job, ctx);
++            let mut rows = dataset.rows(parent, ctx.max_record)?;
++            let mut previous = None;
++            while let Some(mut row) = rows.next_packed(previous.take())? {
++                evaluator.append(&mut row, ctx)?;
++                if let Some(span) = &mut observation {
++                    span.row_processed();
++                }
++                let key = OperationKey::tuple(
++                    row.fields(),
++                    columns,
++                    0,
++                    Reservation::new(ctx),
++                    &mut sorter,
++                )?;
++                let capacity = key.install(&mut row, &mut sorter)?;
++                previous = sorter.push_compact_reusing(row, capacity)?;
++            }
++            Ok(())
++        })();
++        if let Some(span) = observation {
++            span.finish_result(&scan);
+         }
+-        drop(rows);
+-        drop(evaluator);
++        scan?;
+         sorter.finish()
+     }
+ 

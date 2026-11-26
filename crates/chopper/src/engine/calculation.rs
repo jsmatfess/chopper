@@ -217,7 +217,7 @@ impl Plan {
         })
     }
 
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "wasi"))]
     pub(super) fn sorted_partition(
         &self,
         dataset: &Dataset,
@@ -226,19 +226,42 @@ impl Plan {
         job: &Job,
         ctx: &Context,
     ) -> Result<SortedRows> {
-        let mut sorter = Sorter::new(ctx, SortOrder::Key);
-        let mut evaluator = RowEvaluator::new(self, job, ctx);
-        let mut rows = dataset.rows(parent, ctx.max_record)?;
-        let mut previous = None;
-        while let Some(mut row) = rows.next_packed(previous.take())? {
-            evaluator.append(&mut row, ctx)?;
-            let key =
-                OperationKey::tuple(row.fields(), columns, 0, Reservation::new(ctx), &mut sorter)?;
-            let capacity = key.install(&mut row, &mut sorter)?;
-            previous = sorter.push_compact_reusing(row, capacity)?;
+        use crate::observation::physical::Kind;
+        let mut observation = if cfg!(any(target_os = "wasi", test)) {
+            ctx.physical_span(Kind::Calculation)
+        } else {
+            None
+        };
+        let mut sort_ctx = ctx.clone();
+        if observation.is_some() {
+            sort_ctx.physical_source = ctx.physical_identity(Kind::Calculation);
         }
-        drop(rows);
-        drop(evaluator);
+        let mut sorter = Sorter::new(&sort_ctx, SortOrder::Key);
+        let scan = (|| -> Result<()> {
+            let mut evaluator = RowEvaluator::new(self, job, ctx);
+            let mut rows = dataset.rows(parent, ctx.max_record)?;
+            let mut previous = None;
+            while let Some(mut row) = rows.next_packed(previous.take())? {
+                evaluator.append(&mut row, ctx)?;
+                if let Some(span) = &mut observation {
+                    span.row_processed();
+                }
+                let key = OperationKey::tuple(
+                    row.fields(),
+                    columns,
+                    0,
+                    Reservation::new(ctx),
+                    &mut sorter,
+                )?;
+                let capacity = key.install(&mut row, &mut sorter)?;
+                previous = sorter.push_compact_reusing(row, capacity)?;
+            }
+            Ok(())
+        })();
+        if let Some(span) = observation {
+            span.finish_result(&scan);
+        }
+        scan?;
         sorter.finish()
     }
 

@@ -41,7 +41,7 @@ type SpillFile = DiskFile;
 type SpillReader = DiskReader;
 pub(crate) use adaptive::PackedKey;
 pub(crate) use adaptive::Workspace;
-use adaptive::{reserve_row_capacity, ResidentRows, RoutedRows, Router};
+use adaptive::{reserve_row_capacity, ResidentRows, RoutedKey, RoutedRows, Router};
 pub use adaptive::{FieldViews, PackedRow};
 pub(crate) use adaptive::{Reservation, ResidentShuffle};
 use catalog::Catalog;
@@ -1025,9 +1025,14 @@ fn get_bytes(r: &mut impl Read, limit: usize) -> Result<Vec<u8>> {
     Ok(b)
 }
 pub fn write_row(w: &mut impl Write, row: &Row) -> Result<()> {
+    write_row_frame(w, row, true)
+}
+fn write_row_frame(w: &mut impl Write, row: &Row, with_key: bool) -> Result<()> {
     put_u64(w, row.id)?;
     put_u64(w, row.ordinal)?;
-    put_bytes(w, &row.key)?;
+    if with_key {
+        put_bytes(w, &row.key)?;
+    }
     put_u64(w, row.fields.len() as u64)?;
     for field in &row.fields {
         put_bytes(w, field.as_bytes())?;
@@ -2532,10 +2537,7 @@ impl Ord for Head {
     }
 }
 /// A logical sorted run may consist of several disjoint, ordered bucket files.
-struct SortRun(
-    Catalog<SpillFile>,
-    Option<crate::observation::physical::Kind>,
-);
+struct SortRun(Catalog<RunFile>, Option<crate::observation::physical::Kind>);
 impl SortRun {
     fn origin(mut self, kind: Option<crate::observation::physical::Kind>) -> Self {
         self.1 = kind;
@@ -2579,28 +2581,52 @@ impl SortRun {
 
     fn single(ctx: &Context, file: impl Into<SpillFile>) -> Result<Self> {
         let mut files = Catalog::new(ctx);
-        files.push(file.into())?;
+        files.push(RunFile::from(file.into()))?;
         Ok(Self(files, None))
+    }
+}
+struct RunFile {
+    spill: SpillFile,
+    key: Option<Arc<RoutedKey>>,
+}
+impl From<SpillFile> for RunFile {
+    fn from(spill: SpillFile) -> Self {
+        Self { spill, key: None }
     }
 }
 struct RunReader {
     reader: Option<BufReader<SpillReader>>,
     // Close the descriptor before releasing its file, including on Windows.
-    current: Option<SpillFile>,
-    remaining: catalog::CatalogIter<SpillFile>,
+    current: Option<RunFile>,
+    remaining: catalog::CatalogIter<RunFile>,
 }
 impl RunReader {
-    fn new(run: SortRun) -> Self {
+    fn new(files: Catalog<RunFile>) -> Self {
         Self {
             reader: None,
             current: None,
-            remaining: run.0.into_iter(),
+            remaining: files.into_iter(),
         }
     }
     fn header(&mut self, maximum: usize, charge: &Reservation) -> Result<Option<RowHeader>> {
         loop {
             if let Some(reader) = &mut self.reader {
-                if let Some(row) = read_header_reserved(reader, maximum, Some(charge.sibling()))? {
+                let key = self.current.as_ref().and_then(|file| file.key.as_ref());
+                let header = if let Some(key) = key {
+                    if reader.fill_buf()?.is_empty() {
+                        None
+                    } else {
+                        Some(RowHeader {
+                            id: get_u64(reader)?,
+                            ordinal: get_u64(reader)?,
+                            key: FrameKey::Routed(key.clone()),
+                            key_reservation: Some(charge.sibling()),
+                        })
+                    }
+                } else {
+                    read_header_reserved(reader, maximum, Some(charge.sibling()))?
+                };
+                if let Some(row) = header {
                     return Ok(Some(row));
                 }
             }
@@ -2609,7 +2635,7 @@ impl RunReader {
             let Some(file) = self.remaining.next() else {
                 return Ok(None);
             };
-            self.reader = Some(file.reader()?);
+            self.reader = Some(file.spill.reader()?);
             self.current = Some(file);
         }
     }
@@ -2685,7 +2711,7 @@ impl MergeRows {
         let order = Arc::new(order);
         for (run, file) in files.into_iter().enumerate() {
             ctx.check()?;
-            let mut reader = RunReader::new(file);
+            let mut reader = RunReader::new(file.0);
             if let Some(row) = reader.header(ctx.max_record, &reservation)? {
                 heads.push(Head {
                     row,
@@ -3548,7 +3574,12 @@ mod merge_tests {
             let result = rows
                 .next_decoded(|reader, maximum, header| {
                     assert!(header.key_reservation.is_some());
-                    assert_eq!(ctx.workspace.used(), held + 17);
+                    let per_row = if cfg!(feature = "experimental-spill-blocks") {
+                        17
+                    } else {
+                        0
+                    };
+                    assert_eq!(ctx.workspace.used(), held + per_row);
                     owned_fields_reserved(reader, maximum, header)
                 })
                 .unwrap();
@@ -3569,6 +3600,82 @@ mod merge_tests {
         Ok(())
     }
 
+    #[cfg(not(feature = "experimental-spill-blocks"))]
+    #[test]
+    fn routed_merge_keys_outlive_closed_files_and_release_after_failure() -> Result<()> {
+        #[derive(Clone, Copy)]
+        enum Case {
+            Retain,
+            Materialize,
+            Truncate,
+            Cancel,
+        }
+        for case in [
+            Case::Retain,
+            Case::Materialize,
+            Case::Truncate,
+            Case::Cancel,
+        ] {
+            let ctx = context()?;
+            let row = Row {
+                id: 0,
+                ordinal: 0,
+                key: vec![7; 17],
+                fields: vec!["valid".into()],
+            };
+            let mut router = Router::new(&ctx);
+            assert!(router.push_row(&row)?);
+            let files = router.into_runs()?;
+            if matches!(case, Case::Truncate) {
+                let file = &files[0].spill;
+                file.file
+                    .as_ref()
+                    .unwrap()
+                    .as_file()
+                    .set_len(file.len() - 1)?;
+            }
+            let mut runs = Catalog::new(&ctx);
+            runs.push(SortRun(files, None))?;
+            let mut rows = MergeRows::new(runs, SortOrder::Key, &ctx, row.memory(), row.key.len())?;
+            if matches!(case, Case::Cancel) {
+                ctx.budget.cancel.store(true, AtomicOrdering::Relaxed);
+            }
+            match case {
+                Case::Materialize => {
+                    let mut framed = Vec::new();
+                    assert!(rows.copy_next(&mut framed)?);
+                    assert!(!rows.copy_next(&mut framed)?);
+                    let mut expected = Vec::new();
+                    write_row(&mut expected, &row)?;
+                    assert_eq!(framed, expected);
+                    drop(rows);
+                }
+                Case::Truncate | Case::Cancel => {
+                    assert!(rows.next_compact().unwrap().is_err());
+                    assert!(rows.next_compact().is_none());
+                    drop(rows);
+                }
+                Case::Retain => {
+                    let decoded = rows.next_compact().unwrap()?;
+                    drop(rows);
+                    assert_eq!(decoded.key.as_slice(), row.key);
+                    assert_eq!(ctx.used(), 0);
+                    let PackedKey::Routed(owner) = &decoded.key else {
+                        panic!("routed merge row must retain the bucket key");
+                    };
+                    assert_eq!(Arc::strong_count(owner), 1);
+                    assert!(
+                        ctx.workspace.used()
+                            > ctx.directory_reserved_bytes() + decoded.heap_bytes() as u64
+                    );
+                }
+            }
+            assert_eq!(ctx.workspace.used(), ctx.directory_reserved_bytes());
+            assert_eq!(ctx.used(), 0);
+        }
+        Ok(())
+    }
+
     #[test]
     fn merge_header_keys_release_on_truncation_and_cancellation() -> Result<()> {
         for cancel in [false, true] {
@@ -3577,6 +3684,7 @@ mod merge_tests {
             if !cancel {
                 // The second header declares a key whose bytes are truncated.
                 run.0[0]
+                    .spill
                     .file
                     .as_ref()
                     .unwrap()
@@ -4926,7 +5034,7 @@ mod merge_tests {
                     write_row(&mut file, row)?;
                     #[cfg(feature = "experimental-spill-blocks")]
                     let file = SpillFile::from(file);
-                    files.push(file)?;
+                    files.push(RunFile::from(file))?;
                 }
                 runs.push(SortRun(files, None))?;
             }

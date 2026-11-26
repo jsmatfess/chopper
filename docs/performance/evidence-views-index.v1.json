@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "b64ff1d1e3b5d8a0f4aa495ef79ffc8e36f308199313cb650639106b6f3e4eef",
+  "catalog_sha256": "cad675c4153dc56c4a281b131f18f94b2e4aedf10326ff27617c4996123fd4a3",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -1946,6 +1946,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "2027e7d907d5178db5d926cfd0329c439bd654d4e3aa8cc6d5b285051c54f74b",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/compact-parser-native-2026-10-15.jsonl",
       "source_sha256": "202ea67a2116d9a8d79baff95dd628bdf3c76a8e71eab0cfb598d84a4937b1f6",
       "aliases": [
@@ -3625,6 +3638,19 @@
         "docs/benchmarks/partition-routing-summary-2026-11-18.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-uniform-mixed-merge-2026-11-26.patch",
+      "source_sha256": "3d46de61dc5b55b7a22d90ac12347d231dbea5ec03a70d4bda900eb57c2ca6b0",
+      "aliases": [
+        "docs/benchmarks/hosted-uniform-mixed-merge-2026-11-26.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -7625,6 +7651,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/observed-calculated-partition-2026-11-26.patch",
+      "source_sha256": "7ba468eedc64b62a6f72b5d2a591fac99cebcabf4e47d488f0edc84d360b139d",
+      "aliases": [
+        "docs/benchmarks/observed-calculated-partition-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/shuffle-swarm-replay-2026-11-15.tar.gz",
       "source_sha256": "7bac9d054e3e201e844fba0d4c69bde806737c645812b2712fddac27508d6ebb",
       "aliases": [
@@ -8106,6 +8145,19 @@
         "unclassified": 4
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/observed-calculated-partition-faults-2026-11-26.json",
+      "source_sha256": "8519c1d46b7010169492cc8868ad19b7e2b76685e6fa5a7b7daead149d053584",
+      "aliases": [
+        "docs/benchmarks/observed-calculated-partition-faults-2026-11-26.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/native-auto-bounds-2026-11-22-linux-terminal-wide.jsonl",
@@ -11140,6 +11192,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-uniform-mixed-merge-pressure-2026-11-26.patch",
+      "source_sha256": "b8fa55acbdfe6e1bcd0cfdc17df2e06c8e2414e987122a99f2a747460ee91be2",
+      "aliases": [
+        "docs/benchmarks/hosted-uniform-mixed-merge-pressure-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/temporary-construction-source-audit-2026-10-22.json",
       "source_sha256": "b903cb030b315b07f7f0b9b036c06409754e457b84f0c1926ff9fc9b537c85a6",
       "aliases": [
@@ -11479,6 +11544,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-uniform-mixed-merge-2026-11-26.jsonl",
+      "source_sha256": "be20bb44cc9552dd2c929dc1e818065c59231853d862c1dd49a5eec792bf9633",
+      "aliases": [
+        "docs/benchmarks/hosted-uniform-mixed-merge-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 16
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/analysis-text-linux-validation-2026-10-23.json",
       "source_sha256": "be573d8615fbaef8ba36b38b7214ff9ee6f1ee8079f7a5645db18d15f50fdbd8",
       "aliases": [
@@ -11546,6 +11628,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/routed-group-key-owner-2026-11-26.jsonl",
+      "source_sha256": "bf217e40f7c93b15d8a7c5c8309e0d311cae6c280e206ceb1a13ed1f83771335",
+      "aliases": [
+        "docs/benchmarks/routed-group-key-owner-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 24,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 24
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/parallel-groups-retained-pressure-2026-10-25.json",
@@ -13462,6 +13561,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/routed-group-key-owner-2026-11-26.patch",
+      "source_sha256": "db279b6a5764482484cff457866b7d4309f36cef29874dc5098fbce4900fa61f",
+      "aliases": [
+        "docs/benchmarks/routed-group-key-owner-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/native-auto-bounds-2026-11-22-final-bounded-interleaved.jsonl",
       "source_sha256": "db431274345a8e1f459ed4335f7e138888ac59c386aa3bddc14c50574cbba3f7",
       "aliases": [
@@ -13477,6 +13589,19 @@
         "unclassified": 4
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-uniform-mixed-merge-pressure-2026-11-26.json",
+      "source_sha256": "db699ca6c2edb6aad7eaa7427eda806306711712e18cd88dc187ac22facc3aa5",
+      "aliases": [
+        "docs/benchmarks/hosted-uniform-mixed-merge-pressure-2026-11-26.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/streaming-shuffle-adapters-2gib-summary-2026-11-21.json",
@@ -13889,6 +14014,23 @@
       "validation_records": 0,
       "classes": {
         "measurement": 150
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/observed-calculated-partition-2026-11-26.jsonl",
+      "source_sha256": "e1f29f3510e94cae8aad07ca86e83bc8eb534b47a71e83a36721bbc47d303b01",
+      "aliases": [
+        "docs/benchmarks/observed-calculated-partition-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 16
       },
       "coverage": "adapted"
     },
@@ -15396,19 +15538,6 @@
         "docs/benchmarks/aligned-digest-2026-11-05-preflight.py"
       ],
       "format": "py",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "fc9c549b27f93b058de3000d95ad7d1208604a27a9435dd5c124c751cf1cd2f6",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,

@@ -12,19 +12,21 @@ final output preparation when only export uses them. Rewrites must preserve
 that boundary and any row-level evaluation failures. Spills preserve types
 and timestamp offsets. Partition keys compare the rendered text.
 
-An unobserved Linux Run can feed calculated rows directly into a single plain
-Partition that uses a calculated field. Eligibility requires plain output, one
-root group, and a source file of at least 128 MiB. Auto grouping keeps its
-existing choice between routing and sorting. Builds with experimental constant
-Partition use their staged route.
+A hosted Run or an unobserved Linux Run can feed calculated rows directly
+into a single Partition that uses a calculated field. Eligibility requires
+plain output, one root group, and a source file of at least 128 MiB. Auto grouping
+keeps its existing choice between routing and sorting. Builds with experimental
+constant Partition use their staged route.
 
 The fused pass supplies the existing sorter with the same rendered tuple,
 ordinal, and packed fields. Its final writer constructs the same capped output
-snapshot. A failed attempt drops its private output and spills before replaying
-the original staged route from the retained input. Replay preserves error order
-when a resource or Partition failure occurs before a later formula error.
-Cancellation aborts the attempt. The calculation traversal timer includes
-collecting and finishing the sort when this route succeeds.
+snapshot. Hosted Run admits that writer before evaluating the rows and reports
+calculation as the grouping or sort input when observations are enabled. A
+failed attempt drops its private output and spills before replaying the staged
+route from the retained input. Replay preserves error order when a resource or
+Partition failure occurs before a later formula error. Cancellation and failed
+cleanup stop before replay. The calculation traversal timer includes collecting
+and finishing the sort when this route succeeds.
 
 Ordinary builds now fuse adjacent `auto/uniform -> partition(columns)` into one
 sort on partition tuples and random keys, avoiding the global shuffle

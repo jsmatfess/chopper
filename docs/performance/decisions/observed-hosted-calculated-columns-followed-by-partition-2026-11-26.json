@@ -1,0 +1,60 @@
+{
+  "id": "observed-hosted-calculated-columns-followed-by-partition-2026-11-26",
+  "title": "Feed calculated rows directly into an observed hosted terminal Partition",
+  "subsystem": "execution",
+  "question": "Can hosted Run remove an augmented Dataset pass while retaining calculation observations and exact staged error order?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "The 650,003-row job saves 1.322–1.502 seconds and removes 243.6 MB from each direction of tracked temporary traffic. The small ineligible control keeps its data movement.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "A 650,003-row, eight-key calculated Partition over the 128 MiB guard and a 90,003-row control below it."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Exact CSV bytes, keys, order, lineage, caps and markers. Source edges, calculated error precedence, partition-only denial, and cancellation cleanup were verified."
+  },
+  "limitations": [
+    "One bundled Chromium host and two fixture sizes. No device I/O or RSS inference."
+  ],
+  "exclusions": [
+    "Compressed output, composed pipelines, explicit preparation, observed native fusion and experimental constant Partition."
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md"
+  ],
+  "schema_version": 1,
+  "date": "2026-11-26",
+  "supersedes": [],
+  "reopen_when": null,
+  "sources": [
+    {
+      "section": "docs/performance.md#observed-hosted-calculated-columns-followed-by-partition-2026-11-26",
+      "sha256": "e7b2051e20ab6b0e35271ec586e2ed828a6070c1779766c6117364a89bd001c1"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/observed-calculated-partition-2026-11-26.jsonl",
+      "sha256": "e1f29f3510e94cae8aad07ca86e83bc8eb534b47a71e83a36721bbc47d303b01"
+    },
+    {
+      "path": "docs/benchmarks/observed-calculated-partition-faults-2026-11-26.json",
+      "sha256": "8519c1d46b7010169492cc8868ad19b7e2b76685e6fa5a7b7daead149d053584"
+    },
+    {
+      "path": "docs/benchmarks/observed-calculated-partition-2026-11-26.patch",
+      "sha256": "7ba468eedc64b62a6f72b5d2a591fac99cebcabf4e47d488f0edc84d360b139d"
+    }
+  ]
+}

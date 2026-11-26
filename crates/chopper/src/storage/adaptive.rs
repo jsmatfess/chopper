@@ -270,6 +270,7 @@ pub enum PackedKey {
     Random([u8; 16]),
     Index([u8; 8]),
     Bytes(Box<[u8]>),
+    Routed(Arc<RoutedKey>),
 }
 impl PackedKey {
     pub(crate) fn new(bytes: Vec<u8>) -> Self {
@@ -283,11 +284,12 @@ impl PackedKey {
             Self::Random(key) => key,
             Self::Index(key) => key,
             Self::Bytes(key) => key,
+            Self::Routed(key) => &key.bytes,
         }
     }
     fn heap_bytes(&self) -> usize {
         match self {
-            Self::Random(_) | Self::Index(_) => 0,
+            Self::Random(_) | Self::Index(_) | Self::Routed(_) => 0,
             Self::Bytes(key) => key.len(),
         }
     }
@@ -296,6 +298,7 @@ impl PackedKey {
             Self::Random(key) => key.to_vec(),
             Self::Index(key) => key.to_vec(),
             Self::Bytes(key) => key.into_vec(),
+            Self::Routed(key) => key.bytes.to_vec(),
         }
     }
 }
@@ -710,9 +713,14 @@ impl PackedRow {
             }
     }
     pub fn write(&self, w: &mut impl Write) -> Result<()> {
+        self.write_frame(w, true)
+    }
+    fn write_frame(&self, w: &mut impl Write, with_key: bool) -> Result<()> {
         put_u64(w, self.id)?;
         put_u64(w, self.ordinal)?;
-        put_bytes(w, &self.key)?;
+        if with_key {
+            put_bytes(w, &self.key)?;
+        }
         match &self.fields {
             Fields::Packed(fields) => w.write_all(fields)?,
             Fields::Owned(fields) => {
@@ -999,8 +1007,17 @@ impl Iterator for ResidentRows {
 
 const ROUTE_BUFFER: usize = 65536;
 const MAX_ROUTES: usize = 64;
+// The optional compact codec consumes the ordinary complete row framing.
+const KEY_PER_BUCKET: bool = !cfg!(feature = "experimental-spill-blocks");
 fn route_cost(key: &[u8]) -> usize {
     ROUTE_BUFFER + key.len() + 1024
+}
+pub struct RoutedKey {
+    pub(super) bytes: Box<[u8]>,
+    _reservation: Reservation,
+}
+impl RoutedKey {
+    const OWNER_BYTES: usize = std::mem::size_of::<Self>() + 2 * std::mem::size_of::<usize>();
 }
 struct Bucket {
     writer: BufWriter<SpillFile>,
@@ -1009,7 +1026,7 @@ struct Bucket {
 pub struct Router {
     observation: Option<crate::observation::physical::Attempt>,
     observed_rows: u64,
-    buckets: BTreeMap<Vec<u8>, Bucket>,
+    buckets: BTreeMap<Box<[u8]>, Bucket>,
     ctx: Context,
     reservation: Reservation,
     bytes: usize,
@@ -1056,11 +1073,15 @@ impl Router {
     }
     /// Returns the reason for a one-way fallback before writing the row.
     pub fn push(&mut self, row: &PackedRow) -> Result<Option<Reason>> {
-        self.push_parts(&row.key, row.ordinal, |writer| row.write(writer))
+        self.push_parts(&row.key, row.ordinal, |writer| {
+            row.write_frame(writer, !KEY_PER_BUCKET)
+        })
     }
     pub fn push_row(&mut self, row: &Row) -> Result<bool> {
-        self.push_parts(&row.key, row.ordinal, |writer| write_row(writer, row))
-            .map(|reason| reason.is_none())
+        self.push_parts(&row.key, row.ordinal, |writer| {
+            write_row_frame(writer, row, !KEY_PER_BUCKET)
+        })
+        .map(|reason| reason.is_none())
     }
     fn push_parts(
         &mut self,
@@ -1093,7 +1114,7 @@ impl Router {
             let mut writer = self.ctx.spill_writer(ROUTE_BUFFER)?;
             write(&mut writer)?;
             self.buckets.insert(
-                key.to_vec(),
+                key.into(),
                 Bucket {
                     writer,
                     last_ordinal: ordinal,
@@ -1106,18 +1127,34 @@ impl Router {
         }
         Ok(None)
     }
-    fn flush(&mut self) -> Result<Catalog<SpillFile>> {
+    fn flush(&mut self) -> Result<Catalog<RunFile>> {
         let mut files = Catalog::new(&self.ctx);
-        for (_, mut bucket) in std::mem::take(&mut self.buckets) {
+        for (bytes, mut bucket) in std::mem::take(&mut self.buckets) {
             self.ctx.check()?;
             bucket.writer.flush()?;
-            files.push(bucket.writer.into_inner().map_err(|e| e.into_error())?)?;
+            let spill = bucket.writer.into_inner().map_err(|e| e.into_error())?;
+            let key = if KEY_PER_BUCKET {
+                ensure!(
+                    bytes.len() <= self.ctx.max_record * 2 + 64,
+                    "invalid or oversized spool sort key"
+                );
+                // The bucket already owns the key and a 1 KiB metadata
+                // allowance. Transfer the key and its shared owner charge.
+                let _reservation = self.reservation.split(bytes.len() + RoutedKey::OWNER_BYTES);
+                Some(Arc::new(RoutedKey {
+                    bytes,
+                    _reservation,
+                }))
+            } else {
+                None
+            };
+            files.push(RunFile { spill, key })?;
         }
         Ok(files)
     }
     /// Every bucket has a single key and nondecreasing ordinals. These are
     /// already valid Key-sort runs; fallback must not decode/re-sort them.
-    pub fn into_runs(mut self) -> Result<Catalog<SpillFile>> {
+    pub(super) fn into_runs(mut self) -> Result<Catalog<RunFile>> {
         let files = self.flush()?;
         if let Some(attempt) = self.observation.take() {
             attempt.finish(
@@ -1143,9 +1180,7 @@ impl Router {
             );
         }
         Ok(RoutedRows {
-            reader: None,
-            current: None,
-            files: files.into_iter(),
+            reader: RunReader::new(files),
             ctx: self.ctx.clone(),
             _reservation: std::mem::replace(&mut self.reservation, Reservation::new(&self.ctx)),
             failed: false,
@@ -1167,9 +1202,7 @@ impl Drop for Router {
 }
 
 pub struct RoutedRows {
-    reader: Option<BufReader<SpillReader>>,
-    current: Option<SpillFile>,
-    files: catalog::CatalogIter<SpillFile>,
+    reader: RunReader,
     ctx: Context,
     _reservation: Reservation,
     failed: bool,
@@ -1183,26 +1216,15 @@ impl RoutedRows {
             return None;
         }
         let result = (|| -> Result<Option<T>> {
-            loop {
-                self.ctx.check()?;
-                if let Some(reader) = &mut self.reader {
-                    if let Some(header) = read_header_reserved(
-                        reader,
-                        self.ctx.max_record,
-                        Some(self._reservation.sibling()),
-                    )? {
-                        return decode(reader, self.ctx.max_record, header).map(Some);
-                    }
-                }
-                // Close the descriptor before dropping the file (Windows).
-                self.reader = None;
-                self.current = None;
-                let Some(file) = self.files.next() else {
-                    return Ok(None);
-                };
-                self.reader = Some(file.reader()?);
-                self.current = Some(file);
-            }
+            self.ctx.check()?;
+            let Some(header) = self
+                .reader
+                .header(self.ctx.max_record, &self._reservation)?
+            else {
+                return Ok(None);
+            };
+            let reader = self.reader.reader.as_mut().expect("live routed header");
+            decode(reader, self.ctx.max_record, header).map(Some)
         })();
         match result {
             Ok(row) => row.map(Ok),

@@ -73,6 +73,9 @@ def main():
 
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
+    'A single admitted key per routed group (2026-11-26)': 'adaptive-routing',
+    'Observed hosted calculated columns followed by Partition (2026-11-26)': 'profiling',
+    'Mixed hosted Uniform merge with a retained final batch (2026-11-26)': 'external-and-resident-shuffle',
     'Terminal Partition after a shared Balanced range (2026-11-26)': 'balanced-boundaries',
     'Cumulative lookup for probabilistic allocation (2026-11-26)': 'random-quality',
     'Hosted OPFS spill read copy (2026-11-25)': 'ownership-and-lifecycle',

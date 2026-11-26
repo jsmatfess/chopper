@@ -1,0 +1,308 @@
+{
+  "type": "browser_formula_partition_fault_controls",
+  "original_sha256": "935470a7d0604c3747cf7b85bd1f370e40c2c6c8fd761227b62db0a7b46d5c31",
+  "artifact_sha256": {
+    "102-engine.wasm": "ca6b6d2948ea9851b3ee9ccf466d94523f7649a8d48c369f166793884fd00cce",
+    "104-engine.wasm": "803881c1bdb135f9d362ab451b97f0f67557b81f8185b1c9d965c37b2cac8c6c",
+    "104-faults-03.json": "e904e3e639c25f2e82f43f5d989b130ec557e6e6cabf59f3f1a97277612df8b8",
+    "calculated-faults.mjs": "df7217fbfb8d395685d7fef24954e863672bc54853f5987db4a20d68dd8246a2",
+    "benchmark-swarm.ts": "b39f008342d474d62211f4d723969eebbe0015f61ff909873d2f8eda25e2735d",
+    "driver.js": "caf27973b64a0ce807943723f8406b1ae70f9184e800de076014d2f4030f24e1",
+    "engine-worker.js": "59cdd1990b3177aba8f79972158e58c218d2c31ec978f194429287a5daa50770",
+    "storage-worker.js": "a357a9e3e8d3ba21c2e9c08f143712f56f1deb5357c1d93454002950c94ab0ac",
+    "verify.py": "0efaf1dd493461454bb554c9f8489d0a5f13721d37b85222bb101013b1859dc8"
+  },
+  "browser": "156.0.8078.4",
+  "scope": "Fault controls with pinned WASM and worker assets, no timing claim.",
+  "cases": [
+    {
+      "cell": "formula-precedence",
+      "variant": "candidate",
+      "status": "failed",
+      "error": "Error: page.evaluate: Error: Error: input record 258, calculated column \"calc\": invalid number. Give NUMBER text such as \"42\". Use TRIM(...) first to remove surrounding whitespace.",
+      "live_workspace_entries": [],
+      "owned_entries": [
+        "input.csv"
+      ],
+      "cancelled_after_calculation_start": false,
+      "calculation_attempts": 2,
+      "failed_calculation_attempt_rows": 1
+    },
+    {
+      "cell": "formula-precedence",
+      "variant": "baseline",
+      "status": "failed",
+      "error": "Error: page.evaluate: Error: Error: input record 258, calculated column \"calc\": invalid number. Give NUMBER text such as \"42\". Use TRIM(...) first to remove surrounding whitespace.",
+      "live_workspace_entries": [],
+      "owned_entries": [
+        "input.csv"
+      ],
+      "cancelled_after_calculation_start": false,
+      "calculation_attempts": 1,
+      "failed_calculation_attempt_rows": 0
+    },
+    {
+      "cell": "partition-only-error",
+      "variant": "candidate",
+      "status": "failed",
+      "error": "Error: page.evaluate: Error: Error: preparing operation 1: record too large for sort memory budget",
+      "live_workspace_entries": [],
+      "owned_entries": [
+        "input.csv"
+      ],
+      "cancelled_after_calculation_start": false,
+      "calculation_attempts": 2,
+      "failed_calculation_attempt_rows": 1
+    },
+    {
+      "cell": "partition-only-error",
+      "variant": "baseline",
+      "status": "failed",
+      "error": "Error: page.evaluate: Error: Error: preparing operation 1: record too large for sort memory budget",
+      "live_workspace_entries": [],
+      "owned_entries": [
+        "input.csv"
+      ],
+      "cancelled_after_calculation_start": false,
+      "calculation_attempts": 1,
+      "failed_calculation_attempt_rows": 0
+    },
+    {
+      "cell": "cancel-after-calculation-started",
+      "variant": "candidate",
+      "status": "cancelled",
+      "error": "Error: page.evaluate: Error: Cancelled by control",
+      "live_workspace_entries": [],
+      "owned_entries": [
+        "input.csv"
+      ],
+      "cancelled_after_calculation_start": true
+    },
+    {
+      "cell": "cancel-after-calculation-started",
+      "variant": "baseline",
+      "status": "cancelled",
+      "error": "Error: page.evaluate: Error: Cancelled by control",
+      "live_workspace_entries": [],
+      "owned_entries": [
+        "input.csv"
+      ],
+      "cancelled_after_calculation_start": true
+    }
+  ],
+  "fixtures": {
+    "formula-precedence": {
+      "sha256": "8eb356681ba4080b4bb8d91f5e47ff72f55e1c1ed22e6a2de830829d2df424cd",
+      "bytes": 135268278,
+      "recipe": {
+        "id": "formula-precedence",
+        "shape": "calc",
+        "control": "formula-precedence",
+        "expected": "input record 258.*calculated column.*calc",
+        "rows": 258,
+        "keys": 1,
+        "payload": 524288,
+        "pairs": 0,
+        "memory": 32,
+        "calculated_columns": [
+          {
+            "name": "calc",
+            "expression": "IF(id=\"0\", REPEAT(\"X\", 200000), TEXT(NUMBER(key)))"
+          }
+        ],
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc"
+            ]
+          }
+        ]
+      }
+    },
+    "partition-only-error": {
+      "sha256": "645d5767c39d6915ae3ab549e367b631c0042fcd1964c3bc4cde9111badbc914",
+      "bytes": 135268273,
+      "recipe": {
+        "id": "partition-only-error",
+        "shape": "calc",
+        "control": "partition-only-error",
+        "expected": "(sort|working memory|memory budget)",
+        "rows": 258,
+        "keys": 1,
+        "payload": 524288,
+        "pairs": 0,
+        "memory": 32,
+        "calculated_columns": [
+          {
+            "name": "calc",
+            "expression": "IF(id=\"0\", REPEAT(\"X\", 200000), TEXT(NUMBER(key)))"
+          }
+        ],
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc",
+              "calc"
+            ]
+          }
+        ]
+      }
+    },
+    "cancel-after-calculation-started": {
+      "sha256": "645d5767c39d6915ae3ab549e367b631c0042fcd1964c3bc4cde9111badbc914",
+      "bytes": 135268273,
+      "recipe": {
+        "id": "cancel-after-calculation-started",
+        "shape": "calc",
+        "control": "cancel-after-calculation-started",
+        "expected": "Cancelle?d",
+        "rows": 258,
+        "keys": 1,
+        "payload": 524288,
+        "pairs": 0,
+        "memory": 256,
+        "calculated_columns": [
+          {
+            "name": "calc",
+            "expression": "UPPER(key)"
+          }
+        ],
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              "calc"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

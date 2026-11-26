@@ -559,6 +559,11 @@ fn process_using(
     let started = std::time::Instant::now();
     let _unobserved_run = mode.unobserved_run();
     let ctx = mode.context(&job, cancel, notify, pool, physical)?;
+    let _calculated_partition_run = if cfg!(target_os = "wasi") {
+        ctx.auto_run
+    } else {
+        _unobserved_run
+    };
     let direct_terminal = ctx.direct_terminal_output;
 
     let job = PreparedJob::admit(job, Reservation::new(&ctx))?;
@@ -672,8 +677,8 @@ fn process_using(
             let mut step_ctx = ctx.physical_scope([index + 1, 0]);
             step_ctx.physical_source = dataset.physical_source;
             let started = std::time::Instant::now();
-            #[cfg(target_os = "linux")]
-            if _unobserved_run
+            #[cfg(any(target_os = "linux", target_os = "wasi"))]
+            if _calculated_partition_run
                 && !cfg!(feature = "experimental-constant-partition")
                 && index == 0
                 && dataset.groups == 1
@@ -2823,7 +2828,7 @@ fn partition(
         ctx,
     )
 }
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "wasi"))]
 #[cold]
 #[inline(never)]
 fn try_calculated_partition(
@@ -2838,10 +2843,15 @@ fn try_calculated_partition(
         .groups()?
         .next()
         .context("missing retained root group")??;
+    // Hosted calculation/Partition retains the ordinary encoded-output
+    // snapshot and admits its writer before constructing the grouping state.
+    #[cfg(target_os = "wasi")]
+    let mut writer = output::PlanWriter::new(job, Some(&plan.header), ctx)?;
     let started = std::time::Instant::now();
     let sorted = plan.sorted_partition(dataset, &parent, &columns, job, ctx)?;
     let traversal_seconds = started.elapsed().as_secs_f64();
     ctx.operation_event(1, 1)?;
+    #[cfg(target_os = "linux")]
     let mut writer = output::PlanWriter::new(job, Some(&plan.header), ctx)?;
     emit_partition(sorted, &parent, &columns, 0, false, &mut writer, ctx)?;
     let stats = StageStats {
@@ -3145,6 +3155,73 @@ impl Prepared {
 mod performance_tests {
     use super::*;
 
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn calculated_partition_observes_the_evaluator_as_the_sort_source() -> Result<()> {
+        use crate::observation::{
+            physical::{Fact, Kind},
+            Status,
+        };
+        use std::sync::Mutex;
+
+        let facts = Arc::new(Mutex::new(Vec::<Fact>::new()));
+        let seen = facts.clone();
+        let mut ctx = Context::new(
+            &Resources {
+                workers: 1,
+                ..Default::default()
+            },
+            Arc::new(AtomicBool::new(false)),
+            Arc::new(|_| {}),
+        )?
+        .physical_scope([1, 0]);
+        ctx.physical = Some(Arc::new(move |fact| {
+            seen.lock().unwrap().push(fact);
+            true
+        }));
+        let columns = vec![Column::Name("upper_key".into())];
+        let job = Job {
+            calculated_columns: vec![CalculatedColumn {
+                name: "upper_key".into(),
+                expression: "UPPER(key)".into(),
+            }],
+            operations: vec![Operation::Partition {
+                columns: columns.clone(),
+            }],
+            ..Default::default()
+        };
+        let mut writer = DatasetWriter::new(&ctx)?;
+        let mut root = writer.begin(vec![], false);
+        for (id, key) in ["a", "b"].into_iter().enumerate() {
+            writer.row(
+                &mut root,
+                &Row {
+                    id: id as u64,
+                    ordinal: id as u64,
+                    key: vec![],
+                    fields: vec![key.into()],
+                },
+            )?;
+        }
+        writer.end(root)?;
+        let data = writer.finish()?;
+        ctx.physical_source = data.physical_source;
+        let plan =
+            calculation::Plan::prepare(&job, Some(&["key".into()]), 1, Reservation::new(&ctx))?;
+        let (_, stats, _) = try_calculated_partition(&plan, &data, &columns, &job, &ctx)?;
+        assert_eq!(stats.output_groups, 2);
+        let facts = facts.lock().unwrap();
+        let calculated = facts
+            .iter()
+            .find(|f| f.kind == Kind::Calculation && f.status == Status::Completed)
+            .unwrap();
+        assert_eq!(calculated.rows, 2);
+        assert!(facts.iter().any(|f| f.kind == Kind::ResidentSort
+            && f.status == Status::Completed
+            && f.sources.contains(&Some(calculated.id))));
+        Ok(())
+    }
+
     #[test]
     fn partition_rejects_invalid_frames_deferred_by_balanced_boundaries() -> Result<()> {
         use std::{io::Write, sync::atomic::Ordering};
@@ -3196,6 +3273,14 @@ mod performance_tests {
             .unwrap_err();
             assert!(format!("{error:#}").contains(message), "{error:#}");
             assert_eq!(partitioned.finish()?.groups, 0);
+            let missing = Group {
+                offset: data.data.len(),
+                rows: 1,
+                lineage: vec![],
+                exact: true,
+            };
+            let error = data.rows(&missing, ctx.max_record)?.next_packed(None);
+            assert!(matches!(error, Err(error) if error.to_string() == "truncated spool"));
             let mut eager = DatasetWriter::new(&ctx)?;
             assert!(shared_balanced_parent(&data, &parent, 2, 0, false, &mut eager, &ctx).is_err());
 

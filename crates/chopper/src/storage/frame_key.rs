@@ -1,18 +1,20 @@
 //! Temporary spool-header key storage. Fixed keys stay inline until their
 //! consumer chooses packed or independently admitted owned-row storage.
-use super::{PackedKey, Reservation};
+use super::{PackedKey, Reservation, RoutedKey};
 use anyhow::Result;
+use std::sync::Arc;
 
 pub(super) enum FrameKey {
     Random([u8; 16]),
     Index([u8; 8]),
     Heap(Vec<u8>),
+    Routed(Arc<RoutedKey>),
 }
 
 impl FrameKey {
     pub(super) fn capacity(&self) -> usize {
         match self {
-            Self::Random(_) | Self::Index(_) => 0,
+            Self::Random(_) | Self::Index(_) | Self::Routed(_) => 0,
             Self::Heap(bytes) => bytes.capacity(),
         }
     }
@@ -22,6 +24,7 @@ impl FrameKey {
             Self::Random(bytes) => PackedKey::Random(bytes),
             Self::Index(bytes) => PackedKey::Index(bytes),
             Self::Heap(bytes) => PackedKey::new(bytes),
+            Self::Routed(key) => PackedKey::Routed(key),
         }
     }
 
@@ -30,6 +33,7 @@ impl FrameKey {
             Self::Random(bytes) => bytes.to_vec(),
             Self::Index(bytes) => bytes.to_vec(),
             Self::Heap(bytes) => bytes,
+            Self::Routed(key) => key.bytes.to_vec(),
         }
     }
 
@@ -59,6 +63,7 @@ impl std::ops::Deref for FrameKey {
             Self::Random(bytes) => bytes,
             Self::Index(bytes) => bytes,
             Self::Heap(bytes) => bytes,
+            Self::Routed(key) => &key.bytes,
         }
     }
 }

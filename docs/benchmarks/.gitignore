@@ -238,3 +238,8 @@ reservation-entry-2026-11-05-linux-lock.py
 !terminal-partition-shared-balanced-2026-11-26.jsonl
 !probabilistic-allocation-cumulative-2026-11-26.jsonl
 !probabilistic-lookup-wasm-component-2026-11-26.json
+!routed-group-key-owner-2026-11-26.jsonl
+!observed-calculated-partition-2026-11-26.jsonl
+!observed-calculated-partition-faults-2026-11-26.json
+!hosted-uniform-mixed-merge-2026-11-26.jsonl
+!hosted-uniform-mixed-merge-pressure-2026-11-26.json

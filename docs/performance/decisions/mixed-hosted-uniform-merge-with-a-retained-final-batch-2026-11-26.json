@@ -1,0 +1,64 @@
+{
+  "id": "mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26",
+  "title": "Keep the final spill when a mixed merge cannot protect downstream admission",
+  "subsystem": "storage",
+  "question": "Can a final retained batch improve hosted Uniform without taking shared memory needed by the decoder and writer?",
+  "disposition": "reject",
+  "outcome": "mixed",
+  "delivery": "unapplied",
+  "summary": "The mixed merge saves 22.7 MB each way in tracked temporary traffic and 0.127 seconds at the paired median. Under a matched late WASI peer grant it fails before the first decoded row while the ordinary spill encodes all 13.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "150,003 rows with one existing disk run and a final batch, plus a resident control."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Complete export conservation and caps, exact pinned key order, early shared pressure fallback, late peer counterexample, cancellation and cleanup."
+  },
+  "limitations": [
+    "Shared pressure coverage uses injected peer grants within one WASI or native ledger. Three complete pairs on one WSL2 host."
+  ],
+  "exclusions": [
+    "More than one disk run in the hosted timing cell, physical device I/O, native elapsed time and delivery of the prototype."
+  ],
+  "reopen_when": "A bounded mixed cursor can retain its batch while securing decode and encoder capacity through the matched late peer control.",
+  "contracts": [
+    "docs/specification.md",
+    "docs/execution-decisions.md"
+  ],
+  "schema_version": 1,
+  "date": "2026-11-26",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26",
+      "sha256": "42c3d004c0d5afa5ff01852b281282afc67468efe2f97d810fa9250f27bd35fe"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/hosted-uniform-mixed-merge-2026-11-26.jsonl",
+      "sha256": "be20bb44cc9552dd2c929dc1e818065c59231853d862c1dd49a5eec792bf9633"
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-mixed-merge-pressure-2026-11-26.json",
+      "sha256": "db699ca6c2edb6aad7eaa7427eda806306711712e18cd88dc187ac22facc3aa5"
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-mixed-merge-2026-11-26.patch",
+      "sha256": "3d46de61dc5b55b7a22d90ac12347d231dbea5ec03a70d4bda900eb57c2ca6b0"
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-mixed-merge-pressure-2026-11-26.patch",
+      "sha256": "b8fa55acbdfe6e1bcd0cfdc17df2e06c8e2414e987122a99f2a747460ee91be2"
+    }
+  ]
+}

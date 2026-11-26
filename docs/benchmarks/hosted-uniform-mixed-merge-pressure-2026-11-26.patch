@@ -1,0 +1,324 @@
+diff --git a/crates/chopper/src/engine.rs b/crates/chopper/src/engine.rs
+index 8d27181..30731c4 100644
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -97,6 +97,7 @@ pub fn run_resource_contracts() -> Result<serde_json::Value> {
+     {
+         let mut report = resource_contracts::input_adapters()?;
+         report["hosted_uniform_retention"] = crate::storage::hosted_uniform_retention_contract()?;
++        report["mixed_merge_pressure"] = crate::storage::hosted_mixed_merge_pressure()?;
+         Ok(report)
+     }
+     #[cfg(not(target_os = "wasi"))]
+@@ -2085,7 +2086,17 @@ fn ingest_records(
+             })?;
+         }
+         let balanced = initial_balanced(job, rows, &mut consumed, &mut group_count, &mut stages)?;
+-        let sorted = sorter.finish()?;
++        let mixed = cfg!(target_os = "wasi")
++            && ctx.auto_run
++            && !cfg!(feature = "experimental-spill-blocks")
++            && job.compression == chopper_core::Compression::None
++            && matches!(
++                initial_operations,
++                [Operation::Shuffle {
++                    strategy: Shuffle::Uniform
++                }]
++            );
++        let sorted = sorter.finish_with_tail(mixed)?;
+         if let Some(assignment) = initial_assignment {
+             consumed += 1;
+             let stats = if consumed == job.operations.len() {
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+index ee99661..cc17c0f 100644
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -2349,7 +2349,10 @@ impl Sorter {
+         }
+         result
+     }
+-    pub fn finish(mut self) -> Result<SortedRows> {
++    pub fn finish(self) -> Result<SortedRows> {
++        self.finish_with_tail(false)
++    }
++    pub(crate) fn finish_with_tail(mut self, consider_memory_tail: bool) -> Result<SortedRows> {
+         self.ctx.pressure_boundary();
+         if let Some(router) = self.spill_mode.take_router() {
+             self.ctx
+@@ -2375,10 +2378,18 @@ impl Sorter {
+                 _reservation: self.reservation,
+             }));
+         }
+-        self.flush_run(
+-            false,
+-            Some(crate::observation::physical::Reason::FinalBatch),
+-        )?;
++        let keep_tail = consider_memory_tail
++            && !self.buffer.is_empty()
++            && self.levels.len() == 1
++            && (1..=3).contains(&self.levels[0].len())
++            && self.levels[0].len() < self.fan_in()
++            && self.ctx.working_headroom() >= (4 * 1024 * 1024 + self.largest_row * 4) as u64;
++        if !keep_tail {
++            self.flush_run(
++                false,
++                Some(crate::observation::physical::Reason::FinalBatch),
++            )?;
++        }
+         #[cfg(any(target_os = "linux", target_os = "wasi"))]
+         drop(self.spill_mode.take_prepared());
+         let fan_in = self.fan_in();
+@@ -2428,7 +2439,7 @@ impl Sorter {
+             runs = next;
+         }
+         // Stream the last merge to the next stage instead of materializing it.
+-        let (sources, omitted) = if self.ctx.physical_enabled() {
++        let (mut sources, omitted) = if self.ctx.physical_enabled() {
+             SortRun::sources(
+                 &runs,
+                 self.ctx.physical_operations[0],
+@@ -2438,7 +2449,27 @@ impl Sorter {
+         } else {
+             ([None; 4], true)
+         };
+-        Ok(SortedRows::Merge(MergeRows::with_observation(
++        let tail = if keep_tail {
++            let observation_ctx = self.ctx.clone();
++            let span =
++                observation_ctx.physical_span(crate::observation::physical::Kind::ResidentSort);
++            self.sort_buffer();
++            if let Some(span) = span {
++                span.finish(self.buffer.len() as u64);
++                if let Some(slot) = sources.iter_mut().find(|source| source.is_none()) {
++                    *slot = self
++                        .ctx
++                        .physical_identity(crate::observation::physical::Kind::ResidentSort);
++                }
++            }
++            Some(ResidentRows {
++                rows: self.buffer.into_iter(),
++                _reservation: self.reservation,
++            })
++        } else {
++            None
++        };
++        let mut merge = MergeRows::with_observation(
+             runs,
+             self.order,
+             &self.ctx,
+@@ -2447,7 +2478,9 @@ impl Sorter {
+             sources,
+             omitted,
+             true,
+-        )?))
++        )?;
++        merge.tail = tail;
++        Ok(SortedRows::Merge(merge))
+     }
+ }
+ // Keep the lending cursor and its bounded observation inline. Boxing just the
+@@ -2492,9 +2525,12 @@ impl ReusingRows {
+                 drop(previous);
+                 rows.take_packed().map(Ok)
+             }
+-            SortedRows::Merge(rows) => rows.next_decoded(|reader, maximum, header| {
+-                PackedRow::read_fields_reusing(reader, maximum, header, previous)
+-            }),
++            SortedRows::Merge(rows) => match rows.next_tail() {
++                Some(row) => Some(row),
++                None => rows.next_decoded(|reader, maximum, header| {
++                    PackedRow::read_fields_reusing(reader, maximum, header, previous)
++                }),
++            },
+             SortedRows::Routed(rows) => rows.next_decoded(|reader, maximum, header| {
+                 PackedRow::read_fields_reusing(reader, maximum, header, previous)
+             }),
+@@ -2649,6 +2685,7 @@ impl RunReader {
+ pub struct MergeRows {
+     readers: Vec<RunReader>,
+     heads: BinaryHeap<Head>,
++    tail: Option<ResidentRows>,
+     ctx: Context,
+     merged: u64,
+     failed: bool,
+@@ -2730,6 +2767,7 @@ impl MergeRows {
+         Ok(Self {
+             readers,
+             heads,
++            tail: None,
+             ctx: ctx.clone(),
+             merged: 0,
+             failed: false,
+@@ -2749,10 +2787,44 @@ impl MergeRows {
+     }
+ }
+ impl MergeRows {
++    fn next_tail(&mut self) -> Option<Result<PackedRow>> {
++        if self.failed {
++            return None;
++        }
++        let tail = self.tail.as_ref()?;
++        let row = tail.rows.as_slice().first()?;
++        if self.heads.peek().is_some_and(|head| {
++            !head
++                .order
++                .compare_parts((row.key.as_slice(), row.id, row.ordinal), head.row.parts())
++                .is_lt()
++        }) {
++            return None;
++        }
++        let result = (|| -> Result<PackedRow> {
++            self.ctx.check()?;
++            let tail = self.tail.as_mut().expect("present resident tail");
++            let row = tail.take_packed().expect("present resident tail row");
++            if tail.rows.as_slice().is_empty() {
++                self.tail = None;
++            }
++            self.report_merged_row()?;
++            Ok(row)
++        })();
++        if let Err(error) = &result {
++            self.failed = true;
++            self.failure_status = crate::observation::physical::error_status(error);
++        }
++        Some(result)
++    }
++
+     fn advance(&mut self, run: usize, order: Arc<SortOrder>) -> Result<()> {
+         if let Some(row) = self.readers[run].header(self.ctx.max_record, &self._reservation)? {
+             self.heads.push(Head { row, run, order });
+         }
++        self.report_merged_row()
++    }
++    fn report_merged_row(&mut self) -> Result<()> {
+         self.merged += 1;
+         if let Some(attempt) = &mut self.observation {
+             attempt.rows_processed(self.merged);
+@@ -2849,6 +2921,9 @@ impl Drop for MergeRows {
+ impl Iterator for MergeRows {
+     type Item = Result<DecodedRow>;
+     fn next(&mut self) -> Option<Self::Item> {
++        if let Some(row) = self.next_tail() {
++            return Some(row.and_then(|row| row.to_owned_reserved(&self._reservation)));
++        }
+         self.next_decoded(owned_fields_reserved)
+     }
+ }
+@@ -5234,3 +5309,117 @@ pub(crate) fn hosted_uniform_retention_contract() -> Result<serde_json::Value> {
+     }
+     Ok(serde_json::json!(cases))
+ }
++
++#[cfg(any(test, all(target_os = "wasi", feature = "resource-contract-tests")))]
++pub(crate) fn hosted_mixed_merge_pressure() -> Result<serde_json::Value> {
++    use crate::{output::PlanWriter, resources::MemoryPool};
++
++    const MIB: usize = 1024 * 1024;
++    const SHARED: usize = 128 * MIB;
++    let mut late_peer = None;
++    let mut reports = Vec::new();
++    for (candidate, pressure) in [
++        (true, "late"),
++        (false, "late"),
++        (true, "early"),
++        (false, "early"),
++        (true, "none"),
++        (false, "none"),
++        (true, "cancel"),
++    ] {
++        let pool = Arc::new(MemoryPool::new(SHARED as u64));
++        let cancel = Arc::new(AtomicBool::new(false));
++        let ctx = Context::with_memory_pool(
++            &chopper_core::Resources {
++                memory_mb: 128.into(),
++                workers: 1,
++                temp_dir: cfg!(target_os = "wasi").then(|| "/tmp".into()),
++                ..Default::default()
++            },
++            cancel.clone(),
++            Arc::new(|_| {}),
++            pool.clone(),
++        )?;
++        let mut sorter = Sorter::new(&ctx, SortOrder::Random([19; 32]));
++        let row = |id| Row {
++            id,
++            ordinal: id,
++            key: u128::from(id).to_be_bytes().to_vec(),
++            fields: vec!["x".repeat(MIB / 2)],
++        };
++        sorter.push(row(0))?;
++        sorter.flush_run(false, None)?;
++        for id in (1..13).rev() {
++            sorter.push(row(id))?;
++        }
++        let mut peer =
++            Reservation::for_workspace(Arc::new(Workspace::shared(SHARED, pool.clone())));
++        if pressure == "early" {
++            peer.resize(SHARED - pool.usage().reserved_bytes as usize - 2 * MIB)?;
++        }
++        let sorted = sorter.finish_with_tail(candidate)?;
++        let SortedRows::Merge(merge) = &sorted else {
++            anyhow::bail!("expected merge traversal");
++        };
++        let mixed = merge.tail.is_some();
++        ensure!(mixed == (candidate && pressure != "early"));
++        let pre_writer = pool.usage().reserved_bytes;
++        let mut job = chopper_core::Job::default();
++        job.limits.bytes = Some((2 * MIB) as u64);
++        let mut writer = PlanWriter::new(&job, None, &ctx)?;
++        let pre_peer = pool.usage().reserved_bytes;
++        if pressure == "late" {
++            let matched_peer =
++                *late_peer.get_or_insert_with(|| SHARED - pre_peer as usize - 64 * 1024);
++            peer.resize(matched_peer)?;
++        }
++        let headroom = ctx.working_headroom();
++        if pressure == "cancel" {
++            cancel.store(true, AtomicOrdering::Relaxed);
++        }
++        let mut group = writer.begin(vec![], false);
++        let mut count = 0;
++        let traversal = sorted.try_for_each_packed(|row| {
++            ensure!(row.id == count);
++            ensure!(row.fields().next().unwrap().len() == MIB / 2);
++            writer.packed_row_ref(&mut group, row)?;
++            count += 1;
++            Ok(())
++        });
++        let delivered = traversal.is_ok();
++        let error = traversal.as_ref().err().map(|e| format!("{e:#}"));
++        if pressure == "late" && candidate {
++            ensure!(traversal
++                .unwrap_err()
++                .downcast_ref::<crate::resources::MemoryAdmission>()
++                .is_some_and(|x| matches!(x, crate::resources::MemoryAdmission::Shared { .. })));
++        } else if pressure == "cancel" {
++            ensure!(error.as_ref().is_some_and(|e| e.contains("cancel")));
++        } else {
++            traversal?;
++            ensure!(count == 13);
++            writer.end(group)?;
++        }
++        drop(writer);
++        ensure!(ctx.used() == 0);
++        drop(ctx);
++        ensure!(pool.usage().reserved_bytes == peer.bytes());
++        reports.push(serde_json::json!({
++            "candidate":candidate,"pressure":pressure,"mixed":mixed,
++            "shared_pool_bytes":SHARED,"peer_bytes":peer.bytes(),
++            "before_writer_reserved_bytes":pre_writer,"before_late_peer_reserved_bytes":pre_peer,
++            "available_before_rows_bytes":headroom,"rows_to_encoder":count,
++            "all_rows_encoded":delivered,"failure":error,"cleanup":true,
++        }));
++        drop(peer);
++        ensure!(pool.usage().reserved_bytes == 0);
++    }
++    Ok(serde_json::json!(reports))
++}
++
++#[cfg(test)]
++#[test]
++fn mixed_merge_retains_more_memory_during_late_pressure() -> Result<()> {
++    println!("{}", hosted_mixed_merge_pressure()?);
++    Ok(())
++}

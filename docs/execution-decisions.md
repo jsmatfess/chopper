@@ -23,10 +23,11 @@ flowchart TD
     Advice --> Calculation{Calculated column definitions?}
     Calculation -->|Yes| Calculated[Retain source snapshot, bind references and order dependencies]
     Calculated --> Boundary[Evaluate once per row before first consuming operation or during final output preparation]
-    Boundary --> CalcPartition{Unobserved Linux Run, one Partition on a calculated field, plain output, one root group, source at least 128 MiB?}
+    Boundary --> CalcPartition{Hosted Run or unobserved Linux Run, one Partition on a calculated field, plain output, one root group, source at least 128 MiB?}
     CalcPartition -->|Yes| CalcSort[Feed calculated rows to the existing grouping path and build the capped output snapshot]
     CalcSort -->|Success| Publish
     CalcSort -->|Retry after releasing private state| Internal
+    CalcSort -->|Cancellation or cleanup failure| RouteFailed[Fail and retire owned output]
     CalcPartition -->|No| CalcDirect{Unobserved Linux Run, plain output, no ordered operations, and source at least 128 MiB?}
     CalcDirect -->|Yes| CalcPrivate[Write calculated rows to capped CSV in private publication]
     CalcPrivate --> Publish
@@ -777,7 +778,7 @@ summary edges are marked omitted.
 ```mermaid
 flowchart TD
     Rows[Input rows] --> Route{Bounded grouping remains eligible?}
-    Route -->|Yes| Buckets[Write ordered grouping files]
+    Route -->|Yes| Buckets[Write ordered grouping files with one admitted key per bucket]
     Buckets -->|Late key or ordinal invalidates routing| Handoff[Close retained files; mark grouping handed off]
     Handoff --> Reuse[Reuse ordered files without re-sort]
     Route -->|No| Fresh[Sort remaining row buffers into spill runs]
@@ -790,6 +791,12 @@ flowchart TD
     Hierarchy -->|No| Traverse[Final streaming merge traversal]
     Traverse --> CSV[Snapshot or eligible direct grouped serialization]
 ```
+
+The ordinary routed frame stores its ID, ordinal, and fields. The bucket key
+and its grant move to a shared immutable owner when the bucket closes. Routed
+readers, merge heads, and packed rows retain this owner until they release
+their last reference. A materialized merge writes the ordinary full frame.
+The experimental compact spill codec keeps its full frame input.
 
 The native Linux `experimental-wide-uniform-merge` flag raises the terminal
 Uniform merge ceiling to 256 when the soft descriptor limit is at least 4,096.

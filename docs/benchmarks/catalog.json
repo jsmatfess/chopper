@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "20285efcf894741a6a344894a2ce620e97b9f31869433cb7e896d55c80e37129"
+    "sha256": "4fff289bec0ae4051102def6704f1adffe441375db13fd70327431af2aaecc8a"
   },
   "experiments": [
     {
@@ -4663,6 +4663,51 @@
         "path": "docs/performance/investigations/cumulative-lookup-for-probabilistic-allocation-2026-11-26.md",
         "sha256": "dd47ddbe639fa1c96c1b3128cf72d8363a0d7b223eef34fc04d273fd449c7f8d",
         "topic": "random-quality"
+      }
+    },
+    {
+      "title": "A single admitted key per routed group (2026-11-26)",
+      "evidence": "docs/performance.md#a-single-admitted-key-per-routed-group-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/routed-group-key-owner-2026-11-26.jsonl",
+        "docs/benchmarks/routed-group-key-owner-2026-11-26.patch"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/a-single-admitted-key-per-routed-group-2026-11-26.md",
+        "sha256": "45a542c25a3db0cf3e305e713613667cfb76a83990444e7d350c2f0811e247ef",
+        "topic": "adaptive-routing"
+      }
+    },
+    {
+      "title": "Observed hosted calculated columns followed by Partition (2026-11-26)",
+      "evidence": "docs/performance.md#observed-hosted-calculated-columns-followed-by-partition-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/observed-calculated-partition-2026-11-26.jsonl",
+        "docs/benchmarks/observed-calculated-partition-2026-11-26.patch",
+        "docs/benchmarks/observed-calculated-partition-faults-2026-11-26.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/observed-hosted-calculated-columns-followed-by-partition-2026-11-26.md",
+        "sha256": "74db621ec017d219f6f1959bcf2d4d50b9c719b1e43da38558d78111a03240d8",
+        "topic": "profiling"
+      }
+    },
+    {
+      "title": "Mixed hosted Uniform merge with a retained final batch (2026-11-26)",
+      "evidence": "docs/performance.md#mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/hosted-uniform-mixed-merge-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-uniform-mixed-merge-2026-11-26.patch",
+        "docs/benchmarks/hosted-uniform-mixed-merge-pressure-2026-11-26.json",
+        "docs/benchmarks/hosted-uniform-mixed-merge-pressure-2026-11-26.patch"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26.md",
+        "sha256": "b8eaffddc657a6d5a740ca72f06f0ea76f222f7fd393cd81301b48943dbcb2da",
+        "topic": "external-and-resident-shuffle"
       }
     }
   ],
@@ -18421,6 +18466,90 @@
       ]
     },
     {
+      "path": "docs/benchmarks/hosted-uniform-mixed-merge-2026-11-26.jsonl",
+      "sha256": "be20bb44cc9552dd2c929dc1e818065c59231853d862c1dd49a5eec792bf9633",
+      "bytes": 25480,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 19
+      },
+      "fields": [
+        "bytes",
+        "cell",
+        "cpus",
+        "executable",
+        "inputs",
+        "kind",
+        "marker",
+        "memory_bytes",
+        "node",
+        "original_line",
+        "original_sha256",
+        "os",
+        "pair",
+        "peak_temp_bytes",
+        "physical",
+        "projection",
+        "recipe",
+        "resources",
+        "seconds",
+        "sha256",
+        "stages",
+        "storage",
+        "time_scope",
+        "variant",
+        "verification",
+        "workspace_bytes_after_cleanup"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-mixed-merge-2026-11-26.patch",
+      "sha256": "3d46de61dc5b55b7a22d90ac12347d231dbea5ec03a70d4bda900eb57c2ca6b0",
+      "bytes": 7492,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-mixed-merge-pressure-2026-11-26.json",
+      "sha256": "db699ca6c2edb6aad7eaa7427eda806306711712e18cd88dc187ac22facc3aa5",
+      "bytes": 6949,
+      "format": "json",
+      "record_counts": {
+        "mixed_merge_resource_diagnostic": 1
+      },
+      "fields": [
+        "native_linux",
+        "scope",
+        "type",
+        "wasi"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-uniform-mixed-merge-pressure-2026-11-26.patch",
+      "sha256": "b8fa55acbdfe6e1bcd0cfdc17df2e06c8e2414e987122a99f2a747460ee91be2",
+      "bytes": 12594,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26"
+      ]
+    },
+    {
       "path": "docs/benchmarks/hosted-uniform-retention-guard-320-2026-11-25.patch",
       "sha256": "2bdf1db56ff011e1fc0a94f027108d10a63e249feeb5f61919b31a47c1dcf13e",
       "bytes": 2645,
@@ -23290,6 +23419,81 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#nested-balanced-lineage-growth-and-leaf-ownership-2026-10-22"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/observed-calculated-partition-2026-11-26.jsonl",
+      "sha256": "e1f29f3510e94cae8aad07ca86e83bc8eb534b47a71e83a36721bbc47d303b01",
+      "bytes": 31934,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 19
+      },
+      "fields": [
+        "bytes",
+        "cell",
+        "cpus",
+        "executable",
+        "inputs",
+        "kind",
+        "marker",
+        "memory_bytes",
+        "node",
+        "original_line",
+        "original_sha256",
+        "os",
+        "pair",
+        "peak_temp_bytes",
+        "physical",
+        "projection",
+        "recipe",
+        "resources",
+        "seconds",
+        "sha256",
+        "stages",
+        "storage",
+        "time_scope",
+        "variant",
+        "verification",
+        "workspace_bytes_after_cleanup"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#observed-hosted-calculated-columns-followed-by-partition-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/observed-calculated-partition-2026-11-26.patch",
+      "sha256": "7ba468eedc64b62a6f72b5d2a591fac99cebcabf4e47d488f0edc84d360b139d",
+      "bytes": 4572,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#observed-hosted-calculated-columns-followed-by-partition-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/observed-calculated-partition-faults-2026-11-26.json",
+      "sha256": "8519c1d46b7010169492cc8868ad19b7e2b76685e6fa5a7b7daead149d053584",
+      "bytes": 8792,
+      "format": "json",
+      "record_counts": {
+        "browser_formula_partition_fault_controls": 1
+      },
+      "fields": [
+        "artifact_sha256",
+        "browser",
+        "cases",
+        "fixtures",
+        "original_sha256",
+        "scope",
+        "type"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#observed-hosted-calculated-columns-followed-by-partition-2026-11-26"
       ]
     },
     {
@@ -32550,6 +32754,59 @@
       ]
     },
     {
+      "path": "docs/benchmarks/routed-group-key-owner-2026-11-26.jsonl",
+      "sha256": "bf217e40f7c93b15d8a7c5c8309e0d311cae6c280e206ceb1a13ed1f83771335",
+      "bytes": 41931,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 28
+      },
+      "fields": [
+        "bytes",
+        "cell",
+        "cpus",
+        "executable",
+        "inputs",
+        "kind",
+        "marker",
+        "memory_bytes",
+        "node",
+        "original_line",
+        "original_sha256",
+        "os",
+        "pair",
+        "peak_temp_bytes",
+        "physical",
+        "projection",
+        "recipe",
+        "resources",
+        "seconds",
+        "sha256",
+        "stages",
+        "storage",
+        "time_scope",
+        "variant",
+        "verification",
+        "workspace_bytes_after_cleanup"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#a-single-admitted-key-per-routed-group-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/routed-group-key-owner-2026-11-26.patch",
+      "sha256": "db279b6a5764482484cff457866b7d4309f36cef29874dc5098fbce4900fa61f",
+      "bytes": 14589,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#a-single-admitted-key-per-routed-group-2026-11-26"
+      ]
+    },
+    {
       "path": "docs/benchmarks/routing-storage-analysis-2026-11-02.json",
       "sha256": "7498f637220645de701f6c16a0001dadb060158c661a11b3b89556ad5f17eee0",
       "bytes": 5596,
@@ -36984,8 +37241,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "fc9c549b27f93b058de3000d95ad7d1208604a27a9435dd5c124c751cf1cd2f6",
-      "bytes": 1755961,
+      "sha256": "2027e7d907d5178db5d926cfd0329c439bd654d4e3aa8cc6d5b285051c54f74b",
+      "bytes": 1767512,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -41421,7 +41678,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "9074935fd91fdf33a88f58b85fa6bc884419877adf4f2863e5002204c637eb93"
+    "sha256": "a415cfcc7f767cab30aeeb476b5cf2943dd98a8d1f51934b860b260d8c029b37"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

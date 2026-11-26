@@ -1,0 +1,198 @@
+diff --git a/crates/chopper/src/engine.rs b/crates/chopper/src/engine.rs
+index 8d27181..e493e34 100644
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -2085,7 +2085,17 @@ fn ingest_records(
+             })?;
+         }
+         let balanced = initial_balanced(job, rows, &mut consumed, &mut group_count, &mut stages)?;
+-        let sorted = sorter.finish()?;
++        let mixed = cfg!(target_os = "wasi")
++            && ctx.auto_run
++            && !cfg!(feature = "experimental-spill-blocks")
++            && job.compression == chopper_core::Compression::None
++            && matches!(
++                initial_operations,
++                [Operation::Shuffle {
++                    strategy: Shuffle::Uniform
++                }]
++            );
++        let sorted = sorter.finish_with_tail(mixed)?;
+         if let Some(assignment) = initial_assignment {
+             consumed += 1;
+             let stats = if consumed == job.operations.len() {
+diff --git a/crates/chopper/src/storage.rs b/crates/chopper/src/storage.rs
+index ee99661..114ec14 100644
+--- a/crates/chopper/src/storage.rs
++++ b/crates/chopper/src/storage.rs
+@@ -2349,7 +2349,10 @@ impl Sorter {
+         }
+         result
+     }
+-    pub fn finish(mut self) -> Result<SortedRows> {
++    pub fn finish(self) -> Result<SortedRows> {
++        self.finish_with_tail(false)
++    }
++    pub(crate) fn finish_with_tail(mut self, consider_memory_tail: bool) -> Result<SortedRows> {
+         self.ctx.pressure_boundary();
+         if let Some(router) = self.spill_mode.take_router() {
+             self.ctx
+@@ -2375,10 +2378,18 @@ impl Sorter {
+                 _reservation: self.reservation,
+             }));
+         }
+-        self.flush_run(
+-            false,
+-            Some(crate::observation::physical::Reason::FinalBatch),
+-        )?;
++        let keep_tail = consider_memory_tail
++            && !self.buffer.is_empty()
++            && self.levels.len() == 1
++            && (1..=3).contains(&self.levels[0].len())
++            && self.levels[0].len() < self.fan_in()
++            && self.ctx.working_headroom() >= (4 * 1024 * 1024 + self.largest_row * 4) as u64;
++        if !keep_tail {
++            self.flush_run(
++                false,
++                Some(crate::observation::physical::Reason::FinalBatch),
++            )?;
++        }
+         #[cfg(any(target_os = "linux", target_os = "wasi"))]
+         drop(self.spill_mode.take_prepared());
+         let fan_in = self.fan_in();
+@@ -2428,7 +2439,7 @@ impl Sorter {
+             runs = next;
+         }
+         // Stream the last merge to the next stage instead of materializing it.
+-        let (sources, omitted) = if self.ctx.physical_enabled() {
++        let (mut sources, omitted) = if self.ctx.physical_enabled() {
+             SortRun::sources(
+                 &runs,
+                 self.ctx.physical_operations[0],
+@@ -2438,7 +2449,27 @@ impl Sorter {
+         } else {
+             ([None; 4], true)
+         };
+-        Ok(SortedRows::Merge(MergeRows::with_observation(
++        let tail = if keep_tail {
++            let observation_ctx = self.ctx.clone();
++            let span =
++                observation_ctx.physical_span(crate::observation::physical::Kind::ResidentSort);
++            self.sort_buffer();
++            if let Some(span) = span {
++                span.finish(self.buffer.len() as u64);
++                if let Some(slot) = sources.iter_mut().find(|source| source.is_none()) {
++                    *slot = self
++                        .ctx
++                        .physical_identity(crate::observation::physical::Kind::ResidentSort);
++                }
++            }
++            Some(ResidentRows {
++                rows: self.buffer.into_iter(),
++                _reservation: self.reservation,
++            })
++        } else {
++            None
++        };
++        let mut merge = MergeRows::with_observation(
+             runs,
+             self.order,
+             &self.ctx,
+@@ -2447,7 +2478,9 @@ impl Sorter {
+             sources,
+             omitted,
+             true,
+-        )?))
++        )?;
++        merge.tail = tail;
++        Ok(SortedRows::Merge(merge))
+     }
+ }
+ // Keep the lending cursor and its bounded observation inline. Boxing just the
+@@ -2492,9 +2525,12 @@ impl ReusingRows {
+                 drop(previous);
+                 rows.take_packed().map(Ok)
+             }
+-            SortedRows::Merge(rows) => rows.next_decoded(|reader, maximum, header| {
+-                PackedRow::read_fields_reusing(reader, maximum, header, previous)
+-            }),
++            SortedRows::Merge(rows) => match rows.next_tail() {
++                Some(row) => Some(row),
++                None => rows.next_decoded(|reader, maximum, header| {
++                    PackedRow::read_fields_reusing(reader, maximum, header, previous)
++                }),
++            },
+             SortedRows::Routed(rows) => rows.next_decoded(|reader, maximum, header| {
+                 PackedRow::read_fields_reusing(reader, maximum, header, previous)
+             }),
+@@ -2649,6 +2685,7 @@ impl RunReader {
+ pub struct MergeRows {
+     readers: Vec<RunReader>,
+     heads: BinaryHeap<Head>,
++    tail: Option<ResidentRows>,
+     ctx: Context,
+     merged: u64,
+     failed: bool,
+@@ -2730,6 +2767,7 @@ impl MergeRows {
+         Ok(Self {
+             readers,
+             heads,
++            tail: None,
+             ctx: ctx.clone(),
+             merged: 0,
+             failed: false,
+@@ -2749,10 +2787,44 @@ impl MergeRows {
+     }
+ }
+ impl MergeRows {
++    fn next_tail(&mut self) -> Option<Result<PackedRow>> {
++        if self.failed {
++            return None;
++        }
++        let tail = self.tail.as_ref()?;
++        let row = tail.rows.as_slice().first()?;
++        if self.heads.peek().is_some_and(|head| {
++            !head
++                .order
++                .compare_parts((row.key.as_slice(), row.id, row.ordinal), head.row.parts())
++                .is_lt()
++        }) {
++            return None;
++        }
++        let result = (|| -> Result<PackedRow> {
++            self.ctx.check()?;
++            let tail = self.tail.as_mut().expect("present resident tail");
++            let row = tail.take_packed().expect("present resident tail row");
++            if tail.rows.as_slice().is_empty() {
++                self.tail = None;
++            }
++            self.report_merged_row()?;
++            Ok(row)
++        })();
++        if let Err(error) = &result {
++            self.failed = true;
++            self.failure_status = crate::observation::physical::error_status(error);
++        }
++        Some(result)
++    }
++
+     fn advance(&mut self, run: usize, order: Arc<SortOrder>) -> Result<()> {
+         if let Some(row) = self.readers[run].header(self.ctx.max_record, &self._reservation)? {
+             self.heads.push(Head { row, run, order });
+         }
++        self.report_merged_row()
++    }
++    fn report_merged_row(&mut self) -> Result<()> {
+         self.merged += 1;
+         if let Some(attempt) = &mut self.observation {
+             attempt.rows_processed(self.merged);
+@@ -2849,6 +2921,9 @@ impl Drop for MergeRows {
+ impl Iterator for MergeRows {
+     type Item = Result<DecodedRow>;
+     fn next(&mut self) -> Option<Self::Item> {
++        if let Some(row) = self.next_tail() {
++            return Some(row.and_then(|row| row.to_owned_reserved(&self._reservation)));
++        }
+         self.next_decoded(owned_fields_reserved)
+     }
+ }

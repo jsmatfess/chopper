@@ -1,0 +1,56 @@
+{
+  "id": "a-single-admitted-key-per-routed-group-2026-11-26",
+  "title": "Reuse one admitted key for each ordinary routed bucket",
+  "subsystem": "storage",
+  "question": "Can ordinary routing avoid repeated key frames while preserving later merge reuse and key owner lifetimes?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "The 96-byte-key hosted job saves 67.8 MB each of tracked reads, writes and peak temporary storage and improves every elapsed pair. The late-key handoff keeps all 64 reusable buckets with mixed elapsed results.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Eight 96-byte keys, eight one-byte keys, and a late-key handoff from 64 routed buckets."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Exact CSV digests, order, groups, lineage, sizes, caps, marker and cleanup. Focused owner, truncation and cancellation coverage includes a packed row surviving its originating file."
+  },
+  "limitations": [
+    "Three matched pairs per cell on one persistent bundled Chromium/WSL2 environment. Late handoff elapsed results vary by pair."
+  ],
+  "exclusions": [
+    "Experimental compact spill timing, native elapsed time, physical device I/O and renderer RSS."
+  ],
+  "contracts": [
+    "docs/resource-policy-research.md#fixed-size-spool-header-keys-2026-11-05",
+    "docs/execution-decisions.md"
+  ],
+  "schema_version": 1,
+  "date": "2026-11-26",
+  "supersedes": [],
+  "reopen_when": null,
+  "sources": [
+    {
+      "section": "docs/performance.md#a-single-admitted-key-per-routed-group-2026-11-26",
+      "sha256": "cffceb2954452f9e373b43b35e66be007e1ceae67f5fb775e5644e349d4ef2c3"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/routed-group-key-owner-2026-11-26.jsonl",
+      "sha256": "bf217e40f7c93b15d8a7c5c8309e0d311cae6c280e206ceb1a13ed1f83771335"
+    },
+    {
+      "path": "docs/benchmarks/routed-group-key-owner-2026-11-26.patch",
+      "sha256": "db279b6a5764482484cff457866b7d4309f36cef29874dc5098fbce4900fa61f"
+    }
+  ]
+}

@@ -9242,6 +9242,45 @@
       "original_section_sha256": "ce59bd70dad7c3aebc99eab5f2776cd30c01d22e63f8b7d0baac9ef16e30b638",
       "sha256": "dd47ddbe639fa1c96c1b3128cf72d8363a0d7b223eef34fc04d273fd449c7f8d",
       "relocations": []
+    },
+    {
+      "id": "a-single-admitted-key-per-routed-group-2026-11-26",
+      "title": "A single admitted key per routed group (2026-11-26)",
+      "anchor": "a-single-admitted-key-per-routed-group-2026-11-26",
+      "path": "docs/performance/investigations/a-single-admitted-key-per-routed-group-2026-11-26.md",
+      "topic": "adaptive-routing",
+      "legacy_anchors": [
+        "a-single-admitted-key-per-routed-group-2026-11-26"
+      ],
+      "original_section_sha256": "cffceb2954452f9e373b43b35e66be007e1ceae67f5fb775e5644e349d4ef2c3",
+      "sha256": "45a542c25a3db0cf3e305e713613667cfb76a83990444e7d350c2f0811e247ef",
+      "relocations": []
+    },
+    {
+      "id": "observed-hosted-calculated-columns-followed-by-partition-2026-11-26",
+      "title": "Observed hosted calculated columns followed by Partition (2026-11-26)",
+      "anchor": "observed-hosted-calculated-columns-followed-by-partition-2026-11-26",
+      "path": "docs/performance/investigations/observed-hosted-calculated-columns-followed-by-partition-2026-11-26.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "observed-hosted-calculated-columns-followed-by-partition-2026-11-26"
+      ],
+      "original_section_sha256": "e7b2051e20ab6b0e35271ec586e2ed828a6070c1779766c6117364a89bd001c1",
+      "sha256": "74db621ec017d219f6f1959bcf2d4d50b9c719b1e43da38558d78111a03240d8",
+      "relocations": []
+    },
+    {
+      "id": "mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26",
+      "title": "Mixed hosted Uniform merge with a retained final batch (2026-11-26)",
+      "anchor": "mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26",
+      "path": "docs/performance/investigations/mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26.md",
+      "topic": "external-and-resident-shuffle",
+      "legacy_anchors": [
+        "mixed-hosted-uniform-merge-with-a-retained-final-batch-2026-11-26"
+      ],
+      "original_section_sha256": "42c3d004c0d5afa5ff01852b281282afc67468efe2f97d810fa9250f27bd35fe",
+      "sha256": "b8eaffddc657a6d5a740ca72f06f0ea76f222f7fd393cd81301b48943dbcb2da",
+      "relocations": []
     }
   ],
   "migrated_count": 193
