@@ -129,6 +129,15 @@ async function main(){
       &&plan.memory_plan.target_mb===512,'matching preview did not raise the target');
     await destination.removeEntry(done.output!.split('/').at(-1)!,{recursive:true});
 
+    await api('profile',config);
+    await wait('profiled');
+    await api('run-direct',config);
+    done=await wait('complete');
+    plan=done.analysis!.auto_plan!;
+    assert(plan.analysis_status==='matched'&&plan.memory_plan?.preview_tier_mb===512,
+      'Run did not consume both matching Analyze and Preview observations');
+    await destination.removeEntry(done.output!.split('/').at(-1)!,{recursive:true});
+
     await select(input);
     await api('preview',config);
     await api('run-direct',{...config,input_csv:{...config.input_csv,headers:false},
