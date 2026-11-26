@@ -91,8 +91,8 @@ if(browserChannel==='bundled-chromium')await withHostedBrowser({port:8448},async
   const page=await openProbe(context,url);
   const rootEntries=()=>page.evaluate(()=>window.quotaProbe.rootEntries());
   const removedParent=await page.evaluate(({csv,cap})=>window.quotaProbe.prepare(csv,cap),{csv,cap});
-  assert.deepEqual(await rootEntries(),[removedParent]);
-  assert.deepEqual(await page.evaluate(()=>window.quotaProbe.removeSelectedDestination()),[]);
+  assert.deepEqual(await rootEntries(),['chopper-workspaces',removedParent].sort());
+  assert.deepEqual(await page.evaluate(()=>window.quotaProbe.removeSelectedDestination()),['chopper-workspaces']);
 
   const failure=await page.evaluate(()=>window.quotaProbe.run());
   assert.equal(failure.status,'failed',JSON.stringify(failure));
