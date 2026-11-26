@@ -100,27 +100,35 @@ job should normally finish using temporary disk without algorithm selection or
 manual memory tuning. Respect explicit limits, use conservative availability
 estimates, and report when resources genuinely cannot support the job.
 
-Minimize total elapsed time from Run to completed output, including observation,
-planning, retries, processing and publication/export. Rank improvements by
-absolute seconds saved and prioritize larger inputs and longer pipelines when
-they offer greater savings. Prefer simpler strategies and lower resource use
-in close comparisons. Numeric thresholds and the meaning of a close comparison
-require evidence.
+Minimize elapsed time from Run to verified, usable output and required cleanup.
+Charge observation, planning, admission, retries, processing and publication to
+that time. Rank improvements by absolute seconds saved on representative larger
+jobs, including pipelines that spill. Measure small jobs too. A modest absolute
+loss on small jobs can be worthwhile when the larger-job gains are substantial
+and repeatable. Use measured spread and the workload to judge that tradeoff.
+
+When complete Run times are effectively tied, favor changes that increase
+working memory, disk, I/O or CPU headroom while preserving correctness and
+reasonable implementation complexity. Count jobs that can now complete under a
+real limit as a separate benefit. Check where resources overlap in time. Report
+working reservations, process memory, managed temporary storage, combined
+storage, logical traffic and physical I/O with their actual scopes.
 
 Weigh implementation complexity, algorithm maturity and failure risk alongside
 elapsed time and resource use. Prefer simple, known, safe approaches over
 experimental ones with unknown or tricky failure modes unless demonstrated
 benefit and resolved risks justify the added complexity.
 
-Start with cheap facts such as file size, configuration and runtime resources.
-Take an obvious conservative path for small jobs rather than paying for elaborate
-planning. File size alone does not prove resident feasibility, especially for
-compressed input or expanded grouping structures. Gather observations during
-required work, and perform extra analysis only when its expected absolute
-benefit justifies its cost. When the user has already run Analyze, reuse
-applicable observations and optimize the remaining Run time. Auto may adapt
-at safe execution boundaries, accounting
-for switching costs and preserving semantics, admission and failure cleanup.
+Use a situational strategy when Auto can identify its winning region cheaply
+and reliably enough to retain the complete Run benefit. Start with file size,
+configuration and live resources. Reuse applicable Sniff, Preview or Analyze
+facts and observations collected during work Run already performs. Account for
+incremental observation and switching costs, including any extra pass. File
+size on its own cannot establish resident feasibility or predict decoded size
+and group fanout. Test the selection boundary with held-out inputs, including
+misleading or missing signals and resource denial. Use the established route
+when the evidence or live admission is insufficient. Adapt at a boundary where
+the current input, exact semantics and failure cleanup remain protected.
 
 Seeded-output policy has been removed. Randomized results may change with the
 physical plan, resource budget, runtime or build even with the same seed. Auto

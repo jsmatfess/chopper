@@ -73,6 +73,7 @@ def main():
 
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
+    'Hosted Partition Shuffle direct output (2026-11-26)': 'ownership-and-lifecycle',
     'Hosted release comparison 0.6.3 to 0.6.4 (2026-11-26)': 'profiling',
     'A single admitted key per routed group (2026-11-26)': 'adaptive-routing',
     'Observed hosted calculated columns followed by Partition (2026-11-26)': 'profiling',

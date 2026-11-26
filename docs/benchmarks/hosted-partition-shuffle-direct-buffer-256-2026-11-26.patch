@@ -1,0 +1,23 @@
+--- a/crates/chopper/src/output/direct.rs
++++ b/crates/chopper/src/output/direct.rs
+@@ -292,7 +292,19 @@
+         header: Option<&crate::engine::Header>,
+         ctx: &Context,
+     ) -> Result<Self> {
+-        Self::grouped_with_catalog(job, header, ctx, PLAN_CATALOG_BUFFER)
++        let mut result = Self::grouped_with_catalog(job, header, ctx, PLAN_CATALOG_BUFFER)?;
++        if cfg!(target_os = "wasi")
++            && matches!(
++                job.operations.as_slice(),
++                [
++                    chopper_core::Operation::Partition { .. },
++                    chopper_core::Operation::Shuffle { .. }
++                ]
++            )
++        {
++            result.buffer_capacity = super::PLAN_DATA_BUFFER;
++        }
++        Ok(result)
+     }
+     pub(super) fn grouped_with_catalog(
+         job: &Job,

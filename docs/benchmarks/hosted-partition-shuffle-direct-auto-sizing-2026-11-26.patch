@@ -1,0 +1,23 @@
+--- a/crates/chopper/src/engine/auto.rs
++++ b/crates/chopper/src/engine/auto.rs
+@@ -755,14 +755,12 @@
+         let partition = matched
+             .and_then(|hint| hint.partition)
+             .filter(|partition| partition_columns(job) == Some(partition.columns));
+-        let memory_plan = if matches!(route, Route::Snapshot) {
+-            if cfg!(target_os = "wasi") {
+-                memory_plan(job, input_file_bytes.value, matched, preview)
+-            } else if cfg!(target_os = "linux") {
+-                matched.and_then(|hint| linux_merge_memory_plan(job, hint))
+-            } else {
+-                None
+-            }
++        let memory_plan = if cfg!(target_os = "wasi")
++            && matches!(route, Route::Snapshot | Route::PrivateTerminal)
++        {
++            memory_plan(job, input_file_bytes.value, matched, preview)
++        } else if cfg!(target_os = "linux") && matches!(route, Route::Snapshot) {
++            matched.and_then(|hint| linux_merge_memory_plan(job, hint))
+         } else {
+             None
+         };

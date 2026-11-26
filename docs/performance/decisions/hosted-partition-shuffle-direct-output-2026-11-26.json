@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "id": "hosted-partition-shuffle-direct-output-2026-11-26",
+  "title": "Retain buffered hosted Partition and Uniform direct output for guarded follow-up",
+  "date": "2026-11-26",
+  "subsystem": "output",
+  "question": "Can hosted plain Partition followed by Uniform avoid an encoded snapshot and improve complete Run while preserving its resource and publication contracts?",
+  "disposition": "retain-experimental",
+  "outcome": "favorable",
+  "delivery": "unapplied",
+  "summary": "The 512 KiB writer saves 0.30–0.40 s in all nine matched external pairs and about 105 MB each of temporary reads and writes. Both buffered arms complete under a 190 MiB temporary cap that denies snapshot Run. Preserve hosted Auto memory sizing with direct output.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Hosted plain Partition followed by explicit Uniform, eight repeating keys, one worker, 32 or 128 MiB, synthetic resident and 105 MB external fixtures.",
+      "Automatic memory on the same 420,003-row input with no Analyze hint. The matched route retains the 1,024 MiB sizing tier and resident sort.",
+      "Separate 190 MiB managed temporary quota at a fixed 32 MiB working budget."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "Verified every row and field, group lineage, file naming and caps, observed route, marker readback, workspace retirement and 21 fault controls. The managed-quota control records the baseline denial and two complete direct exports."
+  },
+  "limitations": [
+    "One WSL2 host with bundled Chromium and test-provided OPFS handles.",
+    "The 64 KiB writer regresses and route-only automatic sizing adds spills.",
+    "Combined logical storage remains near the snapshot peak in spilling cells. Matching fixed-budget reservation peaks and successful admission do not characterize shared or near-limit overlap."
+  ],
+  "exclusions": [
+    "Native timing, actual desktop picker destinations, device I/O and RSS, high fanout, compressed output, other pipeline shapes and arbitrary Auto workloads."
+  ],
+  "reopen_when": "Reproduce the result with a real desktop destination and a matched late-admission control through the first final writer, including a held-out workload and the existing Auto tier.",
+  "supersedes": [],
+  "sources": [
+    {
+      "section": "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26",
+      "sha256": "70167fd8d3baf5221e7e2a474a0b2c735c9e9b7d6f1fe98165226674d34939d9"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-64-screen-2026-11-26.jsonl",
+      "sha256": "ba48b4d71db4ef86e8ea6cc0ce3a3a07102b7ad9edc41de048874fef42075644"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-auto-2026-11-26.jsonl",
+      "sha256": "2c2e5be6d9d83deeed220efd281f8bbc572130b25380d814e1ce9a66c8911f0e"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-auto-sizing-2026-11-26.patch",
+      "sha256": "3a8ad56a927c347ebce24149c1d533937d9a6e39a6e2a01b6c1ee8d08066ac7b"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-buffer-256-2026-11-26.patch",
+      "sha256": "4d9d96a68924088d886b087179066acff115bd6f1cfd18690ddd115e825eec92"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-buffer-512-2026-11-26.patch",
+      "sha256": "0f1b2db6bca4147a3d01ff7779e1cc8cad84ad595cf08ad169af84e7ee8226a3"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-buffers-2026-11-26.jsonl",
+      "sha256": "7f3580710525668a4022ffd811ead32d1849cffe305957aa3f5cb249592b41d9"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-faults-2026-11-26.jsonl",
+      "sha256": "4087df0dcea15652da6f1fdfd305a75634bed7385f3f3f396fd82cfa997aaf38"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-harness-2026-11-26.mjs",
+      "sha256": "dae6cc78ee7ee1f90a5c98a954f89de0cf870bd82b88352e2f92a6a32dd256bd"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-harness-64-screen-2026-11-26.patch",
+      "sha256": "998c3204a7ac32864b004d315d031eb4f571f1286943868e9e728e0fc42bac20"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-harness-auto-2026-11-26.patch",
+      "sha256": "f4a8c384682519938de127b412b2d4a4cbd3b2765fa242a54828636c893a7b8d"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-harness-controls-2026-11-26.patch",
+      "sha256": "4f21dbfcfade6d53dd5201cdae1184f2248eb360069d61e0c6ec7bfca819ae44"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-quota-2026-11-26.jsonl",
+      "sha256": "719c8d4a5983088924cad3bb6eaa8187f396aee1f919e4a5989f3d6720eabf40"
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-route-2026-11-26.patch",
+      "sha256": "f036469de18086443312b78d5a6da0102f457698b6d23609ac65927addca0647"
+    }
+  ],
+  "contracts": [
+    "docs/specification.md#resources-publication-and-interfaces",
+    "docs/pipeline-rewrites.md",
+    "docs/direct-execution.md#shared-implementation-responsibilities",
+    "docs/execution-decisions.md"
+  ]
+}

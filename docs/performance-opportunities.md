@@ -55,4 +55,11 @@ Resumability, entity-coherent assignment, sampled previews, Parquet interoperabi
 3. Alternate matched baseline/candidate complete jobs; preserve individual repetitions and report sample counts and spread. Separate microbenchmarks, allocation/storage censuses, statistical diagnostics, contracts and timing samples. Compare conversion/preparation/publication scopes explicitly.
 4. Measure CPU, allocations, reservations/RSS, temporary logical traffic and sampled storage peaks where supported. Logical traffic is not physical SSD I/O; reservations are not RSS; sampled peaks are lower bounds. Avoid adding independent peak values or reusing summary rows as new samples.
 5. Check conservation, membership, lineage, digests, strict caps and failure/cancellation/publication cleanup. Require exact order/bytes only for matching algorithms/plans or exact rewrites. Distribution-equivalent changes require their proof and declared diagnostics; preserve flagged results and exclusions.
-6. Promote only after complete-job gains, bounded resource behavior and the replay contract are supported on the intended workload/runtime. Extend device/scale coverage when it can change that decision. Otherwise stop and retain the result with its limitations.
+6. Apply the [Auto performance priorities](maintainer/product-direction.md#auto-and-reproducibility).
+   Compare absolute seconds saved at larger scales, small-job costs and resource
+   headroom. For a situational strategy, preserve the producer and resource
+   policy unless their changes are part of the hypothesis. Measure the planner's
+   signal and decision cost in complete runs. Test the proposed eligibility
+   boundary on held-out inputs and verify the established route on a decline.
+   Promote when the intended workload and runtime support the benefit, selection
+   rule and contracts. Retain the decision and its limits.

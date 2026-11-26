@@ -58,8 +58,12 @@ Operational records reference the owning GitHub issue. GitHub Issues for
 4. Execute through the supported runner/harness. After failure, stop dependent
    work, preserve full logs/partial outputs, diagnose, then declare a revised
    attempt separately if a defensible remedy fits the remaining budget.
-5. Interpret correctness, resources and decision value. Deliver meaningful
-   completed changes through the authorized PR/merge gates. Then return to step 1.
+5. Apply the [Auto performance priorities](../../../docs/maintainer/product-direction.md#auto-and-reproducibility).
+   Use absolute seconds on representative large Runs and measured resource
+   headroom to choose the next experiment or resolve the candidate. For a
+   situational win, complete its selector and decline-path evidence before
+   promotion. Deliver supported changes through the authorized PR/merge gates.
+   Then return to step 1.
 
 A rejected hypothesis ends that experiment. Assess alternatives against the same
 objective before declaring the session finished. A prepared plan, retained patch,

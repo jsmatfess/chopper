@@ -1,0 +1,78 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -28,6 +28,7 @@
+     return {entries, state: await api('state'), diagnostics: structuredClone(browserDiagnostics)};
+   },
+   swarmCancel: () => api('cancel', {}),
++  swarmRetired: () => (browserDiagnostics.storage as any)?.workspace_bytes_after_cleanup === 0,
+   swarmCollect:`);
+ assert(driver.includes('response.body!.pipeTo(writer)') && driver.includes('swarmInspect'));
+ const compiled = await build({stdin:{contents:driver,resolveDir:'ui/tests',loader:'ts'},bundle:true,format:'iife',define:{__HOSTED__:'true'},write:false});
+@@ -44,6 +45,7 @@
+ FileSystemFileHandle.prototype.createWritable = async function (...args) {
+   const writer = await Reflect.apply(open, this, args);
+   const name = this.name;
++  const markerMode = MODE === 'marker' || MODE === 'marker-content';
+   if (name === 'CHOPPER-COMPLETE.json') {
+     postMessage({markerOpened:{openFiles:[...openFiles],closedCsv}});
+   }
+@@ -57,11 +59,12 @@
+       return result;
+     };
+     if (key === 'write') return async (...args) => {
+-      if (!triggered && ((MODE === 'marker' && name === 'CHOPPER-COMPLETE.json')
+-        || (MODE !== 'marker' && name.endsWith('.csv') && closedCsv > 0))) {
++      if (!triggered && ((markerMode && name === 'CHOPPER-COMPLETE.json')
++        || (!markerMode && name.endsWith('.csv') && closedCsv > 0))) {
+         triggered = true;
+         postMessage({faultReached:{name,closedCsv}});
+         if (MODE === 'cancel') await new Promise(resolve => setTimeout(resolve, 350));
++        else if (MODE === 'marker-content') return Reflect.apply(value,target,[new TextEncoder().encode('{"complete":false}')]);
+         else throw new Error('Injected ' + MODE + ' write failure');
+       }
+       return Reflect.apply(value, target, args);
+@@ -228,10 +231,10 @@
+     scope:'Run request through verified completion marker and worker retirement. Excludes fixture import, output verification and successful-result removal.'});
+   if (mode === 'faults') {
+     const source = rowsFor(30001, 240);
+-    for (const variant of variants) for (const test of ['write','marker','cancel','file-limit','byte-cap','malformed']) {
++    for (const variant of variants) for (const test of ['write','marker','marker-content','cancel','file-limit','byte-cap','malformed']) {
+       fixture = test === 'malformed' ? Buffer.concat([source,Buffer.from('30001,g1\n')]) : source;
+       active = variant;
+-      fault = ['write','marker','cancel'].includes(test) ? test : null;
++      fault = ['write','marker','marker-content','cancel'].includes(test) ? test : null;
+       await page.goto(origin);
+       await page.waitForFunction(()=>typeof window.swarmRun === 'function');
+       const job = config(32, test === 'byte-cap' ? {bytes:64} : {});
+@@ -245,7 +248,7 @@
+         await page.evaluate(()=>window.swarmCancel());
+       }
+       const result = await running;
+-      await page.waitForFunction(async()=> (await window.swarmInspect()).diagnostics.storage?.workspace_bytes_after_cleanup === 0);
++      await page.waitForFunction(()=>window.swarmRetired());
+       const inspect = await page.evaluate(()=>window.swarmInspect());
+       const {faultReached:reached,markerOpened,runEvents} = await page.evaluate(()=>({faultReached:window.faultReached,markerOpened:window.markerOpened,runEvents:window.runEvents}));
+       await emit({kind:'fault',variant,test,result,inspect,reached,markerOpened,runEvents});
+@@ -253,11 +256,12 @@
+       assert.equal(inspect.diagnostics.storage.workspace_bytes_after_cleanup,0);
+       assert.equal(inspect.state.status,test === 'cancel' ? 'cancelled' : 'failed');
+       if (fault) assert(reached?.closedCsv > 0);
+-      if (test === 'marker') assert.deepEqual(markerOpened,{openFiles:[],closedCsv:16});
++      if (test === 'marker' || test === 'marker-content') assert.deepEqual(markerOpened,{openFiles:[],closedCsv:16});
+       else assert.equal(markerOpened,undefined);
+       if (test === 'malformed') assert(!runEvents.includes('destination-opened'));
+       assert(!result.success);
+       if (test === 'write' || test === 'marker') assert.match(result.error,/Injected (write|marker) write failure/);
++      if (test === 'marker-content') assert.match(result.error,/completion marker: content did not match/);
+       if (test === 'file-limit') assert.match(result.error,/max_files/);
+       if (test === 'byte-cap') assert.match(result.error,/byte|cap/i);
+       if (test === 'malformed') assert.match(result.error,/expected|column|field/i);
+@@ -289,7 +293,7 @@
+               try { await window.swarmRun(job, 120); return null; }
+               catch (error) { return String(error); }
+             },job);
+-            await page.waitForFunction(async()=> (await window.swarmInspect()).diagnostics.storage?.workspace_bytes_after_cleanup === 0);
++            await page.waitForFunction(()=>window.swarmRetired());
+             const inspect = await page.evaluate(()=>window.swarmInspect());
+             const runEvents = await page.evaluate(()=>window.runEvents);
+             await emit({kind:'quota-denial',cell:cell.cell,variant,error,inspect,runEvents});

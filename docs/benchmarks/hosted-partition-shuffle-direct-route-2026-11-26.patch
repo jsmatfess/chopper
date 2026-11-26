@@ -1,0 +1,11 @@
+--- a/crates/chopper/src/engine/run_route.rs
++++ b/crates/chopper/src/engine/run_route.rs
+@@ -227,6 +227,8 @@
+ fn terminal_direct_eligible(job: &Job) -> bool {
+     job.compression == chopper_core::Compression::None
+         && (matches!(job.operations.as_slice(), [Operation::Balanced { .. }])
++            || (cfg!(target_os = "wasi")
++                && matches!(job.operations.as_slice(), [Operation::Partition { .. }, shuffle] if uniform(shuffle)))
+             || (cfg!(feature = "experimental-terminal-shuffle")
+                 && matches!(job.operations.as_slice(), [shuffle, Operation::Balanced { .. }] if uniform(shuffle)))
+             || (cfg!(all(

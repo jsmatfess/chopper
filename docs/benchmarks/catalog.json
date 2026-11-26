@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "3259be7a1426460dca6934cfe0a56e4da249f538e8897b225380ad5adf7dba75"
+    "sha256": "18bd1c75a37a0bace90a9f37e447334a5c455a91365d3d3e985dafca915e3886"
   },
   "experiments": [
     {
@@ -4721,6 +4721,33 @@
         "path": "docs/performance/investigations/hosted-release-comparison-063-to-064-2026-11-26.md",
         "sha256": "38d62199984a76a6709afa0e7b3322c49686deca9b927950dbd20d2fe4957f7c",
         "topic": "profiling"
+      }
+    },
+    {
+      "title": "Hosted Partition Shuffle direct output (2026-11-26)",
+      "evidence": "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-64-screen-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-partition-shuffle-direct-auto-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-partition-shuffle-direct-auto-sizing-2026-11-26.patch",
+        "docs/benchmarks/hosted-partition-shuffle-direct-buffer-256-2026-11-26.patch",
+        "docs/benchmarks/hosted-partition-shuffle-direct-buffer-512-2026-11-26.patch",
+        "docs/benchmarks/hosted-partition-shuffle-direct-buffers-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-partition-shuffle-direct-faults-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-partition-shuffle-direct-harness-2026-11-26.mjs",
+        "docs/benchmarks/hosted-partition-shuffle-direct-harness-64-screen-2026-11-26.patch",
+        "docs/benchmarks/hosted-partition-shuffle-direct-harness-auto-2026-11-26.patch",
+        "docs/benchmarks/hosted-partition-shuffle-direct-harness-controls-2026-11-26.patch",
+        "docs/benchmarks/hosted-partition-shuffle-direct-quota-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-partition-shuffle-direct-route-2026-11-26.patch"
+      ],
+      "scripts": [
+        "scripts/build-browser.mjs"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-partition-shuffle-direct-output-2026-11-26.md",
+        "sha256": "8a5379d5ff9bba9e0a75f111c0f3b30bb3cdfdfff52673e8a4b5e4aa4657dcd5",
+        "topic": "ownership-and-lifecycle"
       }
     }
   ],
@@ -18478,6 +18505,351 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#hosted-opfs-spill-read-copy-2026-11-25"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-64-screen-2026-11-26.jsonl",
+      "sha256": "ba48b4d71db4ef86e8ea6cc0ce3a3a07102b7ad9edc41de048874fef42075644",
+      "bytes": 91448,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 40
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "browser_executable_sha256",
+        "bytes",
+        "cell",
+        "checks",
+        "completedStages",
+        "context",
+        "cpu",
+        "cpus",
+        "export",
+        "harness_sha256",
+        "job",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_storage",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "resources",
+        "rows",
+        "runEvents",
+        "scope",
+        "seconds",
+        "sha256",
+        "stock_driver_sha256",
+        "unavailable",
+        "variant",
+        "width"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-auto-2026-11-26.jsonl",
+      "sha256": "2c2e5be6d9d83deeed220efd281f8bbc572130b25380d814e1ce9a66c8911f0e",
+      "bytes": 33275,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 14
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "browser_executable_sha256",
+        "bytes",
+        "cell",
+        "checks",
+        "completedStages",
+        "context",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "export",
+        "harness_sha256",
+        "job",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_storage",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "resources",
+        "rows",
+        "runEvents",
+        "scope",
+        "seconds",
+        "sha256",
+        "stock_driver_sha256",
+        "unavailable",
+        "variant",
+        "width"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-auto-sizing-2026-11-26.patch",
+      "sha256": "3a8ad56a927c347ebce24149c1d533937d9a6e39a6e2a01b6c1ee8d08066ac7b",
+      "bytes": 1053,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-buffer-256-2026-11-26.patch",
+      "sha256": "4d9d96a68924088d886b087179066acff115bd6f1cfd18690ddd115e825eec92",
+      "bytes": 830,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-buffer-512-2026-11-26.patch",
+      "sha256": "0f1b2db6bca4147a3d01ff7779e1cc8cad84ad595cf08ad169af84e7ee8226a3",
+      "bytes": 834,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-buffers-2026-11-26.jsonl",
+      "sha256": "7f3580710525668a4022ffd811ead32d1849cffe305957aa3f5cb249592b41d9",
+      "bytes": 122196,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 53
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "browser_executable_sha256",
+        "bytes",
+        "cell",
+        "checks",
+        "completedStages",
+        "context",
+        "cpu",
+        "cpus",
+        "export",
+        "harness_sha256",
+        "job",
+        "kind",
+        "limits",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_storage",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "resources",
+        "rows",
+        "runEvents",
+        "scope",
+        "seconds",
+        "sha256",
+        "stock_driver_sha256",
+        "unavailable",
+        "variant",
+        "width"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-faults-2026-11-26.jsonl",
+      "sha256": "4087df0dcea15652da6f1fdfd305a75634bed7385f3f3f396fd82cfa997aaf38",
+      "bytes": 29406,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 22
+      },
+      "fields": [
+        "assets",
+        "browser",
+        "browser_executable_sha256",
+        "context",
+        "cpu",
+        "cpus",
+        "harness_sha256",
+        "inspect",
+        "kind",
+        "markerOpened",
+        "memory_bytes",
+        "node",
+        "os",
+        "reached",
+        "result",
+        "runEvents",
+        "scope",
+        "stock_driver_sha256",
+        "test",
+        "variant"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-harness-2026-11-26.mjs",
+      "sha256": "dae6cc78ee7ee1f90a5c98a954f89de0cf870bd82b88352e2f92a6a32dd256bd",
+      "bytes": 19442,
+      "format": "mjs",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-harness-64-screen-2026-11-26.patch",
+      "sha256": "998c3204a7ac32864b004d315d031eb4f571f1286943868e9e728e0fc42bac20",
+      "bytes": 5197,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-harness-auto-2026-11-26.patch",
+      "sha256": "f4a8c384682519938de127b412b2d4a4cbd3b2765fa242a54828636c893a7b8d",
+      "bytes": 3499,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-harness-controls-2026-11-26.patch",
+      "sha256": "4f21dbfcfade6d53dd5201cdae1184f2248eb360069d61e0c6ec7bfca819ae44",
+      "bytes": 5118,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-quota-2026-11-26.jsonl",
+      "sha256": "719c8d4a5983088924cad3bb6eaa8187f396aee1f919e4a5989f3d6720eabf40",
+      "bytes": 7594,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 5
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "browser_executable_sha256",
+        "bytes",
+        "cell",
+        "checks",
+        "completedStages",
+        "context",
+        "cpu",
+        "cpus",
+        "error",
+        "export",
+        "harness_sha256",
+        "inspect",
+        "job",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_storage",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "resources",
+        "rows",
+        "runEvents",
+        "scope",
+        "seconds",
+        "sha256",
+        "stock_driver_sha256",
+        "tempBytes",
+        "unavailable",
+        "variant",
+        "width"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-partition-shuffle-direct-route-2026-11-26.patch",
+      "sha256": "f036469de18086443312b78d5a6da0102f457698b6d23609ac65927addca0647",
+      "bytes": 662,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
       ]
     },
     {
@@ -37283,8 +37655,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "b346adc41602e23bd84b521d87e1e72669cf19316f2244a09cd822224a9e8dec",
-      "bytes": 1769279,
+      "sha256": "d8ac48af8bb1a4986548732a657ac2d82f2858e0f9e45d4dce6ffbfbdba5d784",
+      "bytes": 1784614,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -41720,7 +42092,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "d798b3798796d76d16fe206666cd965273dcb3e7c18bb618a8457195471dd35d"
+    "sha256": "b7c622ff4b0e35df2346c66cf311e23327c54504b6d19fdc1a51c1b03c2cdc54"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

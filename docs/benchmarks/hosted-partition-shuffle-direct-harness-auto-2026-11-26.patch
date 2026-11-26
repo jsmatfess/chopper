@@ -1,0 +1,50 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -7,8 +7,8 @@
+ import {build, stop} from '../../ui/node_modules/esbuild/lib/main.js';
+ import {chromium} from '../../ui/node_modules/playwright/index.mjs';
+
+-const [baseline, direct256, direct512, destination, mode, browserExecutable] = process.argv.slice(2);
+-assert(baseline && direct256 && direct512 && destination && browserExecutable && ['smoke', 'measure', 'faults', 'quota'].includes(mode));
++const [baseline, direct512, directAuto, destination, mode, browserExecutable] = process.argv.slice(2);
++assert(baseline && direct512 && directAuto && destination && browserExecutable && ['measure'].includes(mode));
+ const output = resolve(destination);
+ const script = new URL(import.meta.url);
+ const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+@@ -35,7 +35,7 @@
+ const assets = Object.fromEntries(workers.outputFiles.map(file=>[file.path.split('/').at(-1),file.contents]));
+ assets['driver.js'] = compiled.outputFiles[0].contents;
+ await stop();
+-const engines = {baseline:await readFile(baseline),direct256:await readFile(direct256),direct512:await readFile(direct512)};
++const engines = {baseline:await readFile(baseline),direct512:await readFile(direct512),directAuto:await readFile(directAuto)};
+ const variants = Object.keys(engines);
+ const storageWrapper = `import '/storage-worker-production.js';
+ const open = FileSystemFileHandle.prototype.createWritable;
+@@ -264,14 +264,7 @@
+       await page.evaluate(()=>window.swarmCleanup());
+     }
+   } else {
+-    const cases = mode === 'smoke'
+-      ? [{cell:'smoke',rows:2049,width:48,memory:32,pairs:1}]
+-      : mode === 'quota'
+-      ? [{cell:'quota',rows:420003,width:240,memory:32,pairs:0,tempBytes:190*1024*1024}]
+-      : [{cell:'resident',rows:32771,width:48,memory:128,pairs:3},
+-         {cell:'external',rows:420003,width:240,memory:128,pairs:3},
+-         {cell:'tight',rows:420003,width:240,memory:32,pairs:3},
+-         {cell:'wider-cap',rows:180003,width:576,memory:128,pairs:3,limits:{bytes:2*1024*1024}}];
++    const cases = [{cell:'memory-auto',rows:420003,width:240,memory:'auto',pairs:3}];
+     for (const cell of cases) {
+       const {rows,width,memory,pairs,tempBytes,limits} = cell;
+       const job = config(memory, limits);
+@@ -304,9 +297,9 @@
+           const {finalObservation,runEvents} = await page.evaluate(()=>({finalObservation:window.finalObservation, runEvents:window.runEvents}));
+           const checks = await verify(page,result,rows,width,job.limits);
+           const physical = finalObservation.physical.map(({kind,operations,status,sources,rows,bytes,seconds,runs})=>({kind,operations,status,sources,rows,bytes,seconds,runs}));
+-          const {physical_plan,measurements} = result.analysis.auto_plan;
++          const {physical_plan,measurements,effective_memory_bytes,memory_plan} = result.analysis.auto_plan;
+           const resources = result.analysis.diagnostics;
+-          const sample = {kind:'measurement',cell:cell.cell,pair,variant,seconds:result.elapsed_seconds,checks,physical_plan,measurements,
++          const sample = {kind:'measurement',cell:cell.cell,pair,variant,seconds:result.elapsed_seconds,checks,physical_plan,measurements,effective_memory_bytes,memory_plan,
+             peak_temp_bytes:result.analysis.peak_temp_bytes,
+             peak_storage:result.diagnostics.storage,
+             bridge:{destination_write:result.diagnostics.execute.destination_write,source_read:result.diagnostics.execute.source_read},

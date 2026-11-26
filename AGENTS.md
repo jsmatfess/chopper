@@ -194,6 +194,11 @@ matching relevant identities; retain incomplete/failed attempts and full logs.
 
 ## Performance evidence
 
+For performance or Auto changes, apply the [Auto performance priorities](docs/maintainer/product-direction.md#auto-and-reproducibility).
+Rank verified large-job Run time in absolute seconds, value measured resource
+headroom in close comparisons, and validate any situational selector's cheap
+signals and decline path before promotion.
+
 For repeated experiments, follow the [coded experiment cycle](docs/maintainer/experiment-cycle.md)
 for reasoning routing, declared command pipelines and compact evidence handoffs.
 For an authorized end-to-end unattended investigation, use the repository

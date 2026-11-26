@@ -11,7 +11,7 @@ Resolve a named performance or resource decision using Chopper's existing eviden
 
 Work from the user's Chopper checkout. Verify the repository using its workspace manifest and benchmark guide rather than assuming a fixed absolute path. Paths below are relative to that checkout. If those documents are unavailable, ask for the checkout rather than substituting another project's rules.
 
-Read `docs/benchmarks/README.md` for evidence rules and `docs/performance-opportunities.md` for priorities, acceptance, and stop/reopen criteria. Use GitHub Issues for `jsmatfess/chopper` as the sole active backlog and spec tracker; read `docs/agents/issue-tracker.md` before tracker operations. Use `docs/maintainer/README.md` to find related contracts.
+Read [Auto performance priorities](../../../docs/maintainer/product-direction.md#auto-and-reproducibility), `docs/benchmarks/README.md` for evidence rules and `docs/performance-opportunities.md` for acceptance and stop/reopen criteria. Use GitHub Issues for `jsmatfess/chopper` as the sole active backlog and spec tracker; read `docs/agents/issue-tracker.md` before tracker operations. Use `docs/maintainer/README.md` to find related contracts.
 
 For repeated experiments, read `docs/maintainer/experiment-cycle.md` for reasoning routing, declared command pipelines and compact evidence handoffs. For unattended sessions, decision-file resume or session stop/recovery, read `docs/experiment-controller.md` for controller commands and limits. These workflows remain subject to the current task's authorization and resource limits.
 
@@ -47,7 +47,7 @@ No standing elapsed-time, disk-space or directory limits are configured. Respect
 
 Validate conservation, group membership, logical metadata, strict caps and failure/cancellation/publication cleanup as relevant to the candidate. Preserve exact membership, ordering barriers, serialized caps and internal snapshot publication under the current specification and rewrite rules. Distribution-equivalent changes require their justification and declared diagnostics; finite diagnostic success does not prove uniformity. Current product execution has no configurable seed or replay policy. Historical seeded comparisons retain their original identities and contracts.
 
-Promote a candidate only when complete-job benefit, bounded resource behavior and replay claims are supported for the intended workload/runtime. Record regressions and uncertainty. A benchmark request alone does not authorize changing product defaults.
+Compare absolute Run seconds saved on larger jobs through verified publication and cleanup. Measure small-job cost and use the observed spread when comparing close timings or preferring greater resource headroom. For situational gains, declare the signal Auto can obtain cheaply, its incremental cost, the expected winning region and where Auto should decline. Challenge the selector on held-out workloads and check admission while owners actually overlap. Promote after the benefit, eligibility and contracts hold for the intended workload/runtime and the user has authorized delivery.
 
 ## Record the outcome
 

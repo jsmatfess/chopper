@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "e833a509348249221b76716c7c698acdaa0e05f83e91647434de178d4d62a8f5",
+  "catalog_sha256": "9c91c4cf1f58cc01a5b12a872303a160955ed375ec50ec585c89a56f60900bb3",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -896,6 +896,19 @@
       "source_sha256": "0ef9829b3c562d444dda149ef89c8353fd9900f762dec1fd531c87039a1d44b4",
       "aliases": [
         "docs/benchmarks/probabilistic-shuffle-after-observation-2026-11-05.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-buffer-512-2026-11-26.patch",
+      "source_sha256": "0f1b2db6bca4147a3d01ff7779e1cc8cad84ad595cf08ad169af84e7ee8226a3",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-buffer-512-2026-11-26.patch"
       ],
       "format": "patch",
       "layouts": [],
@@ -2817,6 +2830,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-auto-2026-11-26.jsonl",
+      "source_sha256": "2c2e5be6d9d83deeed220efd281f8bbc572130b25380d814e1ce9a66c8911f0e",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-auto-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 12,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 12
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/picker-capture-linux-final-validation-2026-10-23.json",
       "source_sha256": "2cac8912527b4d374756d34c5980e5e0bb208a817ff103da401a8791e1a4b798",
       "aliases": [
@@ -3489,6 +3519,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-auto-sizing-2026-11-26.patch",
+      "source_sha256": "3a8ad56a927c347ebce24149c1d533937d9a6e39a6e2a01b6c1ee8d08066ac7b",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-auto-sizing-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/analysis-diagnostics-snapshot-commit-development-2026-10-23.json",
       "source_sha256": "3afb2c256f4c0bc2393736f38c15051678e671876c2a13aa99ddbdbf94b8331c",
       "aliases": [
@@ -3811,6 +3854,19 @@
         "docs/benchmarks/opfs-private-write-probe-2026-10-18.log"
       ],
       "format": "log",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-faults-2026-11-26.jsonl",
+      "source_sha256": "4087df0dcea15652da6f1fdfd305a75634bed7385f3f3f396fd82cfa997aaf38",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-faults-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -4616,6 +4672,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-buffer-256-2026-11-26.patch",
+      "source_sha256": "4d9d96a68924088d886b087179066acff115bd6f1cfd18690ddd115e825eec92",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-buffer-256-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/shared-memory-native-2026-10-16.jsonl",
       "source_sha256": "4dd78f5730256e1f36c3ea6e9d2dc0f8af811b0f5a5319824e48fe254e09d174",
       "aliases": [
@@ -4691,6 +4760,19 @@
         "measurement": 12
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-harness-controls-2026-11-26.patch",
+      "source_sha256": "4f21dbfcfade6d53dd5201cdae1184f2248eb360069d61e0c6ec7bfca819ae44",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-harness-controls-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/overlap-followup-2026-11-22-digest-narrow.jsonl",
@@ -7056,6 +7138,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-quota-2026-11-26.jsonl",
+      "source_sha256": "719c8d4a5983088924cad3bb6eaa8187f396aee1f919e4a5989f3d6720eabf40",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-quota-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 2,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 2
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/job-manifest-cross-runtime-2026-10-21.json",
       "source_sha256": "71c2a05e8d594a114d217b9401e261f2dec18e8662fc80fdef1a7bd0d13992fe",
       "aliases": [
@@ -7861,6 +7960,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-buffers-2026-11-26.jsonl",
+      "source_sha256": "7f3580710525668a4022ffd811ead32d1849cffe305957aa3f5cb249592b41d9",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-buffers-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 48,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 48
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/hot-paths-browser-2026-10-12.jsonl",
@@ -9413,6 +9529,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-harness-64-screen-2026-11-26.patch",
+      "source_sha256": "998c3204a7ac32864b004d315d031eb4f571f1286943868e9e728e0fc42bac20",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-harness-64-screen-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/native-request-server-parity-2026-10-23.json",
       "source_sha256": "9a15d67d035930f2e5104cb11b433a10db92a97a828d0a9eff43767df201adce",
       "aliases": [
@@ -10915,19 +11044,6 @@
       "coverage": "not-adapted"
     },
     {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "b346adc41602e23bd84b521d87e1e72669cf19316f2244a09cd822224a9e8dec",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
       "source": "docs/benchmarks/inspection-result-owner-development-2026-10-21.json",
       "source_sha256": "b4163627f2d1e74f08925e5c1370f528d989f07abdceb9377b03fb623db88339",
       "aliases": [
@@ -11306,6 +11422,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-64-screen-2026-11-26.jsonl",
+      "source_sha256": "ba48b4d71db4ef86e8ea6cc0ce3a3a07102b7ad9edc41de048874fef42075644",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-64-screen-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 36,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 36
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/buffered-field-copy-2026-11-05-native.py",
@@ -13423,6 +13556,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "d8ac48af8bb1a4986548732a657ac2d82f2858e0f9e45d4dce6ffbfbdba5d784",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/compact-external-multilevel-2026-10-14.jsonl",
       "source_sha256": "d8bedb532f8a920caf8bb35f04722605ab6439c8f01bfcbf04acd1aff5f5158a",
       "aliases": [
@@ -13521,6 +13667,19 @@
         "measurement": 24
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-harness-2026-11-26.mjs",
+      "source_sha256": "dae6cc78ee7ee1f90a5c98a954f89de0cf870bd82b88352e2f92a6a32dd256bd",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-harness-2026-11-26.mjs"
+      ],
+      "format": "mjs",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/parallel-groups-boundaries-2026-10-16.jsonl",
@@ -14859,6 +15018,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-route-2026-11-26.patch",
+      "source_sha256": "f036469de18086443312b78d5a6da0102f457698b6d23609ac65927addca0647",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-route-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/io-overlap-adoption-2026-11-22-browser.jsonl",
       "source_sha256": "f03da4ebf23935009ac54597db81d8d9d606e5a42eaba408788a333f3c1f39b5",
       "aliases": [
@@ -15096,6 +15268,19 @@
         "contract-duration": 23
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-partition-shuffle-direct-harness-auto-2026-11-26.patch",
+      "source_sha256": "f4a8c384682519938de127b412b2d4a4cbd3b2765fa242a54828636c893a7b8d",
+      "aliases": [
+        "docs/benchmarks/hosted-partition-shuffle-direct-harness-auto-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/picker-shutdown-incomplete-request-pipe-eof-validation-2026-10-23.json",

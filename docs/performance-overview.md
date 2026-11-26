@@ -13,7 +13,7 @@ Measured outcome, decision and delivery are independent fields. Favorable eviden
 does not imply default activation. Scope applies to the recorded builds/workloads;
 current contracts remain authoritative. Older baselines stay in the historical log.
 
-Registry coverage: 90 records; latest recorded decision 2026-11-26.
+Registry coverage: 91 records; latest recorded decision 2026-11-26.
 16 superseded records remain queryable but are omitted below.
 
 ## Delivered in default builds
@@ -65,6 +65,7 @@ Registry coverage: 90 records; latest recorded decision 2026-11-26.
 
 | Decision record | Outcome and scope | Interpretation |
 | --- | --- | --- |
+| [Retain buffered hosted Partition and Uniform direct output for guarded follow-up](performance/decisions/hosted-partition-shuffle-direct-output-2026-11-26.json) | favorable; wasi-chromium. The 512 KiB writer saves 0.30–0.40 s in all nine matched external pairs and about 105 MB each of temporary reads and writes. Both buffered arms complete under a 190 MiB temporary cap that denies snapshot Run. Preserve hosted Auto memory sizing with direct output. | [Evidence](performance/investigations/hosted-partition-shuffle-direct-output-2026-11-26.md) |
 | [Measure the hosted fixed-budget Uniform crossover](performance/decisions/hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25.json) | favorable; wasi-chromium, native-linux. The broad 384 MiB target saves 7.664–7.941 seconds in three matched browser pairs. A separate native Fisher–Yates control crosses capacity between 8 and 12 MiB retained at the same 32 MiB job. | [Evidence](performance/investigations/hosted-uniform-retention-at-a-fixed-1024-mib-2026-11-25.md) |
 | [Qualify short-tail Uniform merging at 40 GiB](performance/decisions/terminal-uniform-short-tail-at-40-gib-2026-11-21.json) | favorable; native-linux. One matched 40 GiB pair reduced elapsed 5.83%, CPU 1.09%, and temporary reads/writes 16.84%. Cache refaults rose 38.94%. The original 8 GiB retention remains Linux raw opt-in. | [Evidence](performance/investigations/terminal-uniform-short-tail-at-40-gib-2026-11-21.md) |
 | [Retain terminal-direct under matched shared pressure](performance/decisions/terminal-direct-output-under-matched-pressure-2026-11-21.json) | mixed; native-linux. At publication one fixed-peer pair completed direct only. At live emission a separate fixed request admitted alongside a completed snapshot job but was rejected by the direct job. Defer delivery. | [Evidence](performance/investigations/terminal-direct-output-under-matched-pressure-2026-11-21.md) |

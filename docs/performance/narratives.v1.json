@@ -9294,6 +9294,19 @@
       "original_section_sha256": "ae9297fd3e9bc59af7323f746dd18f4da7731f3abf3bee430bd21f4b7edeb25d",
       "sha256": "38d62199984a76a6709afa0e7b3322c49686deca9b927950dbd20d2fe4957f7c",
       "relocations": []
+    },
+    {
+      "id": "hosted-partition-shuffle-direct-output-2026-11-26",
+      "title": "Hosted Partition Shuffle direct output (2026-11-26)",
+      "anchor": "hosted-partition-shuffle-direct-output-2026-11-26",
+      "path": "docs/performance/investigations/hosted-partition-shuffle-direct-output-2026-11-26.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "hosted-partition-shuffle-direct-output-2026-11-26"
+      ],
+      "original_section_sha256": "70167fd8d3baf5221e7e2a474a0b2c735c9e9b7d6f1fe98165226674d34939d9",
+      "sha256": "8a5379d5ff9bba9e0a75f111c0f3b30bb3cdfdfff52673e8a4b5e4aa4657dcd5",
+      "relocations": []
     }
   ],
   "migrated_count": 193
