@@ -9281,6 +9281,19 @@
       "original_section_sha256": "42c3d004c0d5afa5ff01852b281282afc67468efe2f97d810fa9250f27bd35fe",
       "sha256": "b8eaffddc657a6d5a740ca72f06f0ea76f222f7fd393cd81301b48943dbcb2da",
       "relocations": []
+    },
+    {
+      "id": "hosted-release-comparison-063-to-064-2026-11-26",
+      "title": "Hosted release comparison 0.6.3 to 0.6.4 (2026-11-26)",
+      "anchor": "hosted-release-comparison-063-to-064-2026-11-26",
+      "path": "docs/performance/investigations/hosted-release-comparison-063-to-064-2026-11-26.md",
+      "topic": "profiling",
+      "legacy_anchors": [
+        "hosted-release-comparison-063-to-064-2026-11-26"
+      ],
+      "original_section_sha256": "ae9297fd3e9bc59af7323f746dd18f4da7731f3abf3bee430bd21f4b7edeb25d",
+      "sha256": "38d62199984a76a6709afa0e7b3322c49686deca9b927950dbd20d2fe4957f7c",
+      "relocations": []
     }
   ],
   "migrated_count": 193

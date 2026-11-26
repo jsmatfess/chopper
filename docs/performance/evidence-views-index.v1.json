@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "cad675c4153dc56c4a281b131f18f94b2e4aedf10326ff27617c4996123fd4a3",
+  "catalog_sha256": "e833a509348249221b76716c7c698acdaa0e05f83e91647434de178d4d62a8f5",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -1939,19 +1939,6 @@
         "docs/benchmarks/streaming-chain-controls-2026-10-18.jsonl"
       ],
       "format": "jsonl",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "2027e7d907d5178db5d926cfd0329c439bd654d4e3aa8cc6d5b285051c54f74b",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -8457,6 +8444,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/0.6.4-performance-data.json",
+      "source_sha256": "8a216571725ef2ab540b8350bd0c841a588341ab694637ea0f6a44cd8c3fe145",
+      "aliases": [
+        "docs/benchmarks/0.6.4-performance-data.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/allocation-ranges-summary-2026-10-19.json",
       "source_sha256": "8a2ad0627f0a60d66823bad50c520dd13e88161e70379058dad6f2205fabba36",
       "aliases": [
@@ -10908,6 +10908,19 @@
         "docs/benchmarks/shuffle-diagnostics-native-2026-10-15.jsonl"
       ],
       "format": "jsonl",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "b346adc41602e23bd84b521d87e1e72669cf19316f2244a09cd822224a9e8dec",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,

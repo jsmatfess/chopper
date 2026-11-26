@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "6880314172b2d23e9d1e28681d14f5c50e5a7444a2a8f7b2d51f8d919739a05b",
+  "analysis_script_sha256": "f3e1c27f5f3202cffa2a54d58777af78238471aadce531fe9c989c6e0cc850a2",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "4fff289bec0ae4051102def6704f1adffe441375db13fd70327431af2aaecc8a"
+    "sha256": "3259be7a1426460dca6934cfe0a56e4da249f538e8897b225380ad5adf7dba75"
   },
   "families": [
     "adaptive-routing",
@@ -5006,9 +5006,66 @@
         "topic": "external-and-resident-shuffle"
       },
       "family": "external-and-resident-shuffle"
+    },
+    {
+      "title": "Hosted release comparison 0.6.3 to 0.6.4 (2026-11-26)",
+      "evidence": "docs/performance.md#hosted-release-comparison-063-to-064-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/0.6.4-performance-data.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-release-comparison-063-to-064-2026-11-26.md",
+        "sha256": "38d62199984a76a6709afa0e7b3322c49686deca9b927950dbd20d2fe4957f7c",
+        "topic": "profiling"
+      },
+      "family": "profiling"
     }
   ],
   "sources": [
+    {
+      "path": "docs/benchmarks/0.6.4-performance-data.json",
+      "sha256": "8a216571725ef2ab540b8350bd0c841a588341ab694637ea0f6a44cd8c3fe145",
+      "bytes": 234299,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "baseline",
+        "browser",
+        "comparison",
+        "harness_sha256",
+        "metric_scopes",
+        "original_capture_sha256",
+        "resources",
+        "runtime",
+        "storage_scope",
+        "timing_scope",
+        "verified_pairs_per_workload",
+        "verifier_sha256",
+        "warmups_excluded_per_arm",
+        "workloads"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-063-to-064-2026-11-26"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
     {
       "path": "docs/benchmarks/accounting-batch-browser-2026-10-16.json",
       "sha256": "7d5c240c25005c66fbad060918cd93ca32127e1ff509efe4975bbae2a101825b",

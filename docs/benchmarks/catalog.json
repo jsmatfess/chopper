@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "4fff289bec0ae4051102def6704f1adffe441375db13fd70327431af2aaecc8a"
+    "sha256": "3259be7a1426460dca6934cfe0a56e4da249f538e8897b225380ad5adf7dba75"
   },
   "experiments": [
     {
@@ -4709,9 +4709,51 @@
         "sha256": "b8eaffddc657a6d5a740ca72f06f0ea76f222f7fd393cd81301b48943dbcb2da",
         "topic": "external-and-resident-shuffle"
       }
+    },
+    {
+      "title": "Hosted release comparison 0.6.3 to 0.6.4 (2026-11-26)",
+      "evidence": "docs/performance.md#hosted-release-comparison-063-to-064-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/0.6.4-performance-data.json"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-release-comparison-063-to-064-2026-11-26.md",
+        "sha256": "38d62199984a76a6709afa0e7b3322c49686deca9b927950dbd20d2fe4957f7c",
+        "topic": "profiling"
+      }
     }
   ],
   "artifacts": [
+    {
+      "path": "docs/benchmarks/0.6.4-performance-data.json",
+      "sha256": "8a216571725ef2ab540b8350bd0c841a588341ab694637ea0f6a44cd8c3fe145",
+      "bytes": 234299,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "baseline",
+        "browser",
+        "comparison",
+        "harness_sha256",
+        "metric_scopes",
+        "original_capture_sha256",
+        "resources",
+        "runtime",
+        "storage_scope",
+        "timing_scope",
+        "verified_pairs_per_workload",
+        "verifier_sha256",
+        "warmups_excluded_per_arm",
+        "workloads"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-063-to-064-2026-11-26"
+      ]
+    },
     {
       "path": "docs/benchmarks/accounting-batch-browser-2026-10-16.json",
       "sha256": "7d5c240c25005c66fbad060918cd93ca32127e1ff509efe4975bbae2a101825b",
@@ -37241,8 +37283,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "2027e7d907d5178db5d926cfd0329c439bd654d4e3aa8cc6d5b285051c54f74b",
-      "bytes": 1767512,
+      "sha256": "b346adc41602e23bd84b521d87e1e72669cf19316f2244a09cd822224a9e8dec",
+      "bytes": 1769279,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -41678,7 +41720,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "a415cfcc7f767cab30aeeb476b5cf2943dd98a8d1f51934b860b260d8c029b37"
+    "sha256": "d798b3798796d76d16fe206666cd965273dcb3e7c18bb618a8457195471dd35d"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

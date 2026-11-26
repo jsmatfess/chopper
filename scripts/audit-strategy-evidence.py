@@ -73,6 +73,7 @@ def main():
 
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
+    'Hosted release comparison 0.6.3 to 0.6.4 (2026-11-26)': 'profiling',
     'A single admitted key per routed group (2026-11-26)': 'adaptive-routing',
     'Observed hosted calculated columns followed by Partition (2026-11-26)': 'profiling',
     'Mixed hosted Uniform merge with a retained final batch (2026-11-26)': 'external-and-resident-shuffle',

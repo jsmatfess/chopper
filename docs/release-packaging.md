@@ -209,10 +209,12 @@ publication record owns the final outcome.
 
 For every release that changes performance, include detailed before-and-after
 graphs in the release notes and provide the graphs as downloadable assets.
-Use matched, verified workloads and identify the baseline and candidate builds,
-runtime, fixture, resource settings, and measurement boundary. Show individual
-elapsed-time samples and medians or ranges. Include relevant controls,
-regressions, and separate charts for resource effects such as temporary reads,
-writes, peak storage, and working reservations. Label measured prototypes
-separately from shipped changes. Link the underlying observations and keep a
-text summary alongside the graphs.
+Use the immediately prior published release as the baseline and the new
+release artifacts as the comparison. Verify that the comparison uses the
+same asset bytes as the published release. Run matched workloads, verify the
+outputs, and record both artifact identities, runtime, fixtures, resource
+settings, and measurement boundary. Show individual elapsed-time samples and
+medians or ranges. Include relevant controls, regressions, and resource graphs
+for effects such as temporary reads, writes, peak storage, and working
+reservations. Link the underlying observations and provide a text summary
+alongside the graphs.
