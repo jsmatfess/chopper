@@ -200,6 +200,8 @@ stacks, virtual file storage and browser JS buffers remain separate owners.
 Browser controls compare source reads and malformed errors, check a virtual
 file on each side of 1 MiB, and sample the live charge at the formula pause.
 
+<a id="wasi-run"></a>
+
 ## Saved Job Run
 
 [Hosted Run (#79)](https://github.com/jsmatfess/chopper/issues/79) and
