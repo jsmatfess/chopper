@@ -310,15 +310,23 @@ impl<'a> PlanWriter<'a> {
         header: Option<&crate::engine::Header>,
         ctx: &'a Context,
     ) -> Result<Self> {
+        Self::direct_grouped_buffered(job, header, ctx, PUBLICATION_BUFFER)
+    }
+    pub(crate) fn direct_grouped_buffered(
+        job: &'a Job,
+        header: Option<&crate::engine::Header>,
+        ctx: &'a Context,
+        buffer_capacity: usize,
+    ) -> Result<Self> {
         Self::with_target(
             job,
             header.map(|h| &h[..]),
             ctx,
             Reservation::new(ctx),
             || {
-                Ok(EncodedTarget::Direct(DirectPublication::grouped(
-                    job, header, ctx,
-                )?))
+                let mut target = DirectPublication::grouped(job, header, ctx)?;
+                target.buffer_capacity = buffer_capacity;
+                Ok(EncodedTarget::Direct(target))
             },
         )
     }

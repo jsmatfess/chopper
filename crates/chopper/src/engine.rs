@@ -313,7 +313,7 @@ fn run_using(
     let started = std::time::Instant::now();
     job.validate_for_execution()?;
     let route = RunRoute::select(&job, &cancel, &notify, &pool, observed)?;
-    let plan = route.report(&job, &pool, hint, preview);
+    let mut plan = route.report(&job, &pool, hint, preview);
     let (published, strategy) = match route {
         RunRoute::Direct { mode, context } => (
             direct::run(job, context, (snapshot, physical), mode, started)?,
@@ -321,7 +321,7 @@ fn run_using(
         ),
         RunRoute::Retained(route) => {
             let observe_input = physical.is_some();
-            let published = process_using(
+            let processed = process_using(
                 job,
                 cancel,
                 notify,
@@ -339,9 +339,11 @@ fn run_using(
                         })
                     }
                 },
-            )?
-            .publish()?;
-            (published, None)
+            )?;
+            if matches!(&processed, Processed::Direct { .. }) {
+                plan.record_private_terminal();
+            }
+            (processed.publish()?, None)
         }
     };
     let measurements = published.measurements;
@@ -2033,7 +2035,20 @@ fn ingest_records(
         }
         if let Some(sorted) = sorted {
             if consumed == job.operations.len() {
-                let mut plan = if ctx.direct_terminal_output {
+                // One UTF-8 delimiter or terminator byte per field is a lower
+                // bound. Quoting, headers, and CRLF can only add output bytes.
+                let hosted_buffer = if cfg!(target_os = "wasi") {
+                    run_route::hosted_partition_shuffle_buffer(
+                        job,
+                        ctx,
+                        total_record_bytes.saturating_add(rows.saturating_mul(width as u64)),
+                    )
+                } else {
+                    None
+                };
+                let mut plan = if let Some(buffer) = hosted_buffer {
+                    output::PlanWriter::direct_grouped_buffered(job, header.as_ref(), ctx, buffer)?
+                } else if ctx.direct_terminal_output {
                     output::PlanWriter::direct_grouped(job, header.as_ref(), ctx)?
                 } else {
                     output::PlanWriter::new(job, header.as_deref(), ctx)?
@@ -2055,7 +2070,7 @@ fn ingest_records(
                     largest_group: plan.largest,
                     empty_groups: plan.empty,
                 });
-                if ctx.direct_terminal_output {
+                if hosted_buffer.is_some() || ctx.direct_terminal_output {
                     terminal_publication = Some(plan.finish_direct()?);
                 } else {
                     final_plan = Some(plan.finish()?);

@@ -133,7 +133,7 @@ flowchart TD
     Policy --> Process[Build the retained Context from the selected mode and Auto resource targets]
     Direct --> JobAdmission[Admit PreparedJob and transfer any decode grant]
     Process --> JobAdmission
-    JobAdmission --> Report[Report the selected route after successful publication]
+    JobAdmission --> Report[Report the actual route after successful publication]
 ```
 
 Explicit preparation builds a snapshot Context without selecting a Run route.
@@ -141,7 +141,27 @@ Native preflight includes the live decode charge when sizing Auto or checking
 route headroom. Saved native and hosted Run both transfer that charge after
 Context creation. See the [saved Job ownership contract](cli-job-decoding.md#saved-job-run).
 Retained-parent retries and publication errors remain governed by the selected
-execution path.
+execution path. The [direct-output route inventory](performance/investigations/hosted-partition-shuffle-direct-output-2026-11-26.md#current-routes)
+also traces the independent hosted CSV/gzip and ZIP export routes.
+
+#### Hosted Partition and shuffle output choice
+
+```mermaid
+flowchart TD
+    Run[Retained hosted Run uses its normal Auto memory plan] --> Sort[Validate input and prepare the fused Partition-shuffle traversal]
+    Sort --> Eligible{Terminal Partition then Uniform or Auto, plain UTF-8, Auto grouping, and no formulas?}
+    Eligible -->|No| Snapshot[Use the existing encoded snapshot writer]
+    Eligible -->|Yes| Size{Validated CSV byte lower bound at least 96 MiB?}
+    Size -->|No| Snapshot
+    Size -->|Yes| Headroom{Live headroom for buffered output, records, and metadata?}
+    Headroom -->|No| Snapshot
+    Headroom -->|Yes| Direct[Write capped CSV chunks to private output during final traversal]
+    Snapshot --> Publish[Close destination files and verify completion marker]
+    Direct --> Publish
+```
+
+The buffer and headroom rules sit with the [direct execution contracts](direct-execution.md).
+The choice uses the current intake and leaves Analyze's advisory role unchanged.
 
 ### Engine output staging
 

@@ -235,6 +235,31 @@ fn terminal_direct_eligible(job: &Job) -> bool {
             )) && matches!(job.operations.as_slice(), [operation] if streaming::eligible(operation) || matches!(operation, Operation::Partition { .. }) || matches!(operation, Operation::Assign { strata, .. } if !strata.is_empty()))))
 }
 
+pub(super) fn hosted_partition_shuffle_buffer(
+    job: &Job,
+    ctx: &Context,
+    minimum_csv_bytes: u64,
+) -> Option<usize> {
+    const MIB: u64 = 1024 * 1024;
+    const MINIMUM_CSV_BYTES: u64 = 96 * MIB;
+    const WRITE_BUFFER: u64 = 512 * 1024;
+    if !ctx.auto_run
+        || minimum_csv_bytes < MINIMUM_CSV_BYTES
+        || !job.calculated_columns.is_empty()
+        || job.compression != chopper_core::Compression::None
+        || job.resources.grouping != chopper_core::Grouping::Auto
+        || !job.output_csv.encoding.eq_ignore_ascii_case("utf-8")
+        || !matches!(job.operations.as_slice(), [Operation::Partition { .. }, shuffle] if uniform(shuffle))
+    {
+        return None;
+    }
+    let buffer = job.limits.bytes.unwrap_or(WRITE_BUFFER).min(WRITE_BUFFER);
+    // Check after the sort has opened its final readers. Leave room for the
+    // current row, encoder, and output metadata while the writer is live.
+    let headroom = buffer + 2 * ctx.max_record as u64 + MIB;
+    (ctx.working_headroom() >= headroom).then_some(buffer as usize)
+}
+
 #[cfg(all(
     test,
     target_os = "linux",

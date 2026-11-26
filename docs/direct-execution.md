@@ -18,14 +18,34 @@ using surviving strategies; it does not enable cost selection.
 These are separate choices: this slice changes how output is produced and
 published, while retaining pipeline semantics and output/publication contracts.
 
-The shared engine owns Run dispatch. A limits-only job or a single uncompressed Balanced operation can serialize
-records directly to private publication output. Balanced still retains its input
-Dataset to establish exact quotas; it avoids the additional encoded output snapshot. An unsupported job selects existing
-exact preparation and execution before consuming input. Internal preparation retains an immutable encoded output snapshot until publication.
+The shared engine owns Run dispatch. A limits-only job or a single uncompressed
+Balanced operation can serialize records directly to private publication output.
+Balanced retains its input Dataset to establish exact quotas and can omit the
+encoded output snapshot. The retained engine selects an output writer before
+traversing its final rows. Internal preparation retains an immutable encoded
+output snapshot until publication.
 Analyze is optional, produces only input statistics and estimates, and does not
 validate a later execution snapshot.
 The former alternate flexible-policy runner and its build features are removed.
 There is no Job policy selector.
+
+A hosted Run of exactly Partition followed by Uniform or Auto shuffle can
+select grouped private output after the fused sort has prepared its final
+traversal. This selection requires Auto grouping, plain UTF-8 output, no
+calculated columns, and at least 96 MiB of validated field payload plus one
+delimiter or record terminator byte per field. This lower bound comes from
+the ordinary intake counters. It works with compressed sources and requires
+no additional scan. The producer, existing Auto memory sizing, shuffle and
+serialized caps keep their contracts.
+
+The writer buffer is 512 KiB or the strict CSV byte cap, whichever is smaller.
+Check live working headroom against that buffer, twice the configured record
+ceiling, and 1 MiB of margin while the sorted traversal is live. This is a
+selection check. Each subsequent allocation still requires admission. A
+decline uses the existing snapshot writer before any destination file opens.
+After emission starts, errors terminate through the existing cleanup path.
+Run reports the actual output route. The browser still closes the destination
+streams and verifies the completion marker before confirming publication.
 
 An unobserved Linux Run with calculated columns, plain output, no ordered
 operations, and a source file of at least 128 MiB uses the grouped private

@@ -193,12 +193,16 @@ Duplicate header names are allowed but name selection must reject ambiguity and 
 The native [Validate command](validate-cli.md) checks a saved Job configuration
 without opening its input, resolving Run resources or creating job directories.
 
-Run validates input while processing. Limits-only jobs and a single uncompressed Balanced step write directly
-to private publication output; other jobs select exact preparation internally
-before consuming input. Direct parsing, codec, admission, storage and cancellation
-errors are terminal, without retrying raw input. CLI confirmation precedes
-processing and does not promise exact counts; `--yes` skips confirmation, never
-validation. Non-interactive execution without `--yes` fails rather than waiting.
+Run validates input while processing. Limits-only jobs, a single uncompressed
+Balanced step, and eligible native or hosted plans can write directly to
+private publication output. Hosted Partition followed by Uniform or Auto
+shuffle can choose that writer at the start of final traversal based on
+validated size and live headroom. Other routes use an encoded output snapshot.
+Direct parsing, codec, admission, storage and cancellation errors end the Run
+without retrying raw input. CLI confirmation precedes processing and does not
+promise exact counts.
+`--yes` skips confirmation, never validation. Non-interactive execution without
+`--yes` fails rather than waiting.
 Analyze scans input for bounded statistics and pipeline estimates without producing
 output or retaining an executable result. Run always processes the current submitted
 configuration independently. Internal snapshot paths retain exact encoded bytes
