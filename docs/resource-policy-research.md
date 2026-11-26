@@ -24,6 +24,7 @@ remain in the dated record. Current filesystem and browser acceptance follows
 | Hosted Analyze and Run report serialization | The [WASI adapter](../crates/chopper-browser/src/lib.rs) streams the typed input profile and Run report, including the completion flag, through the stdout newline with their existing payload owners alive. This removes the intermediate Rust JSON value trees. [#71](https://github.com/jsmatfess/chopper/issues/71) |
 | Hosted worker invocation references | The [engine worker](../ui/src/browser/engine-worker.ts) holds the encoded Job file only through its synchronous reactor call, then clears the file entry and the stdout reply slot on success or failure. The response path owns the parsed reply through posting or export. [#76](https://github.com/jsmatfess/chopper/issues/76) |
 | Hosted virtual JSON file construction | The [engine worker](../ui/src/browser/engine-worker.ts) passes the full, fresh UTF-8 `ArrayBuffer` to the pinned WASI shim for readonly Job, formula-preview, and Run observation files. The shim views those worker-owned bytes directly, avoiding one full encoded-byte copy per file at construction. [#91](https://github.com/jsmatfess/chopper/issues/91) |
+| Hosted OPFS read slot | A [WASI read](../ui/src/browser/fs.ts) borrows the storage bridge slot while the shim copies the current iovec into linear memory. Each successive read may replace the slot contents. Staged export owns a separate buffer across awaited writes. The JavaScript slot and export buffers sit outside the WASI working ledger. [#90](https://github.com/jsmatfess/chopper/issues/90) |
 | Retained destination, joined names and paths, and manifest | [Destination retention](#retained-absolute-publication-destination) belongs to the engine after absolute resolution. [Joined file paths](#retained-publication-path-owners-2026-10-21), [names and publication batches](#publication-batch-and-name-owners-2026-10-21), and [manifest assembly](#job-manifest-construction-owner-2026-10-21) have their own grants. |
 | Controlled temporary names and reopening | [Controlled construction and reopen](#controlled-temporary-construction-and-reopen-2026-10-22) owns retained path creation and identity checks after parent discovery. |
 | Input/output codecs and ZIP metadata | See [ZIP metadata](#zip-parser-admission-implementation-2026-10-21), [gzip input](#gzip-input-codec-admission-2026-10-22), and [publication DEFLATE](#zip-member-and-output-deflate-codec-admission-2026-10-22). Preserve the pinned backend and owner lifetimes. |
@@ -54,25 +55,32 @@ quota/deletion/destination behavior scoped to the [filesystem acceptance
 record](history/prior-issues.md#issue-87) and the
 [browser limits](browser.md#processing-and-limits). The bundled Chromium
 controls reproduce [origin quota failures](../scripts/test-browser-quota.mjs)
-before and after successful destination writes and [one real deletion refusal](validation.md#browser-opfs-workspace-deletion-conflict)
+before and after successful destination writes, [selected destination removal](validation.md#browser-opfs-selected-destination-removal)
+before the first output writer opens, and [workspace deletion refusal](validation.md#browser-opfs-workspace-deletion-conflict)
 while a same-origin worker holds an open sync access handle. Device and installed
 browser acceptance have separate evidence requirements.
 
 The [same-origin two-Run comparison](performance/investigations/same-origin-hosted-uniform-run-overlap-2026-11-25.md)
 found that concurrent dispatch finished two guarded Uniform jobs 6.423
 seconds sooner at the paired median. Both policies completed every attempt.
-Keep independent dispatch in this measured case. A cross-instance lease
-requires a workload with evidence of a completion or resource benefit.
+Keep independent dispatch in this measured case.
+The [constrained desktop follow-up](https://github.com/jsmatfess/chopper/issues/94)
+carries the requirement to measure pressure on the supported target and compare
+time to usable output before proposing a shared lease.
 
 ### Bounded ownership changes
 
 The completed [publication destination child](https://github.com/jsmatfess/chopper/issues/9)
 covers retained destination capacity and exact/adjacent local and shared
 limits, competing owners, cancellation, cleanup, and CSV/manifest parity.
-The remaining rows need separately specified implementation children or
-explicit deferrals in the owning issue. For each change, identify the live
-owner, check the overlap with existing grants, and exercise denial,
-cancellation, and release through the applicable public entry points.
+The native discovery, path normalization, thread/runtime, caller-owned copy,
+and typed-error boundaries have a [native headroom follow-up](https://github.com/jsmatfess/chopper/issues/95).
+The [hosted adapter follow-up](https://github.com/jsmatfess/chopper/issues/96)
+records the typed error, JS formatting, transport and virtual-file boundaries.
+Each requires a reproducible workload that attributes material cost or pressure
+to the owner before a separate implementation is specified. Any owner change
+needs overlap, denial, cancellation and release coverage through its public
+entry points.
 
 ## Fixed-size spool header keys (2026-11-05)
 

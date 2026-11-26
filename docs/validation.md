@@ -596,6 +596,17 @@ case. It also retains the active-owner and injected UI retry controls. This
 covers the Chromium lock conflict. Filesystem permission changes, hardware
 failure and power loss have separate acceptance requirements.
 
+## Browser OPFS selected destination removal
+
+The [destination control](../scripts/test-browser-quota.mjs) removes a selected
+OPFS directory through the real origin root in disposable bundled Chromium.
+Production Run reports the resulting `NotFoundError` before any output writes.
+The root inventory and workspace retirement confirm the failed Run left no
+output or marker. Reselecting an OPFS parent in the same page produces exact
+capped CSVs, the manifest and a valid completion marker. The picker returns
+a real OPFS handle through the test fixture. Installed pickers and physical
+device faults have their own acceptance requirements.
+
 ## First workload baseline harness (2026-10-31)
 
 The [baseline slice](maintainer/workload-baselines.md) passes 14 small Python controls for
