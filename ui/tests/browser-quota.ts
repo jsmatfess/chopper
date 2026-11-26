@@ -16,6 +16,12 @@ function check(condition: unknown, reason: string) {
 async function workspaces() {
     return inventory(await root.getDirectoryHandle('chopper-workspaces'));
 }
+async function selectDestination() {
+    destination = await root.getDirectoryHandle('quota-probe-' + crypto.randomUUID(), { create: true });
+    const picked = await api<{ path: string | null }>('pick-path', { mode: 'output' });
+    check(picked.path === destination.name, 'Production client did not select the OPFS directory');
+    return destination.name;
+}
 const hash = async (bytes: ArrayBuffer) => Array.from(
     new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)),
     byte => byte.toString(16).padStart(2, '0'),
@@ -33,8 +39,6 @@ Object.assign(window, { quotaProbe: {
     async prepare(csv: string, cap: number) {
         enableBrowserProfiling();
         root = await navigator.storage.getDirectory();
-        const name = 'quota-probe-' + crypto.randomUUID();
-        destination = await root.getDirectoryHandle(name, { create: true });
         const input = new File([csv], 'input.csv');
         // Only the picker entry points are substituted. They return a real
         // File and a real OPFS handle to the production browser client.
@@ -42,12 +46,21 @@ Object.assign(window, { quotaProbe: {
             showDirectoryPicker: async () => destination});
         const defaults = await api<Job>('defaults');
         await api('pick-path', { mode: 'input' });
-        await api('pick-path', { mode: 'output' });
+        const selected = await selectDestination();
         job = {
             ...defaults, input: input.name, output: 'results', operations: [],
             resources: { ...defaults.resources, memory_mb: 256, workers: 1, temp_dir: null },
             limits: { rows: null, bytes: cap, compressed_bytes: null },
         };
+        return selected;
+    },
+    selectDestination,
+    async removeSelectedDestination() {
+        await root.removeEntry(destination.name);
+        return inventory(root);
+    },
+    async rootEntries() {
+        return inventory(root);
     },
     async run() {
         const dispatched = await api<{ dispatched: boolean }>('run-direct', job);
@@ -56,15 +69,16 @@ Object.assign(window, { quotaProbe: {
         const deadline = performance.now() + 15000;
         for (;;) {
             const workspaceNames = await workspaces();
-            const after = { workspaces: workspaceNames, destination: await inventory(destination) };
+            const destinationExists = (await inventory(root)).includes(destination.name);
+            const after = { workspaces: workspaceNames, destination: destinationExists ? await inventory(destination) : null };
             const storage = browserDiagnostics.storage as {
                 workspace_bytes_after_cleanup?: number;
                 profiled_destination_bytes?: number;
             } | undefined;
-            if ((!workspaceNames.length && (lastState.status === 'complete' || !after.destination.length) &&
+            if ((!workspaceNames.length && (lastState.status === 'complete' || !after.destination?.length) &&
                 storage?.workspace_bytes_after_cleanup === 0) || performance.now() >= deadline) {
                 lastState = await api<State>('state');
-                return { status: lastState.status, error: lastState.error, publication: lastState.publication,
+                return { status: lastState.status, error: lastState.error, output: lastState.output, publication: lastState.publication,
                     after, workspaceBytes: storage?.workspace_bytes_after_cleanup,
                     destinationBytes: storage?.profiled_destination_bytes };
             }

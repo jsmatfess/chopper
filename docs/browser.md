@@ -465,6 +465,19 @@ completion marker. The local browser workflow runs this check on bundled
 Chromium using the production assets. Marker finalization, installed browser
 acceptance, external disk exhaustion and native pickers have separate checks.
 
+On bundled Chromium, the same command runs a separate check in a fresh
+disposable context at the same origin. After the production client selects a
+real OPFS output parent through the picker fixture, the test removes that
+directory through the origin root before Run. The check requires a filesystem
+`NotFoundError`, zero destination bytes, no output or completion receipt, and
+an empty workspace directory. The root inventory rules out both recreation of
+the removed parent and output under another name. The same page retries the
+unchanged Job after selecting a fresh OPFS directory, and the quota check's
+verifier reads the capped CSVs, manifest and completion marker. This leg uses
+the default origin quota and covers an OPFS-backed destination selected through
+the fixture. Installed-browser picker custody and device faults have separate
+acceptance.
+
 `node scripts/test-browser-direct-destination.mjs` exercises direct destination
 publication with real WASI and OPFS, including late input failure, destination
 write/close failure, confirmed invalid markers, unknown readback outcomes and
