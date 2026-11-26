@@ -454,6 +454,37 @@ begins are terminal. This is separate from direct Run and is not a general retry
 rule. See [rewrite eligibility](pipeline-rewrites.md#current-executable-eligibility)
 and [`exact_plan.rs`](../crates/chopper/src/engine/exact_plan.rs).
 
+### Current shared Balanced checkpoints
+
+```mermaid
+flowchart TD
+    Balanced[Shared intermediate Balanced range] --> Partition{Only terminal Partition remains, its columns resolve, and this is a formula-free ordinary build?}
+    Partition -->|Yes| Boundary[Scan only the frames needed to find the final child start]
+    Partition -->|No| Full[Validate all parent frames while locating the child starts]
+    Boundary --> Decode[Decode each deferred frame during terminal Partition before publication]
+```
+
+Balanced(1) can reuse the recorded parent start without opening a scan reader.
+Balanced observation reports actual frame visits and the existing child sizes.
+The terminal Partition retains its normal decoding, cap checks, and publication
+boundary. Invalid selectors, calculated pipelines, and the experimental constant
+Partition build retain the full scan.
+
+### Current probabilistic allocation lookup
+
+```mermaid
+flowchart TD
+    Weights[Validate configured weights] --> Fanout{At least 64 allocations?}
+    Fanout -->|No| Scan[Keep weights and subtract them from the existing draw]
+    Fanout -->|Yes| Prefix[Convert weights in place to cumulative thresholds]
+    Prefix --> First{Draw below the first threshold?}
+    First -->|Yes| Zero[Choose the first allocation]
+    First -->|No| Binary[Choose the first threshold strictly above the draw]
+```
+
+Zero weights remain empty. Both lookups use the same stratified row draw and
+configured group order. Cumulative thresholds reuse the admitted weight vector.
+
 ### Current adjacent shuffle rewrites
 
 ```mermaid

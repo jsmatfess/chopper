@@ -13,13 +13,15 @@ Measured outcome, decision and delivery are independent fields. Favorable eviden
 does not imply default activation. Scope applies to the recorded builds/workloads;
 current contracts remain authoritative. Older baselines stay in the historical log.
 
-Registry coverage: 85 records; latest recorded decision 2026-11-25.
+Registry coverage: 87 records; latest recorded decision 2026-11-26.
 16 superseded records remain queryable but are omitted below.
 
 ## Delivered in default builds
 
 | Decision record | Outcome and scope | Interpretation |
 | --- | --- | --- |
+| [Stop shared Balanced scanning at the final start before terminal Partition](performance/decisions/terminal-partition-after-a-shared-balanced-range-2026-11-26.json) | favorable; wasi-chromium. Balanced(2) halves the frame visits and saves 62.1 MB in actual tracked reads. Balanced(1) opens no scan reader and saves 124.1 MB. All six paired Runs improved. | [Evidence](performance/investigations/terminal-partition-after-a-shared-balanced-range-2026-11-26.md) |
+| [Search cumulative thresholds for probabilistic fanouts of at least 64](performance/decisions/cumulative-lookup-for-probabilistic-allocation-2026-11-26.json) | mixed; wasi-chromium. A 512-group near-uniform fixture saves 70–361 ms across three verified pairs. The 64-group pairs save 13–21 ms. The early-heavy control is nearly even and the two-group control adds about 8 ms at the medians. | [Evidence](performance/investigations/cumulative-lookup-for-probabilistic-allocation-2026-11-26.md) |
 | [Bound WASI inspection Job decode ownership](performance/decisions/wasi-inspection-job-admission-cost-2026-11-25.json) | acceptance-only; wasi-chromium. Matched Preview adds about 0.012 seconds on a near-1 MiB Job and clears the 0.050-second gate. Exact and adjacent resource controls, read-ahead, raw errors and held Job lifetime pass. | [Evidence](performance/investigations/wasi-inspection-job-admission-cost-2026-11-25.md) |
 | [Consume the OPFS read slot directly in synchronous hosted WASI reads](performance/decisions/hosted-opfs-spill-read-copy-2026-11-25.json) | favorable; wasi-chromium. Verified paired median savings of 0.345 seconds for 800,000 rows and 1.573 seconds for 3.2 million rows. All six measured pairs improved with matching spill topology and bridge traffic. | [Evidence](performance/investigations/hosted-opfs-spill-read-copy-2026-11-25.md) |
 | [Batch typed Job JSON reads in the WASI adapter](performance/decisions/hosted-job-json-buffering-2026-11-25.json) | favorable; wasi-chromium. Bundled Chromium saves a median paired 0.251 seconds on the 1,034,770-byte Job. Untimed instrumentation counts 1,034,771 versus 128 reads of the same bytes. Compact median paired cost is 0.005 seconds. | [Evidence](performance/investigations/hosted-job-json-buffering-2026-11-25.md) |

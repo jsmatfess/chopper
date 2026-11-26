@@ -23,6 +23,7 @@ pub(super) struct Membership<'a> {
     counts: Vec<u64>,
     columns: Vec<usize>,
     weights: Vec<u64>,
+    cumulative_weights: bool,
     domain: [u8; 32],
     seen: u64,
     _reservation: Reservation,
@@ -75,6 +76,14 @@ impl<'a> Membership<'a> {
         if !allocations.is_empty() {
             weights_into(allocations, &mut weights)?;
         }
+        let cumulative_weights = weights.len() >= 64;
+        if cumulative_weights {
+            let mut threshold = 0;
+            for weight in &mut weights {
+                threshold += *weight;
+                *weight = threshold;
+            }
+        }
         ensure!(
             reservation.bytes() <= (ctx.memory / 16) as u64,
             "streaming group metadata exceeds memory budget"
@@ -84,6 +93,7 @@ impl<'a> Membership<'a> {
             counts,
             columns,
             weights,
+            cumulative_weights,
             domain: Self::scoped_domain(&domain),
             seen: 0,
             _reservation: reservation,
@@ -102,6 +112,8 @@ impl<'a> Membership<'a> {
     pub fn index_in(&self, domain: &[u8; 32], seen: u64, id: u64, fields: FieldViews<'_>) -> usize {
         if self.exact() {
             (seen % self.counts.len() as u64) as usize
+        } else if self.cumulative_weights {
+            random::categorical_cumulative_views(domain, id, fields, &self.columns, &self.weights)
         } else {
             random::categorical_views(domain, id, fields, &self.columns, &self.weights)
         }

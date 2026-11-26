@@ -73,6 +73,8 @@ def main():
 
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
+    'Terminal Partition after a shared Balanced range (2026-11-26)': 'balanced-boundaries',
+    'Cumulative lookup for probabilistic allocation (2026-11-26)': 'random-quality',
     'Hosted OPFS spill read copy (2026-11-25)': 'ownership-and-lifecycle',
     'Standalone Uniform final reader admission (2026-11-25)': 'ownership-and-lifecycle',
     'Pending standalone Uniform spill admission (2026-11-25)': 'ownership-and-lifecycle',

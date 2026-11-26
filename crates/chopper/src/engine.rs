@@ -2274,9 +2274,19 @@ fn apply(
     }
     let mut output = DatasetWriter::new(ctx)?;
     if let Operation::Balanced { files } = operation {
+        // A terminal Partition decodes every row before emitting each group.
+        // Leave invalid selectors and alternate rewrite paths on the full scan.
+        let defer_last = job.calculated_columns.is_empty()
+            && !cfg!(feature = "experimental-constant-partition")
+            && matches!(
+                &job.operations[step + 1..],
+                [Operation::Partition { columns }] if columns.iter().all(|column| {
+                    resolve_column(column, analysis.header.as_deref(), analysis.columns).is_ok()
+                })
+            );
         for parent in data.groups()? {
             let parent = parent?;
-            shared_balanced_parent(data, &parent, *files, step, &mut output, ctx)?;
+            shared_balanced_parent(data, &parent, *files, step, defer_last, &mut output, ctx)?;
         }
         let mut result = output.finish()?;
         result.data = data.data.clone();
@@ -2300,6 +2310,7 @@ fn shared_balanced_parent(
     parent: &Group,
     files: u64,
     step: usize,
+    defer_last: bool,
     output: &mut impl RowSink,
     ctx: &Context,
 ) -> Result<()> {
@@ -2312,7 +2323,11 @@ fn shared_balanced_parent(
             "cannot split {} rows into {files} nonempty balanced groups",
             parent.rows
         );
-        let mut rows = data.frame_lengths(parent, ctx.max_record)?;
+        let mut rows = if defer_last && files == 1 {
+            None
+        } else {
+            Some(data.frame_lengths(parent, ctx.max_record)?)
+        };
         let mut offset = parent.offset;
         observed.len = usize::try_from(files).unwrap_or(usize::MAX);
         for part in 0..files {
@@ -2328,14 +2343,19 @@ fn shared_balanced_parent(
                     exact: true,
                 },
             )?;
-            for _ in 0..n {
+            if defer_last && part + 1 == files {
                 ctx.check()?;
-                offset = offset
-                    .checked_add(rows.next().context("missing balanced row")??)
-                    .context("spool size overflow")?;
-                observed.rows += 1;
-                if let Some(attempt) = &mut observation {
-                    attempt.rows_processed(observed.rows);
+            } else {
+                let rows = rows.as_mut().expect("boundary scan reader");
+                for _ in 0..n {
+                    ctx.check()?;
+                    offset = offset
+                        .checked_add(rows.next().context("missing balanced row")??)
+                        .context("spool size overflow")?;
+                    observed.rows += 1;
+                    if let Some(attempt) = &mut observation {
+                        attempt.rows_processed(observed.rows);
+                    }
                 }
             }
             group.finish(output)?;
@@ -3124,6 +3144,68 @@ impl Prepared {
 #[cfg(test)]
 mod performance_tests {
     use super::*;
+
+    #[test]
+    fn partition_rejects_invalid_frames_deferred_by_balanced_boundaries() -> Result<()> {
+        use std::{io::Write, sync::atomic::Ordering};
+
+        let cancel = Arc::new(AtomicBool::new(false));
+        let ctx = Context::new(&Resources::default(), cancel.clone(), Arc::new(|_| {}))?;
+        let row = Row {
+            id: 0,
+            ordinal: 0,
+            key: vec![],
+            fields: vec!["valid".into()],
+        };
+        let mut bytes = Vec::new();
+        write_row(&mut bytes, &row)?;
+        let mut invalid_utf8 = bytes.clone();
+        *invalid_utf8.last_mut().unwrap() = 0xff;
+        let mut oversized = bytes.clone();
+        oversized[32..40].copy_from_slice(&u64::MAX.to_le_bytes());
+        for (tail, message) in [
+            (&bytes[..bytes.len() - 1], "reading field"),
+            (invalid_utf8.as_slice(), "invalid utf-8"),
+            (oversized.as_slice(), "exceeds limit"),
+        ] {
+            let mut writer = DatasetWriter::new(&ctx)?;
+            let mut parent = writer.begin(vec![], false);
+            writer.row(&mut parent, &row)?;
+            parent.rows = 2;
+            writer.end(parent.clone())?;
+            let mut data = writer.finish()?;
+            Arc::get_mut(&mut data.data).unwrap().write_all(tail)?;
+            let mut ranges = DatasetWriter::new(&ctx)?;
+            shared_balanced_parent(&data, &parent, 2, 0, true, &mut ranges, &ctx)?;
+            let ranges = ranges.finish()?;
+            let final_range = ranges.groups()?.nth(1).unwrap()?;
+            assert_eq!((final_range.offset, final_range.rows), (row.disk_len(), 1));
+
+            let mut partitioned = DatasetWriter::new(&ctx)?;
+            let error = partition(
+                &data,
+                &final_range,
+                &[0],
+                1,
+                &mut partitioned,
+                &ctx,
+                None,
+                #[cfg(feature = "experimental-constant-partition")]
+                None,
+            )
+            .unwrap_err();
+            assert!(format!("{error:#}").contains(message), "{error:#}");
+            assert_eq!(partitioned.finish()?.groups, 0);
+            let mut eager = DatasetWriter::new(&ctx)?;
+            assert!(shared_balanced_parent(&data, &parent, 2, 0, false, &mut eager, &ctx).is_err());
+
+            cancel.store(true, Ordering::Relaxed);
+            assert!(shared_balanced_parent(&data, &parent, 1, 0, true, &mut eager, &ctx).is_err());
+            cancel.store(false, Ordering::Relaxed);
+        }
+        assert_eq!(ctx.used(), 0);
+        Ok(())
+    }
 
     #[test]
     fn grouping_observation_waits_for_input_rows() -> Result<()> {

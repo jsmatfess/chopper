@@ -1,0 +1,73 @@
+diff --git a/crates/chopper/src/engine.rs b/crates/chopper/src/engine.rs
+index 37f2431..7303615 100644
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -2274,9 +2274,19 @@ fn apply(
+     }
+     let mut output = DatasetWriter::new(ctx)?;
+     if let Operation::Balanced { files } = operation {
++        // A terminal Partition decodes every row before emitting each group.
++        // Leave invalid selectors and alternate rewrite paths on the full scan.
++        let defer_last = job.calculated_columns.is_empty()
++            && !cfg!(feature = "experimental-constant-partition")
++            && matches!(
++                &job.operations[step + 1..],
++                [Operation::Partition { columns }] if columns.iter().all(|column| {
++                    resolve_column(column, analysis.header.as_deref(), analysis.columns).is_ok()
++                })
++            );
+         for parent in data.groups()? {
+             let parent = parent?;
+-            shared_balanced_parent(data, &parent, *files, step, &mut output, ctx)?;
++            shared_balanced_parent(data, &parent, *files, step, defer_last, &mut output, ctx)?;
+         }
+         let mut result = output.finish()?;
+         result.data = data.data.clone();
+@@ -2300,6 +2310,7 @@ fn shared_balanced_parent(
+     parent: &Group,
+     files: u64,
+     step: usize,
++    defer_last: bool,
+     output: &mut impl RowSink,
+     ctx: &Context,
+ ) -> Result<()> {
+@@ -2312,7 +2323,11 @@ fn shared_balanced_parent(
+             "cannot split {} rows into {files} nonempty balanced groups",
+             parent.rows
+         );
+-        let mut rows = data.frame_lengths(parent, ctx.max_record)?;
++        let mut rows = if defer_last && files == 1 {
++            None
++        } else {
++            Some(data.frame_lengths(parent, ctx.max_record)?)
++        };
+         let mut offset = parent.offset;
+         observed.len = usize::try_from(files).unwrap_or(usize::MAX);
+         for part in 0..files {
+@@ -2328,14 +2343,19 @@ fn shared_balanced_parent(
+                     exact: true,
+                 },
+             )?;
+-            for _ in 0..n {
++            if defer_last && part + 1 == files {
+                 ctx.check()?;
+-                offset = offset
+-                    .checked_add(rows.next().context("missing balanced row")??)
+-                    .context("spool size overflow")?;
+-                observed.rows += 1;
+-                if let Some(attempt) = &mut observation {
+-                    attempt.rows_processed(observed.rows);
++            } else {
++                let rows = rows.as_mut().expect("boundary scan reader");
++                for _ in 0..n {
++                    ctx.check()?;
++                    offset = offset
++                        .checked_add(rows.next().context("missing balanced row")??)
++                        .context("spool size overflow")?;
++                    observed.rows += 1;
++                    if let Some(attempt) = &mut observation {
++                        attempt.rows_processed(observed.rows);
++                    }
+                 }
+             }
+             group.finish(output)?;

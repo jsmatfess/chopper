@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "2c80e78cd1108c33f07bb9dd5449b6e228687812c1a1e54d1a666ab78cb27faa",
+  "catalog_sha256": "b64ff1d1e3b5d8a0f4aa495ef79ffc8e36f308199313cb650639106b6f3e4eef",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -4948,6 +4948,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/terminal-partition-shared-balanced-2026-11-26.jsonl",
+      "source_sha256": "536e6675e42e482da370b8bd9088b9217913795c1b2c919ae84ddd6d878b63ac",
+      "aliases": [
+        "docs/benchmarks/terminal-partition-shared-balanced-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 16
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/analysis-diagnostics-browser-followup-2026-10-23.json",
       "source_sha256": "539b2be3a353d57768efeb0fa1aa74343e7918d8a854bccb1434c69088d55a77",
       "aliases": [
@@ -6014,6 +6031,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/probabilistic-lookup-wasm-component-2026-11-26.json",
+      "source_sha256": "62caad0c28ce90b7b0272b0bb0507f3703f881cbbc8d326975e9b722137b7c44",
+      "aliases": [
+        "docs/benchmarks/probabilistic-lookup-wasm-component-2026-11-26.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/catalog-reader-browser-2026-10-16.json",
       "source_sha256": "6341fdb0f6a2d28bf6e66c50dc562429076cb8359008173ca92ce43615fa6821",
       "aliases": [
@@ -7011,19 +7041,6 @@
         "measurement": 108
       },
       "coverage": "adapted"
-    },
-    {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "71bc15588e64f0924a8553c3939445be541762e2a78a7269c634dca14c66038d",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/job-manifest-cross-runtime-2026-10-21.json",
@@ -8251,6 +8268,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.jsonl",
+      "source_sha256": "8818eae790de4018ee7b34aaa2c1d72ce23c6e8e083bd4ebc3d720238f935ee7",
+      "aliases": [
+        "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 32,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 32
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/streaming-chain-boundaries-2026-10-18.jsonl",
       "source_sha256": "882b833c6eb653ee54b05803494e852da8d1f737ed2103fa6403f3df8a4f1a95",
       "aliases": [
@@ -9242,6 +9276,19 @@
         "docs/benchmarks/shuffle-policy-archive-provenance-2026-11-15.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/terminal-partition-shared-balanced-2026-11-26.patch",
+      "source_sha256": "982b8177d0a7fa39362ea4f944d7f4fa54108b38f30f198c791839dc728ced9d",
+      "aliases": [
+        "docs/benchmarks/terminal-partition-shared-balanced-2026-11-26.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -12894,6 +12941,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.patch",
+      "source_sha256": "d3b9598c6eb9e8abd18980b7aa6e873ef338f544f2014ceafc76bd5d299d4882",
+      "aliases": [
+        "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/auto-followup-2026-11-21-linux-workers-four-cpus.jsonl",
       "source_sha256": "d3f63fd8f25a759966fc47087a9cef15e059745b23fb437fb6f19c90d4584a3d",
       "aliases": [
@@ -15336,6 +15396,19 @@
         "docs/benchmarks/aligned-digest-2026-11-05-preflight.py"
       ],
       "format": "py",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "fc9c549b27f93b058de3000d95ad7d1208604a27a9435dd5c124c751cf1cd2f6",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,

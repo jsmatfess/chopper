@@ -1,0 +1,60 @@
+{
+  "id": "cumulative-lookup-for-probabilistic-allocation-2026-11-26",
+  "title": "Search cumulative thresholds for probabilistic fanouts of at least 64",
+  "subsystem": "execution",
+  "question": "Can the same categorical draw select high-fanout groups faster using the existing admitted weights?",
+  "disposition": "adopt",
+  "outcome": "mixed",
+  "delivery": "default",
+  "summary": "A 512-group near-uniform fixture saves 70–361 ms across three verified pairs. The 64-group pairs save 13–21 ms. The early-heavy control is nearly even and the two-group control adds about 8 ms at the medians.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "64 and 512 near-uniform groups, 512 groups with 90% first, and a two-group 80/20 control."
+    ],
+    "measurement": "mixed"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Exact seeded internal lookup agreement including zero weights and threshold boundaries. Hosted export verifies conservation, configured order, subsequences, zeros, CSV caps and marker."
+  },
+  "limitations": [
+    "Three complete paired repetitions per cell with uncontrolled warm cache. One high-fanout pair is slow in both arms. Isolated lookup probe excludes hashing and job work."
+  ],
+  "exclusions": [
+    "Cross-Run membership parity with fresh entropy, native elapsed time and physical disk I/O."
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/execution-decisions.md"
+  ],
+  "schema_version": 1,
+  "date": "2026-11-26",
+  "supersedes": [],
+  "reopen_when": null,
+  "sources": [
+    {
+      "section": "docs/performance.md#cumulative-lookup-for-probabilistic-allocation-2026-11-26",
+      "sha256": "ce59bd70dad7c3aebc99eab5f2776cd30c01d22e63f8b7d0baac9ef16e30b638"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.jsonl",
+      "sha256": "8818eae790de4018ee7b34aaa2c1d72ce23c6e8e083bd4ebc3d720238f935ee7"
+    },
+    {
+      "path": "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.patch",
+      "sha256": "d3b9598c6eb9e8abd18980b7aa6e873ef338f544f2014ceafc76bd5d299d4882"
+    },
+    {
+      "path": "docs/benchmarks/probabilistic-lookup-wasm-component-2026-11-26.json",
+      "sha256": "62caad0c28ce90b7b0272b0bb0507f3703f881cbbc8d326975e9b722137b7c44"
+    }
+  ]
+}

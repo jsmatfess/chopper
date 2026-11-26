@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "d16827a142f736106a9fbdb618f09a9b1990facf37ff25ffc2fac0e2e242ddac",
+  "analysis_script_sha256": "7e19e9b776a8544ab75de2558bd17bdce68d5552fe649d9a4fbe0075cd0d286a",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "8dbd8e705012aa995f08a7b27c7149ca8c462b284731d0ffbd4b1d5adf05d324"
+    "sha256": "20285efcf894741a6a344894a2ce620e97b9f31869433cb7e896d55c80e37129"
   },
   "families": [
     "adaptive-routing",
@@ -4922,6 +4922,42 @@
         "topic": "ownership-and-lifecycle"
       },
       "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Terminal Partition after a shared Balanced range (2026-11-26)",
+      "evidence": "docs/performance.md#terminal-partition-after-a-shared-balanced-range-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.patch",
+        "docs/benchmarks/terminal-partition-shared-balanced-2026-11-26.jsonl",
+        "docs/benchmarks/terminal-partition-shared-balanced-2026-11-26.patch"
+      ],
+      "scripts": [
+        "scripts/build-browser.mjs"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/terminal-partition-after-a-shared-balanced-range-2026-11-26.md",
+        "sha256": "5d0fdd3a6fbcc23295f20293646bd458df9320c6c7df1bdea36f6f24125e6913",
+        "topic": "balanced-boundaries"
+      },
+      "family": "balanced-boundaries"
+    },
+    {
+      "title": "Cumulative lookup for probabilistic allocation (2026-11-26)",
+      "evidence": "docs/performance.md#cumulative-lookup-for-probabilistic-allocation-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.jsonl",
+        "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.patch",
+        "docs/benchmarks/probabilistic-lookup-wasm-component-2026-11-26.json"
+      ],
+      "scripts": [
+        "scripts/build-browser.mjs"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/cumulative-lookup-for-probabilistic-allocation-2026-11-26.md",
+        "sha256": "dd47ddbe639fa1c96c1b3128cf72d8363a0d7b223eef34fc04d273fd449c7f8d",
+        "topic": "random-quality"
+      },
+      "family": "random-quality"
     }
   ],
   "sources": [
@@ -42924,6 +42960,112 @@
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
+      "path": "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.jsonl",
+      "sha256": "8818eae790de4018ee7b34aaa2c1d72ce23c6e8e083bd4ebc3d720238f935ee7",
+      "bytes": 98744,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 37
+      },
+      "fields": [
+        "bytes",
+        "cell",
+        "cpus",
+        "executable",
+        "inputs",
+        "kind",
+        "marker",
+        "memory_bytes",
+        "node",
+        "original_line",
+        "original_sha256",
+        "os",
+        "pair",
+        "physical",
+        "projection",
+        "recipe",
+        "resources",
+        "seconds",
+        "sha256",
+        "stages",
+        "storage",
+        "time_scope",
+        "variant",
+        "verification",
+        "workspace_bytes_after_cleanup"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#cumulative-lookup-for-probabilistic-allocation-2026-11-26"
+      ],
+      "families": [
+        "random-quality"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 37
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/probabilistic-allocation-cumulative-2026-11-26.patch",
+      "sha256": "d3b9598c6eb9e8abd18980b7aa6e873ef338f544f2014ceafc76bd5d299d4882",
+      "bytes": 5257,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#terminal-partition-after-a-shared-balanced-range-2026-11-26",
+        "docs/performance.md#cumulative-lookup-for-probabilistic-allocation-2026-11-26"
+      ],
+      "families": [
+        "balanced-boundaries",
+        "random-quality"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/probabilistic-lookup-wasm-component-2026-11-26.json",
+      "sha256": "62caad0c28ce90b7b0272b0bb0507f3703f881cbbc8d326975e9b722137b7c44",
+      "bytes": 1451,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "cases",
+        "node",
+        "scope",
+        "wasm_sha256"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#cumulative-lookup-for-probabilistic-allocation-2026-11-26"
+      ],
+      "families": [
+        "random-quality"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
       "path": "docs/benchmarks/probabilistic-shuffle-after-observation-2026-11-05.json",
       "sha256": "41956c94620846e64ec55441a1e33df5d4bf6a19447ede6779b69833e50cd8b0",
       "bytes": 109875,
@@ -57797,6 +57939,77 @@
       ],
       "families": [
         "adaptive-routing"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/terminal-partition-shared-balanced-2026-11-26.jsonl",
+      "sha256": "536e6675e42e482da370b8bd9088b9217913795c1b2c919ae84ddd6d878b63ac",
+      "bytes": 33574,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 19
+      },
+      "fields": [
+        "bytes",
+        "cell",
+        "cpus",
+        "executable",
+        "inputs",
+        "kind",
+        "marker",
+        "memory_bytes",
+        "node",
+        "original_line",
+        "original_sha256",
+        "os",
+        "pair",
+        "physical",
+        "projection",
+        "recipe",
+        "resources",
+        "seconds",
+        "sha256",
+        "stages",
+        "storage",
+        "time_scope",
+        "variant",
+        "verification",
+        "workspace_bytes_after_cleanup"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#terminal-partition-after-a-shared-balanced-range-2026-11-26"
+      ],
+      "families": [
+        "balanced-boundaries"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 19
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/terminal-partition-shared-balanced-2026-11-26.patch",
+      "sha256": "982b8177d0a7fa39362ea4f944d7f4fa54108b38f30f198c791839dc728ced9d",
+      "bytes": 3151,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#terminal-partition-after-a-shared-balanced-range-2026-11-26"
+      ],
+      "families": [
+        "balanced-boundaries"
       ],
       "record_bounds_by_kind": {},
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."

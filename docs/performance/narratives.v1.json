@@ -9216,6 +9216,32 @@
       "original_section_sha256": "f89461b6366f08c1e7e3c525370d94ab50a8e0407c63b62b56a628dc75f44d78",
       "sha256": "700d294a070051551f0f240a1eebb89731dbe85c5b83361e5dd54c5a4b8cfa02",
       "relocations": []
+    },
+    {
+      "id": "terminal-partition-after-a-shared-balanced-range-2026-11-26",
+      "title": "Terminal Partition after a shared Balanced range (2026-11-26)",
+      "anchor": "terminal-partition-after-a-shared-balanced-range-2026-11-26",
+      "path": "docs/performance/investigations/terminal-partition-after-a-shared-balanced-range-2026-11-26.md",
+      "topic": "balanced-boundaries",
+      "legacy_anchors": [
+        "terminal-partition-after-a-shared-balanced-range-2026-11-26"
+      ],
+      "original_section_sha256": "1219d95c19041d75566505c5396b85c8022f42a8a9894d5703f1d11c11e5b623",
+      "sha256": "5d0fdd3a6fbcc23295f20293646bd458df9320c6c7df1bdea36f6f24125e6913",
+      "relocations": []
+    },
+    {
+      "id": "cumulative-lookup-for-probabilistic-allocation-2026-11-26",
+      "title": "Cumulative lookup for probabilistic allocation (2026-11-26)",
+      "anchor": "cumulative-lookup-for-probabilistic-allocation-2026-11-26",
+      "path": "docs/performance/investigations/cumulative-lookup-for-probabilistic-allocation-2026-11-26.md",
+      "topic": "random-quality",
+      "legacy_anchors": [
+        "cumulative-lookup-for-probabilistic-allocation-2026-11-26"
+      ],
+      "original_section_sha256": "ce59bd70dad7c3aebc99eab5f2776cd30c01d22e63f8b7d0baac9ef16e30b638",
+      "sha256": "dd47ddbe639fa1c96c1b3128cf72d8363a0d7b223eef34fc04d273fd449c7f8d",
+      "relocations": []
     }
   ],
   "migrated_count": 193

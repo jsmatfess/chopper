@@ -233,3 +233,8 @@ reservation-entry-2026-11-05-linux-lock.py
 # Paired calculated-column measurements without workstation paths.
 !calculated-column-optimization-summary-2026-11-24.json
 !calculated-partition-summary-2026-11-24.json
+
+# Compact hosted performance observations. Full browser captures remain local.
+!terminal-partition-shared-balanced-2026-11-26.jsonl
+!probabilistic-allocation-cumulative-2026-11-26.jsonl
+!probabilistic-lookup-wasm-component-2026-11-26.json

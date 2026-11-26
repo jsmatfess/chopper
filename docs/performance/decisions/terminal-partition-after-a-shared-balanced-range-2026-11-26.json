@@ -1,0 +1,57 @@
+{
+  "id": "terminal-partition-after-a-shared-balanced-range-2026-11-26",
+  "title": "Stop shared Balanced scanning at the final start before terminal Partition",
+  "subsystem": "execution",
+  "question": "Can a terminal Partition perform final-child validation while locating its keys and reduce Run time?",
+  "disposition": "adopt",
+  "outcome": "favorable",
+  "delivery": "default",
+  "summary": "Balanced(2) halves the frame visits and saves 62.1 MB in actual tracked reads. Balanced(1) opens no scan reader and saves 124.1 MB. All six paired Runs improved.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Formula-free Balanced(1 or 2) followed by terminal Partition, 600,003 rows, 256 MiB and 4 MiB CSV cap."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "native-linux",
+      "wasi-chromium"
+    ],
+    "summary": "Independent exact fields, CSV hashes, lineage, membership, caps, marker and workspace checks. Corrupt final frames and cancellation fail in focused engine coverage."
+  },
+  "limitations": [
+    "Measured on one bundled Chromium WSL2 profile. Unexpected private-spool damage in a deferred frame surfaces during subsequent Partition."
+  ],
+  "exclusions": [
+    "Other following operations, calculated jobs, experimental constant Partition, native elapsed time and physical disk I/O."
+  ],
+  "contracts": [
+    "docs/specification.md",
+    "docs/pipeline-rewrites.md",
+    "docs/execution-decisions.md"
+  ],
+  "schema_version": 1,
+  "date": "2026-11-26",
+  "supersedes": [],
+  "reopen_when": null,
+  "sources": [
+    {
+      "section": "docs/performance.md#terminal-partition-after-a-shared-balanced-range-2026-11-26",
+      "sha256": "1219d95c19041d75566505c5396b85c8022f42a8a9894d5703f1d11c11e5b623"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/terminal-partition-shared-balanced-2026-11-26.jsonl",
+      "sha256": "536e6675e42e482da370b8bd9088b9217913795c1b2c919ae84ddd6d878b63ac"
+    },
+    {
+      "path": "docs/benchmarks/terminal-partition-shared-balanced-2026-11-26.patch",
+      "sha256": "982b8177d0a7fa39362ea4f944d7f4fa54108b38f30f198c791839dc728ced9d"
+    }
+  ]
+}

@@ -155,6 +155,43 @@ pub fn categorical_views<'a>(
     columns: &[usize],
     weights: &[u64],
 ) -> usize {
+    let mut draw = categorical_draw(domain, row, fields, columns);
+    for (index, weight) in weights.iter().enumerate() {
+        if draw < *weight {
+            return index;
+        }
+        draw -= weight;
+    }
+    unreachable!("validated weights total 100 percent")
+}
+
+/// Use the same categorical v1 draw with cumulative, validated weights.
+pub fn categorical_cumulative_views<'a>(
+    domain: &[u8; 32],
+    row: u64,
+    fields: impl Iterator<Item = &'a str> + Clone,
+    columns: &[usize],
+    thresholds: &[u64],
+) -> usize {
+    let draw = categorical_draw(domain, row, fields, columns);
+    cumulative_index(thresholds, draw)
+}
+
+fn cumulative_index(thresholds: &[u64], draw: u64) -> usize {
+    if draw < thresholds[0] {
+        return 0;
+    }
+    // Repeated thresholds represent zero weights. Equality belongs to the next
+    // nonempty interval, as it does in the subtractive lookup.
+    thresholds.partition_point(|&threshold| threshold <= draw)
+}
+
+fn categorical_draw<'a>(
+    domain: &[u8; 32],
+    row: u64,
+    fields: impl Iterator<Item = &'a str> + Clone,
+    columns: &[usize],
+) -> u64 {
     let mut hash = blake3::Hasher::new_keyed(domain);
     hash.update(&row.to_le_bytes());
     for &column in columns {
@@ -165,18 +202,11 @@ pub fn categorical_views<'a>(
     // This per-row cursor supplies one draw; buffering its unused words adds work.
     let domain = *hash.finalize().as_bytes();
     let mut counter = 0u64;
-    let mut draw = below_with(100_000_000, || {
+    below_with(100_000_000, || {
         let bytes = block(&domain, counter, 0);
         counter = counter.checked_add(1).expect("random stream exhausted");
         u64::from_le_bytes(bytes[..8].try_into().unwrap())
-    });
-    for (index, weight) in weights.iter().enumerate() {
-        if draw < *weight {
-            return index;
-        }
-        draw -= weight;
-    }
-    unreachable!("validated weights total 100 percent")
+    })
 }
 
 #[cfg(test)]
@@ -246,6 +276,32 @@ mod tests {
                     expected
                 );
             }
+        }
+    }
+
+    #[test]
+    fn cumulative_lookup_preserves_boundaries_and_v1_membership() {
+        assert_eq!(cumulative_index(&[3, 3, 5], 2), 0);
+        for (draw, expected) in [(0, 1), (2, 1), (3, 3), (4, 3), (5, 4), (6, 4)] {
+            assert_eq!(cumulative_index(&[0, 3, 3, 5, 7, 7], draw), expected);
+        }
+        let mut weights = [390_625; 256];
+        weights[0] = 0;
+        weights[199] *= 3;
+        weights[255] = 0;
+        let mut sum = 0;
+        let thresholds = weights.map(|weight| {
+            sum += weight;
+            sum
+        });
+        let domain = domain("cumulative-categorical", 1, "[]");
+        let fields = ["", "界\0\n"];
+        for id in 0..1000 {
+            let expected = categorical_views(&domain, id, fields.into_iter(), &[1, 0], &weights);
+            assert_eq!(
+                categorical_cumulative_views(&domain, id, fields.into_iter(), &[1, 0], &thresholds),
+                expected
+            );
         }
     }
 
