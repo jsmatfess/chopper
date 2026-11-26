@@ -149,7 +149,7 @@ also traces the independent hosted CSV/gzip and ZIP export routes.
 ```mermaid
 flowchart TD
     Run[Retained hosted Run uses its normal Auto memory plan] --> Sort[Validate input and prepare the fused Partition-shuffle traversal]
-    Sort --> Eligible{Terminal Partition then Uniform or Auto, plain UTF-8, Auto grouping, and no formulas?}
+    Sort --> Eligible{Exactly Partition and Uniform or Auto in either order, plain UTF-8, Auto grouping, and no formulas?}
     Eligible -->|No| Snapshot[Use the existing encoded snapshot writer]
     Eligible -->|Yes| Size{Validated CSV byte lower bound at least 96 MiB?}
     Size -->|No| Snapshot

@@ -29,14 +29,14 @@ validate a later execution snapshot.
 The former alternate flexible-policy runner and its build features are removed.
 There is no Job policy selector.
 
-A hosted Run of exactly Partition followed by Uniform or Auto shuffle can
-select grouped private output after the fused sort has prepared its final
-traversal. This selection requires Auto grouping, plain UTF-8 output, no
-calculated columns, and at least 96 MiB of validated field payload plus one
-delimiter or record terminator byte per field. This lower bound comes from
-the ordinary intake counters. It works with compressed sources and requires
-no additional scan. The producer, existing Auto memory sizing, shuffle and
-serialized caps keep their contracts.
+A hosted Run of exactly Partition and a Uniform or Auto shuffle, in either
+order, can select grouped private output after the fused sort prepares its
+final traversal. The selection requires Auto grouping, plain UTF-8 output,
+no calculated columns, and at least 96 MiB of validated field payload plus
+one delimiter or record terminator byte per field. This lower bound comes
+from the ordinary intake counters. It works with compressed sources and
+requires no additional scan. The producer, existing Auto memory sizing,
+shuffle and serialized caps keep their contracts.
 
 The writer buffer is 512 KiB or the strict CSV byte cap, whichever is smaller.
 Check live working headroom against that buffer, twice the configured record

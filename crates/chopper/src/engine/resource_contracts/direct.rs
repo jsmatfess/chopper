@@ -46,6 +46,22 @@ fn partition_shuffle_writer_boundary(root: &std::path::Path) -> Result<()> {
     );
     job.limits.bytes = None;
 
+    job.operations.swap(0, 1);
+    ensure!(
+        choose(&job, &ctx, at_size) == Some(512 * KIB),
+        "Uniform then Partition did not select buffered output"
+    );
+    job.operations[0] = Operation::Shuffle {
+        strategy: Shuffle::FisherYates,
+    };
+    ensure!(
+        choose(&job, &ctx, at_size).is_none(),
+        "Fisher–Yates was eligible"
+    );
+    job.operations[0] = Operation::Shuffle {
+        strategy: Shuffle::Auto,
+    };
+
     let row = Row {
         id: 0,
         ordinal: 0,

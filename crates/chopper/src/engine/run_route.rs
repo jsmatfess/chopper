@@ -249,7 +249,11 @@ pub(super) fn hosted_partition_shuffle_buffer(
         || job.compression != chopper_core::Compression::None
         || job.resources.grouping != chopper_core::Grouping::Auto
         || !job.output_csv.encoding.eq_ignore_ascii_case("utf-8")
-        || !matches!(job.operations.as_slice(), [Operation::Partition { .. }, shuffle] if uniform(shuffle))
+        || !matches!(
+            job.operations.as_slice(),
+            [Operation::Partition { .. }, shuffle] | [shuffle, Operation::Partition { .. }]
+                if uniform(shuffle)
+        )
     {
         return None;
     }
