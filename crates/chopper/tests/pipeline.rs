@@ -611,14 +611,15 @@ fn adaptive_grouping_matches_sorting_through_late_shape_changes() -> Result<()> 
         ctx.memory = 4 * 1024 * 1024;
         let mut sorter = Sorter::new(&ctx, SortOrder::Key);
         let count = if shape == "small" { 12 } else { 18000 };
+        let late_start = 15_000;
         for id in 0..count {
-            let key = if shape == "unique" || (shape == "late_keys" && id >= 15000) {
+            let key = if shape == "unique" || (shape == "late_keys" && id >= late_start) {
                 id
             } else {
                 id % 3
             };
-            let ordinal = if shape == "late_reorder" && id >= 15000 {
-                id - 15000
+            let ordinal = if shape == "late_reorder" && id >= late_start {
+                id - late_start
             } else {
                 id
             };
@@ -662,7 +663,8 @@ fn adaptive_grouping_matches_sorting_through_late_shape_changes() -> Result<()> 
             }
             "late_keys" | "late_reorder" => {
                 assert_eq!(d["routing_fallbacks"], 1);
-                assert!(d["routing_reused_runs"].as_u64().unwrap() > 0);
+                let reused = d["routing_reused_runs"].as_u64().unwrap();
+                assert!(reused >= 3);
                 assert_eq!(d["merge_operations"], 1);
                 assert_eq!(
                     d["merge_inputs"].as_u64().unwrap(),
@@ -671,12 +673,20 @@ fn adaptive_grouping_matches_sorting_through_late_shape_changes() -> Result<()> 
                 );
                 // These fixtures fit one final merge. Reusing bucket files means
                 // each row is written once, even when the shape changes late.
-                // Normalize compact physical blocks back to v1 logical traffic.
+                // Late keys add one routed row per bucket after the first
+                // three buckets. Each ordinary routed frame omits its 8-byte
+                // key length and 8-byte key. The compact codec keeps both.
+                let routed_rows = late_start + if shape == "late_keys" { reused - 3 } else { 0 };
+                let omitted_key_bytes = if cfg!(feature = "experimental-spill-blocks") {
+                    0
+                } else {
+                    routed_rows * 16
+                };
                 assert_eq!(
                     d["temporary_bytes_written"].as_u64().unwrap()
                         + d["compact_spill_source_bytes"].as_u64().unwrap()
                         - d["compact_spill_stored_bytes"].as_u64().unwrap(),
-                    expected.iter().map(Row::disk_len).sum::<u64>()
+                    expected.iter().map(Row::disk_len).sum::<u64>() - omitted_key_bytes
                 );
                 assert!(d["sort_runs"].as_u64().unwrap() > 0);
             }
