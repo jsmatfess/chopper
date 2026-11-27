@@ -5186,7 +5186,7 @@
       "scripts": [],
       "narrative": {
         "path": "docs/performance/investigations/hosted-release-comparison-065-to-066-2026-11-27.md",
-        "sha256": "2000aa26ba1726cfa892c5fe287528232fd8e6734f5e5adeca9d58a6b60267c5",
+        "sha256": "347fb0ae15d18207aa71aaa63e621e61013dabeeb3ed931bc027ac1ac8990196",
         "topic": "profiling"
       },
       "family": "profiling"
@@ -5280,8 +5280,8 @@
     },
     {
       "path": "docs/benchmarks/0.6.6-performance-data.json",
-      "sha256": "a857f4ea5de830d56a29a95a167eadb3019f6670ae2c7759189e6907623bc304",
-      "bytes": 27398,
+      "sha256": "e48cc994d13fc48196712fb7b2b1fcb7447e571b69befbed768974cdf7e59715",
+      "bytes": 27375,
       "format": "json",
       "record_counts": {
         "untyped": 1

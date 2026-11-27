@@ -13,7 +13,7 @@ timer. Each trial uses a fresh page and context with a synthetic File handle.
 The fixtures contain 64 and 12,000 rows of comma CSV. The harness checks
 the header and all eight preview rows. Each fixture has eight alternating
 pairs after an excluded warmup per arm. The v0.6.6 median preview times are
-4.4 and 4.5 ms longer, respectively. This measures the interactive selection
+3.4 and 6.4 ms longer, respectively. This measures the interactive selection
 path with a supplied file handle.
 
 The two Run controls reuse the small Shuffle then Partition and below-floor

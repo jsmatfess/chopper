@@ -4882,7 +4882,7 @@
       "scripts": [],
       "narrative": {
         "path": "docs/performance/investigations/hosted-release-comparison-065-to-066-2026-11-27.md",
-        "sha256": "2000aa26ba1726cfa892c5fe287528232fd8e6734f5e5adeca9d58a6b60267c5",
+        "sha256": "347fb0ae15d18207aa71aaa63e621e61013dabeeb3ed931bc027ac1ac8990196",
         "topic": "profiling"
       }
     }
@@ -4947,8 +4947,8 @@
     },
     {
       "path": "docs/benchmarks/0.6.6-performance-data.json",
-      "sha256": "a857f4ea5de830d56a29a95a167eadb3019f6670ae2c7759189e6907623bc304",
-      "bytes": 27398,
+      "sha256": "e48cc994d13fc48196712fb7b2b1fcb7447e571b69befbed768974cdf7e59715",
+      "bytes": 27375,
       "format": "json",
       "record_counts": {
         "untyped": 1
@@ -39440,7 +39440,7 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "b323366f849898b8d2f7eb4fdc78edc480a91870725d75a249869d951c0a59a8",
+      "sha256": "4ff72e8a3ed3f501f2b871d7969180f98dbe1419b45a591e53df8e80bc1eec47",
       "bytes": 1851715,
       "format": "json",
       "record_counts": {
@@ -43877,7 +43877,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "b056cb1fc0b11c7425f9a9ef2f333838e51a441ee0b4dc7c1b008625e0e6d42d"
+    "sha256": "04b97c37eb4fa65a70b377544f144b2bf3d3b28e9f3ab6dd6da322d7c0454e6c"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",
