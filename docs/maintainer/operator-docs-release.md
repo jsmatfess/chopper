@@ -44,6 +44,7 @@ navigating the guides without JavaScript.
 
 ```sh
 npm --prefix docs-site ci
+npm --prefix docs-site test
 npm --prefix docs-site exec -- playwright install chromium
 v=$(node -p "require('./ui/package.json').version")
 npm --prefix docs-site run build -- 0.5.0 0.6.0 0.6.1 0.6.2 0.6.3 0.6.4 0.6.5 "${v}=HEAD"

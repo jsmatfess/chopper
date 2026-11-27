@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test": "node --test library-guide.test.mjs",
     "build": "node build.mjs",
     "check": "node check.mjs dist",
     "smoke": "node smoke.mjs",
