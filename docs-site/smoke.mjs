@@ -70,6 +70,137 @@ async function checkLibraryLanguage(browser, origin, base) {
   }
 }
 
+async function checkSplitLibraryGuides(browser, origin, base) {
+  const index = origin + base + 'libraries';
+  const languages = ['Rust', 'Python'];
+  const url = language => index + '-' + language.toLowerCase();
+  const compose = '#compose-inspect-and-replay';
+  const firstJob = '#run-your-first-job';
+  const nav = page => page.getByRole('navigation', { name: 'Library guides', exact: true });
+  const link = (page, language) => nav(page).getByRole('link', { name: new RegExp(`\\b${language}\\b`) });
+  const guide = page => page.locator('.vp-doc');
+  const heading = (page, language) => guide(page).getByRole('heading', {
+    level: 1, name: new RegExp(`^Chopper for ${language}\\b`),
+  });
+  const install = {
+    Rust: /chopper-csv\s*=|cargo add chopper-csv/,
+    Python: /pip install chopper-csv/,
+  };
+  const sections = {
+    'inspect-an-input': { Rust: /\bInputReport\b/, Python: /\biter_columns\b/ },
+    'add-calculated-columns': { Rust: /\.alias\(/, Python: /\bcalculated_columns\s+mapping\b/ },
+    'stream-published-output-metadata': { Rust: /\breport\.outputs\(/, Python: /\bopen_manifest\b/ },
+    'observe-and-cancel-a-run': { Rust: /\bcloned control\b/, Python: /\bcontrol object\b/ },
+  };
+
+  async function checkNav(page, current) {
+    await nav(page).waitFor();
+    for (const language of languages) {
+      const item = link(page, language);
+      const href = await item.getAttribute('href');
+      assert.equal(new URL(href, page.url()).pathname, new URL(url(language)).pathname);
+      assert.equal(await item.getAttribute('aria-current') === 'page', language === current);
+    }
+  }
+
+  async function checkFragment(page, destination) {
+    await page.waitForURL(destination);
+    await page.waitForFunction(id => {
+      const box = document.getElementById(id)?.getBoundingClientRect();
+      return box && box.top >= 0 && box.bottom <= window.innerHeight;
+    }, new URL(destination).hash.slice(1));
+  }
+
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.setDefaultTimeout(10_000);
+  try {
+    assert.equal((await page.goto(index))?.status(), 200);
+    await checkNav(page);
+    await link(page, 'Python').click();
+    await page.waitForURL(url('Python'));
+    await heading(page, 'Python').waitFor();
+    await page.goBack();
+    await page.waitForURL(index);
+    await checkNav(page);
+
+    for (const language of languages) {
+      const other = language === 'Rust' ? 'Python' : 'Rust';
+      const destination = url(language);
+      assert.equal((await page.goto(destination + compose))?.status(), 200);
+      await checkFragment(page, destination + compose);
+      await heading(page, language).waitFor();
+      await checkNav(page, language);
+      const body = guide(page);
+      const text = await body.innerText();
+      assert.match(text, install[language]);
+      assert.doesNotMatch(text, install[other]);
+      const guideText = await body.evaluate(article => {
+        const content = article.cloneNode(true);
+        content.querySelectorAll('nav, pre').forEach(node => node.remove());
+        return content.textContent;
+      });
+      assert.doesNotMatch(guideText, new RegExp(`\\b${other}\\b`, 'i'));
+      await body.locator(`.language-${language.toLowerCase()} pre`).first().waitFor();
+      assert.equal(await body.locator(`.language-${other.toLowerCase()} pre`).count(), 0);
+
+      for (const [id, terminology] of Object.entries(sections)) {
+        const prose = await body.locator(`#${id}`).evaluate(section => {
+          const paragraphs = [];
+          for (let node = section.nextElementSibling; node; node = node.nextElementSibling) {
+            if (/^H[1-6]$/.test(node.tagName) && node.tagName <= section.tagName) break;
+            if (node.tagName === 'P') paragraphs.push(node.textContent);
+          }
+          return paragraphs.join('\n');
+        });
+        assert.match(prose, terminology[language], `${language} prose at #${id}`);
+        assert.doesNotMatch(prose, terminology[other], `${other} prose leaked into ${language} #${id}`);
+      }
+
+      await page.getByRole('button', { name: 'Search' }).first().click();
+      await page.getByRole('searchbox').fill(language === 'Rust' ? 'InputReport' : 'open_manifest');
+      const route = new URL(destination).pathname;
+      await page.locator(`#localsearch-list a[href^="${route}#"]`).first().click();
+      await page.waitForURL(target => target.pathname === route && target.hash.length > 1);
+    }
+
+    for (const fragment of [compose, '#detect-a-dialect-and-list-columns']) {
+      await page.goto(url('Rust') + fragment);
+      const sectionLink = link(page, 'Python').and(page.locator(`a[href$="${fragment}"]`));
+      await sectionLink.waitFor();
+      await sectionLink.click();
+      await checkFragment(page, url('Python') + fragment);
+      await page.goBack();
+      await page.waitForURL(url('Rust') + fragment);
+      await heading(page, 'Rust').waitFor();
+    }
+
+    for (const language of languages) {
+      const slug = language.toLowerCase();
+      for (const [legacy, anchor] of [[`?lang=${slug}${compose}`, compose], [`#${slug}`, firstJob]]) {
+        await page.goto(index + legacy, { waitUntil: 'commit' });
+        await checkFragment(page, url(language) + anchor);
+      }
+    }
+  } finally {
+    await page.close();
+  }
+
+  const fallback = await browser.newPage({ javaScriptEnabled: false });
+  fallback.setDefaultTimeout(10_000);
+  try {
+    await fallback.goto(index);
+    for (const language of languages) {
+      await link(fallback, language).click();
+      await fallback.waitForURL(url(language));
+      await heading(fallback, language).waitFor();
+      await checkNav(fallback, language);
+      await guide(fallback).locator(`.language-${language.toLowerCase()} pre`).first().waitFor();
+    }
+  } finally {
+    await fallback.close();
+  }
+}
+
 let server;
 let browser;
 try {
@@ -186,7 +317,14 @@ try {
       await formulaResult.click();
       await page.waitForURL(url => url.pathname === base + 'formula-functions' && url.hash.length > 1);
     }
-    if (additionalPages.includes('libraries')) {
+    const splitGuides = ['libraries-rust', 'libraries-python'];
+    if (splitGuides.some(guide => additionalPages.includes(guide))) {
+      for (const route of ['libraries', ...splitGuides]) {
+        assert.ok(additionalPages.includes(route), `Missing ${route} in ${version} additionalPages`);
+      }
+      await checkSplitLibraryGuides(browser, origin, base);
+      console.log(`Verified ${version} Rust and Python guides, navigation, deep links, and search`);
+    } else if (additionalPages.includes('libraries')) {
       await checkLibraryLanguage(browser, origin, base);
       console.log(`Verified ${version} library language choice, deep links, keyboard use, and search`);
     }

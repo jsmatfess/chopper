@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { build, createMarkdownRenderer, disposeMdItInstance } from 'vitepress';
 import { checkSite } from './check.mjs';
 import { renderCliReference } from './cli-reference.mjs';
-import { renderLibraryGuide } from './library-guide.mjs';
+import { languagePagesMarker, renderLanguageGuide, renderLibraryGuide, renderLibraryIndex } from './library-guide.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const out = fileURLToPath(new URL('./dist', import.meta.url));
@@ -32,6 +32,10 @@ const pages = [
 ];
 const formulaPage = ['docs/formula-functions.md', 'formula-functions', 'Formula functions'];
 const libraryPage = ['docs/user/libraries.md', 'libraries', 'Libraries'];
+const languagePages = [
+  [libraryPage[0], 'libraries-rust', 'Rust'],
+  [libraryPage[0], 'libraries-python', 'Python'],
+];
 const imagePath = 'docs/images/workbench.png';
 const samplePath = 'examples/customers.csv';
 const supportUrl = 'https://buymeacoffee.com/tblflip';
@@ -63,7 +67,12 @@ function content(source, name) {
 }
 
 function rewriteLinks(md, tag, releasePages) {
-  const pageMap = new Map(releasePages.map(([source, name]) => [source, name]));
+  // The shared Markdown points to the library index. Each language guide
+  // still resolves its relative links from that same source file.
+  const pageMap = new Map();
+  for (const [source, name] of releasePages) {
+    if (!pageMap.has(source)) pageMap.set(source, name);
+  }
   for (const [rule, attribute] of [['link_open', 'href'], ['image', 'src']]) {
     const render = md.renderer.rules[rule] ?? ((tokens, i, options, _env, self) => self.renderToken(tokens, i, options));
     md.renderer.rules[rule] = (tokens, i, options, env, self) => {
@@ -93,17 +102,41 @@ function rewriteLinks(md, tag, releasePages) {
   }
 }
 
-async function preparePages(source, documents) {
+async function preparePages(source, documents, base, splitLibraries) {
   const renderer = await createMarkdownRenderer(source, {
     headers: { level: [2, 3] },
     highlight: () => '',
   });
   try {
+    const generated = new Map();
+    const library = documents.find(({ name }) => name === libraryPage[1]);
+    if (library) {
+      const env = { path: join(source, `${library.name}.md`) };
+      const tokens = renderer.parse(library.markdown, env);
+      if (splitLibraries) {
+        const anchorsByLanguage = [];
+        for (const [, name] of languagePages) {
+          const language = name.slice('libraries-'.length);
+          const page = renderLanguageGuide(library.markdown, tokens, language, base);
+          const guideEnv = { path: join(source, `${name}.md`) };
+          renderer.render(page, guideEnv);
+          anchorsByLanguage.push(guideEnv.headers.map(heading => heading.link));
+          generated.set(name, page);
+        }
+        const [rust, python] = anchorsByLanguage;
+        if (JSON.stringify(rust) !== JSON.stringify(python)) {
+          throw new Error('Rust and Python library guides must share section anchors');
+        }
+        generated.set(library.name, renderLibraryIndex(base, rust));
+      } else {
+        generated.set(library.name, renderLibraryGuide(library.markdown, tokens));
+      }
+    }
     const navigation = [];
     for (const { name, text, markdown } of documents) {
       const link = name === 'index' ? '/' : `/${name}`;
       const env = { path: join(source, `${name}.md`) };
-      const page = name === libraryPage[1] ? renderLibraryGuide(markdown, renderer.parse(markdown, env)) : markdown;
+      const page = generated.get(name) ?? markdown;
       await writeFile(env.path, page);
       renderer.render(page, env);
       const items = env.headers.map(heading => ({
@@ -114,9 +147,17 @@ async function preparePages(source, documents) {
     }
     // VitePress selects a sidebar by source path on each route change.
     return Object.fromEntries(navigation.map(current => {
-      const items = navigation.map(({ name, text, link, items }) => (
+      const item = ({ name, text, link, items }) => (
         items.length ? { text, link, items, collapsed: name !== current.name } : { text, link }
-      ));
+      );
+      const items = navigation.flatMap(page => {
+        if (!splitLibraries) return [item(page)];
+        if (page.name.startsWith('libraries-')) return [];
+        if (page.name !== libraryPage[1]) return [item(page)];
+        const guides = navigation.filter(entry => entry.name.startsWith('libraries-')).map(item);
+        const active = current.name === page.name || current.name.startsWith('libraries-');
+        return [{ ...item(page), items: guides, collapsed: !active }];
+      });
       return [`/${current.name}.md`, [{ items }]];
     }));
   } finally {
@@ -134,20 +175,21 @@ const releases = versions.map(arg => {
   }
   const hasFormulas = git('ls-tree', '--name-only', commit, '--', formulaPage[0]).length > 0;
   const hasLibraries = git('ls-tree', '--name-only', commit, '--', libraryPage[0]).length > 0;
-  return { version, commit, read, hasFormulas, hasLibraries };
+  const splitLibraries = hasLibraries && read(libraryPage[0]).toString().split('\n').includes(languagePagesMarker);
+  return { version, commit, read, hasFormulas, hasLibraries, splitLibraries };
 }).sort((a, b) => b.version.localeCompare(a.version, 'en', { numeric: true }));
 if (new Set(releases.map(r => r.version)).size !== releases.length) throw new Error('Duplicate documentation version');
 
 const staging = await mkdtemp(fileURLToPath(new URL('./.build-', import.meta.url)));
 try {
   const site = join(staging, 'dist');
-  for (const { version, read, hasFormulas, hasLibraries } of releases) {
+  for (const { version, read, hasFormulas, hasLibraries, splitLibraries } of releases) {
     const source = join(staging, version);
     const base = `/versions/${version}/`;
     await mkdir(join(source, 'public'), { recursive: true });
     await cp(stylesheet, join(source, 'public/chopper.css'));
     const releasePages = pages.flatMap(page => {
-      if (hasLibraries && page[1] === 'index') return [page, libraryPage];
+      if (hasLibraries && page[1] === 'index') return [page, libraryPage, ...(splitLibraries ? languagePages : [])];
       if (hasFormulas && page[1] === 'job-json') return [page, formulaPage];
       return [page];
     });
@@ -157,11 +199,12 @@ try {
         : content(read(path).toString(), name),
     }));
     if (hasLibraries) {
-      await cp(new URL('./LibraryLanguage.vue', import.meta.url), join(source, 'LibraryLanguage.vue'));
+      const component = splitLibraries ? 'LibraryGuideNav.vue' : 'LibraryLanguage.vue';
+      await cp(new URL(`./${component}`, import.meta.url), join(source, component));
     }
     await writeFile(join(source, 'workbench.png'), read(imagePath));
     await writeFile(join(source, 'public/customers.csv'), read(samplePath));
-    const sidebar = await preparePages(source, documents);
+    const sidebar = await preparePages(source, documents, base, splitLibraries);
 
     await build(source, {
       onAfterConfigResolve(config) {
@@ -210,8 +253,9 @@ try {
   await writeFile(join(site, '_redirects'), `/latest /versions/${latest.version}/ 302\n/latest/* /versions/${latest.version}/:splat 302\n`);
   await writeFile(join(site, 'versions.json'), JSON.stringify({
     latest: latest.version,
-    versions: releases.map(({ version, commit, hasFormulas, hasLibraries }) => {
-      const additionalPages = [hasFormulas && formulaPage[1], hasLibraries && libraryPage[1]].filter(Boolean);
+    versions: releases.map(({ version, commit, hasFormulas, hasLibraries, splitLibraries }) => {
+      const additionalPages = [hasFormulas && formulaPage[1], hasLibraries && libraryPage[1],
+        ...(splitLibraries ? languagePages.map(([, name]) => name) : [])].filter(Boolean);
       return { version, commit, ...(additionalPages.length ? { additionalPages } : {}) };
     }),
     pages: pages.map(([, name]) => name),

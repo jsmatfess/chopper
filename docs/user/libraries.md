@@ -1,10 +1,10 @@
 # Rust and Python libraries
 
+<!-- chopper-docs:language-pages -->
+
 Build a Job in your application, load one from the CLI, or save one for another
-caller. Both libraries run the native engine synchronously and accept the
-[versioned Job format](../job-json.md). They process files on Windows and Linux
-x86-64. Python wheels target standard CPython 3.11 or later. The Linux wheel
-targets glibc 2.28 or later.
+caller. Run Jobs synchronously with the native engine on Windows and Linux
+x86-64 using the [versioned Job format](../job-json.md).
 
 ## Sample input
 
@@ -22,9 +22,20 @@ id,country,segment
 8,GB,returning
 ```
 
-Use each Rust block as `src/main.rs` and run `cargo run`. Run each Python block
-as a script. Use a fresh directory for each language's walkthrough, or change
-the output paths and saved Job filenames when you repeat an example.
+<!-- docs:rust -->
+
+Use each Rust example as `src/main.rs` and run `cargo run`.
+
+<!-- docs:end -->
+
+<!-- docs:python -->
+
+Run each Python example as a script.
+
+<!-- docs:end -->
+
+Use a fresh directory for the walkthrough, or change the output paths and saved
+Job filenames when you repeat an example.
 
 ## Rust
 
@@ -65,9 +76,14 @@ Set `resources` explicitly to choose a fixed budget.
 
 ## Python
 
+Python wheels target standard CPython 3.11 or later. The Linux wheel targets
+glibc 2.28 or later.
+
 Once the wheel is published, install it with `python -m pip install chopper-csv`.
 For a local build, follow the [wheel instructions](../../crates/chopper-python/README.md#build-and-check-a-local-wheel).
-This example runs the same country partition, shuffle, and byte cap.
+
+Partition by country, shuffle each country independently, and cap each CSV at
+50 bytes. With the sample input, the Run writes four CSVs.
 
 ```python
 from chopper_csv import Job, Pipeline, partition, shuffle
@@ -96,24 +112,40 @@ the output path empty while deciding how to configure the Job.
 
 | Method | What it reads | What it returns |
 | --- | --- | --- |
-| `detect_dialect()` | Up to 64 KiB of decompressed input before text decoding | Suggested CSV settings, a delimiter status, a note, and the number of bytes sampled |
-| `inspect()` | The first parsed CSV record | Column count, optional header, and whether the input is ZIP |
-| `preview()` | The header, if configured, and up to eight data records | Column metadata and sampled rows with their record numbers |
-| `analyze()` | The full input | Bounded statistics and pipeline estimates for a configured Job |
+| `detect_dialect` | Up to 64 KiB of decompressed input before text decoding | Suggested CSV settings, a delimiter status, a note, and the number of bytes sampled |
+| `inspect` | The first parsed CSV record | Column count, optional header, and whether the input is ZIP |
+| `preview` | The header, if configured, and up to eight data records | Column metadata and sampled rows with their record numbers |
+| `analyze` | The full input | Bounded statistics and pipeline estimates for a configured Job |
+
+<!-- docs:python -->
 
 Python also exports `detect_dialect(settings)`, `inspect(settings)`, and
 `preview(settings)` for use with a settings dictionary.
+
+<!-- docs:end -->
 
 ### Detect a dialect and list columns
 
 Detection compares the configured delimiter and comma, tab, semicolon, and
 pipe. It can recognize a supported encoding from a BOM and suggest an observed
-line ending. When candidates tie (`ambiguous`) or none fits (`not_detected`),
-it keeps the configured delimiter. A single best fit reports `detected`.
+line ending. When candidates tie or none fits, detection keeps the configured
+delimiter.
 Set header, quote, and escape behavior using what you know about the file.
 Review the suggestion before applying it to a new Job's `input_csv`.
-Read the suggestion via `DetectedDialect::settings()` in Rust or the
-`settings` key in Python.
+
+<!-- docs:rust -->
+
+Read the recommendation with `DetectedDialect::settings()`. The
+`delimiter_status()` method reports `Detected`, `Ambiguous`, or `NotDetected`.
+
+<!-- docs:end -->
+
+<!-- docs:python -->
+
+Read the recommendation from the `settings` key. The `delimiter_status` key
+reports `"detected"`, `"ambiguous"`, or `"not_detected"`.
+
+<!-- docs:end -->
 
 Column positions are zero-based in parsed input order. Names reflect the
 configured input parsing rules. Duplicate names keep their positions, so use
@@ -163,11 +195,21 @@ for index, name in iter_columns(report):
     print(f"{index}: {label}")
 ```
 
-Rust's `InputReport` exposes `column_count()`, `header()`, and
+<!-- docs:rust -->
+
+The Rust `InputReport` exposes `column_count()`, `header()`, and
 `input_is_zip()`. The `columns()` iterator borrows names from the report.
+
+<!-- docs:end -->
+
+<!-- docs:python -->
+
 Python's report stores the count in `columns`, the list of names or `None`
 in `header`, and the ZIP flag in `input_is_zip`. `iter_columns(report)`
 yields `(index, name)` pairs lazily.
+
+<!-- docs:end -->
+
 The sample reports `0: id`, `1: country`, and `2: segment`.
 
 ### Preview input rows
@@ -250,16 +292,27 @@ print(f"{report['rows']} rows in {report['groups']} groups")
 
 With the sample input, the Run writes eight rows in two groups. `validate()`
 checks formula syntax. Analyze and Run resolve column references against the
-input. Rust's `.alias(name)` produces a `CalculatedColumn` for
-`JobSettings.calculated_columns`. Python takes each column name from the
-`calculated_columns` mapping.
+input.
+
+<!-- docs:rust -->
+
+Rust's `.alias(name)` produces a `CalculatedColumn` for
+`JobSettings.calculated_columns`.
+
+<!-- docs:end -->
+
+<!-- docs:python -->
+
+Python takes each column name from the `calculated_columns` mapping.
+
+<!-- docs:end -->
 
 ### Use formulas with headerless CSVs
 
 Save the eight data lines from the sample as `customers-no-header.csv`.
-Set `headers` to `false` for input and output. `col(0)` selects the first
-parsed field by position. `col("0")` selects a column with the exact header
-`0`. Use positions for headerless input or duplicate headers.
+Turn off headers in the input and output CSV settings. `col(0)` selects the
+first parsed field by position. `col("0")` selects a column with the exact
+header `0`. Use positions for headerless input or duplicate headers.
 
 **Rust**
 
@@ -306,44 +359,68 @@ steps can refer to it. The output CSV has no header. Its first record is
 
 ### Pass function arguments
 
-Use `lit("US")` to build a text literal. Both libraries accept strings,
-numbers, and booleans as literals for fixed function arguments. In Python
-`f.concat(col("country"), "-")` appends a hyphen. Use `col` to refer to a field.
+Use `col` to refer to a field and `lit("US")` to build a text literal. Fixed
+function arguments also accept strings, numbers, and booleans directly.
 
-For optional parameters, pass `None` in Rust or omit the argument in Python
-to use the function default. Rust accepts a supplied argument as
-`Some(expr)`. Use Rust's `null()` or Python's `None` for an explicit formula
-`NULL` in an argument. The [formula reference](../formula-functions.md)
-describes how each function handles nulls.
+<!-- docs:rust -->
 
+In Rust, pass `None` to use the function default for an optional parameter or
+`Some(expr)` to supply a value. Use `null()` for an explicit formula `NULL`
+in a required slot and `Some(null())` in an optional slot.
 Enable case-insensitive matching with
-`f::startswith(col("country"), lit("u"), Some(lit(true)))` in Rust or
-`f.startswith(col("country"), "u", True)` in Python.
+`f::startswith(col("country"), lit("u"), Some(lit(true)))`.
 
-For variable-length arguments, pass an array or iterator in Rust, such as
-`f::concat([col("country"), lit("-"), col("segment")])`. In Python, pass
-arguments in order, as in `f.concat(col("country"), "-", col("segment"))`.
-`CONCAT_WS` takes literal Boolean flags after its text arguments.
+For variable-length arguments, pass an array or iterator, as in
+`f::concat([col("country"), lit("-"), col("segment")])`. For `IFS`, pass
+condition-value pairs and a fallback with
+`f::ifs([(condition, value)], fallback)`.
 
-For `IF`, call `if_else(condition, when_true, when_false)`. Pass condition
-and value pairs to `ifs`, followed by a fallback. Use
-`f::ifs([(condition, value)], fallback)` in Rust and
-`f.ifs((condition, value), fallback=fallback)` in Python.
+<!-- docs:end -->
+
+<!-- docs:python -->
+
+In Python, omit an optional parameter to use the function default or pass
+`None` for an explicit formula `NULL`. Enable case-insensitive matching with
+`f.startswith(col("country"), "u", True)`.
+
+For variable-length arguments, pass each value in order, as in
+`f.concat(col("country"), "-", col("segment"))`. For `IFS`, pass
+condition-value pairs and a named fallback with
+`f.ifs((condition, value), fallback=fallback)`.
+
+<!-- docs:end -->
+
+`CONCAT_WS` takes literal Boolean flags after its text arguments. For `IF`,
+call `if_else(condition, when_true, when_false)`. The
+[formula reference](../formula-functions.md) describes how each function
+handles nulls.
 
 ### Reuse existing formula text
 
-Import `parse` from `chopper::formula` in Rust or `chopper_csv` in Python to
-incorporate an existing formula into an expression. For example, write
-`parse("NUMBER([id])")? * lit(2)` in Rust or `parse("NUMBER([id])") * 2` in
-Python. Use `Expr::as_str()` in Rust or `str(expr)` in Python to read the
-resulting formula text. When the text is invalid, Rust's `parse` returns
-`FormulaError` and Python's `parse` raises `ValueError`.
+<!-- docs:rust -->
+
+Import `parse` from `chopper::formula` to incorporate a formula into an
+expression, as in `parse("NUMBER([id])")? * lit(2)`. `Expr::as_str()` reads
+the resulting formula text. Invalid formulas return `FormulaError`.
 
 You can also put formula text directly in the `expression` field of a
-`CalculatedColumn` in Rust or of a `{"name": ..., "expression": ...}` record
-in the Python settings dictionary's `calculated_columns` list. Python's
-`calculated_columns` keyword also accepts formula strings as values.
-`Job.save` in both languages writes the formulas to the same
+`CalculatedColumn`.
+
+<!-- docs:end -->
+
+<!-- docs:python -->
+
+Import `parse` from `chopper_csv` to incorporate a formula into an
+expression, as in `parse("NUMBER([id])") * 2`. `str(expr)` reads the
+resulting formula text. Invalid formulas raise `ValueError`.
+
+The `calculated_columns` keyword accepts formula strings as values. You can
+also pass `{"name": ..., "expression": ...}` records in the settings
+dictionary's `calculated_columns` list.
+
+<!-- docs:end -->
+
+Saving a Job writes the formulas to the same
 [Job JSON](../job-json.md#formulas) that the CLI accepts.
 
 ### Offer formula suggestions
@@ -377,9 +454,23 @@ for name, signature in formula_functions():
 
 `then` returns a new Pipeline and accepts one operation or an entire Pipeline.
 Each operation applies to each group produced by the preceding operation.
-Both interfaces supply `partition`, `assign`, `assign_probabilistic`, `shuffle`,
-`balanced`, and `interleaved`. Use a string for an exact column name such as
-`"0"` and an integer for a zero-based index such as `0`.
+Available operations include `partition`, `assign`, `assign_probabilistic`,
+`shuffle`, `balanced`, and `interleaved`.
+
+<!-- docs:rust -->
+
+Build steps with `Operation`. Use `Column::Name("0".into())` to select the
+exact header `0` and `Column::Index(0)` to select the first column.
+
+<!-- docs:end -->
+
+<!-- docs:python -->
+
+Import step constructors from `chopper_csv`. Use a string such as `"0"` to
+select that exact header and an integer such as `0` to select a zero-based
+column position.
+
+<!-- docs:end -->
 
 ### Reuse a country partition
 
@@ -458,7 +549,7 @@ for output, pipeline in variants:
 
 ### Reload a Job with a new destination
 
-Use `job.json` from either first example. Copy its settings and change
+Use `job.json` from the quickstart. Copy its settings and change
 `output` to replay the recipe in a new directory. Change `input` as well to
 apply the same recipe to another CSV.
 
@@ -490,8 +581,21 @@ print(f"{report['output_files']} files from {report['rows']} rows")
 print(f"Read {report['manifest_path']}")
 ```
 
-`Job.load` reads a saved Job, and `Job.save` creates a new Job JSON file. For CLI
-replay, set a fresh `output` in a copy of the Job and run
+<!-- docs:rust -->
+
+`Job::load` reads a saved Job. Call `job.save(path)` to create a new Job
+JSON file.
+
+<!-- docs:end -->
+
+<!-- docs:python -->
+
+`Job.load(path)` reads a saved Job. Call `job.save(path)` to create a new Job
+JSON file.
+
+<!-- docs:end -->
+
+For CLI replay, set a fresh `output` in a copy of the Job and run
 `chopper run --config job-for-cli.json --yes`.
 Relative paths resolve from the process's current working directory, even when
 the Job file is in a subdirectory. Keep that directory stable while Jobs run.
@@ -501,10 +605,11 @@ temporary directory. Analyze reads the current input and returns bounded
 statistics and advisory estimates. Run validates the input it reads and
 publishes to a new or empty destination on success. The strict byte cap applies
 to each serialized CSV, including its header, BOM and record terminators.
-Run returns row, column, group, output-file and CSV-byte counts and the path to
-the [native manifest](../native-manifest.md). A relative destination gives a
-relative manifest path. Independent shuffled Runs preserve the same grouping
-and cap guarantees with independently generated order.
+Run reports row, column, group, output-file and CSV-byte counts. Its
+`manifest_path` points to the [native manifest](../native-manifest.md).
+A relative destination gives a relative manifest path. Independent shuffled
+Runs preserve the same grouping and cap guarantees with independently
+generated order.
 
 ## Stream published output metadata
 
@@ -541,8 +646,12 @@ fn main() -> Result<(), Error> {
 }
 ```
 
-Use `report.outputs(max_record_bytes)` to open the reader from a Rust
+<!-- docs:rust -->
+
+Use `report.outputs(max_record_bytes)` to open the reader from a
 `RunReport`. Each iteration item is a `Result<ManifestOutput, Error>`.
+
+<!-- docs:end -->
 
 **Python**
 
@@ -557,16 +666,35 @@ with open_manifest(
         print(f"{output['path']}: {output['rows']} rows, {output['csv_bytes']} CSV bytes")
 ```
 
-Python's `open_manifest` defaults to a 16 MiB limit per record. The reader
+<!-- docs:python -->
+
+`open_manifest` defaults to a 16 MiB limit per record. The reader
 returns dictionaries and raises `ChopperError` for manifest failures. The
 context manager closes the file. You can also call `manifest.close()` directly.
+
+<!-- docs:end -->
+
 Use the [native manifest verification example](../native-manifest.md#verify-a-result)
 when you also need to check the published CSV payloads.
 
 ## Handle errors and control execution
 
-Errors expose a `code` and a readable message. Configuration errors may also
-include a JSON Pointer in `path` and one-based `line` and `column` coordinates.
+Job errors have a code and a readable message. Configuration errors can also
+include a JSON Pointer and one-based line and column coordinates.
+
+<!-- docs:rust -->
+
+Read these details on `chopper::job::Error` through `code()`, `path()`,
+`line()`, and `column()`.
+
+<!-- docs:end -->
+
+<!-- docs:python -->
+
+Catch `ChopperError` and read its `code`, `path`, `line`, and `column`
+attributes.
+
+<!-- docs:end -->
 
 | Code | Meaning |
 | --- | --- |
@@ -585,7 +713,7 @@ include a JSON Pointer in `path` and one-based `line` and `column` coordinates.
 
 ### Report a configuration error
 
-This Job supplies a string for its byte limit. Both examples report
+This Job supplies a string for its byte limit. The example reports
 `json_schema` and the field `/limits/bytes`. Use a JSON number for the limit.
 
 **Rust**
@@ -623,18 +751,33 @@ except ChopperError as error:
 
 ### Observe and cancel a Run
 
-Pass a fresh `ExecutionControl` to each Analyze or Run. Share a cloned Rust
-handle or the same Python object with the observing thread. `progress()` reports
+Pass a fresh `ExecutionControl` to each Analyze or Run. `progress()` reports
 the latest phase, rows processed in that phase, and temporary bytes sampled
 with the event. A terminal snapshot reports zero bytes of active temporary
-storage. Call `cancel()` to request cooperative cancellation. Before
-publication, cancellation follows the native staging and temporary cleanup
-rules. A committed Run remains successful when cancellation arrives late.
-Concurrent Jobs need separate destinations and share the process-wide working
-memory ledger.
+storage.
 
-The examples run the Job on a background thread, read one progress snapshot,
-and request cancellation. The snapshot can show `Pending` while the worker
+<!-- docs:rust -->
+
+Share a cloned control with the observing thread and pass `Some(&control)`
+to the execution. `progress()` returns a `Progress` snapshot.
+
+<!-- docs:end -->
+
+<!-- docs:python -->
+
+Share the same control object with the observing thread. `progress()`
+returns a dictionary.
+
+<!-- docs:end -->
+
+Call `cancel()` to request cooperative cancellation. Before publication,
+cancellation follows the native staging and temporary cleanup rules. A
+committed Run remains successful when cancellation arrives late. Concurrent
+Jobs need separate destinations and share the process-wide working memory
+ledger.
+
+The example runs the Job on a background thread, reads one progress snapshot,
+and requests cancellation. The snapshot can show `Pending` while the worker
 starts. A late request can still return a published manifest.
 
 **Rust**

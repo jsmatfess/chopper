@@ -20,13 +20,20 @@ checks the landing page, version navigation, an export-recovery deep link,
 and search within each version. Versions with the formula reference also get a
 sidebar, CLI cross-link, and function search check for that page.
 
-The site renders the [library guide](../user/libraries.md) with one example
-language dropdown. Keep its consecutive Rust and Python quickstart headings
-and label fenced examples as `rust` or `python`. Keep shared explanations
-outside those quickstart sections and code fences. Links can select an
-example language with `?lang=rust` or `?lang=python` before the section anchor.
-The smoke test checks switching, direct links, search, and the fallback that
-shows both languages when JavaScript is unavailable.
+The [library guide](../user/libraries.md) supplies the Libraries index and
+the `libraries-rust` and `libraries-python` pages. Keep the consecutive Rust
+and Python quickstart headings and label the fenced examples as `rust` or
+`python`. Wrap any language-specific prose outside the quickstarts in
+`<!-- docs:rust -->` or `<!-- docs:python -->` and close it with
+`<!-- docs:end -->`. Keep common headings and explanations outside those
+blocks. The source guide reads as ordinary Markdown in Cargo package metadata.
+
+Use the language guide URL and its section anchor when linking to a particular
+SDK. Existing `libraries?lang=rust` and `libraries?lang=python` links forward
+to the selected guide with their section anchors. The smoke test checks
+language-scoped prose, navigation, direct links, search, and reading and
+navigating the guides without JavaScript. The source marker selects the
+appropriate guide layout when building historical versions.
 
 ```sh
 npm --prefix docs-site ci

@@ -134,6 +134,35 @@
   background: var(--vp-c-brand-1);
 }
 
+.library-guide-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-block: 1.25rem;
+}
+
+.vp-doc .library-guide-links a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.75rem;
+  padding-inline: .875rem;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: .375rem;
+  background: var(--vp-c-bg);
+  font-weight: 600;
+}
+
+.vp-doc .library-guide-links a[aria-current="page"] {
+  border-color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
+  text-decoration: none;
+}
+
+.library-guide-links a:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+}
+
 :is(.VPNav, .version-index) a[href="https://buymeacoffee.com/tblflip"] {
   font-size: .8125rem;
   color: var(--vp-c-text-2, #45554b);
