@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Generate named Rust and Python builders from the core formula catalog."""
+"""Generate SDK builders and reference syntax from the core formula catalog."""
 
 import argparse
 from dataclasses import dataclass
+import json
 import keyword
 from pathlib import Path
 import re
@@ -13,6 +14,8 @@ ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "crates/chopper-core/src/expression.rs"
 RUST = ROOT / "crates/chopper/src/formula/functions.rs"
 PYTHON = ROOT / "crates/chopper-python/python/chopper_csv/functions.py"
+REFERENCE = ROOT / "docs/formula-functions.md"
+REFERENCE_SYNTAX = ROOT / "docs/formula-reference-syntax.json"
 COMMAND = "python scripts/generate-formula-bindings.py"
 
 ROW = re.compile(r'([A-Z][A-Z0-9_]*),\s*"([^"]+)",\s*([0-9]+),\s*([0-9]+);')
@@ -184,6 +187,186 @@ def python_function(binding: Binding) -> str:
     return "\n".join([declaration, f"    {docs}", *(f"    {line}" for line in body)])
 
 
+@dataclass(frozen=True)
+class Snippet:
+    rust: str
+    python: str
+    rust_literal: bool = False
+
+    def rust_expr(self) -> str:
+        return f"lit({self.rust})" if self.rust_literal else self.rust
+
+
+INLINE_CODE = re.compile(r"`([^`]+)`")
+EXAMPLE = re.compile(r"`([^`]+)`\s*→")
+TEXT_LITERAL = re.compile(r'"(?:[^"]|"")*"')
+COLUMN_NAME = re.compile(r"\[(?:[^\]]|\]\])*\]")
+NUMBER_LITERAL = re.compile(r"-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?")
+FORMULA_CALL = re.compile(r"(SAFE\.)?([A-Z][A-Z0-9_]*)\((.*)\)")
+ARGUMENT_TOKEN = re.compile(rf'{TEXT_LITERAL.pattern}|{COLUMN_NAME.pattern}|[(),"\[]')
+
+
+def sdk_call(name: str, rust: list[str], python: list[str]) -> Snippet:
+    return Snippet(f"f::{name}({', '.join(rust)})", f"f.{name}({', '.join(python)})")
+
+
+def sdk_signature(binding: Binding) -> Snippet:
+    if binding.name in VARIADIC:
+        rust = [parameter.split(":", 1)[0] for parameter in rust_special(binding)[0]]
+        python = [parameter.split(":", 1)[0] for parameter in python_special(binding)[0]]
+        if binding.name == "IFS":
+            python[-1] = "fallback=fallback"
+    else:
+        rust = list(binding.required)
+        python = list(binding.required)
+        if binding.optional is not None:
+            rust.append(binding.optional)
+            python.append(f"{binding.optional}={binding.optional}")
+    return sdk_call(binding.sdk_name, rust, python)
+
+
+def sdk_string(source: str) -> Snippet:
+    rust = source.replace("\\", "\\\\").replace('"', '\\"')
+    rust = re.sub(r"[\x00-\x1f]", lambda char: f"\\u{{{ord(char[0]):x}}}", rust)
+    return Snippet(f'"{rust}"', json.dumps(source, ensure_ascii=False), rust_literal=True)
+
+
+def parsed_snippet(source: str) -> Snippet:
+    text = sdk_string(source)
+    return Snippet(f"parse({text.rust})?", f"parse({text.python})")
+
+
+def split_arguments(source: str) -> list[str] | None:
+    # Find commas outside quoted text and nested calls. The SDK's parse handles
+    # formula syntax beyond the examples we can express with named builders.
+    arguments = []
+    start = depth = 0
+    for token in ARGUMENT_TOKEN.finditer(source):
+        match token[0]:
+            case "(":
+                depth += 1
+            case ")":
+                depth -= 1
+                if depth < 0:
+                    return None
+            case "," if depth == 0:
+                arguments.append(source[start:token.start()].strip())
+                start = token.end()
+            case '"' | "[":
+                return None
+    arguments.append(source[start:].strip())
+    return arguments if depth == 0 and all(arguments) else None
+
+
+def sdk_example_call(binding: Binding, arguments: list[Snippet]) -> Snippet:
+    rust = [argument.rust for argument in arguments]
+    python = [argument.python for argument in arguments]
+    match binding.name:
+        case "CONCAT" | "COALESCE" | "CONCAT_WS":
+            start = int(binding.name == "CONCAT_WS")
+            values = ", ".join(argument.rust_expr() for argument in arguments[start:])
+            rust = [*rust[:start], f"[{values}]"]
+        case "IFS":
+            pairs = list(zip(arguments[:-1:2], arguments[1:-1:2], strict=True))
+            rust_cases = ", ".join(f"({a.rust_expr()}, {b.rust_expr()})" for a, b in pairs)
+            python_cases = [f"({a.python}, {b.python})" for a, b in pairs]
+            rust = [f"[{rust_cases}]", rust[-1]]
+            python = [*python_cases, f"fallback={python[-1]}"]
+        case _ if binding.optional is not None:
+            if len(arguments) == len(binding.required):
+                rust.append("None")
+            else:
+                rust[-1] = f"Some({arguments[-1].rust_expr()})"
+                python[-1] = f"{binding.optional}={python[-1]}"
+    return sdk_call(binding.sdk_name, rust, python)
+
+
+def sdk_example(source: str, bindings: dict[str, Binding]) -> Snippet:
+    if TEXT_LITERAL.fullmatch(source):
+        return sdk_string(source[1:-1].replace('""', '"'))
+    if COLUMN_NAME.fullmatch(source):
+        name = sdk_string(source[1:-1].replace("]]", "]"))
+        return Snippet(f"col({name.rust})", f"col({name.python})")
+    if re.fullmatch(r"\$(?:0|[1-9][0-9]*)", source):
+        return Snippet(f"col({source[1:]})", f"col({source[1:]})")
+    if NUMBER_LITERAL.fullmatch(source):
+        return Snippet(source, source, rust_literal=True)
+    match source:
+        case "NULL":
+            return Snippet("null()", "None")
+        case "TRUE" | "FALSE":
+            return Snippet(source.lower(), source.title(), rust_literal=True)
+    call = FORMULA_CALL.fullmatch(source)
+    if call is None or call[2] not in bindings:
+        return parsed_snippet(source)
+    arguments = split_arguments(call[3])
+    if arguments is None:
+        return parsed_snippet(source)
+    binding = bindings[call[2]]
+    minimum = len(binding.required)
+    maximum = minimum + int(binding.optional is not None)
+    if binding.name in VARIADIC:
+        _, minimum, maximum = VARIADIC[binding.name]
+    if not minimum <= len(arguments) <= maximum:
+        raise ValueError(f"invalid argument count in formula reference example {source!r}")
+    snippet = sdk_example_call(binding, [sdk_example(argument, bindings) for argument in arguments])
+    if call[1] is not None:
+        return sdk_call("safe", [snippet.rust], [snippet.python])
+    return snippet
+
+
+def render_reference(bindings: list[Binding], source: str) -> str:
+    by_name = {binding.name: binding for binding in bindings}
+    signatures = {binding.signature: sdk_signature(binding) for binding in bindings}
+    operators = {
+        **{op: Snippet(f"left {op} right", f"left {op} right") for op in ("+", "-", "*", "/")},
+        **{op: parsed_snippet(f"5 {op} 2") for op in ("%", "=", "!=", "<>", "<", "<=", ">", ">=")},
+        "&": Snippet("f::concat([left, right])", "f.concat(left, right)"),
+        "AND": Snippet("left.and(right)", "left.and_(right)"),
+        "OR": Snippet("left.or(right)", "left.or_(right)"),
+        "NOT": Snippet("expr.not()", "expr.not_()"),
+    }
+    code = {}
+    table = ""
+    for line in source.splitlines():
+        if not line.startswith("|"):
+            table = ""
+            continue
+        if line == "| Function | Behavior | Examples |":
+            table = "functions"
+            continue
+        if line == "| Operator | Behavior |":
+            table = "operators"
+            continue
+        if not table or line.startswith("| ---"):
+            continue
+        cells = [cell.replace(r"\|", "|").strip() for cell in re.split(r"(?<!\\)\|", line)[1:-1]]
+        names = INLINE_CODE.findall(cells[0])
+        if table == "operators":
+            for name in names:
+                if name not in operators:
+                    raise ValueError(f"unknown operator in the formula reference {name!r}")
+                code[name] = operators[name]
+            continue
+        if len(cells) != 3 or len(names) != 1 or names[0] not in signatures:
+            raise ValueError(f"unrecognized function row in the formula reference {line!r}")
+        code[names[0]] = signatures[names[0]]
+        for item in re.split(r"<br\s*/?>", cells[2]):
+            example = EXAMPLE.match(item.strip())
+            if example is None:
+                raise ValueError(f"unrecognized example in the formula reference {item!r}")
+            code[example[1]] = sdk_example(example[1], by_name)
+
+    missing = (signatures.keys() | operators.keys()) - code.keys()
+    if missing:
+        raise ValueError(f"missing rows in the formula reference: {', '.join(sorted(missing))}")
+    payload = {
+        "schema_version": 1,
+        "code": {key: {"rust": item.rust, "python": item.python} for key, item in code.items()},
+    }
+    return json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+
+
 def render(bindings: list[Binding]) -> dict[Path, str]:
     rust_header = (
         f"// Generated by `{COMMAND}`.\n"
@@ -202,6 +385,7 @@ def render(bindings: list[Binding]) -> dict[Path, str]:
     return {
         RUST: "\n\n".join([rust_header, *(rust_function(binding) for binding in bindings)]) + "\n",
         PYTHON: "\n\n\n".join([python_header, *(python_function(binding) for binding in bindings)]) + "\n",
+        REFERENCE_SYNTAX: render_reference(bindings, REFERENCE.read_text(encoding="utf-8")),
     }
 
 

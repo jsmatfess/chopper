@@ -1,0 +1,881 @@
+{
+  "schema_version": 1,
+  "code": {
+    "SAFE(expression)": {
+      "rust": "f::safe(expression)",
+      "python": "f.safe(expression)"
+    },
+    "SAFE(1 / 0)": {
+      "rust": "f::safe(parse(\"1 / 0\")?)",
+      "python": "f.safe(parse(\"1 / 0\"))"
+    },
+    "SAFE(NUMBER(\"42\"))": {
+      "rust": "f::safe(f::number(\"42\"))",
+      "python": "f.safe(f.number(\"42\"))"
+    },
+    "IS_ERROR(expression)": {
+      "rust": "f::is_error(expression)",
+      "python": "f.is_error(expression)"
+    },
+    "IS_ERROR(NUMBER(\"unknown\"))": {
+      "rust": "f::is_error(f::number(\"unknown\"))",
+      "python": "f.is_error(f.number(\"unknown\"))"
+    },
+    "IS_ERROR(NULL)": {
+      "rust": "f::is_error(null())",
+      "python": "f.is_error(None)"
+    },
+    "+": {
+      "rust": "left + right",
+      "python": "left + right"
+    },
+    "-": {
+      "rust": "left - right",
+      "python": "left - right"
+    },
+    "*": {
+      "rust": "left * right",
+      "python": "left * right"
+    },
+    "/": {
+      "rust": "left / right",
+      "python": "left / right"
+    },
+    "%": {
+      "rust": "parse(\"5 % 2\")?",
+      "python": "parse(\"5 % 2\")"
+    },
+    "&": {
+      "rust": "f::concat([left, right])",
+      "python": "f.concat(left, right)"
+    },
+    "=": {
+      "rust": "parse(\"5 = 2\")?",
+      "python": "parse(\"5 = 2\")"
+    },
+    "!=": {
+      "rust": "parse(\"5 != 2\")?",
+      "python": "parse(\"5 != 2\")"
+    },
+    "<>": {
+      "rust": "parse(\"5 <> 2\")?",
+      "python": "parse(\"5 <> 2\")"
+    },
+    "<": {
+      "rust": "parse(\"5 < 2\")?",
+      "python": "parse(\"5 < 2\")"
+    },
+    "<=": {
+      "rust": "parse(\"5 <= 2\")?",
+      "python": "parse(\"5 <= 2\")"
+    },
+    ">": {
+      "rust": "parse(\"5 > 2\")?",
+      "python": "parse(\"5 > 2\")"
+    },
+    ">=": {
+      "rust": "parse(\"5 >= 2\")?",
+      "python": "parse(\"5 >= 2\")"
+    },
+    "AND": {
+      "rust": "left.and(right)",
+      "python": "left.and_(right)"
+    },
+    "OR": {
+      "rust": "left.or(right)",
+      "python": "left.or_(right)"
+    },
+    "NOT": {
+      "rust": "expr.not()",
+      "python": "expr.not_()"
+    },
+    "TRIM(text)": {
+      "rust": "f::trim(text)",
+      "python": "f.trim(text)"
+    },
+    "TRIM(\"  north  \")": {
+      "rust": "f::trim(\"  north  \")",
+      "python": "f.trim(\"  north  \")"
+    },
+    "UPPER(text)": {
+      "rust": "f::upper(text)",
+      "python": "f.upper(text)"
+    },
+    "UPPER(\"Straße\")": {
+      "rust": "f::upper(\"Straße\")",
+      "python": "f.upper(\"Straße\")"
+    },
+    "LOWER(text)": {
+      "rust": "f::lower(text)",
+      "python": "f.lower(text)"
+    },
+    "LOWER(\"ÉTÉ\")": {
+      "rust": "f::lower(\"ÉTÉ\")",
+      "python": "f.lower(\"ÉTÉ\")"
+    },
+    "CONCAT(text, ...)": {
+      "rust": "f::concat(values)",
+      "python": "f.concat(text, *additional_text)"
+    },
+    "CONCAT(\"North\", \"-\", \"West\")": {
+      "rust": "f::concat([lit(\"North\"), lit(\"-\"), lit(\"West\")])",
+      "python": "f.concat(\"North\", \"-\", \"West\")"
+    },
+    "CONCAT(\"x\", NULL)": {
+      "rust": "f::concat([lit(\"x\"), null()])",
+      "python": "f.concat(\"x\", None)"
+    },
+    "REPLACE(text, search, replacement)": {
+      "rust": "f::replace(text, search, replacement)",
+      "python": "f.replace(text, search, replacement)"
+    },
+    "REPLACE(\"red red\", \"red\", \"blue\")": {
+      "rust": "f::replace(\"red red\", \"red\", \"blue\")",
+      "python": "f.replace(\"red red\", \"red\", \"blue\")"
+    },
+    "STARTSWITH(text, prefix, ignore_case?)": {
+      "rust": "f::startswith(text, prefix, ignore_case)",
+      "python": "f.startswith(text, prefix, ignore_case=ignore_case)"
+    },
+    "STARTSWITH(\"North\", \"No\")": {
+      "rust": "f::startswith(\"North\", \"No\", None)",
+      "python": "f.startswith(\"North\", \"No\")"
+    },
+    "STARTSWITH(\"North\", \"no\", TRUE)": {
+      "rust": "f::startswith(\"North\", \"no\", Some(lit(true)))",
+      "python": "f.startswith(\"North\", \"no\", ignore_case=True)"
+    },
+    "ENDSWITH(text, suffix, ignore_case?)": {
+      "rust": "f::endswith(text, suffix, ignore_case)",
+      "python": "f.endswith(text, suffix, ignore_case=ignore_case)"
+    },
+    "ENDSWITH(\"data.csv\", \".CSV\")": {
+      "rust": "f::endswith(\"data.csv\", \".CSV\", None)",
+      "python": "f.endswith(\"data.csv\", \".CSV\")"
+    },
+    "ENDSWITH(\"data.csv\", \".CSV\", TRUE)": {
+      "rust": "f::endswith(\"data.csv\", \".CSV\", Some(lit(true)))",
+      "python": "f.endswith(\"data.csv\", \".CSV\", ignore_case=True)"
+    },
+    "SUBSTRING(text, start, length?)": {
+      "rust": "f::substring(text, start, length)",
+      "python": "f.substring(text, start, length=length)"
+    },
+    "SUBSTRING(\"North\", 1, 2)": {
+      "rust": "f::substring(\"North\", 1, Some(lit(2)))",
+      "python": "f.substring(\"North\", 1, length=2)"
+    },
+    "SUBSTRING(\"North\", 1)": {
+      "rust": "f::substring(\"North\", 1, None)",
+      "python": "f.substring(\"North\", 1)"
+    },
+    "LEFT(text, count)": {
+      "rust": "f::left(text, count)",
+      "python": "f.left(text, count)"
+    },
+    "LEFT(\"é🙂z\", 2)": {
+      "rust": "f::left(\"é🙂z\", 2)",
+      "python": "f.left(\"é🙂z\", 2)"
+    },
+    "RIGHT(text, count)": {
+      "rust": "f::right(text, count)",
+      "python": "f.right(text, count)"
+    },
+    "RIGHT(\"é🙂z\", 2)": {
+      "rust": "f::right(\"é🙂z\", 2)",
+      "python": "f.right(\"é🙂z\", 2)"
+    },
+    "LENGTH(text)": {
+      "rust": "f::length(text)",
+      "python": "f.length(text)"
+    },
+    "LENGTH(\"é🙂\")": {
+      "rust": "f::length(\"é🙂\")",
+      "python": "f.length(\"é🙂\")"
+    },
+    "BYTE_LENGTH(text)": {
+      "rust": "f::byte_length(text)",
+      "python": "f.byte_length(text)"
+    },
+    "BYTE_LENGTH(\"é🙂\")": {
+      "rust": "f::byte_length(\"é🙂\")",
+      "python": "f.byte_length(\"é🙂\")"
+    },
+    "CONTAINS(text, search, ignore_case?)": {
+      "rust": "f::contains(text, search, ignore_case)",
+      "python": "f.contains(text, search, ignore_case=ignore_case)"
+    },
+    "CONTAINS(\"North\", \"north\")": {
+      "rust": "f::contains(\"North\", \"north\", None)",
+      "python": "f.contains(\"North\", \"north\")"
+    },
+    "CONTAINS(\"North\", \"north\", TRUE)": {
+      "rust": "f::contains(\"North\", \"north\", Some(lit(true)))",
+      "python": "f.contains(\"North\", \"north\", ignore_case=True)"
+    },
+    "IS_ASCII(text)": {
+      "rust": "f::is_ascii(text)",
+      "python": "f.is_ascii(text)"
+    },
+    "IS_ASCII(\"é\")": {
+      "rust": "f::is_ascii(\"é\")",
+      "python": "f.is_ascii(\"é\")"
+    },
+    "IS_ASCII(\"\")": {
+      "rust": "f::is_ascii(\"\")",
+      "python": "f.is_ascii(\"\")"
+    },
+    "IS_DIGITS(text)": {
+      "rust": "f::is_digits(text)",
+      "python": "f.is_digits(text)"
+    },
+    "IS_DIGITS(\"007\")": {
+      "rust": "f::is_digits(\"007\")",
+      "python": "f.is_digits(\"007\")"
+    },
+    "IS_DIGITS(\"１\")": {
+      "rust": "f::is_digits(\"１\")",
+      "python": "f.is_digits(\"１\")"
+    },
+    "LTRIM(text)": {
+      "rust": "f::ltrim(text)",
+      "python": "f.ltrim(text)"
+    },
+    "LTRIM(\"  x  \")": {
+      "rust": "f::ltrim(\"  x  \")",
+      "python": "f.ltrim(\"  x  \")"
+    },
+    "RTRIM(text)": {
+      "rust": "f::rtrim(text)",
+      "python": "f.rtrim(text)"
+    },
+    "RTRIM(\"  x  \")": {
+      "rust": "f::rtrim(\"  x  \")",
+      "python": "f.rtrim(\"  x  \")"
+    },
+    "IS_BLANK(text)": {
+      "rust": "f::is_blank(text)",
+      "python": "f.is_blank(text)"
+    },
+    "IS_BLANK(\" \")": {
+      "rust": "f::is_blank(\" \")",
+      "python": "f.is_blank(\" \")"
+    },
+    "IS_BLANK(NULL)": {
+      "rust": "f::is_blank(null())",
+      "python": "f.is_blank(None)"
+    },
+    "STRIP_PREFIX(text, prefix, ignore_case?)": {
+      "rust": "f::strip_prefix(text, prefix, ignore_case)",
+      "python": "f.strip_prefix(text, prefix, ignore_case=ignore_case)"
+    },
+    "STRIP_PREFIX(\"prepreflight\", \"pre\")": {
+      "rust": "f::strip_prefix(\"prepreflight\", \"pre\", None)",
+      "python": "f.strip_prefix(\"prepreflight\", \"pre\")"
+    },
+    "STRIP_PREFIX(\"PREFlight\", \"pre\", TRUE)": {
+      "rust": "f::strip_prefix(\"PREFlight\", \"pre\", Some(lit(true)))",
+      "python": "f.strip_prefix(\"PREFlight\", \"pre\", ignore_case=True)"
+    },
+    "STRIP_SUFFIX(text, suffix, ignore_case?)": {
+      "rust": "f::strip_suffix(text, suffix, ignore_case)",
+      "python": "f.strip_suffix(text, suffix, ignore_case=ignore_case)"
+    },
+    "STRIP_SUFFIX(\"data.csv\", \".CSV\")": {
+      "rust": "f::strip_suffix(\"data.csv\", \".CSV\", None)",
+      "python": "f.strip_suffix(\"data.csv\", \".CSV\")"
+    },
+    "STRIP_SUFFIX(\"Data.CSV\", \".csv\", TRUE)": {
+      "rust": "f::strip_suffix(\"Data.CSV\", \".csv\", Some(lit(true)))",
+      "python": "f.strip_suffix(\"Data.CSV\", \".csv\", ignore_case=True)"
+    },
+    "TEXT_BEFORE(text, delimiter, ignore_case?)": {
+      "rust": "f::text_before(text, delimiter, ignore_case)",
+      "python": "f.text_before(text, delimiter, ignore_case=ignore_case)"
+    },
+    "TEXT_BEFORE(\"a:b:c\", \":\")": {
+      "rust": "f::text_before(\"a:b:c\", \":\", None)",
+      "python": "f.text_before(\"a:b:c\", \":\")"
+    },
+    "TEXT_BEFORE(\"North VIA Central\", \" via \", TRUE)": {
+      "rust": "f::text_before(\"North VIA Central\", \" via \", Some(lit(true)))",
+      "python": "f.text_before(\"North VIA Central\", \" via \", ignore_case=True)"
+    },
+    "TEXT_BEFORE(\"abc\", \":\")": {
+      "rust": "f::text_before(\"abc\", \":\", None)",
+      "python": "f.text_before(\"abc\", \":\")"
+    },
+    "TEXT_AFTER(text, delimiter, ignore_case?)": {
+      "rust": "f::text_after(text, delimiter, ignore_case)",
+      "python": "f.text_after(text, delimiter, ignore_case=ignore_case)"
+    },
+    "TEXT_AFTER(\"a:b:c\", \":\")": {
+      "rust": "f::text_after(\"a:b:c\", \":\", None)",
+      "python": "f.text_after(\"a:b:c\", \":\")"
+    },
+    "TEXT_AFTER(\"North VIA Central\", \" via \", TRUE)": {
+      "rust": "f::text_after(\"North VIA Central\", \" via \", Some(lit(true)))",
+      "python": "f.text_after(\"North VIA Central\", \" via \", ignore_case=True)"
+    },
+    "TEXT_AFTER(\"abc\", \":\")": {
+      "rust": "f::text_after(\"abc\", \":\", None)",
+      "python": "f.text_after(\"abc\", \":\")"
+    },
+    "SPLIT_PART(text, delimiter, index)": {
+      "rust": "f::split_part(text, delimiter, index)",
+      "python": "f.split_part(text, delimiter, index)"
+    },
+    "SPLIT_PART(\"apple,banana,cherry\", \",\", 1)": {
+      "rust": "f::split_part(\"apple,banana,cherry\", \",\", 1)",
+      "python": "f.split_part(\"apple,banana,cherry\", \",\", 1)"
+    },
+    "SPLIT_PART(\"a::c\", \":\", 1)": {
+      "rust": "f::split_part(\"a::c\", \":\", 1)",
+      "python": "f.split_part(\"a::c\", \":\", 1)"
+    },
+    "SPLIT_PART(\"a::c\", \":\", 3)": {
+      "rust": "f::split_part(\"a::c\", \":\", 3)",
+      "python": "f.split_part(\"a::c\", \":\", 3)"
+    },
+    "TRANSLATE(text, from, to)": {
+      "rust": "f::translate(text, from_, to)",
+      "python": "f.translate(text, from_, to)"
+    },
+    "TRANSLATE(\"a!b\", \"ab!\", \"xy\")": {
+      "rust": "f::translate(\"a!b\", \"ab!\", \"xy\")",
+      "python": "f.translate(\"a!b\", \"ab!\", \"xy\")"
+    },
+    "LPAD(text, width, pad?)": {
+      "rust": "f::lpad(text, width, pad)",
+      "python": "f.lpad(text, width, pad=pad)"
+    },
+    "LPAD(\"x\", 3, \"0\")": {
+      "rust": "f::lpad(\"x\", 3, Some(lit(\"0\")))",
+      "python": "f.lpad(\"x\", 3, pad=\"0\")"
+    },
+    "LPAD(\"abc\", 2)": {
+      "rust": "f::lpad(\"abc\", 2, None)",
+      "python": "f.lpad(\"abc\", 2)"
+    },
+    "RPAD(text, width, pad?)": {
+      "rust": "f::rpad(text, width, pad)",
+      "python": "f.rpad(text, width, pad=pad)"
+    },
+    "RPAD(\"x\", 4, \"ab\")": {
+      "rust": "f::rpad(\"x\", 4, Some(lit(\"ab\")))",
+      "python": "f.rpad(\"x\", 4, pad=\"ab\")"
+    },
+    "RPAD(\"abc\", 2)": {
+      "rust": "f::rpad(\"abc\", 2, None)",
+      "python": "f.rpad(\"abc\", 2)"
+    },
+    "REPEAT(text, count)": {
+      "rust": "f::repeat(text, count)",
+      "python": "f.repeat(text, count)"
+    },
+    "REPEAT(\"ab\", 3)": {
+      "rust": "f::repeat(\"ab\", 3)",
+      "python": "f.repeat(\"ab\", 3)"
+    },
+    "REPEAT(\"ab\", 0)": {
+      "rust": "f::repeat(\"ab\", 0)",
+      "python": "f.repeat(\"ab\", 0)"
+    },
+    "CONCAT_WS(separator, text, ..., ignore_null?, ignore_empty?)": {
+      "rust": "f::concat_ws(separator, values)",
+      "python": "f.concat_ws(separator, text, *additional_text_and_flags)"
+    },
+    "CONCAT_WS(\":\", \"a\", NULL, \"\", \"b\")": {
+      "rust": "f::concat_ws(\":\", [lit(\"a\"), null(), lit(\"\"), lit(\"b\")])",
+      "python": "f.concat_ws(\":\", \"a\", None, \"\", \"b\")"
+    },
+    "CONCAT_WS(\":\", \"a\", NULL, \"\", \"b\", TRUE, TRUE)": {
+      "rust": "f::concat_ws(\":\", [lit(\"a\"), null(), lit(\"\"), lit(\"b\"), lit(true), lit(true)])",
+      "python": "f.concat_ws(\":\", \"a\", None, \"\", \"b\", True, True)"
+    },
+    "CONCAT_WS(\":\", \"a\", NULL, \"\", \"b\", FALSE, TRUE)": {
+      "rust": "f::concat_ws(\":\", [lit(\"a\"), null(), lit(\"\"), lit(\"b\"), lit(false), lit(true)])",
+      "python": "f.concat_ws(\":\", \"a\", None, \"\", \"b\", False, True)"
+    },
+    "LIKE(text, pattern)": {
+      "rust": "f::like(text, pattern)",
+      "python": "f.like(text, pattern)"
+    },
+    "LIKE(\"North\", \"N.*\")": {
+      "rust": "f::like(\"North\", \"N.*\")",
+      "python": "f.like(\"North\", \"N.*\")"
+    },
+    "LIKE(\"North\", \"or\")": {
+      "rust": "f::like(\"North\", \"or\")",
+      "python": "f.like(\"North\", \"or\")"
+    },
+    "ILIKE(text, pattern)": {
+      "rust": "f::ilike(text, pattern)",
+      "python": "f.ilike(text, pattern)"
+    },
+    "ILIKE(\"North\", \"n.*\")": {
+      "rust": "f::ilike(\"North\", \"n.*\")",
+      "python": "f.ilike(\"North\", \"n.*\")"
+    },
+    "REGEX_MATCH(text, pattern)": {
+      "rust": "f::regex_match(text, pattern)",
+      "python": "f.regex_match(text, pattern)"
+    },
+    "REGEX_MATCH(\"Order 42\", \"[0-9]+\")": {
+      "rust": "f::regex_match(\"Order 42\", \"[0-9]+\")",
+      "python": "f.regex_match(\"Order 42\", \"[0-9]+\")"
+    },
+    "REGEX_MATCH(\"Order 42\", \"^[0-9]+$\")": {
+      "rust": "f::regex_match(\"Order 42\", \"^[0-9]+$\")",
+      "python": "f.regex_match(\"Order 42\", \"^[0-9]+$\")"
+    },
+    "REGEX_REPLACE(text, pattern, replacement)": {
+      "rust": "f::regex_replace(text, pattern, replacement)",
+      "python": "f.regex_replace(text, pattern, replacement)"
+    },
+    "REGEX_REPLACE(\"Order 42\", \"([0-9]+)\", \"number $1\")": {
+      "rust": "f::regex_replace(\"Order 42\", \"([0-9]+)\", \"number $1\")",
+      "python": "f.regex_replace(\"Order 42\", \"([0-9]+)\", \"number $1\")"
+    },
+    "REGEX_EXTRACT(text, pattern, group?)": {
+      "rust": "f::regex_extract(text, pattern, group)",
+      "python": "f.regex_extract(text, pattern, group=group)"
+    },
+    "REGEX_EXTRACT(\"Order 42\", \"Order ([0-9]+)\")": {
+      "rust": "f::regex_extract(\"Order 42\", \"Order ([0-9]+)\", None)",
+      "python": "f.regex_extract(\"Order 42\", \"Order ([0-9]+)\")"
+    },
+    "REGEX_EXTRACT(\"Order 42\", \"Order ([0-9]+)\", 1)": {
+      "rust": "f::regex_extract(\"Order 42\", \"Order ([0-9]+)\", Some(lit(1)))",
+      "python": "f.regex_extract(\"Order 42\", \"Order ([0-9]+)\", group=1)"
+    },
+    "REGEX_EXTRACT(\"b\", \"(a)?b\", 1)": {
+      "rust": "f::regex_extract(\"b\", \"(a)?b\", Some(lit(1)))",
+      "python": "f.regex_extract(\"b\", \"(a)?b\", group=1)"
+    },
+    "IF(condition, when_true, when_false)": {
+      "rust": "f::if_else(condition, when_true, when_false)",
+      "python": "f.if_else(condition, when_true, when_false)"
+    },
+    "IF(2 < 3, \"yes\", \"no\")": {
+      "rust": "f::if_else(parse(\"2 < 3\")?, \"yes\", \"no\")",
+      "python": "f.if_else(parse(\"2 < 3\"), \"yes\", \"no\")"
+    },
+    "IF(NULL, \"yes\", \"no\")": {
+      "rust": "f::if_else(null(), \"yes\", \"no\")",
+      "python": "f.if_else(None, \"yes\", \"no\")"
+    },
+    "IFS(condition, value, ..., fallback)": {
+      "rust": "f::ifs(cases, fallback)",
+      "python": "f.ifs(*cases, fallback=fallback)"
+    },
+    "IFS(FALSE, \"a\", TRUE, \"b\", \"other\")": {
+      "rust": "f::ifs([(lit(false), lit(\"a\")), (lit(true), lit(\"b\"))], \"other\")",
+      "python": "f.ifs((False, \"a\"), (True, \"b\"), fallback=\"other\")"
+    },
+    "IFS(FALSE, \"a\", \"other\")": {
+      "rust": "f::ifs([(lit(false), lit(\"a\"))], \"other\")",
+      "python": "f.ifs((False, \"a\"), fallback=\"other\")"
+    },
+    "IS_NULL(value)": {
+      "rust": "f::is_null(value)",
+      "python": "f.is_null(value)"
+    },
+    "IS_NULL(NULL)": {
+      "rust": "f::is_null(null())",
+      "python": "f.is_null(None)"
+    },
+    "IS_NULL(\"\")": {
+      "rust": "f::is_null(\"\")",
+      "python": "f.is_null(\"\")"
+    },
+    "COALESCE(value, ...)": {
+      "rust": "f::coalesce(values)",
+      "python": "f.coalesce(value, *additional_values)"
+    },
+    "COALESCE(NULL, \"\", \"fallback\")": {
+      "rust": "f::coalesce([null(), lit(\"\"), lit(\"fallback\")])",
+      "python": "f.coalesce(None, \"\", \"fallback\")"
+    },
+    "COALESCE(NULL, NULL)": {
+      "rust": "f::coalesce([null(), null()])",
+      "python": "f.coalesce(None, None)"
+    },
+    "NUMBER(text)": {
+      "rust": "f::number(text)",
+      "python": "f.number(text)"
+    },
+    "NUMBER(\"0042\")": {
+      "rust": "f::number(\"0042\")",
+      "python": "f.number(\"0042\")"
+    },
+    "NUMBER(\"\")": {
+      "rust": "f::number(\"\")",
+      "python": "f.number(\"\")"
+    },
+    "SAFE.NUMBER(\" 42\")": {
+      "rust": "f::safe(f::number(\" 42\"))",
+      "python": "f.safe(f.number(\" 42\"))"
+    },
+    "TEXT(value)": {
+      "rust": "f::text(value)",
+      "python": "f.text(value)"
+    },
+    "TEXT(42)": {
+      "rust": "f::text(42)",
+      "python": "f.text(42)"
+    },
+    "TEXT(NULL)": {
+      "rust": "f::text(null())",
+      "python": "f.text(None)"
+    },
+    "ABS(number)": {
+      "rust": "f::abs(number)",
+      "python": "f.abs(number)"
+    },
+    "ABS(-7)": {
+      "rust": "f::abs(-7)",
+      "python": "f.abs(-7)"
+    },
+    "ROUND(number, places?)": {
+      "rust": "f::round(number, places)",
+      "python": "f.round(number, places=places)"
+    },
+    "ROUND(12.375, 2)": {
+      "rust": "f::round(12.375, Some(lit(2)))",
+      "python": "f.round(12.375, places=2)"
+    },
+    "ROUND(125, -1)": {
+      "rust": "f::round(125, Some(lit(-1)))",
+      "python": "f.round(125, places=-1)"
+    },
+    "NULLIF(value, match)": {
+      "rust": "f::nullif(value, match_)",
+      "python": "f.nullif(value, match_)"
+    },
+    "NULLIF(\"x\", \"x\")": {
+      "rust": "f::nullif(\"x\", \"x\")",
+      "python": "f.nullif(\"x\", \"x\")"
+    },
+    "NULLIF(\"x\", \"y\")": {
+      "rust": "f::nullif(\"x\", \"y\")",
+      "python": "f.nullif(\"x\", \"y\")"
+    },
+    "BETWEEN(value, lower, upper)": {
+      "rust": "f::between(value, lower, upper)",
+      "python": "f.between(value, lower, upper)"
+    },
+    "BETWEEN(3, 1, 3)": {
+      "rust": "f::between(3, 1, 3)",
+      "python": "f.between(3, 1, 3)"
+    },
+    "BETWEEN(4, 1, 3)": {
+      "rust": "f::between(4, 1, 3)",
+      "python": "f.between(4, 1, 3)"
+    },
+    "IS_TEXT(value)": {
+      "rust": "f::is_text(value)",
+      "python": "f.is_text(value)"
+    },
+    "IS_TEXT(\"42\")": {
+      "rust": "f::is_text(\"42\")",
+      "python": "f.is_text(\"42\")"
+    },
+    "IS_TEXT(42)": {
+      "rust": "f::is_text(42)",
+      "python": "f.is_text(42)"
+    },
+    "IS_NUMBER(value)": {
+      "rust": "f::is_number(value)",
+      "python": "f.is_number(value)"
+    },
+    "IS_NUMBER(\"42\")": {
+      "rust": "f::is_number(\"42\")",
+      "python": "f.is_number(\"42\")"
+    },
+    "IS_NUMBER(NUMBER(\"42\"))": {
+      "rust": "f::is_number(f::number(\"42\"))",
+      "python": "f.is_number(f.number(\"42\"))"
+    },
+    "IS_BOOLEAN(value)": {
+      "rust": "f::is_boolean(value)",
+      "python": "f.is_boolean(value)"
+    },
+    "IS_BOOLEAN(TRUE)": {
+      "rust": "f::is_boolean(true)",
+      "python": "f.is_boolean(True)"
+    },
+    "IS_BOOLEAN(\"TRUE\")": {
+      "rust": "f::is_boolean(\"TRUE\")",
+      "python": "f.is_boolean(\"TRUE\")"
+    },
+    "FLOOR(number)": {
+      "rust": "f::floor(number)",
+      "python": "f.floor(number)"
+    },
+    "FLOOR(-2.7)": {
+      "rust": "f::floor(-2.7)",
+      "python": "f.floor(-2.7)"
+    },
+    "CEIL(number)": {
+      "rust": "f::ceil(number)",
+      "python": "f.ceil(number)"
+    },
+    "CEIL(-2.7)": {
+      "rust": "f::ceil(-2.7)",
+      "python": "f.ceil(-2.7)"
+    },
+    "TRUNC(number)": {
+      "rust": "f::trunc(number)",
+      "python": "f.trunc(number)"
+    },
+    "TRUNC(-2.7)": {
+      "rust": "f::trunc(-2.7)",
+      "python": "f.trunc(-2.7)"
+    },
+    "SQRT(number)": {
+      "rust": "f::sqrt(number)",
+      "python": "f.sqrt(number)"
+    },
+    "SQRT(81)": {
+      "rust": "f::sqrt(81)",
+      "python": "f.sqrt(81)"
+    },
+    "SAFE.SQRT(-1)": {
+      "rust": "f::safe(f::sqrt(-1))",
+      "python": "f.safe(f.sqrt(-1))"
+    },
+    "POWER(base, exponent)": {
+      "rust": "f::power(base, exponent)",
+      "python": "f.power(base, exponent)"
+    },
+    "POWER(2, 3)": {
+      "rust": "f::power(2, 3)",
+      "python": "f.power(2, 3)"
+    },
+    "POWER(2, -1)": {
+      "rust": "f::power(2, -1)",
+      "python": "f.power(2, -1)"
+    },
+    "LN(number)": {
+      "rust": "f::ln(number)",
+      "python": "f.ln(number)"
+    },
+    "LN(1)": {
+      "rust": "f::ln(1)",
+      "python": "f.ln(1)"
+    },
+    "LOG10(number)": {
+      "rust": "f::log10(number)",
+      "python": "f.log10(number)"
+    },
+    "LOG10(1000)": {
+      "rust": "f::log10(1000)",
+      "python": "f.log10(1000)"
+    },
+    "EXP(number)": {
+      "rust": "f::exp(number)",
+      "python": "f.exp(number)"
+    },
+    "EXP(0)": {
+      "rust": "f::exp(0)",
+      "python": "f.exp(0)"
+    },
+    "BUCKET(number, width, origin?)": {
+      "rust": "f::bucket(number, width, origin)",
+      "python": "f.bucket(number, width, origin=origin)"
+    },
+    "BUCKET(-1, 5)": {
+      "rust": "f::bucket(-1, 5, None)",
+      "python": "f.bucket(-1, 5)"
+    },
+    "BUCKET(8, 5, 2)": {
+      "rust": "f::bucket(8, 5, Some(lit(2)))",
+      "python": "f.bucket(8, 5, origin=2)"
+    },
+    "DATE_PARSE(text, format?)": {
+      "rust": "f::date_parse(text, format)",
+      "python": "f.date_parse(text, format=format)"
+    },
+    "DATE_PARSE(\"2024-02-29\")": {
+      "rust": "f::date_parse(\"2024-02-29\", None)",
+      "python": "f.date_parse(\"2024-02-29\")"
+    },
+    "DATE_PARSE(\"29/02/2024\", \"%d/%m/%Y\")": {
+      "rust": "f::date_parse(\"29/02/2024\", Some(lit(\"%d/%m/%Y\")))",
+      "python": "f.date_parse(\"29/02/2024\", format=\"%d/%m/%Y\")"
+    },
+    "TIMESTAMP_PARSE(text, format?)": {
+      "rust": "f::timestamp_parse(text, format)",
+      "python": "f.timestamp_parse(text, format=format)"
+    },
+    "TIMESTAMP_PARSE(\"2024-01-02T03:04:05+02:00\")": {
+      "rust": "f::timestamp_parse(\"2024-01-02T03:04:05+02:00\", None)",
+      "python": "f.timestamp_parse(\"2024-01-02T03:04:05+02:00\")"
+    },
+    "DATE_FORMAT(date, format)": {
+      "rust": "f::date_format(date, format)",
+      "python": "f.date_format(date, format)"
+    },
+    "DATE_FORMAT(DATE_PARSE(\"2024-02-29\"), \"%d/%m/%Y\")": {
+      "rust": "f::date_format(f::date_parse(\"2024-02-29\", None), \"%d/%m/%Y\")",
+      "python": "f.date_format(f.date_parse(\"2024-02-29\"), \"%d/%m/%Y\")"
+    },
+    "TIMESTAMP_FORMAT(timestamp, format, basis?)": {
+      "rust": "f::timestamp_format(timestamp, format, basis)",
+      "python": "f.timestamp_format(timestamp, format, basis=basis)"
+    },
+    "TIMESTAMP_FORMAT(TIMESTAMP_PARSE(\"2024-01-02T03:04:05+02:00\"), \"%H:%M\")": {
+      "rust": "f::timestamp_format(f::timestamp_parse(\"2024-01-02T03:04:05+02:00\", None), \"%H:%M\", None)",
+      "python": "f.timestamp_format(f.timestamp_parse(\"2024-01-02T03:04:05+02:00\"), \"%H:%M\")"
+    },
+    "TIMESTAMP_FORMAT(TIMESTAMP_PARSE(\"2024-01-02T03:04:05+02:00\"), \"%H:%M\", \"local\")": {
+      "rust": "f::timestamp_format(f::timestamp_parse(\"2024-01-02T03:04:05+02:00\", None), \"%H:%M\", Some(lit(\"local\")))",
+      "python": "f.timestamp_format(f.timestamp_parse(\"2024-01-02T03:04:05+02:00\"), \"%H:%M\", basis=\"local\")"
+    },
+    "DATE_EXTRACT(date, part)": {
+      "rust": "f::date_extract(date, part)",
+      "python": "f.date_extract(date, part)"
+    },
+    "DATE_EXTRACT(DATE_PARSE(\"2024-05-29\"), \"quarter\")": {
+      "rust": "f::date_extract(f::date_parse(\"2024-05-29\", None), \"quarter\")",
+      "python": "f.date_extract(f.date_parse(\"2024-05-29\"), \"quarter\")"
+    },
+    "TIMESTAMP_EXTRACT(timestamp, part, basis?)": {
+      "rust": "f::timestamp_extract(timestamp, part, basis)",
+      "python": "f.timestamp_extract(timestamp, part, basis=basis)"
+    },
+    "TIMESTAMP_EXTRACT(TIMESTAMP_PARSE(\"2024-01-02T03:04:05+02:00\"), \"hour\")": {
+      "rust": "f::timestamp_extract(f::timestamp_parse(\"2024-01-02T03:04:05+02:00\", None), \"hour\", None)",
+      "python": "f.timestamp_extract(f.timestamp_parse(\"2024-01-02T03:04:05+02:00\"), \"hour\")"
+    },
+    "TIMESTAMP_EXTRACT(TIMESTAMP_PARSE(\"2024-01-02T03:04:05+02:00\"), \"hour\", \"local\")": {
+      "rust": "f::timestamp_extract(f::timestamp_parse(\"2024-01-02T03:04:05+02:00\", None), \"hour\", Some(lit(\"local\")))",
+      "python": "f.timestamp_extract(f.timestamp_parse(\"2024-01-02T03:04:05+02:00\"), \"hour\", basis=\"local\")"
+    },
+    "DATE_TRUNC(date, unit)": {
+      "rust": "f::date_trunc(date, unit)",
+      "python": "f.date_trunc(date, unit)"
+    },
+    "DATE_TRUNC(DATE_PARSE(\"2024-05-29\"), \"quarter\")": {
+      "rust": "f::date_trunc(f::date_parse(\"2024-05-29\", None), \"quarter\")",
+      "python": "f.date_trunc(f.date_parse(\"2024-05-29\"), \"quarter\")"
+    },
+    "TIMESTAMP_TRUNC(timestamp, unit, basis?)": {
+      "rust": "f::timestamp_trunc(timestamp, unit, basis)",
+      "python": "f.timestamp_trunc(timestamp, unit, basis=basis)"
+    },
+    "TIMESTAMP_TRUNC(TIMESTAMP_PARSE(\"2024-01-02T03:04:05+02:00\"), \"day\")": {
+      "rust": "f::timestamp_trunc(f::timestamp_parse(\"2024-01-02T03:04:05+02:00\", None), \"day\", None)",
+      "python": "f.timestamp_trunc(f.timestamp_parse(\"2024-01-02T03:04:05+02:00\"), \"day\")"
+    },
+    "TIMESTAMP_TRUNC(TIMESTAMP_PARSE(\"2024-01-02T03:04:05+02:00\"), \"day\", \"local\")": {
+      "rust": "f::timestamp_trunc(f::timestamp_parse(\"2024-01-02T03:04:05+02:00\", None), \"day\", Some(lit(\"local\")))",
+      "python": "f.timestamp_trunc(f.timestamp_parse(\"2024-01-02T03:04:05+02:00\"), \"day\", basis=\"local\")"
+    },
+    "DATE_FROM_PARTS(year, month, day)": {
+      "rust": "f::date_from_parts(year, month, day)",
+      "python": "f.date_from_parts(year, month, day)"
+    },
+    "DATE_FROM_PARTS(2024, 2, 29)": {
+      "rust": "f::date_from_parts(2024, 2, 29)",
+      "python": "f.date_from_parts(2024, 2, 29)"
+    },
+    "DATE_ADD_DAYS(date, count)": {
+      "rust": "f::date_add_days(date, count)",
+      "python": "f.date_add_days(date, count)"
+    },
+    "DATE_ADD_DAYS(DATE_FROM_PARTS(2024, 3, 1), -1)": {
+      "rust": "f::date_add_days(f::date_from_parts(2024, 3, 1), -1)",
+      "python": "f.date_add_days(f.date_from_parts(2024, 3, 1), -1)"
+    },
+    "DATE_DIFF_DAYS(start, end)": {
+      "rust": "f::date_diff_days(start, end)",
+      "python": "f.date_diff_days(start, end)"
+    },
+    "DATE_DIFF_DAYS(DATE_FROM_PARTS(2024, 2, 28), DATE_FROM_PARTS(2024, 3, 1))": {
+      "rust": "f::date_diff_days(f::date_from_parts(2024, 2, 28), f::date_from_parts(2024, 3, 1))",
+      "python": "f.date_diff_days(f.date_from_parts(2024, 2, 28), f.date_from_parts(2024, 3, 1))"
+    },
+    "DATE_WEEKDAY(date)": {
+      "rust": "f::date_weekday(date)",
+      "python": "f.date_weekday(date)"
+    },
+    "DATE_WEEKDAY(DATE_FROM_PARTS(2024, 2, 29))": {
+      "rust": "f::date_weekday(f::date_from_parts(2024, 2, 29))",
+      "python": "f.date_weekday(f.date_from_parts(2024, 2, 29))"
+    },
+    "DATE_IS_WEEKEND(date)": {
+      "rust": "f::date_is_weekend(date)",
+      "python": "f.date_is_weekend(date)"
+    },
+    "DATE_IS_WEEKEND(DATE_FROM_PARTS(2024, 3, 3))": {
+      "rust": "f::date_is_weekend(f::date_from_parts(2024, 3, 3))",
+      "python": "f.date_is_weekend(f.date_from_parts(2024, 3, 3))"
+    },
+    "DATE_END_OF_MONTH(date)": {
+      "rust": "f::date_end_of_month(date)",
+      "python": "f.date_end_of_month(date)"
+    },
+    "DATE_END_OF_MONTH(DATE_FROM_PARTS(2024, 2, 1))": {
+      "rust": "f::date_end_of_month(f::date_from_parts(2024, 2, 1))",
+      "python": "f.date_end_of_month(f.date_from_parts(2024, 2, 1))"
+    },
+    "DATE_ADD_MONTHS(date, count)": {
+      "rust": "f::date_add_months(date, count)",
+      "python": "f.date_add_months(date, count)"
+    },
+    "DATE_ADD_MONTHS(DATE_FROM_PARTS(2024, 1, 31), 1)": {
+      "rust": "f::date_add_months(f::date_from_parts(2024, 1, 31), 1)",
+      "python": "f.date_add_months(f.date_from_parts(2024, 1, 31), 1)"
+    },
+    "DATE_ISO_WEEK(date)": {
+      "rust": "f::date_iso_week(date)",
+      "python": "f.date_iso_week(date)"
+    },
+    "DATE_ISO_WEEK(DATE_FROM_PARTS(2021, 1, 1))": {
+      "rust": "f::date_iso_week(f::date_from_parts(2021, 1, 1))",
+      "python": "f.date_iso_week(f.date_from_parts(2021, 1, 1))"
+    },
+    "DATE_ISO_WEEK_YEAR(date)": {
+      "rust": "f::date_iso_week_year(date)",
+      "python": "f.date_iso_week_year(date)"
+    },
+    "DATE_ISO_WEEK_YEAR(DATE_FROM_PARTS(2021, 1, 1))": {
+      "rust": "f::date_iso_week_year(f::date_from_parts(2021, 1, 1))",
+      "python": "f.date_iso_week_year(f.date_from_parts(2021, 1, 1))"
+    },
+    "TIMESTAMP_ADD_SECONDS(timestamp, count)": {
+      "rust": "f::timestamp_add_seconds(timestamp, count)",
+      "python": "f.timestamp_add_seconds(timestamp, count)"
+    },
+    "TIMESTAMP_ADD_SECONDS(TIMESTAMP_FROM_UNIX(0), 0.5)": {
+      "rust": "f::timestamp_add_seconds(f::timestamp_from_unix(0), 0.5)",
+      "python": "f.timestamp_add_seconds(f.timestamp_from_unix(0), 0.5)"
+    },
+    "TIMESTAMP_DIFF_SECONDS(start, end)": {
+      "rust": "f::timestamp_diff_seconds(start, end)",
+      "python": "f.timestamp_diff_seconds(start, end)"
+    },
+    "TIMESTAMP_DIFF_SECONDS(TIMESTAMP_FROM_UNIX(1), TIMESTAMP_FROM_UNIX(3))": {
+      "rust": "f::timestamp_diff_seconds(f::timestamp_from_unix(1), f::timestamp_from_unix(3))",
+      "python": "f.timestamp_diff_seconds(f.timestamp_from_unix(1), f.timestamp_from_unix(3))"
+    },
+    "TIMESTAMP_FROM_UNIX(seconds)": {
+      "rust": "f::timestamp_from_unix(seconds)",
+      "python": "f.timestamp_from_unix(seconds)"
+    },
+    "TIMESTAMP_FROM_UNIX(0.5)": {
+      "rust": "f::timestamp_from_unix(0.5)",
+      "python": "f.timestamp_from_unix(0.5)"
+    },
+    "TIMESTAMP_TO_UNIX(timestamp)": {
+      "rust": "f::timestamp_to_unix(timestamp)",
+      "python": "f.timestamp_to_unix(timestamp)"
+    },
+    "TIMESTAMP_TO_UNIX(TIMESTAMP_PARSE(\"1970-01-01T01:00:00+01:00\"))": {
+      "rust": "f::timestamp_to_unix(f::timestamp_parse(\"1970-01-01T01:00:00+01:00\", None))",
+      "python": "f.timestamp_to_unix(f.timestamp_parse(\"1970-01-01T01:00:00+01:00\"))"
+    }
+  }
+}

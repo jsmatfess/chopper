@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { build, createMarkdownRenderer, disposeMdItInstance } from 'vitepress';
 import { checkSite } from './check.mjs';
 import { renderCliReference } from './cli-reference.mjs';
+import { formulaTablesMarker, renderFormulaTables } from './formula-tables.mjs';
 import { findLanguagePagesMarker, findTopLevelMarker, renderLanguageGuide, renderLibraryGuide, renderLibraryIndex } from './library-guide.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -32,6 +33,7 @@ const pages = [
 ];
 const formulaPage = ['docs/formula-functions.md', 'formula-functions', 'Formula functions'];
 const formulaSyntaxMarker = '<!-- chopper-docs:formula-syntax -->';
+const formulaSyntaxData = 'docs/formula-reference-syntax.json';
 const libraryPage = ['docs/user/libraries.md', 'libraries', 'Libraries'];
 const languagePages = [
   [libraryPage[0], 'libraries-rust', 'Rust'],
@@ -116,7 +118,7 @@ function rewriteLinks(md, tag, releasePages) {
   }
 }
 
-async function preparePages(source, documents, base) {
+async function preparePages(source, documents, base, formulaData) {
   const renderer = await createMarkdownRenderer(source, {
     headers: { level: [2, 3] },
     highlight: () => '',
@@ -128,6 +130,14 @@ async function preparePages(source, documents, base) {
     if (formulas) {
       const tokens = renderer.parse(formulas.markdown, { path: join(source, `${formulas.name}.md`) });
       const marker = findTopLevelMarker(tokens, formulaSyntaxMarker);
+      const tables = findTopLevelMarker(tokens, formulaTablesMarker);
+      if (Boolean(tables) !== Boolean(formulaData) || (tables && !marker)) {
+        throw new Error('Formula table syntax needs both markers and the generated reference data');
+      }
+      if (formulaData && (formulaData.schema_version !== 1 || !formulaData.code || Array.isArray(formulaData.code) ||
+          typeof formulaData.code !== 'object')) {
+        throw new Error('Unrecognized formula reference syntax data');
+      }
       const panels = tokens.flatMap((token, index) => (
         token.type === 'html_block' && /^<div .*\bdata-formula-syntax=/.test(token.content)
           ? [{ choice: token.content.match(/\bdata-formula-syntax="(formula|rust|python)"/)?.[1], heading: tokens[index + 1]?.tag }]
@@ -217,7 +227,8 @@ const releases = versions.map(arg => {
   }
   const hasFormulas = git('ls-tree', '--name-only', commit, '--', formulaPage[0]).length > 0;
   const hasLibraries = git('ls-tree', '--name-only', commit, '--', libraryPage[0]).length > 0;
-  return { version, commit, read, hasFormulas, hasLibraries };
+  const formulaTables = git('ls-tree', '--name-only', commit, '--', formulaSyntaxData).length > 0;
+  return { version, commit, read, hasFormulas, hasLibraries, formulaTables };
 }).sort((a, b) => b.version.localeCompare(a.version, 'en', { numeric: true }));
 if (new Set(releases.map(r => r.version)).size !== releases.length) throw new Error('Duplicate documentation version');
 
@@ -225,7 +236,7 @@ const staging = await mkdtemp(fileURLToPath(new URL('./.build-', import.meta.url
 try {
   const site = join(staging, 'dist');
   for (const release of releases) {
-    const { version, read, hasFormulas, hasLibraries } = release;
+    const { version, read, hasFormulas, hasLibraries, formulaTables } = release;
     const source = join(staging, version);
     const base = `/versions/${version}/`;
     await mkdir(join(source, 'public'), { recursive: true });
@@ -241,7 +252,8 @@ try {
         ? renderCliReference(read(path).toString(), JSON.parse(read('docs/cli-reference-data.json')), version)
         : path === libraryPage[0] ? library : content(read(path).toString(), name),
     }));
-    const { sidebar, splitLibraries, formulaSyntax } = await preparePages(source, documents, base);
+    const formulaData = formulaTables ? JSON.parse(read(formulaSyntaxData)) : null;
+    const { sidebar, splitLibraries, formulaSyntax } = await preparePages(source, documents, base, formulaData);
     const releasePages = candidatePages.filter(([, name]) => splitLibraries || !name.startsWith('libraries-'));
     release.splitLibraries = splitLibraries;
     release.formulaSyntax = formulaSyntax;
@@ -262,7 +274,10 @@ try {
         config.site.title = `Chopper ${version}`;
         config.site.description = `Operator documentation for Chopper ${version}`;
         config.site.head.push(['link', { rel: 'stylesheet', href: base + 'chopper.css' }]);
-        config.markdown = { config: md => rewriteLinks(md, `v${version}`, releasePages) };
+        config.markdown = { config: md => {
+          rewriteLinks(md, `v${version}`, releasePages);
+          if (formulaData) renderFormulaTables(md, formulaData.code);
+        } };
         config.site.themeConfig = {
           nav: [
             { text: 'Release notes', link: `${repo}/releases/tag/v${version}` },
@@ -301,10 +316,11 @@ try {
   await writeFile(join(site, '_redirects'), `/latest /versions/${latest.version}/ 302\n/latest/* /versions/${latest.version}/:splat 302\n`);
   await writeFile(join(site, 'versions.json'), JSON.stringify({
     latest: latest.version,
-    versions: releases.map(({ version, commit, hasFormulas, hasLibraries, splitLibraries, formulaSyntax }) => {
+    versions: releases.map(({ version, commit, hasFormulas, hasLibraries, splitLibraries, formulaSyntax, formulaTables }) => {
       const additionalPages = [hasFormulas && formulaPage[1], hasLibraries && libraryPage[1],
         ...(splitLibraries ? languagePages.map(([, name]) => name) : [])].filter(Boolean);
-      return { version, commit, ...(additionalPages.length ? { additionalPages } : {}), ...(formulaSyntax ? { formulaSyntax } : {}) };
+      return { version, commit, ...(additionalPages.length ? { additionalPages } : {}),
+        ...(formulaSyntax ? { formulaSyntax } : {}), ...(formulaTables ? { formulaTables } : {}) };
     }),
     pages: pages.map(([, name]) => name),
   }, null, 2) + '\n');

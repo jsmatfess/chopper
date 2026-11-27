@@ -42,12 +42,19 @@ to the selected guide with their section anchors. The smoke test checks
 language-scoped prose, navigation, direct links, search, and reading and
 navigating the guides without JavaScript.
 
-The formula reference keeps the function tables in formula text. The
-`<!-- chopper-docs:formula-syntax -->` marker adds a selector for the
+The `<!-- chopper-docs:formula-syntax -->` marker adds a selector for the
 `formula`, `rust`, and `python` panels. Each panel uses `data-formula-syntax`
 with its corresponding value and starts with a level-three Markdown heading.
 Use `?lang=rust#rust-syntax` or `?lang=python#python-syntax` to link to the
 SDK notes. The heading anchors also work without JavaScript.
+
+Keep the reference tables in formula text in the source Markdown. The
+`<!-- chopper-docs:formula-tables -->` marker enables the Rust and Python
+table syntax from `docs/formula-reference-syntax.json` at the selected
+release revision. Run `python scripts/generate-formula-bindings.py` after
+editing the signatures or examples. The site switches the table syntax
+and examples while keeping the behavior and result descriptions available.
+Readers without JavaScript see the formula text tables and all syntax notes.
 
 ```sh
 npm --prefix docs-site ci

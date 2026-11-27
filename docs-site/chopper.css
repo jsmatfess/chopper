@@ -163,6 +163,22 @@
   outline-offset: 2px;
 }
 
+.vp-doc .formula-table-scroll {
+  overflow-x: auto;
+  margin-block: 20px;
+}
+
+.vp-doc .formula-table-scroll table {
+  display: table;
+  margin: 0;
+  overflow: visible;
+}
+
+.formula-table-scroll:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+}
+
 :is(.VPNav, .version-index) a[href="https://buymeacoffee.com/tblflip"] {
   font-size: .8125rem;
   color: var(--vp-c-text-2, #45554b);

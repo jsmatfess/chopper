@@ -1,12 +1,15 @@
 # Formula functions
 
 Calculated columns evaluate expressions against the current row. The same
-formulas work in the hosted app, the CLI, and both libraries. The function
-tables use Chopper formula text.
+formulas work in the hosted app, the CLI, and both libraries. In the docs
+site, choose **Formula syntax** to see the function signatures, operators,
+and examples in formula text, Rust, or Python.
 
 ## Build formulas with the client libraries
 
 <!-- chopper-docs:formula-syntax -->
+
+<!-- chopper-docs:formula-tables -->
 
 <div data-formula-syntax="formula">
 
@@ -32,6 +35,7 @@ See [calculated columns in Job JSON](job-json.md#formulas) and
 Import the helpers from `chopper::formula::functions`. Names are lowercase,
 with `if_else` for `IF`. Use `col("country")` for a header, `col(0)` for the
 first field, and `lit(value)` for an explicit literal expression.
+The operator examples use `left`, `right`, and `expr` as expressions.
 
 ```rust
 use chopper::formula::{col, functions as f, lit};
@@ -44,7 +48,8 @@ fn main() {
 ```
 
 - Pass `None` to omit an optional argument and `Some(expr)` to supply one.
-  Use `null()` for formula `NULL`, or `Some(null())` in an optional slot.
+  Use `chopper::formula::null()` for formula `NULL`, or `Some(null())` in an
+  optional slot.
 - Pass an iterator of expressions to `concat` and `coalesce`. `concat_ws`
   takes the separator followed by the iterator, including any literal Boolean
   flags at its end. `ifs` takes `(condition, value)` pairs and a fallback.
@@ -65,6 +70,7 @@ adding expressions to a Job.
 Import the helpers from `chopper_csv.functions`. Names are lowercase,
 with `if_else` for `IF`. Use `col("country")` for a header, `col(0)` for the
 first field, and `lit(value)` for an explicit literal expression.
+The operator examples use `left`, `right`, and `expr` as expressions.
 
 ```python
 from chopper_csv import col, functions as f
@@ -145,14 +151,14 @@ Chopper still reports invalid formulas and resource errors.
 
 | Operator | Behavior |
 | --- | --- |
-| `+`, `-`, `*`, `/`, `%` | Add, subtract, multiply, divide, and take the remainder of numbers. Unary `+` and `-` also work on numbers. |
+| `+`, `-`, `*`, `/`, `%` | Add, subtract, multiply, divide, and take the remainder of numbers. In formula text, unary `+` and `-` also work on numbers. |
 | `&` | Join text. Either operand being `NULL` yields `NULL`, as with `CONCAT`. |
 | `=`, `!=`, `<>`, `<`, `<=`, `>`, `>=` | Compare values of matching types. A null operand yields `NULL`. |
 | `AND`, `OR`, `NOT` | Evaluate Boolean conditions. `FALSE AND NULL` is false, `TRUE OR NULL` is true, and `NOT NULL` yields `NULL`. |
 
-Arithmetic binds before `&`, which binds before comparisons and `IN`.
-For example, `first_name & " " & last_name = "Ada Lovelace"` joins the name
-before comparing it.
+In formula text, arithmetic binds before `&`, which binds before comparisons
+and `IN`. For example, `first_name & " " & last_name = "Ada Lovelace"` joins
+the name before comparing it.
 
 `region IN ("North", "West")` tests membership in a nonempty list. Items can
 be expressions or column references. `IN` uses the same type and case rules

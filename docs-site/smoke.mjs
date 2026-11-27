@@ -251,11 +251,13 @@ async function checkSplitLibraryGuides(browser, origin, base) {
   }
 }
 
-async function checkFormulaSyntax(browser, origin, base) {
+async function checkFormulaSyntax(browser, origin, base, formulaTables) {
   const url = origin + base + 'formula-functions';
   const anchor = '#build-formulas-with-the-client-libraries';
   const panel = (page, syntax) => page.locator(`[data-formula-syntax="${syntax}"]`);
   const selector = page => page.getByLabel('Formula syntax', { exact: true });
+  const tableCode = (page, code) => page.locator('table code').and(page.getByText(code, { exact: true }));
+  const concatSignature = 'CONCAT_WS(separator, text, ..., ignore_null?, ignore_empty?)';
   const page = await browser.newPage({ viewport: { width: 1280, height: 844 } });
   page.setDefaultTimeout(10_000);
   try {
@@ -268,12 +270,40 @@ async function checkFormulaSyntax(browser, origin, base) {
     await page.waitForURL(url + '?source=guide&lang=rust' + anchor);
     await panel(page, 'rust').getByText('Rust syntax', { exact: true }).waitFor();
     assert.equal(await panel(page, 'python').getAttribute('hidden'), 'until-found');
-    await page.getByText('CONCAT_WS(separator, text, ..., ignore_null?, ignore_empty?)', { exact: true }).waitFor();
+    if (formulaTables) {
+      for (const code of [
+        'f::concat_ws(separator, values)',
+        'f::startswith("North", "No", None)',
+        'f::startswith("North", "no", Some(lit(true)))',
+        'left.and(right)',
+      ]) await tableCode(page, code).waitFor();
+      assert.equal(await tableCode(page, concatSignature).count(), 0);
+      const region = page.getByRole('region', { name: 'Operators', exact: true });
+      assert.equal(await region.getAttribute('tabindex'), '0');
+      assert.equal(await region.getByRole('columnheader', { name: 'Operator' }).getAttribute('scope'), 'col');
+      await page.getByRole('region', { name: 'Parsing, formatting, and parts', exact: true }).waitFor();
+      await page.getByRole('region', { name: 'Calendar and timestamp arithmetic', exact: true }).waitFor();
+    } else {
+      await tableCode(page, concatSignature).waitFor();
+    }
 
     await page.goto(url + '?lang=python#python-syntax');
     await picker.waitFor();
     assert.equal(await picker.inputValue(), 'python');
     await panel(page, 'python').getByText('Python syntax', { exact: true }).waitFor();
+    if (formulaTables) {
+      for (const code of [
+        'f.concat_ws(separator, text, *additional_text_and_flags)',
+        'f.startswith("North", "no", ignore_case=True)',
+        'f.ifs((False, "a"), (True, "b"), fallback="other")',
+        'left.and_(right)',
+      ]) await tableCode(page, code).waitFor();
+      const example = page.getByText('f.startswith("North", "No")', { exact: true });
+      const row = page.getByRole('row').filter({ has: example });
+      assert.match(await row.getByRole('cell').nth(1).innerText(), /Test whether text starts with the literal prefix/);
+      assert.equal(await row.getByRole('cell').nth(2).getByText('TRUE', { exact: true }).count(), 2);
+      assert.equal(await tableCode(page, 'left.and(right)').count(), 0);
+    }
     await page.locator('#VPSidebarNav').getByRole('link', { name: 'Handle row errors with SAFE', exact: true }).click();
     await page.waitForURL(url + '?lang=python#handle-row-errors-with-safe');
     await page.reload();
@@ -285,6 +315,7 @@ async function checkFormulaSyntax(browser, origin, base) {
     await picker.selectOption('formula');
     await page.waitForURL(url + '?lang=formula#formula-text');
     await panel(page, 'formula').getByText('Formula text', { exact: true }).waitFor();
+    await tableCode(page, concatSignature).waitFor();
 
     await page.goto(url + '?lang=python#%72ust-syntax');
     await picker.waitFor();
@@ -304,6 +335,7 @@ async function checkFormulaSyntax(browser, origin, base) {
     await page.waitForURL(url + '?lang=python#python-syntax');
     await panel(page, 'python').getByText('Python syntax', { exact: true }).waitFor();
     assert.equal(await picker.inputValue(), 'python');
+    if (formulaTables) await tableCode(page, 'f.safe(f.number("42"))').waitFor();
 
     for (const language of ['rust', 'python']) {
       await page.goto(origin + base + `libraries-${language}#pass-function-arguments`);
@@ -323,6 +355,7 @@ async function checkFormulaSyntax(browser, origin, base) {
     await fallback.goto(url + '#python-syntax');
     for (const syntax of ['formula', 'rust', 'python']) await panel(fallback, syntax).waitFor();
     await selector(fallback).waitFor({ state: 'hidden' });
+    await tableCode(fallback, concatSignature).waitFor();
   } finally {
     await fallback.close();
   }
@@ -361,7 +394,7 @@ try {
   assert.equal(await support.getAttribute('href'), 'https://buymeacoffee.com/tblflip');
   assert.equal(await page.getByRole('link', { name: /Latest stable release/ }).getAttribute('href'), `/versions/${latest}/`);
   await page.getByRole('link', { name: latest, exact: true }).waitFor();
-  for (const { version, commit, additionalPages = [], formulaSyntax } of versions) {
+  for (const { version, commit, additionalPages = [], formulaSyntax, formulaTables } of versions) {
     const base = `/versions/${version}/`;
     assert.match(commit, /^[0-9a-f]{40}$/);
     assert.equal((await page.goto(origin + base))?.status(), 200);
@@ -445,8 +478,8 @@ try {
       await page.waitForURL(url => url.pathname === base + 'formula-functions' && url.hash.length > 1);
     }
     if (formulaSyntax) {
-      await checkFormulaSyntax(browser, origin, base);
-      console.log(`Verified ${version} formula syntax selector, deep links, and static fallback`);
+      await checkFormulaSyntax(browser, origin, base, formulaTables);
+      console.log(`Verified ${version} formula syntax selector${formulaTables ? ', tables' : ''}, deep links, and static fallback`);
     }
     const splitGuides = ['libraries-rust', 'libraries-python'];
     if (splitGuides.some(guide => additionalPages.includes(guide))) {

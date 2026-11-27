@@ -16,6 +16,8 @@ const selection = ref('');
 let guide;
 let anchorFrame;
 let formulaPanels = [];
+let formulaCodes = [];
+let searchablePanels;
 let stopNavigationSync;
 
 function fragmentId(hash) {
@@ -43,9 +45,15 @@ function restoreLanguage(keepSelection = false) {
       url.searchParams.set('lang', selection.value);
       window.history.replaceState(window.history.state, '', url);
     }
-    for (const panel of formulaPanels) {
-      if (panel.syntax === selection.value) panel.element.removeAttribute('hidden');
-      else panel.element.setAttribute('hidden', 'until-found');
+    if (searchablePanels) {
+      for (const panel of formulaPanels) {
+        if (panel.syntax === selection.value) panel.element.removeAttribute('hidden');
+        else panel.element.setAttribute('hidden', 'until-found');
+      }
+    }
+    for (const { element, ...syntax } of formulaCodes) {
+      const code = syntax[selection.value];
+      if (element.textContent !== code) element.textContent = code;
     }
     return;
   }
@@ -84,12 +92,18 @@ function alignLinkedSection() {
 onMounted(() => {
   guide = picker.value.closest('.vp-doc');
   if (props.formulaReference) {
-    // Without searchable hidden content, all three sections and their links are available.
-    if (!('onbeforematch' in HTMLElement.prototype)) return;
+    searchablePanels = 'onbeforematch' in HTMLElement.prototype;
+    formulaCodes = Array.from(guide.querySelectorAll('code[data-formula-rust][data-formula-python]'), element => ({
+      element, formula: element.textContent, rust: element.dataset.formulaRust, python: element.dataset.formulaPython,
+    }));
+    // Without searchable hidden content, leave all notes visible and switch the tables.
+    if (!searchablePanels && !formulaCodes.length) return;
     formulaPanels = Array.from(guide.querySelectorAll('[data-formula-syntax]'), element => ({
       element, syntax: element.dataset.formulaSyntax, heading: element.querySelector('h3'),
     }));
-    for (const panel of formulaPanels) panel.element.addEventListener('beforematch', revealSyntax);
+    if (searchablePanels) {
+      for (const panel of formulaPanels) panel.element.addEventListener('beforematch', revealSyntax);
+    }
     // Search can change the fragment through the router without firing hashchange.
     const referencePath = window.location.pathname;
     const previous = router.onBeforePageLoad;
