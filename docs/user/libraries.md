@@ -413,13 +413,15 @@ handles nulls.
 ### Compose Boolean formulas
 
 Review customers who are in the US or in the returning segment. Customer `3`
-has already been reviewed, so skip that row. The parentheses group the country
-and segment conditions before applying the exclusion. `if_else` turns the
-result into a `review_status` column.
+has already been reviewed, so skip that row. Apply the exclusion after combining
+the country and segment conditions. `if_else` turns the result into a
+`review_status` column.
 
 <!-- docs:rust -->
 
-Use `|` for OR, `&` for AND, and `!` for NOT.
+Use `.or()` or `|` for OR, `.and()` or `&` for AND, and `.not()` or `!` for
+NOT. The method chain below is equivalent to
+`(is_us | is_returning) & !already_reviewed`.
 
 <!-- docs:end -->
 
@@ -433,7 +435,7 @@ fn main() -> Result<(), Error> {
     let is_us = f::regex_match(col("country"), "^US$");
     let is_returning = f::regex_match(col("segment"), "^returning$");
     let already_reviewed = f::regex_match(col("id"), "^3$");
-    let needs_review = (is_us | is_returning) & !already_reviewed;
+    let needs_review = is_us.or(is_returning).and(already_reviewed.not());
 
     let job = Job::new(JobSettings {
         calculated_columns: vec![f::if_else(needs_review, "review", "skip").alias("review_status")],
@@ -446,8 +448,11 @@ fn main() -> Result<(), Error> {
 
 <!-- docs:python -->
 
-Use `|` for OR, `&` for AND, and `~` for NOT. Python truth tests,
-including `and`, `or`, and `not`, raise `TypeError` on a formula expression.
+Use `.or_()` or `|` for OR, `.and_()` or `&` for AND, and `.not_()` or `~` for
+NOT. The method chain below is equivalent to
+`(is_us | is_returning) & ~already_reviewed`. The method names end in `_`
+because `or`, `and`, and `not` are Python keywords. A Python truth test on a
+formula expression raises `TypeError`.
 
 <!-- docs:end -->
 
@@ -459,7 +464,7 @@ from chopper_csv import Job, col, functions as f
 is_us = f.regex_match(col("country"), "^US$")
 is_returning = f.regex_match(col("segment"), "^returning$")
 already_reviewed = f.regex_match(col("id"), "^3$")
-needs_review = (is_us | is_returning) & ~already_reviewed
+needs_review = is_us.or_(is_returning).and_(already_reviewed.not_())
 
 job = Job(
     {"input": "customers.csv", "output": "customer-review"},

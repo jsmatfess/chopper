@@ -55,6 +55,18 @@ class Expr:
         """Return the expression's formula text."""
         return self._source
 
+    def and_(self, other: ExprLike) -> Expr:
+        """Combine two formula expressions with AND, as with the `&` operator."""
+        return self & other
+
+    def or_(self, other: ExprLike) -> Expr:
+        """Combine two formula expressions with OR, as with the `|` operator."""
+        return self | other
+
+    def not_(self) -> Expr:
+        """Negate a formula expression with NOT, as with the `~` operator."""
+        return ~self
+
     def __str__(self) -> str:
         return self._source
 

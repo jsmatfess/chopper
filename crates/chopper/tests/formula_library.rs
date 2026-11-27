@@ -35,10 +35,9 @@ fn composed_arithmetic_preserves_grouping_without_extra_depth() -> anyhow::Resul
     assert_eq!((lit(1) - (lit(2) - 3)).as_str(), "1 - (2 - 3)");
     assert_eq!((lit(1) + lit(2) * 3).as_str(), "1 + 2 * 3");
     assert_eq!((parse("1 + 2")? * 3).as_str(), "(1 + 2) * 3");
-    assert_eq!(
-        (!(lit(false) | true) & true).as_str(),
-        "NOT (FALSE OR TRUE) AND TRUE"
-    );
+    let condition = !(lit(false) | true) & true;
+    assert_eq!(condition.as_str(), "NOT (FALSE OR TRUE) AND TRUE");
+    assert_eq!(lit(false).or(true).not().and(true), condition);
     Ok(())
 }
 

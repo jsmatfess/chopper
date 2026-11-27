@@ -58,6 +58,25 @@ impl Expr {
         }
     }
 
+    /// Combine two formula expressions with AND, as with the `&` operator.
+    pub fn and(self, rhs: impl Into<Self>) -> Self {
+        self & rhs
+    }
+
+    /// Combine two formula expressions with OR, as with the `|` operator.
+    pub fn or(self, rhs: impl Into<Self>) -> Self {
+        self | rhs
+    }
+
+    /// Negate a formula expression with NOT, as with the `!` operator.
+    #[allow(
+        clippy::should_implement_trait,
+        reason = "The inherent method delegates to the existing Not implementation"
+    )]
+    pub fn not(self) -> Self {
+        !self
+    }
+
     fn operand(&self, parent: Precedence, wrap_equal: bool) -> Cow<'_, str> {
         if self.precedence < parent || (wrap_equal && self.precedence == parent) {
             Cow::Owned(format!("({self})"))

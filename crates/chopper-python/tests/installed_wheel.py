@@ -238,7 +238,9 @@ class InstalledWheel(unittest.TestCase):
         column = chopper.col(1)
         with self.assertRaisesRegex(TypeError, "truth value"):
             bool(f.is_blank(column))
-        self.assertEqual(str(~(chopper.lit(False) | True) & True), "NOT (FALSE OR TRUE) AND TRUE")
+        condition = ~(chopper.lit(False) | True) & True
+        self.assertEqual(str(condition), "NOT (FALSE OR TRUE) AND TRUE")
+        self.assertEqual(chopper.lit(False).or_(True).not_().and_(True), condition)
         definitions = {
             "score": (10 - number) * chopper.parse("1 + 2") + 8 / (number + 1),
             "label": f.if_else(
