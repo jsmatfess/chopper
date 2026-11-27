@@ -1,12 +1,14 @@
 """Compose, load and execute file-to-file Chopper Jobs."""
 
-from collections.abc import Iterator, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from itertools import repeat
 import json
 from os import PathLike
 from typing import Any
 
+from . import functions
+from ._formula import Expr, col, lit, parse
 from ._native import (
     ChopperError,
     ExecutionControl,
@@ -17,9 +19,10 @@ from ._native import (
 )
 
 __all__ = [
-    "ChopperError", "ExecutionControl", "Job", "ManifestReader", "Pipeline", "analyze", "assign",
-    "assign_probabilistic", "balanced", "detect_dialect", "formula_functions", "inspect",
-    "interleaved", "iter_columns", "open_manifest", "partition", "preview", "run", "shuffle", "validate",
+    "ChopperError", "ExecutionControl", "Expr", "Job", "ManifestReader", "Pipeline", "analyze",
+    "assign", "assign_probabilistic", "balanced", "col", "detect_dialect", "formula_functions",
+    "functions", "inspect", "interleaved", "iter_columns", "lit", "open_manifest", "parse",
+    "partition", "preview", "run", "shuffle", "validate",
 ]
 
 _Column = str | int
@@ -100,7 +103,13 @@ class Job:
 
     __slots__ = ("_native",)
 
-    def __init__(self, settings: dict[str, Any], *, pipeline: Pipeline | None = None):
+    def __init__(
+        self,
+        settings: dict[str, Any],
+        *,
+        pipeline: Pipeline | None = None,
+        calculated_columns: Mapping[str, Expr | str] | None = None,
+    ):
         if not isinstance(settings, dict):
             raise TypeError("Job settings must be a dictionary")
         if pipeline is not None:
@@ -112,6 +121,21 @@ class Job:
                 **settings,
                 "operations": [json.loads(step.source) for step in pipeline._operations],
             }
+        if calculated_columns is not None:
+            if not isinstance(calculated_columns, Mapping):
+                raise TypeError("calculated_columns must be a mapping")
+            if "calculated_columns" in settings:
+                raise TypeError("supply calculated_columns in settings or as a keyword")
+            definitions = []
+            for name, expression in calculated_columns.items():
+                if not isinstance(name, str):
+                    raise TypeError("calculated column names must be strings")
+                if isinstance(expression, Expr):
+                    expression = expression.as_str()
+                elif not isinstance(expression, str):
+                    raise TypeError("calculated column expressions must be Expr or str")
+                definitions.append({"name": name, "expression": expression})
+            settings = {**settings, "calculated_columns": definitions}
         self._native = _NativeJob.from_json(_json(settings))
 
     @classmethod

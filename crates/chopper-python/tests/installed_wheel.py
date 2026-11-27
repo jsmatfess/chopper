@@ -153,6 +153,87 @@ class InstalledWheel(unittest.TestCase):
                     self.assertEqual(row[4:], [row[1].lower(), str(int(row[0]) * 2)])
                     self.assertEqual(row[4], label)
 
+    def test_composed_formulas_run_on_headerless_records(self):
+        f = chopper.functions
+        Path("records.csv").write_text("3,us\n7,gb\n", encoding="utf-8")
+        settings = {
+            **self.settings,
+            "input": "records.csv",
+            "input_csv": {"headers": False},
+            "output_csv": {"headers": False},
+        }
+        number = f.number(chopper.col(0))
+        definitions = {
+            "score": (10 - number) * chopper.parse("1 + 2") + 8 / (number + 1),
+            "label": f.concat(f.upper(chopper.col(1)), ' "quoted"'),
+            "tail": f.coalesce(None, f.substring(chopper.col("label"), 1), "fallback"),
+            "raw": "lOwEr($1)",
+        }
+        job = chopper.Job(settings, calculated_columns=definitions)
+        self.assertNotIn("calculated_columns", settings)
+        job.validate()
+        job.save("composed.json")
+        saved = chopper.Job.load("composed.json")
+        self.assertEqual(saved.to_dict(), job.to_dict())
+        self.assertEqual(saved.to_dict()["calculated_columns"], [
+            {"name": name, "expression": str(expression)}
+            for name, expression in definitions.items()
+        ])
+
+        result = saved.run()
+        with chopper.open_manifest(result["manifest_path"]) as manifest:
+            entry, = manifest
+        self.assertEqual(read_csv(Path("output", entry["path"])), [
+            ["3", "us", "23", 'US "quoted"', 'S "quoted"', "us"],
+            ["7", "gb", "10", 'GB "quoted"', 'B "quoted"', "gb"],
+        ])
+
+    def test_formula_column_names_and_positions_remain_distinct(self):
+        f = chopper.functions
+        Path("records.csv").write_text("id,0,side]\n3,7,western\n", encoding="utf-8")
+        pipeline = chopper.Pipeline().then(chopper.partition(["choice"]))
+        job = chopper.Job(
+            {**self.settings, "input": "records.csv"},
+            pipeline=pipeline,
+            calculated_columns={
+                "named": f.number(chopper.col("0")),
+                "positional": f.number(chopper.col(0)),
+                "joined": f.concat_ws(":", chopper.col("side]"), None, "", "tip", True, True),
+                "choice": f.ifs((False, "wrong"), (True, "middle"), fallback="last"),
+            },
+        )
+        result = job.run()
+        with chopper.open_manifest(result["manifest_path"]) as manifest:
+            entry, = manifest
+        self.assertEqual(read_csv(Path("output", entry["path"])), [
+            ["id", "0", "side]", "named", "positional", "joined", "choice"],
+            ["3", "7", "western", "7", "3", "western:tip", "middle"],
+        ])
+
+    def test_formula_expression_builders_validate_inputs(self):
+        f = chopper.functions
+        expected = {
+            "if_else" if name == "IF" else name.lower()
+            for name, _ in chopper.formula_functions()
+        }
+        self.assertEqual(set(f.__all__), expected)
+        self.assertEqual(chopper.col("a]b").as_str(), "[a]]b]")
+        self.assertEqual(str(chopper.lit('a"b')), '"a""b"')
+        self.assertEqual(str(f.round(2.5)), "ROUND(2.5)")
+        self.assertEqual(str(f.round(2.5, None)), "ROUND(2.5, NULL)")
+        with self.assertRaises(ValueError):
+            chopper.parse("1 +")
+        with self.assertRaises(TypeError):
+            chopper.col(True)
+        for index in (-1, 2 ** 128):
+            with self.subTest(index=index), self.assertRaises(ValueError):
+                chopper.col(index)
+        for value in (float("nan"), float("inf"), 2 ** 1024):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                chopper.lit(value)
+        with self.assertRaisesRegex(TypeError, "supply calculated_columns"):
+            chopper.Job({**self.settings, "calculated_columns": []}, calculated_columns={})
+
     def test_stream_a_published_manifest(self):
         for mode in ("none", "gzip", "zip"):
             with self.subTest(compression=mode):

@@ -85,7 +85,7 @@ job.save("job.json")
 
 Use `Job(settings)` to construct a Job from a dictionary, or pass a dictionary
 to `validate`, `analyze`, or `run`. Execution releases the GIL, so another
-Python thread can observe or cancel the Job. Python failures raise `ChopperError`.
+Python thread can observe or cancel the Job. Engine errors raise `ChopperError`.
 
 ## Inspect an input
 
@@ -204,29 +204,25 @@ for number, row in zip(report["preview_row_numbers"], report["preview"], strict=
 
 ## Add calculated columns
 
-Give each calculated column a name and a [formula](../formula-functions.md).
-`[id]` refers to the `id` header. CSV fields start as text, so use `NUMBER`
-before doing arithmetic. The new columns are appended in declaration order
-and can be used for partitioning or allocation strata.
+Build expressions with `col`, named functions, and arithmetic operators.
+`col("id")` selects the exact `id` header. CSV fields start as text, so use
+`number` to convert them before doing arithmetic. The new columns are appended
+in declaration order and can be used for partitioning or allocation strata.
 
 **Rust**
 
 ```rust
-use chopper::job::{CalculatedColumn, Column, Error, Job, JobSettings, Operation};
+use chopper::formula::{col, functions as f, lit};
+use chopper::job::{Column, Error, Job, JobSettings, Operation};
 
 fn main() -> Result<(), Error> {
+    let by_country_label = Operation::partition(vec![Column::Name("country_label".into())]);
     let job = Job::new(JobSettings {
         calculated_columns: vec![
-            CalculatedColumn {
-                name: "country_label".into(),
-                expression: "LOWER([country])".into(),
-            },
-            CalculatedColumn {
-                name: "double_id".into(),
-                expression: "NUMBER([id]) * 2".into(),
-            },
+            f::upper(f::trim(col("country"))).alias("country_label"),
+            (f::number(col("id")) * lit(2)).alias("double_id"),
         ],
-        operations: vec![Operation::partition(vec![Column::Name("country_label".into())])],
+        operations: vec![by_country_label],
         ..JobSettings::for_files("customers.csv", "calculated")
     });
     let report = job.run(None)?;
@@ -238,24 +234,115 @@ fn main() -> Result<(), Error> {
 **Python**
 
 ```python
-from chopper_csv import Job, Pipeline, partition
+from chopper_csv import Job, Pipeline, col, functions as f, partition
 
-job = Job({
-    "input": "customers.csv",
-    "output": "calculated",
-    "calculated_columns": [
-        {"name": "country_label", "expression": "LOWER([country])"},
-        {"name": "double_id", "expression": "NUMBER([id]) * 2"},
-    ],
-}, pipeline=Pipeline().then(partition(["country_label"])))
+job = Job(
+    {"input": "customers.csv", "output": "calculated"},
+    pipeline=Pipeline().then(partition(["country_label"])),
+    calculated_columns={
+        "country_label": f.upper(f.trim(col("country"))),
+        "double_id": f.number(col("id")) * 2,
+    },
+)
 report = job.run()
 print(f"{report['rows']} rows in {report['groups']} groups")
 ```
 
 With the sample input, the Run writes eight rows in two groups. `validate()`
 checks formula syntax. Analyze and Run resolve column references against the
-input. `Job.save` in both languages writes the formulas to the same versioned
-Job JSON that the CLI accepts.
+input. Rust's `.alias(name)` produces a `CalculatedColumn` for
+`JobSettings.calculated_columns`. Python takes each column name from the
+`calculated_columns` mapping.
+
+### Use formulas with headerless CSVs
+
+Save the eight data lines from the sample as `customers-no-header.csv`.
+Set `headers` to `false` for input and output. `col(0)` selects the first
+parsed field by position. `col("0")` selects a column with the exact header
+`0`. Use positions for headerless input or duplicate headers.
+
+**Rust**
+
+```rust
+use chopper::formula::{col, functions as f, lit};
+use chopper::job::{CsvSettings, Error, Job, JobSettings};
+
+fn main() -> Result<(), Error> {
+    let csv = CsvSettings {
+        headers: false,
+        ..CsvSettings::default()
+    };
+    let job = Job::new(JobSettings {
+        input_csv: csv.clone(),
+        output_csv: csv,
+        calculated_columns: vec![(f::number(col(0)) * lit(2)).alias("double_id")],
+        ..JobSettings::for_files("customers-no-header.csv", "calculated-headerless")
+    });
+    println!("{} rows", job.run(None)?.rows);
+    Ok(())
+}
+```
+
+**Python**
+
+```python
+from chopper_csv import Job, col, functions as f
+
+job = Job(
+    {
+        "input": "customers-no-header.csv",
+        "output": "calculated-headerless",
+        "input_csv": {"headers": False},
+        "output_csv": {"headers": False},
+    },
+    calculated_columns={"double_id": f.number(col(0)) * 2},
+)
+print(f"{job.run()['rows']} rows")
+```
+
+The first output record is `1,US,new,2`.
+
+### Pass function arguments
+
+Use `lit("US")` to build a text literal. Both libraries accept strings,
+numbers, and booleans as literals for fixed function arguments. In Python
+`f.concat(col("country"), "-")` appends a hyphen. Use `col` to refer to a field.
+
+For optional parameters, pass `None` in Rust or omit the argument in Python
+to use the function default. Rust accepts a supplied argument as
+`Some(expr)`. Use Rust's `null()` or Python's `None` for an explicit formula
+`NULL` in an argument. The [formula reference](../formula-functions.md)
+describes how each function handles nulls.
+
+Enable case-insensitive matching with
+`f::startswith(col("country"), lit("u"), Some(lit(true)))` in Rust or
+`f.startswith(col("country"), "u", True)` in Python.
+
+For variable-length arguments, pass an array or iterator in Rust, such as
+`f::concat([col("country"), lit("-"), col("segment")])`. In Python, pass
+arguments in order, as in `f.concat(col("country"), "-", col("segment"))`.
+`CONCAT_WS` takes literal Boolean flags after its text arguments.
+
+For `IF`, call `if_else(condition, when_true, when_false)`. Pass condition
+and value pairs to `ifs`, followed by a fallback. Use
+`f::ifs([(condition, value)], fallback)` in Rust and
+`f.ifs((condition, value), fallback=fallback)` in Python.
+
+### Reuse existing formula text
+
+Import `parse` from `chopper::formula` in Rust or `chopper_csv` in Python to
+incorporate an existing formula into an expression. For example, write
+`parse("NUMBER([id])")? * lit(2)` in Rust or `parse("NUMBER([id])") * 2` in
+Python. Use `Expr::as_str()` in Rust or `str(expr)` in Python to read the
+resulting formula text. When the text is invalid, Rust's `parse` returns
+`FormulaError` and Python's `parse` raises `ValueError`.
+
+You can also put formula text directly in the `expression` field of a
+`CalculatedColumn` in Rust or of a `{"name": ..., "expression": ...}` record
+in the Python settings dictionary's `calculated_columns` list. Python's
+`calculated_columns` keyword also accepts formula strings as values.
+`Job.save` in both languages writes the formulas to the same
+[Job JSON](../job-json.md#formulas) that the CLI accepts.
 
 ### Offer formula suggestions
 

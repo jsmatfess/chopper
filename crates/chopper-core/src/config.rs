@@ -303,6 +303,25 @@ pub enum Column {
     Index(usize),
     Name(String),
 }
+
+impl From<usize> for Column {
+    fn from(index: usize) -> Self {
+        Self::Index(index)
+    }
+}
+
+impl From<String> for Column {
+    fn from(name: String) -> Self {
+        Self::Name(name)
+    }
+}
+
+impl From<&str> for Column {
+    fn from(name: &str) -> Self {
+        name.to_owned().into()
+    }
+}
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Allocation {

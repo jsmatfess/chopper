@@ -9,8 +9,9 @@ formulas work in the hosted app, the CLI, and both libraries. See runnable
 ## Write a formula
 
 Write a bare column name, a bracketed name such as `[Sales Region]`, or an
-index such as `$0`. Double a closing bracket inside a bracketed name. Use an
-index to disambiguate duplicate headers. Double quotes delimit text literals,
+index such as `$0` for the first field. Double a closing bracket inside a
+bracketed name. Use zero-based indices for headerless input or duplicate
+headers. Double quotes delimit text literals,
 and doubling an embedded quote inserts it literally. In the hosted editor, Tab accepts the highlighted suggestion and Ctrl+Space
 opens suggestions. Exact and prefix matches appear first, followed by names
 that contain the typed text. Each group is alphabetical, and matching is
@@ -40,6 +41,17 @@ skipped by the sample.
 
 Function names are case-insensitive. CSV fields start as text. Use `NUMBER`,
 `DATE_PARSE`, or `TIMESTAMP_PARSE` to convert input explicitly.
+
+## Build formulas with the client libraries
+
+Rust's `chopper::formula::functions` and Python's `chopper_csv.functions`
+provide named helpers for these functions. Use lowercase names such as
+`trim` and `upper`, and use `if_else` for `IF`. Compose helpers with
+`col("country")` for the exact header `country` or `col(0)` for the first
+field. Use `parse(text)` to incorporate a formula written in the syntax below.
+
+The [library guide](user/libraries.md#add-calculated-columns) shows how to
+attach expressions to a Job and how to pass optional arguments and literals.
 
 ## Handle row errors with SAFE
 

@@ -1,6 +1,9 @@
-use chopper::job::{
-    formula_functions, Column, DelimiterStatus, Job, JobSettings, Limits, Operation, Pipeline,
-    Shuffle,
+use chopper::{
+    formula::{col, functions as f},
+    job::{
+        formula_functions, Column, DelimiterStatus, Job, JobSettings, Limits, Operation, Pipeline,
+        Shuffle,
+    },
 };
 use std::{error::Error, fs, path::Path};
 
@@ -81,6 +84,23 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     settings.output = "cli".into();
     Job::new(settings.clone()).save("recipes/cli.json")?;
+
+    fs::write("quantities.csv", "3\n7\n")?;
+    let mut calculated = JobSettings::for_files("quantities.csv", "calculated");
+    calculated.input_csv.headers = false;
+    calculated.output_csv.headers = false;
+    calculated.calculated_columns = vec![(f::number(col(0)) * 2).alias("double_quantity")];
+    let calculated = Job::new(calculated).run(None)?;
+    let chunks = calculated
+        .outputs(1024 * 1024)?
+        .collect::<Result<Vec<_>, _>>()?;
+    assert_eq!(chunks.len(), 1);
+    assert_eq!(
+        fs::read_to_string(Path::new("calculated").join(&chunks[0].path))?
+            .lines()
+            .collect::<Vec<_>>(),
+        ["3,6", "7,14"]
+    );
 
     settings.input = "too-many-members.zip".into();
     settings.output = "denied".into();

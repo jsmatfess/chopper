@@ -9,6 +9,8 @@ mod csv_intake;
 mod digest;
 pub mod engine;
 #[cfg(not(target_os = "wasi"))]
+pub mod formula;
+#[cfg(not(target_os = "wasi"))]
 pub mod job;
 pub mod output;
 pub mod profile;

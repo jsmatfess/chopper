@@ -40,6 +40,14 @@ from `partition`, `assign`, `assign_probabilistic`, `shuffle`, `balanced`, or
 such as `0` to select a column by position. The allocation helpers accept ordered
 `{"name": ..., "percent": ...}` records and an optional `strata` sequence.
 
+Build calculated columns with `col` and the named helpers in `chopper_csv.functions`.
+Use `from chopper_csv import col, functions as f`, then pass
+`calculated_columns={"country_label": f.upper(f.trim(col("country")))}` to
+`Job`. Use `col(0)` for the first field
+of a headerless CSV and `col("0")` for the exact header `0`. The
+[calculated column examples](https://github.com/jsmatfess/chopper/blob/main/docs/user/libraries.md#add-calculated-columns)
+show both forms and how to reuse existing formula text with `parse`.
+
 `validate` returns `None` on success. Analyze returns bounded statistics and
 advisory estimates. Run reads the current input and returns `rows`, `columns`,
 `groups`, `output_files`, `output_csv_bytes`, and `manifest_path`. Job and

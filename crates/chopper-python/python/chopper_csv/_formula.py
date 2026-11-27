@@ -1,0 +1,128 @@
+"""Compose row formulas for calculated columns."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from math import isfinite
+from sys import maxsize
+
+from ._native import _validate_formula
+
+
+@dataclass(frozen=True, slots=True, init=False)
+class Expr:
+    """An immutable Chopper formula expression."""
+
+    _source: str
+
+    def __init__(self, source: str):
+        _validate_formula(source)
+        object.__setattr__(self, "_source", source)
+
+    @classmethod
+    def _from_source(cls, source: str) -> Expr:
+        # Composition uses known grammar. Job validation checks the entire formula.
+        expression = cls.__new__(cls)
+        object.__setattr__(expression, "_source", source)
+        return expression
+
+    def as_str(self) -> str:
+        """Return the expression's formula text."""
+        return self._source
+
+    def __str__(self) -> str:
+        return self._source
+
+    def __add__(self, other: ExprLike) -> Expr:
+        return _binary(self, "+", other)
+
+    def __radd__(self, other: ExprLike) -> Expr:
+        return _binary(other, "+", self)
+
+    def __sub__(self, other: ExprLike) -> Expr:
+        return _binary(self, "-", other)
+
+    def __rsub__(self, other: ExprLike) -> Expr:
+        return _binary(other, "-", self)
+
+    def __mul__(self, other: ExprLike) -> Expr:
+        return _binary(self, "*", other)
+
+    def __rmul__(self, other: ExprLike) -> Expr:
+        return _binary(other, "*", self)
+
+    def __truediv__(self, other: ExprLike) -> Expr:
+        return _binary(self, "/", other)
+
+    def __rtruediv__(self, other: ExprLike) -> Expr:
+        return _binary(other, "/", self)
+
+
+ExprLike = Expr | str | bool | int | float | None
+
+
+def col(column: str | int) -> Expr:
+    """Reference a column by exact header name or zero-based index."""
+    if isinstance(column, str):
+        name = str.replace(column, "]", "]]")
+        return Expr._from_source(f"[{name}]")
+    if isinstance(column, bool) or not isinstance(column, int):
+        raise TypeError("column must be a header name or an integer index")
+    index = int(column)
+    if not 0 <= index <= 2 * maxsize + 1:
+        raise ValueError("column index is outside the supported range")
+    return Expr._from_source(f"${index}")
+
+
+def lit(value: ExprLike) -> Expr:
+    """Make a text, numeric, Boolean or null literal, or return an existing expression."""
+    if isinstance(value, Expr):
+        return value
+    if isinstance(value, str):
+        text = str.replace(value, '"', '""')
+        return Expr._from_source(f'"{text}"')
+    if value is None:
+        return Expr._from_source("NULL")
+    if isinstance(value, bool):
+        return Expr._from_source("TRUE" if value else "FALSE")
+    if isinstance(value, (int, float)):
+        number = int(value) if isinstance(value, int) else float(value)
+        try:
+            finite = isfinite(number)
+        except OverflowError:
+            finite = False
+        if not finite:
+            raise ValueError("formula number must be finite")
+        return Expr._from_source(str(number))
+    raise TypeError("formula literals must be strings, numbers, Booleans or None")
+
+
+def parse(source: str) -> Expr:
+    """Check formula text and preserve its spelling for composition or reuse."""
+    return Expr(source)
+
+
+def _binary(left: ExprLike, operator: str, right: ExprLike) -> Expr:
+    return Expr._from_source(f"({lit(left)}) {operator} ({lit(right)})")
+
+
+class _Omitted:
+    __slots__ = ()
+
+    def __repr__(self) -> str:
+        return "<omitted>"
+
+
+_OMITTED = _Omitted()
+
+
+def _function(name: str, *args: ExprLike | _Omitted) -> Expr:
+    end = len(args)
+    while end and isinstance(args[end - 1], _Omitted):
+        end -= 1
+    expressions = []
+    for arg in args[:end]:
+        if isinstance(arg, _Omitted):
+            raise TypeError("supply earlier optional arguments before later ones")
+        expressions.append(lit(arg).as_str())
+    return Expr._from_source(f"{name}({', '.join(expressions)})")

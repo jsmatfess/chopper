@@ -1,7 +1,11 @@
 use chopper::job::{
     Error, ExecutionControl as Control, Job as RustJob, ManifestReader as RustManifestReader,
 };
-use pyo3::{create_exception, exceptions::PyException, prelude::*};
+use pyo3::{
+    create_exception,
+    exceptions::{PyException, PyValueError},
+    prelude::*,
+};
 use serde::Serialize;
 use std::path::PathBuf;
 
@@ -135,6 +139,13 @@ fn formula_functions() -> Vec<(&'static str, &'static str)> {
     chopper::job::formula_functions().to_vec()
 }
 
+#[pyfunction]
+fn _validate_formula(source: &str) -> PyResult<()> {
+    chopper::formula::parse(source)
+        .map(|_| ())
+        .map_err(|error| PyValueError::new_err(error.to_string()))
+}
+
 #[pyclass(name = "ManifestReader", module = "chopper_csv")]
 /// Stream metadata from one published native result manifest.
 struct ManifestReader {
@@ -200,5 +211,6 @@ fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add_class::<ManifestReader>()?;
     module.add_function(wrap_pyfunction!(formula_functions, module)?)?;
     module.add_function(wrap_pyfunction!(open_manifest, module)?)?;
+    module.add_function(wrap_pyfunction!(_validate_formula, module)?)?;
     module.add_class::<NativeJob>()
 }

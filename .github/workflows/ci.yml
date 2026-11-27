@@ -240,6 +240,8 @@ jobs:
         if: ${{ !env.ACT || runner.os == 'Linux' }}
       - name: Check standalone Python extension
         run: cargo check --locked --all-targets --manifest-path crates/chopper-python/Cargo.toml --target-dir target/python-check
+      - name: Check generated Rust and Python formula bindings
+        run: python scripts/generate-formula-bindings.py --check
       - run: python -m compileall -q crates/chopper-python/python crates/chopper-python/tests
       - run: python scripts/test-package-release.py
       - run: python scripts/test-publish-library-release.py
