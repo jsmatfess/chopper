@@ -1,0 +1,19 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -43,5 +43,3 @@
+-  "    const source = await (await navigator.storage.getDirectory()).getFileHandle('fixture.csv', {create:true});",
+-  "    const response = await fetch('/input.csv');",
+-  "    check(response.ok, 'Fixture fetch failed');",
+-  '    await response.body!.pipeTo(await source.createWritable());',
+-  '    (window as any).fixtureFile = await source.getFile();',
++  "    const selected = document.querySelector<HTMLInputElement>('#benchmark-file')?.files?.[0];",
++  "    check(selected && selected.size > 0, 'Disk File selection failed');",
++  '    (window as any).fixtureFile = selected;',
+@@ -92 +90 @@
+-      res.end('<!doctype html><main class="editor"></main><script src="/driver.js"></script>');
++      res.end('<!doctype html><input id="benchmark-file" type="file"><main class="editor"></main><script src="/driver.js"></script>');
+@@ -267 +265 @@
+-    source_and_destination:'OPFS on WSL ext4 with warm uncontrolled caches',
++    source_and_destination:'Local disk File selection on WSL ext4; OPFS workspace and destination, warm uncontrolled caches',
+@@ -281,0 +280 @@
++    await page.locator('#benchmark-file').setInputFiles(fixturePath);

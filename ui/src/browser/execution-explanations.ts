@@ -115,7 +115,14 @@ const mergePass: Explanation = ({kind, sortOrder}) => [
   `Each active chunk needs a reader and a next-row candidate. Chopper merges batches into temporary chunks to bound how many readers are open. ${kind === 'hierarchical_merge' ? 'A higher-level pass can combine chunks from earlier merges. ' : ''}The row visits count describes work in these passes, including a row each time a pass reads it.`,
 ];
 
-const balanced: Explanation = ({kind, parts}) => {
+const balanced: Explanation = ({kind, parts, step}) => {
+  if (kind === 'balanced_traversal' && step.operations?.length === 2) {
+    return [
+      'Chopper splits the incoming rows into consecutive groups, then splits each group again.',
+      'Chopper visits the retained rows once and fills the final parts in the order set by both Balanced operations.',
+      'Each split gives the first few children of its parent one extra row when needed. The traversal preserves both sets of boundaries and counts the final groups it emits.',
+    ];
+  }
   const stream = kind === 'fused_balanced' ? 'the shuffled stream' : 'the incoming rows';
   return [
     `Chopper splits ${stream} into ${parts}. It fills one part before starting the next, keeping their sizes as close as possible.`,

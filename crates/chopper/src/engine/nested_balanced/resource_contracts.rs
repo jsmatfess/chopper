@@ -3,6 +3,67 @@ use super::*;
 use crate::resources::{MemoryAdmission, MemoryPool};
 use std::sync::atomic::Ordering;
 
+#[cfg(all(target_os = "wasi", not(feature = "experimental-nested-balanced")))]
+fn hosted_guard(root: &std::path::Path) -> Result<()> {
+    const MIB: u64 = 1024 * 1024;
+    let mut job = Job {
+        operations: vec![
+            Operation::Balanced { files: 3 },
+            Operation::Balanced { files: 7 },
+        ],
+        resources: Resources {
+            memory_mb: 32.into(),
+            max_record_bytes: MIB as usize,
+            temp_dir: Some(root.to_string_lossy().into_owned()),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let pool = Arc::new(MemoryPool::new(32 * MIB));
+    let mut ctx = Context::with_memory_pool(
+        &job.resources,
+        Arc::new(AtomicBool::new(false)),
+        Arc::new(|_| {}),
+        pool.clone(),
+    )?;
+    ensure!(
+        !hosted_eligible(&job, &ctx, 256 * MIB, 21),
+        "Prepare selected fusion"
+    );
+    ctx.auto_run = true;
+    ensure!(
+        hosted_eligible(&job, &ctx, 256 * MIB, 21),
+        "Run declined fusion"
+    );
+    ensure!(
+        !hosted_eligible(&job, &ctx, 256 * MIB - 1, 21),
+        "small spool selected fusion"
+    );
+    ensure!(
+        !hosted_eligible(&job, &ctx, 256 * MIB, 20),
+        "invalid leaf count selected fusion"
+    );
+    job.operations.push(Operation::Balanced { files: 2 });
+    ensure!(
+        !hosted_eligible(&job, &ctx, 256 * MIB, 42),
+        "three steps selected fusion"
+    );
+    job.operations.pop();
+    let mut peer = Reservation::for_workspace(Arc::new(Workspace::shared(32 * MIB as usize, pool)));
+    let held = ctx.working_headroom() - 12 * MIB;
+    peer.resize(held as usize)?;
+    ensure!(
+        hosted_eligible(&job, &ctx, 256 * MIB, 21),
+        "exact headroom declined fusion"
+    );
+    peer.resize(held as usize + 1)?;
+    ensure!(
+        !hosted_eligible(&job, &ctx, 256 * MIB, 21),
+        "insufficient headroom selected fusion"
+    );
+    Ok(())
+}
+
 fn parent(data: &Dataset) -> Result<ChargedJson<Group>> {
     data.groups()?.next().context("missing nested parent")?
 }
@@ -264,7 +325,7 @@ pub(in crate::engine) fn run() -> Result<serde_json::Value> {
             ends: 0,
         };
         let mut stats = Stages::new(operations.len(), Reservation::new(&ctx))?;
-        let result = emit(&source, &operations, 1, &ctx, &mut sink, &mut stats);
+        let result = emit(&source, &operations, 1, &ctx, &mut sink, &mut stats, None);
         ensure!(
             result.is_ok() == (mode == "success"),
             "nested {mode}: {result:?}"
@@ -296,6 +357,8 @@ pub(in crate::engine) fn run() -> Result<serde_json::Value> {
         );
         outcomes.push(json!({"mode":mode,"baseline_restored":true}));
     }
+    #[cfg(all(target_os = "wasi", not(feature = "experimental-nested-balanced")))]
+    hosted_guard(&root)?;
     drop(source);
     ensure!(
         ctx.used() == 0 && pool.usage().reserved_bytes == ctx.directory_reserved_bytes(),

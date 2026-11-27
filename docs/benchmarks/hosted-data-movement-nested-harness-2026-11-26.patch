@@ -1,0 +1,5 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -300 +300 @@
+-        const physical=observed.physical.map(({kind,operations,status,rows,runs,seconds})=>({kind,operations,status,rows,runs,seconds}));
++        const physical=observed.physical.map(({kind,operations,status,rows,runs,seconds,groups,sources})=>({kind,operations,status,rows,runs,seconds,groups,sources}));

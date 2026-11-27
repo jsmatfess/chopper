@@ -1,5 +1,9 @@
 //! Traverse the original nested ranges, retaining each logical rounding boundary.
 use super::*;
+use crate::observation::{
+    physical::{error_status, AllocationCounts, Attempt, MAX_MEMBERSHIPS},
+    Status,
+};
 
 /// The decoded tree and its extra traversal capacity drop before either grant.
 struct Parent {
@@ -115,6 +119,11 @@ fn finish(stats: &mut [StageStats], stages: &mut Stages) -> Result<()> {
     Ok(())
 }
 
+#[cfg(any(
+    feature = "experimental-nested-balanced",
+    test,
+    feature = "resource-contract-tests"
+))]
 pub(super) fn shared(
     data: &Dataset,
     operations: &[Operation],
@@ -158,32 +167,104 @@ pub(super) fn emit(
     ctx: &Context,
     output: &mut impl RowSink,
     stages: &mut Stages,
+    mut observation: Option<Attempt>,
 ) -> Result<()> {
     let mut stats = statistics(step);
-    for parent in data.groups()? {
-        let mut parent = Parent::new(parent?, operations.len(), Reservation::new(ctx))?;
-        let parent = parent.value.value_mut();
-        let mut rows = data.rows(parent, ctx.max_record)?;
-        let mut previous = None;
-        walk(parent, operations, step, &mut stats, ctx, &mut |group| {
-            let mut owned =
-                group_metadata::ClonedGroup::begin(group, output, Reservation::new(ctx))?;
-            let result = &mut owned.group;
-            result.exact = true;
-            for _ in 0..group.rows {
+    let mut counts = AllocationCounts::default();
+    let result = (|| {
+        for parent in data.groups()? {
+            let mut parent = Parent::new(parent?, operations.len(), Reservation::new(ctx))?;
+            let parent = parent.value.value_mut();
+            let mut rows = data.rows(parent, ctx.max_record)?;
+            let mut previous = None;
+            walk(parent, operations, step, &mut stats, ctx, &mut |group| {
+                let mut owned =
+                    group_metadata::ClonedGroup::begin(group, output, Reservation::new(ctx))?;
+                let result = &mut owned.group;
+                result.exact = true;
+                for _ in 0..group.rows {
+                    ctx.check()?;
+                    let row = rows
+                        .next_packed(previous.take())?
+                        .context("missing balanced row")?;
+                    output.packed_row_ref(result, &row)?;
+                    previous = Some(row);
+                    if let Some(attempt) = &mut observation {
+                        counts.rows += 1;
+                        attempt.rows_processed(counts.rows);
+                    }
+                }
                 ctx.check()?;
-                let row = rows
-                    .next_packed(previous.take())?
-                    .context("missing balanced row")?;
-                output.packed_row_ref(result, &row)?;
-                previous = Some(row);
-            }
-            ctx.check()?;
-            owned.finish(output)
-        })?;
+                owned.finish(output)?;
+                if let Some(attempt) = &mut observation {
+                    if counts.len < MAX_MEMBERSHIPS {
+                        counts.memberships[counts.len] = group.rows;
+                        counts.len += 1;
+                    }
+                    counts.groups += 1;
+                    attempt.groups_processed(counts.groups, 0);
+                }
+                Ok(())
+            })?;
+        }
+        finish(&mut stats[..operations.len()], stages)
+    })();
+    if let Some(attempt) = observation {
+        let status = result
+            .as_ref()
+            .err()
+            .map_or(Status::Completed, error_status);
+        attempt.allocation(status, counts);
     }
-    finish(&mut stats[..operations.len()], stages)?;
-    Ok(())
+    result
+}
+
+#[cfg(all(target_os = "wasi", not(feature = "experimental-nested-balanced")))]
+pub(super) fn hosted_eligible(job: &Job, ctx: &Context, retained_bytes: u64, rows: u64) -> bool {
+    const MIB: u64 = 1024 * 1024;
+    let [Operation::Balanced { files: outer }, Operation::Balanced { files: inner }] =
+        job.operations.as_slice()
+    else {
+        return false;
+    };
+    if !ctx.auto_run
+        || retained_bytes < 256 * MIB
+        || !job.calculated_columns.is_empty()
+        || job.compression != chopper_core::Compression::None
+        || job.resources.grouping != chopper_core::Grouping::Auto
+        || !job.output_csv.encoding.eq_ignore_ascii_case("utf-8")
+        || outer
+            .checked_mul(*inner)
+            .is_none_or(|leaves| leaves > rows.min(ctx.max_files))
+    {
+        return false;
+    }
+    // Leave room for packed decoding, CSV encoding, and the two-level lineage.
+    ctx.pressure_boundary();
+    ctx.working_headroom() >= 4 * ctx.max_record as u64 + 8 * MIB
+}
+
+#[cfg(all(target_os = "wasi", not(feature = "experimental-nested-balanced")))]
+pub(super) fn emit_hosted(
+    data: &Dataset,
+    operations: &[Operation],
+    ctx: &Context,
+    output: &mut impl RowSink,
+    stages: &mut Stages,
+) -> Result<()> {
+    use crate::observation::physical::Kind;
+    let mut scope = ctx.physical_scope([1, 2]);
+    scope.physical_source = data.physical_source;
+    output.physical_input(scope.physical_identity(Kind::BalancedTraversal));
+    emit(
+        data,
+        operations,
+        0,
+        &scope,
+        output,
+        stages,
+        scope.physical_attempt(Kind::BalancedTraversal),
+    )
 }
 
 #[cfg(any(test, feature = "resource-contract-tests"))]
@@ -255,7 +336,7 @@ mod tests {
             );
             let mut writer = DatasetWriter::new(&ctx)?;
             stats = Stages::new(operations.len(), Reservation::new(&ctx))?;
-            emit(&parent, &operations, 1, &ctx, &mut writer, &mut stats)?;
+            emit(&parent, &operations, 1, &ctx, &mut writer, &mut stats, None)?;
             let emitted = writer.finish()?;
             assert_eq!(snapshot(&emitted, &ctx)?, snapshot(&serial, &ctx)?);
             assert_eq!(

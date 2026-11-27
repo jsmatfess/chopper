@@ -40,7 +40,7 @@ pub(crate) use job_owner::capacity as job_capacity;
 pub use job_owner::PreparedJob;
 use job_owner::RunJob;
 mod keys;
-#[cfg(feature = "experimental-nested-balanced")]
+#[cfg(any(target_os = "wasi", feature = "experimental-nested-balanced"))]
 mod nested_balanced;
 #[cfg(feature = "experimental-partition-balanced")]
 mod partition_balanced;
@@ -842,6 +842,26 @@ fn process_using(
                 continue;
             }
         }
+        #[cfg(all(target_os = "wasi", not(feature = "experimental-nested-balanced")))]
+        if index == 0
+            && dataset.groups == 1
+            && nested_balanced::hosted_eligible(&job, &ctx, dataset.data.len(), analysis.rows)
+        {
+            ctx.event("Preparing nested balanced ranges", 0)?;
+            let mut writer = output::PlanWriter::new(&job, analysis.header.as_deref(), &ctx)?;
+            nested_balanced::emit_hosted(
+                &dataset,
+                &job.operations,
+                &ctx,
+                &mut writer,
+                &mut analysis.stages,
+            )
+            .context("preparing operation 2")?;
+            analysis.groups = writer.groups;
+            final_plan = Some(writer.finish()?);
+            index = job.operations.len();
+            continue;
+        }
         #[cfg(feature = "experimental-nested-balanced")]
         {
             let count = job.operations[index..]
@@ -860,6 +880,7 @@ fn process_using(
                         &ctx,
                         &mut writer,
                         &mut analysis.stages,
+                        None,
                     )?;
                     analysis.groups = writer.groups;
                     final_plan = Some(writer.finish()?);
@@ -2038,7 +2059,7 @@ fn ingest_records(
                 // One UTF-8 delimiter or terminator byte per field is a lower
                 // bound. Quoting, headers, and CRLF can only add output bytes.
                 let hosted_buffer = if cfg!(target_os = "wasi") {
-                    run_route::hosted_partition_shuffle_buffer(
+                    run_route::hosted_terminal_shuffle_buffer(
                         job,
                         ctx,
                         total_record_bytes.saturating_add(rows.saturating_mul(width as u64)),
@@ -2128,7 +2149,18 @@ fn ingest_records(
             group_count = stats.output_groups;
             stages.push(stats)?;
         } else if consumed == job.operations.len() {
-            let mut plan = if ctx.direct_terminal_output {
+            let hosted_buffer = if cfg!(target_os = "wasi") {
+                run_route::hosted_terminal_shuffle_buffer(
+                    job,
+                    ctx,
+                    total_record_bytes.saturating_add(rows.saturating_mul(width as u64)),
+                )
+            } else {
+                None
+            };
+            let mut plan = if let Some(buffer) = hosted_buffer {
+                output::PlanWriter::direct_grouped_buffered(job, header.as_ref(), ctx, buffer)?
+            } else if ctx.direct_terminal_output {
                 output::PlanWriter::direct_grouped(job, header.as_ref(), ctx)?
             } else {
                 output::PlanWriter::new(job, header.as_deref(), ctx)?
@@ -2142,7 +2174,7 @@ fn ingest_records(
                 ctx,
                 crate::observation::physical::Kind::ResidentSort,
             )?;
-            if ctx.direct_terminal_output {
+            if hosted_buffer.is_some() || ctx.direct_terminal_output {
                 terminal_publication = Some(plan.finish_direct()?);
             } else {
                 final_plan = Some(plan.finish()?);

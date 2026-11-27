@@ -1,0 +1,244 @@
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -43 +43 @@
+-#[cfg(feature = "experimental-nested-balanced")]
++#[cfg(any(target_os = "wasi", feature = "experimental-nested-balanced"))]
+@@ -844,0 +845,20 @@
++        #[cfg(all(target_os = "wasi", not(feature = "experimental-nested-balanced")))]
++        if index == 0
++            && dataset.groups == 1
++            && nested_balanced::hosted_eligible(&job, &ctx, dataset.data.len(), analysis.rows)
++        {
++            ctx.event("Preparing nested balanced ranges", 0)?;
++            let mut writer = output::PlanWriter::new(&job, analysis.header.as_deref(), &ctx)?;
++            nested_balanced::emit_hosted(
++                &dataset,
++                &job.operations,
++                &ctx,
++                &mut writer,
++                &mut analysis.stages,
++            )
++            .context("preparing operation 2")?;
++            analysis.groups = writer.groups;
++            final_plan = Some(writer.finish()?);
++            index = job.operations.len();
++            continue;
++        }
+@@ -862,0 +883 @@
++                        None,
+--- a/crates/chopper/src/engine/nested_balanced.rs
++++ b/crates/chopper/src/engine/nested_balanced.rs
+@@ -2,0 +3,4 @@
++use crate::observation::{
++    physical::{error_status, AllocationCounts, Attempt, MAX_MEMBERSHIPS},
++    Status,
++};
+@@ -117,0 +122,5 @@
++#[cfg(any(
++    feature = "experimental-nested-balanced",
++    test,
++    feature = "resource-contract-tests"
++))]
+@@ -160,0 +170 @@
++    mut observation: Option<Attempt>,
+@@ -163,11 +173,24 @@
+-    for parent in data.groups()? {
+-        let mut parent = Parent::new(parent?, operations.len(), Reservation::new(ctx))?;
+-        let parent = parent.value.value_mut();
+-        let mut rows = data.rows(parent, ctx.max_record)?;
+-        let mut previous = None;
+-        walk(parent, operations, step, &mut stats, ctx, &mut |group| {
+-            let mut owned =
+-                group_metadata::ClonedGroup::begin(group, output, Reservation::new(ctx))?;
+-            let result = &mut owned.group;
+-            result.exact = true;
+-            for _ in 0..group.rows {
++    let mut counts = AllocationCounts::default();
++    let result = (|| {
++        for parent in data.groups()? {
++            let mut parent = Parent::new(parent?, operations.len(), Reservation::new(ctx))?;
++            let parent = parent.value.value_mut();
++            let mut rows = data.rows(parent, ctx.max_record)?;
++            let mut previous = None;
++            walk(parent, operations, step, &mut stats, ctx, &mut |group| {
++                let mut owned =
++                    group_metadata::ClonedGroup::begin(group, output, Reservation::new(ctx))?;
++                let result = &mut owned.group;
++                result.exact = true;
++                for _ in 0..group.rows {
++                    ctx.check()?;
++                    let row = rows
++                        .next_packed(previous.take())?
++                        .context("missing balanced row")?;
++                    output.packed_row_ref(result, &row)?;
++                    previous = Some(row);
++                    if let Some(attempt) = &mut observation {
++                        counts.rows += 1;
++                        attempt.rows_processed(counts.rows);
++                    }
++                }
+@@ -175,9 +198,20 @@
+-                let row = rows
+-                    .next_packed(previous.take())?
+-                    .context("missing balanced row")?;
+-                output.packed_row_ref(result, &row)?;
+-                previous = Some(row);
+-            }
+-            ctx.check()?;
+-            owned.finish(output)
+-        })?;
++                owned.finish(output)?;
++                if let Some(attempt) = &mut observation {
++                    if counts.len < MAX_MEMBERSHIPS {
++                        counts.memberships[counts.len] = group.rows;
++                        counts.len += 1;
++                    }
++                    counts.groups += 1;
++                    attempt.groups_processed(counts.groups, 0);
++                }
++                Ok(())
++            })?;
++        }
++        finish(&mut stats[..operations.len()], stages)
++    })();
++    if let Some(attempt) = observation {
++        let status = result
++            .as_ref()
++            .err()
++            .map_or(Status::Completed, error_status);
++        attempt.allocation(status, counts);
+@@ -185,2 +219,49 @@
+-    finish(&mut stats[..operations.len()], stages)?;
+-    Ok(())
++    result
++}
++
++#[cfg(all(target_os = "wasi", not(feature = "experimental-nested-balanced")))]
++pub(super) fn hosted_eligible(job: &Job, ctx: &Context, retained_bytes: u64, rows: u64) -> bool {
++    const MIB: u64 = 1024 * 1024;
++    let [Operation::Balanced { files: outer }, Operation::Balanced { files: inner }] =
++        job.operations.as_slice()
++    else {
++        return false;
++    };
++    if !ctx.auto_run
++        || retained_bytes < 256 * MIB
++        || !job.calculated_columns.is_empty()
++        || job.compression != chopper_core::Compression::None
++        || job.resources.grouping != chopper_core::Grouping::Auto
++        || !job.output_csv.encoding.eq_ignore_ascii_case("utf-8")
++        || outer
++            .checked_mul(*inner)
++            .is_none_or(|leaves| leaves > rows.min(ctx.max_files))
++    {
++        return false;
++    }
++    // Leave room for packed decoding, CSV encoding, and the two-level lineage.
++    ctx.pressure_boundary();
++    ctx.working_headroom() >= 4 * ctx.max_record as u64 + 8 * MIB
++}
++
++#[cfg(all(target_os = "wasi", not(feature = "experimental-nested-balanced")))]
++pub(super) fn emit_hosted(
++    data: &Dataset,
++    operations: &[Operation],
++    ctx: &Context,
++    output: &mut impl RowSink,
++    stages: &mut Stages,
++) -> Result<()> {
++    use crate::observation::physical::Kind;
++    let mut scope = ctx.physical_scope([1, 2]);
++    scope.physical_source = data.physical_source;
++    output.physical_input(scope.physical_identity(Kind::BalancedTraversal));
++    emit(
++        data,
++        operations,
++        0,
++        &scope,
++        output,
++        stages,
++        scope.physical_attempt(Kind::BalancedTraversal),
++    )
+@@ -258 +339 @@
+-            emit(&parent, &operations, 1, &ctx, &mut writer, &mut stats)?;
++            emit(&parent, &operations, 1, &ctx, &mut writer, &mut stats, None)?;
+--- a/crates/chopper/src/engine/resource_contracts.rs
++++ b/crates/chopper/src/engine/resource_contracts.rs
+@@ -269 +269 @@
+-    #[cfg(feature = "experimental-nested-balanced")]
++    #[cfg(any(target_os = "wasi", feature = "experimental-nested-balanced"))]
+--- a/crates/chopper/src/engine/nested_balanced/resource_contracts.rs
++++ b/crates/chopper/src/engine/nested_balanced/resource_contracts.rs
+@@ -5,0 +6,61 @@
++#[cfg(all(target_os = "wasi", not(feature = "experimental-nested-balanced")))]
++fn hosted_guard(root: &std::path::Path) -> Result<()> {
++    const MIB: u64 = 1024 * 1024;
++    let mut job = Job {
++        operations: vec![
++            Operation::Balanced { files: 3 },
++            Operation::Balanced { files: 7 },
++        ],
++        resources: Resources {
++            memory_mb: 32.into(),
++            max_record_bytes: MIB as usize,
++            temp_dir: Some(root.to_string_lossy().into_owned()),
++            ..Default::default()
++        },
++        ..Default::default()
++    };
++    let pool = Arc::new(MemoryPool::new(32 * MIB));
++    let mut ctx = Context::with_memory_pool(
++        &job.resources,
++        Arc::new(AtomicBool::new(false)),
++        Arc::new(|_| {}),
++        pool.clone(),
++    )?;
++    ensure!(
++        !hosted_eligible(&job, &ctx, 256 * MIB, 21),
++        "Prepare selected fusion"
++    );
++    ctx.auto_run = true;
++    ensure!(
++        hosted_eligible(&job, &ctx, 256 * MIB, 21),
++        "Run declined fusion"
++    );
++    ensure!(
++        !hosted_eligible(&job, &ctx, 256 * MIB - 1, 21),
++        "small spool selected fusion"
++    );
++    ensure!(
++        !hosted_eligible(&job, &ctx, 256 * MIB, 20),
++        "invalid leaf count selected fusion"
++    );
++    job.operations.push(Operation::Balanced { files: 2 });
++    ensure!(
++        !hosted_eligible(&job, &ctx, 256 * MIB, 42),
++        "three steps selected fusion"
++    );
++    job.operations.pop();
++    let mut peer = Reservation::for_workspace(Arc::new(Workspace::shared(32 * MIB as usize, pool)));
++    let held = ctx.working_headroom() - 12 * MIB;
++    peer.resize(held as usize)?;
++    ensure!(
++        hosted_eligible(&job, &ctx, 256 * MIB, 21),
++        "exact headroom declined fusion"
++    );
++    peer.resize(held as usize + 1)?;
++    ensure!(
++        !hosted_eligible(&job, &ctx, 256 * MIB, 21),
++        "insufficient headroom selected fusion"
++    );
++    Ok(())
++}
++
+@@ -267 +328 @@
+-        let result = emit(&source, &operations, 1, &ctx, &mut sink, &mut stats);
++        let result = emit(&source, &operations, 1, &ctx, &mut sink, &mut stats, None);
+@@ -298,0 +360,2 @@
++    #[cfg(all(target_os = "wasi", not(feature = "experimental-nested-balanced")))]
++    hosted_guard(&root)?;
+--- a/crates/chopper/src/storage/json_lines.rs
++++ b/crates/chopper/src/storage/json_lines.rs
+@@ -80 +80 @@
+-    #[cfg(feature = "experimental-nested-balanced")]
++    #[cfg(any(target_os = "wasi", feature = "experimental-nested-balanced"))]

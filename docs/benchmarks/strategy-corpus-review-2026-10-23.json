@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "15f3a44df8796d680ddd7119ab2e6717810b14df2e6686caa52a9a486739c8bf",
+  "analysis_script_sha256": "0d3ef7ba31ba1edb91b5029871c055ab8d295899bd1c827fcc4f291560bf0a3b",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "54bd0c55836cb6f987197d961f0ce9e63bf117615a6de49402330fd0db5e0edf"
+    "sha256": "82ad5779db4ade75f0a31994496f8841df0723fb32dcc277f4ee60c6d7a380e6"
   },
   "families": [
     "adaptive-routing",
@@ -5117,6 +5117,43 @@
       "narrative": {
         "path": "docs/performance/investigations/hosted-opfs-write-size-lookup-2026-11-26.md",
         "sha256": "304e0eaa0df8ba1532598dfc3a15bb5a3be9a1d6b49041820a7f1b3e6a53bbac",
+        "topic": "ownership-and-lifecycle"
+      },
+      "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Hosted data movement follow-ups (2026-11-26)",
+      "evidence": "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/guarded-hosted-partition-shuffle-harness-2026-11-26.mjs",
+        "docs/benchmarks/hosted-data-movement-disk-harness-2026-11-26.patch",
+        "docs/benchmarks/hosted-data-movement-fault-harness-2026-11-26.patch",
+        "docs/benchmarks/hosted-data-movement-fault-verifier-2026-11-26.py",
+        "docs/benchmarks/hosted-data-movement-harness-2026-11-26.patch",
+        "docs/benchmarks/hosted-data-movement-nested-harness-2026-11-26.patch",
+        "docs/benchmarks/hosted-data-movement-nested-observation-verifier-2026-11-26.py",
+        "docs/benchmarks/hosted-data-movement-nested-screen-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-data-movement-nested-selector-decline-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-data-movement-nested-selector-engine-2026-11-26.patch",
+        "docs/benchmarks/hosted-data-movement-nested-selector-faults-retired-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-data-movement-nested-selector-holdout-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-data-movement-pair-verifier-2026-11-26.py",
+        "docs/benchmarks/hosted-data-movement-prefetch-disk-holdout-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-data-movement-prefetch-faults-retired-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-data-movement-prefetch-holdout-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-data-movement-prefetch-screen-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-data-movement-prefetch-worker-2026-11-26.patch",
+        "docs/benchmarks/hosted-data-movement-shuffle-balanced-engine-2026-11-26.patch",
+        "docs/benchmarks/hosted-data-movement-shuffle-balanced-faults-retired-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-data-movement-shuffle-balanced-holdout-2026-11-26.jsonl",
+        "docs/benchmarks/hosted-data-movement-shuffle-balanced-screen-2026-11-26.jsonl"
+      ],
+      "scripts": [
+        "scripts/build-browser.mjs"
+      ],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-data-movement-follow-ups-2026-11-26.md",
+        "sha256": "386c2882fb6c6f61b377ec683f94df6913df4fe5e033edcfb28386544cb65985",
         "topic": "ownership-and-lifecycle"
       },
       "family": "ownership-and-lifecycle"
@@ -26304,7 +26341,8 @@
       "evidence": [
         "docs/performance.md#guarded-hosted-partition-shuffle-publication-2026-11-26",
         "docs/performance.md#hosted-shuffle-then-partition-buffered-output-2026-11-26",
-        "docs/performance.md#hosted-opfs-write-size-lookup-2026-11-26"
+        "docs/performance.md#hosted-opfs-write-size-lookup-2026-11-26",
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
       ],
       "families": [
         "ownership-and-lifecycle"
@@ -26894,6 +26932,987 @@
           },
           "last": {
             "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-disk-harness-2026-11-26.patch",
+      "sha256": "e48f21fa5414a244bb6df63e4b267f92eb373112b91fef3d56ea5c1076201fd8",
+      "bytes": 1198,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-fault-harness-2026-11-26.patch",
+      "sha256": "a6ba21360d5f128422bd21f3932dab7ac03d5902a0172d41b7f1030858f81cee",
+      "bytes": 5518,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-fault-verifier-2026-11-26.py",
+      "sha256": "0dd99f6f1a9feef8dbfcf9524a2aaf2fdaa376d471522d4db4a1d689b4b481d4",
+      "bytes": 1214,
+      "format": "py",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-harness-2026-11-26.patch",
+      "sha256": "d7ca2912d09b494a599b846c88b89943923dc6f9db10903d596ca73de8517514",
+      "bytes": 6763,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-nested-harness-2026-11-26.patch",
+      "sha256": "1ef56f0a7b9eba2555375583eb229770c834426bdf375f776b04ca63875b118f",
+      "bytes": 360,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-nested-observation-verifier-2026-11-26.py",
+      "sha256": "c34adf853299ebbc8707f27325069b541828f9ceab0ae6ffa7ab82b6625cf753",
+      "bytes": 1383,
+      "format": "py",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-nested-screen-2026-11-26.jsonl",
+      "sha256": "5afd0c93adf81879ae42c3824477a28586542caaf8e3ed453f0bae721d0c300f",
+      "bytes": 24075,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 10
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "fewer_scans",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "min_saved",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shape",
+        "sort",
+        "source_and_destination",
+        "splits",
+        "stages",
+        "storage",
+        "variant",
+        "warmup",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 10
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-nested-selector-decline-2026-11-26.jsonl",
+      "sha256": "467d08ed5972c0c1a573427a3ec5c98d8af950ad97f5d81b51dd955f46f22481",
+      "bytes": 49082,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 19
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shape",
+        "sort",
+        "source_and_destination",
+        "splits",
+        "stages",
+        "storage",
+        "variant",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 19
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-nested-selector-engine-2026-11-26.patch",
+      "sha256": "f10b8ce1913c137f3a8257dea09dcc441a741c1e7bff0eee54c899448f235f3d",
+      "bytes": 9361,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-nested-selector-faults-retired-2026-11-26.jsonl",
+      "sha256": "6855c45b707d4e38fac1ea99918e7f10de1a81271e418057459801b1d8e5e483",
+      "bytes": 6694,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 9
+      },
+      "fields": [
+        "assets",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "entries",
+        "error",
+        "executable_sha256",
+        "failure",
+        "fault",
+        "job",
+        "keys",
+        "kind",
+        "maxFiles",
+        "memory",
+        "memory_bytes",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "reached",
+        "rows",
+        "scope",
+        "script_sha256",
+        "sha256",
+        "shape",
+        "source_and_destination",
+        "splits",
+        "status",
+        "storage",
+        "variant",
+        "variants",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 9
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-nested-selector-holdout-2026-11-26.jsonl",
+      "sha256": "87d369abeb968d1253ea188acc9bb6108c0f74c2b7969454935c1d638aa5cbd7",
+      "bytes": 53854,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 22
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "fewer_scans",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "min_saved",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shape",
+        "sort",
+        "source_and_destination",
+        "splits",
+        "stages",
+        "storage",
+        "variant",
+        "warmup",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 22
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-pair-verifier-2026-11-26.py",
+      "sha256": "d8879021f88273062966fb4a523184424185f33e3ec4e9e25dc496346d1e4fed",
+      "bytes": 4335,
+      "format": "py",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-prefetch-disk-holdout-2026-11-26.jsonl",
+      "sha256": "ecacb4e35a6467bbf2b43b48e9d542665d90641f0c26033e14d1962174a5701d",
+      "bytes": 22041,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 10
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "min_runs",
+        "min_saved",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "prefetch",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shape",
+        "sort",
+        "source_and_destination",
+        "stages",
+        "storage",
+        "variant",
+        "warmup",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 10
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-prefetch-faults-retired-2026-11-26.jsonl",
+      "sha256": "4e6cb57534a032fed16db12b545460d02ee8c83c9c3efa05ffda7754b9b85ba5",
+      "bytes": 7259,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 7
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "entries",
+        "error",
+        "executable_sha256",
+        "failure",
+        "fault",
+        "job",
+        "keys",
+        "kind",
+        "malformed",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "name",
+        "node",
+        "opened",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "reached",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shape",
+        "sort",
+        "source_and_destination",
+        "stages",
+        "status",
+        "storage",
+        "variant",
+        "variants",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 7
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-prefetch-holdout-2026-11-26.jsonl",
+      "sha256": "6283390772581c02cfd77e7f862addb01ad590a9de8d70d83428517a6a53409b",
+      "bytes": 42789,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 20
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "min_runs",
+        "min_saved",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "prefetch",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shape",
+        "sort",
+        "source_and_destination",
+        "stages",
+        "storage",
+        "variant",
+        "warmup",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 20
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-prefetch-screen-2026-11-26.jsonl",
+      "sha256": "c9c73cc11f23da62e64f0f84c17caa7c87908178e7e1716a629b206e623b1cc7",
+      "bytes": 40194,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 19
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "min_runs",
+        "min_saved",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "prefetch",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shape",
+        "sort",
+        "source_and_destination",
+        "stages",
+        "storage",
+        "variant",
+        "warmup",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 19
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-prefetch-worker-2026-11-26.patch",
+      "sha256": "0a177ede91a062464c2f16005b2711a4054145b65ce2a78ec02da57e8cf91823",
+      "bytes": 417,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-shuffle-balanced-engine-2026-11-26.patch",
+      "sha256": "c33cab2593bf4ac712a56643a7b4751aaf15caa778dd62ac804940a8f29f907b",
+      "bytes": 1733,
+      "format": "patch",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-shuffle-balanced-faults-retired-2026-11-26.jsonl",
+      "sha256": "1cc9fe59797b53f41545ba835748eefa5dfb056566efd046a8d7388703fe8a9c",
+      "bytes": 19153,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 22
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "entries",
+        "error",
+        "executable_sha256",
+        "expect",
+        "failure",
+        "fault",
+        "job",
+        "keys",
+        "kind",
+        "malformed",
+        "marker",
+        "maxFiles",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "name",
+        "node",
+        "opened",
+        "os",
+        "pair",
+        "pairs",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "reached",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shape",
+        "sort",
+        "source_and_destination",
+        "splits",
+        "stages",
+        "status",
+        "storage",
+        "tempBytes",
+        "variant",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 22
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-shuffle-balanced-holdout-2026-11-26.jsonl",
+      "sha256": "f596f6268bc46417722c62a63d782df939f58eda34afaeadcfa7f134ee91a4a6",
+      "bytes": 44638,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 20
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "expect",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "min_runs",
+        "min_saved",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "pass_removed",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shape",
+        "shuffle",
+        "sort",
+        "source_and_destination",
+        "splits",
+        "stages",
+        "storage",
+        "variant",
+        "warmup",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 20
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-shuffle-balanced-screen-2026-11-26.jsonl",
+      "sha256": "1ae59a9a0187c510c8fbc97b1de1257ff2edbc2fc18bfc2756beb0e5a5dbb55d",
+      "bytes": 42545,
+      "format": "jsonl",
+      "record_counts": {
+        "untyped": 19
+      },
+      "fields": [
+        "assets",
+        "bridge",
+        "browser",
+        "byteCap",
+        "bytes",
+        "cell",
+        "checks",
+        "config_sha256",
+        "cpu",
+        "cpus",
+        "effective_memory_bytes",
+        "executable_sha256",
+        "expect",
+        "job",
+        "keys",
+        "kind",
+        "marker",
+        "measurements",
+        "memory",
+        "memory_bytes",
+        "memory_plan",
+        "min_runs",
+        "min_saved",
+        "name",
+        "node",
+        "os",
+        "pair",
+        "pairs",
+        "pass_removed",
+        "peak_temp_bytes",
+        "physical",
+        "physical_plan",
+        "rows",
+        "scope",
+        "script_sha256",
+        "seconds",
+        "sha256",
+        "shape",
+        "sort",
+        "source_and_destination",
+        "splits",
+        "stages",
+        "storage",
+        "variant",
+        "warmup",
+        "widths"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "families": [
+        "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "line": 1
+          },
+          "last": {
+            "line": 19
           }
         }
       },

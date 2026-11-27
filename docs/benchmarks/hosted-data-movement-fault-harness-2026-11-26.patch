@@ -1,0 +1,110 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -57,0 +58,12 @@
++replaceDriver(
++  "if (state.status === 'failed' || state.error)",
++  "if (state.status === 'cancelled' || state.status === 'failed' || state.error)",
++);
++replaceDriver('  swarmCollect:', `  swarmInspect: async () => {
++    const entries = [];
++    for await (const [name] of (destination as any).entries()) entries.push(name);
++    return {entries, state: await api('state'), diagnostics: structuredClone(browserDiagnostics)};
++  },
++  swarmRetired: () => (browserDiagnostics.storage as any)?.workspace_bytes_after_cleanup === 0,
++  swarmCancel: () => api('cancel', {}),
++  swarmCollect:`);
+@@ -83 +95,38 @@
+-let active, input, capture;
++let active, input, capture, fault;
++const storageFault = `
++import '/storage-worker-original.js';
++const originalRead = Blob.prototype.arrayBuffer;
++const originalOpen = FileSystemFileHandle.prototype.createWritable;
++let reached = false, closed = 0;
++const live = new Set();
++Blob.prototype.arrayBuffer = async function(...args) {
++  if (!reached && MODE.startsWith('source-') && this.size === 256*1024) {
++    reached = true;
++    postMessage({faultReached:{mode:MODE, bytes:this.size}});
++    if (MODE === 'source-rejection') throw new Error('Injected speculative read failure');
++    await new Promise(()=>{});
++  }
++  return Reflect.apply(originalRead, this, args);
++};
++FileSystemFileHandle.prototype.createWritable = async function(...args) {
++  const stream = await Reflect.apply(originalOpen, this, args), name = this.name;
++  const write = stream.write.bind(stream), close = stream.close.bind(stream);
++  if (name === 'CHOPPER-COMPLETE.json') postMessage({markerOpened:{closed,live:[...live]}});
++  live.add(name);
++  stream.close = async () => {
++    await close();
++    live.delete(name);
++    if (name.endsWith('.csv')) closed++;
++  };
++  stream.write = async data => {
++    if (!reached && ((MODE === 'marker' && name === 'CHOPPER-COMPLETE.json')
++      || (['write','cancel'].includes(MODE) && name.endsWith('.csv') && closed > 0))) {
++      reached = true;
++      postMessage({faultReached:{mode:MODE,name,closed}});
++      if (MODE === 'cancel') await new Promise(resolve => setTimeout(resolve, 500));
++      else throw new Error('Injected '+MODE+' write failure');
++    }
++    return write(data);
++  };
++  return stream;
++};`;
+@@ -101,0 +151,6 @@
++    } else if (path === 'storage-worker.js' && fault) {
++      res.setHeader('Content-Type','application/javascript');
++      res.end('const MODE = '+JSON.stringify(fault)+';\n'+storageFault);
++    } else if (path === 'storage-worker-original.js') {
++      res.setHeader('Content-Type','application/javascript');
++      res.end(assets.get('storage-worker.js'));
+@@ -260,0 +316,2 @@
++          if(data.faultReached) window.faultReached=data.faultReached;
++          if(data.markerOpened) window.markerOpened=data.markerOpened;
+@@ -277,0 +335 @@
++    if (fixture.malformed) await appendFile(fixturePath, 'missing,third\n');
+@@ -279,0 +338 @@
++    fault=fixture.fault;
+@@ -291 +350,36 @@
+-        const result=await page.evaluate(([job,timeout])=>window.swarmRun(job,timeout),[job,options.runTimeout]);
++        const failureMode=fixture.failure?.[active];
++        const running=page.evaluate(async ([job,timeout])=>{
++          delete window.faultReached;
++          delete window.markerOpened;
++          try { return {result:await window.swarmRun(job,timeout)}; }
++          catch (error) { return {error:String(error)}; }
++        },[job,options.runTimeout]);
++        if (failureMode==='cancelled') {
++          await page.waitForFunction(()=>!!window.faultReached,null,{timeout:30000});
++          await page.evaluate(()=>window.swarmCancel());
++        }
++        const {result,error}=await running;
++        const evidence=await page.evaluate(()=>({reached:window.faultReached,opened:window.markerOpened}));
++        if (failureMode) {
++          await page.waitForFunction(()=>window.swarmRetired());
++          const {entries,state,diagnostics}=await page.evaluate(()=>window.swarmInspect());
++          await emit({kind:'fault',cell:fixture.name,variant:active,pair,error,status:state.status,
++            entries,storage:diagnostics.storage,...evidence});
++          assert(!result,fixture.name+' unexpectedly completed');
++          assert.equal(state.status,failureMode);
++          assert.equal(diagnostics.storage.workspace_bytes_after_cleanup,0);
++          assert.deepEqual(entries,[]);
++          if (fault) assert.equal(evidence.reached?.mode,fault);
++          if (fault==='marker') assert.deepEqual(evidence.opened,{live:[],closed:(fixture.splits??[]).reduce((product,files)=>product*files,1)});
++          else assert.equal(evidence.opened,undefined);
++          if (fixture.error) assert.match(error,new RegExp(fixture.error,'i'));
++          await page.evaluate(()=>window.swarmCleanup());
++          await rm(directory,{recursive:true});
++          console.log(JSON.stringify({cell:fixture.name,variant:active,verified:state.status,error}));
++          continue;
++        }
++        assert(result,error);
++        if (fault==='source-rejection') {
++          assert.deepEqual(evidence.reached,{mode:fault,bytes:256*1024});
++          assert(result.diagnostics.execute.source_prefetch_fallback.calls > 0);
++        }
+@@ -317 +411 @@
+-          sort:{sort_runs,merge_operations,resident_sorts},physical,marker:observed.marker};
++          sort:{sort_runs,merge_operations,resident_sorts},physical,marker:observed.marker,...evidence};

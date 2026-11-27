@@ -266,7 +266,7 @@ pub(super) fn input_adapters() -> Result<serde_json::Value> {
         report["spill_blocks"] = crate::storage::spill_block_resource_contracts()?;
         report
     };
-    #[cfg(feature = "experimental-nested-balanced")]
+    #[cfg(any(target_os = "wasi", feature = "experimental-nested-balanced"))]
     let report = {
         let mut report = report;
         report["nested_balanced"] = nested_balanced::resource_contracts::run()?;

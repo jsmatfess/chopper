@@ -1,0 +1,131 @@
+--- a/harness.mjs
++++ b/harness.mjs
+@@ -67,0 +68,8 @@
++const workerVariants = new Map(await Promise.all(Object.entries(options.engineWorkers??{})
++  .map(async ([name,path]) => {
++    const worker = await build({
++      stdin:{contents:await readFile(path,'utf8'),sourcefile:'ui/src/browser/engine-worker.ts',
++        resolveDir:'ui/src/browser',loader:'ts'},bundle:true,format:'esm',write:false,
++    });
++    return [name,worker.outputFiles[0].contents];
++  })));
+@@ -90,0 +99,3 @@
++    } else if (path === 'engine-worker.js' && workerVariants.has(active)) {
++      res.setHeader('Content-Type','application/javascript');
++      res.end(workerVariants.get(active));
+@@ -136 +147,4 @@
+-    operations:[{type:'partition',columns:['key']},{type:'shuffle',strategy:fixture.shuffle??'uniform'}],
++    operations:[
++      ...(fixture.shape==='nested'?[]:[{type:'shuffle',strategy:fixture.shuffle??'uniform'}]),
++      ...(fixture.splits??[]).map(files=>({type:'balanced',files})),
++    ],
+@@ -142,0 +157,16 @@
++// Derive the quotas and paths from the Job, independently of the engine report.
++function groupsFor(rows, operations) {
++  let groups=[{rows,lineage:[]}];
++  const stages=operations.map((op,operation)=>{
++    const parents=groups.length;
++    if(op.type==='balanced') {
++      groups=groups.flatMap(parent=>Array.from({length:op.files},(_,part)=>({
++        rows:Math.floor(parent.rows/op.files)+Number(part<parent.rows%op.files),
++        lineage:[...parent.lineage,{operation,part:part+1}],
++      })));
++    }
++    return [operation+1, parents, groups.length,
++      Math.min(...groups.map(group=>group.rows)),Math.max(...groups.map(group=>group.rows)),0];
++  });
++  return {groups,stages};
++}
+@@ -149,3 +179,3 @@
+-  assert.deepEqual(head.analysis.stages.map(stage=>[stage.operation,stage.input_groups,stage.output_groups]),
+-    [[1,1,fixture.keys],[2,fixture.keys,fixture.keys]]);
+-  const expectedFiles = ['manifest.jsonl','CHOPPER-COMPLETE.json',...entries.map(entry=>entry.path)].sort();
++  const {groups,stages}=groupsFor(fixture.rows,job.operations);
++  assert.deepEqual(head.analysis.stages.map(s=>[s.operation,s.input_groups,s.output_groups,s.smallest_group,s.largest_group,s.empty_groups]),stages);
++  const expectedFiles=['manifest.jsonl','CHOPPER-COMPLETE.json',...entries.map(entry=>entry.path)].sort();
+@@ -154,7 +184,7 @@
+-  const seen = new Uint8Array(fixture.rows);
+-  const membership = new Set();
+-  const hashes = createHash('sha256');
+-  const byteCap = job.limits.bytes??Infinity, rowCap = job.limits.rows??Infinity;
+-  let rows=0, bytes=0, descents=0, previous=-1, previousKey='', previousChunk;
+-  const payloads = fixture.widths.map(width=>Array.from({length:26},(_,id)=>payloadFor(id,width)));
+-  for (const [index,entry] of entries.entries()) {
++  const seen=new Uint8Array(fixture.rows);
++  const hashes=createHash('sha256');
++  const byteCap=job.limits.bytes??Infinity, rowCap=job.limits.rows??Infinity;
++  let rows=0, bytes=0, descents=0, previous=-1, previousChunk;
++  const payloads=fixture.widths.map(width=>Array.from({length:26},(_,id)=>payloadFor(id,width)));
++  if(fixture.splits?.length) assert.equal(entries.length,groups.length);
++  for(const [index,entry] of entries.entries()) {
+@@ -162,3 +192,5 @@
+-    const key = entry.lineage[0].values[0];
+-    assert.equal(entry.path,'key-'+key+'-part-'+String(index+1).padStart(8,'0')+'.csv');
+-    assert.deepEqual(entry.lineage,[{operation:0,values:[key]}]);
++    const group=groups[fixture.splits?.length?index:0];
++    const prefix=group.lineage.map(step=>'split-'+step.part).join('-');
++    assert.equal(entry.path,(prefix?prefix+'-':'')+'part-'+String(index+1).padStart(8,'0')+'.csv');
++    assert.deepEqual(entry.lineage,group.lineage);
++    if(fixture.splits?.length) assert.equal(entry.rows,group.rows);
+@@ -167,2 +199,2 @@
+-    const path = join(directory,entry.path);
+-    const size = (await stat(path)).size;
++    const path=join(directory,entry.path);
++    const size=(await stat(path)).size;
+@@ -171,2 +203,2 @@
+-    const current = createHash('sha256');
+-    const contents = createReadStream(path);
++    const current=createHash('sha256');
++    const contents=createReadStream(path);
+@@ -174,7 +206,3 @@
+-    let fileRows=0, fileBytes=0;
+-    if (key!==previousKey) {
+-      assert(key>previousKey);
+-      previous=-1;
+-    }
+-    for await (const line of createInterface({input:contents,crlfDelay:Infinity})) {
+-      if (fileBytes===0) {
++    let fileRows=0,fileBytes=0;
++    for await(const line of createInterface({input:contents,crlfDelay:Infinity})) {
++      if(fileBytes===0) {
+@@ -183 +211 @@
+-        if (fileRows===0 && key===previousKey && previousChunk.rows<rowCap) {
++        if(fileRows===0 && previousChunk && !fixture.splits?.length && previousChunk.rows<rowCap) {
+@@ -186,2 +214,2 @@
+-        const [idText,fieldKey,payload,extra] = line.split(',');
+-        const id = Number(idText);
++        const [idText,fieldKey,payload,extra]=line.split(',');
++        const id=Number(idText);
+@@ -190 +217,0 @@
+-        assert.equal(fieldKey,key);
+@@ -193,0 +221 @@
++        if(fixture.shape==='nested') assert.equal(id,rows+fileRows);
+@@ -195 +223 @@
+-        descents += Number(id<previous);
++        descents+=Number(id<previous);
+@@ -203 +230,0 @@
+-    membership.add(key);
+@@ -207 +233,0 @@
+-    previousKey=key;
+@@ -211,2 +237,2 @@
+-  assert.equal(membership.size,fixture.keys);
+-  assert(descents>0);
++  if(fixture.shape!=='nested') assert(descents>0);
++  assert.equal(result.analysis.groups,groups.length);
+@@ -215 +241 @@
+-  return {rows,groups:membership.size,files:entries.length,csv_bytes:bytes,descents,
++  return {rows,groups:groups.length,files:entries.length,csv_bytes:bytes,descents,
+@@ -246 +272 @@
+-    assets:Object.fromEntries([...engines,...assets].map(([name,bytes])=>[name,sha(bytes)]))});
++    assets:Object.fromEntries([...engines,...assets,...Array.from(workerVariants,([name,bytes])=>['worker:'+name,bytes])].map(([name,bytes])=>[name,sha(bytes)]))});
+@@ -273 +299 @@
+-        const expected=fixture.expect?.[active]??(active==='baseline'?'snapshot':'private_terminal');
++        const expected=fixture.expect?.[active]??'snapshot';
+@@ -278 +304 @@
+-        assert.deepEqual(observed.completedStages,[0,1,2,3]);
++        assert.deepEqual(observed.completedStages,Array.from({length:job.operations.length+2},(_,step)=>step));
+@@ -288 +314,3 @@
+-          bridge:{destination_write:result.diagnostics.execute.destination_write,source_read:result.diagnostics.execute.source_read},
++          bridge:Object.fromEntries(Object.entries(result.diagnostics.execute)
++            .filter(([key])=>key.startsWith('source_')||key==='destination_write'||key==='read'||key==='write')),
++          stages:result.analysis.stages,

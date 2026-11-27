@@ -1,0 +1,36 @@
+--- a/crates/chopper/src/engine.rs
++++ b/crates/chopper/src/engine.rs
+@@ -2041 +2041 @@
+-                    run_route::hosted_partition_shuffle_buffer(
++                    run_route::hosted_terminal_shuffle_buffer(
+@@ -2131 +2131,12 @@
+-            let mut plan = if ctx.direct_terminal_output {
++            let hosted_buffer = if cfg!(target_os = "wasi") {
++                run_route::hosted_terminal_shuffle_buffer(
++                    job,
++                    ctx,
++                    total_record_bytes.saturating_add(rows.saturating_mul(width as u64)),
++                )
++            } else {
++                None
++            };
++            let mut plan = if let Some(buffer) = hosted_buffer {
++                output::PlanWriter::direct_grouped_buffered(job, header.as_ref(), ctx, buffer)?
++            } else if ctx.direct_terminal_output {
+@@ -2145 +2156 @@
+-            if ctx.direct_terminal_output {
++            if hosted_buffer.is_some() || ctx.direct_terminal_output {
+--- a/crates/chopper/src/engine/resource_contracts/direct.rs
++++ b/crates/chopper/src/engine/resource_contracts/direct.rs
+@@ -5 +5 @@
+-    use crate::engine::run_route::hosted_partition_shuffle_buffer as choose;
++    use crate::engine::run_route::hosted_terminal_shuffle_buffer as choose;
+--- a/crates/chopper/src/engine/run_route.rs
++++ b/crates/chopper/src/engine/run_route.rs
+@@ -238 +238 @@
+-pub(super) fn hosted_partition_shuffle_buffer(
++pub(super) fn hosted_terminal_shuffle_buffer(
+@@ -254 +254,2 @@
+-            [Operation::Partition { .. }, shuffle] | [shuffle, Operation::Partition { .. }]
++            [Operation::Partition { .. }, shuffle]
++                | [shuffle, Operation::Partition { .. } | Operation::Balanced { .. }]

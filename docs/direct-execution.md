@@ -29,10 +29,11 @@ validate a later execution snapshot.
 The former alternate flexible-policy runner and its build features are removed.
 There is no Job policy selector.
 
-A hosted Run of exactly Partition and a Uniform or Auto shuffle, in either
-order, can select grouped private output after the fused sort prepares its
-final traversal. The selection requires Auto grouping, plain UTF-8 output,
-no calculated columns, and at least 96 MiB of validated field payload plus
+A hosted Run can select grouped private output for Partition and a Uniform or
+Auto shuffle in either order, or a Uniform or Auto shuffle followed by Balanced.
+These two-operation pipelines select after the fused sort prepares its final
+traversal. Selection requires Auto grouping, plain UTF-8 output, no calculated
+columns, and at least 96 MiB of validated field payload plus
 one delimiter or record terminator byte per field. This lower bound comes
 from the ordinary intake counters. It works with compressed sources and
 requires no additional scan. The producer, existing Auto memory sizing,
@@ -54,15 +55,15 @@ evaluating formulas. The ordinary capped CSV serializer writes the calculated
 rows directly into private publication, removing the encoded output snapshot.
 Destination checks, atomic commit, and cleanup apply.
 
-The opt-in `experimental-terminal-shuffle` build also permits exactly a root
-Uniform/Auto shuffle followed by Balanced, with uncompressed output. Its existing
-external or resident random-key sort streams the same rows into grouped private
-publication; explicit internal preparation still retains a snapshot. This is a
-performance experiment, not a default selector or a new randomization algorithm.
-Qualify its hosted graph using a build with
+The opt-in `experimental-terminal-shuffle` build permits root Uniform/Auto
+shuffle followed by Balanced with uncompressed output outside the default
+hosted size and headroom gate. Its existing external or resident random-key
+sort streams the same rows into grouped private publication. Explicit internal
+preparation retains a snapshot. Qualify the experimental hosted graph using
+a build with
 `--features chopper/experimental-terminal-shuffle` and
-`node scripts/test-browser-graph.mjs --terminal-direct`. The default graph check
-continues to require snapshot materialization for this pipeline.
+`node scripts/test-browser-graph.mjs --terminal-direct`. The small fixture in
+the default graph check exercises the snapshot decline.
 
 On native builds, the same terminal-shuffle experiment additionally permits an
 unobserved standalone Uniform, Auto or resident-only Fisher–Yates operation, or
@@ -353,8 +354,9 @@ cancellation and after staged export failure. A confirmed invalid marker trigger
 this cleanup. A closed marker with an unreadable readback remains in place for
 inspection. If cancellation leaves a destination, the browser reports its path.
 An outstanding speculative source read does not delay storage cleanup.
-For plain output from a `.csv` selection with an empty pipeline or one
-Partition, the hosted bridge keeps one bounded source read outstanding.
+For plain output from a `.csv` selection, the hosted bridge keeps one bounded
+source read outstanding for an empty pipeline, one Partition, or one Uniform
+shuffle on a file of at least 128 MiB.
 An empty pipeline also permits one pending batched destination write. The
 bridge drains the write before every destination control operation. The
 storage worker flushes buffered data before closing a stream or publishing

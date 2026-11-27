@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "26b5a95ffbd73ec4769a2975eefe6d6da0f7c9009d227a86a3403990a073a214",
+  "catalog_sha256": "c92654179ad465d06ef8add5171517a14271f84a928ac749d80bfbd9e32f568d",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -552,6 +552,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-prefetch-worker-2026-11-26.patch",
+      "source_sha256": "0a177ede91a062464c2f16005b2711a4054145b65ce2a78ec02da57e8cf91823",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-prefetch-worker-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/native-http-server-parity-2026-10-23.json",
       "source_sha256": "0a681d4ef2de89616cf267d82dcce1e59b0c2bee24d61b7d787528e88157e1f7",
       "aliases": [
@@ -819,6 +832,19 @@
         "unclassified": 4
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-data-movement-fault-verifier-2026-11-26.py",
+      "source_sha256": "0dd99f6f1a9feef8dbfcf9524a2aaf2fdaa376d471522d4db4a1d689b4b481d4",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-fault-verifier-2026-11-26.py"
+      ],
+      "format": "py",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/auto-followup-2026-11-21-browser-windows.jsonl",
@@ -1592,6 +1618,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-shuffle-balanced-screen-2026-11-26.jsonl",
+      "source_sha256": "1ae59a9a0187c510c8fbc97b1de1257ff2edbc2fc18bfc2756beb0e5a5dbb55d",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-shuffle-balanced-screen-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 16
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/parallel-profile-engines-2026-10-16.jsonl",
       "source_sha256": "1bc28d06976fadf56ab4d6ac4f11f6b4eaa93a93dbd4075cc349a1f891e08718",
       "aliases": [
@@ -1722,6 +1765,23 @@
       "validation_records": 24,
       "classes": {
         "contract-duration": 24
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-data-movement-shuffle-balanced-faults-retired-2026-11-26.jsonl",
+      "source_sha256": "1cc9fe59797b53f41545ba835748eefa5dfb056566efd046a8d7388703fe8a9c",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-shuffle-balanced-faults-retired-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 1,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 1
       },
       "coverage": "adapted"
     },
@@ -1883,6 +1943,19 @@
         "docs/benchmarks/post-spool-cpu-attribution-2026-11-05-codegen.txt"
       ],
       "format": "txt",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-data-movement-nested-harness-2026-11-26.patch",
+      "source_sha256": "1ef56f0a7b9eba2555375583eb229770c834426bdf375f776b04ca63875b118f",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-nested-harness-2026-11-26.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -4318,6 +4391,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-nested-selector-decline-2026-11-26.jsonl",
+      "source_sha256": "467d08ed5972c0c1a573427a3ec5c98d8af950ad97f5d81b51dd955f46f22481",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-nested-selector-decline-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 16
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/compact-external-native-2026-10-14.jsonl",
       "source_sha256": "46ad1312820edfef5a7562c353e69b559f0b58af66aa51ba1327ca34a926df0e",
       "aliases": [
@@ -4810,6 +4900,23 @@
       "validation_records": 0,
       "classes": {
         "measurement": 6
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-data-movement-prefetch-faults-retired-2026-11-26.jsonl",
+      "source_sha256": "4e6cb57534a032fed16db12b545460d02ee8c83c9c3efa05ffda7754b9b85ba5",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-prefetch-faults-retired-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 1,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 1
       },
       "coverage": "adapted"
     },
@@ -5770,6 +5877,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-nested-screen-2026-11-26.jsonl",
+      "source_sha256": "5afd0c93adf81879ae42c3824477a28586542caaf8e3ed453f0bae721d0c300f",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-nested-screen-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/serializer-utf16-engines-2026-10-16.jsonl",
       "source_sha256": "5b18bc81e101412c4d27979c0e6e75a5601f55dae593877550ae206a6f3c7ee0",
       "aliases": [
@@ -6224,6 +6348,23 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-prefetch-holdout-2026-11-26.jsonl",
+      "source_sha256": "6283390772581c02cfd77e7f862addb01ad590a9de8d70d83428517a6a53409b",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-prefetch-holdout-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 16
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/public-preparation-full-validation-2026-10-21.json",
       "source_sha256": "628a511a2c1b1cc671d9922ab589cb5ea3dd93b1590cd27ea8c481c590c6d268",
       "aliases": [
@@ -6639,6 +6780,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-nested-selector-faults-retired-2026-11-26.jsonl",
+      "source_sha256": "6855c45b707d4e38fac1ea99918e7f10de1a81271e418057459801b1d8e5e483",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-nested-selector-faults-retired-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/accounting-batch-profiling-2026-10-16.jsonl",
       "source_sha256": "68c71edf61708592284a9c337cc1737143dba81bcd428072bf4bdb58cc65cc58",
       "aliases": [
@@ -6853,19 +7007,6 @@
       "source_sha256": "6b0af382c7a4f45959cd63e1fa71547b4cc8ab56c74403aa74f5aa00d227cff9",
       "aliases": [
         "docs/benchmarks/parallel-profile-summary-2026-10-16.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "6b2fff094d4d876febceb76f6ba3ce343b2d1d37f7a08a71948de08524458591",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
       ],
       "format": "json",
       "layouts": [],
@@ -8597,6 +8738,23 @@
       "validation_records": 0,
       "classes": {},
       "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-data-movement-nested-selector-holdout-2026-11-26.jsonl",
+      "source_sha256": "87d369abeb968d1253ea188acc9bb6108c0f74c2b7969454935c1d638aa5cbd7",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-nested-selector-holdout-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 18,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 18
+      },
+      "coverage": "adapted"
     },
     {
       "source": "docs/benchmarks/e5-memory-source-identities-2026-10-28.json",
@@ -10495,6 +10653,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-fault-harness-2026-11-26.patch",
+      "source_sha256": "a6ba21360d5f128422bd21f3932dab7ac03d5902a0172d41b7f1030858f81cee",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-fault-harness-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/overlap-followup-2026-11-22-browser-prefetch.jsonl",
       "source_sha256": "a6c6dcb093168ea79a0091b3eb8301a1dd930c0713b65445644c77af3bd63954",
       "aliases": [
@@ -12285,6 +12456,32 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-shuffle-balanced-engine-2026-11-26.patch",
+      "source_sha256": "c33cab2593bf4ac712a56643a7b4751aaf15caa778dd62ac804940a8f29f907b",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-shuffle-balanced-engine-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-data-movement-nested-observation-verifier-2026-11-26.py",
+      "source_sha256": "c34adf853299ebbc8707f27325069b541828f9ceab0ae6ffa7ab82b6625cf753",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-nested-observation-verifier-2026-11-26.py"
+      ],
+      "format": "py",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/quoted-serialization-2026-11-05.patch",
       "source_sha256": "c3bbb5253be6f8a5c139cf7c6f5d7b54923af41d335005cd9e91fead898df63f",
       "aliases": [
@@ -12774,6 +12971,23 @@
       "classes": {
         "allocation-census": 36,
         "measurement": 108
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-data-movement-prefetch-screen-2026-11-26.jsonl",
+      "source_sha256": "c9c73cc11f23da62e64f0f84c17caa7c87908178e7e1716a629b206e623b1cc7",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-prefetch-screen-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 16
       },
       "coverage": "adapted"
     },
@@ -13848,6 +14062,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-harness-2026-11-26.patch",
+      "source_sha256": "d7ca2912d09b494a599b846c88b89943923dc6f9db10903d596ca73de8517514",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-harness-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/inline-spool-key-2026-11-05.py",
       "source_sha256": "d7ffbc8b284aa2a47d8c4e5f539473cc8b305a60ff56fd712a8851353db7eb0c",
       "aliases": [
@@ -13876,6 +14103,19 @@
         "measurement": 2
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-data-movement-pair-verifier-2026-11-26.py",
+      "source_sha256": "d8879021f88273062966fb4a523184424185f33e3ec4e9e25dc496346d1e4fed",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-pair-verifier-2026-11-26.py"
+      ],
+      "format": "py",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/compact-external-multilevel-2026-10-14.jsonl",
@@ -13927,6 +14167,19 @@
         "docs/benchmarks/zip-metadata-owner-probe-2026-10-21.jsonl"
       ],
       "format": "jsonl",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "d9c46423a2b3d560ce2bd1a45a17ccc9cf7e1893899395184f5f7c7789621827",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -14709,6 +14962,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-disk-harness-2026-11-26.patch",
+      "source_sha256": "e48f21fa5414a244bb6df63e4b267f92eb373112b91fef3d56ea5c1076201fd8",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-disk-harness-2026-11-26.patch"
+      ],
+      "format": "patch",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/partition-first-diagnostics-native-2026-10-18.jsonl",
       "source_sha256": "e538d3ab54b3937c17fa484425e7b0f8e0b1919d5dde8be66123f930ea4bdf57",
       "aliases": [
@@ -15179,6 +15445,23 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-data-movement-prefetch-disk-holdout-2026-11-26.jsonl",
+      "source_sha256": "ecacb4e35a6467bbf2b43b48e9d542665d90641f0c26033e14d1962174a5701d",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-prefetch-disk-holdout-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 8,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 8
+      },
+      "coverage": "adapted"
+    },
+    {
       "source": "docs/benchmarks/csv-marker-cache-2026-11-05-plan.json",
       "source_sha256": "ecf219aa9489da392b9daecd9d351c78055fbd9bbafbac9f3dbf7cc6b42819f1",
       "aliases": [
@@ -15410,6 +15693,19 @@
         "docs/benchmarks/native-request-json-server-parity-2026-10-23.json"
       ],
       "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-data-movement-nested-selector-engine-2026-11-26.patch",
+      "source_sha256": "f10b8ce1913c137f3a8257dea09dcc441a741c1e7bff0eee54c899448f235f3d",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-nested-selector-engine-2026-11-26.patch"
+      ],
+      "format": "patch",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,
@@ -15674,6 +15970,23 @@
       "validation_records": 0,
       "classes": {
         "measurement": 72
+      },
+      "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-data-movement-shuffle-balanced-holdout-2026-11-26.jsonl",
+      "source_sha256": "f596f6268bc46417722c62a63d782df939f58eda34afaeadcfa7f134ee91a4a6",
+      "aliases": [
+        "docs/benchmarks/hosted-data-movement-shuffle-balanced-holdout-2026-11-26.jsonl"
+      ],
+      "format": "jsonl",
+      "layouts": [
+        "jsonl-record"
+      ],
+      "observation_records": 16,
+      "validation_records": 0,
+      "classes": {
+        "unclassified": 16
       },
       "coverage": "adapted"
     },

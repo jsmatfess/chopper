@@ -235,7 +235,7 @@ fn terminal_direct_eligible(job: &Job) -> bool {
             )) && matches!(job.operations.as_slice(), [operation] if streaming::eligible(operation) || matches!(operation, Operation::Partition { .. }) || matches!(operation, Operation::Assign { strata, .. } if !strata.is_empty()))))
 }
 
-pub(super) fn hosted_partition_shuffle_buffer(
+pub(super) fn hosted_terminal_shuffle_buffer(
     job: &Job,
     ctx: &Context,
     minimum_csv_bytes: u64,
@@ -251,7 +251,8 @@ pub(super) fn hosted_partition_shuffle_buffer(
         || !job.output_csv.encoding.eq_ignore_ascii_case("utf-8")
         || !matches!(
             job.operations.as_slice(),
-            [Operation::Partition { .. }, shuffle] | [shuffle, Operation::Partition { .. }]
+            [Operation::Partition { .. }, shuffle]
+                | [shuffle, Operation::Partition { .. } | Operation::Balanced { .. }]
                 if uniform(shuffle)
         )
     {

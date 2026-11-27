@@ -2,7 +2,7 @@
 use super::*;
 
 fn partition_shuffle_writer_boundary(root: &std::path::Path) -> Result<()> {
-    use crate::engine::run_route::hosted_partition_shuffle_buffer as choose;
+    use crate::engine::run_route::hosted_terminal_shuffle_buffer as choose;
     const KIB: usize = 1024;
     const MIB: usize = 1024 * KIB;
     let output = root.join("partition-output");
@@ -61,6 +61,15 @@ fn partition_shuffle_writer_boundary(root: &std::path::Path) -> Result<()> {
     job.operations[0] = Operation::Shuffle {
         strategy: Shuffle::Auto,
     };
+    job.operations[1] = Operation::Balanced { files: 2 };
+    ensure!(
+        choose(&job, &ctx, at_size - 1).is_none(),
+        "small Shuffle then Balanced was eligible"
+    );
+    ensure!(
+        choose(&job, &ctx, at_size) == Some(512 * KIB),
+        "Auto then Balanced did not select buffered output"
+    );
 
     let row = Row {
         id: 0,

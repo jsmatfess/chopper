@@ -1,0 +1,7 @@
+--- a/ui/src/browser/engine-worker.ts
++++ b/ui/src/browser/engine-worker.ts
+@@ -121 +121,3 @@
+-        ||(plainCsv&&operations?.length===1&&operations[0]?.type==='partition');
++        ||(plainCsv&&operations?.length===1&&operations[0]?.type==='partition')
++        || (plainCsv&&data.file.size>=128*1024*1024&&operations?.length===1
++          &&operations[0]?.type==='shuffle'&&operations[0].strategy==='uniform');

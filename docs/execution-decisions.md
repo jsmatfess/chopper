@@ -144,12 +144,14 @@ Retained-parent retries and publication errors remain governed by the selected
 execution path. The [direct-output route inventory](performance/investigations/hosted-partition-shuffle-direct-output-2026-11-26.md#current-routes)
 also traces the independent hosted CSV/gzip and ZIP export routes.
 
-#### Hosted Partition and shuffle output choice
+<a id="hosted-partition-and-shuffle-output-choice"></a>
+
+#### Hosted fused shuffle output choice
 
 ```mermaid
 flowchart TD
-    Run[Retained hosted Run uses its normal Auto memory plan] --> Sort[Validate input and prepare the fused Partition-shuffle traversal]
-    Sort --> Eligible{Exactly Partition and Uniform or Auto in either order, plain UTF-8, Auto grouping, and no formulas?}
+    Run[Retained hosted Run uses its normal Auto memory plan] --> Sort[Validate input and prepare the fused sort traversal]
+    Sort --> Eligible{Partition and Uniform or Auto in either order, or Uniform or Auto then Balanced? Plain UTF-8, Auto grouping, no formulas?}
     Eligible -->|No| Snapshot[Use the existing encoded snapshot writer]
     Eligible -->|Yes| Size{Validated CSV byte lower bound at least 96 MiB?}
     Size -->|No| Snapshot
@@ -721,6 +723,26 @@ Streaming allows outer fallback only on the setup-error edge. Its retained-paren
 preparation/emission rules remain in exact_plan::Proposal. Consecutive partitions
 and partition/balanced preserve their own typed-denial rules; this diagram does
 not broaden replay eligibility. Raw input and nested shared ranges are separate.
+
+#### Hosted consecutive Balanced
+
+```mermaid
+flowchart TD
+    Input[Hosted Run with exactly two root Balanced operations] --> Shape{One validated root dataset, Auto grouping, plain UTF-8 output and no formulas?}
+    Shape -->|Yes| Count{Packed input at least 256 MiB and leaf count within rows and max_files?}
+    Count -->|Yes| Room{Live headroom for four configured records and 8 MiB?}
+    Shape -->|No| Ordinary[Run the existing Balanced stages]
+    Count -->|No| Ordinary
+    Room -->|No| Ordinary
+    Room -->|Yes| Nested[Traverse retained rows once with both levels of quotas]
+    Ordinary --> Snapshot[Retain one encoded output snapshot]
+    Nested --> Snapshot
+```
+
+The guard applies to hosted Run after intake, using the existing packed file
+size and validated row count. The shared traversal records both logical
+operations and their stage statistics. A failure during nested emission drops
+the private snapshot through the normal cleanup path.
 
 ## 3. Current Auto planning
 

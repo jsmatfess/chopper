@@ -73,6 +73,7 @@ def main():
 
 # Exact section titles: additions require an explicit family/eligibility review.
 SECTIONS = {
+    'Hosted data movement follow-ups (2026-11-26)': 'ownership-and-lifecycle',
     'Guarded hosted partition shuffle publication (2026-11-26)': 'ownership-and-lifecycle',
     'Hosted Shuffle then Partition buffered output (2026-11-26)': 'ownership-and-lifecycle',
     'Hosted OPFS write size lookup (2026-11-26)': 'ownership-and-lifecycle',

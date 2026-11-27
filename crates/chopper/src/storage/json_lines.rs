@@ -77,7 +77,7 @@ impl<T> Deref for ChargedJson<T> {
     }
 }
 impl<T> ChargedJson<T> {
-    #[cfg(feature = "experimental-nested-balanced")]
+    #[cfg(any(target_os = "wasi", feature = "experimental-nested-balanced"))]
     // Nested balanced traversal admits its separate lineage-growth owner before
     // using this seam. The decoded grant continues to cover the original tree.
     pub(crate) fn value_mut(&mut self) -> &mut T {

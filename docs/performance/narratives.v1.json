@@ -9346,6 +9346,19 @@
       "original_section_sha256": "8e206e029941854b0f4b5fe5ec508ee3ac3d2414ed41673973e5abedcdd885fa",
       "sha256": "304e0eaa0df8ba1532598dfc3a15bb5a3be9a1d6b49041820a7f1b3e6a53bbac",
       "relocations": []
+    },
+    {
+      "id": "hosted-data-movement-follow-ups-2026-11-26",
+      "title": "Hosted data movement follow-ups (2026-11-26)",
+      "anchor": "hosted-data-movement-follow-ups-2026-11-26",
+      "path": "docs/performance/investigations/hosted-data-movement-follow-ups-2026-11-26.md",
+      "topic": "ownership-and-lifecycle",
+      "legacy_anchors": [
+        "hosted-data-movement-follow-ups-2026-11-26"
+      ],
+      "original_section_sha256": "541cfb6b0289a5b5357c14e76f3863675818636ffcf798b505b3308ac1cb9eb6",
+      "sha256": "386c2882fb6c6f61b377ec683f94df6913df4fe5e033edcfb28386544cb65985",
+      "relocations": []
     }
   ],
   "migrated_count": 193

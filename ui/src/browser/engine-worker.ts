@@ -118,7 +118,9 @@ scope.onmessage=async({data})=>{
       const operations:Job['operations']|undefined=data.job?.operations;
       bridge.overlapDestination=plainCsv&&operations?.length===0;
       bridge.prefetchSource=bridge.overlapDestination
-        ||(plainCsv&&operations?.length===1&&operations[0]?.type==='partition');
+        ||(plainCsv&&operations?.length===1&&operations[0]?.type==='partition')
+        || (plainCsv&&data.file.size>=128*1024*1024&&operations?.length===1
+          &&operations[0]?.type==='shuffle'&&operations[0].strategy==='uniform');
       root.contents.set(inputPath,new DiskFile(bridge,data.file));
       // ZIP reopens its manifest for archiving and needs the private filesystem.
       directDestination=type==='run-direct'&&['none','gzip'].includes(data.job.compression);

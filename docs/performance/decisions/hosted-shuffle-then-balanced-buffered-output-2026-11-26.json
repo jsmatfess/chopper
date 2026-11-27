@@ -1,0 +1,83 @@
+{
+  "id": "hosted-shuffle-then-balanced-buffered-output-2026-11-26",
+  "title": "Use buffered direct output for large hosted Shuffle then Balanced",
+  "subsystem": "output",
+  "question": "Does the existing hosted buffered writer remove the encoded snapshot for terminal Shuffle then Balanced while preserving exact quotas and caps?",
+  "disposition": "adopt",
+  "delivery": "default",
+  "outcome": "favorable",
+  "summary": "All eight eligible pairs improved. The 1.265 GB Auto case saved 3.764 seconds at the paired median and avoided about 1.265 GB of tracked temporary storage traffic in each direction with the same measured peak working reservations.",
+  "scope": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "workloads": [
+      "Exactly hosted Uniform or Auto Shuffle then Balanced with plain UTF-8 output, Auto grouping and no formulas.",
+      "A 96 MiB validated output-byte lower bound and live headroom guard. Paired persistent Chromium jobs at 32 to 256 MiB fixed working memory."
+    ],
+    "measurement": "complete-run"
+  },
+  "validation": {
+    "runtimes": [
+      "wasi-chromium"
+    ],
+    "summary": "Complete independent CSV readback verifies exact quotas, row conservation, ordered lineage, serialized caps, stage statistics and marker retirement. Both writers clean up across publication failures and rejection cases. Buffered output completes below the managed temporary cap that rejects the snapshot."
+  },
+  "limitations": [
+    "One persistent OPFS environment on WSL2 ext4 with synthetic inputs and uncontrolled caches.",
+    "Managed temporary traffic and working reservations measure engine accounting. Physical I/O and RSS were outside the timing experiment."
+  ],
+  "exclusions": [
+    "Fisher–Yates, calculated columns, compressed or non-UTF-8 output, and native performance."
+  ],
+  "reopen_when": "A representative eligible workload regresses under the reused buffer or admission guard.",
+  "supersedes": [],
+  "contracts": [
+    "docs/direct-execution.md",
+    "docs/execution-decisions.md",
+    "docs/pipeline-rewrites.md",
+    "docs/specification.md#resources-publication-and-interfaces"
+  ],
+  "schema_version": 1,
+  "date": "2026-11-26",
+  "sources": [
+    {
+      "section": "docs/performance.md#hosted-data-movement-follow-ups-2026-11-26",
+      "sha256": "541cfb6b0289a5b5357c14e76f3863675818636ffcf798b505b3308ac1cb9eb6"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/benchmarks/hosted-data-movement-fault-harness-2026-11-26.patch",
+      "sha256": "a6ba21360d5f128422bd21f3932dab7ac03d5902a0172d41b7f1030858f81cee"
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-fault-verifier-2026-11-26.py",
+      "sha256": "0dd99f6f1a9feef8dbfcf9524a2aaf2fdaa376d471522d4db4a1d689b4b481d4"
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-harness-2026-11-26.patch",
+      "sha256": "d7ca2912d09b494a599b846c88b89943923dc6f9db10903d596ca73de8517514"
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-pair-verifier-2026-11-26.py",
+      "sha256": "d8879021f88273062966fb4a523184424185f33e3ec4e9e25dc496346d1e4fed"
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-shuffle-balanced-engine-2026-11-26.patch",
+      "sha256": "c33cab2593bf4ac712a56643a7b4751aaf15caa778dd62ac804940a8f29f907b"
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-shuffle-balanced-faults-retired-2026-11-26.jsonl",
+      "sha256": "1cc9fe59797b53f41545ba835748eefa5dfb056566efd046a8d7388703fe8a9c"
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-shuffle-balanced-holdout-2026-11-26.jsonl",
+      "sha256": "f596f6268bc46417722c62a63d782df939f58eda34afaeadcfa7f134ee91a4a6"
+    },
+    {
+      "path": "docs/benchmarks/hosted-data-movement-shuffle-balanced-screen-2026-11-26.jsonl",
+      "sha256": "1ae59a9a0187c510c8fbc97b1de1257ff2edbc2fc18bfc2756beb0e5a5dbb55d"
+    }
+  ]
+}

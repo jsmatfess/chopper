@@ -161,15 +161,16 @@ leftover exports.
 
 ## Processing and limits
 
-A hosted Run with a selected `.csv` file and plain output can prefetch
-one 256 KiB source window for an empty pipeline or a single Partition. With
-an empty pipeline, the storage worker also batches adjacent writes to the
-current file in one 1 MiB block. The two shared slots and the worker buffers have a combined
-live capacity of 2.5 MiB plus 24 control bytes, outside the WASI working-memory
-reservations. A rejected source prefetch falls back to the current synchronous
-read. Destination errors fail Run before completion. The storage worker waits
-for outstanding operations before aborting open streams and cleaning incomplete
-results. See the [publication contract](direct-execution.md).
+A hosted Run with a selected `.csv` file and plain output can prefetch one
+256 KiB source window for an empty pipeline, a single Partition, or a single
+Uniform shuffle when the selected file is at least 128 MiB. For an empty
+pipeline the storage worker also batches adjacent writes to the current file
+in one 1 MiB block. The two shared slots and worker buffers have a combined
+live capacity of 2.5 MiB plus 24 control bytes outside the WASI working-memory
+reservations. A rejected or timed-out prefetch falls back to the current
+synchronous read. Cleanup waits for pending destination and workspace work.
+The speculative source read owns only its Blob and reply slot, so cleanup
+can proceed while that read is outstanding. See the [publication contract](direct-execution.md).
 
 For large local benchmark jobs, use a persistent browser profile. The external
 comparison harness now does so explicitly. On the recorded Chromium build,
