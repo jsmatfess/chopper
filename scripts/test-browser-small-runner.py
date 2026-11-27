@@ -1062,8 +1062,14 @@ class Controls(unittest.TestCase):
         self.assertEqual(storage.sample(), high)
         replacement = self.root / 'replacement'
         replacement.write_text('new identity')
-        # Allocate before unlink so inode-reusing filesystems keep identities distinct.
+        replacement_root = self.root / 'replacement-root'
+        replacement_root.mkdir()
+        new_cache = replacement_root / 'new-cache'
+        new_cache.write_text('replacement root')
+        # Allocate both replacements while the original is live. Linux's
+        # synthetic census has no birth time to distinguish a reused inode.
         self.assertNotEqual(path.stat().st_ino, replacement.stat().st_ino)
+        self.assertNotEqual(path.stat().st_ino, new_cache.stat().st_ino)
         path.unlink()
         self.assertEqual(storage.sample(), high)
         replacement.replace(path)
@@ -1071,8 +1077,7 @@ class Controls(unittest.TestCase):
         adopted.rename(self.root / 'retired')
         with self.assertRaises(OSError):
             storage.sample()
-        adopted.mkdir()
-        (adopted / 'new-cache').write_text('replacement root')
+        replacement_root.rename(adopted)
         self.assertEqual(storage.sample(), high + 16384)
 
     def primed_origin_fixture(self):
