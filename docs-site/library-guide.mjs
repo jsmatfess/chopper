@@ -8,7 +8,8 @@ export function renderLibraryGuide(markdown, tokens) {
       : []
   ));
   const setup = headings.findIndex(heading => heading.title === 'Rust');
-  if (setup === -1 || headings[setup + 1]?.title !== 'Python') {
+  const title = tokens.find(token => token.type === 'heading_open' && token.tag === 'h1' && token.level === 0);
+  if (!title || setup === -1 || headings[setup + 1]?.title !== 'Python') {
     throw new Error('The library guide needs consecutive Rust and Python quickstart sections');
   }
   const rust = headings[setup].line;
@@ -18,6 +19,10 @@ export function renderLibraryGuide(markdown, tokens) {
   const panel = (language, body) => `<div data-library-example="${language}">\n\n${body}\n\n</div>\n\n`;
 
   const edits = [{
+    start: title.map[0],
+    end: title.map[1],
+    text: '# Chopper libraries\n\n<span id="rust-and-python-libraries" class="library-section-alias"></span>\n',
+  }, {
     start: rust,
     end,
     text: '## Run your first Job\n\n<span id="rust" class="library-section-alias"></span>'

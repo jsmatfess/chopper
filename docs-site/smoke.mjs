@@ -19,12 +19,11 @@ async function checkLibraryLanguage(browser, origin, base) {
   const anchor = '#compose-inspect-and-replay';
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   try {
-    const picker = page.getByRole('group', { name: 'Example language' });
-    const radio = language => picker.getByRole('radio', { name: language });
+    const picker = page.getByRole('combobox', { name: 'Example language' });
     const examples = language => page.locator(`[data-library-example="${language}"]`);
     async function checkLanguage(language, other) {
-      await radio(language).waitFor();
-      assert.ok(await radio(language).isChecked());
+      await picker.waitFor();
+      assert.equal(await picker.inputValue(), language.toLowerCase());
       assert.ok(await examples(language.toLowerCase()).count() > 0);
       assert.equal(
         await examples(language.toLowerCase()).filter({ visible: true }).count(),
@@ -35,11 +34,12 @@ async function checkLibraryLanguage(browser, origin, base) {
 
     assert.equal((await page.goto(url + '?lang=python' + anchor))?.status(), 200);
     await checkLanguage('Python', 'Rust');
+    await page.locator('h1#chopper-libraries').waitFor();
     await page.waitForFunction(id => {
       const heading = document.getElementById(id).getBoundingClientRect();
       return heading.top >= 0 && heading.bottom <= window.innerHeight;
     }, anchor.slice(1));
-    await radio('Python').press('ArrowLeft');
+    await picker.press('ArrowUp');
     await page.waitForURL(url + '?lang=rust' + anchor);
     await checkLanguage('Rust', 'Python');
     await page.reload();
@@ -64,7 +64,7 @@ async function checkLibraryLanguage(browser, origin, base) {
     for (const language of ['rust', 'python']) {
       await fallback.locator(`[data-library-example="${language}"]`).first().waitFor();
     }
-    assert.equal(await fallback.getByRole('group', { name: 'Example language' }).count(), 0);
+    assert.equal(await fallback.getByRole('combobox', { name: 'Example language' }).count(), 0);
   } finally {
     await fallback.close();
   }

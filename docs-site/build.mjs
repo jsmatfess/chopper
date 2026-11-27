@@ -31,7 +31,7 @@ const pages = [
   ['docs/compatibility.md', 'compatibility', 'Compatibility and migration'],
 ];
 const formulaPage = ['docs/formula-functions.md', 'formula-functions', 'Formula functions'];
-const libraryPage = ['docs/user/libraries.md', 'libraries', 'Rust and Python libraries'];
+const libraryPage = ['docs/user/libraries.md', 'libraries', 'Libraries'];
 const imagePath = 'docs/images/workbench.png';
 const samplePath = 'examples/customers.csv';
 const supportUrl = 'https://buymeacoffee.com/tblflip';

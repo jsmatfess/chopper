@@ -61,63 +61,45 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <fieldset ref="picker" class="library-picker" :hidden="!selection">
-    <legend>Example language</legend>
-    <div class="library-picker-options">
-      <div v-for="(label, language) in choices" :key="language">
-        <input
-          :id="`library-language-${language}`"
-          type="radio"
-          name="library-language"
-          :value="language"
-          :checked="selection === language"
-          @change="chooseLanguage(language)"
-        >
-        <label :for="`library-language-${language}`">{{ label }}</label>
-      </div>
-    </div>
-  </fieldset>
+  <div ref="picker" class="library-picker" :hidden="!selection">
+    <label for="library-language">Example language</label>
+    <select
+      id="library-language"
+      name="library-language"
+      :value="selection"
+      @change="chooseLanguage($event.target.value)"
+    >
+      <option v-for="(label, language) in choices" :key="language" :value="language">{{ label }}</option>
+    </select>
+  </div>
 </template>
 
 <style>
 .library-picker {
-  border: 0;
   margin-block-start: 1.5rem;
-  min-inline-size: 0;
-  padding: 0;
-}
-
-.library-picker legend {
-  font-weight: 650;
-}
-
-.library-picker-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 1rem;
-}
-
-.library-picker-options > div {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-}
-
-.library-picker input {
-  accent-color: var(--vp-c-brand-1);
-}
-
-.library-picker input:focus-visible {
-  outline: 2px solid var(--vp-c-brand-1);
-  outline-offset: 2px;
 }
 
 .library-picker label {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: 3rem;
-  min-inline-size: 3rem;
+  display: block;
+  font-weight: 650;
+  margin-block-end: .375rem;
+}
+
+.library-picker select {
+  appearance: auto;
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-text-2);
+  border-radius: .375rem;
   cursor: pointer;
+  font: inherit;
+  min-block-size: 3rem;
+  min-inline-size: 9rem;
+  padding-inline: .75rem;
+}
+
+.library-picker select:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
 }
 
 [data-library-language="rust"] [data-library-example="python"],

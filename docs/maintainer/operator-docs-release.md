@@ -21,7 +21,7 @@ and search within each version. Versions with the formula reference also get a
 sidebar, CLI cross-link, and function search check for that page.
 
 The site renders the [library guide](../user/libraries.md) with one example
-language picker. Keep its consecutive Rust and Python quickstart headings
+language dropdown. Keep its consecutive Rust and Python quickstart headings
 and label fenced examples as `rust` or `python`. Keep shared explanations
 outside those quickstart sections and code fences. Links can select an
 example language with `?lang=rust` or `?lang=python` before the section anchor.
