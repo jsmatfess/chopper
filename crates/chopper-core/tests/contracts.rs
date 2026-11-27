@@ -338,6 +338,29 @@ fn decoder_preserves_characters_across_input_blocks() {
         assert_eq!(text, actual);
     }
 }
+
+#[test]
+fn decoder_delivers_the_valid_prefix_before_reporting_malformed_input() -> anyhow::Result<()> {
+    for capacity in [1, 64 * 1024] {
+        let mut decoder = DecodeReader::new(b"valid\n\xfftail".as_slice(), "utf-8")?;
+        let mut buffer = vec![0; capacity];
+        let mut prefix = Vec::new();
+        let error = loop {
+            match decoder.read(&mut buffer) {
+                Ok(0) => panic!("reader discarded a malformed byte"),
+                Ok(read) => prefix.extend_from_slice(&buffer[..read]),
+                Err(error) => break error,
+            }
+        };
+        assert_eq!(prefix, b"valid\n");
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
+        let mut tail = String::new();
+        decoder.read_to_string(&mut tail)?;
+        assert_eq!(tail, "tail");
+    }
+    Ok(())
+}
+
 #[test]
 fn custom_escape_and_delimiter() {
     let s = CsvSettings {

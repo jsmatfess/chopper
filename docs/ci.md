@@ -205,6 +205,7 @@ gate. Selected checks are the union of all changed paths:
 | Shared engine or vendored source | Native Windows/Linux/macOS, combined features, browser, tooling on Linux and Windows |
 | WASI adapter source | Native Windows/Linux/macOS, combined features, browser |
 | Standalone Python package and root `pyproject.toml` | Tooling on Linux and Windows |
+| Formula binding generator (`scripts/generate-formula-bindings.py`) | Tooling on Linux and Windows |
 | UI sources/generated native bundle | Native Windows/Linux/macOS (including UI parity), browser |
 | Browser build wrappers and build controls (`build-browser.mjs`, `build-browser.sh`, `browser-build.test.mjs`) | Browser and tooling on Linux; tooling on Windows |
 | Other browser acceptance helpers | Browser |
@@ -213,6 +214,9 @@ gate. Selected checks are the union of all changed paths:
 | Windows dispatcher, local release packaging or Graphify/RTK tooling | Tooling on Linux and Windows |
 | Shared migration validator and archived artifact aliases | Evidence checks |
 | Workspace manifest/lockfile, attributes/ignore policy, workflow/routing changes, unclassified paths | All jobs |
+
+The tooling job runs `python scripts/generate-formula-bindings.py --check` to
+verify that the Rust and Python builders match the portable formula catalog.
 
 Evidence checks also verify extracted narrative reconstruction and legacy anchors,
 normalized-view coverage, exact historical comparison populations and reviewed

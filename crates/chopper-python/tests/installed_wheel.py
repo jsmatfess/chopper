@@ -188,6 +188,34 @@ class InstalledWheel(unittest.TestCase):
             ["7", "gb", "10", 'GB "quoted"', 'B "quoted"', "gb"],
         ])
 
+    def test_long_arithmetic_chains_run_and_nested_arithmetic_keeps_grouping(self):
+        f = chopper.functions
+        values = [str(value) for value in range(1, 65)]
+        Path("numbers.csv").write_text(",".join(values) + "\n", encoding="utf-8")
+        total = f.number(chopper.col(0))
+        for index in range(1, len(values)):
+            total += f.number(chopper.col(index))
+        settings = {
+            **self.settings,
+            "input": "numbers.csv",
+            "input_csv": {"headers": False},
+            "output_csv": {"headers": False},
+        }
+        job = chopper.Job(settings, calculated_columns={
+            "total": total,
+            "difference": chopper.lit(15) - (chopper.lit(6) - 2),
+            "ratio": chopper.lit(32) / (chopper.lit(8) / 2),
+            "rounded": chopper.lit(1e16) + (chopper.lit(-1e16) + 1),
+        })
+
+        result = job.run()
+        with chopper.open_manifest(result["manifest_path"]) as manifest:
+            entry, = manifest
+        self.assertEqual(read_csv(Path("output", entry["path"])), [
+            [*values, "2080", "11", "8", "0"],
+        ])
+        self.assertEqual(chopper.parse(str(total)), total)
+
     def test_formula_column_names_and_positions_remain_distinct(self):
         f = chopper.functions
         Path("records.csv").write_text("id,0,side]\n3,7,western\n", encoding="utf-8")

@@ -1173,7 +1173,11 @@ fn validate_input_inspection(job: &Job) -> Result<()> {
         input: job.input.clone(),
         input_csv: job.input_csv.clone(),
         input_dialect: job.input_dialect.clone(),
-        output_csv: job.input_csv.clone(),
+        // The placeholder output must also validate for headerless input.
+        output_csv: CsvSettings {
+            headers: false,
+            ..CsvSettings::default()
+        },
         resources: job.resources.clone(),
         ..Job::default()
     }

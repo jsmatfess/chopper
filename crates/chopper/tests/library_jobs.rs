@@ -76,6 +76,33 @@ fn input_probes_discover_the_dialect_and_columns_without_a_destination() -> anyh
 }
 
 #[test]
+fn inspection_accepts_bom_setting_for_legacy_source_encoding() -> anyhow::Result<()> {
+    let root = tempfile::tempdir()?;
+    let source = root.path().join("records.csv");
+    let input = b"city,price\ncaf\xe9,3\n";
+    fs::write(&source, input)?;
+    let mut settings = JobSettings::for_files(source.to_str().unwrap(), "");
+    settings.input_csv.encoding = "windows-1252".into();
+    settings.input_csv.bom = true;
+    let job = Job::new(settings);
+
+    assert_eq!(
+        job.inspect()?.header().unwrap().collect::<Vec<_>>(),
+        ["city", "price"],
+    );
+    let preview = job.preview()?;
+    let row = preview.preview_rows().next().unwrap();
+    assert_eq!(row.fields().collect::<Vec<_>>(), ["café", "3"]);
+    let suggestion = job.detect_dialect()?;
+    assert_eq!(suggestion.sample_bytes(), input.len());
+    let detected = suggestion.settings();
+    assert_eq!(detected.encoding, "windows-1252");
+    assert!(!detected.bom);
+    assert_eq!(root.path().read_dir()?.count(), 1);
+    Ok(())
+}
+
+#[test]
 fn dialect_detection_bounds_the_sample_and_keeps_ambiguous_options() -> anyhow::Result<()> {
     let root = tempfile::tempdir()?;
     let source = root.path().join("ambiguous.csv");
@@ -98,6 +125,35 @@ fn dialect_detection_bounds_the_sample_and_keeps_ambiguous_options() -> anyhow::
         .unwrap_err()
         .to_string()
         .contains("regular file"));
+    Ok(())
+}
+
+#[test]
+fn input_probes_report_only_encoding_errors_in_consumed_records() -> anyhow::Result<()> {
+    let root = tempfile::tempdir()?;
+    let source = root.path().join("records.csv");
+    let destination = root.path().join("results");
+    let mut input = b"id,country\n".to_vec();
+    for number in 1..=8 {
+        writeln!(&mut input, "{number},US")?;
+    }
+    input.extend_from_slice(b"9,\xff\n");
+    fs::write(&source, &input)?;
+    let job = Job::new(JobSettings::for_files(
+        source.to_str().unwrap(),
+        destination.to_str().unwrap(),
+    ));
+    assert_eq!(job.inspect()?.column_count(), 2);
+    assert_eq!(job.preview()?.preview_rows().len(), 8);
+    for error in [job.analyze(None).err(), job.run(None).err()] {
+        let error = error.expect("full execution must reject malformed input");
+        assert!(error.to_string().contains("invalid byte sequence"));
+    }
+    assert!(!destination.exists());
+
+    fs::write(&source, b"id,country\n1,\xff\n")?;
+    assert_eq!(job.inspect()?.column_count(), 2);
+    assert!(job.preview().is_err());
     Ok(())
 }
 

@@ -300,7 +300,9 @@ job = Job(
 print(f"{job.run()['rows']} rows")
 ```
 
-The first output record is `1,US,new,2`.
+`double_id` names the calculation inside the Job so other formulas and pipeline
+steps can refer to it. The output CSV has no header. Its first record is
+`1,US,new,2`, with the calculated value in the fourth field.
 
 ### Pass function arguments
 

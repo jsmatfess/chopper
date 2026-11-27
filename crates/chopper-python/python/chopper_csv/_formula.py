@@ -2,11 +2,19 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from enum import IntEnum
 from math import isfinite
 from sys import maxsize
 
 from ._native import _validate_formula
+
+
+class _Precedence(IntEnum):
+    UNKNOWN = 0
+    ADDITIVE = 1
+    MULTIPLICATIVE = 2
+    ATOM = 3
 
 
 @dataclass(frozen=True, slots=True, init=False)
@@ -14,16 +22,19 @@ class Expr:
     """An immutable Chopper formula expression."""
 
     _source: str
+    _precedence: _Precedence = field(compare=False, repr=False)
 
     def __init__(self, source: str):
         _validate_formula(source)
         object.__setattr__(self, "_source", source)
+        object.__setattr__(self, "_precedence", _Precedence.UNKNOWN)
 
     @classmethod
-    def _from_source(cls, source: str) -> Expr:
+    def _from_source(cls, source: str, precedence: _Precedence = _Precedence.ATOM) -> Expr:
         # Composition uses known grammar. Job validation checks the entire formula.
         expression = cls.__new__(cls)
         object.__setattr__(expression, "_source", source)
+        object.__setattr__(expression, "_precedence", precedence)
         return expression
 
     def as_str(self) -> str:
@@ -103,7 +114,17 @@ def parse(source: str) -> Expr:
 
 
 def _binary(left: ExprLike, operator: str, right: ExprLike) -> Expr:
-    return Expr._from_source(f"({lit(left)}) {operator} ({lit(right)})")
+    precedence = _Precedence.ADDITIVE if operator in ("+", "-") else _Precedence.MULTIPLICATIVE
+    left_expr = lit(left)
+    right_expr = lit(right)
+    left_source = left_expr.as_str()
+    right_source = right_expr.as_str()
+    if left_expr._precedence < precedence:
+        left_source = f"({left_source})"
+    # Equal-precedence operators are left-associative.
+    if right_expr._precedence <= precedence:
+        right_source = f"({right_source})"
+    return Expr._from_source(f"{left_source} {operator} {right_source}", precedence)
 
 
 class _Omitted:

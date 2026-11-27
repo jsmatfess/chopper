@@ -22,6 +22,27 @@ fn expressions_preserve_literals_references_and_existing_formula_text() -> anyho
 }
 
 #[test]
+fn composed_arithmetic_preserves_grouping_without_extra_depth() -> anyhow::Result<()> {
+    let sum = (0..64)
+        .map(|index| f::number(col(index)))
+        .reduce(|left, right| left + right)
+        .unwrap();
+    parse(sum.as_str())?;
+    assert_eq!((lit(1) - (lit(2) - 3)).as_str(), "1 - (2 - 3)");
+    assert_eq!((lit(1) + lit(2) * 3).as_str(), "1 + 2 * 3");
+    assert_eq!((parse("1 + 2")? * 3).as_str(), "(1 + 2) * 3");
+    Ok(())
+}
+
+#[test]
+fn numeric_literals_keep_extreme_finite_values_compact() -> anyhow::Result<()> {
+    let expression = f::coalesce(std::iter::repeat_with(|| lit(f64::MIN_POSITIVE)).take(64));
+    parse(expression.as_str())?;
+    assert_eq!(lit(2.25).as_str(), "2.25");
+    Ok(())
+}
+
+#[test]
 fn composed_formulas_bind_numeric_selectors_in_headered_and_headerless_jobs() -> anyhow::Result<()>
 {
     let root = tempfile::tempdir()?;
@@ -31,9 +52,9 @@ fn composed_formulas_bind_numeric_selectors_in_headered_and_headerless_jobs() ->
             "3,us\n7,gb\n",
             false,
             col(0),
-            "3,us,9,US\n7,gb,21,GB\n",
+            "3,us,9,US,10\n7,gb,21,GB,22\n",
         ),
-        ("named-zero", "id,0\n3,7\n", true, col("0"), "3,7,21,7\n"),
+        ("named-zero", "id,0\n3,7\n", true, col("0"), "3,7,21,7,22\n"),
     ] {
         let source = root.path().join(format!("{name}.csv"));
         let destination = root.path().join(name);
@@ -45,6 +66,7 @@ fn composed_formulas_bind_numeric_selectors_in_headered_and_headerless_jobs() ->
         settings.calculated_columns = vec![
             (parse("1 + 2")? * f::number(reference)).alias("triple"),
             f::upper(f::trim(col(1))).alias("label"),
+            (col("triple") + 1).alias("next"),
         ];
         let job = Job::new(settings);
         job.validate()?;

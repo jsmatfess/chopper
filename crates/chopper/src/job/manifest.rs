@@ -78,7 +78,15 @@ struct HeaderRecord {
 
 #[derive(Deserialize)]
 struct HeaderConfig {
+    #[serde(deserialize_with = "manifest_compression")]
     compression: Compression,
+}
+
+fn manifest_compression<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Compression, D::Error> {
+    let name = String::deserialize(deserializer)?;
+    Compression::deserialize(de::value::StringDeserializer::new(name))
 }
 
 #[derive(Deserialize)]
@@ -650,6 +658,27 @@ mod tests {
         assert_eq!(overflow.code(), "manifest_format");
         assert!(overflow.to_string().contains("overflow at line 3"));
         assert!(reader.next().is_none());
+        Ok(())
+    }
+
+    #[test]
+    fn manifest_compression_requires_a_supported_string() -> anyhow::Result<()> {
+        let temp = tempfile::tempdir()?;
+        let path = temp.path().join("manifest.jsonl");
+        let mut first = header(0, 0, 0);
+        for compression in [
+            json!({"zip": null}),
+            json!(["zip"]),
+            json!("zstd"),
+            Value::Null,
+        ] {
+            first["config"]["compression"] = compression;
+            fs::write(&path, first.to_string())?;
+            assert_eq!(
+                ManifestReader::open(&path, LIMIT).unwrap_err().code(),
+                "manifest_format"
+            );
+        }
         Ok(())
     }
 

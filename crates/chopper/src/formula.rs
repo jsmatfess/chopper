@@ -12,6 +12,7 @@
 
 use chopper_core::{expression::Expression, CalculatedColumn, Column};
 use std::{
+    borrow::Cow,
     fmt,
     ops::{Add, Div, Mul, Sub},
 };
@@ -19,23 +20,67 @@ use std::{
 pub mod functions;
 
 /// A composable formula for a calculated column.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Expr(String);
+#[derive(Clone, Debug)]
+pub struct Expr {
+    source: String,
+    precedence: Precedence,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+enum Precedence {
+    Unknown,
+    Additive,
+    Multiplicative,
+    Atom,
+}
 
 impl Expr {
+    fn atom(source: impl Into<String>) -> Self {
+        Self {
+            source: source.into(),
+            precedence: Precedence::Atom,
+        }
+    }
+
     /// Borrow the formula text used in saved Job JSON.
     pub fn as_str(&self) -> &str {
-        &self.0
+        &self.source
     }
 
     /// Name this expression as a calculated column in a Job.
     pub fn alias(self, name: impl Into<String>) -> CalculatedColumn {
         CalculatedColumn {
             name: name.into(),
-            expression: self.0,
+            expression: self.source,
+        }
+    }
+
+    fn operand(&self, parent: Precedence, wrap_equal: bool) -> Cow<'_, str> {
+        if self.precedence < parent || (wrap_equal && self.precedence == parent) {
+            Cow::Owned(format!("({self})"))
+        } else {
+            Cow::Borrowed(self.as_str())
+        }
+    }
+
+    fn binary(self, rhs: Self, operator: &str, precedence: Precedence) -> Self {
+        let left = self.operand(precedence, false);
+        // The parser is left-associative. Keep explicit right-side grouping.
+        let right = rhs.operand(precedence, true);
+        Self {
+            source: format!("{left} {operator} {right}"),
+            precedence,
         }
     }
 }
+
+impl PartialEq for Expr {
+    fn eq(&self, other: &Self) -> bool {
+        self.source == other.source
+    }
+}
+
+impl Eq for Expr {}
 
 impl fmt::Display for Expr {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -60,12 +105,15 @@ impl std::error::Error for FormulaError {}
 pub fn parse(source: impl Into<String>) -> Result<Expr, FormulaError> {
     let source = source.into();
     Expression::parse(&source).map_err(FormulaError)?;
-    Ok(Expr(source))
+    Ok(Expr {
+        source,
+        precedence: Precedence::Unknown,
+    })
 }
 
 /// Refer to an exact header name or a zero-based input position.
 pub fn col(column: impl Into<Column>) -> Expr {
-    Expr(match column.into() {
+    Expr::atom(match column.into() {
         Column::Name(name) => format!("[{}]", name.replace(']', "]]")),
         Column::Index(index) => format!("${index}"),
     })
@@ -79,7 +127,7 @@ pub fn lit(value: impl Into<Expr>) -> Expr {
 
 /// Build a NULL literal.
 pub fn null() -> Expr {
-    Expr("NULL".into())
+    Expr::atom("NULL")
 }
 
 impl From<&Expr> for Expr {
@@ -90,7 +138,7 @@ impl From<&Expr> for Expr {
 
 impl From<&str> for Expr {
     fn from(value: &str) -> Self {
-        Self(format!("\"{}\"", value.replace('"', "\"\"")))
+        Self::atom(format!("\"{}\"", value.replace('"', "\"\"")))
     }
 }
 
@@ -102,7 +150,7 @@ impl From<String> for Expr {
 
 impl From<bool> for Expr {
     fn from(value: bool) -> Self {
-        Self(if value { "TRUE" } else { "FALSE" }.into())
+        Self::atom(if value { "TRUE" } else { "FALSE" })
     }
 }
 
@@ -110,7 +158,7 @@ macro_rules! integer_literals {
     ($($kind:ty),+ $(,)?) => {
         $(impl From<$kind> for Expr {
             fn from(value: $kind) -> Self {
-                Self(value.to_string())
+                Self::atom(value.to_string())
             }
         })+
     };
@@ -120,12 +168,17 @@ integer_literals!(i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize
 
 impl From<f64> for Expr {
     fn from(value: f64) -> Self {
-        if value.is_finite() {
-            Self(value.to_string())
-        } else {
+        if !value.is_finite() {
             // This literal fails the shared finite-number check without looking like a header.
-            Self("1e9999".into())
+            return Self::atom("1e9999");
         }
+        let decimal = value.to_string();
+        let scientific = format!("{value:e}");
+        Self::atom(if scientific.len() < decimal.len() {
+            scientific
+        } else {
+            decimal
+        })
     }
 }
 
@@ -136,21 +189,21 @@ impl From<f32> for Expr {
 }
 
 macro_rules! arithmetic {
-    ($trait:ident, $method:ident, $operator:literal) => {
+    ($trait:ident, $method:ident, $operator:literal, $precedence:ident) => {
         impl<Rhs: Into<Expr>> $trait<Rhs> for Expr {
             type Output = Self;
 
             fn $method(self, rhs: Rhs) -> Self {
-                Self(format!("({self}) {} ({})", $operator, rhs.into()))
+                self.binary(rhs.into(), $operator, Precedence::$precedence)
             }
         }
     };
 }
 
-arithmetic!(Add, add, "+");
-arithmetic!(Sub, sub, "-");
-arithmetic!(Mul, mul, "*");
-arithmetic!(Div, div, "/");
+arithmetic!(Add, add, "+", Additive);
+arithmetic!(Sub, sub, "-", Additive);
+arithmetic!(Mul, mul, "*", Multiplicative);
+arithmetic!(Div, div, "/", Multiplicative);
 
 fn function(name: &str, arguments: impl IntoIterator<Item = Expr>) -> Expr {
     let mut source = name.to_owned();
@@ -164,5 +217,5 @@ fn function(name: &str, arguments: impl IntoIterator<Item = Expr>) -> Expr {
         }
     }
     source.push(')');
-    Expr(source)
+    Expr::atom(source)
 }

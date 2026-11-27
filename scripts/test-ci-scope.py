@@ -102,6 +102,16 @@ class ScopeTests(unittest.TestCase):
             self.assertEqual(self.selected(path), set(scope.JOBS))
         self.assertEqual(scope.classify([], full=True), dict.fromkeys(scope.JOBS, True))
 
+    def test_formula_bindings_select_the_tooling_check(self):
+        generator = 'scripts/generate-formula-bindings.py'
+        self.assertEqual(self.selected(generator), {'tooling'})
+        for path in (generator, 'crates/chopper-core/src/expression.rs',
+                     'crates/chopper/src/formula/functions.rs',
+                     'crates/chopper-python/python/chopper_csv/functions.py'):
+            for platform in ('linux', 'windows'):
+                with self.subTest(path=path, platform=platform):
+                    self.assertTrue(scope.classify([path], platform=platform)['tooling'])
+
     def test_small_python_controls_keep_browser_and_add_owning_tooling(self):
         for path in ('scripts/browser-small-runner.py', 'scripts/browser-small-windows.py',
                      'scripts/test-browser-small-runner.py'):

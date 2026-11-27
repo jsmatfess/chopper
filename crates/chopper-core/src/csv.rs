@@ -47,6 +47,7 @@ pub struct DecodeReader<R> {
     output: [u8; 32768],
     pos: usize,
     len: usize,
+    malformed_pending: bool,
     eof: bool,
     done: bool,
 }
@@ -61,6 +62,7 @@ impl<R: Read> DecodeReader<R> {
             output: [0; 32768],
             pos: 0,
             len: 0,
+            malformed_pending: false,
             eof: false,
             done: false,
         })
@@ -90,6 +92,12 @@ impl<R: Read> DecodeReader<R> {
         let output_capacity = self.output.len();
         let direct = DIRECT && self.pos == self.len && out.len() >= output_capacity;
         while self.pos == self.len && !self.done {
+            if std::mem::take(&mut self.malformed_pending) {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "invalid byte sequence in selected input encoding",
+                ));
+            }
             if self.start == self.end && !self.eof {
                 self.end = self.source.read(&mut self.input)?;
                 self.start = 0;
@@ -109,16 +117,8 @@ impl<R: Read> DecodeReader<R> {
             self.len = if direct { 0 } else { written };
             match result {
                 DecoderResult::Malformed(_, _) => {
-                    // Preserve the buffered reader's state if a library caller
-                    // retries after InvalidData; Intake itself stays terminal.
-                    if direct {
-                        self.output[..written].copy_from_slice(&out[..written]);
-                        self.len = written;
-                    }
-                    return Err(io::Error::new(
-                        io::ErrorKind::InvalidData,
-                        "invalid byte sequence in selected input encoding",
-                    ));
+                    // Yield the valid prefix so callers can finish complete records before the error.
+                    self.malformed_pending = true;
                 }
                 DecoderResult::InputEmpty if self.eof => self.done = true,
                 _ => {}
