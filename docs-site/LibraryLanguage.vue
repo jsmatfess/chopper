@@ -61,9 +61,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <fieldset ref="picker" class="library-language" :hidden="!selection">
+  <fieldset ref="picker" class="library-picker" :hidden="!selection">
     <legend>Example language</legend>
-    <div class="library-language-choices">
+    <div class="library-picker-options">
       <div v-for="(label, language) in choices" :key="language">
         <input
           :id="`library-language-${language}`"
@@ -80,36 +80,39 @@ onUnmounted(() => {
 </template>
 
 <style>
-.library-language {
+.library-picker {
+  border: 0;
   margin-block-start: 1.5rem;
+  min-inline-size: 0;
+  padding: 0;
 }
 
-.library-language legend {
+.library-picker legend {
   font-weight: 650;
 }
 
-.library-language-choices {
+.library-picker-options {
   display: flex;
   flex-wrap: wrap;
   gap: 0 1rem;
 }
 
-.library-language-choices > div {
+.library-picker-options > div {
   display: flex;
   align-items: center;
   gap: .5rem;
 }
 
-.library-language input {
+.library-picker input {
   accent-color: var(--vp-c-brand-1);
 }
 
-.library-language input:focus-visible {
+.library-picker input:focus-visible {
   outline: 2px solid var(--vp-c-brand-1);
   outline-offset: 2px;
 }
 
-.library-language label {
+.library-picker label {
   display: inline-flex;
   align-items: center;
   min-block-size: 3rem;
