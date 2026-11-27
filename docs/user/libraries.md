@@ -87,7 +87,204 @@ Use `Job(settings)` to construct a Job from a dictionary, or pass a dictionary
 to `validate`, `analyze`, or `run`. Execution releases the GIL, so another
 Python thread can observe or cancel the Job. Python failures raise `ChopperError`.
 
-## Compose, inspect, and replay
+## Inspect an input
+
+Use the input path and any [CSV settings](../job-json.md#csv-settings) you
+already know. These methods also work with gzip and ZIP inputs. For a ZIP with
+multiple CSV members, set `zip_member` to the exact member name. You can leave
+the output path empty while deciding how to configure the Job.
+
+| Method | What it reads | What it returns |
+| --- | --- | --- |
+| `detect_dialect()` | Up to 64 KiB of decompressed input before text decoding | Suggested CSV settings, a delimiter status, a note, and the number of bytes sampled |
+| `inspect()` | The first parsed CSV record | Column count, optional header, and whether the input is ZIP |
+| `preview()` | The header, if configured, and up to eight data records | Column metadata and sampled rows with their record numbers |
+| `analyze()` | The full input | Bounded statistics and pipeline estimates for a configured Job |
+
+Python also exports `detect_dialect(settings)`, `inspect(settings)`, and
+`preview(settings)` for use with a settings dictionary.
+
+### Detect a dialect and list columns
+
+Detection compares the configured delimiter and comma, tab, semicolon, and
+pipe. It can recognize a supported encoding from a BOM and suggest an observed
+line ending. When candidates tie (`ambiguous`) or none fits (`not_detected`),
+it keeps the configured delimiter. A single best fit reports `detected`.
+Set header, quote, and escape behavior using what you know about the file.
+Review the suggestion before applying it to a new Job's `input_csv`.
+Read the suggestion via `DetectedDialect::settings()` in Rust or the
+`settings` key in Python.
+
+Column positions are zero-based in parsed input order. Names reflect the
+configured input parsing rules. Duplicate names keep their positions, so use
+indices to distinguish them. With `headers` set to `false`, inspection gets
+the width from the first data record, with no name for each column.
+
+**Rust**
+
+```rust
+use chopper::job::{Error, Job, JobSettings};
+
+fn main() -> Result<(), Error> {
+    let input = Job::new(JobSettings::for_files("customers.csv", ""));
+    let detected = input.detect_dialect()?;
+    println!(
+        "{:?} from {} bytes: {}",
+        detected.delimiter_status(),
+        detected.sample_bytes(),
+        detected.note(),
+    );
+
+    let mut settings = input.settings().clone();
+    settings.input_csv = detected.settings();
+    let report = Job::new(settings).inspect()?;
+    println!("{} columns", report.column_count());
+    for column in report.columns() {
+        println!("{}: {}", column.index, column.name.unwrap_or("(no header)"));
+    }
+    Ok(())
+}
+```
+
+**Python**
+
+```python
+from chopper_csv import detect_dialect, inspect, iter_columns
+
+source = {"input": "customers.csv"}
+detected = detect_dialect(source)
+print(f"{detected['delimiter_status']} from {detected['sample_bytes']} bytes")
+print(detected["note"])
+
+report = inspect({**source, "input_csv": detected["settings"]})
+print(f"{report['columns']} columns")
+for index, name in iter_columns(report):
+    label = "(no header)" if name is None else name
+    print(f"{index}: {label}")
+```
+
+Rust's `InputReport` exposes `column_count()`, `header()`, and
+`input_is_zip()`. The `columns()` iterator borrows names from the report.
+Python's report stores the count in `columns`, the list of names or `None`
+in `header`, and the ZIP flag in `input_is_zip`. `iter_columns(report)`
+yields `(index, name)` pairs lazily.
+The sample reports `0: id`, `1: country`, and `2: segment`.
+
+### Preview input rows
+
+Preview retains up to 32 KiB of decoded field text across its sampled rows.
+Large records can be omitted, so pair each returned row with its number.
+Numbers start at one for the first data record after input filtering and
+exclude the header. Preview rows contain text values.
+
+**Rust**
+
+```rust
+use chopper::job::{Error, Job, JobSettings};
+
+fn main() -> Result<(), Error> {
+    let report = Job::new(JobSettings::for_files("customers.csv", "")).preview()?;
+    for row in report.preview_rows() {
+        let fields: Vec<_> = row.fields().collect();
+        println!("{}: {fields:?}", row.number);
+    }
+    Ok(())
+}
+```
+
+**Python**
+
+```python
+from chopper_csv import Job
+
+report = Job({"input": "customers.csv"}).preview()
+for number, row in zip(report["preview_row_numbers"], report["preview"], strict=True):
+    print(f"{number}: {row}")
+```
+
+## Add calculated columns
+
+Give each calculated column a name and a [formula](../formula-functions.md).
+`[id]` refers to the `id` header. CSV fields start as text, so use `NUMBER`
+before doing arithmetic. The new columns are appended in declaration order
+and can be used for partitioning or allocation strata.
+
+**Rust**
+
+```rust
+use chopper::job::{CalculatedColumn, Column, Error, Job, JobSettings, Operation};
+
+fn main() -> Result<(), Error> {
+    let job = Job::new(JobSettings {
+        calculated_columns: vec![
+            CalculatedColumn {
+                name: "country_label".into(),
+                expression: "LOWER([country])".into(),
+            },
+            CalculatedColumn {
+                name: "double_id".into(),
+                expression: "NUMBER([id]) * 2".into(),
+            },
+        ],
+        operations: vec![Operation::partition(vec![Column::Name("country_label".into())])],
+        ..JobSettings::for_files("customers.csv", "calculated")
+    });
+    let report = job.run(None)?;
+    println!("{} rows in {} groups", report.rows, report.groups);
+    Ok(())
+}
+```
+
+**Python**
+
+```python
+from chopper_csv import Job, Pipeline, partition
+
+job = Job({
+    "input": "customers.csv",
+    "output": "calculated",
+    "calculated_columns": [
+        {"name": "country_label", "expression": "LOWER([country])"},
+        {"name": "double_id", "expression": "NUMBER([id]) * 2"},
+    ],
+}, pipeline=Pipeline().then(partition(["country_label"])))
+report = job.run()
+print(f"{report['rows']} rows in {report['groups']} groups")
+```
+
+With the sample input, the Run writes eight rows in two groups. `validate()`
+checks formula syntax. Analyze and Run resolve column references against the
+input. `Job.save` in both languages writes the formulas to the same versioned
+Job JSON that the CLI accepts.
+
+### Offer formula suggestions
+
+Use `formula_functions()` to populate an editor with pairs of function names
+and call signatures. The [formula reference](../formula-functions.md) explains
+function behavior and shows how to refer to input columns.
+
+**Rust**
+
+```rust
+use chopper::job::formula_functions;
+
+fn main() {
+    for (name, signature) in formula_functions() {
+        println!("{name}: {signature}");
+    }
+}
+```
+
+**Python**
+
+```python
+from chopper_csv import formula_functions
+
+for name, signature in formula_functions():
+    print(f"{name}: {signature}")
+```
+
+## Compose and replay Jobs
 
 `then` returns a new Pipeline and accepts one operation or an entire Pipeline.
 Each operation applies to each group produced by the preceding operation.
@@ -220,6 +417,63 @@ the [native manifest](../native-manifest.md). A relative destination gives a
 relative manifest path. Independent shuffled Runs preserve the same grouping
 and cap guarantees with independently generated order.
 
+## Stream published output metadata
+
+Run the quickstart to create `results/manifest.jsonl`, then read one output
+record at a time. Use the same API for a manifest from a CLI Run. The reader
+opens the manifest only. Output records contain the path, row and byte counts,
+`compressed_target_exceeded` flag, and lineage. For a ZIP result, keep `path`
+as the exact member name inside `outputs.zip`.
+
+Set a per-line byte limit that can hold the manifest's Job record, which can
+include substantial configuration and analysis data. The limit counts each
+line's bytes up to its LF terminator. Opening reads the Job record and returns
+a reader with a header containing version, input header, compression, and
+aggregate counts. Iterating to exhaustion reconciles the output count, row
+count, and total CSV bytes with the header.
+
+**Rust**
+
+```rust
+use chopper::job::{Error, ManifestReader};
+
+fn main() -> Result<(), Error> {
+    let max_record_bytes = 16 * 1024 * 1024;
+    let manifest = ManifestReader::open("results/manifest.jsonl", max_record_bytes)?;
+    println!("{} published CSVs", manifest.header().output_files);
+    for output in manifest {
+        let output = output?;
+        println!(
+            "{}: {} rows, {} CSV bytes",
+            output.path, output.rows, output.csv_bytes
+        );
+    }
+    Ok(())
+}
+```
+
+Use `report.outputs(max_record_bytes)` to open the reader from a Rust
+`RunReport`. Each iteration item is a `Result<ManifestOutput, Error>`.
+
+**Python**
+
+```python
+from chopper_csv import open_manifest
+
+with open_manifest(
+    "results/manifest.jsonl", max_record_bytes=16 * 1024 * 1024
+) as manifest:
+    print(f"{manifest.header['output_files']} published CSVs")
+    for output in manifest:
+        print(f"{output['path']}: {output['rows']} rows, {output['csv_bytes']} CSV bytes")
+```
+
+Python's `open_manifest` defaults to a 16 MiB limit per record. The reader
+returns dictionaries and raises `ChopperError` for manifest failures. The
+context manager closes the file. You can also call `manifest.close()` directly.
+Use the [native manifest verification example](../native-manifest.md#verify-a-result)
+when you also need to check the published CSV payloads.
+
 ## Handle errors and control execution
 
 Errors expose a `code` and a readable message. Configuration errors may also
@@ -236,6 +490,9 @@ include a JSON Pointer in `path` and one-based `line` and `column` coordinates.
 | `cancelled` | Execution observed a cancellation request before completion |
 | `control_in_use` | The control already belongs to an execution |
 | `execution` | Another execution failure, described by the message |
+| `manifest_read` | Could not open or read the result manifest |
+| `manifest_format` | Invalid manifest record, unsupported schema version, or inconsistent totals |
+| `manifest_limit` | A record exceeds the byte limit, the limit is zero, or the reader could not allocate its buffer |
 
 ### Report a configuration error
 

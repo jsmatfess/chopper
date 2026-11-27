@@ -73,10 +73,12 @@ the same compiler release selected for the candidate's other builds.
 - `wheels/` contains the exact wheel installed into the fresh `installed/`
   environment. Qualification checks the version, `cp311-abi3` platform tag and
   byte-for-byte license and notice payloads. The installed tests cover the
-  composed Job, CLI replay and concurrent cancellation.
+  composed Job, CLI replay, concurrent cancellation, calculated columns, input
+  probes, and manifest streaming for plain, gzip and ZIP output.
 - `cargo-packages/receipt.json` records the packaged crate set, the downstream
-  lockfile and native host, and the ZIP resource checks. It covers the public
-  crate, portable core, and the bundled ZIP, Deflate and JSON dependencies.
+  lockfile and native host, and the ZIP resource checks. The downstream caller
+  exercises input probes and reads the published manifest. Qualification covers
+  the public crate, portable core, and the bundled ZIP, Deflate and JSON dependencies.
 - The native CLI's version, generated reference, quickstart and other recipes,
   output manifests, and prior-release Jobs are checked against that candidate
   executable. The package and wheel tests also check row conservation, group

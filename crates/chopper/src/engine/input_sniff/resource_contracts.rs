@@ -34,7 +34,13 @@ fn parity(bytes: &[u8], delimiter: char, encoding: &str, bom: bool, crlf: bool) 
     settings.bom = bom;
     settings.line_ending = if crlf { "crlf" } else { "lf" }.into();
     ensure!(
-        result == json!({"settings":settings,"note":NOTE}),
+        result
+            == json!({
+                "settings": settings,
+                "note": NOTE,
+                "delimiter_status": "detected",
+                "sample_bytes": bytes.len().min(SAMPLE),
+            }),
         "sniff JSON parity failed: {result}"
     );
     ensure!(workspace.used() > 0, "sniff result lost admission");
@@ -105,7 +111,7 @@ fn scoring() -> Result<()> {
         Reservation::for_workspace(workspace.clone()),
     )?;
     ensure!(
-        result["note"] == NO_MATCH,
+        result["note"] == NO_MATCH && result["delimiter_status"] == "not_detected",
         "malformed sample changed the delimiter"
     );
     drop(result);

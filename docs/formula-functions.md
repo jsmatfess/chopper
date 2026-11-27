@@ -1,10 +1,10 @@
 # Formula functions
 
 Calculated columns evaluate expressions against the current row. The same
-formulas work in the hosted app, the guided CLI, and saved Jobs. See
-[Calculated columns in Job JSON](job-json.md#formulas) for an example of grouping
-by a formula result and [Run with flags](run-cli.md#calculated-columns) for native CLI
-syntax.
+formulas work in the hosted app, the CLI, and both libraries. See runnable
+[Rust and Python examples](user/libraries.md#add-calculated-columns),
+[calculated columns in Job JSON](job-json.md#formulas), or
+[CLI flags](run-cli.md#calculated-columns).
 
 ## Write a formula
 

@@ -1,17 +1,25 @@
 """Compose, load and execute file-to-file Chopper Jobs."""
 
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass
+from itertools import repeat
 import json
 from os import PathLike
 from typing import Any
 
-from ._native import ChopperError, ExecutionControl, NativeJob as _NativeJob
+from ._native import (
+    ChopperError,
+    ExecutionControl,
+    ManifestReader,
+    NativeJob as _NativeJob,
+    formula_functions,
+    open_manifest,
+)
 
 __all__ = [
-    "ChopperError", "ExecutionControl", "Job", "Pipeline", "analyze", "assign",
-    "assign_probabilistic", "balanced", "interleaved", "partition", "run", "shuffle",
-    "validate",
+    "ChopperError", "ExecutionControl", "Job", "ManifestReader", "Pipeline", "analyze", "assign",
+    "assign_probabilistic", "balanced", "detect_dialect", "formula_functions", "inspect",
+    "interleaved", "iter_columns", "open_manifest", "partition", "preview", "run", "shuffle", "validate",
 ]
 
 _Column = str | int
@@ -132,6 +140,18 @@ class Job:
         """Check configuration and raise ChopperError on failure."""
         self._native.validate()
 
+    def inspect(self) -> dict[str, Any]:
+        """Discover input columns from the first parsed record."""
+        return self._native.inspect()
+
+    def preview(self) -> dict[str, Any]:
+        """Discover input columns and sample up to eight data records."""
+        return self._native.preview()
+
+    def detect_dialect(self) -> dict[str, Any]:
+        """Suggest CSV settings from a bounded sample of the input."""
+        return self._native.detect_dialect()
+
     def analyze(self, control: ExecutionControl | None = None) -> dict[str, Any]:
         """Return bounded statistics and advisory estimates."""
         return self._native.analyze(control)
@@ -144,6 +164,28 @@ class Job:
 def validate(settings: dict[str, Any]) -> None:
     """Validate a dictionary Job."""
     Job(settings).validate()
+
+
+def inspect(settings: dict[str, Any]) -> dict[str, Any]:
+    """Discover input columns for a dictionary Job."""
+    return Job(settings).inspect()
+
+
+def preview(settings: dict[str, Any]) -> dict[str, Any]:
+    """Preview the input for a dictionary Job."""
+    return Job(settings).preview()
+
+
+def detect_dialect(settings: dict[str, Any]) -> dict[str, Any]:
+    """Suggest CSV settings for a dictionary Job."""
+    return Job(settings).detect_dialect()
+
+
+def iter_columns(report: dict[str, Any]) -> Iterator[tuple[int, str | None]]:
+    """Yield zero-based column indices and optional names from an input report."""
+    header = report.get("header")
+    names = header if header is not None else repeat(None, report["columns"])
+    return enumerate(names)
 
 
 def analyze(settings: dict[str, Any], control: ExecutionControl | None = None) -> dict[str, Any]:

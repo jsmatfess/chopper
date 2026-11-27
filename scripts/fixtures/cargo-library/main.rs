@@ -1,4 +1,7 @@
-use chopper::job::{Column, Job, JobSettings, Limits, Operation, Pipeline, Shuffle};
+use chopper::job::{
+    formula_functions, Column, DelimiterStatus, Job, JobSettings, Limits, Operation, Pipeline,
+    Shuffle,
+};
 use std::{error::Error, fs, path::Path};
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -19,7 +22,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     let consumer_json: serde_json::Value =
         serde_json::from_str(r#"{"z":184467440737095516160,"a":0.1}"#)?;
     assert_eq!(consumer_json["z"].to_string(), "184467440737095516160");
-    assert_eq!(consumer_json.as_object().unwrap().keys().next().unwrap(), "z");
+    assert_eq!(
+        consumer_json.as_object().unwrap().keys().next().unwrap(),
+        "z"
+    );
     let pipeline = Pipeline::default()
         .then(Operation::partition(vec![Column::Name("country".into())]))
         .then(Operation::shuffle(Shuffle::Uniform));
@@ -35,7 +41,22 @@ fn main() -> Result<(), Box<dyn Error>> {
     settings.input_csv.encoding = "utf-16le".into();
     fs::create_dir("recipes")?;
     Job::new(settings.clone()).save("recipes/rust.json")?;
-    let report = Job::load("recipes/rust.json")?.run(None)?;
+    let job = Job::load("recipes/rust.json")?;
+    let dialect = job.detect_dialect()?;
+    assert_eq!(dialect.delimiter_status(), DelimiterStatus::Detected);
+    assert_eq!(dialect.settings().encoding, "utf-16le");
+    assert_eq!(dialect.settings().delimiter, ',');
+    let input = job.inspect()?;
+    assert!(input.input_is_zip());
+    assert_eq!(
+        input.header().unwrap().collect::<Vec<_>>(),
+        ["id", "country", "note"]
+    );
+    let preview = job.preview()?;
+    assert_eq!(preview.preview_rows().len(), 4);
+    assert!(formula_functions().contains(&("UPPER", "UPPER(text)")));
+
+    let report = job.run(None)?;
     assert_eq!(
         (
             report.rows,
@@ -46,6 +67,16 @@ fn main() -> Result<(), Box<dyn Error>> {
         (4, 3, 2, 4)
     );
     assert_eq!(report.manifest_path, Path::new("rust/manifest.jsonl"));
+    let outputs = report.outputs(1024 * 1024)?;
+    assert_eq!(outputs.header().rows, report.rows);
+    assert_eq!(outputs.header().output_files, report.output_files);
+    let mut total_rows = 0;
+    for output in outputs {
+        let output = output?;
+        assert!(Path::new("rust").join(&output.path).is_file());
+        total_rows += output.rows;
+    }
+    assert_eq!(total_rows, report.rows);
     println!("{}", serde_json::to_string(&report)?);
 
     settings.output = "cli".into();

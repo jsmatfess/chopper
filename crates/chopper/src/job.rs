@@ -26,11 +26,22 @@ pub use chopper_core::{
 };
 
 mod error;
+mod input;
+mod manifest;
 mod save;
 mod worker;
 pub use error::Error;
+pub use input::{DelimiterStatus, DetectedDialect, InputColumn, InputReport, PreviewRow};
+pub use manifest::{
+    ManifestDecision, ManifestHeader, ManifestLineage, ManifestOutput, ManifestReader,
+};
 #[doc(hidden)]
 pub use save::{display_guide_text, save_guide_configuration};
+
+/// Built-in calculated-column function names and their argument signatures.
+pub fn formula_functions() -> &'static [(&'static str, &'static str)] {
+    chopper_core::expression::FUNCTIONS
+}
 
 /// An ordered, reusable sequence of existing Job operations.
 #[derive(Clone, Debug, Default)]
@@ -130,6 +141,27 @@ impl Job {
             .map_err(|error| Error::new("invalid_config", error))
     }
 
+    /// Read the first parsed record to discover input columns.
+    pub fn inspect(&self) -> Result<InputReport, Error> {
+        worker::execute(|| crate::engine::input_columns(self.settings()))
+            .map(InputReport::new)
+            .map_err(Error::execution)
+    }
+
+    /// Inspect the parsed columns and a bounded sample of up to eight data records.
+    pub fn preview(&self) -> Result<InputReport, Error> {
+        worker::execute(|| crate::engine::input_preview(self.settings()))
+            .map(InputReport::new)
+            .map_err(Error::execution)
+    }
+
+    /// Suggest CSV settings from at most 64 KiB of input after decompression.
+    pub fn detect_dialect(&self) -> Result<DetectedDialect, Error> {
+        worker::execute(|| crate::engine::sniff_csv(self.settings()))
+            .map(DetectedDialect::new)
+            .map_err(Error::execution)
+    }
+
     /// Scan the current input and return bounded, advisory observations.
     pub fn analyze(&self, control: Option<&ExecutionControl>) -> Result<AnalyzeReport, Error> {
         execute(control, |cancel, notify| {
@@ -167,6 +199,13 @@ pub struct RunReport {
     pub output_files: u64,
     pub output_csv_bytes: u64,
     pub manifest_path: PathBuf,
+}
+
+impl RunReport {
+    /// Open the result manifest and read its output metadata incrementally.
+    pub fn outputs(&self, max_record_bytes: usize) -> Result<ManifestReader, Error> {
+        ManifestReader::open(&self.manifest_path, max_record_bytes)
+    }
 }
 
 /// Bounded observations from Analyze. Borrowed access keeps the report's

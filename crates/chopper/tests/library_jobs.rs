@@ -15,6 +15,93 @@ use std::{
 };
 
 #[test]
+fn input_probes_discover_the_dialect_and_columns_without_a_destination() -> anyhow::Result<()> {
+    use std::fmt::Write as _;
+
+    let root = tempfile::tempdir()?;
+    let source = root.path().join("records.tsv");
+    let mut input = String::from("\u{feff}0\tsegment\tsegment\r\n");
+    for row in 1..=9 {
+        writeln!(&mut input, "{row}\tnew\treturning\r")?;
+    }
+    fs::write(&source, &input)?;
+    let mut settings = JobSettings::for_files(source.to_str().unwrap(), "");
+    let suggestion = Job::new(settings.clone()).detect_dialect()?;
+    assert_eq!(
+        suggestion.delimiter_status(),
+        chopper::job::DelimiterStatus::Detected
+    );
+    assert_eq!(suggestion.sample_bytes(), input.len());
+    settings.input_csv = suggestion.settings();
+    assert_eq!(settings.input_csv.delimiter, '\t');
+    assert_eq!(settings.input_csv.line_ending, "crlf");
+    assert!(settings.input_csv.bom);
+
+    let job = Job::new(settings.clone());
+    let inspected = job.inspect()?;
+    assert_eq!(inspected.column_count(), 3);
+    assert!(!inspected.input_is_zip());
+    assert_eq!(
+        inspected
+            .columns()
+            .map(|column| (column.index, column.name))
+            .collect::<Vec<_>>(),
+        [(0, Some("0")), (1, Some("segment")), (2, Some("segment"))],
+    );
+    assert_eq!(inspected.preview_rows().len(), 0);
+    let preview = job.preview()?;
+    let mut rows = preview.preview_rows();
+    assert_eq!(rows.len(), 8);
+    let first = rows.next().unwrap();
+    assert_eq!(first.number, 1);
+    assert_eq!(
+        first.fields().collect::<Vec<_>>(),
+        ["1", "new", "returning"]
+    );
+    let mut analyzable = settings.clone();
+    analyzable.output = root.path().join("results").to_str().unwrap().into();
+    let analyzable = Job::new(analyzable);
+    assert_eq!(analyzable.analyze(None)?.rows(), 9);
+
+    input.push_str("invalid\r\n");
+    fs::write(&source, input)?;
+    assert_eq!(job.preview()?.preview_rows().len(), 8);
+    assert!(analyzable.analyze(None).is_err());
+    settings.input_csv.headers = false;
+    let headerless = Job::new(settings).inspect()?;
+    assert!(headerless.header().is_none());
+    assert!(headerless.columns().all(|column| column.name.is_none()));
+    assert_eq!(root.path().read_dir()?.count(), 1);
+    Ok(())
+}
+
+#[test]
+fn dialect_detection_bounds_the_sample_and_keeps_ambiguous_options() -> anyhow::Result<()> {
+    let root = tempfile::tempdir()?;
+    let source = root.path().join("ambiguous.csv");
+    fs::write(&source, "a,b;c\nx,y;z\n".repeat(7000))?;
+    let job = Job::new(JobSettings::for_files(source.to_str().unwrap(), ""));
+    let suggestion = job.detect_dialect()?;
+    assert_eq!(suggestion.sample_bytes(), 64 * 1024);
+    assert_eq!(
+        suggestion.delimiter_status(),
+        chopper::job::DelimiterStatus::Ambiguous,
+    );
+    assert_eq!(suggestion.settings().delimiter, ',');
+    assert!(chopper::job::formula_functions()
+        .iter()
+        .any(|(name, _)| *name == "UPPER"));
+
+    let directory = Job::new(JobSettings::for_files(root.path().to_str().unwrap(), ""));
+    assert!(directory
+        .inspect()
+        .unwrap_err()
+        .to_string()
+        .contains("regular file"));
+    Ok(())
+}
+
+#[test]
 fn composed_job_publishes_capped_files_and_replays_from_cli() -> anyhow::Result<()> {
     let root = tempfile::tempdir()?;
     let input = root.path().join("input.csv");

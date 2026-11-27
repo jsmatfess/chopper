@@ -14,8 +14,7 @@ The forms are mutually exclusive. `--config` permits the `--memory-mb` and
 It rejects job-building flags before opening the config. Chopper resolves relative
 paths from the process's working directory, including paths inside a saved Job.
 For example, run a Job with `input: "quickstart/customers.csv"` from the directory
-that contains `quickstart/`. The `split` convenience command uses the fixed
-partition → assign → shuffle → balanced/interleaved → limits order.
+that contains `quickstart/`.
 
 ```sh
 chopper run --input input.csv --output results \
@@ -32,9 +31,9 @@ belong to the preceding step, even when job-wide flags occur between them.
 Wrong-scope options, duplicate scalar step settings and unknown options fail;
 they never leak forward or change another step. Repeated global settings fail.
 Defaults and semantic validation come from the existing Job types. Flag-built Run
-constructs a caller-owned Job as `split` does; JSON Run retains its existing
-admitted decoded owner through confirmation, then transfers its charge to
-the prepared configuration during execution. Flag construction
+constructs a caller-owned Job. JSON Run retains its admitted decoded owner
+through confirmation, then transfers its charge to the prepared configuration
+during execution. Flag construction
 does not use or extend the
 [scripted JSON decode-origin admission envelope](cli-job-decoding.md).
 

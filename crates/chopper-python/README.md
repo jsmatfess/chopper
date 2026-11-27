@@ -22,14 +22,14 @@ job.save("job.json")
 ```
 
 The [library guide](https://github.com/jsmatfess/chopper/blob/main/docs/user/libraries.md)
-includes sample input and runnable examples for pipeline reuse, replay,
-configuration errors, and cancellation.
+includes sample input and runnable examples for input inspection, calculated
+columns, pipeline reuse, replay, streaming manifests, and cancellation.
 
 `Job.save` creates a new file. `Job.load("job.json")` reads a saved Job from
 Chopper's CLI or another caller.
 `Job(settings)` and the module's `validate`, `analyze`, and `run` functions also
 accept Job dictionaries. The dictionary fields, including CSV settings, limits,
-resources, and operations, follow the versioned [Job format](https://github.com/jsmatfess/chopper/blob/main/docs/job-json.md).
+resources, calculated columns, and operations, follow the versioned [Job format](https://github.com/jsmatfess/chopper/blob/main/docs/job-json.md).
 Relative paths resolve from the current working directory. Run requires a new
 or empty destination directory and publishes it only after execution succeeds.
 Byte limits apply to the serialized CSV, including the header and record endings.
@@ -45,6 +45,12 @@ advisory estimates. Run reads the current input and returns `rows`, `columns`,
 `groups`, `output_files`, `output_csv_bytes`, and `manifest_path`. Job and
 execution failures raise `ChopperError` with a stable `code`, a readable message,
 and `path`, `line`, and `column` when available.
+
+Use `Job.detect_dialect()`, `Job.inspect()`, and `Job.preview()` to suggest CSV
+settings, read column names, and sample input records. Use
+`open_manifest(report["manifest_path"])` to iterate through published output
+metadata. `formula_functions()` returns the built-in function names and call
+signatures.
 
 Analyze and Run are synchronous. Pass a fresh `ExecutionControl()` to each
 call to let another thread poll `control.progress()` for `phase`, `rows`, and

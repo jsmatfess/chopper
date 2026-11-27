@@ -248,7 +248,8 @@ fn score(
 
 pub(super) fn sniff(source: impl Read, job: &Job, charge: Reservation) -> Result<Inspection> {
     let raw = ChargedBytes::read(source.take(SAMPLE as u64), charge.sibling(), SAMPLE)?;
-    let capped = raw.bytes.len() == SAMPLE;
+    let sample_bytes = raw.bytes.len();
+    let capped = sample_bytes == SAMPLE;
     let mut settings = job.input_csv.clone();
     sample_settings(&raw.bytes, &mut settings)?;
     // The supported encodings expand to at most three UTF-8 bytes per source
@@ -303,18 +304,27 @@ pub(super) fn sniff(source: impl Read, job: &Job, charge: Reservation) -> Result
     if let Some(ending) = ending {
         settings.line_ending = ending.into();
     }
-    let note = if ambiguous {
-        AMBIGUOUS
+    let (delimiter_status, note) = if ambiguous {
+        ("ambiguous", AMBIGUOUS)
     } else if best == 0 {
-        NO_MATCH
+        ("not_detected", NO_MATCH)
     } else {
         settings.delimiter = suggested;
-        NOTE
+        ("detected", NOTE)
     };
-    Inspection::build(
-        charge,
-        0,
-        note.len() + 64,
-        || json!({"settings": settings, "note": note}),
-    )
+    // Charge all owned text, including up to three encoded CSV setting characters.
+    let text_bytes = settings
+        .encoding
+        .len()
+        .checked_add(settings.line_ending.len())
+        .and_then(|bytes| bytes.checked_add(note.len() + delimiter_status.len() + 12))
+        .context("dialect suggestion text length overflow")?;
+    Inspection::build(charge, 0, text_bytes, || {
+        json!({
+            "settings": settings,
+            "note": note,
+            "delimiter_status": delimiter_status,
+            "sample_bytes": sample_bytes,
+        })
+    })
 }

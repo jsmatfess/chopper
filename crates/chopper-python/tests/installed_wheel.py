@@ -98,6 +98,101 @@ class InstalledWheel(unittest.TestCase):
         self.assertEqual(cli.returncode, 0, cli.stderr)
         self.verify_capped_result("replayed/manifest.jsonl", json.loads(cli.stdout), cap)
 
+    def test_inspect_and_detect_a_source_only_job(self):
+        content = "0\tsegment\tsegment\r\n" + "1\tnew\treturning\r\n" * 10
+        sample = b"\xff\xfe" + content.encode("utf-16le")
+        with ZipFile("records.zip", "w", compression=ZIP_DEFLATED) as archive:
+            archive.writestr("nested/records.csv", sample)
+            archive.writestr("notes.txt", "Choose the CSV member with zip_member.")
+        settings = {"input": "records.zip", "zip_member": "nested/records.csv"}
+        suggested = chopper.detect_dialect(settings)
+        self.assertEqual(suggested["delimiter_status"], "detected")
+        self.assertEqual(suggested["sample_bytes"], len(sample))
+        self.assertEqual(suggested["settings"]["encoding"], "utf-16le")
+        self.assertEqual(suggested["settings"]["delimiter"], "\t")
+        self.assertEqual(suggested["settings"]["line_ending"], "crlf")
+        self.assertTrue(suggested["settings"]["bom"])
+
+        job = chopper.Job({**settings, "input_csv": suggested["settings"]})
+        columns = job.inspect()
+        self.assertTrue(columns["input_is_zip"])
+        self.assertEqual(list(chopper.iter_columns(columns)),
+                         [(0, "0"), (1, "segment"), (2, "segment")])
+        preview = chopper.preview(job.to_dict())
+        self.assertEqual(preview["preview"], [["1", "new", "returning"]] * 8)
+        self.assertEqual(preview["preview_row_numbers"], list(range(1, 9)))
+        headerless = {
+            **settings, "input_csv": {**suggested["settings"], "headers": False},
+        }
+        self.assertEqual(list(chopper.iter_columns(chopper.inspect(headerless))),
+                         [(0, None), (1, None), (2, None)])
+        self.assertIn("UPPER", dict(chopper.formula_functions()))
+        self.assertEqual({path.name for path in Path().iterdir()}, {"customers.csv", "records.zip"})
+
+    def test_calculated_columns_are_saved_and_can_partition_output(self):
+        job = chopper.Job({
+            **self.settings,
+            "calculated_columns": [
+                {"name": "label", "expression": "LOWER([country])"},
+                {"name": "double_id", "expression": "NUMBER([id]) * 2"},
+            ],
+        }, pipeline=chopper.Pipeline().then(chopper.partition(["label"])))
+        job.validate()
+        job.save("formulas.json")
+        saved = chopper.Job.load("formulas.json")
+        self.assertEqual(saved.to_dict(), job.to_dict())
+        result = saved.run()
+        self.assertEqual((result["rows"], result["groups"]), (12, 3))
+        with chopper.open_manifest(result["manifest_path"]) as manifest:
+            for entry in manifest:
+                label, = entry["lineage"][0]["values"]
+                header, *rows = read_csv(Path("output", entry["path"]))
+                self.assertEqual(header[-2:], ["label", "double_id"])
+                self.assertTrue(rows)
+                for row in rows:
+                    self.assertEqual(row[4:], [row[1].lower(), str(int(row[0]) * 2)])
+                    self.assertEqual(row[4], label)
+
+    def test_stream_a_published_manifest(self):
+        for mode in ("none", "gzip", "zip"):
+            with self.subTest(compression=mode):
+                destination = Path(f"manifest-{mode}")
+                report = chopper.run({
+                    **self.settings, "output": str(destination), "compression": mode,
+                    "operations": [{"type": "partition", "columns": ["country"]}],
+                })
+                path = Path(report["manifest_path"])
+                with chopper.open_manifest(path) as reader:
+                    self.assertIsInstance(reader, chopper.ManifestReader)
+                    self.assertEqual(reader.header["input_header"], ["id", "country", "segment", "note"])
+                    self.assertEqual(reader.header["compression"], mode)
+                    entries = list(reader)
+                self.assertEqual(len(entries), report["output_files"])
+                self.assertEqual(sum(entry["rows"] for entry in entries), report["rows"])
+                self.assertEqual(sum(entry["csv_bytes"] for entry in entries), report["output_csv_bytes"])
+                names = {entry["path"] for entry in entries}
+                if mode == "zip":
+                    with ZipFile(destination / "outputs.zip") as archive:
+                        self.assertEqual(names | {"manifest.jsonl"}, set(archive.namelist()))
+                        self.assertEqual(archive.read("manifest.jsonl"), path.read_bytes())
+                else:
+                    self.assertEqual(names, {file.name for file in destination.iterdir()} - {path.name})
+
+                with chopper.open_manifest(path) as reader:
+                    self.assertEqual(next(reader), entries[0])
+                self.assertIsNone(next(reader, None))
+                self.assert_job_error("manifest_limit", lambda: chopper.open_manifest(path, max_record_bytes=1))
+
+        damaged = Path("damaged.jsonl")
+        with path.open("rb") as source:
+            damaged.write_bytes(source.readline() + b"{\n")
+        with chopper.open_manifest(damaged) as reader:
+            with self.assertRaises(chopper.ChopperError) as failed:
+                next(reader)
+            self.assertEqual(failed.exception.code, "manifest_format")
+            self.assertEqual(failed.exception.line, 2)
+            self.assertIsNone(next(reader, None))
+
     def test_pipeline_reuse_keeps_operation_order_and_owns_its_selectors(self):
         columns = ["0", 0]
         groups = [{"name": "a", "percent": "70"}, {"name": "b", "percent": "30"}]

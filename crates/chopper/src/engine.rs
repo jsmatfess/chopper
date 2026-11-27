@@ -1177,7 +1177,15 @@ fn validate_input_inspection(job: &Job) -> Result<()> {
         resources: job.resources.clone(),
         ..Job::default()
     }
-    .validate()
+    .validate()?;
+    #[cfg(not(target_os = "wasi"))]
+    ensure!(
+        std::fs::metadata(&job.input)
+            .context("open input")?
+            .is_file(),
+        "input must be a regular file"
+    );
+    Ok(())
 }
 fn inspect_input(job: &Job, preview: bool) -> Result<Inspection> {
     validate_input_inspection(job)?;

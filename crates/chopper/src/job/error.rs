@@ -9,11 +9,20 @@ use chopper_core::JobValidationError;
 use serde::{ser::SerializeStruct, Serialize, Serializer};
 use std::{fmt, io};
 
-/// A Job failure with a stable code and available configuration location.
+/// A Job failure with a stable code and available source location.
 #[derive(Debug)]
 pub struct Error {
     code: &'static str,
     source: anyhow::Error,
+}
+
+#[derive(Debug)]
+pub(super) struct ManifestLocation(pub(super) u64);
+
+impl fmt::Display for ManifestLocation {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "decode manifest line {}", self.0)
+    }
 }
 
 impl Error {
@@ -75,6 +84,9 @@ impl Error {
     }
 
     pub fn line(&self) -> Option<usize> {
+        if let Some(location) = self.source.downcast_ref::<ManifestLocation>() {
+            return usize::try_from(location.0).ok();
+        }
         self.json_location().map(|error| error.line())
     }
 

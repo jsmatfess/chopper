@@ -1,4 +1,6 @@
-use chopper::job::{Error, ExecutionControl as Control, Job as RustJob};
+use chopper::job::{
+    Error, ExecutionControl as Control, Job as RustJob, ManifestReader as RustManifestReader,
+};
 use pyo3::{create_exception, exceptions::PyException, prelude::*};
 use serde::Serialize;
 use std::path::PathBuf;
@@ -81,6 +83,27 @@ impl NativeJob {
         self.inner.validate().map_err(|error| job_error(py, error))
     }
 
+    fn inspect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let report = py
+            .detach(|| self.inner.inspect())
+            .map_err(|error| job_error(py, error))?;
+        dictionary(py, &report)
+    }
+
+    fn preview<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let report = py
+            .detach(|| self.inner.preview())
+            .map_err(|error| job_error(py, error))?;
+        dictionary(py, &report)
+    }
+
+    fn detect_dialect<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let report = py
+            .detach(|| self.inner.detect_dialect())
+            .map_err(|error| job_error(py, error))?;
+        dictionary(py, &report)
+    }
+
     fn analyze<'py>(
         &self,
         py: Python<'py>,
@@ -106,9 +129,76 @@ impl NativeJob {
     }
 }
 
+#[pyfunction]
+/// Return the built-in calculated-column functions as name and signature pairs.
+fn formula_functions() -> Vec<(&'static str, &'static str)> {
+    chopper::job::formula_functions().to_vec()
+}
+
+#[pyclass(name = "ManifestReader", module = "chopper_csv")]
+/// Stream metadata from one published native result manifest.
+struct ManifestReader {
+    inner: RustManifestReader,
+}
+
+#[pymethods]
+impl ManifestReader {
+    #[getter]
+    fn header<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        dictionary(py, self.inner.header())
+    }
+
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __next__<'py>(&mut self, py: Python<'py>) -> PyResult<Option<Bound<'py, PyAny>>> {
+        let output = py
+            .detach(|| self.inner.next())
+            .transpose()
+            .map_err(|error| job_error(py, error))?;
+        output.map(|entry| dictionary(py, &entry)).transpose()
+    }
+
+    fn __enter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __exit__(
+        &mut self,
+        _kind: &Bound<'_, PyAny>,
+        _value: &Bound<'_, PyAny>,
+        _traceback: &Bound<'_, PyAny>,
+    ) {
+        self.close();
+    }
+
+    /// Close the manifest early.
+    fn close(&mut self) {
+        self.inner.close();
+    }
+}
+
+const DEFAULT_MANIFEST_RECORD_BYTES: usize = 16 * 1024 * 1024;
+
+#[pyfunction(signature = (path, *, max_record_bytes = DEFAULT_MANIFEST_RECORD_BYTES))]
+/// Open a native result manifest with a limit on each JSON Lines record.
+fn open_manifest(
+    py: Python<'_>,
+    path: PathBuf,
+    max_record_bytes: usize,
+) -> PyResult<ManifestReader> {
+    py.detach(|| RustManifestReader::open(path, max_record_bytes))
+        .map(|inner| ManifestReader { inner })
+        .map_err(|error| job_error(py, error))
+}
+
 #[pymodule]
 fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
     module.add("ChopperError", module.py().get_type::<ChopperError>())?;
     module.add_class::<ExecutionControl>()?;
+    module.add_class::<ManifestReader>()?;
+    module.add_function(wrap_pyfunction!(formula_functions, module)?)?;
+    module.add_function(wrap_pyfunction!(open_manifest, module)?)?;
     module.add_class::<NativeJob>()
 }
