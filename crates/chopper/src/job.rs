@@ -1,14 +1,13 @@
 //! Synchronous file-to-file Jobs for native Rust callers.
 use crate::{
-    cli_job::{DecodedJob, MAX_JOB_BYTES},
+    cli_job::DecodedJob,
     profile::{InputProfile, ProfileCache},
     storage::{Cancelled, Notify, ProgressPhase},
 };
-use anyhow::{ensure, Context as _};
+use anyhow::ensure;
 use serde::Serialize;
 use std::{
     fmt,
-    io::Write,
     path::{Path, PathBuf},
     sync::{
         atomic::{AtomicBool, Ordering},
@@ -27,8 +26,11 @@ pub use chopper_core::{
 };
 
 mod error;
+mod save;
 mod worker;
 pub use error::Error;
+#[doc(hidden)]
+pub use save::{display_guide_text, save_guide_configuration};
 
 /// An ordered, reusable sequence of existing Job operations.
 #[derive(Clone, Debug, Default)]
@@ -110,26 +112,14 @@ impl Job {
     }
 
     /// Write a Job JSON file atomically. The target file must be new.
+    /// An error can report a committed save with incomplete temporary cleanup.
     pub fn save(&self, path: impl AsRef<Path>) -> Result<(), Error> {
-        self.save_new(path.as_ref())
+        std::path::absolute(path)
+            .map_err(anyhow::Error::from)
+            .and_then(|destination| {
+                save::write(self.settings(), &destination, save::Mode::CompactNew)
+            })
             .map_err(|error| Error::new("config_write", error))
-    }
-
-    fn save_new(&self, path: &Path) -> anyhow::Result<()> {
-        let path = std::path::absolute(path)?;
-        let parent = path.parent().context("configuration parent is required")?;
-        let mut temporary = tempfile::NamedTempFile::new_in(parent)?;
-        serde_json::to_writer(&mut temporary, self.settings())?;
-        temporary.write_all(b"\n")?;
-        ensure!(
-            temporary.as_file().metadata()?.len() <= MAX_JOB_BYTES,
-            "configuration exceeds 1 MiB"
-        );
-        temporary.as_file().sync_all()?;
-        temporary
-            .persist_noclobber(path)
-            .map_err(|error| error.error)?;
-        Ok(())
     }
 
     /// Check only configuration, including formulas and the required output path.
@@ -299,9 +289,7 @@ fn execute<T: Send>(
             Err(error) if error.code() == "cancelled" => "Cancelled",
             Err(_) => "Failed",
         });
-        if result.is_ok() {
-            progress.temp_bytes = 0;
-        }
+        progress.temp_bytes = 0;
     }
     result
 }

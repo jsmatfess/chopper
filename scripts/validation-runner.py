@@ -208,39 +208,53 @@ def linux_process_identity(pid):
     return {'pid': pid, 'process_group': int(fields[2]), 'linux_start_ticks': int(fields[19])}
 
 
+def linux_exit_without_reaping(process, timeout, deadline):
+    flags = os.WEXITED | os.WNOWAIT
+    if hasattr(os, 'pidfd_open'):
+        import select
+        descriptor = os.pidfd_open(process.pid)
+        try:
+            if not select.select([descriptor], [], [], timeout)[0]:
+                raise subprocess.TimeoutExpired(process.args, timeout)
+            return os.waitid(os.P_PID, process.pid, flags)
+        finally:
+            os.close(descriptor)
+    # The manylinux glibc 2.28 interpreters omit pidfd_open. Poll waitid
+    # with the same WNOWAIT option to keep the PID/PGID anchored.
+    wait_until = min(deadline, time.monotonic() + timeout)
+    while (remaining := wait_until - time.monotonic()) > 0:
+        status = os.waitid(os.P_PID, process.pid, flags | os.WNOHANG)
+        if status is not None:
+            return status
+        time.sleep(min(0.02, remaining))
+    raise subprocess.TimeoutExpired(process.args, timeout)
+
+
 def wait_command(process, timeout, deadline):
     if sys.platform != 'linux':
         return process.wait(timeout=timeout)
-    # Retain the exited leader as a zombie until group cleanup. Reaping first
-    # would allow PID/PGID reuse before a later killpg.
-    import select
-    descriptor = os.pidfd_open(process.pid)
-    try:
-        if not select.select([descriptor], [], [], timeout)[0]:
-            raise subprocess.TimeoutExpired(process.args, timeout)
-        ended = os.waitid(os.P_PID, process.pid, os.WEXITED | os.WNOWAIT)
-        abandoned = False
-        with os.scandir('/proc') as entries:
-            for entry in entries:
-                if time.monotonic() >= deadline:
-                    raise subprocess.TimeoutExpired(process.args, timeout)
-                if not entry.name.isdecimal() or entry.name == str(process.pid):
-                    continue
-                try:
-                    member = linux_process_identity(int(entry.name))
-                except (FileNotFoundError, ProcessLookupError):
-                    continue
-                if member['process_group'] == process.pid:
-                    abandoned = True
-                    break
-        if time.monotonic() >= deadline:
-            raise subprocess.TimeoutExpired(process.args, timeout)
-        if abandoned:
-            raise OSError('command exited with an abandoned owned process group')
-        # The one cleanup boundary in run() signals/reaps this retained leader.
-        return ended.si_status if ended.si_code == os.CLD_EXITED else -ended.si_status
-    finally:
-        os.close(descriptor)
+    # A reaped leader's PID could be recycled before a later killpg.
+    ended = linux_exit_without_reaping(process, timeout, deadline)
+    abandoned = False
+    with os.scandir('/proc') as entries:
+        for entry in entries:
+            if time.monotonic() >= deadline:
+                raise subprocess.TimeoutExpired(process.args, timeout)
+            if not entry.name.isdecimal() or entry.name == str(process.pid):
+                continue
+            try:
+                member = linux_process_identity(int(entry.name))
+            except (FileNotFoundError, ProcessLookupError):
+                continue
+            if member['process_group'] == process.pid:
+                abandoned = True
+                break
+    if time.monotonic() >= deadline:
+        raise subprocess.TimeoutExpired(process.args, timeout)
+    if abandoned:
+        raise OSError('command exited with an abandoned owned process group')
+    # The one cleanup boundary in run() signals/reaps this retained leader.
+    return ended.si_status if ended.si_code == os.CLD_EXITED else -ended.si_status
 
 
 AttemptStatus = Literal['running', 'passed', 'failed', 'timeout', 'interrupted', 'invalidated']

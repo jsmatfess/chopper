@@ -144,6 +144,11 @@ def build_plan(tag, output):
     wheel = wheels / f'chopper_csv-{version}-{wheel_tag}.whl'
     installed = output / 'installed'
     installed_python = installed / ('Scripts/python.exe' if suffix else 'bin/python')
+    python_minor = f'python{sys.version_info.major}.{sys.version_info.minor}'
+    site = installed / ('Lib/site-packages' if suffix else f'lib/{python_minor}/site-packages')
+    package = site / 'chopper_csv'
+    installed_files = [package / '__init__.py', package / ('_native.pyd' if suffix else '_native.abi3.so'),
+                       site / f'chopper_csv-{version}.dist-info/RECORD']
     plan_path = output / 'qualification.json'
     steps = []
     sources = tracked('Cargo.toml', 'Cargo.lock', '.cargo', 'crates', 'vendor', 'pyproject.toml',
@@ -170,10 +175,10 @@ def build_plan(tag, output):
     step('wheel-venv', [python, '-I', '-m', 'venv', '--copies', installed],
          [SCRIPT], [installed_python, installed / 'pyvenv.cfg'])
     step('wheel-install', [installed_python, '-I', '-m', 'pip', 'install', '--no-index',
-                           '--no-deps', '--disable-pip-version-check', wheel],
-         [wheel, installed / 'pyvenv.cfg'])
+                           '--no-deps', '--force-reinstall', '--disable-pip-version-check', wheel],
+         [wheel, installed / 'pyvenv.cfg'], installed_files)
     step('installed-wheel', [installed_python, '-I', INSTALLED_TEST, cli],
-         [INSTALLED_TEST, 'examples/customers.csv', wheel, cli, installed / 'pyvenv.cfg'])
+         [INSTALLED_TEST, 'examples/customers.csv', wheel, cli, installed / 'pyvenv.cfg', *installed_files])
     for name, script, paths, args in (
         ('cli-reference', 'scripts/cli-reference.py', ('docs/cli-reference.md',
                                                      'docs/cli-reference-data.json'), ('--check',)),

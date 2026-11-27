@@ -49,6 +49,8 @@ def classify(paths, full=False, platform='all'):
             selected.update(JOBS)
         elif path in TOOLS:
             selected.add('tooling')
+        elif path == 'pyproject.toml' or path.startswith('crates/chopper-python/'):
+            selected.add('tooling')
         elif path in EVIDENCE_SCRIPTS:
             selected.add('evidence')
         elif path.startswith(('schemas/', 'scripts/fixtures/release-upgrade/')) or path in {
@@ -61,6 +63,8 @@ def classify(paths, full=False, platform='all'):
             pass
         elif path.startswith(('crates/', 'vendor/')):
             selected.update(('native', 'features', 'browser'))
+            if path.startswith(('crates/chopper/', 'crates/chopper-core/', 'vendor/')):
+                selected.add('tooling')
             if path.startswith('crates/chopper-core/'):
                 selected.add('core')
         elif path.startswith('ui/') or path == 'docs/cli-reference-data.json':

@@ -19,6 +19,7 @@ struct Program {
 
 fn prepare(
     source: &str,
+    index: usize,
     schema: &Header,
     source_width: usize,
     unnamed: usize,
@@ -26,7 +27,8 @@ fn prepare(
     source_reference: &mut impl FnMut(usize),
 ) -> Result<Program> {
     memory.resize(Expression::preparation_bytes(source))?;
-    let mut expression = Expression::parse(source).map_err(anyhow::Error::msg)?;
+    let mut expression = Expression::parse(source)
+        .map_err(|cause| chopper_core::JobValidationError::calculated_expression(index, cause))?;
     let mut dependencies = 0;
     expression
         .bind_references(Some(schema), schema.len(), unnamed, &mut |index| {
@@ -170,9 +172,10 @@ impl Plan {
     ) -> Result<Self> {
         let expanded = schema(job, header, width, memory.sibling())?;
         let mut order = [0; 64];
-        let programs = BoundPrograms::bind(&job.calculated_columns, |_, column| {
+        let programs = BoundPrograms::bind(&job.calculated_columns, |index, column| {
             prepare(
                 &column.expression,
+                index,
                 &expanded,
                 width,
                 if header.is_none() { width } else { 0 },
@@ -570,6 +573,7 @@ fn formula_preview(request: FormulaPreviewRequest) -> Result<FormulaPreview> {
         } else {
             prepare(
                 &calculation.expression,
+                index,
                 &expanded,
                 columns,
                 if header.is_none() { columns } else { 0 },

@@ -188,6 +188,19 @@ class InstalledWheel(unittest.TestCase):
         self.assert_job_error("json_syntax", lambda: chopper.Job.from_json("{"))
         self.assert_job_error("config_read", lambda: chopper.Job.load("missing-job.json"))
 
+        unicode_job = {**self.settings, "input_dialect": {"comment_prefix": "é" * 180_000}}
+        Path("unicode.json").write_text(json.dumps(unicode_job, ensure_ascii=False), encoding="utf-8")
+        self.assertEqual(chopper.Job(unicode_job).to_dict(), chopper.Job.load("unicode.json").to_dict())
+        for invalid_job in ({**self.settings, "limits": {"bytes": float("nan")}},
+                            {**self.settings, "output": "\ud800"}):
+            Path("invalid.json").write_text(json.dumps(invalid_job), encoding="utf-8")
+            for action in (lambda: chopper.Job(invalid_job), lambda: chopper.Job.load("invalid.json")):
+                self.assert_job_error("json_syntax", action)
+
+        formula = chopper.Job({**self.settings, "calculated_columns": [{"name": "bad", "expression": "1+"}]})
+        for action in (formula.validate, formula.analyze, formula.run):
+            self.assert_job_error("invalid_config", action, path="/calculated_columns/0/expression")
+
         destination = Path("output")
         destination.mkdir()
         keep = destination / "keep.txt"

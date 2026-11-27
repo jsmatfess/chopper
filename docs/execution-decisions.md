@@ -13,7 +13,12 @@ control, with working allocations charged to the shared native process ledger.
 
 ```mermaid
 flowchart TD
-    Request[User action] --> Schema{Valid job without seed settings?}
+    Request[User action] --> LibraryRun{Reusable native library Run?}
+    LibraryRun -->|No| Schema{Valid job without seed settings?}
+    LibraryRun -->|Yes| CopyAdmission{Admit a settings copy in the process ledger?}
+    CopyAdmission -->|Denied| ConfigurationError[Return resource_limit before opening input]
+    CopyAdmission -->|Admitted| Copy[Hold the copy and grant for transfer to the execution workspace]
+    Copy --> Schema
     Schema -->|No| RejectSeed[Reject obsolete seed / internal random_seed fields]
     Schema -->|Yes| Action{Which action?}
     Action -->|Analyze input| Profile[Full-file validation and bounded statistics]

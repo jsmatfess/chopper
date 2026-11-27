@@ -22,8 +22,15 @@ class _Operation:
     source: str
 
 
+def _json(value: Any) -> str:
+    text = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+    # Keep UTF-8 Job sizes comparable to saved files. Escape lone surrogates
+    # so the shared decoder, rather than Python's UTF-8 bridge, diagnoses them.
+    return text.encode("utf-8", errors="backslashreplace").decode("utf-8")
+
+
 def _operation(kind: str, **settings: Any) -> _Operation:
-    return _Operation(json.dumps({"type": kind, **settings}, allow_nan=False))
+    return _Operation(_json({"type": kind, **settings}))
 
 
 @dataclass(frozen=True, slots=True, init=False)
@@ -97,7 +104,7 @@ class Job:
                 **settings,
                 "operations": [json.loads(step.source) for step in pipeline._operations],
             }
-        self._native = _NativeJob.from_json(json.dumps(settings, allow_nan=False, separators=(",", ":")))
+        self._native = _NativeJob.from_json(_json(settings))
 
     @classmethod
     def load(cls, path: str | PathLike[str]) -> "Job":

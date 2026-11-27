@@ -21,6 +21,14 @@ impl JobValidationError {
     pub fn path(&self) -> &str {
         &self.path
     }
+
+    /// Associate a formula parse error with its Job setting.
+    pub fn calculated_expression(index: usize, cause: String) -> Self {
+        Self::new(
+            format!("/calculated_columns/{index}/expression"),
+            anyhow::Error::msg(cause),
+        )
+    }
 }
 
 impl fmt::Display for JobValidationError {
@@ -206,12 +214,8 @@ impl Job {
                 "calculated column formula is empty or exceeds the size limit"
             );
             if prepare_formulas {
-                crate::expression::Expression::parse(&column.expression).map_err(|cause| {
-                    JobValidationError::new(
-                        format!("/calculated_columns/{index}/expression"),
-                        anyhow::anyhow!(cause),
-                    )
-                })?;
+                crate::expression::Expression::parse(&column.expression)
+                    .map_err(|cause| JobValidationError::calculated_expression(index, cause))?;
             }
         }
         for (index, op) in self.operations.iter().enumerate() {

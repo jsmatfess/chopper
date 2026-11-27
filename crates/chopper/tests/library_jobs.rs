@@ -23,14 +23,15 @@ fn composed_job_publishes_capped_files_and_replays_from_cli() -> anyhow::Result<
         Pipeline::default().then(Operation::partition(vec![Column::Name("country".into())]));
     let pipeline = partition.then(Operation::shuffle(Shuffle::Uniform));
     let job = Job::new(JobSettings {
-        input: input.to_str().unwrap().into(),
-        output: root.path().join("rust").to_str().unwrap().into(),
         operations: pipeline.into_operations(),
         limits: Limits {
             bytes: Some(18),
             ..Limits::default()
         },
-        ..JobSettings::default()
+        ..JobSettings::for_files(
+            input.to_str().unwrap(),
+            root.path().join("rust").to_str().unwrap(),
+        )
     });
 
     let report = job.run(None)?;
@@ -362,6 +363,7 @@ fn controls_cancel_live_jobs_without_affecting_other_executions() -> anyhow::Res
         Ok(completing.join().unwrap()?)
     })?;
     assert_eq!(first_control.progress().phase.as_str(), "Cancelled");
+    assert_eq!(first_control.progress().temp_bytes, 0);
     assert_eq!(second_control.progress().phase.as_str(), "Complete");
     assert_eq!(second_control.progress().rows, 300_000);
     assert_eq!(

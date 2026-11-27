@@ -213,7 +213,9 @@ within the command deadline,
 and group termination occurs before reaping that identity anchor. An observed
 remaining member fails the attempt even if the immediate child exited zero;
 inaccessible census metadata or deadline exhaustion also denies completion.
-This requires Linux PIDFD support and an accessible matching `/proc` namespace.
+Linux uses PIDFD readiness when exposed by Python, or polls non-reaping
+`waitid` when the interpreter omits it. Both paths require an accessible
+matching `/proc` namespace.
 The census and cleanup are part of the attempt duration, not free observation.
 `on_process` callbacks may observe the child but must not wait for or reap it.
 

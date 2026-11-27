@@ -12,8 +12,8 @@ describes future behavior; [GitHub Issues](https://github.com/jsmatfess/chopper/
    construct that configuration. The ordered
    [Run CLI parser](../crates/chopper/src/run_cli.rs) accepts JSON via
    the admitted decode owner or appends explicit `--step` blocks to a caller-owned
-   Job, without changing the fixed-order `split` interface; see its
-   [reference](run-cli.md). The [hosted result owner](../ui/src/result-ownership.ts)
+   Job. See the [Run reference](run-cli.md). The
+   [hosted result owner](../ui/src/result-ownership.ts)
    tracks edits by revision. A successful Run acknowledgement clears changed
    settings only if no edit occurred since submission. In-place operation edits,
    imports and edits subsequently reverted still require a new Run.

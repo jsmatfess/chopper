@@ -295,6 +295,11 @@ def control_records(text):
     return records
 
 
+def selects_chopper(command):
+    return any(option == '-p' and name in ('chopper', 'chopper-csv')
+               for option, name in zip(command, command[1:]))
+
+
 def validate_controls(report, identity, binary):
     require(report.get('schema') == 1 and report.get('exit_code') == 0, 'failed denial controls report')
     require(report.get('source_sha256') == identity['source_sha256'], 'stale denial controls source inventory')
@@ -304,7 +309,8 @@ def validate_controls(report, identity, binary):
             and build.get('binary_sha256') == sha(test_binary), 'missing matching test build provenance')
     require(build.get('exit_code') == 0 and build.get('toolchains'), 'failed test build')
     command = build.get('command', [])
-    require(all(v in command for v in ('test', '--locked', '--lib', '--no-run', '-p', 'chopper'))
+    require(all(v in command for v in ('test', '--locked', '--lib', '--no-run'))
+            and selects_chopper(command)
             and not any(v.startswith(('--features', '--all-features')) for v in command), 'test build command')
     require(build.get('logs'), 'missing test build logs')
     for log in build['logs']:
@@ -326,8 +332,8 @@ def validate_build(proof, identity):
     require(proof.get('profile') == 'release' and proof.get('toolchains'), 'incomplete release build provenance')
     commands = proof.get('commands', [])
     require(commands and all(isinstance(c, list) for c in commands), 'build commands require argument arrays')
-    require(any('build' in c and '--release' in c and '--locked' in c and '-p' in c
-                and c[c.index('-p') + 1] == 'chopper' for c in commands), 'missing locked release build command')
+    require(any('build' in c and '--release' in c and '--locked' in c and selects_chopper(c)
+                for c in commands), 'missing locked release build command')
     require(not any(any(v.startswith(('--features', '--all-features', '--tests', '--lib')) for v in c) for c in commands),
             'production proof includes test hooks/features')
     outcomes = proof.get('outcomes', [])

@@ -197,8 +197,10 @@ gate. Selected checks are the union of all changed paths:
 | Changes | Selected jobs |
 | --- | --- |
 | Ordinary Markdown and `docs/` guidance | Planner and result only |
-| Portable-core source | Native Windows/Linux/macOS, combined features, core WASM target, browser |
-| Other Rust workspace or vendored source | Native Windows/Linux/macOS, combined features, browser |
+| Portable-core source | Native Windows/Linux/macOS, combined features, core WASM target, browser, tooling on Linux and Windows |
+| Shared engine or vendored source | Native Windows/Linux/macOS, combined features, browser, tooling on Linux and Windows |
+| WASI adapter source | Native Windows/Linux/macOS, combined features, browser |
+| Standalone Python package and root `pyproject.toml` | Tooling on Linux and Windows |
 | UI sources/generated native bundle | Native Windows/Linux/macOS (including UI parity), browser |
 | Browser build wrappers and build controls (`build-browser.mjs`, `build-browser.sh`, `browser-build.test.mjs`) | Browser and tooling on Linux; tooling on Windows |
 | Other browser acceptance helpers | Browser |
@@ -412,6 +414,11 @@ The shared browser artifact guard selects both browser
 and tooling checks. Packaging controls cover hashes, ZIP inventories/CRC/modes,
 source cleanliness and production WASM. Run the [extracted native smoke](release-packaging.md#extracted-native-smoke)
 with actual release builds for platform acceptance.
+
+The tooling job also checks the standalone PyO3 crate with its own Cargo
+lockfile and checks Python source syntax on Linux and Windows. The tagged
+[library release qualification](maintainer/library-release.md) builds and
+tests installed wheels on the supported platforms.
 
 ## Current owner-selected local-only operation
 

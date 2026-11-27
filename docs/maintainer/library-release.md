@@ -9,6 +9,8 @@ The [qualification command](../../scripts/qualify-library-release.py) checks the
 tag against HEAD, builds the locked CLI and wheel, and invokes the existing
 [validation runner](../validation-runner.md#local-batch-execution). Give each
 attempt a fresh output directory outside the checkout or under ignored `scratch/`.
+Retry a failed qualification from the entry point with a fresh directory so
+the previous package staging tree, installed environment and logs are retained.
 
 ## Windows x86-64
 

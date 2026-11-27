@@ -6,6 +6,7 @@ import csv
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import platform
 import shutil
@@ -89,12 +90,19 @@ def stage_workspace(path):
                  f'resolver = {json.dumps(source["resolver"])}\n\n'
                  '[workspace.package]' + cargo.split('[workspace.package]', 1)[1])
     (path / 'Cargo.toml').write_text(workspace, encoding='utf-8')
-    for directory in members:
-        shutil.copytree(ROOT / directory, path / directory, ignore=shutil.ignore_patterns('target'))
-    for name in ('Cargo.lock', 'LICENSE', 'docs/user/libraries.md'):
-        dest = path / name
+    tracked = subprocess.check_output(
+        ['git', '-C', ROOT, 'ls-files', '-z', '--', *members,
+         'Cargo.lock', 'LICENSE', 'docs/user/libraries.md'], timeout=30)
+    for name in tracked.split(b'\0'):
+        if not name:
+            continue
+        relative = Path(os.fsdecode(name))
+        original = ROOT / relative
+        require(original.is_file() and original.resolve() == original,
+                f'Expected a regular tracked package input: {relative}')
+        dest = path / relative
         dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / name, dest)
+        shutil.copy2(original, dest)
     # A nested staging directory may be inside the source checkout's ignored scratch/.
     # Give Cargo its own tree for file selection.
     subprocess.run(['git', 'init', '-q', path], check=True, timeout=30)

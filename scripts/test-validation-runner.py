@@ -111,6 +111,15 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(self.status()['attempts'][-1]['exit_code'], 0)
         self.assertIn('census denial', self.status()['attempts'][-1]['error'])
 
+    @unittest.skipUnless(sys.platform == 'linux', 'Linux waitid completion control')
+    def test_waitid_preserves_ownership_when_python_omits_pidfd(self):
+        from types import SimpleNamespace
+
+        os_without_pidfd = SimpleNamespace(**{name: value for name, value in vars(os).items()
+                                               if name != 'pidfd_open'})
+        with patch.object(runner, 'os', os_without_pidfd):
+            self.test_group_signal_keeps_leader_identity_and_census_failure_denies()
+
     def test_resume_requires_the_owning_runner_implementation_identity(self):
         self.assertEqual(self.execute(), 0)
         for absent in [True, False]:

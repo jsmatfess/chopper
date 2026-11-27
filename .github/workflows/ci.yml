@@ -236,6 +236,11 @@ jobs:
         if: ${{ !env.ACT || runner.os == 'Linux' }}
         with:
           node-version: 22
+      - uses: dtolnay/rust-toolchain@stable
+        if: ${{ !env.ACT || runner.os == 'Linux' }}
+      - name: Check standalone Python extension
+        run: cargo check --locked --all-targets --manifest-path crates/chopper-python/Cargo.toml --target-dir target/python-check
+      - run: python -m compileall -q crates/chopper-python/python crates/chopper-python/tests
       - run: python scripts/test-package-release.py
       - run: python scripts/test-windows-native.py
       - run: python scripts/test-validation-runner.py

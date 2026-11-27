@@ -91,6 +91,17 @@ impl Default for Job {
         }
     }
 }
+impl Job {
+    /// Start a file-to-file Job with the same defaults as omitted JSON settings.
+    pub fn for_files(input: impl Into<String>, output: impl Into<String>) -> Self {
+        Self {
+            input: input.into(),
+            output: output.into(),
+            resources: Resources::automatic(),
+            ..Self::default()
+        }
+    }
+}
 wire_choices! {
     /// Versioned counter source. Removed source names remain strict decoding errors.
     #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]

@@ -992,16 +992,19 @@ pub fn execute(prepared: &Prepared) -> Result<EnginePublication> {
         .as_path()
         .parent()
         .expect("checked output parent");
-    let available = available_space(parent)?;
+    let available = available_space(parent)
+        .with_context(|| DestinationError("check output disk space".into()))?;
     ensure!(
         available
             > analysis
                 .output_csv_bytes
                 .saturating_add(analysis.output_csv_bytes / 10)
                 .saturating_add(1024 * 1024),
-        "insufficient output disk space for conservative estimate"
+        DestinationError("insufficient output disk space for conservative estimate".into())
     );
-    let mut stage = ctx.staging_directory(parent)?;
+    let mut stage = ctx
+        .staging_directory(parent)
+        .with_context(|| DestinationError("create private output staging directory".into()))?;
     let manifest_path =
         PublicationPath::join(stage.path(), "manifest.jsonl", Reservation::new(ctx))?;
     let mut manifest = PublicationWriter::new(&manifest_path, MANIFEST_BUFFER, ctx)?;

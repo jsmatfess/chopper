@@ -255,7 +255,9 @@ impl DirectPublication {
             .as_path()
             .parent()
             .expect("checked output parent");
-        let stage = ctx.staging_directory(parent)?;
+        let stage = ctx
+            .staging_directory(parent)
+            .with_context(|| DestinationError("create private output staging directory".into()))?;
         let mut buffer = Reservation::new(ctx);
         let records = if let Some(capacity) = capacity {
             buffer.resize(capacity)?;

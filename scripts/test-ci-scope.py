@@ -30,7 +30,22 @@ class ScopeTests(unittest.TestCase):
             self.assertTrue(scope.classify([path], platform='windows')['tooling'])
 
     def test_shared_core_checks_every_runtime_and_portable_target(self):
-        self.assertEqual(self.selected('crates/chopper-core/src/config.rs'), {'native', 'features', 'core', 'browser'})
+        self.assertEqual(self.selected('crates/chopper-core/src/config.rs'),
+                         {'native', 'features', 'core', 'browser', 'tooling'})
+
+    def test_python_paths_select_native_tooling_on_supported_platforms(self):
+        for path in ('pyproject.toml', 'crates/chopper-python/Cargo.toml',
+                     'crates/chopper-python/Cargo.lock', 'crates/chopper-python/src/lib.rs',
+                     'crates/chopper-python/python/chopper_csv/__init__.py',
+                     'crates/chopper-python/tests/installed_wheel.py'):
+            for platform in scope.PLATFORM_JOBS:
+                with self.subTest(path=path, platform=platform):
+                    jobs = scope.classify([path], platform=platform)
+                    self.assertEqual({job for job, enabled in jobs.items() if enabled},
+                                     {'tooling'} if platform != 'macos' else set())
+        workflow = (Path(__file__).resolve().parents[1] / '.github/workflows/ci.yml').read_text()
+        tooling = workflow.split('  tooling:\n', 1)[1].split('  result:\n', 1)[0]
+        self.assertIn('cargo check --locked --all-targets --manifest-path crates/chopper-python/Cargo.toml', tooling)
 
     def test_job_authoring_artifact_and_guide_select_native_checks(self):
         for path in ('schemas/0.5.0/job.schema.json', 'docs/job-json.md',
@@ -45,9 +60,10 @@ class ScopeTests(unittest.TestCase):
     def test_packaged_job_selects_native_browser_and_packaging_checks(self):
         self.assertEqual(self.selected('examples/quickstart-job.json'), {'native', 'browser', 'tooling'})
 
-    def test_native_engine_and_vendored_code_also_reach_browser(self):
+    def test_native_engine_and_vendored_code_reach_browser_and_python(self):
         for path in ('crates/chopper/src/storage.rs', 'vendor/zip-2.4.2/src/lib.rs'):
-            self.assertEqual(self.selected(path), {'native', 'features', 'browser'})
+            self.assertEqual(self.selected(path), {'native', 'features', 'browser', 'tooling'})
+        self.assertEqual(self.selected('crates/chopper-browser/src/lib.rs'), {'native', 'features', 'browser'})
 
     def test_ui_checks_embedded_and_hosted_builds(self):
         self.assertEqual(self.selected('ui/src/app.ts'), {'native', 'browser'})

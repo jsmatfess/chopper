@@ -13,19 +13,16 @@ The library target is `chopper`. During candidate testing, use the staged Cargo
 packages described in the [maintainer guide](../maintainer/library-release.md).
 
 ```rust
-use chopper::job::{Column, Job, JobSettings, Limits, Operation, Pipeline, Resources, Shuffle};
+use chopper::job::{Column, Job, JobSettings, Limits, Operation, Pipeline, Shuffle};
 
 fn main() -> Result<(), chopper::job::Error> {
     let pipeline = Pipeline::new()
         .then(Operation::partition(vec![Column::Name("country".into())]))
         .then(Operation::shuffle(Shuffle::Uniform));
     let job = Job::new(JobSettings {
-        input: "customers.csv".into(),
-        output: "results".into(),
         operations: pipeline.into_operations(),
         limits: Limits { bytes: Some(25_000_000), ..Limits::default() },
-        resources: Resources::automatic(),
-        ..JobSettings::default()
+        ..JobSettings::for_files("customers.csv", "results")
     });
     job.validate()?;
     let estimate = job.analyze(None)?;
@@ -36,6 +33,9 @@ fn main() -> Result<(), chopper::job::Error> {
     Ok(())
 }
 ```
+
+`JobSettings::for_files` applies saved Job defaults, including automatic memory.
+Set `resources` explicitly to choose a fixed budget.
 
 ## Python
 
@@ -88,7 +88,7 @@ include a JSON Pointer in `path` and one-based `line` and `column` coordinates.
 
 | Code | Meaning |
 | --- | --- |
-| `config_read`, `config_write` | Could not read or save Job JSON |
+| `config_read`, `config_write` | Could not read Job JSON, save it, or verify temporary-file cleanup |
 | `json_syntax`, `json_schema` | Invalid JSON or a value outside the Job schema |
 | `invalid_config` | A decoded setting fails configuration validation |
 | `destination` | The output directory could not be reserved or committed |
@@ -101,7 +101,8 @@ include a JSON Pointer in `path` and one-based `line` and `column` coordinates.
 Pass a fresh `ExecutionControl` to each Analyze or Run. Share a cloned Rust
 handle or the same Python object with the observing thread. `progress()` reports
 the latest phase, rows processed in that phase, and temporary bytes sampled
-with the event. Call `cancel()` to request cooperative cancellation. Before
+with the event. A terminal snapshot reports zero bytes of active temporary
+storage. Call `cancel()` to request cooperative cancellation. Before
 publication, cancellation follows the native staging and temporary cleanup
 rules. A committed Run remains successful when cancellation arrives late.
 Concurrent Jobs need separate destinations and share the process-wide working

@@ -1,6 +1,12 @@
 //! Native, line-oriented slice A. Engine and configuration remain authoritative.
 use anyhow::{bail, ensure, Context, Result};
-use chopper::{core::*, engine, profile::ProfileCache, storage::Notify};
+use chopper::{
+    core::*,
+    engine,
+    job::{display_guide_text as display, save_guide_configuration},
+    profile::ProfileCache,
+    storage::Notify,
+};
 use std::{
     fs::{self, File},
     io::{self, IsTerminal, Read, Write},
@@ -21,25 +27,6 @@ const STEPS: [&str; 6] = [
     "Resources",
     "Review",
 ];
-
-/// Escape presentation only. Never feed this text back into the draft.
-fn display(value: &str) -> String {
-    let mut shown: String = value
-        .chars()
-        .take(256)
-        .flat_map(|c| {
-            if c.is_control() {
-                c.escape_default().collect::<Vec<_>>()
-            } else {
-                vec![c]
-            }
-        })
-        .collect();
-    if value.chars().nth(256).is_some() {
-        shown.push_str(" [truncated]");
-    }
-    shown
-}
 
 trait Terminal {
     fn line(&mut self, prompt: &str, cancel: &AtomicBool) -> Result<String>;
@@ -342,12 +329,6 @@ fn quote(path: &str) -> String {
         format!("'{}'", path.replace('\'', "'\"'\"'"))
     }
 }
-#[cfg(test)]
-thread_local! {
-    static SAVE_WRITE_FAULT: std::cell::Cell<u8> = const { std::cell::Cell::new(0) };
-    static SAVE_PERSIST_LEFTOVER: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
-}
-
 fn resource_description(job: &Job) -> String {
     format!("memory {:?} MiB (or auto), workers {}, temp_dir {}, temp_bytes {:?}, max_files {}, max_record_bytes {}, grouping {:?}", job.resources.memory_mb, job.resources.workers, display(job.resources.temp_dir.as_deref().unwrap_or("default")), job.resources.temp_bytes, job.resources.max_files, job.resources.max_record_bytes, job.resources.grouping)
 }
@@ -363,79 +344,7 @@ fn save_file(job: &Job, path: &Path, overwrite: bool) -> Result<()> {
         !path.exists() || !fs::symlink_metadata(path)?.file_type().is_symlink(),
         "refusing configuration symlink"
     );
-    let parent = destination
-        .parent()
-        .context("configuration parent is required")?;
-    let mut temp = tempfile::NamedTempFile::new_in(parent)?;
-    let result = (|| -> Result<()> {
-        serde_json::to_writer_pretty(temp.as_file_mut(), job)?;
-        temp.write_all(b"\n")?;
-        #[cfg(test)]
-        SAVE_WRITE_FAULT.with(|fault| -> Result<()> {
-            match fault.replace(0) {
-                1 => bail!("injected configuration write failure"),
-                2 => {
-                    let path = temp.path().to_owned();
-                    fs::rename(&path, path.with_extension("retained"))?;
-                    fs::create_dir(path)?;
-                    bail!("injected configuration write failure with unlink denial");
-                }
-                _ => Ok(()),
-            }
-        })?;
-        temp.flush()?;
-        temp.as_file().sync_all()?;
-        Ok(())
-    })();
-    if let Err(error) = result {
-        let owned_path = temp.path().to_owned();
-        return match temp.close() {
-            Ok(()) => Err(error),
-            Err(cleanup) => Err(error.context(format!(
-                "temporary configuration cleanup {} failed: {cleanup}",
-                display(&owned_path.to_string_lossy())
-            ))),
-        };
-    }
-    let temporary_path = temp.path().to_owned();
-    let persisted = if overwrite {
-        temp.persist(&destination)
-    } else {
-        temp.persist_noclobber(&destination)
-    };
-    if let Err(error) = persisted {
-        let message = format!("atomic configuration save failed: {}", error.error);
-        let owned_path = error.file.path().to_path_buf();
-        if let Err(cleanup) = error.file.close() {
-            bail!(
-                "{message}; cleanup {} failed: {cleanup}",
-                display(&owned_path.to_string_lossy())
-            );
-        }
-        bail!("{message}");
-    }
-    #[cfg(test)]
-    SAVE_PERSIST_LEFTOVER.with(|fault| -> Result<()> {
-        if fault.replace(false) {
-            fs::hard_link(&destination, &temporary_path)?;
-        }
-        Ok(())
-    })?;
-    // tempfile's no-clobber hard-link fallback can silently ignore unlink
-    // failure after a successful publication. Report that committed save and
-    // leftover path; do not risk deleting a pathname replaced by someone else.
-    match fs::symlink_metadata(&temporary_path) {
-        Err(error) if error.kind() == io::ErrorKind::NotFound => (),
-        Err(error) => bail!(
-            "configuration saved, but temporary cleanup {} could not be verified: {error}",
-            display(&temporary_path.to_string_lossy())
-        ),
-        Ok(_) => bail!(
-            "configuration saved, but temporary cleanup {} did not complete; draft retained",
-            display(&temporary_path.to_string_lossy())
-        ),
-    }
-    Ok(())
+    save_guide_configuration(job, &destination, overwrite)
 }
 
 struct Session {
@@ -1046,61 +955,6 @@ mod tests {
         assert_eq!(s.job.input, "back");
         assert_eq!(s.step, 0);
         assert!(crate::Cli::try_parse_from(["chopper", "guide", "--yes"]).is_err());
-    }
-    #[test]
-    fn atomic_write_failure_preserves_old_file_and_reports_cleanup_path() {
-        let (dir, job) = fixture();
-        let path = dir.path().join("job.json");
-        save_file(&job, &path, false).unwrap();
-        let original = fs::read(&path).unwrap();
-        for mode in [1, 2] {
-            SAVE_WRITE_FAULT.with(|fault| fault.set(mode));
-            let error = save_file(&job, &path, true).unwrap_err();
-            let text = format!("{error:#}");
-            assert!(text.contains("injected configuration write failure"));
-            assert_eq!(fs::read(&path).unwrap(), original);
-            if mode == 2 {
-                assert!(text.contains("temporary configuration cleanup"));
-                assert!(text.contains(&display(&dir.path().to_string_lossy())));
-                for entry in fs::read_dir(dir.path()).unwrap() {
-                    let path = entry.unwrap().path();
-                    if path
-                        .file_name()
-                        .unwrap()
-                        .to_string_lossy()
-                        .starts_with(".tmp")
-                    {
-                        if path.is_dir() {
-                            fs::remove_dir(path).unwrap();
-                        } else {
-                            fs::remove_file(path).unwrap();
-                        }
-                    }
-                }
-            }
-        }
-    }
-    #[test]
-    fn successful_save_with_leftover_link_is_reported_without_deleting_config() {
-        let (dir, job) = fixture();
-        let path = dir.path().join("job.json");
-        SAVE_PERSIST_LEFTOVER.with(|fault| fault.set(true));
-        let error = save_file(&job, &path, false).unwrap_err();
-        assert!(error
-            .to_string()
-            .contains("configuration saved, but temporary cleanup"));
-        assert_eq!(load(&path).unwrap().random_seed, job.random_seed);
-        for entry in fs::read_dir(dir.path()).unwrap() {
-            let path = entry.unwrap().path();
-            if path
-                .file_name()
-                .unwrap()
-                .to_string_lossy()
-                .starts_with(".tmp")
-            {
-                fs::remove_file(path).unwrap();
-            }
-        }
     }
     #[test]
     fn imported_unsupported_fields_are_retained() {

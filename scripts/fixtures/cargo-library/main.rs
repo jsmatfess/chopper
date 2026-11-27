@@ -24,15 +24,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         .then(Operation::partition(vec![Column::Name("country".into())]))
         .then(Operation::shuffle(Shuffle::Uniform));
     let mut settings = JobSettings {
-        input: "input.zip".into(),
         zip_member: Some("nested/records.csv".into()),
-        output: "rust".into(),
         operations: pipeline.into_operations(),
         limits: Limits {
             bytes: Some(53),
             ..Limits::default()
         },
-        ..JobSettings::default()
+        ..JobSettings::for_files("input.zip", "rust")
     };
     settings.input_csv.encoding = "utf-16le".into();
     fs::create_dir("recipes")?;

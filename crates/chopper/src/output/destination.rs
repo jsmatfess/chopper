@@ -10,6 +10,8 @@ impl std::fmt::Display for DestinationError {
     }
 }
 
+impl std::error::Error for DestinationError {}
+
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(crate) mod resource_contracts;
 
