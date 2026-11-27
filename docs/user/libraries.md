@@ -284,7 +284,7 @@ for name, signature in formula_functions():
     print(f"{name}: {signature}")
 ```
 
-## Compose and replay Jobs
+## Compose, inspect, and replay
 
 `then` returns a new Pipeline and accepts one operation or an entire Pipeline.
 Each operation applies to each group produced by the preceding operation.
