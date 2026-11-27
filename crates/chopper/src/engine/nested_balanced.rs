@@ -292,7 +292,14 @@ mod tests {
         for count in [24, 25, 47, 101] {
             let job = Job {
                 random_seed: Some("nested".into()),
-                operations: vec![Operation::Balanced { files: 2 }],
+                operations: vec![
+                    Operation::Balanced { files: 2 },
+                    Operation::Balanced { files: 3 },
+                    Operation::Balanced { files: 2 },
+                    Operation::Shuffle {
+                        strategy: Shuffle::Uniform,
+                    },
+                ],
                 ..Default::default()
             };
             let ctx = Context::new(
@@ -310,16 +317,13 @@ mod tests {
             assert_eq!(source.dataset.groups, 1);
             let parent = apply(
                 &source.dataset,
-                &Operation::Balanced { files: 2 },
+                &job.operations[0],
                 0,
                 &job,
                 &source.analysis,
                 &ctx,
             )?;
-            let operations = [
-                Operation::Balanced { files: 3 },
-                Operation::Balanced { files: 2 },
-            ];
+            let operations = &job.operations[1..3];
             let first = apply(&parent, &operations[0], 1, &job, &source.analysis, &ctx)?;
             let serial = apply(&first, &operations[1], 2, &job, &source.analysis, &ctx)?;
             let expected = vec![
@@ -327,7 +331,7 @@ mod tests {
                 dataset_stats(&serial, 3, first.groups, &ctx)?,
             ];
             let mut stats = Stages::new(operations.len(), Reservation::new(&ctx))?;
-            let fused = shared(&parent, &operations, 1, &ctx, &mut stats)?;
+            let fused = shared(&parent, operations, 1, &ctx, &mut stats)?;
             assert!(Arc::ptr_eq(&fused.data, &parent.data));
             assert_eq!(snapshot(&fused, &ctx)?, snapshot(&serial, &ctx)?);
             assert_eq!(
@@ -336,18 +340,16 @@ mod tests {
             );
             let mut writer = DatasetWriter::new(&ctx)?;
             stats = Stages::new(operations.len(), Reservation::new(&ctx))?;
-            emit(&parent, &operations, 1, &ctx, &mut writer, &mut stats, None)?;
+            emit(&parent, operations, 1, &ctx, &mut writer, &mut stats, None)?;
             let emitted = writer.finish()?;
             assert_eq!(snapshot(&emitted, &ctx)?, snapshot(&serial, &ctx)?);
             assert_eq!(
                 serde_json::to_value(stats)?,
                 serde_json::to_value(expected)?
             );
-            let shuffle = Operation::Shuffle {
-                strategy: Shuffle::Uniform,
-            };
-            let a = apply(&serial, &shuffle, 3, &job, &source.analysis, &ctx)?;
-            let b = apply(&fused, &shuffle, 3, &job, &source.analysis, &ctx)?;
+            let shuffle = &job.operations[3];
+            let a = apply(&serial, shuffle, 3, &job, &source.analysis, &ctx)?;
+            let b = apply(&fused, shuffle, 3, &job, &source.analysis, &ctx)?;
             assert_eq!(snapshot(&a, &ctx)?, snapshot(&b, &ctx)?);
         }
         Ok(())

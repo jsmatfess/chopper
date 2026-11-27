@@ -231,11 +231,18 @@ pub(in crate::engine) fn run() -> Result<serde_json::Value> {
     let source = writer.finish()?;
     let owner_controls = edges(&source)?;
     let baseline = pool.usage().reserved_bytes;
-    let operations = [
-        Operation::Balanced { files: 2 },
-        Operation::Balanced { files: 2 },
-        Operation::Balanced { files: 2 },
-    ];
+    let job = Job {
+        operations: vec![
+            Operation::Partition {
+                columns: vec![chopper_core::Column::Index(1)],
+            },
+            Operation::Balanced { files: 2 },
+            Operation::Balanced { files: 2 },
+            Operation::Balanced { files: 2 },
+        ],
+        ..job
+    };
+    let operations = &job.operations[1..];
     let one = apply(&source, &operations[0], 1, &job, &analysis, &ctx)?;
     let two = apply(&one, &operations[1], 2, &job, &analysis, &ctx)?;
     let serial = apply(&two, &operations[2], 3, &job, &analysis, &ctx)?;
@@ -246,7 +253,7 @@ pub(in crate::engine) fn run() -> Result<serde_json::Value> {
         dataset_stats(&serial, 4, two.groups, &ctx)?,
     ];
     let mut stats = Stages::new(operations.len(), Reservation::new(&ctx))?;
-    let fused = shared(&source, &operations, 1, &ctx, &mut stats)?;
+    let fused = shared(&source, operations, 1, &ctx, &mut stats)?;
     ensure!(
         Arc::ptr_eq(&fused.data, &source.data)
             && snapshot(&fused, &ctx)? == expected
@@ -325,7 +332,7 @@ pub(in crate::engine) fn run() -> Result<serde_json::Value> {
             ends: 0,
         };
         let mut stats = Stages::new(operations.len(), Reservation::new(&ctx))?;
-        let result = emit(&source, &operations, 1, &ctx, &mut sink, &mut stats, None);
+        let result = emit(&source, operations, 1, &ctx, &mut sink, &mut stats, None);
         ensure!(
             result.is_ok() == (mode == "success"),
             "nested {mode}: {result:?}"
