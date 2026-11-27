@@ -256,7 +256,7 @@ async function checkFormulaSyntax(browser, origin, base) {
   const anchor = '#build-formulas-with-the-client-libraries';
   const panel = (page, syntax) => page.locator(`[data-formula-syntax="${syntax}"]`);
   const selector = page => page.getByLabel('Formula syntax', { exact: true });
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const page = await browser.newPage({ viewport: { width: 1280, height: 844 } });
   page.setDefaultTimeout(10_000);
   try {
     await page.goto(url + '?source=guide' + anchor);
@@ -274,12 +274,36 @@ async function checkFormulaSyntax(browser, origin, base) {
     await picker.waitFor();
     assert.equal(await picker.inputValue(), 'python');
     await panel(page, 'python').getByText('Python syntax', { exact: true }).waitFor();
+    await page.locator('#VPSidebarNav').getByRole('link', { name: 'Handle row errors with SAFE', exact: true }).click();
+    await page.waitForURL(url + '?lang=python#handle-row-errors-with-safe');
+    await page.reload();
+    await picker.waitFor();
+    assert.equal(await picker.inputValue(), 'python');
     await page.evaluate(() => { window.location.hash = '#rust-syntax'; });
     await page.waitForURL(url + '?lang=rust#rust-syntax');
     assert.equal(await picker.inputValue(), 'rust');
     await picker.selectOption('formula');
-    await page.waitForURL(url + '?lang=formula#formula-text-syntax');
+    await page.waitForURL(url + '?lang=formula#formula-text');
     await panel(page, 'formula').getByText('Formula text', { exact: true }).waitFor();
+
+    await page.goto(url + '?lang=python#%72ust-syntax');
+    await picker.waitFor();
+    assert.equal(await picker.inputValue(), 'rust');
+    await page.getByRole('button', { name: 'Search' }).first().click();
+    const search = page.getByRole('searchbox');
+    await search.fill('trailing underscores');
+    const results = page.locator('#localsearch-list');
+    const result = `a[href="${base}formula-functions#python-syntax"]`;
+    await results.locator(result).waitFor();
+    const selected = results.locator(`[aria-selected="true"] ${result}`);
+    for (let remaining = await results.locator('a').count(); remaining && !(await selected.isVisible()); remaining--) {
+      await search.press('ArrowDown');
+    }
+    await selected.waitFor();
+    await search.press('Enter');
+    await page.waitForURL(url + '?lang=python#python-syntax');
+    await panel(page, 'python').getByText('Python syntax', { exact: true }).waitFor();
+    assert.equal(await picker.inputValue(), 'python');
 
     for (const language of ['rust', 'python']) {
       await page.goto(origin + base + `libraries-${language}#pass-function-arguments`);

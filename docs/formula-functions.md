@@ -8,9 +8,9 @@ tables use Chopper formula text.
 
 <!-- chopper-docs:formula-syntax -->
 
-<div id="formula-text-syntax" data-formula-syntax="formula">
+<div data-formula-syntax="formula">
 
-**Formula text**
+### Formula text
 
 Paste this expression into the hosted formula editor. For the CLI, pass
 `--calculated-column 'review_status=...'` with the expression after `=`.
@@ -25,9 +25,9 @@ See [calculated columns in Job JSON](job-json.md#formulas) and
 
 </div>
 
-<div id="rust-syntax" data-formula-syntax="rust">
+<div data-formula-syntax="rust">
 
-**Rust syntax**
+### Rust syntax
 
 Import the helpers from `chopper::formula::functions`. Names are lowercase,
 with `if_else` for `IF`. Use `col("country")` for a header, `col(0)` for the
@@ -58,9 +58,9 @@ adding expressions to a Job.
 
 </div>
 
-<div id="python-syntax" data-formula-syntax="python">
+<div data-formula-syntax="python">
 
-**Python syntax**
+### Python syntax
 
 Import the helpers from `chopper_csv.functions`. Names are lowercase,
 with `if_else` for `IF`. Use `col("country")` for a header, `col(0)` for the

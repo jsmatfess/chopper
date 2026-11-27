@@ -1,7 +1,9 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
+import { useRouter } from 'vitepress';
 
 const props = defineProps({ formulaReference: Boolean });
+const router = useRouter();
 const choices = {
   ...(props.formulaReference ? { formula: 'Formula text' } : {}),
   rust: 'Rust',
@@ -14,16 +16,36 @@ const selection = ref('');
 let guide;
 let anchorFrame;
 let formulaPanels = [];
+let stopNavigationSync;
 
-function restoreLanguage() {
+function fragmentId(hash) {
+  try {
+    return decodeURIComponent(hash.slice(1));
+  } catch {
+    return '';
+  }
+}
+
+function linkedPanel(url) {
+  const id = fragmentId(url.hash);
+  return formulaPanels.find(panel => panel.heading.id === id);
+}
+
+function restoreLanguage(keepSelection = false) {
   const url = new URL(window.location.href);
   if (props.formulaReference) {
     const linked = url.searchParams.get('lang');
-    const target = formulaPanels.find(panel => `#${panel.id}` === url.hash);
-    selection.value = Object.hasOwn(choices, linked) ? linked : target?.dataset.formulaSyntax ?? 'formula';
+    const target = linkedPanel(url);
+    const fallback = (keepSelection === true && selection.value) || 'formula';
+    selection.value = target?.syntax ?? (Object.hasOwn(choices, linked) ? linked : fallback);
+    if ((target && linked && linked !== selection.value) ||
+        (keepSelection === true && !linked && selection.value !== 'formula')) {
+      url.searchParams.set('lang', selection.value);
+      window.history.replaceState(window.history.state, '', url);
+    }
     for (const panel of formulaPanels) {
-      if (panel.dataset.formulaSyntax === selection.value) panel.removeAttribute('hidden');
-      else panel.setAttribute('hidden', 'until-found');
+      if (panel.syntax === selection.value) panel.element.removeAttribute('hidden');
+      else panel.element.setAttribute('hidden', 'until-found');
     }
     return;
   }
@@ -43,8 +65,8 @@ function restoreLanguage() {
 function chooseLanguage(language) {
   const url = new URL(window.location.href);
   url.searchParams.set('lang', language);
-  if (formulaPanels.some(panel => `#${panel.id}` === url.hash)) {
-    url.hash = formulaPanels.find(panel => panel.dataset.formulaSyntax === language).id;
+  if (linkedPanel(url)) {
+    url.hash = formulaPanels.find(panel => panel.syntax === language).heading.id;
   }
   window.history.replaceState(window.history.state, '', url);
   restoreLanguage();
@@ -55,13 +77,7 @@ function revealSyntax(event) {
 }
 
 function alignLinkedSection() {
-  let id;
-  try {
-    id = decodeURIComponent(window.location.hash.slice(1));
-  } catch {
-    return;
-  }
-  const target = document.getElementById(id);
+  const target = document.getElementById(fragmentId(window.location.hash));
   if (target && guide.contains(target)) target.scrollIntoView({ block: 'start' });
 }
 
@@ -70,8 +86,23 @@ onMounted(() => {
   if (props.formulaReference) {
     // Without searchable hidden content, all three sections and their links are available.
     if (!('onbeforematch' in HTMLElement.prototype)) return;
-    formulaPanels = [...guide.querySelectorAll('[data-formula-syntax]')];
-    for (const panel of formulaPanels) panel.addEventListener('beforematch', revealSyntax);
+    formulaPanels = Array.from(guide.querySelectorAll('[data-formula-syntax]'), element => ({
+      element, syntax: element.dataset.formulaSyntax, heading: element.querySelector('h3'),
+    }));
+    for (const panel of formulaPanels) panel.element.addEventListener('beforematch', revealSyntax);
+    // Search can change the fragment through the router without firing hashchange.
+    const referencePath = window.location.pathname;
+    const previous = router.onBeforePageLoad;
+    const sync = async href => {
+      const result = await previous?.(href);
+      if (result !== false && router.onBeforePageLoad === sync &&
+          new URL(href, window.location.href).pathname === referencePath) restoreLanguage(true);
+      return result;
+    };
+    router.onBeforePageLoad = sync;
+    stopNavigationSync = () => {
+      if (router.onBeforePageLoad === sync) router.onBeforePageLoad = previous;
+    };
   }
   restoreLanguage();
   // The initial fragment scroll can happen before the language changes the layout.
@@ -85,7 +116,8 @@ onMounted(() => {
 onUnmounted(() => {
   window.cancelAnimationFrame(anchorFrame);
   delete guide.dataset.libraryLanguage;
-  for (const panel of formulaPanels) panel.removeEventListener('beforematch', revealSyntax);
+  for (const panel of formulaPanels) panel.element.removeEventListener('beforematch', revealSyntax);
+  stopNavigationSync?.();
   window.removeEventListener('popstate', restoreLanguage);
   window.removeEventListener('hashchange', restoreLanguage);
 });
@@ -133,7 +165,7 @@ onUnmounted(() => {
   outline-offset: 2px;
 }
 
-[data-formula-syntax] {
+[data-formula-syntax] h3[id] {
   scroll-margin-block-start: calc(var(--vp-nav-height) + 1.5rem);
 }
 

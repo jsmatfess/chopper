@@ -128,13 +128,18 @@ async function preparePages(source, documents, base) {
     if (formulas) {
       const tokens = renderer.parse(formulas.markdown, { path: join(source, `${formulas.name}.md`) });
       const marker = findTopLevelMarker(tokens, formulaSyntaxMarker);
-      const panels = tokens.filter(token => token.type === 'html_block' && /^<div .*\bdata-formula-syntax=/.test(token.content));
+      const panels = tokens.flatMap((token, index) => (
+        token.type === 'html_block' && /^<div .*\bdata-formula-syntax=/.test(token.content)
+          ? [{ choice: token.content.match(/\bdata-formula-syntax="(formula|rust|python)"/)?.[1], heading: tokens[index + 1]?.tag }]
+          : []
+      ));
       if (panels.length && !marker) throw new Error('Formula syntax panels need the top-level formula syntax marker');
       if (marker) {
-        const choices = panels.map(panel => panel.content.match(/\bdata-formula-syntax="(formula|rust|python)"/)?.[1]);
+        const choices = panels.map(panel => panel.choice);
         if (choices.length !== 3 || ['formula', 'rust', 'python'].some(choice => !choices.includes(choice))) {
           throw new Error('The formula syntax selector needs one panel for each syntax');
         }
+        if (panels.some(panel => panel.heading !== 'h3')) throw new Error('Each formula syntax panel must start with an H3');
         const lines = formulas.markdown.split('\n');
         lines.splice(marker.map[0], marker.map[1] - marker.map[0], '<LibraryLanguage formula-reference />');
         const setup = "<script setup>\nimport LibraryLanguage from './LibraryLanguage.vue';\n</script>\n\n";
