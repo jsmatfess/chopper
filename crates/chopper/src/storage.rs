@@ -297,7 +297,7 @@ impl Context {
     ) -> Result<Self> {
         #[cfg(target_os = "wasi")]
         let _ = automatic_worker_limit;
-        ensure!(!cancel.load(AtomicOrdering::Relaxed), "job cancelled");
+        ensure!(!cancel.load(AtomicOrdering::Relaxed), Cancelled);
         let memory_mb =
             memory_pool.resolve_memory_for_run(resources, auto_memory_targets_mb, job_credit)?;
         let workspace = Arc::new(Workspace::shared(
@@ -789,7 +789,7 @@ impl DiskFile {
 impl Write for DiskFile {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         if self.budget.cancel.load(AtomicOrdering::Relaxed) {
-            return Err(io::Error::other("job cancelled"));
+            return Err(io::Error::other(Cancelled));
         }
         let count = buf.len() as u64;
         #[allow(deprecated)] // Keep support for Rust releases predating AtomicU64::try_update.
@@ -1687,7 +1687,7 @@ impl Iterator for GroupRows {
                     .budget
                     .cancel
                     .load(AtomicOrdering::Relaxed),
-                "job cancelled"
+                Cancelled
             );
             let header = read_header_reserved(
                 &mut self.reader,
@@ -4418,7 +4418,8 @@ mod merge_tests {
             let mut rows = data.rows(&group, ctx.max_record)?;
             if cancelled {
                 ctx.budget.cancel.store(true, AtomicOrdering::Relaxed);
-                assert!(ctx.check().is_err());
+                let result = rows.next().expect("expected a cancelled row read");
+                assert!(matches!(result, Err(error) if error.is::<Cancelled>()));
             } else {
                 assert!(rows.next_packed(None).is_err());
             }

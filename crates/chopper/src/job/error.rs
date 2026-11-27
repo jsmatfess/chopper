@@ -41,7 +41,7 @@ impl Error {
                 error
                     .downcast_ref::<io::Error>()
                     .and_then(io::Error::get_ref)
-                    .is_some_and(|inner| inner.is::<ProfileCancelled>())
+                    .is_some_and(|inner| inner.is::<Cancelled>() || inner.is::<ProfileCancelled>())
             }) {
             "cancelled"
         } else if source.is::<JobValidationError>() {

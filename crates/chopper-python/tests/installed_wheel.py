@@ -258,6 +258,18 @@ class InstalledWheel(unittest.TestCase):
         self.assertFalse(Path("analyzing/output").exists())
         self.assertEqual(list(Path("analyzing/temp").iterdir()), [])
 
+    def test_cancellation_requested_before_execution(self):
+        job = chopper.Job(self.settings)
+        for action in (job.analyze, job.run):
+            with self.subTest(action=action.__name__):
+                control = chopper.ExecutionControl()
+                control.cancel()
+                self.assert_job_error("cancelled", lambda: action(control))
+                self.assertEqual(
+                    control.progress(), {"phase": "Cancelled", "rows": 0, "temp_bytes": 0},
+                )
+                self.assertFalse(Path("output").exists())
+
     def test_cancelling_run_cleans_its_job_while_another_publishes(self):
         cancelled = self.large_job("cancelled", 256)
         survivor = self.large_job("survivor", 512)

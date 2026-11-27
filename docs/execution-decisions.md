@@ -133,7 +133,7 @@ flowchart TD
     Hosted -->|No| Context{Build the candidate Context and check live headroom}
     Output -->|Yes| Context
     Output -->|No| Fail
-    Context -->|Construction error| Fail[Fail the Run before input consumption]
+    Context -->|Construction error or cancellation| Fail[Return the failure before input consumption]
     Context -->|Ready| Direct[Dispatch the direct plan with its Context and destination]
     Context -->|Headroom declined| Drop[Drop the tentative Context and retain the destination witness]
     Drop --> Retained[Select retained publication mode]
@@ -146,6 +146,8 @@ flowchart TD
 ```
 
 Explicit preparation builds a snapshot Context without selecting a Run route.
+The native library reports cancellation during Context setup or temporary
+storage I/O with the `cancelled` error code.
 Native preflight includes the live decode charge when sizing Auto or checking
 route headroom. Saved native and hosted Run both transfer that charge after
 Context creation. See the [saved Job ownership contract](cli-job-decoding.md#saved-job-run).

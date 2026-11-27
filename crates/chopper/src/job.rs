@@ -293,3 +293,52 @@ fn execute<T: Send>(
     }
     result
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{execute, DecodedJob, ExecutionControl, JobSettings, Resources};
+    use crate::storage::Context;
+    use std::{io::Write, sync::atomic::Ordering};
+
+    #[test]
+    fn run_setup_cancellation_reports_cancelled() -> anyhow::Result<()> {
+        let root = tempfile::tempdir()?;
+        let output = root.path().join("output");
+        let settings = JobSettings::for_files("unused.csv", output.to_str().unwrap());
+        let control = ExecutionControl::new();
+        let result = execute(Some(&control), |cancel, notify| {
+            let job = DecodedJob::copy_for_run(&settings)?;
+            // Reproduce cancellation after the worker's first check.
+            cancel.store(true, Ordering::Relaxed);
+            job.run(cancel, notify).map(|_| ())
+        });
+
+        assert_eq!(result.unwrap_err().code(), "cancelled");
+        assert_eq!(control.progress().phase.as_str(), "Cancelled");
+        assert_eq!(root.path().read_dir()?.count(), 0);
+        Ok(())
+    }
+
+    #[test]
+    fn spill_write_cancellation_reports_cancelled() -> anyhow::Result<()> {
+        let root = tempfile::tempdir()?;
+        let resources = Resources {
+            temp_dir: Some(root.path().to_str().unwrap().into()),
+            ..Resources::default()
+        };
+        let control = ExecutionControl::new();
+        let result = execute(Some(&control), |cancel, notify| {
+            let context = Context::new(&resources, cancel.clone(), notify)?;
+            let mut spill = context.file()?;
+            cancel.store(true, Ordering::Relaxed);
+            spill.write_all(b"record")?;
+            Ok(())
+        });
+
+        assert_eq!(result.unwrap_err().code(), "cancelled");
+        assert_eq!(control.progress().phase.as_str(), "Cancelled");
+        assert_eq!(control.progress().temp_bytes, 0);
+        assert_eq!(root.path().read_dir()?.count(), 0);
+        Ok(())
+    }
+}
