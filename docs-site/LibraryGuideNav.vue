@@ -21,6 +21,13 @@ function updateSection() {
   if (section?.matches('.vp-doc h2, .vp-doc h3')) fragment.value = window.location.hash;
 }
 
+function followGuide(event, language) {
+  // Same-page search can update history without emitting a hashchange event.
+  // Native navigation lets us read the current fragment before following the link.
+  updateSection();
+  event.currentTarget.href = props.base + 'libraries-' + language + fragment.value;
+}
+
 onMounted(() => {
   updateSection();
   window.addEventListener('hashchange', updateSection);
@@ -34,7 +41,11 @@ onUnmounted(() => window.removeEventListener('hashchange', updateSection));
       v-for="(label, language) in guides"
       :key="language"
       :href="base + 'libraries-' + language + fragment"
+      target="_self"
       :aria-current="current === language ? 'page' : undefined"
+      @focus="updateSection"
+      @pointerenter="updateSection"
+      @click="followGuide($event, language)"
     >{{ label }}</a>
   </nav>
 </template>

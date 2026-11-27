@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { build, createMarkdownRenderer, disposeMdItInstance } from 'vitepress';
 import { checkSite } from './check.mjs';
 import { renderCliReference } from './cli-reference.mjs';
-import { languagePagesMarker, renderLanguageGuide, renderLibraryGuide, renderLibraryIndex } from './library-guide.mjs';
+import { findLanguagePagesMarker, renderLanguageGuide, renderLibraryGuide, renderLibraryIndex } from './library-guide.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const out = fileURLToPath(new URL('./dist', import.meta.url));
@@ -73,6 +73,7 @@ function rewriteLinks(md, tag, releasePages) {
   for (const [source, name] of releasePages) {
     if (!pageMap.has(source)) pageMap.set(source, name);
   }
+  const routes = new Set(releasePages.map(([, name]) => name));
   for (const [rule, attribute] of [['link_open', 'href'], ['image', 'src']]) {
     const render = md.renderer.rules[rule] ?? ((tokens, i, options, _env, self) => self.renderToken(tokens, i, options));
     md.renderer.rules[rule] = (tokens, i, options, env, self) => {
@@ -81,10 +82,22 @@ function rewriteLinks(md, tag, releasePages) {
       if (target && !/^(?:[\w+.-]+:|\/|#)/.test(target)) {
         const source = releasePages.find(([, name]) => `${name}.md` === env.relativePath)?.[0];
         if (!source) throw new Error(`Unknown link source: ${env.relativePath}`);
-        const [path, hash] = target.split('#', 2);
-        const suffix = hash ? `#${hash}` : '';
+        const [resource, hash] = target.split('#', 2);
+        const queryAt = resource.indexOf('?');
+        const path = queryAt < 0 ? resource : resource.slice(0, queryAt);
+        let search = queryAt < 0 ? '' : resource.slice(queryAt);
         const resolved = posix.normalize(posix.join(posix.dirname(source), path));
-        const local = pageMap.get(resolved);
+        let local = pageMap.get(resolved);
+        if (local === libraryPage[1] && search) {
+          const parameters = new URLSearchParams(search);
+          const guide = `libraries-${parameters.get('lang')}`;
+          if (routes.has(guide)) {
+            local = guide;
+            parameters.delete('lang');
+            search = parameters.size ? `?${parameters}` : '';
+          }
+        }
+        const suffix = search + (hash ? `#${hash}` : '');
         if (resolved === imagePath) {
           token.attrSet(attribute, './workbench.png');
         } else if (resolved === samplePath && rule === 'link_open') {
@@ -102,7 +115,7 @@ function rewriteLinks(md, tag, releasePages) {
   }
 }
 
-async function preparePages(source, documents, base, splitLibraries) {
+async function preparePages(source, documents, base) {
   const renderer = await createMarkdownRenderer(source, {
     headers: { level: [2, 3] },
     highlight: () => '',
@@ -110,9 +123,11 @@ async function preparePages(source, documents, base, splitLibraries) {
   try {
     const generated = new Map();
     const library = documents.find(({ name }) => name === libraryPage[1]);
+    let splitLibraries = false;
     if (library) {
       const env = { path: join(source, `${library.name}.md`) };
       const tokens = renderer.parse(library.markdown, env);
+      splitLibraries = Boolean(findLanguagePagesMarker(tokens));
       if (splitLibraries) {
         const anchorsByLanguage = [];
         for (const [, name] of languagePages) {
@@ -134,6 +149,7 @@ async function preparePages(source, documents, base, splitLibraries) {
     }
     const navigation = [];
     for (const { name, text, markdown } of documents) {
+      if (!splitLibraries && name.startsWith('libraries-')) continue;
       const link = name === 'index' ? '/' : `/${name}`;
       const env = { path: join(source, `${name}.md`) };
       const page = generated.get(name) ?? markdown;
@@ -146,7 +162,7 @@ async function preparePages(source, documents, base, splitLibraries) {
       navigation.push({ name, text, link, items });
     }
     // VitePress selects a sidebar by source path on each route change.
-    return Object.fromEntries(navigation.map(current => {
+    const sidebar = Object.fromEntries(navigation.map(current => {
       const item = ({ name, text, link, items }) => (
         items.length ? { text, link, items, collapsed: name !== current.name } : { text, link }
       );
@@ -160,6 +176,7 @@ async function preparePages(source, documents, base, splitLibraries) {
       });
       return [`/${current.name}.md`, [{ items }]];
     }));
+    return { sidebar, splitLibraries };
   } finally {
     disposeMdItInstance();
   }
@@ -175,36 +192,39 @@ const releases = versions.map(arg => {
   }
   const hasFormulas = git('ls-tree', '--name-only', commit, '--', formulaPage[0]).length > 0;
   const hasLibraries = git('ls-tree', '--name-only', commit, '--', libraryPage[0]).length > 0;
-  const splitLibraries = hasLibraries && read(libraryPage[0]).toString().split('\n').includes(languagePagesMarker);
-  return { version, commit, read, hasFormulas, hasLibraries, splitLibraries };
+  return { version, commit, read, hasFormulas, hasLibraries };
 }).sort((a, b) => b.version.localeCompare(a.version, 'en', { numeric: true }));
 if (new Set(releases.map(r => r.version)).size !== releases.length) throw new Error('Duplicate documentation version');
 
 const staging = await mkdtemp(fileURLToPath(new URL('./.build-', import.meta.url)));
 try {
   const site = join(staging, 'dist');
-  for (const { version, read, hasFormulas, hasLibraries, splitLibraries } of releases) {
+  for (const release of releases) {
+    const { version, read, hasFormulas, hasLibraries } = release;
     const source = join(staging, version);
     const base = `/versions/${version}/`;
     await mkdir(join(source, 'public'), { recursive: true });
     await cp(stylesheet, join(source, 'public/chopper.css'));
-    const releasePages = pages.flatMap(page => {
-      if (hasLibraries && page[1] === 'index') return [page, libraryPage, ...(splitLibraries ? languagePages : [])];
+    const candidatePages = pages.flatMap(page => {
+      if (hasLibraries && page[1] === 'index') return [page, libraryPage, ...languagePages];
       if (hasFormulas && page[1] === 'job-json') return [page, formulaPage];
       return [page];
     });
-    const documents = releasePages.map(([path, name, text]) => ({
+    const library = hasLibraries ? read(libraryPage[0]).toString() : '';
+    const documents = candidatePages.map(([path, name, text]) => ({
       name, text, markdown: name === 'cli-reference'
         ? renderCliReference(read(path).toString(), JSON.parse(read('docs/cli-reference-data.json')), version)
-        : content(read(path).toString(), name),
+        : path === libraryPage[0] ? library : content(read(path).toString(), name),
     }));
+    const { sidebar, splitLibraries } = await preparePages(source, documents, base);
+    const releasePages = candidatePages.filter(([, name]) => splitLibraries || !name.startsWith('libraries-'));
+    release.splitLibraries = splitLibraries;
     if (hasLibraries) {
       const component = splitLibraries ? 'LibraryGuideNav.vue' : 'LibraryLanguage.vue';
       await cp(new URL(`./${component}`, import.meta.url), join(source, component));
     }
     await writeFile(join(source, 'workbench.png'), read(imagePath));
     await writeFile(join(source, 'public/customers.csv'), read(samplePath));
-    const sidebar = await preparePages(source, documents, base, splitLibraries);
 
     await build(source, {
       onAfterConfigResolve(config) {

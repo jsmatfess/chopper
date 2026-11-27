@@ -1,6 +1,22 @@
 export const languagePagesMarker = '<!-- chopper-docs:language-pages -->';
 const languages = ['rust', 'python'];
 
+export function findLanguagePagesMarker(tokens) {
+  return tokens.find(token => (
+    token.type === 'html_block' && token.level === 0 && token.content.trim() === languagePagesMarker
+  ));
+}
+
+function proseMarker(token) {
+  if (token.type !== 'html_block' && token.type !== 'html_inline') return;
+  return token.content.trim().match(/^<!-- docs:(rust|python|end) -->$/)?.[1];
+}
+
+function fenceLanguage(token) {
+  if (token.type !== 'fence') return;
+  return token.info.trim().match(/^(rust|python)(?:$|[\s:{])/)?.[1];
+}
+
 // Markdown tokens keep fenced text out of the heading and label detection.
 function structure(tokens, lineCount) {
   const headings = tokens.flatMap((token, index) => (
@@ -20,11 +36,10 @@ function structure(tokens, lineCount) {
 
 function examples(tokens, rust, end) {
   return tokens.flatMap((token, index) => {
-    if (token.type !== 'fence' || token.level !== 0) return [];
+    const language = fenceLanguage(token);
+    if (!language || token.level !== 0) return [];
     const [fence, stop] = token.map;
     if (fence >= rust && fence < end) return [];
-    const language = token.info.trim().match(/^(rust|python)(?:$|[\s:{])/)?.[1];
-    if (!language) return [];
     const label = language === 'rust' ? '**Rust**' : '**Python**';
     const paragraph = tokens[index - 3];
     const start = paragraph?.type === 'paragraph_open'
@@ -44,6 +59,9 @@ function editLines(lines, edits) {
 }
 
 export function renderLibraryGuide(markdown, tokens) {
+  if (tokens.some(token => proseMarker(token) || token.children?.some(proseMarker))) {
+    throw new Error('Library prose language markers require the top-level chopper-docs:language-pages layout marker');
+  }
   const lines = markdown.split('\n');
   const { title, rust, python, end, firstHeading } = structure(tokens, lines.length);
   const source = (start, stop) => lines.slice(start, stop).join('\n').trim();
@@ -72,8 +90,10 @@ function proseBlocks(tokens) {
   const blocks = [];
   let open;
   for (const token of tokens) {
-    if (token.type !== 'html_block' || token.level !== 0) continue;
-    const language = token.content.trim().match(/^<!-- docs:(rust|python|end) -->$/)?.[1];
+    const language = proseMarker(token);
+    if ((language && token.level !== 0) || token.children?.some(proseMarker)) {
+      throw new Error('Library prose language markers must be top-level comment blocks');
+    }
     if (!language) continue;
     if (language === 'end') {
       if (!open) throw new Error('Library prose has a closing language marker with no opening marker');
@@ -91,6 +111,10 @@ function proseBlocks(tokens) {
 const navImport = "import LibraryGuideNav from './LibraryGuideNav.vue';\n";
 
 export function renderLanguageGuide(markdown, tokens, language, base) {
+  if (tokens.some(token => token.level !== 0 && fenceLanguage(token))) {
+    throw new Error('Rust and Python example fences must be top-level blocks in the library source');
+  }
+  const blocks = proseBlocks(tokens);
   const lines = markdown.split('\n');
   const { title, rust, python, end } = structure(tokens, lines.length);
   const label = language === 'rust' ? 'Rust' : 'Python';
@@ -102,8 +126,8 @@ export function renderLanguageGuide(markdown, tokens, language, base) {
     start: rust, end,
     text: '## Run your first Job\n\n' + lines.slice(start, stop).join('\n'),
   }];
-  const marker = lines.indexOf(languagePagesMarker);
-  if (marker !== -1) edits.push({ start: marker, end: marker + 1, text: '' });
+  const marker = findLanguagePagesMarker(tokens);
+  if (marker) edits.push({ start: marker.map[0], end: marker.map[1], text: '' });
   for (const example of examples(tokens, rust, end)) {
     edits.push({
       start: example.start,
@@ -111,7 +135,7 @@ export function renderLanguageGuide(markdown, tokens, language, base) {
       text: '',
     });
   }
-  for (const block of proseBlocks(tokens)) {
+  for (const block of blocks) {
     if (block.language === language) {
       edits.push({ start: block.start[0], end: block.start[1], text: '' });
       edits.push({ start: block.close[0], end: block.close[1], text: '' });
@@ -124,23 +148,36 @@ export function renderLanguageGuide(markdown, tokens, language, base) {
 
 export function renderLibraryIndex(base, anchors) {
   return `<script setup>
-${navImport}import { onMounted } from 'vue';
+${navImport}import { onMounted, onUnmounted } from 'vue';
 
 const base = ${JSON.stringify(base)};
 const sections = ${JSON.stringify(anchors)};
-onMounted(() => {
+const languages = ${JSON.stringify(languages)};
+
+function redirectLibraryLink() {
   const url = new URL(window.location.href);
-  const languages = ${JSON.stringify(languages)};
+  let hash = '';
+  try {
+    hash = decodeURIComponent(url.hash);
+  } catch {
+    // Malformed fragments cannot match a section or a legacy language.
+  }
   const requested = url.searchParams.get('lang');
-  const legacy = languages.find(language => url.hash === '#' + language);
-  const section = sections.includes(url.hash) ? url.hash : '';
+  const legacy = languages.find(language => hash === '#' + language);
+  const section = sections.includes(hash) ? hash : '';
   const language = languages.includes(requested) ? requested : legacy ?? (section ? 'rust' : '');
   if (!language) return;
   url.pathname = base + 'libraries-' + language;
   url.searchParams.delete('lang');
   url.hash = legacy ? '#run-your-first-job' : section;
   window.location.replace(url);
+}
+
+onMounted(() => {
+  window.addEventListener('hashchange', redirectLibraryLink);
+  redirectLibraryLink();
 });
+onUnmounted(() => window.removeEventListener('hashchange', redirectLibraryLink));
 </script>
 
 # Chopper libraries

@@ -2,7 +2,8 @@
 
 Calculated columns evaluate expressions against the current row. The same
 formulas work in the hosted app, the CLI, and both libraries. See runnable
-[Rust and Python examples](user/libraries.md#add-calculated-columns),
+[Rust examples](user/libraries.md?lang=rust#add-calculated-columns),
+[Python examples](user/libraries.md?lang=python#add-calculated-columns),
 [calculated columns in Job JSON](job-json.md#formulas), or
 [CLI flags](run-cli.md#calculated-columns).
 
@@ -50,8 +51,9 @@ provide named helpers for these functions. Use lowercase names such as
 `col("country")` for the exact header `country` or `col(0)` for the first
 field. Use `parse(text)` to incorporate a formula written in the syntax below.
 
-The [library guide](user/libraries.md#add-calculated-columns) shows how to
-attach expressions to a Job and how to pass optional arguments and literals.
+The [Rust examples](user/libraries.md?lang=rust#add-calculated-columns) and
+[Python examples](user/libraries.md?lang=python#add-calculated-columns) show
+how to attach expressions to a Job and pass optional arguments and literals.
 
 ## Handle row errors with SAFE
 

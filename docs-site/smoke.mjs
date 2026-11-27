@@ -75,7 +75,9 @@ async function checkSplitLibraryGuides(browser, origin, base) {
   const languages = ['Rust', 'Python'];
   const url = language => index + '-' + language.toLowerCase();
   const compose = '#compose-inspect-and-replay';
+  const detect = '#detect-a-dialect-and-list-columns';
   const firstJob = '#run-your-first-job';
+  const calculatedColumns = '#add-calculated-columns';
   const nav = page => page.getByRole('navigation', { name: 'Library guides', exact: true });
   const link = (page, language) => nav(page).getByRole('link', { name: new RegExp(`\\b${language}\\b`) });
   const guide = page => page.locator('.vp-doc');
@@ -163,7 +165,7 @@ async function checkSplitLibraryGuides(browser, origin, base) {
       await page.waitForURL(target => target.pathname === route && target.hash.length > 1);
     }
 
-    for (const fragment of [compose, '#detect-a-dialect-and-list-columns']) {
+    for (const fragment of [compose, detect]) {
       await page.goto(url('Rust') + fragment);
       const sectionLink = link(page, 'Python').and(page.locator(`a[href$="${fragment}"]`));
       await sectionLink.waitFor();
@@ -174,6 +176,20 @@ async function checkSplitLibraryGuides(browser, origin, base) {
       await heading(page, 'Rust').waitFor();
     }
 
+    await page.goto(url('Rust') + compose);
+    await checkFragment(page, url('Rust') + compose);
+    await page.getByRole('button', { name: 'Search' }).first().click();
+    const search = page.getByRole('searchbox');
+    await search.fill('InputReport');
+    const result = `${base}libraries-rust${detect}`;
+    await page.locator(`#localsearch-list [aria-selected="true"] a[href="${result}"]`).waitFor();
+    await search.press('Enter');
+    await checkFragment(page, url('Rust') + detect);
+    const pythonGuide = link(page, 'Python');
+    await pythonGuide.focus();
+    await pythonGuide.and(page.locator(`a[href$="${detect}"]`)).click();
+    await checkFragment(page, url('Python') + detect);
+
     for (const language of languages) {
       const slug = language.toLowerCase();
       for (const [legacy, anchor] of [[`?lang=${slug}${compose}`, compose], [`#${slug}`, firstJob]]) {
@@ -181,6 +197,18 @@ async function checkSplitLibraryGuides(browser, origin, base) {
         await checkFragment(page, url(language) + anchor);
       }
     }
+    await page.goto(index + '?lang=python#compose%2Dinspect%2Dand%2Dreplay', { waitUntil: 'commit' });
+    await checkFragment(page, url('Python') + compose);
+    await page.goto(index + '#py%74hon', { waitUntil: 'commit' });
+    await checkFragment(page, url('Python') + firstJob);
+
+    await page.goto(index);
+    await page.getByRole('button', { name: 'Search' }).first().click();
+    await search.waitFor();
+    await search.press('Escape');
+    await search.waitFor({ state: 'hidden' });
+    await page.evaluate(() => { window.location.hash = '#python'; });
+    await checkFragment(page, url('Python') + firstJob);
   } finally {
     await page.close();
   }
@@ -195,6 +223,19 @@ async function checkSplitLibraryGuides(browser, origin, base) {
       await heading(fallback, language).waitFor();
       await checkNav(fallback, language);
       await guide(fallback).locator(`.language-${language.toLowerCase()} pre`).first().waitFor();
+    }
+    for (const language of languages) {
+      assert.equal((await fallback.goto(origin + base + 'formula-functions'))?.status(), 200);
+      const examples = guide(fallback).getByRole('link', { name: `${language} examples`, exact: true });
+      const destination = url(language) + calculatedColumns;
+      await examples.first().waitFor();
+      for (const href of await examples.evaluateAll(anchors => anchors.map(anchor => anchor.href))) {
+        assert.equal(href, destination);
+      }
+      await examples.first().click();
+      await fallback.waitForURL(destination);
+      await heading(fallback, language).waitFor();
+      await guide(fallback).locator(calculatedColumns).waitFor();
     }
   } finally {
     await fallback.close();

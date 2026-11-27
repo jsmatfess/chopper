@@ -21,19 +21,26 @@ and search within each version. Versions with the formula reference also get a
 sidebar, CLI cross-link, and function search check for that page.
 
 The [library guide](../user/libraries.md) supplies the Libraries index and
-the `libraries-rust` and `libraries-python` pages. Keep the consecutive Rust
-and Python quickstart headings and label the fenced examples as `rust` or
-`python`. Wrap any language-specific prose outside the quickstarts in
-`<!-- docs:rust -->` or `<!-- docs:python -->` and close it with
-`<!-- docs:end -->`. Keep common headings and explanations outside those
-blocks. The source guide reads as ordinary Markdown in Cargo package metadata.
+the `libraries-rust` and `libraries-python` pages. The
+`<!-- chopper-docs:language-pages -->` marker selects the layout for that
+release. Keep the consecutive Rust and Python quickstart headings. Put
+language-prose markers and fenced `rust` or `python` examples at the top
+level of the Markdown, outside lists and block quotes. Wrap language-specific
+prose outside the quickstarts in `<!-- docs:rust -->` or `<!-- docs:python -->`
+and close it with `<!-- docs:end -->`. Keep common headings and explanations
+outside those blocks. The source guide reads as ordinary Markdown in Cargo
+package metadata.
 
-Use the language guide URL and its section anchor when linking to a particular
-SDK. Existing `libraries?lang=rust` and `libraries?lang=python` links forward
+In source Markdown, link to the shared guide with `?lang=rust` or
+`?lang=python` before the section fragment. For example, the source link
+`../user/libraries.md?lang=rust#add-calculated-columns` opens that section in
+the combined Markdown guide. The site builder links it directly to
+`libraries-rust#add-calculated-columns` in the same release. Use the language
+page URL and section anchor when linking from outside the repository.
+Existing `libraries?lang=rust` and `libraries?lang=python` site links forward
 to the selected guide with their section anchors. The smoke test checks
 language-scoped prose, navigation, direct links, search, and reading and
-navigating the guides without JavaScript. The source marker selects the
-appropriate guide layout when building historical versions.
+navigating the guides without JavaScript.
 
 ```sh
 npm --prefix docs-site ci
