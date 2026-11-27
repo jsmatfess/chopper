@@ -161,6 +161,12 @@ own directory and package the hosted app with the explicit release docs origin.
 After the approved GitHub release is public, publish the tagged docs and verify
 the live deep links, search and app link before recording release completion.
 
+## Rust and Python distributions
+
+Use [library qualification and publication](maintainer/library-release.md) to
+build and test the Cargo archives and wheels from the tagged candidate and
+publish the verified artifacts to the registries.
+
 ## Release status and forecasts
 
 Use the owning release issue's acceptance checklist and the exact candidate's

@@ -90,3 +90,43 @@ the [local delivery gate](../ci.md) and [release archive evidence](../release-pa
 before approving publication. Record qualification and publication in the
 [release record](https://github.com/jsmatfess/chopper/releases) and
 [#122](https://github.com/jsmatfess/chopper/issues/122).
+
+## Preview and publish the native library distributions
+
+From the clean checkout at the qualified candidate, supply the retained Linux
+and Windows qualification directories. The paths can point to a container bind
+mount on Linux and a native Windows drive mounted in WSL.
+
+```sh
+python3 scripts/publish-library-release.py v0.7.0-rc.3 \
+  --linux /absolute/qualification/linux \
+  --windows /mnt/c/chopper-evidence/library-070-windows
+```
+
+The default preview checks both platform receipts and the runner's latest
+successful attempts. It checks the SHA-256 of each wheel against the build
+and installed-wheel records and requires the five qualified Cargo archives
+to match across platforms. The JSON result reports which versions and wheel
+files are pending or already present with the same bytes.
+
+Land the candidate through the [local delivery gate](../ci.md). Put the final
+`v<version>` tag on the approved qualified commit locally and on GitHub. For publication,
+use a Python 3.11+ environment with Twine installed. Supply the corresponding
+release credentials through `CARGO_REGISTRY_TOKEN` and `TWINE_USERNAME=__token__`
+with `TWINE_PASSWORD` in the publishing environment for pending uploads. The
+tokens need permission to create the projects on the first release.
+
+Run the same command with `--publish` and retain its JSON result with the
+qualification records. The publisher checks the final tag and reachability
+from GitHub main and runs Twine's offline metadata check on pending wheels
+before uploading. It sends the verified Cargo tarballs in
+dependency order and waits for their checksums to appear in the registry index.
+It then passes the exact verified wheels to Twine. [Cargo registry publish API](https://doc.rust-lang.org/cargo/reference/registry-web-api.html#publish) · [Twine upload](https://twine.readthedocs.io/en/stable/index.html#twine-upload)
+
+After a partial release, repeat preview and then `--publish` with the same
+qualified artifacts. Existing artifacts with identical checksums are reused.
+If an upload response is lost, the publisher checks the index before asking
+for a retry.
+An unexpected PyPI file, yanked version or different checksum stops the release.
+The tooling CI job runs offline publication simulations. Live publication runs
+as an explicit local command after final tag approval.

@@ -15,6 +15,10 @@ execution does not alter those local jobs. Delivery uses `local-ci.py land` with
 matching Linux and applicable native Windows receipts as its sole CI gate.
 Product, platform, package, browser and release acceptance remain required.
 
+The tooling workflow exercises the library publisher against simulated registry
+responses. Use the separate [library release process](maintainer/library-release.md)
+to qualify the artifacts and publish them explicitly after source delivery.
+
 [PR #101](history/prior-issues.md#issue-101) delivered the trigger patch.
 Its hosted attempt was blocked before job steps by account capacity; no hosted
 runner or artifact-service acceptance is claimed. [#21](https://github.com/jsmatfess/chopper/issues/21)

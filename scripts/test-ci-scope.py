@@ -47,6 +47,16 @@ class ScopeTests(unittest.TestCase):
         tooling = workflow.split('  tooling:\n', 1)[1].split('  result:\n', 1)[0]
         self.assertIn('cargo check --locked --all-targets --manifest-path crates/chopper-python/Cargo.toml', tooling)
 
+    def test_library_publish_controls_run_in_tooling_without_publishing(self):
+        paths = ['scripts/publish-library-release.py', 'scripts/test-publish-library-release.py']
+        for path in paths:
+            for platform in ('linux', 'windows'):
+                jobs = scope.classify([path], platform=platform)
+                self.assertEqual({job for job, enabled in jobs.items() if enabled}, {'tooling'})
+        workflow = (Path(__file__).resolve().parents[1] / '.github/workflows/ci.yml').read_text()
+        self.assertIn('run: python scripts/test-publish-library-release.py', workflow)
+        self.assertNotIn('run: python scripts/publish-library-release.py', workflow)
+
     def test_job_authoring_artifact_and_guide_select_native_checks(self):
         for path in ('schemas/0.5.0/job.schema.json', 'docs/job-json.md',
                      'scripts/test-job-schema.py', 'scripts/requirements-job-schema.txt',
