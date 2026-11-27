@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "76b1273c92c9f85f06670adac9bcb7734fa36c61664197da988ac9b7b49e8e81"
+    "sha256": "fd1be497603dc291701fce1475236dbb1d03829600c9b6e913fcd7159e3882fa"
   },
   "experiments": [
     {
@@ -4869,6 +4869,22 @@
         "sha256": "ed013902dca85e62f301abeda4fe5d33ea6277a6bfda3985b66de027569633ef",
         "topic": "profiling"
       }
+    },
+    {
+      "title": "Hosted release comparison 0.6.5 to 0.6.6 (2026-11-27)",
+      "evidence": "docs/performance.md#hosted-release-comparison-065-to-066-2026-11-27",
+      "artifacts": [
+        "docs/benchmarks/0.6.6-performance-data.json",
+        "docs/benchmarks/hosted-csv-selection-065-to-066.mjs",
+        "docs/benchmarks/hosted-release-comparison-064-to-065.mjs",
+        "docs/benchmarks/hosted-release-comparison-064-to-065.py"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-release-comparison-065-to-066-2026-11-27.md",
+        "sha256": "2000aa26ba1726cfa892c5fe287528232fd8e6734f5e5adeca9d58a6b60267c5",
+        "topic": "profiling"
+      }
     }
   ],
   "artifacts": [
@@ -4927,6 +4943,30 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/0.6.6-performance-data.json",
+      "sha256": "a857f4ea5de830d56a29a95a167eadb3019f6670ae2c7759189e6907623bc304",
+      "bytes": 27398,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "baseline",
+        "candidate",
+        "candidate_implementation_commit",
+        "raw_capture_sha256",
+        "run",
+        "run_runtime",
+        "selection",
+        "selection_harness_sha256",
+        "selection_runtime"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-065-to-066-2026-11-27"
       ]
     },
     {
@@ -18920,6 +18960,18 @@
       ]
     },
     {
+      "path": "docs/benchmarks/hosted-csv-selection-065-to-066.mjs",
+      "sha256": "e813eb92b9b3e900562fe29fac071746f136e6c3b7410dd0b9642961bdb16182",
+      "bytes": 5151,
+      "format": "mjs",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-065-to-066-2026-11-27"
+      ]
+    },
+    {
       "path": "docs/benchmarks/hosted-data-movement-disk-harness-2026-11-26.patch",
       "sha256": "e48f21fa5414a244bb6df63e4b267f92eb373112b91fef3d56ea5c1076201fd8",
       "bytes": 1198,
@@ -20262,7 +20314,8 @@
       "fields": [],
       "context_records": [],
       "evidence": [
-        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
+        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26",
+        "docs/performance.md#hosted-release-comparison-065-to-066-2026-11-27"
       ]
     },
     {
@@ -20274,7 +20327,8 @@
       "fields": [],
       "context_records": [],
       "evidence": [
-        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
+        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26",
+        "docs/performance.md#hosted-release-comparison-065-to-066-2026-11-27"
       ]
     },
     {
@@ -39386,8 +39440,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "e3ed411c464795eb68137ed74c9748152a163e51dd215729a975bfafa05d3874",
-      "bytes": 1849045,
+      "sha256": "b323366f849898b8d2f7eb4fdc78edc480a91870725d75a249869d951c0a59a8",
+      "bytes": 1851715,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -43823,7 +43877,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "961525ea1f4f10fc501e445a24ccd9ab275f8a9db576b56f97a677c0f85f46ef"
+    "sha256": "b056cb1fc0b11c7425f9a9ef2f333838e51a441ee0b4dc7c1b008625e0e6d42d"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

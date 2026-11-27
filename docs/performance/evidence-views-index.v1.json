@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "8f16d51a73f4c4c70c56b94e3e377aab2ef50a85c3690a75ccdd20b9195e4981",
+  "catalog_sha256": "cf1bf4a9a2b2ad105f705ca91a64deae398e2d1cbf7b7ac856f107bc27bc01da",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -10795,6 +10795,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/0.6.6-performance-data.json",
+      "source_sha256": "a857f4ea5de830d56a29a95a167eadb3019f6670ae2c7759189e6907623bc304",
+      "aliases": [
+        "docs/benchmarks/0.6.6-performance-data.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/browser-auto-multigib-2026-11-21-production.jsonl",
       "source_sha256": "a88ec0342f98222967262323d89ebf6ef0063e288daa975ed63795bf7007baee",
       "aliases": [
@@ -11492,6 +11505,19 @@
         "unclassified": 6
       },
       "coverage": "adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "b323366f849898b8d2f7eb4fdc78edc480a91870725d75a249869d951c0a59a8",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
     },
     {
       "source": "docs/benchmarks/shuffle-diagnostics-native-2026-10-15.jsonl",
@@ -14945,19 +14971,6 @@
       "coverage": "not-adapted"
     },
     {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "e3ed411c464795eb68137ed74c9748152a163e51dd215729a975bfafa05d3874",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
       "source": "docs/benchmarks/blake3-xof-v1-vectors-2026-10-18.json",
       "source_sha256": "e458eae7864e3ace29db5da6fbc87c84b7101a9995e7ad7ca49dd53449bbefd4",
       "aliases": [
@@ -15187,6 +15200,19 @@
         "docs/benchmarks/shuffle-partition-trap-repro-32m-2026-10-16.jsonl"
       ],
       "format": "jsonl",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/hosted-csv-selection-065-to-066.mjs",
+      "source_sha256": "e813eb92b9b3e900562fe29fac071746f136e6c3b7410dd0b9642961bdb16182",
+      "aliases": [
+        "docs/benchmarks/hosted-csv-selection-065-to-066.mjs"
+      ],
+      "format": "mjs",
       "layouts": [],
       "observation_records": 0,
       "validation_records": 0,

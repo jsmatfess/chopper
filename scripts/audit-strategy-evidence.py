@@ -80,6 +80,7 @@ SECTIONS = {
     'Hosted Partition Shuffle direct output (2026-11-26)': 'ownership-and-lifecycle',
     'Hosted release comparison 0.6.3 to 0.6.4 (2026-11-26)': 'profiling',
     'Hosted release comparison 0.6.4 to 0.6.5 (2026-11-26)': 'profiling',
+    'Hosted release comparison 0.6.5 to 0.6.6 (2026-11-27)': 'profiling',
     'A single admitted key per routed group (2026-11-26)': 'adaptive-routing',
     'Observed hosted calculated columns followed by Partition (2026-11-26)': 'profiling',
     'Mixed hosted Uniform merge with a retained final batch (2026-11-26)': 'external-and-resident-shuffle',

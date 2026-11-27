@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "97d889fbe80fdc2f69245cb1da0d56097d9fc2ee66c869b0246a5d149cb7adb1",
+  "analysis_script_sha256": "052dd86af834e1338f53961df832e6c45a47ae6107e211af1935dc0535948c31",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "76b1273c92c9f85f06670adac9bcb7734fa36c61664197da988ac9b7b49e8e81"
+    "sha256": "fd1be497603dc291701fce1475236dbb1d03829600c9b6e913fcd7159e3882fa"
   },
   "families": [
     "adaptive-routing",
@@ -5173,6 +5173,23 @@
         "topic": "profiling"
       },
       "family": "profiling"
+    },
+    {
+      "title": "Hosted release comparison 0.6.5 to 0.6.6 (2026-11-27)",
+      "evidence": "docs/performance.md#hosted-release-comparison-065-to-066-2026-11-27",
+      "artifacts": [
+        "docs/benchmarks/0.6.6-performance-data.json",
+        "docs/benchmarks/hosted-csv-selection-065-to-066.mjs",
+        "docs/benchmarks/hosted-release-comparison-064-to-065.mjs",
+        "docs/benchmarks/hosted-release-comparison-064-to-065.py"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-release-comparison-065-to-066-2026-11-27.md",
+        "sha256": "2000aa26ba1726cfa892c5fe287528232fd8e6734f5e5adeca9d58a6b60267c5",
+        "topic": "profiling"
+      },
+      "family": "profiling"
     }
   ],
   "sources": [
@@ -5245,6 +5262,44 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/0.6.6-performance-data.json",
+      "sha256": "a857f4ea5de830d56a29a95a167eadb3019f6670ae2c7759189e6907623bc304",
+      "bytes": 27398,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "baseline",
+        "candidate",
+        "candidate_implementation_commit",
+        "raw_capture_sha256",
+        "run",
+        "run_runtime",
+        "selection",
+        "selection_harness_sha256",
+        "selection_runtime"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-065-to-066-2026-11-27"
       ],
       "families": [
         "profiling"
@@ -26996,6 +27051,23 @@
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
     },
     {
+      "path": "docs/benchmarks/hosted-csv-selection-065-to-066.mjs",
+      "sha256": "e813eb92b9b3e900562fe29fac071746f136e6c3b7410dd0b9642961bdb16182",
+      "bytes": 5151,
+      "format": "mjs",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-065-to-066-2026-11-27"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
       "path": "docs/benchmarks/hosted-data-movement-disk-harness-2026-11-26.patch",
       "sha256": "e48f21fa5414a244bb6df63e4b267f92eb373112b91fef3d56ea5c1076201fd8",
       "bytes": 1198,
@@ -28737,7 +28809,8 @@
       "fields": [],
       "context_records": [],
       "evidence": [
-        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
+        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26",
+        "docs/performance.md#hosted-release-comparison-065-to-066-2026-11-27"
       ],
       "families": [
         "profiling"
@@ -28754,7 +28827,8 @@
       "fields": [],
       "context_records": [],
       "evidence": [
-        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
+        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26",
+        "docs/performance.md#hosted-release-comparison-065-to-066-2026-11-27"
       ],
       "families": [
         "profiling"
