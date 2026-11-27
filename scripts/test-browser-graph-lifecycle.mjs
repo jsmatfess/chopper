@@ -110,7 +110,12 @@ await withHostedBrowser({port:8425},async({context,url,browserVersion})=>{
    else{const start=Date.now();await page.locator('#cancel').click();await page.waitForFunction(()=>document.getElementById('status').textContent==='CANCELLED',{},{timeout:20000});cancellationMs=Date.now()-start;if(mode==='marker_late')await page.evaluate(()=>window.graphLate.handler({data:window.graphLate.data}));}
   }
   const expected=['result_close','marker_write','marker_close','marker_read','worker_error'].includes(mode)?'FAILED':['processing_cancel','new_generation_cancel','cleanup_error_cancel','marker_closed','marker_confirmed','marker_late'].includes(mode)?'CANCELLED':'COMPLETE';
-  await page.waitForFunction(expected=>document.getElementById('status').textContent===expected&&(!['FAILED'].includes(expected)||!document.getElementById('error').hidden),expected,{timeout:30000});await page.waitForFunction(()=>window.graphWorkers.size===0);
+  // Wait for the current Run to dispatch before reading terminal UI state.
+  await page.waitForFunction(expected=>{
+   const status=document.getElementById('status').textContent;
+   const error=document.getElementById('error');
+   return window.graphRunStarted&&window.graphWorkers.size===0&&status===expected&&(expected!=='FAILED'||!error.hidden);
+  },expected,{timeout:30000});
   const nodes=await page.locator('.execution-list li>button').evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-label'))),text=nodes.join(' '),note=await page.locator('.execution-note').textContent();
   const find=title=>nodes.find(node=>node.startsWith(title));
   for(const node of before.filter(node=>node.includes(' · Completed'))){const title=node.split(' · Completed')[0];assert.ok(nodes.some(after=>after.startsWith(title+' · Completed')),'confirmed work survives shutdown: '+title);}
