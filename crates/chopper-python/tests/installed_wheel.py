@@ -150,7 +150,11 @@ class InstalledWheel(unittest.TestCase):
         destination = Path("output")
         temp_dir = Path("temporary")
         temp_dir.mkdir()
-        settings = UserDict({"input": source, "output": destination, "resources": {"temp_dir": temp_dir}})
+        settings = UserDict({
+            "input": source,
+            "output": destination,
+            "resources": UserDict({"temp_dir": temp_dir}),
+        })
         job = chopper.Job(settings)
         job.save(Path("job.json"))
         saved = chopper.Job.load(Path("job.json"))
@@ -160,6 +164,8 @@ class InstalledWheel(unittest.TestCase):
         self.assertIs(settings["input"], source)
         self.assertIs(settings["resources"]["temp_dir"], temp_dir)
         self.assertEqual(chopper.inspect(settings).columns, 4)
+        settings["resources"]["temp_dir"] = str(temp_dir)
+        self.assertEqual(chopper.Job(settings).to_dict(), saved.to_dict())
         self.assertEqual(saved.run().manifest_path, destination / "manifest.jsonl")
 
     def test_inspect_and_detect_a_source_only_job(self):

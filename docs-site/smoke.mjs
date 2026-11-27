@@ -91,7 +91,10 @@ async function checkSplitLibraryGuides(browser, origin, base) {
   const sections = {
     'inspect-an-input': { Rust: /\bcolumn_count\(\)/, Python: /\biter_columns\b/ },
     'add-calculated-columns': { Rust: /\.alias\(/, Python: /\bcalculated_columns\s+mapping\b/ },
-    'stream-published-output-metadata': { Rust: /\boutputs\(max_record_bytes\)/, Python: /\bopen_manifest\b/ },
+    'stream-published-output-metadata': {
+      Rust: /\b(?:outputs\(max_record_bytes\)|outputs_with_record_limit\b)/,
+      Python: /\bopen_manifest\b/,
+    },
     'observe-and-cancel-a-run': { Rust: /\bcloned control\b/, Python: /\bcontrol object\b/ },
   };
 

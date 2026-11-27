@@ -154,9 +154,11 @@ class Job:
                 settings[key] = fspath(path)
         resources = settings.get("resources")
         if isinstance(resources, Mapping):
+            resources = dict(resources)
             temp_dir = resources.get("temp_dir")
             if isinstance(temp_dir, PathLike):
-                settings["resources"] = {**resources, "temp_dir": fspath(temp_dir)}
+                resources["temp_dir"] = fspath(temp_dir)
+            settings["resources"] = resources
         if pipeline is not None:
             if not isinstance(pipeline, Pipeline):
                 raise TypeError("pipeline must be a Pipeline")
