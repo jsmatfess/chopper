@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { build, createMarkdownRenderer, disposeMdItInstance } from 'vitepress';
 import { checkSite } from './check.mjs';
 import { renderCliReference } from './cli-reference.mjs';
-import { findLanguagePagesMarker, renderLanguageGuide, renderLibraryGuide, renderLibraryIndex } from './library-guide.mjs';
+import { findLanguagePagesMarker, findTopLevelMarker, renderLanguageGuide, renderLibraryGuide, renderLibraryIndex } from './library-guide.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const out = fileURLToPath(new URL('./dist', import.meta.url));
@@ -31,6 +31,7 @@ const pages = [
   ['docs/compatibility.md', 'compatibility', 'Compatibility and migration'],
 ];
 const formulaPage = ['docs/formula-functions.md', 'formula-functions', 'Formula functions'];
+const formulaSyntaxMarker = '<!-- chopper-docs:formula-syntax -->';
 const libraryPage = ['docs/user/libraries.md', 'libraries', 'Libraries'];
 const languagePages = [
   [libraryPage[0], 'libraries-rust', 'Rust'],
@@ -122,6 +123,25 @@ async function preparePages(source, documents, base) {
   });
   try {
     const generated = new Map();
+    const formulas = documents.find(({ name }) => name === formulaPage[1]);
+    let formulaSyntax = false;
+    if (formulas) {
+      const tokens = renderer.parse(formulas.markdown, { path: join(source, `${formulas.name}.md`) });
+      const marker = findTopLevelMarker(tokens, formulaSyntaxMarker);
+      const panels = tokens.filter(token => token.type === 'html_block' && /^<div .*\bdata-formula-syntax=/.test(token.content));
+      if (panels.length && !marker) throw new Error('Formula syntax panels need the top-level formula syntax marker');
+      if (marker) {
+        const choices = panels.map(panel => panel.content.match(/\bdata-formula-syntax="(formula|rust|python)"/)?.[1]);
+        if (choices.length !== 3 || ['formula', 'rust', 'python'].some(choice => !choices.includes(choice))) {
+          throw new Error('The formula syntax selector needs one panel for each syntax');
+        }
+        const lines = formulas.markdown.split('\n');
+        lines.splice(marker.map[0], marker.map[1] - marker.map[0], '<LibraryLanguage formula-reference />');
+        const setup = "<script setup>\nimport LibraryLanguage from './LibraryLanguage.vue';\n</script>\n\n";
+        generated.set(formulas.name, setup + lines.join('\n'));
+        formulaSyntax = true;
+      }
+    }
     const library = documents.find(({ name }) => name === libraryPage[1]);
     let splitLibraries = false;
     if (library) {
@@ -176,7 +196,7 @@ async function preparePages(source, documents, base) {
       });
       return [`/${current.name}.md`, [{ items }]];
     }));
-    return { sidebar, splitLibraries };
+    return { sidebar, splitLibraries, formulaSyntax };
   } finally {
     disposeMdItInstance();
   }
@@ -216,12 +236,15 @@ try {
         ? renderCliReference(read(path).toString(), JSON.parse(read('docs/cli-reference-data.json')), version)
         : path === libraryPage[0] ? library : content(read(path).toString(), name),
     }));
-    const { sidebar, splitLibraries } = await preparePages(source, documents, base);
+    const { sidebar, splitLibraries, formulaSyntax } = await preparePages(source, documents, base);
     const releasePages = candidatePages.filter(([, name]) => splitLibraries || !name.startsWith('libraries-'));
     release.splitLibraries = splitLibraries;
-    if (hasLibraries) {
-      const component = splitLibraries ? 'LibraryGuideNav.vue' : 'LibraryLanguage.vue';
-      await cp(new URL(`./${component}`, import.meta.url), join(source, component));
+    release.formulaSyntax = formulaSyntax;
+    if (splitLibraries) {
+      await cp(new URL('./LibraryGuideNav.vue', import.meta.url), join(source, 'LibraryGuideNav.vue'));
+    }
+    if (formulaSyntax || (hasLibraries && !splitLibraries)) {
+      await cp(new URL('./LibraryLanguage.vue', import.meta.url), join(source, 'LibraryLanguage.vue'));
     }
     await writeFile(join(source, 'workbench.png'), read(imagePath));
     await writeFile(join(source, 'public/customers.csv'), read(samplePath));
@@ -273,10 +296,10 @@ try {
   await writeFile(join(site, '_redirects'), `/latest /versions/${latest.version}/ 302\n/latest/* /versions/${latest.version}/:splat 302\n`);
   await writeFile(join(site, 'versions.json'), JSON.stringify({
     latest: latest.version,
-    versions: releases.map(({ version, commit, hasFormulas, hasLibraries, splitLibraries }) => {
+    versions: releases.map(({ version, commit, hasFormulas, hasLibraries, splitLibraries, formulaSyntax }) => {
       const additionalPages = [hasFormulas && formulaPage[1], hasLibraries && libraryPage[1],
         ...(splitLibraries ? languagePages.map(([, name]) => name) : [])].filter(Boolean);
-      return { version, commit, ...(additionalPages.length ? { additionalPages } : {}) };
+      return { version, commit, ...(additionalPages.length ? { additionalPages } : {}), ...(formulaSyntax ? { formulaSyntax } : {}) };
     }),
     pages: pages.map(([, name]) => name),
   }, null, 2) + '\n');

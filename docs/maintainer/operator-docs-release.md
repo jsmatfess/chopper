@@ -42,6 +42,13 @@ to the selected guide with their section anchors. The smoke test checks
 language-scoped prose, navigation, direct links, search, and reading and
 navigating the guides without JavaScript.
 
+The formula reference keeps the function tables in formula text. The
+`<!-- chopper-docs:formula-syntax -->` marker adds a selector for the
+`formula`, `rust`, and `python` panels. Each panel uses `data-formula-syntax`
+with its corresponding value and an anchor that remains readable without
+JavaScript. Use `?lang=rust#rust-syntax` or `?lang=python#python-syntax` to link
+to the SDK notes.
+
 ```sh
 npm --prefix docs-site ci
 npm --prefix docs-site test

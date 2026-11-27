@@ -251,6 +251,59 @@ async function checkSplitLibraryGuides(browser, origin, base) {
   }
 }
 
+async function checkFormulaSyntax(browser, origin, base) {
+  const url = origin + base + 'formula-functions';
+  const anchor = '#build-formulas-with-the-client-libraries';
+  const panel = (page, syntax) => page.locator(`[data-formula-syntax="${syntax}"]`);
+  const selector = page => page.getByLabel('Formula syntax', { exact: true });
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  page.setDefaultTimeout(10_000);
+  try {
+    await page.goto(url + '?source=guide' + anchor);
+    const picker = selector(page);
+    await picker.waitFor();
+    assert.equal(await picker.inputValue(), 'formula');
+    assert.equal(await panel(page, 'rust').getAttribute('hidden'), 'until-found');
+    await picker.selectOption('rust');
+    await page.waitForURL(url + '?source=guide&lang=rust' + anchor);
+    await panel(page, 'rust').getByText('Rust syntax', { exact: true }).waitFor();
+    assert.equal(await panel(page, 'python').getAttribute('hidden'), 'until-found');
+    await page.getByText('CONCAT_WS(separator, text, ..., ignore_null?, ignore_empty?)', { exact: true }).waitFor();
+
+    await page.goto(url + '?lang=python#python-syntax');
+    await picker.waitFor();
+    assert.equal(await picker.inputValue(), 'python');
+    await panel(page, 'python').getByText('Python syntax', { exact: true }).waitFor();
+    await page.evaluate(() => { window.location.hash = '#rust-syntax'; });
+    await page.waitForURL(url + '?lang=rust#rust-syntax');
+    assert.equal(await picker.inputValue(), 'rust');
+    await picker.selectOption('formula');
+    await page.waitForURL(url + '?lang=formula#formula-text-syntax');
+    await panel(page, 'formula').getByText('Formula text', { exact: true }).waitFor();
+
+    for (const language of ['rust', 'python']) {
+      await page.goto(origin + base + `libraries-${language}#pass-function-arguments`);
+      const notes = page.getByRole('link', { name: new RegExp(`^${language} syntax notes$`, 'i') });
+      await notes.click();
+      await page.waitForURL(url + `?lang=${language}#${language}-syntax`);
+      await picker.waitFor();
+      assert.equal(await picker.inputValue(), language);
+    }
+  } finally {
+    await page.close();
+  }
+
+  const fallback = await browser.newPage({ javaScriptEnabled: false });
+  fallback.setDefaultTimeout(10_000);
+  try {
+    await fallback.goto(url + '#python-syntax');
+    for (const syntax of ['formula', 'rust', 'python']) await panel(fallback, syntax).waitFor();
+    await selector(fallback).waitFor({ state: 'hidden' });
+  } finally {
+    await fallback.close();
+  }
+}
+
 let server;
 let browser;
 try {
@@ -284,7 +337,7 @@ try {
   assert.equal(await support.getAttribute('href'), 'https://buymeacoffee.com/tblflip');
   assert.equal(await page.getByRole('link', { name: /Latest stable release/ }).getAttribute('href'), `/versions/${latest}/`);
   await page.getByRole('link', { name: latest, exact: true }).waitFor();
-  for (const { version, commit, additionalPages = [] } of versions) {
+  for (const { version, commit, additionalPages = [], formulaSyntax } of versions) {
     const base = `/versions/${version}/`;
     assert.match(commit, /^[0-9a-f]{40}$/);
     assert.equal((await page.goto(origin + base))?.status(), 200);
@@ -366,6 +419,10 @@ try {
       const formulaResult = page.locator(`#localsearch-list a[href^="${base}formula-functions"]`).first();
       await formulaResult.click();
       await page.waitForURL(url => url.pathname === base + 'formula-functions' && url.hash.length > 1);
+    }
+    if (formulaSyntax) {
+      await checkFormulaSyntax(browser, origin, base);
+      console.log(`Verified ${version} formula syntax selector, deep links, and static fallback`);
     }
     const splitGuides = ['libraries-rust', 'libraries-python'];
     if (splitGuides.some(guide => additionalPages.includes(guide))) {

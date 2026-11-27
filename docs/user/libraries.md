@@ -390,6 +390,9 @@ For variable-length arguments, pass an array or iterator, as in
 condition-value pairs and a fallback with
 `f::ifs([(condition, value)], fallback)`.
 
+See the [Rust syntax notes](../formula-functions.md?lang=rust#rust-syntax) in
+the formula reference.
+
 <!-- docs:end -->
 
 <!-- docs:python -->
@@ -402,6 +405,9 @@ For variable-length arguments, pass each value in order, as in
 `f.concat(col("country"), "-", col("segment"))`. For `IFS`, pass
 condition-value pairs and a named fallback with
 `f.ifs((condition, value), fallback=fallback)`.
+
+See the [Python syntax notes](../formula-functions.md?lang=python#python-syntax)
+in the formula reference.
 
 <!-- docs:end -->
 

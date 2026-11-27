@@ -1,11 +1,94 @@
 # Formula functions
 
 Calculated columns evaluate expressions against the current row. The same
-formulas work in the hosted app, the CLI, and both libraries. See runnable
-[Rust examples](user/libraries.md?lang=rust#add-calculated-columns),
-[Python examples](user/libraries.md?lang=python#add-calculated-columns),
-[calculated columns in Job JSON](job-json.md#formulas), or
+formulas work in the hosted app, the CLI, and both libraries. The function
+tables use Chopper formula text.
+
+## Build formulas with the client libraries
+
+<!-- chopper-docs:formula-syntax -->
+
+<div id="formula-text-syntax" data-formula-syntax="formula">
+
+**Formula text**
+
+Paste this expression into the hosted formula editor. For the CLI, pass
+`--calculated-column 'review_status=...'` with the expression after `=`.
+In Job JSON, set the calculated column's `expression` field.
+
+```text
+IF(STARTSWITH([country], "u", TRUE) AND NOT IS_BLANK([segment]), "review", "skip")
+```
+
+See [calculated columns in Job JSON](job-json.md#formulas) and
 [CLI flags](run-cli.md#calculated-columns).
+
+</div>
+
+<div id="rust-syntax" data-formula-syntax="rust">
+
+**Rust syntax**
+
+Import the helpers from `chopper::formula::functions`. Names are lowercase,
+with `if_else` for `IF`. Use `col("country")` for a header, `col(0)` for the
+first field, and `lit(value)` for an explicit literal expression.
+
+```rust
+use chopper::formula::{col, functions as f, lit};
+
+fn main() {
+    let country = f::startswith(col("country"), "u", Some(lit(true)));
+    let needs_review = country.and(f::is_blank(col("segment")).not());
+    println!("{}", f::if_else(needs_review, "review", "skip"));
+}
+```
+
+- Pass `None` to omit an optional argument and `Some(expr)` to supply one.
+  Use `null()` for formula `NULL`, or `Some(null())` in an optional slot.
+- Pass an iterator of expressions to `concat` and `coalesce`. `concat_ws`
+  takes the separator followed by the iterator, including any literal Boolean
+  flags at its end. `ifs` takes `(condition, value)` pairs and a fallback.
+- Compose Boolean expressions with `.and()`, `.or()`, and `.not()`, or use
+  `&`, `|`, and `!`. For text concatenation, use `f::concat`.
+- Use `f::safe(expr)` to catch row errors. Use `chopper::formula::parse`
+  for formula text such as comparisons, `IN`, or `SAFE.NUMBER([amount])`.
+
+See [Rust examples](user/libraries.md?lang=rust#add-calculated-columns) for
+adding expressions to a Job.
+
+</div>
+
+<div id="python-syntax" data-formula-syntax="python">
+
+**Python syntax**
+
+Import the helpers from `chopper_csv.functions`. Names are lowercase,
+with `if_else` for `IF`. Use `col("country")` for a header, `col(0)` for the
+first field, and `lit(value)` for an explicit literal expression.
+
+```python
+from chopper_csv import col, functions as f
+
+country = f.startswith(col("country"), "u", True)
+needs_review = country.and_(f.is_blank(col("segment")).not_())
+print(f.if_else(needs_review, "review", "skip"))
+```
+
+- Omit an optional argument to use the function default. Pass `None` for
+  formula `NULL`.
+- Pass arguments individually to `concat` and `coalesce`. Append any
+  literal Boolean flags to `concat_ws`. `ifs` takes `(condition, value)`
+  pairs and a `fallback=` keyword argument.
+- Compose Boolean expressions with `.and_()`, `.or_()`, and `.not_()`, or use
+  `&`, `|`, and `~`. The trailing underscores avoid Python's reserved
+  keywords. For text concatenation, use `f.concat`.
+- Use `f.safe(expr)` to catch row errors. Use `chopper_csv.parse`
+  for formula text such as comparisons, `IN`, or `SAFE.NUMBER([amount])`.
+
+See [Python examples](user/libraries.md?lang=python#add-calculated-columns)
+for adding expressions to a Job.
+
+</div>
 
 ## Write a formula
 
@@ -42,18 +125,6 @@ skipped by the sample.
 
 Function names are case-insensitive. CSV fields start as text. Use `NUMBER`,
 `DATE_PARSE`, or `TIMESTAMP_PARSE` to convert input explicitly.
-
-## Build formulas with the client libraries
-
-Rust's `chopper::formula::functions` and Python's `chopper_csv.functions`
-provide named helpers for these functions. Use lowercase names such as
-`trim` and `upper`, and use `if_else` for `IF`. Compose helpers with
-`col("country")` for the exact header `country` or `col(0)` for the first
-field. Use `parse(text)` to incorporate a formula written in the syntax below.
-
-The [Rust examples](user/libraries.md?lang=rust#add-calculated-columns) and
-[Python examples](user/libraries.md?lang=python#add-calculated-columns) show
-how to attach expressions to a Job and pass optional arguments and literals.
 
 ## Handle row errors with SAFE
 

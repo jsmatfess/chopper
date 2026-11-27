@@ -1,15 +1,32 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
 
-const choices = { rust: 'Rust', python: 'Python' };
+const props = defineProps({ formulaReference: Boolean });
+const choices = {
+  ...(props.formulaReference ? { formula: 'Formula text' } : {}),
+  rust: 'Rust',
+  python: 'Python',
+};
+const pickerId = props.formulaReference ? 'formula-language' : 'library-language';
 const preference = 'chopper-docs-library-language';
 const picker = ref(null);
 const selection = ref('');
 let guide;
 let anchorFrame;
+let formulaPanels = [];
 
 function restoreLanguage() {
   const url = new URL(window.location.href);
+  if (props.formulaReference) {
+    const linked = url.searchParams.get('lang');
+    const target = formulaPanels.find(panel => `#${panel.id}` === url.hash);
+    selection.value = Object.hasOwn(choices, linked) ? linked : target?.dataset.formulaSyntax ?? 'formula';
+    for (const panel of formulaPanels) {
+      if (panel.dataset.formulaSyntax === selection.value) panel.removeAttribute('hidden');
+      else panel.setAttribute('hidden', 'until-found');
+    }
+    return;
+  }
   const linked = [url.searchParams.get('lang'), url.hash.slice(1)]
     .find(language => Object.hasOwn(choices, language));
   let saved;
@@ -26,8 +43,15 @@ function restoreLanguage() {
 function chooseLanguage(language) {
   const url = new URL(window.location.href);
   url.searchParams.set('lang', language);
+  if (formulaPanels.some(panel => `#${panel.id}` === url.hash)) {
+    url.hash = formulaPanels.find(panel => panel.dataset.formulaSyntax === language).id;
+  }
   window.history.replaceState(window.history.state, '', url);
   restoreLanguage();
+}
+
+function revealSyntax(event) {
+  chooseLanguage(event.currentTarget.dataset.formulaSyntax);
 }
 
 function alignLinkedSection() {
@@ -43,6 +67,12 @@ function alignLinkedSection() {
 
 onMounted(() => {
   guide = picker.value.closest('.vp-doc');
+  if (props.formulaReference) {
+    // Without searchable hidden content, all three sections and their links are available.
+    if (!('onbeforematch' in HTMLElement.prototype)) return;
+    formulaPanels = [...guide.querySelectorAll('[data-formula-syntax]')];
+    for (const panel of formulaPanels) panel.addEventListener('beforematch', revealSyntax);
+  }
   restoreLanguage();
   // The initial fragment scroll can happen before the language changes the layout.
   if (window.location.hash && !window.history.state?.scrollPosition) {
@@ -55,6 +85,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.cancelAnimationFrame(anchorFrame);
   delete guide.dataset.libraryLanguage;
+  for (const panel of formulaPanels) panel.removeEventListener('beforematch', revealSyntax);
   window.removeEventListener('popstate', restoreLanguage);
   window.removeEventListener('hashchange', restoreLanguage);
 });
@@ -62,10 +93,10 @@ onUnmounted(() => {
 
 <template>
   <div ref="picker" class="library-picker" :hidden="!selection">
-    <label for="library-language">Example language</label>
+    <label :for="pickerId">{{ formulaReference ? 'Formula syntax' : 'Example language' }}</label>
     <select
-      id="library-language"
-      name="library-language"
+      :id="pickerId"
+      :name="pickerId"
       :value="selection"
       @change="chooseLanguage($event.target.value)"
     >
@@ -100,6 +131,10 @@ onUnmounted(() => {
 .library-picker select:focus-visible {
   outline: 2px solid var(--vp-c-brand-1);
   outline-offset: 2px;
+}
+
+[data-formula-syntax] {
+  scroll-margin-block-start: calc(var(--vp-nav-height) + 1.5rem);
 }
 
 [data-library-language="rust"] [data-library-example="python"],

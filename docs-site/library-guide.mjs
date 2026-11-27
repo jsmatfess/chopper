@@ -1,10 +1,14 @@
 export const languagePagesMarker = '<!-- chopper-docs:language-pages -->';
 const languages = ['rust', 'python'];
 
-export function findLanguagePagesMarker(tokens) {
+export function findTopLevelMarker(tokens, marker) {
   return tokens.find(token => (
-    token.type === 'html_block' && token.level === 0 && token.content.trim() === languagePagesMarker
+    token.type === 'html_block' && token.level === 0 && token.content.trim() === marker
   ));
+}
+
+export function findLanguagePagesMarker(tokens) {
+  return findTopLevelMarker(tokens, languagePagesMarker);
 }
 
 function proseMarker(token) {
