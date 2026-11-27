@@ -6,11 +6,7 @@ const preference = 'chopper-docs-library-language';
 const picker = ref(null);
 const selection = ref('');
 let guide;
-
-function applyLanguage(language) {
-  selection.value = language;
-  guide.dataset.libraryLanguage = language;
-}
+let anchorFrame;
 
 function restoreLanguage() {
   const url = new URL(window.location.href);
@@ -23,7 +19,8 @@ function restoreLanguage() {
   } catch {
     // The URL still works when the browser blocks storage.
   }
-  applyLanguage(linked ?? (Object.hasOwn(choices, saved) ? saved : selection.value || 'rust'));
+  selection.value = linked ?? (Object.hasOwn(choices, saved) ? saved : selection.value || 'rust');
+  guide.dataset.libraryLanguage = selection.value;
 }
 
 function chooseLanguage(language) {
@@ -33,14 +30,30 @@ function chooseLanguage(language) {
   restoreLanguage();
 }
 
+function alignLinkedSection() {
+  let id;
+  try {
+    id = decodeURIComponent(window.location.hash.slice(1));
+  } catch {
+    return;
+  }
+  const target = document.getElementById(id);
+  if (target && guide.contains(target)) target.scrollIntoView({ block: 'start' });
+}
+
 onMounted(() => {
   guide = picker.value.closest('.vp-doc');
   restoreLanguage();
+  // The initial fragment scroll can happen before the language changes the layout.
+  if (window.location.hash && !window.history.state?.scrollPosition) {
+    anchorFrame = window.requestAnimationFrame(alignLinkedSection);
+  }
   window.addEventListener('popstate', restoreLanguage);
   window.addEventListener('hashchange', restoreLanguage);
 });
 
 onUnmounted(() => {
+  window.cancelAnimationFrame(anchorFrame);
   delete guide.dataset.libraryLanguage;
   window.removeEventListener('popstate', restoreLanguage);
   window.removeEventListener('hashchange', restoreLanguage);
@@ -107,5 +120,13 @@ onUnmounted(() => {
 [data-library-language="rust"] [data-library-example="python"],
 [data-library-language="python"] [data-library-example="rust"] {
   display: none;
+}
+
+[data-library-language] :is(h1, h2, h3, .library-section-alias) {
+  scroll-margin-block-start: calc(var(--vp-nav-height) + 3.5rem);
+}
+
+.library-section-alias {
+  display: block;
 }
 </style>

@@ -35,7 +35,10 @@ async function checkLibraryLanguage(browser, origin, base) {
 
     assert.equal((await page.goto(url + '?lang=python' + anchor))?.status(), 200);
     await checkLanguage('Python', 'Rust');
-    await page.locator(anchor).waitFor();
+    await page.waitForFunction(id => {
+      const heading = document.getElementById(id).getBoundingClientRect();
+      return heading.top >= 0 && heading.bottom <= window.innerHeight;
+    }, anchor.slice(1));
     await radio('Python').press('ArrowLeft');
     await page.waitForURL(url + '?lang=rust' + anchor);
     await checkLanguage('Rust', 'Python');

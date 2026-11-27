@@ -20,7 +20,8 @@ export function renderLibraryGuide(markdown, tokens) {
   const edits = [{
     start: rust,
     end,
-    text: '## Run your first Job\n\n<span id="rust"></span><span id="python"></span>\n\n'
+    text: '## Run your first Job\n\n<span id="rust" class="library-section-alias"></span>'
+      + '<span id="python" class="library-section-alias"></span>\n\n'
       + panel('rust', '**Rust**\n\n' + source(rust + 1, python))
       + panel('python', '**Python**\n\n' + source(python + 1, end)),
   }];
