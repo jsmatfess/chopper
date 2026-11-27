@@ -40,6 +40,8 @@ mod wasi_contracts;
 const BUFFER_BYTES: usize = 8 * 1024;
 #[cfg(not(target_os = "wasi"))]
 const BUFFER_BYTES: usize = 0;
+#[cfg(not(target_os = "wasi"))]
+pub(crate) const MAX_JOB_BYTES: u64 = 1024 * 1024;
 const DECODE_ORIGIN: &str = if cfg!(target_os = "wasi") {
     "Job"
 } else {
@@ -184,12 +186,33 @@ impl DecodedJob {
         pool: impl FnOnce() -> Result<Arc<MemoryPool>>,
         track_paths: bool,
     ) -> Result<Self> {
-        ensure!(length <= 1024 * 1024, "configuration exceeds 1 MiB");
+        ensure!(length <= MAX_JOB_BYTES, "configuration exceeds 1 MiB");
         let file = open()?;
         Self::decode(file, pool()?, track_paths)
     }
     fn decode(source: impl Read, pool: Arc<MemoryPool>, track_paths: bool) -> Result<Self> {
         Self::decode_admitted(|| source, pool, track_paths)
+    }
+    pub(crate) fn from_json(json: &str) -> Result<Self> {
+        Self::open_after_metadata(
+            json.len() as u64,
+            || Ok(json.as_bytes()),
+            process_memory,
+            true,
+        )
+    }
+    pub(crate) fn copy_for_run(settings: &Job) -> Result<Self> {
+        let mut grant = Grant::new(process_memory()?);
+        // Clone allocates by length for the schema's Vec and String fields.
+        grant.grow(engine::job_capacity(settings)?)?;
+        let job = settings.clone();
+        let retained = engine::job_capacity(&job)?;
+        ensure!(
+            retained <= grant.bytes,
+            "Job copy exceeds admitted capacity"
+        );
+        grant.shrink(retained);
+        Ok(Self { job, _grant: grant })
     }
     pub fn resource_overrides(
         mut self,

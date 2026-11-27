@@ -30,6 +30,7 @@ const pages = [
   ['docs/compatibility.md', 'compatibility', 'Compatibility and migration'],
 ];
 const formulaPage = ['docs/formula-functions.md', 'formula-functions', 'Formula functions'];
+const libraryPage = ['docs/user/libraries.md', 'libraries', 'Rust and Python libraries'];
 const imagePath = 'docs/images/workbench.png';
 const samplePath = 'examples/customers.csv';
 const supportUrl = 'https://buymeacoffee.com/tblflip';
@@ -128,20 +129,24 @@ const releases = versions.map(arg => {
     throw new Error(`App version does not match docs version ${version} at ${commit}`);
   }
   const hasFormulas = git('ls-tree', '--name-only', commit, '--', formulaPage[0]).length > 0;
-  return { version, commit, read, hasFormulas };
+  const hasLibraries = git('ls-tree', '--name-only', commit, '--', libraryPage[0]).length > 0;
+  return { version, commit, read, hasFormulas, hasLibraries };
 }).sort((a, b) => b.version.localeCompare(a.version, 'en', { numeric: true }));
 if (new Set(releases.map(r => r.version)).size !== releases.length) throw new Error('Duplicate documentation version');
 
 const staging = await mkdtemp(fileURLToPath(new URL('./.build-', import.meta.url)));
 try {
   const site = join(staging, 'dist');
-  for (const { version, read, hasFormulas } of releases) {
+  for (const { version, read, hasFormulas, hasLibraries } of releases) {
     const source = join(staging, version);
     const base = `/versions/${version}/`;
     await mkdir(join(source, 'public'), { recursive: true });
     await cp(stylesheet, join(source, 'public/chopper.css'));
-    const releasePages = pages.flatMap(page =>
-      hasFormulas && page[1] === 'job-json' ? [page, formulaPage] : [page]);
+    const releasePages = pages.flatMap(page => {
+      if (hasLibraries && page[1] === 'index') return [page, libraryPage];
+      if (hasFormulas && page[1] === 'job-json') return [page, formulaPage];
+      return [page];
+    });
     const documents = releasePages.map(([path, name, text]) => ({
       name, text, markdown: name === 'cli-reference'
         ? renderCliReference(read(path).toString(), JSON.parse(read('docs/cli-reference-data.json')), version)
@@ -201,9 +206,10 @@ try {
   await writeFile(join(site, '_redirects'), `/latest /versions/${latest.version}/ 302\n/latest/* /versions/${latest.version}/:splat 302\n`);
   await writeFile(join(site, 'versions.json'), JSON.stringify({
     latest: latest.version,
-    versions: releases.map(({ version, commit, hasFormulas }) => ({
-      version, commit, ...(hasFormulas ? { additionalPages: [formulaPage[1]] } : {}),
-    })),
+    versions: releases.map(({ version, commit, hasFormulas, hasLibraries }) => {
+      const additionalPages = [hasFormulas && formulaPage[1], hasLibraries && libraryPage[1]].filter(Boolean);
+      return { version, commit, ...(additionalPages.length ? { additionalPages } : {}) };
+    }),
     pages: pages.map(([, name]) => name),
   }, null, 2) + '\n');
   await checkSite(site);

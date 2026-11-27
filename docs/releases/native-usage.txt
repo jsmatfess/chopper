@@ -11,6 +11,11 @@ with them in the notices below. Upstream notice texts
 are preserved byte for byte. Identical texts appear once with all source files
 identified.
 
+Chopper 0.7.0 uses the separately named Cargo packages chopper-flate2 1.1.10,
+chopper-serde-json 1.0.151 and chopper-zip 2.4.2. They retain the respective
+flate2, serde_json and zip upstream notices below. Chopper uses the same
+miniz backend and JSON feature set described by the pinned allocation audits.
+
 Scope: default normal-dependency closures for chopper on x86_64-unknown-linux-gnu
 and x86_64-pc-windows-msvc; chopper-browser on wasm32-wasip1; and the bundled
 @bjorn3/browser_wasi_shim. Normal-edge procedural macros are included. Build-only

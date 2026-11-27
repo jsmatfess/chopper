@@ -18,9 +18,12 @@ describes future behavior; [GitHub Issues](https://github.com/jsmatfess/chopper/
    settings only if no edit occurred since submission. In-place operation edits,
    imports and edits subsequently reverted still require a new Run.
    New executions obtain internal entropy; no user seed remains in the draft.
-   The native interface is the CLI; there is no native HTTP server or embedded
-   UI. The hosted interface runs in the browser and communicates with its WASI
-   engine worker.
+   The [native Job API](../crates/chopper/src/job.rs) composes the same settings
+   and uses the CLI's admitted JSON decoder. It exposes synchronous execution
+   with a per-Job progress and cancellation handle. The
+   [Python extension](../crates/chopper-python/src/lib.rs) delegates to it with
+   the GIL released during Analyze and Run. The hosted interface communicates
+   with its WASI engine worker.
 2. [CSV intake](../crates/chopper/src/csv_intake.rs) owns the decoded source,
    strict parser, reusable records, column-count validation and their grants for
    Run, preparation, profiling and first-record inspection. Owned and compact

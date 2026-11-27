@@ -222,6 +222,6 @@ On Linux it uses `/dev/full` to fail the stdout report and a gated row checkpoin
 to deliver SIGINT before commit.
 
 ```sh
-cargo test --locked -p chopper --test cli_publication
-cargo test --locked -p chopper --test cli_publication --features resource-contract-tests
+cargo test --locked -p chopper-csv --test cli_publication
+cargo test --locked -p chopper-csv --test cli_publication --features resource-contract-tests
 ```

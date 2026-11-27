@@ -136,16 +136,40 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f079e83a288787bcd14a6aea84cee5c87a67c5a3e660c30f557a3d24761b3527"
 
 [[package]]
-name = "chopper"
-version = "0.6.6"
+name = "chopper-browser"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "chopper-csv",
+ "chopper-serde-json",
+ "serde",
+]
+
+[[package]]
+name = "chopper-core"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "blake3",
+ "chopper-serde-json",
+ "encoding_rs",
+ "memchr",
+ "serde",
+]
+
+[[package]]
+name = "chopper-csv"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "blake3",
  "chopper-core",
+ "chopper-flate2",
+ "chopper-serde-json",
+ "chopper-zip",
  "clap",
  "crc32fast",
  "ctrlc",
- "flate2",
  "fs2",
  "getrandom 0.2.17",
  "libc",
@@ -153,33 +177,43 @@ dependencies = [
  "rayon",
  "rustix",
  "serde",
- "serde_json",
  "serde_path_to_error",
  "tempfile",
  "windows-sys",
- "zip",
 ]
 
 [[package]]
-name = "chopper-browser"
-version = "0.6.6"
+name = "chopper-flate2"
+version = "1.1.10"
 dependencies = [
- "anyhow",
- "chopper",
- "serde",
- "serde_json",
+ "crc32fast",
+ "miniz_oxide",
 ]
 
 [[package]]
-name = "chopper-core"
-version = "0.6.6"
+name = "chopper-serde-json"
+version = "1.0.151"
 dependencies = [
- "anyhow",
- "blake3",
- "encoding_rs",
+ "itoa",
  "memchr",
- "serde",
- "serde_json",
+ "serde_core",
+ "zmij",
+]
+
+[[package]]
+name = "chopper-zip"
+version = "2.4.2"
+dependencies = [
+ "arbitrary",
+ "chopper-flate2",
+ "crc32fast",
+ "crossbeam-utils",
+ "displaydoc",
+ "hashbrown",
+ "indexmap",
+ "memchr",
+ "thiserror",
+ "zopfli",
 ]
 
 [[package]]
@@ -375,17 +409,6 @@ name = "find-msvc-tools"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aedcfb3409746eddb02b9e19ebda1c3394f759a152e48ee875a0844d1b955484"
-
-[[package]]
-name = "flate2"
-version = "1.1.10"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e634e2e0ebac1ee034020da1ca582e17ffe4e0f5e985823721e168928136dcb"
-dependencies = [
- "crc32fast",
- "miniz_oxide",
- "zlib-rs",
-]
 
 [[package]]
 name = "fs2"
@@ -632,19 +655,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_json"
-version = "1.0.151"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c841b55ecdae098c80dcae9cf767f6f8a0c2cdb3416bbef72181df4d0fe73f14"
-dependencies = [
- "itoa",
- "memchr",
- "serde",
- "serde_core",
- "zmij",
-]
-
-[[package]]
 name = "serde_path_to_error"
 version = "0.1.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -777,27 +787,6 @@ checksum = "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc"
 dependencies = [
  "windows-link",
 ]
-
-[[package]]
-name = "zip"
-version = "2.4.2"
-dependencies = [
- "arbitrary",
- "crc32fast",
- "crossbeam-utils",
- "displaydoc",
- "flate2",
- "indexmap",
- "memchr",
- "thiserror",
- "zopfli",
-]
-
-[[package]]
-name = "zlib-rs"
-version = "0.6.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b268e58e7c693d7c271f93ffc4ba3b380412554231c85bf61ca7af91042a4112"
 
 [[package]]
 name = "zmij"

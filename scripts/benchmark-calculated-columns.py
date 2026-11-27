@@ -87,7 +87,7 @@ def main():
         parser.error("--repeats must be positive")
     if command("git", "status", "--porcelain"):
         parser.error("benchmark from a clean committed source checkout")
-    build_command = ["cargo", "build", "--release", "--locked", "-p", "chopper"]
+    build_command = ["cargo", "build", "--release", "--locked", "-p", "chopper-csv"]
     subprocess.run(build_command, check=True)
     metadata = json.loads(command("cargo", "metadata", "--no-deps", "--format-version", "1"))
     executable = Path(metadata["target_directory"]) / "release" / "chopper"

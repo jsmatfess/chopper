@@ -46,7 +46,7 @@ impl<P: CsvRecords> Records<P> {
         combinations: &[(Vec<usize>, Cardinality)],
         cancel: &AtomicBool,
     ) -> Result<Option<Record<'a>>> {
-        ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
+        ensure!(!cancel.load(Ordering::Relaxed), ProfileCancelled);
         #[cfg(all(feature = "experimental-parallel-profile", not(target_os = "wasi")))]
         if let Some(batch) = &mut self.batch {
             return batch.next(&mut self.input, combinations, cancel, &mut self.execution);
@@ -156,7 +156,7 @@ mod parallel {
                 self.count = 0;
                 let mut bytes = 0;
                 for slot in &mut self.slots {
-                    ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
+                    ensure!(!cancel.load(Ordering::Relaxed), ProfileCancelled);
                     if self.first {
                         self.first = false;
                         input.validate_slot(&slot.fields)?;
@@ -182,7 +182,7 @@ mod parallel {
                         .par_iter_mut()
                         .with_min_len(16)
                         .try_for_each(|slot| -> Result<()> {
-                            ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
+                            ensure!(!cancel.load(Ordering::Relaxed), ProfileCancelled);
                             slot.hashes.clear();
                             for field in &slot.fields {
                                 slot.hashes.push(blake3::hash(field.as_bytes()));

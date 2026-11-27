@@ -472,6 +472,7 @@ pub(crate) fn make_symlink<T>(
     target: &[u8],
     #[allow(unused)] existing_files: &IndexMap<Box<str>, T>,
 ) -> ZipResult<()> {
+    #[cfg_attr(not(any(unix, windows)), allow(unused_variables))]
     let Ok(target_str) = std::str::from_utf8(target) else {
         return Err(ZipError::InvalidArchive("Invalid UTF-8 as symlink target"));
     };

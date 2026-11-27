@@ -29,9 +29,9 @@ Run from the repository root under the existing
 Build the ordinary binary and retain a copy before building the fault binary:
 
 ```sh
-cargo build --locked -p chopper --bin chopper -j 2
+cargo build --locked -p chopper-csv --bin chopper -j 2
 # Copy target/debug/chopper to a fresh owned artifact directory as chopper-default.
-cargo build --locked -p chopper --bin chopper -j 2 --features resource-contract-tests
+cargo build --locked -p chopper-csv --bin chopper -j 2 --features resource-contract-tests
 python3 scripts/test-guide.py --binary scratch/OWNED/chopper-default \
   --fault-binary target/debug/chopper --artifacts scratch/OWNED/new-pty-attempt
 ```
@@ -59,7 +59,7 @@ publication and cleanup-failure contracts separately; a PTY pass does not replac
 them. Restore an ordinary build before handing off a runnable production binary.
 
 Focused injected-I/O transcripts live in `guide.rs`; run them with
-`cargo test --locked -p chopper --bin chopper guide::tests`. These establish prompt
+`cargo test --locked -p chopper-csv --bin chopper guide::tests`. These establish prompt
 and persistence controls, not actual-terminal coverage. Normal contributor
 fmt/Clippy/workspace tests remain applicable.
 

@@ -1,6 +1,15 @@
 use super::*;
 use std::{fs, path::PathBuf};
 
+#[derive(Debug)]
+pub(crate) struct DestinationError(pub(super) String);
+
+impl std::fmt::Display for DestinationError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(&self.0)
+    }
+}
+
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(crate) mod resource_contracts;
 
@@ -29,15 +38,15 @@ impl RunDestination {
             }
         };
         check().with_context(|| {
-            format!(
+            DestinationError(format!(
                 "choose a new or empty output directory instead of {:?}",
                 job.output
-            )
+            ))
         })
     }
 
     pub(super) fn check(&self, path: &Path) -> Result<bool> {
-        match self {
+        let check = || match self {
             Self::Unchecked => empty_destination(path, false),
             #[cfg(not(target_os = "wasi"))]
             Self::Absent => empty_destination(path, true),
@@ -49,7 +58,8 @@ impl RunDestination {
                 ensure!(current.identity == original.identity, "{changed}");
                 Ok(true)
             }
-        }
+        };
+        check().with_context(|| DestinationError("check output destination".into()))
     }
 }
 
@@ -79,7 +89,8 @@ pub(super) fn staging_destination(job: &Job, ctx: &Context) -> Result<(Destinati
     let path = std::path::absolute(&job.output)?;
     let destination = DestinationPath::admit(path, Reservation::new(ctx))?;
     let existing_empty = ctx.run_destination().check(destination.as_path())?;
-    check_parent(destination.as_path())?;
+    check_parent(destination.as_path())
+        .with_context(|| DestinationError("check output destination".into()))?;
     Ok((destination, existing_empty))
 }
 

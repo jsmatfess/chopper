@@ -8,6 +8,8 @@ pub use cli_job::DecodedJob;
 mod csv_intake;
 mod digest;
 pub mod engine;
+#[cfg(not(target_os = "wasi"))]
+pub mod job;
 pub mod output;
 pub mod profile;
 pub mod resources;

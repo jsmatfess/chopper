@@ -1,6 +1,6 @@
 """Compare complete resident random-key v1 and Fisher–Yates v1 jobs.
 
-Build: cargo build --release --locked -p chopper --bin chopper --example allocation-profile
+Build: cargo build --release --locked -p chopper-csv --bin chopper --example allocation-profile
 Warm, uncontrolled local storage only. Timings include process startup, ingestion,
 RNG, preparation, allocation, CSV serialization and publication; verification and
 fixture creation are outside timing. Loop diagnostics exclude ingestion/output

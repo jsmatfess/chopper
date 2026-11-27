@@ -104,15 +104,17 @@ enable a later covered allocation. The accountant emits no lexical errors.
 
 ## Audit gates and limits
 
-The proof depends on serde/core/derive **1.0.229**, serde_json **1.0.151**, JSON
-std with **arbitrary_precision and float_roundtrip disabled**, default recursion
-limits, the exhaustive current Job schema and audited std growth/copy behavior.
-Dependency or feature changes require re-audit; Cargo.lock alone is insufficient.
+The proof depends on serde/core/derive **1.0.229**, serde_json **1.0.151** with
+its default `std` implementation, default recursion limits, the current Job
+schema and audited std growth/copy behavior. The [separately named JSON package](../vendor/serde_json-1.0.151/CHOPPER.md)
+keeps this implementation when a Cargo consumer also enables other features on
+upstream serde_json. Re-audit dependency and feature changes independently of
+the lockfile.
 For each delivery build, inspect effective target features (use the actual target,
 avoiding resolution of unfetched unrelated platform dependencies):
 
 ```sh
-cargo tree --locked --offline --target x86_64-unknown-linux-gnu -p chopper -e features -i serde_json
+cargo tree --locked --offline --target x86_64-unknown-linux-gnu -p chopper-csv -e features -i chopper-serde-json
 ```
 
 The versioned private Content reference deliberately breaks on a serde update.

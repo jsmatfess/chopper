@@ -1,0 +1,24 @@
+[package]
+name = "chopper-flate2"
+version = "1.1.10"
+edition = "2018"
+license = "MIT OR Apache-2.0"
+description = "Chopper's miniz-only flate2 backend for bounded CSV processing"
+repository = "https://github.com/jsmatfess/chopper"
+readme = "CHOPPER.md"
+include = ["src/**", "CHOPPER.md", "README.md", "LICENSE-MIT", "LICENSE-APACHE"]
+
+[lib]
+name = "flate2"
+
+[dependencies]
+crc32fast = { version = "1.2.0", default-features = false, features = ["std"] }
+miniz_oxide = { version = "=0.9.1", features = ["simd"] }
+
+[lints.rust.unexpected_cfgs]
+level = "warn"
+# These upstream alternatives are retained in source, but cannot be selected.
+check-cfg = [
+    'cfg(flate2_unstable_nightly_alloc_io)',
+    'cfg(feature, values("any_c_zlib", "any_zlib", "document-features", "zlib-ng", "zlib-rs"))',
+]

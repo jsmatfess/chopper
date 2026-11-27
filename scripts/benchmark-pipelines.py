@@ -1,6 +1,6 @@
 """Compare two native builds using identical seeded jobs and verify logical output parity.
 
-Build the fixture generator with cargo build --release -p chopper --example generate.
+Build the fixture generator with cargo build --release -p chopper-csv --example generate.
 Run with --before OLD_CHOPPER --after NEW_CHOPPER --generator GENERATE.
 All fixtures, outputs, and temporary data are isolated and removed on completion.
 """

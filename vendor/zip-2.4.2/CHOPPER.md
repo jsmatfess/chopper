@@ -2,8 +2,10 @@
 
 Upstream: registry `zip` 2.4.2, package checksum
 `fabe6324e908f85a1c52063ce7aa26b68dcb7eb6dbc83a2d148403c9bc3eba50`.
-The original MIT license is retained. This copy is excluded from the workspace
-and selected by the root Cargo patch; it is not an independent Chopper product.
+The original MIT license is retained. The engine uses a versioned dependency
+on `chopper-zip`; development resolves this directory and Cargo consumers
+resolve the Chopper package from the registry. It is excluded from the
+workspace's normal checks.
 
 The patch adds `ZipArchive::new_with_metadata_budget`, a constructor callback
 receiving a conservative metadata allocation envelope before the corresponding
@@ -15,8 +17,10 @@ so resource denial cannot silently select an earlier archive instead.
 The envelope covers directory search scratch, EOCD comments, ZIP64 extensions,
 entry-vector/map construction overlap, names/comments and extra-field decoding.
 It is a pinned-source upper allowance, not an exact allocator/RSS measurement.
-The enabled Chopper features remain Stored/Deflate. The member-reader seam below
-accounts for its containers; filesystem and runtime allocations remain separate.
+The package exposes Stored/Deflate readers and uses the [isolated miniz backend](../flate2-1.1.10/CHOPPER.md).
+Cargo features cannot enable another reader codec on the Chopper package.
+The member-reader seam below accounts for its containers. Filesystem and runtime
+allocations remain separate.
 Read `src/metadata_budget.rs` before changing
 the implementation, features or dependency versions; re-audit allocation bounds
 and run native/WASI admission and compatibility controls in the same change.
@@ -24,8 +28,11 @@ and run native/WASI admission and compatibility controls in the same change.
 The current descriptor envelope is `capacity * (4 * size_of::<ZipFileData>() +
 256)`, charged before the initial vector allocation and each explicit growth.
 It covers vector growth and the simultaneous IndexMap vector/table construction.
-`indexmap` 2.14.2 uses a dense `Vec<Bucket<K,V>>` and `hashbrown` 0.17.1 indices;
-the pinned hash table rounds its 8/7 load-adjusted capacity to a power of two.
+The manifest pins `indexmap` 2.14.2 and `hashbrown` 0.17.1 for downstream resolution.
+IndexMap uses a dense `Vec<Bucket<K,V>>`. Hashbrown's table rounds its 8/7
+load-adjusted capacity to a power of two. Its supported stable features can
+change inlining, trait implementations and which global allocator adapter is
+used. They preserve the global table allocation and its entry and control sizes.
 The 256-byte term covers indices/hash/control/alignment overhead. Normal entries
 use their declared initial capacity; counts the parser discards do not receive
 an unnecessary full-count grant. Growth is explicitly reserved before `push`.

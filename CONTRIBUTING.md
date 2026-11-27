@@ -38,12 +38,13 @@ contracts. Review success and failure branches and current-versus-designed statu
 | Browser scale acceptance orchestration | Run `python3 scripts/test-scale-acceptance-browser-scale.py` and `node scripts/test-scale-acceptance-browser-scale.mjs scratch/new-scale-controls` with a fresh owned evidence directory. These fake controls run in the tooling job; actual installed-browser and scale execution require their separate frozen plan and approval. |
 | Evidence, audit scripts or evidence links | Run the [read-only evidence checks](docs/benchmarks/README.md#evidence-checks). Refresh derived outputs only after reviewing intended source changes; preserve raw evidence/source snapshots byte-for-byte. |
 | Local release packaging | `python3 scripts/test-package-release.py`; Python 3.11+ and Node required. For actual native archives, run the [extracted-package smoke](docs/release-packaging.md#extracted-native-smoke) on each supported host. |
+| Published Cargo graph | `python3 scripts/test-cargo-packages.py scratch/new-cargo-qualification --cli target/release/chopper`; run from the release candidate on each native host. See [library release qualification](docs/maintainer/library-release.md). |
 | Saved Job schema or decoder | After building the native CLI, install `scripts/requirements-job-schema.txt` and run `python3 scripts/test-job-schema.py target/debug/chopper` (use the actual binary path). The [Job guide](docs/job-json.md#verify-the-release-schema) covers tagged-download verification. |
-| Native CLI help or Job recipes | Build with `cargo build --release --locked -p chopper`, then run `python3 scripts/cli-reference.py target/release/chopper --check` and `python3 scripts/test-job-recipes.py target/release/chopper`. Omit `--check` to regenerate the reference. On Windows, use `python` and `target/release/chopper.exe`. |
+| Native CLI help or Job recipes | Build with `cargo build --release --locked -p chopper-csv`, then run `python3 scripts/cli-reference.py target/release/chopper --check` and `python3 scripts/test-job-recipes.py target/release/chopper`. Omit `--check` to regenerate the reference. On Windows, use `python` and `target/release/chopper.exe`. |
 | Documentation or CI routing | Review links, actual command options and workflow syntax; execute newly routed checks. Documentation alone does not require a full engine rebuild. |
 
 For focused CSV parser and export checks, run
-`cargo test --locked -p chopper --test csv_compatibility`. The workspace tests
+`cargo test --locked -p chopper-csv --test csv_compatibility`. The workspace tests
 also run this suite. See the
 [compatibility report](docs/validation.md#csv-compatibility-coverage).
 
@@ -100,7 +101,7 @@ On Windows, create the directory with `New-Item -ItemType Directory` and invoke
 The tool checks an unmodified copy before testing mutants. Use `--list` to
 inspect the inventory, `--file` to scope to a file, and `--re` to rerun matching
 mutations. To test a portable mutation through the native crate, add
-`--cargo-arg=--package=chopper` to the portable command above. Add
+`--cargo-arg=--package=chopper-csv` to the portable command above. Add
 `--cargo-arg=--test=pipeline` to select the native pipeline tests.
 
 Read `mutants.out/missed.txt`, `outcomes.json`, and the relevant diff and test
@@ -127,6 +128,6 @@ rules and the [experiment criteria](docs/performance-opportunities.md#acceptance
 Contract timings, working-allocation accounting, RSS and physical I/O are distinct.
 Do not run broad matrices or reinterpret historical measurements for routine cleanup.
 
-Workspace packages declare `MIT` in `Cargo.toml`; the root [LICENSE](LICENSE)
-contains the project license with the owner's confirmed copyright wording.
-Preserve the separate upstream license and attribution files in vendor sources.
+The root [LICENSE](LICENSE) contains the project's MIT license and is included
+in the published first-party Cargo packages. Preserve the separate upstream
+license and attribution files in vendor sources.

@@ -1,6 +1,6 @@
 """Capture native whole-job CPU samples, allocation census and sort wall times.
 
-Build with CARGO_PROFILE_RELEASE_DEBUG=1 cargo build --release --locked -p chopper
+Build with CARGO_PROFILE_RELEASE_DEBUG=1 cargo build --release --locked -p chopper-csv
 --bin chopper --example allocation-profile. Requires Linux perf and GNU time.
 Raw perf data/reports are retained in --artifacts; stdout is portable JSONL evidence.
 Allocation and CPU profiling run separately from ordinary wall/CPU/RSS measurements.

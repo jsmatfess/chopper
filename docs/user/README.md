@@ -45,6 +45,7 @@ input settings or repeat detection under **Parsing, encoding & ZIP member**. See
 | Write calculated columns and look up a function | [Formula functions](../formula-functions.md) |
 | Check a saved Job before opening its input | [Validate](../validate-cli.md) |
 | Schedule Runs and handle exit statuses or reports | [Run and automation](../run-cli.md) |
+| Compose and run Jobs inside an application | [Rust and Python libraries](libraries.md) |
 | Verify published CSVs or ZIP members | [Native manifest](../native-manifest.md) |
 
 For installation, memory, disk space, or sharing diagnostics, see

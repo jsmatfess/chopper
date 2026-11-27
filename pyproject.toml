@@ -1,0 +1,37 @@
+[build-system]
+requires = ["maturin==1.16.0"]
+build-backend = "maturin"
+
+[project]
+name = "chopper-csv"
+description = "Split large CSVs with bounded memory and ordered Chopper Jobs"
+dynamic = ["version"]
+readme = "crates/chopper-python/README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = [
+    "LICENSE",
+    "crates/chopper-python/licenses/PyO3-LICENSE-MIT.txt",
+    "docs/releases/native-usage.txt",
+    "vendor/flate2-1.1.10/LICENSE-APACHE",
+    "vendor/flate2-1.1.10/LICENSE-MIT",
+    "vendor/serde_json-1.0.151/LICENSE-APACHE",
+    "vendor/serde_json-1.0.151/LICENSE-MIT",
+    "vendor/zip-2.4.2/LICENSE",
+]
+classifiers = [
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Rust",
+]
+
+[project.urls]
+Repository = "https://github.com/jsmatfess/chopper"
+
+[tool.maturin]
+manifest-path = "crates/chopper-python/Cargo.toml"
+python-source = "crates/chopper-python/python"
+module-name = "chopper_csv._native"
+locked = true

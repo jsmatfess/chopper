@@ -305,7 +305,7 @@ def make_plans(directory, executable, node, parameters, byte_cap=4096, build_sta
                       'node': version([node, '--version']), 'wasm_target': 'wasm32-wasip1'}
         source = ['Cargo.toml', 'Cargo.lock', 'crates', 'vendor']
         for runtime in ('native', 'browser'):
-            steps = [{'id': 'engine-build', 'argv': ([cargo, 'build', '--release', '--locked', '-p', 'chopper']
+            steps = [{'id': 'engine-build', 'argv': ([cargo, 'build', '--release', '--locked', '-p', 'chopper-csv']
                        if runtime == 'native' else [node, 'scripts/build-browser.mjs']),
                       'timeout_seconds': 540, 'inputs': source + ([] if runtime == 'native' else ['scripts/build-browser.mjs']),
                       'artifacts': [str(executable.relative_to(ROOT))] if runtime == 'native' else ['ui/dist/engine.wasm'],

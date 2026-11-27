@@ -123,7 +123,7 @@ After these scripts exist in the Windows checkout, use its absolute mounted path
 ```sh
 python3 scripts/windows-native.py --checkout /mnt/c/src/chopper doctor
 python3 scripts/windows-native.py --checkout /mnt/c/src/chopper \
-  --expect-commit "$(git rev-parse HEAD)" cargo -- build --release --locked -p chopper --bin chopper
+  --expect-commit "$(git rev-parse HEAD)" cargo -- build --release --locked -p chopper-csv --bin chopper
 python3 scripts/windows-native.py --checkout /mnt/c/src/chopper \
   --expect-commit "$(git rev-parse HEAD)" cargo -- test --workspace --locked
 python3 scripts/windows-native.py --checkout /mnt/c/src/chopper \

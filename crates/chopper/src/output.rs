@@ -21,6 +21,7 @@ pub(crate) use parallel_deflate::hosted::Lease as HostedDeflateLease;
 mod destination;
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(crate) use destination::resource_contracts as destination_contracts;
+pub(crate) use destination::DestinationError;
 pub(crate) use destination::RunDestination;
 use destination::{staging_destination, DestinationPath};
 mod direct;
@@ -44,6 +45,17 @@ use publication_metadata::{output_name, PublicationBatch, PublicationName};
 #[cfg(any(test, feature = "resource-contract-tests"))]
 pub(crate) use publication_path::resource_contracts as publication_path_contracts;
 use publication_path::PublicationPath;
+
+#[derive(Debug)]
+pub(crate) struct OutputLimitError(&'static str);
+
+impl std::fmt::Display for OutputLimitError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.0)
+    }
+}
+
+impl std::error::Error for OutputLimitError {}
 
 /// Proof that the platform's engine publication commit point succeeded.
 /// Browser destination export requires its separate verified marker receipt.
@@ -428,7 +440,7 @@ impl<'a> PlanWriter<'a> {
             }
             ensure!(
                 prefix.len() as u64 <= job.limits.bytes.unwrap_or(u64::MAX),
-                "header/BOM exceeds output byte limit"
+                OutputLimitError("header/BOM exceeds output byte limit")
             );
             Ok(Self {
                 job,
@@ -1245,13 +1257,14 @@ fn commit_directory(
         let mut witness = ctx.run_destination();
         witness.check(destination)?;
         // Non-recursive removal fails if any files appeared while the job ran.
-        std::fs::remove_dir(destination)
-            .context("remove empty output folder before publication")?;
+        std::fs::remove_dir(destination).with_context(|| {
+            DestinationError("remove empty output folder before publication".into())
+        })?;
         // Windows finishes removing a directory when the last handle closes.
         *witness = RunDestination::Unchecked;
     }
     publish_directory(stage.path(), destination, ctx)
-        .context("publish completed result directory")?;
+        .with_context(|| DestinationError("publish completed result directory".into()))?;
     stage.published();
     #[cfg(any(test, feature = "resource-contract-tests"))]
     commit_test_hook::committed(ctx);
@@ -1782,7 +1795,7 @@ impl PlanWriter<'_> {
         let hard = self.job.limits.bytes.unwrap_or(u64::MAX);
         ensure!(
             self.prefix.len() as u64 + size <= hard,
-            "one row plus header exceeds output byte limit"
+            OutputLimitError("one row plus header exceeds output byte limit")
         );
         let soft = self
             .job
@@ -1797,7 +1810,7 @@ impl PlanWriter<'_> {
             if chunk.rows > 0
                 && (overflow || (!group.exact && chunk.bytes.saturating_add(size) > soft))
             {
-                ensure!(!group.exact, "balanced group cannot satisfy final row/byte limits without changing its exact file count");
+                ensure!(!group.exact, OutputLimitError("balanced group cannot satisfy final row/byte limits without changing its exact file count"));
                 self.close()?;
             }
         }
@@ -1807,7 +1820,7 @@ impl PlanWriter<'_> {
                     let size = size + quote.extra_bytes() as u64;
                     ensure!(
                         size <= hard,
-                        "one row plus header exceeds output byte limit"
+                        OutputLimitError("one row plus header exceeds output byte limit")
                     );
                     self.open(group)?;
                     for bytes in quote.parts(external.unwrap_or(&self.serializer).bytes()) {

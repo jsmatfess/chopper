@@ -1,8 +1,8 @@
 # Working on Chopper
 
-Chopper processes CSVs larger than memory through a Rust CLI for Windows/Linux
-and a hosted TypeScript UI. The hosted build runs the engine in a WASI browser
-worker; native builds contain the CLI only.
+Chopper processes CSVs larger than memory through a native CLI and Rust and
+Python libraries for Windows/Linux, plus a hosted TypeScript UI. The hosted
+build runs the engine in a WASI browser worker.
 
 ## Find the current source of truth
 
@@ -44,11 +44,15 @@ Graphify Cloud as part of ordinary graph refreshes.
 - `crates/chopper-core`: portable configuration, CSV and randomization contracts.
 - `crates/chopper`: native CLI, engine, storage, resources and publication.
 - `crates/chopper-browser`: WASI engine adapter.
+- `crates/chopper-python`: standalone PyO3 wheel for the native Job interface.
+  Follow [library qualification](docs/maintainer/library-release.md) for wheel
+  and downstream Cargo checks.
 - `ui/src`: framework-free TypeScript UI and browser workers.
 - `scripts`: builds, validation and experiment harnesses.
-- `vendor/zip-2.4.2`: pinned ZIP reader patch for metadata and member-container admission;
-  see its `CHOPPER.md`. It is excluded from the workspace. Include vendor sources
-  in fresh build provenance and re-audit the ownership bounds when updating it.
+- `vendor/`: pinned support crates for ZIP metadata, DEFLATE and JSON admission.
+  Include vendor sources in build provenance and re-audit ownership bounds on
+  updates. See the [ZIP adapter notes](vendor/zip-2.4.2/CHOPPER.md) and
+  [Job decoder audit](docs/cli-job-decoding.md).
 
 Preserve pipeline semantics, exact allocation/group membership and strict serialized
 CSV byte caps. Randomized output has no cross-plan seeded replay guarantee;

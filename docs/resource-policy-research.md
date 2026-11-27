@@ -540,8 +540,9 @@ bound; the existing EOCD expression alone is demonstrably insufficient.
 ## ZIP parser admission implementation (2026-10-21)
 
 The preceding source audit and diagnostic observations describe the unpatched
-registry build. The current implementation uses a [local zip 2.4.2 patch](../vendor/zip-2.4.2/CHOPPER.md)
-selected by the root Cargo patch and excluded from the workspace. The
+registry build. The current implementation uses a [patched ZIP reader](../vendor/zip-2.4.2/CHOPPER.md)
+through the pinned `chopper-zip` dependency, which resolves locally in the
+workspace and by version for registry consumers. The
 [source inventory audit](evidence-originals.md#sha256-8def2d8ad5ffee8969eb5cb2f9edb75336e5d0461eb3c9e743f253097cda4c00 "Original: docs/benchmarks/zip-metadata-owner-source-audit-2026-10-21.json")
 records every retained upstream file, the three modified upstream modules, the
 new metadata module and the exact indexmap/hashbrown allocation sources.
@@ -832,7 +833,10 @@ reservations. Output compression settings, bytes, CSV caps and publication rules
 remain unchanged.
 
 The [source audit](evidence-originals.md#sha256-e33cd3bde26727b7b9bc22c5f9c3a4b89cc2a917964f2401ad7f220ef02cfd50 "Original: docs/benchmarks/zip-output-codec-source-audit-2026-10-22.json")
-records both dependency feature trees and source hashes. Output allowance adds
+records both dependency feature trees and source hashes. The [miniz-only Chopper package](../vendor/flate2-1.1.10/CHOPPER.md)
+compiles the same flate2 1.1.10 decoder and encoder with an independent identity.
+Enabling a backend feature on upstream flate2 leaves the admitted Chopper codec
+on miniz. Output allowance adds
 `size_of::<CompressorOxide>()`, the boxed Huffman tables, LocalBuf, dictionary and
 two hash-chain arrays, wasm32's additional boxed LZ code array, flate2's fixed
 32 KiB output Vec and sixteen bytes for the metadata-free ten-byte gzip header.

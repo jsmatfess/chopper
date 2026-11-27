@@ -20,6 +20,7 @@ use std::{
 
 #[derive(Parser)]
 #[command(
+    name = "chopper",
     version,
     about = "Split large CSVs with bounded memory, ordered pipelines and full random shuffles"
 )]

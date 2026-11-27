@@ -7,6 +7,10 @@ and [GitHub Issues](https://github.com/jsmatfess/chopper/issues) own contracts a
 
 ## 1. Current workflow: Analyze or Run
 
+The CLI and native Job API enter the same engine. A reusable library Job retains
+its settings and admits a copy for Run. Each operation uses its own execution
+control, with working allocations charged to the shared native process ledger.
+
 ```mermaid
 flowchart TD
     Request[User action] --> Schema{Valid job without seed settings?}

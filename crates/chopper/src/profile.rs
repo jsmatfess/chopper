@@ -28,6 +28,17 @@ mod records;
 mod writers;
 pub use writers::WriterEstimate;
 
+#[derive(Debug)]
+pub(crate) struct ProfileCancelled;
+
+impl std::fmt::Display for ProfileCancelled {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("cancelled")
+    }
+}
+
+impl std::error::Error for ProfileCancelled {}
+
 /// Experimental scan diagnostics, excluded from the stable profile JSON.
 #[derive(Clone, Copy, Default, Serialize)]
 pub struct ProfileExecution {
@@ -481,7 +492,7 @@ impl ProfileCache {
     ) -> Result<InputProfile> {
         let started = Instant::now();
         job.validate_for_execution()?;
-        ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
+        ensure!(!cancel.load(Ordering::Relaxed), ProfileCancelled);
         let pool = self
             .pool
             .clone()
@@ -557,7 +568,7 @@ impl ProfileCache {
             observations
                 .key_buffers
                 .resize(key.path.capacity() + key.input_options.capacity())?;
-            ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
+            ensure!(!cancel.load(Ordering::Relaxed), ProfileCancelled);
             ensure!(
                 key == Key::read(job, memory_mb)?,
                 "input changed during profiling; retry with a stable source"
@@ -568,7 +579,7 @@ impl ProfileCache {
                 self.entry = Some((key, observations));
             }
         }
-        ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
+        ensure!(!cancel.load(Ordering::Relaxed), ProfileCancelled);
         // Do not retain a cache owner that this runtime cannot safely reuse.
         let (key, observations) = uncached.as_ref().or(self.entry.as_ref()).unwrap();
         let mut profile = observations.profile.try_clone()?;
@@ -633,7 +644,7 @@ struct Cancellable<'a, R> {
 impl<R: Read> Read for Cancellable<'_, R> {
     fn read(&mut self, buffer: &mut [u8]) -> io::Result<usize> {
         if self.cancel.load(Ordering::Relaxed) {
-            return Err(io::Error::other("cancelled"));
+            return Err(io::Error::other(ProfileCancelled));
         }
         self.source.read(buffer)
     }
@@ -766,7 +777,7 @@ fn scan_records(
             let hash = blake3::hash(fields[*column].as_bytes());
             partition_buckets[hash.as_bytes()[0] as usize % 64] += 1;
         }
-        ensure!(!cancel.load(Ordering::Relaxed), "cancelled");
+        ensure!(!cancel.load(Ordering::Relaxed), ProfileCancelled);
         for (i, (summary, cardinality)) in column_values.iter_mut().zip(&mut sketches).enumerate() {
             let value = &fields[i];
             if let Some(count) = summary.frequencies.get_mut(value.as_str()) {

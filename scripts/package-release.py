@@ -84,7 +84,7 @@ def frozen_source(source, manifest):
     versions = [cargo['workspace']['package']['version'], ui['version'], ui_lock['version'],
                 ui_lock['packages']['']['version']]
     versions += [p['version'] for p in lock['package'] if p['name'] in
-                 ('chopper', 'chopper-core', 'chopper-browser')]
+                 ('chopper', 'chopper-csv', 'chopper-core', 'chopper-browser')]
     require(len(versions) == 7 and all(v == version for v in versions), 'Version metadata mismatch')
     required_paths = {path.format(version=version) for path in PAYLOADS.values()}
     required_paths.update({'Cargo.toml', 'Cargo.lock', 'ui/package.json',

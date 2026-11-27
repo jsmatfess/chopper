@@ -16,6 +16,8 @@ not a supported release target. There is no native server or native UI.
   and running the bundled sample.
 
 The [user guide](docs/user/README.md) covers saved Jobs, recipes, and upgrades.
+See [Rust and Python libraries](docs/user/libraries.md) to build and run Jobs
+inside an application.
 
 ## Native quickstart
 
@@ -147,7 +149,7 @@ cloning. Native CLI builds need no Node installation and do not embed UI assets.
 From the repository root:
 
 ```sh
-cargo build --release --locked -p chopper
+cargo build --release --locked -p chopper-csv
 ```
 
 Run `target/release/chopper --help` on Linux or `target\release\chopper.exe --help`

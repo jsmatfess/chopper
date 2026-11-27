@@ -32,7 +32,7 @@ exercise explicit opt-in settings. CSVW metadata discovery and import,
 schema and datatype validation, and conversion to JSON or RDF are outside
 Chopper's support. See [optional input dialect](job-json.md#optional-input-dialect).
 
-Run `cargo test --locked -p chopper --test csv_compatibility` to see the
+Run `cargo test --locked -p chopper-csv --test csv_compatibility` to see the
 breakdown by source and any unexpected failures. The local gate's workspace
 test runs the same suite, including a 40,000-row forced spill that checks
 exact row multiplicities, partition membership and chunk manifests.

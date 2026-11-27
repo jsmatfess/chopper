@@ -251,6 +251,31 @@ wire_choices! {
         } => "shuffle",
     }; empty_step
 }
+impl Operation {
+    pub fn partition(columns: Vec<Column>) -> Self {
+        Self::Partition { columns }
+    }
+
+    pub fn assign(groups: Vec<Allocation>, strata: Vec<Column>) -> Self {
+        Self::Assign { groups, strata }
+    }
+
+    pub fn assign_probabilistic(groups: Vec<Allocation>, strata: Vec<Column>) -> Self {
+        Self::AssignProbabilistic { groups, strata }
+    }
+
+    pub fn shuffle(strategy: Shuffle) -> Self {
+        Self::Shuffle { strategy }
+    }
+
+    pub fn balanced(files: u64) -> Self {
+        Self::Balanced { files }
+    }
+
+    pub fn interleaved(files: u64) -> Self {
+        Self::Interleaved { files }
+    }
+}
 wire_choices! {
     #[derive(Clone, Copy, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
     pub enum Shuffle {

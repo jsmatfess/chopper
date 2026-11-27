@@ -3,6 +3,7 @@ name = "chopper-browser"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -28,7 +29,7 @@ experimental-streaming-chain = ["chopper/experimental-streaming-chain"]
 
 
 [dependencies]
-chopper = { path = "../chopper" }
-serde_json = "1"
-serde = { version = "1", features = ["derive"] }
+chopper = { package = "chopper-csv", path = "../chopper" }
+serde_json.workspace = true
+serde.workspace = true
 anyhow = "1"

@@ -1,0 +1,30 @@
+[package]
+name = "chopper-serde-json"
+version = "1.0.151"
+edition = "2021"
+authors = ["Erick Tryzelaar <erick.tryzelaar@gmail.com>", "David Tolnay <dtolnay@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Chopper's Serde JSON dependency with its audited allocation paths"
+repository = "https://github.com/jsmatfess/chopper"
+readme = "CHOPPER.md"
+include = ["src/**", "build.rs", "CHOPPER.md", "README.md", "LICENSE-MIT", "LICENSE-APACHE"]
+
+[lib]
+name = "serde_json"
+
+[features]
+default = ["std"]
+std = ["memchr/std", "serde_core/std"]
+
+[dependencies]
+itoa = "1.0"
+memchr = { version = "2", default-features = false }
+serde_core = { version = "=1.0.229", default-features = false }
+zmij = "1.0"
+
+[lints.rust.unexpected_cfgs]
+level = "warn"
+# These upstream cfg branches are retained in source and cannot be enabled.
+check-cfg = [
+    'cfg(feature, values("alloc", "arbitrary_precision", "float_roundtrip", "preserve_order", "raw_value", "unbounded_depth"))',
+]

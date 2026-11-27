@@ -2,7 +2,9 @@
 name = "chopper-core"
 version.workspace = true
 edition.workspace = true
-license.workspace = true
+license-file = "../../LICENSE"
+repository.workspace = true
+description = "Portable Job, CSV, and randomization contracts for Chopper"
 
 [features]
 # Opt-in decoder output directly into large caller buffers; small reads unchanged.
@@ -10,8 +12,8 @@ experimental-direct-decode = []
 
 [dependencies]
 anyhow = "1"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde.workspace = true
+serde_json.workspace = true
 blake3 = { version = "1", default-features = false, features = ["pure"] }
 encoding_rs = "0.8"
 memchr = "2"

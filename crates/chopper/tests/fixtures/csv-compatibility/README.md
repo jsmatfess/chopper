@@ -9,7 +9,7 @@ refill boundary and a separate forced-spill workload. See
 Run the suite from the repository root with the checked-in fixtures.
 
 ```sh
-cargo test --locked -p chopper --test csv_compatibility
+cargo test --locked -p chopper-csv --test csv_compatibility
 ```
 
 ## Chopper

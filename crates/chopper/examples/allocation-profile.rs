@@ -1,4 +1,4 @@
-//! Opt-in allocation census: cargo run --release -p chopper --example allocation-profile -- job.json
+//! Opt-in allocation census: cargo run --release -p chopper-csv --example allocation-profile -- job.json
 //! Uses the system allocator, counts requested bytes (not RSS), and publishes the job.
 //! Add `profile` after the config path to measure a fresh full-file profile instead.
 //! Global atomics perturb timing, especially with multiple workers: use normal builds for speed.
