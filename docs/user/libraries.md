@@ -390,9 +390,6 @@ For variable-length arguments, pass an array or iterator, as in
 condition-value pairs and a fallback with
 `f::ifs([(condition, value)], fallback)`.
 
-Compose Boolean expressions with `&`, `|`, and `!`, as in
-`f::is_text(col("country")) & !f::is_blank(col("country"))`.
-
 <!-- docs:end -->
 
 <!-- docs:python -->
@@ -406,16 +403,80 @@ For variable-length arguments, pass each value in order, as in
 condition-value pairs and a named fallback with
 `f.ifs((condition, value), fallback=fallback)`.
 
-Compose Boolean expressions with `&`, `|`, and `~`, as in
-`f.is_text(col("country")) & ~f.is_blank(col("country"))`. Python truth tests,
-including `and`, `or`, and `not`, raise `TypeError` on an expression.
-
 <!-- docs:end -->
 
 `CONCAT_WS` takes literal Boolean flags after its text arguments. For `IF`,
 call `if_else(condition, when_true, when_false)`. The
 [formula reference](../formula-functions.md) describes how each function
 handles nulls.
+
+### Compose Boolean formulas
+
+Review customers who are in the US or in the returning segment. Customer `3`
+has already been reviewed, so skip that row. The parentheses group the country
+and segment conditions before applying the exclusion. `if_else` turns the
+result into a `review_status` column.
+
+<!-- docs:rust -->
+
+Use `|` for OR, `&` for AND, and `!` for NOT.
+
+<!-- docs:end -->
+
+**Rust**
+
+```rust
+use chopper::formula::{col, functions as f};
+use chopper::job::{Error, Job, JobSettings};
+
+fn main() -> Result<(), Error> {
+    let is_us = f::regex_match(col("country"), "^US$");
+    let is_returning = f::regex_match(col("segment"), "^returning$");
+    let already_reviewed = f::regex_match(col("id"), "^3$");
+    let needs_review = (is_us | is_returning) & !already_reviewed;
+
+    let job = Job::new(JobSettings {
+        calculated_columns: vec![f::if_else(needs_review, "review", "skip").alias("review_status")],
+        ..JobSettings::for_files("customers.csv", "customer-review")
+    });
+    println!("{}", job.run()?.manifest_path.display());
+    Ok(())
+}
+```
+
+<!-- docs:python -->
+
+Use `|` for OR, `&` for AND, and `~` for NOT. Python truth tests,
+including `and`, `or`, and `not`, raise `TypeError` on a formula expression.
+
+<!-- docs:end -->
+
+**Python**
+
+```python
+from chopper_csv import Job, col, functions as f
+
+is_us = f.regex_match(col("country"), "^US$")
+is_returning = f.regex_match(col("segment"), "^returning$")
+already_reviewed = f.regex_match(col("id"), "^3$")
+needs_review = (is_us | is_returning) & ~already_reviewed
+
+job = Job(
+    {"input": "customers.csv", "output": "customer-review"},
+    calculated_columns={"review_status": f.if_else(needs_review, "review", "skip")},
+)
+print(job.run().manifest_path)
+```
+
+The output CSV starts with these records.
+
+```csv
+id,country,segment,review_status
+1,US,new,review
+2,GB,returning,review
+3,US,returning,skip
+4,GB,new,skip
+```
 
 ### Reuse existing formula text
 
