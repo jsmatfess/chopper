@@ -342,7 +342,8 @@ fn decoder_preserves_characters_across_input_blocks() {
 #[test]
 fn decoder_delivers_the_valid_prefix_before_reporting_malformed_input() -> anyhow::Result<()> {
     for capacity in [1, 64 * 1024] {
-        let mut decoder = DecodeReader::new(b"valid\n\xfftail".as_slice(), "utf-8")?;
+        let mut decoder =
+            DecodeReader::new(b"valid\n\xfftail".as_slice(), "utf-8")?.defer_decode_errors();
         let mut buffer = vec![0; capacity];
         let mut prefix = Vec::new();
         let error = loop {

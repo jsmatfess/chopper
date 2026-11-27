@@ -47,10 +47,18 @@ pub struct DecodeReader<R> {
     output: [u8; 32768],
     pos: usize,
     len: usize,
-    malformed_pending: bool,
+    errors: DecodeErrors,
     eof: bool,
     done: bool,
 }
+
+#[derive(PartialEq, Eq)]
+enum DecodeErrors {
+    Immediate,
+    AfterPrefix,
+    Pending,
+}
+
 impl<R: Read> DecodeReader<R> {
     pub fn new(source: R, name: &str) -> Result<Self> {
         Ok(Self {
@@ -62,10 +70,17 @@ impl<R: Read> DecodeReader<R> {
             output: [0; 32768],
             pos: 0,
             len: 0,
-            malformed_pending: false,
+            errors: DecodeErrors::Immediate,
             eof: false,
             done: false,
         })
+    }
+
+    /// Yield decoded bytes before reporting a later malformed sequence. This
+    /// lets a caller inspecting a prefix finish complete records before the error.
+    pub fn defer_decode_errors(mut self) -> Self {
+        self.errors = DecodeErrors::AfterPrefix;
+        self
     }
 
     /// Decode a byte-limited sample without treating an incomplete trailing
@@ -91,12 +106,16 @@ impl<R: Read> DecodeReader<R> {
         // Keep pending decoded bytes and small-reader behavior unchanged.
         let output_capacity = self.output.len();
         let direct = DIRECT && self.pos == self.len && out.len() >= output_capacity;
+        let invalid_data = || {
+            io::Error::new(
+                io::ErrorKind::InvalidData,
+                "invalid byte sequence in selected input encoding",
+            )
+        };
         while self.pos == self.len && !self.done {
-            if std::mem::take(&mut self.malformed_pending) {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidData,
-                    "invalid byte sequence in selected input encoding",
-                ));
+            if self.errors == DecodeErrors::Pending {
+                self.errors = DecodeErrors::AfterPrefix;
+                return Err(invalid_data());
             }
             if self.start == self.end && !self.eof {
                 self.end = self.source.read(&mut self.input)?;
@@ -116,9 +135,17 @@ impl<R: Read> DecodeReader<R> {
             self.pos = 0;
             self.len = if direct { 0 } else { written };
             match result {
+                DecoderResult::Malformed(_, _) if self.errors == DecodeErrors::AfterPrefix => {
+                    self.errors = DecodeErrors::Pending;
+                }
                 DecoderResult::Malformed(_, _) => {
-                    // Yield the valid prefix so callers can finish complete records before the error.
-                    self.malformed_pending = true;
+                    // Preserve the buffered reader's state if a library caller
+                    // retries after InvalidData; Intake itself stays terminal.
+                    if direct {
+                        self.output[..written].copy_from_slice(&out[..written]);
+                        self.len = written;
+                    }
+                    return Err(invalid_data());
                 }
                 DecoderResult::InputEmpty if self.eof => self.done = true,
                 _ => {}

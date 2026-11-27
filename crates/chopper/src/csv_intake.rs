@@ -124,7 +124,7 @@ impl<R: Read> DecodedInput<R> {
         maximum: usize,
         mut memory: Reservation,
     ) -> Result<Self> {
-        let decoder = DecodeReader::new(source, &settings.encoding)?;
+        let decoder = DecodeReader::new(source, &settings.encoding)?.defer_decode_errors();
         memory.resize(SOURCE_BUFFER)?;
         Ok(Self::from_parser(
             Parser::new(
