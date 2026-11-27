@@ -416,6 +416,31 @@ call `if_else(condition, when_true, when_false)`. The
 [formula reference](../formula-functions.md) describes how each function
 handles nulls.
 
+### Compare row values
+
+Call `.equal()` or `.not_equal()` to compare values for equality, and use
+`.lt()`, `.le()`, `.gt()`, or `.ge()` to order them. These methods build
+conditions you can combine or pass to `if_else`. Use `==` and `!=` to
+compare the formula text of two expression objects.
+
+<!-- docs:rust -->
+
+Convert the CSV text to a number and test whether it is odd with
+`(f::number(col("id")) % 2).not_equal(0)`. The `%` operator takes an expression on
+the left. Use `lit` when the left operand is a number literal.
+
+<!-- docs:end -->
+
+<!-- docs:python -->
+
+Convert the CSV text to a number and test whether it is odd with
+`(f.number(col("id")) % 2).not_equal(0)`. The `%` operator also accepts an
+expression on the right, as in `100 % f.number(col("id"))`.
+
+<!-- docs:end -->
+
+Use `col(0)` in place of `col("id")` to refer to the first field by position.
+
 ### Compose Boolean formulas
 
 Review customers who are in the US or in the returning segment. Customer `3`
@@ -438,9 +463,9 @@ use chopper::formula::{col, functions as f};
 use chopper::job::{Error, Job, JobSettings};
 
 fn main() -> Result<(), Error> {
-    let is_us = f::regex_match(col("country"), "^US$");
-    let is_returning = f::regex_match(col("segment"), "^returning$");
-    let already_reviewed = f::regex_match(col("id"), "^3$");
+    let is_us = col("country").equal("US");
+    let is_returning = col("segment").equal("returning");
+    let already_reviewed = f::number(col("id")).equal(3);
     let needs_review = is_us.or(is_returning).and(already_reviewed.not());
 
     let job = Job::new(JobSettings {
@@ -467,9 +492,9 @@ formula expression raises `TypeError`.
 ```python
 from chopper_csv import Job, col, functions as f
 
-is_us = f.regex_match(col("country"), "^US$")
-is_returning = f.regex_match(col("segment"), "^returning$")
-already_reviewed = f.regex_match(col("id"), "^3$")
+is_us = col("country").equal("US")
+is_returning = col("segment").equal("returning")
+already_reviewed = f.number(col("id")).equal(3)
 needs_review = is_us.or_(is_returning).and_(already_reviewed.not_())
 
 job = Job(

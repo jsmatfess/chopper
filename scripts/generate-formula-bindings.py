@@ -202,12 +202,22 @@ EXAMPLE = re.compile(r"`([^`]+)`\s*→")
 TEXT_LITERAL = re.compile(r'"(?:[^"]|"")*"')
 COLUMN_NAME = re.compile(r"\[(?:[^\]]|\]\])*\]")
 NUMBER_LITERAL = re.compile(r"-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?")
+ARITHMETIC_OPERATORS = ("+", "-", "*", "/", "%")
+COMPARISON_METHODS = {"=": "equal", "!=": "not_equal", "<": "lt", "<=": "le", ">": "gt", ">=": "ge"}
+INFIX_OPERATORS = "|".join(map(re.escape, (*ARITHMETIC_OPERATORS, *COMPARISON_METHODS)))
+INFIX_NUMBERS = re.compile(rf"({NUMBER_LITERAL.pattern})\s*({INFIX_OPERATORS})\s*({NUMBER_LITERAL.pattern})")
 FORMULA_CALL = re.compile(r"(SAFE\.)?([A-Z][A-Z0-9_]*)\((.*)\)")
 ARGUMENT_TOKEN = re.compile(rf'{TEXT_LITERAL.pattern}|{COLUMN_NAME.pattern}|[(),"\[]')
 
 
 def sdk_call(name: str, rust: list[str], python: list[str]) -> Snippet:
     return Snippet(f"f::{name}({', '.join(rust)})", f"f.{name}({', '.join(python)})")
+
+
+def sdk_infix(left: str, operator: str, right: str) -> Snippet:
+    method = COMPARISON_METHODS.get(operator)
+    source = f"{left}.{method}({right})" if method else f"{left} {operator} {right}"
+    return Snippet(source, source)
 
 
 def sdk_signature(binding: Binding) -> Snippet:
@@ -291,6 +301,9 @@ def sdk_example(source: str, bindings: dict[str, Binding]) -> Snippet:
         return Snippet(f"col({source[1:]})", f"col({source[1:]})")
     if NUMBER_LITERAL.fullmatch(source):
         return Snippet(source, source, rust_literal=True)
+    if infix := INFIX_NUMBERS.fullmatch(source):
+        left, operator, right = infix.groups()
+        return sdk_infix(f"lit({left})", operator, right)
     match source:
         case "NULL":
             return Snippet("null()", "None")
@@ -319,8 +332,7 @@ def render_reference(bindings: list[Binding], source: str) -> str:
     by_name = {binding.name: binding for binding in bindings}
     signatures = {binding.signature: sdk_signature(binding) for binding in bindings}
     operators = {
-        **{op: Snippet(f"left {op} right", f"left {op} right") for op in ("+", "-", "*", "/")},
-        **{op: parsed_snippet(f"5 {op} 2") for op in ("%", "=", "!=", "<>", "<", "<=", ">", ">=")},
+        **{op: sdk_infix("left", op, "right") for op in (*ARITHMETIC_OPERATORS, *COMPARISON_METHODS)},
         "&": Snippet("f::concat([left, right])", "f.concat(left, right)"),
         "AND": Snippet("left.and(right)", "left.and_(right)"),
         "OR": Snippet("left.or(right)", "left.or_(right)"),

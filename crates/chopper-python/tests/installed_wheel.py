@@ -241,8 +241,12 @@ class InstalledWheel(unittest.TestCase):
         condition = ~(chopper.lit(False) | True) & True
         self.assertEqual(str(condition), "NOT (FALSE OR TRUE) AND TRUE")
         self.assertEqual(chopper.lit(False).or_(True).not_().and_(True), condition)
+        same_result = number.gt(2).equal(number.le(6))
         definitions = {
             "score": (10 - number) * chopper.parse("1 + 2") + 8 / (number + 1),
+            "remainder": 10 % (number % 4),
+            "matches": same_result.or_(number.ge(7).and_(number.lt(6).not_())),
+            "unknown": number.not_equal(None),
             "label": f.if_else(
                 ~(f.is_blank(column) | f.is_null(column)) & f.is_text(column),
                 f.concat(f.upper(column), ' "quoted"'),
@@ -266,9 +270,9 @@ class InstalledWheel(unittest.TestCase):
         with chopper.open_manifest(result["manifest_path"]) as manifest:
             entry, = manifest
         self.assertEqual(read_csv(Path("output", entry["path"])), [
-            ["3", "us", "23", 'US "quoted"', 'S "quoted"', "us"],
-            ["7", "gb", "10", 'GB "quoted"', 'B "quoted"', "gb"],
-            ["1", "", "31", "missing", "issing", ""],
+            ["3", "us", "23", "1", "true", "", 'US "quoted"', 'S "quoted"', "us"],
+            ["7", "gb", "10", "1", "true", "", 'GB "quoted"', 'B "quoted"', "gb"],
+            ["1", "", "31", "0", "false", "", "missing", "issing", ""],
         ])
 
     def test_long_arithmetic_chains_run_and_nested_arithmetic_keeps_grouping(self):

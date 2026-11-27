@@ -55,8 +55,12 @@ fn main() {
   flags at its end. `ifs` takes `(condition, value)` pairs and a fallback.
 - Compose Boolean expressions with `.and()`, `.or()`, and `.not()`, or use
   `&`, `|`, and `!`. For text concatenation, use `f::concat`.
-- Use `f::safe(expr)` to catch row errors. Use `chopper::formula::parse`
-  for formula text such as comparisons, `IN`, or `SAFE.NUMBER([amount])`.
+- Use `%` for remainder and `.equal()`, `.not_equal()`, `.lt()`, `.le()`,
+  `.gt()`, or `.ge()` to compare row values. For example,
+  `(f::number(col(0)) % 2).equal(0)` tests whether the first field is even.
+  Rust's `==` and `!=` compare expressions by their formula text.
+- Use `f::safe(expr)` to catch row errors and `chopper::formula::parse`
+  to reuse formula text.
 
 See [Rust examples](user/libraries.md?lang=rust#add-calculated-columns) for
 adding expressions to a Job.
@@ -88,8 +92,12 @@ print(f.if_else(needs_review, "review", "skip"))
 - Compose Boolean expressions with `.and_()`, `.or_()`, and `.not_()`, or use
   `&`, `|`, and `~`. The trailing underscores avoid Python's reserved
   keywords. For text concatenation, use `f.concat`.
-- Use `f.safe(expr)` to catch row errors. Use `chopper_csv.parse`
-  for formula text such as comparisons, `IN`, or `SAFE.NUMBER([amount])`.
+- Use `%` for remainder and `.equal()`, `.not_equal()`, `.lt()`, `.le()`,
+  `.gt()`, or `.ge()` to compare row values. For example,
+  `(f.number(col(0)) % 2).equal(0)` tests whether the first field is even.
+  Python's `==` and `!=` compare expressions by their formula text.
+- Use `f.safe(expr)` to catch row errors and `chopper_csv.parse`
+  to reuse formula text.
 
 See [Python examples](user/libraries.md?lang=python#add-calculated-columns)
 for adding expressions to a Job.
@@ -151,9 +159,9 @@ Chopper still reports invalid formulas and resource errors.
 
 | Operator | Behavior |
 | --- | --- |
-| `+`, `-`, `*`, `/`, `%` | Add, subtract, multiply, divide, and take the remainder of numbers. In formula text, unary `+` and `-` also work on numbers. |
+| `+`, `-`, `*`, `/`, `%` | Add, subtract, multiply, divide, and take the remainder of numbers. The remainder takes the dividend's sign. A dividend of `-5` and divisor of `3` yield `-2`. Division and remainder by zero raise a row error. In formula text, unary `+` and `-` also work on numbers. |
 | `&` | Join text. Either operand being `NULL` yields `NULL`, as with `CONCAT`. |
-| `=`, `!=`, `<>`, `<`, `<=`, `>`, `>=` | Compare values of matching types. A null operand yields `NULL`. |
+| `=`, `!=`, `<`, `<=`, `>`, `>=` | Compare values of matching types. A null operand yields `NULL`. In formula text, `<>` is an alias for `!=`. |
 | `AND`, `OR`, `NOT` | Evaluate Boolean conditions. `FALSE AND NULL` is false, `TRUE OR NULL` is true, and `NOT NULL` yields `NULL`. |
 
 In formula text, arithmetic binds before `&`, which binds before comparisons

@@ -16,24 +16,36 @@ class _Precedence(IntEnum):
     OR = 1
     AND = 2
     NOT = 3
-    ADDITIVE = 4
-    MULTIPLICATIVE = 5
-    ATOM = 6
+    COMPARISON = 4
+    ADDITIVE = 5
+    MULTIPLICATIVE = 6
+    ATOM = 7
 
 
 _BINARY_PRECEDENCE = {
     "OR": _Precedence.OR,
     "AND": _Precedence.AND,
+    "=": _Precedence.COMPARISON,
+    "!=": _Precedence.COMPARISON,
+    "<": _Precedence.COMPARISON,
+    "<=": _Precedence.COMPARISON,
+    ">": _Precedence.COMPARISON,
+    ">=": _Precedence.COMPARISON,
     "+": _Precedence.ADDITIVE,
     "-": _Precedence.ADDITIVE,
     "*": _Precedence.MULTIPLICATIVE,
     "/": _Precedence.MULTIPLICATIVE,
+    "%": _Precedence.MULTIPLICATIVE,
 }
 
 
 @dataclass(frozen=True, slots=True, init=False)
 class Expr:
-    """An immutable Chopper formula expression."""
+    """An immutable Chopper formula expression.
+
+    ``==`` compares formula text. Use ``equal`` or another comparison method
+    to construct a condition on row values.
+    """
 
     _source: str
     _precedence: _Precedence = field(compare=False, repr=False)
@@ -54,6 +66,30 @@ class Expr:
     def as_str(self) -> str:
         """Return the expression's formula text."""
         return self._source
+
+    def equal(self, other: ExprLike) -> Expr:
+        """Compare row values for equality."""
+        return _binary(self, "=", other)
+
+    def not_equal(self, other: ExprLike) -> Expr:
+        """Compare row values for inequality."""
+        return _binary(self, "!=", other)
+
+    def lt(self, other: ExprLike) -> Expr:
+        """Compare whether this row value is less than the other value."""
+        return _binary(self, "<", other)
+
+    def le(self, other: ExprLike) -> Expr:
+        """Compare whether this row value is less than or equal to the other value."""
+        return _binary(self, "<=", other)
+
+    def gt(self, other: ExprLike) -> Expr:
+        """Compare whether this row value is greater than the other value."""
+        return _binary(self, ">", other)
+
+    def ge(self, other: ExprLike) -> Expr:
+        """Compare whether this row value is greater than or equal to the other value."""
+        return _binary(self, ">=", other)
 
     def and_(self, other: ExprLike) -> Expr:
         """Combine two formula expressions with AND, as with the `&` operator."""
@@ -117,6 +153,12 @@ class Expr:
 
     def __rtruediv__(self, other: ExprLike) -> Expr:
         return _binary(other, "/", self)
+
+    def __mod__(self, other: ExprLike) -> Expr:
+        return _binary(self, "%", other)
+
+    def __rmod__(self, other: ExprLike) -> Expr:
+        return _binary(other, "%", self)
 
 
 ExprLike = Expr | str | bool | int | float | None

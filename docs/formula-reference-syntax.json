@@ -6,8 +6,8 @@
       "python": "f.safe(expression)"
     },
     "SAFE(1 / 0)": {
-      "rust": "f::safe(parse(\"1 / 0\")?)",
-      "python": "f.safe(parse(\"1 / 0\"))"
+      "rust": "f::safe(lit(1) / 0)",
+      "python": "f.safe(lit(1) / 0)"
     },
     "SAFE(NUMBER(\"42\"))": {
       "rust": "f::safe(f::number(\"42\"))",
@@ -42,40 +42,36 @@
       "python": "left / right"
     },
     "%": {
-      "rust": "parse(\"5 % 2\")?",
-      "python": "parse(\"5 % 2\")"
+      "rust": "left % right",
+      "python": "left % right"
     },
     "&": {
       "rust": "f::concat([left, right])",
       "python": "f.concat(left, right)"
     },
     "=": {
-      "rust": "parse(\"5 = 2\")?",
-      "python": "parse(\"5 = 2\")"
+      "rust": "left.equal(right)",
+      "python": "left.equal(right)"
     },
     "!=": {
-      "rust": "parse(\"5 != 2\")?",
-      "python": "parse(\"5 != 2\")"
-    },
-    "<>": {
-      "rust": "parse(\"5 <> 2\")?",
-      "python": "parse(\"5 <> 2\")"
+      "rust": "left.not_equal(right)",
+      "python": "left.not_equal(right)"
     },
     "<": {
-      "rust": "parse(\"5 < 2\")?",
-      "python": "parse(\"5 < 2\")"
+      "rust": "left.lt(right)",
+      "python": "left.lt(right)"
     },
     "<=": {
-      "rust": "parse(\"5 <= 2\")?",
-      "python": "parse(\"5 <= 2\")"
+      "rust": "left.le(right)",
+      "python": "left.le(right)"
     },
     ">": {
-      "rust": "parse(\"5 > 2\")?",
-      "python": "parse(\"5 > 2\")"
+      "rust": "left.gt(right)",
+      "python": "left.gt(right)"
     },
     ">=": {
-      "rust": "parse(\"5 >= 2\")?",
-      "python": "parse(\"5 >= 2\")"
+      "rust": "left.ge(right)",
+      "python": "left.ge(right)"
     },
     "AND": {
       "rust": "left.and(right)",
@@ -458,8 +454,8 @@
       "python": "f.if_else(condition, when_true, when_false)"
     },
     "IF(2 < 3, \"yes\", \"no\")": {
-      "rust": "f::if_else(parse(\"2 < 3\")?, \"yes\", \"no\")",
-      "python": "f.if_else(parse(\"2 < 3\"), \"yes\", \"no\")"
+      "rust": "f::if_else(lit(2).lt(3), \"yes\", \"no\")",
+      "python": "f.if_else(lit(2).lt(3), \"yes\", \"no\")"
     },
     "IF(NULL, \"yes\", \"no\")": {
       "rust": "f::if_else(null(), \"yes\", \"no\")",

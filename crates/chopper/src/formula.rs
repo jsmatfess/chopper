@@ -14,12 +14,15 @@ use chopper_core::{expression::Expression, CalculatedColumn, Column};
 use std::{
     borrow::Cow,
     fmt,
-    ops::{Add, BitAnd, BitOr, Div, Mul, Not, Sub},
+    ops::{Add, BitAnd, BitOr, Div, Mul, Not, Rem, Sub},
 };
 
 pub mod functions;
 
 /// A composable formula for a calculated column.
+///
+/// `==` compares the formula text of two expressions. Use [`Expr::equal`]
+/// or another comparison method to build a row condition.
 #[derive(Clone, Debug)]
 pub struct Expr {
     source: String,
@@ -32,6 +35,7 @@ enum Precedence {
     Or,
     And,
     Not,
+    Comparison,
     Additive,
     Multiplicative,
     Atom,
@@ -75,6 +79,36 @@ impl Expr {
     )]
     pub fn not(self) -> Self {
         !self
+    }
+
+    /// Build a row condition that tests whether the values are equal.
+    pub fn equal(self, rhs: impl Into<Self>) -> Self {
+        self.binary(rhs.into(), "=", Precedence::Comparison)
+    }
+
+    /// Build a row condition that tests whether the values differ.
+    pub fn not_equal(self, rhs: impl Into<Self>) -> Self {
+        self.binary(rhs.into(), "!=", Precedence::Comparison)
+    }
+
+    /// Build a row condition that tests whether the left value is less than the right.
+    pub fn lt(self, rhs: impl Into<Self>) -> Self {
+        self.binary(rhs.into(), "<", Precedence::Comparison)
+    }
+
+    /// Build a row condition that tests whether the left value is at most the right.
+    pub fn le(self, rhs: impl Into<Self>) -> Self {
+        self.binary(rhs.into(), "<=", Precedence::Comparison)
+    }
+
+    /// Build a row condition that tests whether the left value is greater than the right.
+    pub fn gt(self, rhs: impl Into<Self>) -> Self {
+        self.binary(rhs.into(), ">", Precedence::Comparison)
+    }
+
+    /// Build a row condition that tests whether the left value is at least the right.
+    pub fn ge(self, rhs: impl Into<Self>) -> Self {
+        self.binary(rhs.into(), ">=", Precedence::Comparison)
     }
 
     fn operand(&self, parent: Precedence, wrap_equal: bool) -> Cow<'_, str> {
@@ -234,6 +268,7 @@ binary_operator!(Add, add, "+", Additive);
 binary_operator!(Sub, sub, "-", Additive);
 binary_operator!(Mul, mul, "*", Multiplicative);
 binary_operator!(Div, div, "/", Multiplicative);
+binary_operator!(Rem, rem, "%", Multiplicative);
 binary_operator!(BitAnd, bitand, "AND", And);
 binary_operator!(BitOr, bitor, "OR", Or);
 
