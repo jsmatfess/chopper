@@ -21,6 +21,10 @@ print(job.run()["manifest_path"])
 job.save("job.json")
 ```
 
+The [library guide](https://github.com/jsmatfess/chopper/blob/main/docs/user/libraries.md)
+includes sample input and runnable examples for pipeline reuse, replay,
+configuration errors, and cancellation.
+
 `Job.save` creates a new file. `Job.load("job.json")` reads a saved Job from
 Chopper's CLI or another caller.
 `Job(settings)` and the module's `validate`, `analyze`, and `run` functions also
