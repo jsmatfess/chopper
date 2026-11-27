@@ -163,7 +163,16 @@ impl Job {
     }
 
     /// Scan the current input and return bounded, advisory observations.
-    pub fn analyze(&self, control: Option<&ExecutionControl>) -> Result<AnalyzeReport, Error> {
+    pub fn analyze(&self) -> Result<AnalyzeReport, Error> {
+        self.analyze_internal(None)
+    }
+
+    /// Analyze with a control for progress and cooperative cancellation.
+    pub fn analyze_with_control(&self, control: &ExecutionControl) -> Result<AnalyzeReport, Error> {
+        self.analyze_internal(Some(control))
+    }
+
+    fn analyze_internal(&self, control: Option<&ExecutionControl>) -> Result<AnalyzeReport, Error> {
         execute(control, |cancel, notify| {
             ProfileCache::default()
                 .profile(self.settings(), cancel, notify)
@@ -172,7 +181,16 @@ impl Job {
     }
 
     /// Validate the current source, execute the Job, and publish the result.
-    pub fn run(&self, control: Option<&ExecutionControl>) -> Result<RunReport, Error> {
+    pub fn run(&self) -> Result<RunReport, Error> {
+        self.run_internal(None)
+    }
+
+    /// Run with a control for progress and cooperative cancellation.
+    pub fn run_with_control(&self, control: &ExecutionControl) -> Result<RunReport, Error> {
+        self.run_internal(Some(control))
+    }
+
+    fn run_internal(&self, control: Option<&ExecutionControl>) -> Result<RunReport, Error> {
         execute(control, |cancel, notify| {
             let settings = self.settings();
             let manifest_path = Path::new(&settings.output).join("manifest.jsonl");
@@ -202,9 +220,17 @@ pub struct RunReport {
 }
 
 impl RunReport {
-    /// Open the result manifest and read its output metadata incrementally.
-    pub fn outputs(&self, max_record_bytes: usize) -> Result<ManifestReader, Error> {
-        ManifestReader::open(&self.manifest_path, max_record_bytes)
+    /// Stream result metadata with the default manifest record limit.
+    pub fn outputs(&self) -> Result<ManifestReader, Error> {
+        ManifestReader::open(&self.manifest_path)
+    }
+
+    /// Stream result metadata with a custom per-record byte limit.
+    pub fn outputs_with_record_limit(
+        &self,
+        max_record_bytes: usize,
+    ) -> Result<ManifestReader, Error> {
+        ManifestReader::open_with_record_limit(&self.manifest_path, max_record_bytes)
     }
 }
 

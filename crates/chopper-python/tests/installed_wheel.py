@@ -1,7 +1,7 @@
 """Exercise Chopper from a fresh wheel install and a native CLI build."""
 
 import argparse
-from collections import Counter
+from collections import Counter, UserDict
 from concurrent.futures import ThreadPoolExecutor
 import csv
 from importlib.metadata import version
@@ -145,6 +145,23 @@ class InstalledWheel(unittest.TestCase):
             self.assertEqual(header.to_dict(), dict(header))
             self.assertEqual(entry.to_dict(), dict(entry))
 
+    def test_jobs_accept_path_objects_in_mapping_settings(self):
+        source = Path("customers.csv")
+        destination = Path("output")
+        temp_dir = Path("temporary")
+        temp_dir.mkdir()
+        settings = UserDict({"input": source, "output": destination, "resources": {"temp_dir": temp_dir}})
+        job = chopper.Job(settings)
+        job.save(Path("job.json"))
+        saved = chopper.Job.load(Path("job.json"))
+        self.assertEqual(saved.to_dict()["input"], str(source))
+        self.assertEqual(saved.to_dict()["output"], str(destination))
+        self.assertEqual(saved.to_dict()["resources"]["temp_dir"], str(temp_dir))
+        self.assertIs(settings["input"], source)
+        self.assertIs(settings["resources"]["temp_dir"], temp_dir)
+        self.assertEqual(chopper.inspect(settings).columns, 4)
+        self.assertEqual(saved.run().manifest_path, destination / "manifest.jsonl")
+
     def test_inspect_and_detect_a_source_only_job(self):
         content = "0\tsegment\tsegment\r\n" + "1\tnew\treturning\r\n" * 10
         sample = b"\xff\xfe" + content.encode("utf-16le")
@@ -163,6 +180,8 @@ class InstalledWheel(unittest.TestCase):
         job = chopper.Job({**settings, "input_csv": suggested["settings"]})
         columns = job.inspect()
         self.assertTrue(columns["input_is_zip"])
+        self.assertEqual(list(columns.iter_columns()),
+                         [(0, "0"), (1, "segment"), (2, "segment")])
         self.assertEqual(list(chopper.iter_columns(columns)),
                          [(0, "0"), (1, "segment"), (2, "segment")])
         preview = chopper.preview(job.to_dict())
@@ -171,7 +190,7 @@ class InstalledWheel(unittest.TestCase):
         headerless = {
             **settings, "input_csv": {**suggested["settings"], "headers": False},
         }
-        self.assertEqual(list(chopper.iter_columns(chopper.inspect(headerless))),
+        self.assertEqual(list(chopper.inspect(headerless).iter_columns()),
                          [(0, None), (1, None), (2, None)])
         self.assertIn("UPPER", dict(chopper.formula_functions()))
         self.assertEqual({path.name for path in Path().iterdir()}, {"customers.csv", "records.zip"})
@@ -202,7 +221,7 @@ class InstalledWheel(unittest.TestCase):
 
     def test_composed_formulas_run_on_headerless_records(self):
         f = chopper.functions
-        Path("records.csv").write_text("3,us\n7,gb\n", encoding="utf-8")
+        Path("records.csv").write_text("3,us\n7,gb\n1,\n", encoding="utf-8")
         settings = {
             **self.settings,
             "input": "records.csv",
@@ -210,9 +229,17 @@ class InstalledWheel(unittest.TestCase):
             "output_csv": {"headers": False},
         }
         number = f.number(chopper.col(0))
+        column = chopper.col(1)
+        with self.assertRaisesRegex(TypeError, "truth value"):
+            bool(f.is_blank(column))
+        self.assertEqual(str(~(chopper.lit(False) | True) & True), "NOT (FALSE OR TRUE) AND TRUE")
         definitions = {
             "score": (10 - number) * chopper.parse("1 + 2") + 8 / (number + 1),
-            "label": f.concat(f.upper(chopper.col(1)), ' "quoted"'),
+            "label": f.if_else(
+                ~(f.is_blank(column) | f.is_null(column)) & f.is_text(column),
+                f.concat(f.upper(column), ' "quoted"'),
+                "missing",
+            ),
             "tail": f.coalesce(None, f.substring(chopper.col("label"), 1), "fallback"),
             "raw": "lOwEr($1)",
         }
@@ -233,6 +260,7 @@ class InstalledWheel(unittest.TestCase):
         self.assertEqual(read_csv(Path("output", entry["path"])), [
             ["3", "us", "23", 'US "quoted"', 'S "quoted"', "us"],
             ["7", "gb", "10", 'GB "quoted"', 'B "quoted"', "gb"],
+            ["1", "", "31", "missing", "issing", ""],
         ])
 
     def test_long_arithmetic_chains_run_and_nested_arithmetic_keeps_grouping(self):

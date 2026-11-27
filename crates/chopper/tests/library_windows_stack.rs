@@ -38,7 +38,7 @@ fn embedded_run_publishes_from_a_one_mib_host_stack() -> anyhow::Result<()> {
     let result = thread::scope(|scope| {
         let host = thread::Builder::new()
             .stack_size(1024 * 1024)
-            .spawn_scoped(scope, || job.run(None))?;
+            .spawn_scoped(scope, || job.run())?;
         Ok::<_, std::io::Error>(host.join().expect("embedded host thread panicked"))
     })?;
     let report = result?;

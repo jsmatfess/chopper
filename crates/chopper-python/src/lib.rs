@@ -113,9 +113,11 @@ impl NativeJob {
         py: Python<'py>,
         control: Option<&ExecutionControl>,
     ) -> PyResult<Bound<'py, PyAny>> {
-        let control = control.map(|control| &control.inner);
         let report = py
-            .detach(|| self.inner.analyze(control))
+            .detach(|| match control {
+                Some(control) => self.inner.analyze_with_control(&control.inner),
+                None => self.inner.analyze(),
+            })
             .map_err(|error| job_error(py, error))?;
         dictionary(py, &report)
     }
@@ -125,9 +127,11 @@ impl NativeJob {
         py: Python<'py>,
         control: Option<&ExecutionControl>,
     ) -> PyResult<Bound<'py, PyAny>> {
-        let control = control.map(|control| &control.inner);
         let report = py
-            .detach(|| self.inner.run(control))
+            .detach(|| match control {
+                Some(control) => self.inner.run_with_control(&control.inner),
+                None => self.inner.run(),
+            })
             .map_err(|error| job_error(py, error))?;
         dictionary(py, &report)
     }
@@ -190,7 +194,7 @@ impl ManifestReader {
     }
 }
 
-const DEFAULT_MANIFEST_RECORD_BYTES: usize = 16 * 1024 * 1024;
+const DEFAULT_MANIFEST_RECORD_BYTES: usize = RustManifestReader::DEFAULT_MAX_RECORD_BYTES;
 
 #[pyfunction(signature = (path, *, max_record_bytes = DEFAULT_MANIFEST_RECORD_BYTES))]
 /// Open a native result manifest with a limit on each JSON Lines record.
@@ -199,13 +203,17 @@ fn open_manifest(
     path: PathBuf,
     max_record_bytes: usize,
 ) -> PyResult<ManifestReader> {
-    py.detach(|| RustManifestReader::open(path, max_record_bytes))
+    py.detach(|| RustManifestReader::open_with_record_limit(path, max_record_bytes))
         .map(|inner| ManifestReader { inner })
         .map_err(|error| job_error(py, error))
 }
 
 #[pymodule]
 fn _native(module: &Bound<'_, PyModule>) -> PyResult<()> {
+    module.add(
+        "_DEFAULT_MANIFEST_RECORD_BYTES",
+        DEFAULT_MANIFEST_RECORD_BYTES,
+    )?;
     module.add("ChopperError", module.py().get_type::<ChopperError>())?;
     module.add_class::<ExecutionControl>()?;
     module.add_class::<ManifestReader>()?;

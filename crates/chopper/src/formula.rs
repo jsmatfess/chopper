@@ -14,7 +14,7 @@ use chopper_core::{expression::Expression, CalculatedColumn, Column};
 use std::{
     borrow::Cow,
     fmt,
-    ops::{Add, Div, Mul, Sub},
+    ops::{Add, BitAnd, BitOr, Div, Mul, Not, Sub},
 };
 
 pub mod functions;
@@ -29,6 +29,9 @@ pub struct Expr {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 enum Precedence {
     Unknown,
+    Or,
+    And,
+    Not,
     Additive,
     Multiplicative,
     Atom,
@@ -85,6 +88,14 @@ impl Eq for Expr {}
 impl fmt::Display for Expr {
     fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
         formatter.write_str(self.as_str())
+    }
+}
+
+impl std::str::FromStr for Expr {
+    type Err = FormulaError;
+
+    fn from_str(source: &str) -> Result<Self, FormulaError> {
+        parse(source)
     }
 }
 
@@ -188,7 +199,7 @@ impl From<f32> for Expr {
     }
 }
 
-macro_rules! arithmetic {
+macro_rules! binary_operator {
     ($trait:ident, $method:ident, $operator:literal, $precedence:ident) => {
         impl<Rhs: Into<Expr>> $trait<Rhs> for Expr {
             type Output = Self;
@@ -200,10 +211,23 @@ macro_rules! arithmetic {
     };
 }
 
-arithmetic!(Add, add, "+", Additive);
-arithmetic!(Sub, sub, "-", Additive);
-arithmetic!(Mul, mul, "*", Multiplicative);
-arithmetic!(Div, div, "/", Multiplicative);
+binary_operator!(Add, add, "+", Additive);
+binary_operator!(Sub, sub, "-", Additive);
+binary_operator!(Mul, mul, "*", Multiplicative);
+binary_operator!(Div, div, "/", Multiplicative);
+binary_operator!(BitAnd, bitand, "AND", And);
+binary_operator!(BitOr, bitor, "OR", Or);
+
+impl Not for Expr {
+    type Output = Self;
+
+    fn not(self) -> Self {
+        Self {
+            source: format!("NOT {}", self.operand(Precedence::Not, false)),
+            precedence: Precedence::Not,
+        }
+    }
+}
 
 fn function(name: &str, arguments: impl IntoIterator<Item = Expr>) -> Expr {
     let mut source = name.to_owned();

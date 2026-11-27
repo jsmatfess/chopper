@@ -1,11 +1,10 @@
 """Compose, load and execute file-to-file Chopper Jobs."""
 
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from itertools import repeat
 import json
-from os import PathLike
-from typing import Any
+from os import PathLike, fspath
+from typing import Any, Self
 
 from . import functions
 from ._formula import Expr, col, lit, parse
@@ -24,6 +23,7 @@ from ._reports import (
     ManifestReader,
     Progress,
     RunReport,
+    iter_columns,
     open_manifest,
 )
 
@@ -60,7 +60,7 @@ class Pipeline:
 
     _operations: tuple[_Operation, ...]
 
-    def __init__(self):
+    def __init__(self) -> None:
         object.__setattr__(self, "_operations", ())
 
     def then(self, step: "_Operation | Pipeline") -> "Pipeline":
@@ -140,22 +140,29 @@ class Job:
 
     def __init__(
         self,
-        settings: dict[str, Any],
+        settings: Mapping[str, Any],
         *,
         pipeline: Pipeline | None = None,
         calculated_columns: Mapping[str, Expr | str] | None = None,
-    ):
-        if not isinstance(settings, dict):
-            raise TypeError("Job settings must be a dictionary")
+    ) -> None:
+        if not isinstance(settings, Mapping):
+            raise TypeError("Job settings must be a mapping")
+        settings = dict(settings)
+        for key in ("input", "output"):
+            path = settings.get(key)
+            if isinstance(path, PathLike):
+                settings[key] = fspath(path)
+        resources = settings.get("resources")
+        if isinstance(resources, Mapping):
+            temp_dir = resources.get("temp_dir")
+            if isinstance(temp_dir, PathLike):
+                settings["resources"] = {**resources, "temp_dir": fspath(temp_dir)}
         if pipeline is not None:
             if not isinstance(pipeline, Pipeline):
                 raise TypeError("pipeline must be a Pipeline")
             if "operations" in settings:
                 raise TypeError("supply either operations or a pipeline")
-            settings = {
-                **settings,
-                "operations": [json.loads(step.source) for step in pipeline._operations],
-            }
+            settings["operations"] = [json.loads(step.source) for step in pipeline._operations]
         if calculated_columns is not None:
             if not isinstance(calculated_columns, Mapping):
                 raise TypeError("calculated_columns must be a mapping")
@@ -170,18 +177,18 @@ class Job:
                 elif not isinstance(expression, str):
                     raise TypeError("calculated column expressions must be Expr or str")
                 definitions.append({"name": name, "expression": expression})
-            settings = {**settings, "calculated_columns": definitions}
+            settings["calculated_columns"] = definitions
         self._native = _NativeJob.from_json(_json(settings))
 
     @classmethod
-    def load(cls, path: str | PathLike[str]) -> "Job":
+    def load(cls, path: str | PathLike[str]) -> Self:
         """Read saved Job JSON. Relative paths resolve from the working directory."""
         job = cls.__new__(cls)
         job._native = _NativeJob.load(path)
         return job
 
     @classmethod
-    def from_json(cls, source: str) -> "Job":
+    def from_json(cls, source: str) -> Self:
         """Decode a Job from a versioned JSON string."""
         job = cls.__new__(cls)
         job._native = _NativeJob.from_json(source)
@@ -220,38 +227,31 @@ class Job:
         return RunReport(self._native.run(_native_control(control)))
 
 
-def validate(settings: dict[str, Any]) -> None:
-    """Validate a dictionary Job."""
+def validate(settings: Mapping[str, Any]) -> None:
+    """Validate a Job settings mapping."""
     Job(settings).validate()
 
 
-def inspect(settings: dict[str, Any]) -> InputReport:
-    """Discover input columns for a dictionary Job."""
+def inspect(settings: Mapping[str, Any]) -> InputReport:
+    """Discover input columns for a Job settings mapping."""
     return Job(settings).inspect()
 
 
-def preview(settings: dict[str, Any]) -> InputReport:
-    """Preview the input for a dictionary Job."""
+def preview(settings: Mapping[str, Any]) -> InputReport:
+    """Preview the input for a Job settings mapping."""
     return Job(settings).preview()
 
 
-def detect_dialect(settings: dict[str, Any]) -> DetectedDialect:
-    """Suggest CSV settings for a dictionary Job."""
+def detect_dialect(settings: Mapping[str, Any]) -> DetectedDialect:
+    """Suggest CSV settings for a Job settings mapping."""
     return Job(settings).detect_dialect()
 
 
-def iter_columns(report: Mapping[str, Any]) -> Iterator[tuple[int, str | None]]:
-    """Yield zero-based column indices and optional names from an input report."""
-    header = report.get("header")
-    names = header if header is not None else repeat(None, report["columns"])
-    return enumerate(names)
-
-
-def analyze(settings: dict[str, Any], control: ExecutionControl | None = None) -> AnalyzeReport:
-    """Analyze a dictionary Job."""
+def analyze(settings: Mapping[str, Any], control: ExecutionControl | None = None) -> AnalyzeReport:
+    """Analyze a Job settings mapping."""
     return Job(settings).analyze(control)
 
 
-def run(settings: dict[str, Any], control: ExecutionControl | None = None) -> RunReport:
-    """Run a dictionary Job."""
+def run(settings: Mapping[str, Any], control: ExecutionControl | None = None) -> RunReport:
+    """Run a Job settings mapping."""
     return Job(settings).run(control)

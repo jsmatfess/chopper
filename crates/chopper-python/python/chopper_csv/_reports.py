@@ -4,15 +4,13 @@ from __future__ import annotations
 
 from collections.abc import Iterator, Mapping
 from copy import deepcopy
+from itertools import repeat
 from os import PathLike
 from pathlib import Path
 from typing import Any, Literal
 
-from ._native import ManifestReader as _NativeManifestReader
+from ._native import _DEFAULT_MANIFEST_RECORD_BYTES, ManifestReader as _NativeManifestReader
 from ._native import open_manifest as _open_manifest
-
-
-_DEFAULT_MANIFEST_RECORD_BYTES = 16 * 1024 * 1024
 
 
 class _Report(Mapping[str, Any]):
@@ -149,6 +147,17 @@ class InputReport(_Report):
     def preview_row_numbers(self) -> list[int]:
         """One-based data-record numbers for the retained preview."""
         return self.get("preview_row_numbers", [])
+
+    def iter_columns(self) -> Iterator[tuple[int, str | None]]:
+        """Yield zero-based column indices and optional names in input order."""
+        return iter_columns(self)
+
+
+def iter_columns(report: Mapping[str, Any]) -> Iterator[tuple[int, str | None]]:
+    """Yield zero-based column indices and optional names from an input report."""
+    header = report.get("header")
+    names = header if header is not None else repeat(None, report["columns"])
+    return enumerate(names)
 
 
 class DetectedDialect(_Report):

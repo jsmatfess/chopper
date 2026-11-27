@@ -317,11 +317,22 @@ impl fmt::Debug for ManifestReader {
 }
 
 impl ManifestReader {
+    /// The default byte limit for each JSON Lines record, including the header.
+    pub const DEFAULT_MAX_RECORD_BYTES: usize = 16 * 1024 * 1024;
+
+    /// Read and validate the v1 header with a 16 MiB per-record byte limit.
+    pub fn open(path: impl AsRef<Path>) -> Result<Self, Error> {
+        Self::open_with_record_limit(path, Self::DEFAULT_MAX_RECORD_BYTES)
+    }
+
     /// Read and validate the v1 header. The positive `max_record_bytes` limit
     /// applies to each JSON line, including the header. Count all bytes before
     /// the line feed, including a carriage return if present.
     /// Choose a larger limit for manifests containing large records.
-    pub fn open(path: impl AsRef<Path>, max_record_bytes: usize) -> Result<Self, Error> {
+    pub fn open_with_record_limit(
+        path: impl AsRef<Path>,
+        max_record_bytes: usize,
+    ) -> Result<Self, Error> {
         if max_record_bytes == 0 {
             return Err(Error::new(
                 "manifest_limit",
@@ -494,8 +505,8 @@ mod tests {
             settings
                 .operations
                 .push(Operation::partition(vec![Column::Name("city".into())]));
-            let report = Job::new(settings).run(None)?;
-            let mut reader = ManifestReader::open(report.manifest_path, 1024 * 1024)?;
+            let report = Job::new(settings).run()?;
+            let mut reader = ManifestReader::open(report.manifest_path)?;
             assert_eq!(reader.header().compression, compression);
             assert_eq!(reader.header().output_files, 3);
             assert_eq!(
@@ -539,7 +550,7 @@ mod tests {
             &path,
             format!("{}\n{record}", header(u64::MAX, 1, u64::MAX)),
         )?;
-        let mut reader = ManifestReader::open(&path, LIMIT)?;
+        let mut reader = ManifestReader::open_with_record_limit(&path, LIMIT)?;
         let value = serde_json::to_value(reader.next().unwrap()?)?;
         assert_eq!(value["rows"].as_u64(), Some(u64::MAX));
         assert_eq!(value["csv_bytes"].as_u64(), Some(u64::MAX));
@@ -566,11 +577,11 @@ mod tests {
         let limit = 24 * 1024;
         let padding = " ".repeat(limit - record.len());
         fs::write(&path, format!("{first}\r\n{record}{padding}\n"))?;
-        let mut exact = ManifestReader::open(&path, limit)?;
+        let mut exact = ManifestReader::open_with_record_limit(&path, limit)?;
         assert!(exact.next().unwrap().is_ok());
         assert!(exact.next().is_none());
         fs::write(&path, format!("{first}\n{record}{padding}\r\n"))?;
-        let mut oversized = ManifestReader::open(&path, limit)?;
+        let mut oversized = ManifestReader::open_with_record_limit(&path, limit)?;
         assert_eq!(
             oversized.next().unwrap().unwrap_err().code(),
             "manifest_limit"
@@ -578,11 +589,15 @@ mod tests {
         assert!(oversized.next().is_none());
         assert!(oversized.input.is_none());
         assert_eq!(
-            ManifestReader::open(&path, 1).unwrap_err().code(),
+            ManifestReader::open_with_record_limit(&path, 1)
+                .unwrap_err()
+                .code(),
             "manifest_limit"
         );
         assert_eq!(
-            ManifestReader::open(&path, 0).unwrap_err().code(),
+            ManifestReader::open_with_record_limit(&path, 0)
+                .unwrap_err()
+                .code(),
             "manifest_limit"
         );
         Ok(())
@@ -593,31 +608,37 @@ mod tests {
         let temp = tempfile::tempdir()?;
         let path = temp.path().join("manifest.jsonl");
         assert_eq!(
-            ManifestReader::open(&path, LIMIT).unwrap_err().code(),
+            ManifestReader::open_with_record_limit(&path, LIMIT)
+                .unwrap_err()
+                .code(),
             "manifest_read"
         );
         fs::write(&path, b"")?;
         assert_eq!(
-            ManifestReader::open(&path, LIMIT).unwrap_err().code(),
+            ManifestReader::open_with_record_limit(&path, LIMIT)
+                .unwrap_err()
+                .code(),
             "manifest_format"
         );
         let mut first = header(0, 0, 0);
         first["schema_version"] = json!(2);
         fs::write(&path, first.to_string())?;
-        assert!(ManifestReader::open(&path, LIMIT)
+        assert!(ManifestReader::open_with_record_limit(&path, LIMIT)
             .unwrap_err()
             .to_string()
             .contains("schema version 2"));
         first["schema_version"] = json!(1);
         first["analysis"]["header"] = Value::Null;
         fs::write(&path, first.to_string())?;
-        let mut empty = ManifestReader::open(&path, LIMIT)?;
+        let mut empty = ManifestReader::open_with_record_limit(&path, LIMIT)?;
         assert!(empty.header().input_header.is_none());
         assert!(empty.next().is_none());
         first["config"] = json!(["zip"]);
         fs::write(&path, first.to_string())?;
         assert_eq!(
-            ManifestReader::open(&path, LIMIT).unwrap_err().code(),
+            ManifestReader::open_with_record_limit(&path, LIMIT)
+                .unwrap_err()
+                .code(),
             "manifest_format"
         );
 
@@ -632,7 +653,7 @@ mod tests {
                 .collect::<Vec<_>>()
                 .join("\n");
             fs::write(&path, format!("{first}\n{records}"))?;
-            let mut reader = ManifestReader::open(&path, LIMIT)?;
+            let mut reader = ManifestReader::open_with_record_limit(&path, LIMIT)?;
             for _ in output_records {
                 assert!(reader.next().unwrap().is_ok());
             }
@@ -652,7 +673,7 @@ mod tests {
                 output(1, 1)
             ),
         )?;
-        let mut reader = ManifestReader::open(&path, LIMIT)?;
+        let mut reader = ManifestReader::open_with_record_limit(&path, LIMIT)?;
         assert_eq!(reader.next().unwrap()?.rows, u64::MAX);
         let overflow = reader.next().unwrap().unwrap_err();
         assert_eq!(overflow.code(), "manifest_format");
@@ -675,7 +696,9 @@ mod tests {
             first["config"]["compression"] = compression;
             fs::write(&path, first.to_string())?;
             assert_eq!(
-                ManifestReader::open(&path, LIMIT).unwrap_err().code(),
+                ManifestReader::open_with_record_limit(&path, LIMIT)
+                    .unwrap_err()
+                    .code(),
                 "manifest_format"
             );
         }
@@ -707,7 +730,7 @@ mod tests {
             let mut contents = format!("{first}\n").into_bytes();
             contents.extend(malformed);
             fs::write(&path, contents)?;
-            let mut reader = ManifestReader::open(&path, LIMIT)?;
+            let mut reader = ManifestReader::open_with_record_limit(&path, LIMIT)?;
             assert_eq!(
                 reader.next().unwrap().unwrap_err().code(),
                 "manifest_format"
@@ -716,7 +739,7 @@ mod tests {
         }
 
         fs::write(&path, first.to_string())?;
-        let mut reader = ManifestReader::open(&path, LIMIT)?;
+        let mut reader = ManifestReader::open_with_record_limit(&path, LIMIT)?;
         reader.close();
         reader.close();
         assert!(reader.next().is_none());

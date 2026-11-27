@@ -1,7 +1,7 @@
 #![cfg(not(target_os = "wasi"))]
 
 use chopper::{
-    formula::{col, functions as f, lit, null, parse},
+    formula::{col, functions as f, lit, null, parse, Expr},
     job::{Job, JobSettings},
 };
 use std::fs;
@@ -18,6 +18,10 @@ fn expressions_preserve_literals_references_and_existing_formula_text() -> anyho
     assert!(parse("1 +").is_err());
     assert!(parse(lit(f64::INFINITY).as_str()).is_err());
     assert_eq!(parse("upper([country])")?.as_str(), "upper([country])");
+    assert_eq!(
+        "upper([country])".parse::<Expr>()?,
+        parse("upper([country])")?
+    );
     Ok(())
 }
 
@@ -31,6 +35,10 @@ fn composed_arithmetic_preserves_grouping_without_extra_depth() -> anyhow::Resul
     assert_eq!((lit(1) - (lit(2) - 3)).as_str(), "1 - (2 - 3)");
     assert_eq!((lit(1) + lit(2) * 3).as_str(), "1 + 2 * 3");
     assert_eq!((parse("1 + 2")? * 3).as_str(), "(1 + 2) * 3");
+    assert_eq!(
+        (!(lit(false) | true) & true).as_str(),
+        "NOT (FALSE OR TRUE) AND TRUE"
+    );
     Ok(())
 }
 
@@ -49,10 +57,10 @@ fn composed_formulas_bind_numeric_selectors_in_headered_and_headerless_jobs() ->
     for (name, input, headers, reference, expected) in [
         (
             "headerless",
-            "3,us\n7,gb\n",
+            "3,us\n7,gb\n1,\n",
             false,
             col(0),
-            "3,us,9,US,10\n7,gb,21,GB,22\n",
+            "3,us,9,US,10\n7,gb,21,GB,22\n1,\"\",3,missing,4\n",
         ),
         ("named-zero", "id,0\n3,7\n", true, col("0"), "3,7,21,7,22\n"),
     ] {
@@ -65,17 +73,20 @@ fn composed_formulas_bind_numeric_selectors_in_headered_and_headerless_jobs() ->
         settings.output_csv.headers = false;
         settings.calculated_columns = vec![
             (parse("1 + 2")? * f::number(reference)).alias("triple"),
-            f::upper(f::trim(col(1))).alias("label"),
+            f::if_else(
+                !(f::is_blank(col(1)) | f::is_null(col(1))) & f::is_text(col(1)),
+                f::upper(f::trim(col(1))),
+                "missing",
+            )
+            .alias("label"),
             (col("triple") + 1).alias("next"),
         ];
         let job = Job::new(settings);
         job.validate()?;
         let saved = root.path().join(format!("{name}.json"));
         job.save(&saved)?;
-        let report = Job::load(&saved)?.run(None)?;
-        let outputs = report
-            .outputs(1024 * 1024)?
-            .collect::<Result<Vec<_>, _>>()?;
+        let report = Job::load(&saved)?.run()?;
+        let outputs = report.outputs()?.collect::<Result<Vec<_>, _>>()?;
         assert_eq!(outputs.len(), 1);
         let output = fs::read_to_string(destination.join(&outputs[0].path))?;
         assert_eq!(output.replace("\r\n", "\n"), expected);

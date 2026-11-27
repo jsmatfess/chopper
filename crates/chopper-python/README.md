@@ -7,18 +7,20 @@ Chopper processes file-to-file CSV Jobs with bounded working memory. The
 Install a published version with `python -m pip install chopper-csv`.
 
 ```python
+from pathlib import Path
+
 from chopper_csv import Job, Pipeline, partition, shuffle
 
 pipeline = Pipeline().then(partition(["country"])).then(shuffle())
 job = Job({
-    "input": "customers.csv",
-    "output": "results",
+    "input": Path("customers.csv"),
+    "output": Path("results"),
     "limits": {"bytes": 25_000_000},
 }, pipeline=pipeline)
 job.validate()
 print(job.analyze().rows)
 print(job.run().manifest_path)
-job.save("job.json")
+job.save(Path("job.json"))
 ```
 
 The [library guide](https://github.com/jsmatfess/chopper/blob/main/docs/user/libraries.md)
@@ -28,8 +30,10 @@ columns, pipeline reuse, replay, streaming manifests, and cancellation.
 `Job.save` creates a new file. `Job.load("job.json")` reads a saved Job from
 Chopper's CLI or another caller.
 `Job(settings)` and the module's `validate`, `analyze`, and `run` functions also
-accept Job dictionaries. The dictionary fields, including CSV settings, limits,
+accept settings mappings. The fields, including CSV settings, limits,
 resources, calculated columns, and operations, follow the versioned [Job format](https://github.com/jsmatfess/chopper/blob/main/docs/job-json.md).
+Use strings or `Path` objects for `input`, `output`, and `resources.temp_dir`.
+Saved Jobs and `to_dict()` use path strings.
 Relative paths resolve from the current working directory. Run requires a new
 or empty destination directory and publishes it only after execution succeeds.
 Byte limits apply to the serialized CSV, including the header and record endings.
@@ -44,7 +48,8 @@ Build calculated columns with `col` and the named helpers in `chopper_csv.functi
 Use `from chopper_csv import col, functions as f`, then pass
 `calculated_columns={"country_label": f.upper(f.trim(col("country")))}` to
 `Job`. Use `col(0)` for the first field
-of a headerless CSV and `col("0")` for the exact header `0`. The
+of a headerless CSV and `col("0")` for the exact header `0`. Compose Boolean
+expressions with `&`, `|`, and `~`. The
 [calculated column examples](https://github.com/jsmatfess/chopper/blob/main/docs/user/libraries.md#add-calculated-columns)
 show both forms and how to reuse existing formula text with `parse`.
 
@@ -60,14 +65,15 @@ available.
 `Job.detect_dialect()` returns a `DetectedDialect` with a CSV settings
 dictionary in `.settings`. `Job.inspect()` and `Job.preview()` return an
 `InputReport` for column names and sampled input records. Use
+`report.iter_columns()` to yield `(index, name)` pairs in input order. Use
 `report.outputs()` on a `RunReport` or `open_manifest(path)` to iterate
 through published output metadata. The reader exposes a `ManifestHeader` as
 `.header` and yields `ManifestOutput` records. Each record's `.path` is a
 string, which can name a ZIP member. These reports also provide `.to_dict()`.
 `formula_functions()` returns the built-in function names and call signatures.
 
-Analyze and Run are synchronous. Pass a fresh `ExecutionControl()` to each
-call to let another thread poll `control.progress()` for a `Progress` report
+Analyze and Run are synchronous. Pass a fresh `ExecutionControl()` as the
+`control` argument to let another thread poll `control.progress()` for a `Progress` report
 with `.phase`, `.rows`, and `.temp_bytes`, or call `control.cancel()`.
 `Progress.to_dict()` gives the same snapshot as a JSON-ready dictionary.
 A Run cancelled before publication removes its temporary and staging data.

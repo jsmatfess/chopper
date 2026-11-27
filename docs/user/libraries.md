@@ -62,9 +62,9 @@ fn main() -> Result<(), chopper::job::Error> {
         ..JobSettings::for_files("customers.csv", "results")
     });
     job.validate()?;
-    let estimate = job.analyze(None)?;
+    let estimate = job.analyze()?;
     println!("{} input rows", estimate.rows());
-    let result = job.run(None)?;
+    let result = job.run()?;
     println!("{}", result.manifest_path.display());
     job.save("job.json")?;
     Ok(())
@@ -86,22 +86,27 @@ Partition by country, shuffle each country independently, and cap each CSV at
 50 bytes. With the sample input, the Run writes four CSVs.
 
 ```python
+from pathlib import Path
+
 from chopper_csv import Job, Pipeline, partition, shuffle
 
 pipeline = Pipeline().then(partition(["country"])).then(shuffle())
 job = Job(
-    {"input": "customers.csv", "output": "results", "limits": {"bytes": 50}},
+    {"input": Path("customers.csv"), "output": Path("results"), "limits": {"bytes": 50}},
     pipeline=pipeline,
 )
 job.validate()
 print(f"{job.analyze().rows} input rows")
 print(job.run().manifest_path)
-job.save("job.json")
+job.save(Path("job.json"))
 ```
 
-Use `Job(settings)` to construct a Job from a dictionary, or pass a dictionary
-to `validate`, `analyze`, or `run`. Execution releases the GIL, so another
-Python thread can observe or cancel the Job. Engine errors raise `ChopperError`.
+Use `Job(settings)` to construct a Job from a settings mapping. `validate`,
+`analyze`, and `run` also accept settings mappings directly. `input`, `output`,
+and `resources.temp_dir` accept strings and `os.PathLike[str]` objects.
+Saved Jobs and `Job.to_dict()` use path strings. Execution releases the GIL,
+so another Python thread can observe or cancel the Job. Engine errors raise
+`ChopperError`.
 
 `analyze()` returns an `AnalyzeReport`, and `run()` returns a `RunReport`.
 Read their fields as attributes. The Run report's `.manifest_path` is a
@@ -126,7 +131,7 @@ the output path empty while deciding how to configure the Job.
 <!-- docs:python -->
 
 Python also exports `detect_dialect(settings)`, `inspect(settings)`, and
-`preview(settings)` for use with a settings dictionary.
+`preview(settings)` for use with a settings mapping.
 
 <!-- docs:end -->
 
@@ -190,7 +195,7 @@ fn main() -> Result<(), Error> {
 **Python**
 
 ```python
-from chopper_csv import detect_dialect, inspect, iter_columns
+from chopper_csv import detect_dialect, inspect
 
 source = {"input": "customers.csv"}
 detected = detect_dialect(source)
@@ -199,7 +204,7 @@ print(detected.note)
 
 report = inspect({**source, "input_csv": detected.settings})
 print(f"{report.columns} columns")
-for index, name in iter_columns(report):
+for index, name in report.iter_columns():
     label = "(no header)" if name is None else name
     print(f"{index}: {label}")
 ```
@@ -214,7 +219,7 @@ The Rust `InputReport` exposes `column_count()`, `header()`, and
 <!-- docs:python -->
 
 The `InputReport` exposes the count as `.columns`, the names or `None` as
-`.header`, and the ZIP flag as `.input_is_zip`. `iter_columns(report)`
+`.header`, and the ZIP flag as `.input_is_zip`. `report.iter_columns()`
 yields `(index, name)` pairs lazily. A preview report also has `.preview` with
 sampled rows and `.preview_row_numbers` with their data record numbers.
 
@@ -277,7 +282,7 @@ fn main() -> Result<(), Error> {
         operations: vec![by_country_label],
         ..JobSettings::for_files("customers.csv", "calculated")
     });
-    let report = job.run(None)?;
+    let report = job.run()?;
     println!("{} rows in {} groups", report.rows, report.groups);
     Ok(())
 }
@@ -341,7 +346,7 @@ fn main() -> Result<(), Error> {
         calculated_columns: vec![(f::number(col(0)) * lit(2)).alias("double_id")],
         ..JobSettings::for_files("customers-no-header.csv", "calculated-headerless")
     });
-    println!("{} rows", job.run(None)?.rows);
+    println!("{} rows", job.run()?.rows);
     Ok(())
 }
 ```
@@ -385,6 +390,9 @@ For variable-length arguments, pass an array or iterator, as in
 condition-value pairs and a fallback with
 `f::ifs([(condition, value)], fallback)`.
 
+Compose Boolean expressions with `&`, `|`, and `!`, as in
+`f::is_text(col("country")) & !f::is_blank(col("country"))`.
+
 <!-- docs:end -->
 
 <!-- docs:python -->
@@ -398,6 +406,10 @@ For variable-length arguments, pass each value in order, as in
 condition-value pairs and a named fallback with
 `f.ifs((condition, value), fallback=fallback)`.
 
+Compose Boolean expressions with `&`, `|`, and `~`, as in
+`f.is_text(col("country")) & ~f.is_blank(col("country"))`. Python truth tests,
+including `and`, `or`, and `not`, raise `TypeError` on an expression.
+
 <!-- docs:end -->
 
 `CONCAT_WS` takes literal Boolean flags after its text arguments. For `IF`,
@@ -409,9 +421,10 @@ handles nulls.
 
 <!-- docs:rust -->
 
-Import `parse` from `chopper::formula` to incorporate a formula into an
-expression, as in `parse("NUMBER([id])")? * lit(2)`. `Expr::as_str()` reads
-the resulting formula text. Invalid formulas return `FormulaError`.
+Parse a formula with `"NUMBER([id])".parse::<Expr>()?` or call
+`chopper::formula::parse("NUMBER([id])")?`. Combine the resulting expression
+with other expressions and literals. `Expr::as_str()` borrows its formula
+text. Invalid formulas return `FormulaError`.
 
 You can also put formula text directly in the `expression` field of a
 `CalculatedColumn`.
@@ -524,7 +537,7 @@ fn main() -> Result<(), Error> {
             operations: pipeline.into_operations(),
             ..JobSettings::for_files("customers.csv", output)
         });
-        let report = job.run(None)?;
+        let report = job.run()?;
         println!("{output}: {} files", report.output_files);
     }
     Ok(())
@@ -572,7 +585,7 @@ fn main() -> Result<(), Error> {
     let saved = Job::load("job.json")?;
     let mut settings = saved.settings().clone();
     settings.output = "results-replay".into();
-    let report = Job::new(settings).run(None)?;
+    let report = Job::new(settings).run()?;
     println!("{} files from {} rows", report.output_files, report.rows);
     println!("Read {}", report.manifest_path.display());
     Ok(())
@@ -629,8 +642,8 @@ opens the manifest only. Output records contain the path, row and byte counts,
 `compressed_target_exceeded` flag, and lineage. For a ZIP result, keep `path`
 as the exact member name inside `outputs.zip`.
 
-Set a per-line byte limit that can hold the manifest's Job record, which can
-include substantial configuration and analysis data. The limit counts each
+The default per-line limit is 16 MiB. Raise it for a manifest with a large Job
+record, which can include configuration and analysis data. The limit counts each
 line's bytes up to its LF terminator. Opening reads the Job record and returns
 a reader with a header containing version, input header, compression, and
 aggregate counts. Iterating to exhaustion reconciles the output count, row
@@ -642,8 +655,7 @@ count, and total CSV bytes with the header.
 use chopper::job::{Error, ManifestReader};
 
 fn main() -> Result<(), Error> {
-    let max_record_bytes = 16 * 1024 * 1024;
-    let manifest = ManifestReader::open("results/manifest.jsonl", max_record_bytes)?;
+    let manifest = ManifestReader::open("results/manifest.jsonl")?;
     println!("{} published CSVs", manifest.header().output_files);
     for output in manifest {
         let output = output?;
@@ -658,8 +670,10 @@ fn main() -> Result<(), Error> {
 
 <!-- docs:rust -->
 
-Use `report.outputs(max_record_bytes)` to open the reader from a
-`RunReport`. Each iteration item is a `Result<ManifestOutput, Error>`.
+Use `report.outputs()` to open the reader from a `RunReport`. Set a custom
+limit with `ManifestReader::open_with_record_limit(path, bytes)` or
+`report.outputs_with_record_limit(bytes)`. Each iteration item is a
+`Result<ManifestOutput, Error>`.
 
 <!-- docs:end -->
 
@@ -668,9 +682,7 @@ Use `report.outputs(max_record_bytes)` to open the reader from a
 ```python
 from chopper_csv import open_manifest
 
-with open_manifest(
-    "results/manifest.jsonl", max_record_bytes=16 * 1024 * 1024
-) as manifest:
+with open_manifest("results/manifest.jsonl") as manifest:
     print(f"{manifest.header.output_files} published CSVs")
     for output in manifest:
         print(f"{output.path}: {output.rows} rows, {output.csv_bytes} CSV bytes")
@@ -679,8 +691,8 @@ with open_manifest(
 <!-- docs:python -->
 
 Use `RunReport.outputs()` to open a Run's manifest directly, or
-`open_manifest(path)` if you have the manifest path. `open_manifest` defaults
-to a 16 MiB limit per record. The reader exposes `.header` as a
+`open_manifest(path)` if you have the manifest path. Both accept a custom
+`max_record_bytes` keyword. The reader exposes `.header` as a
 `ManifestHeader` and yields `ManifestOutput` records. Each record's `.path`
 is a string, which can name a member inside `outputs.zip`. Manifest failures
 raise `ChopperError`. The context manager closes the file. You can also call
@@ -772,15 +784,17 @@ storage.
 
 <!-- docs:rust -->
 
-Share a cloned control with the observing thread and pass `Some(&control)`
-to the execution. `progress()` returns a `Progress` snapshot.
+Share a cloned control with the observing thread. Use
+`job.run_with_control(&control)` or `job.analyze_with_control(&control)` for
+the operation. `progress()` returns a `Progress` snapshot.
 
 <!-- docs:end -->
 
 <!-- docs:python -->
 
-Share the same control object with the observing thread. `progress()`
-returns a `Progress` snapshot with `.phase`, `.rows`, and `.temp_bytes`.
+Share the same control object with the observing thread and pass it as
+`control=control`. `progress()` returns a `Progress` snapshot with `.phase`,
+`.rows`, and `.temp_bytes`.
 
 <!-- docs:end -->
 
@@ -805,7 +819,7 @@ fn main() -> Result<(), Error> {
     let control = ExecutionControl::new();
     let result = thread::scope(|scope| {
         let worker_control = control.clone();
-        let worker = scope.spawn(move || job.run(Some(&worker_control)));
+        let worker = scope.spawn(move || job.run_with_control(&worker_control));
         let progress = control.progress();
         println!("{}: {} rows", progress.phase, progress.rows);
         control.cancel();
@@ -830,7 +844,7 @@ from chopper_csv import ChopperError, ExecutionControl, Job
 job = Job({"input": "customers.csv", "output": "cancel-demo"})
 control = ExecutionControl()
 with ThreadPoolExecutor(max_workers=1) as pool:
-    future = pool.submit(job.run, control)
+    future = pool.submit(job.run, control=control)
     progress = control.progress()
     print(f"{progress.phase}: {progress.rows} rows")
     control.cancel()

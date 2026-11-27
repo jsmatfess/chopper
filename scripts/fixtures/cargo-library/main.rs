@@ -59,7 +59,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     assert_eq!(preview.preview_rows().len(), 4);
     assert!(formula_functions().contains(&("UPPER", "UPPER(text)")));
 
-    let report = job.run(None)?;
+    let report = job.run()?;
     assert_eq!(
         (
             report.rows,
@@ -70,7 +70,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         (4, 3, 2, 4)
     );
     assert_eq!(report.manifest_path, Path::new("rust/manifest.jsonl"));
-    let outputs = report.outputs(1024 * 1024)?;
+    let outputs = report.outputs()?;
     assert_eq!(outputs.header().rows, report.rows);
     assert_eq!(outputs.header().output_files, report.output_files);
     let mut total_rows = 0;
@@ -90,9 +90,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     calculated.input_csv.headers = false;
     calculated.output_csv.headers = false;
     calculated.calculated_columns = vec![(f::number(col(0)) * 2).alias("double_quantity")];
-    let calculated = Job::new(calculated).run(None)?;
+    let calculated = Job::new(calculated).run()?;
     let chunks = calculated
-        .outputs(1024 * 1024)?
+        .outputs()?
         .collect::<Result<Vec<_>, _>>()?;
     assert_eq!(chunks.len(), 1);
     assert_eq!(
@@ -109,7 +109,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     settings.resources.temp_dir = Some("temporary".into());
     fs::create_dir("temporary")?;
     let error = Job::new(settings)
-        .run(None)
+        .run()
         .expect_err("ZIP metadata budget was not enforced");
     assert!(
         error

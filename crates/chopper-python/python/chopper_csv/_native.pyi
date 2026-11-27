@@ -1,7 +1,9 @@
 from collections.abc import Iterator
 from os import PathLike
 from types import TracebackType
-from typing import Any, Self
+from typing import Any, Final, Self
+
+_DEFAULT_MANIFEST_RECORD_BYTES: Final[int]
 
 class ChopperError(Exception):
     code: str

@@ -6,15 +6,29 @@ from dataclasses import dataclass, field
 from enum import IntEnum
 from math import isfinite
 from sys import maxsize
+from typing import Never
 
 from ._native import _validate_formula
 
 
 class _Precedence(IntEnum):
     UNKNOWN = 0
-    ADDITIVE = 1
-    MULTIPLICATIVE = 2
-    ATOM = 3
+    OR = 1
+    AND = 2
+    NOT = 3
+    ADDITIVE = 4
+    MULTIPLICATIVE = 5
+    ATOM = 6
+
+
+_BINARY_PRECEDENCE = {
+    "OR": _Precedence.OR,
+    "AND": _Precedence.AND,
+    "+": _Precedence.ADDITIVE,
+    "-": _Precedence.ADDITIVE,
+    "*": _Precedence.MULTIPLICATIVE,
+    "/": _Precedence.MULTIPLICATIVE,
+}
 
 
 @dataclass(frozen=True, slots=True, init=False)
@@ -43,6 +57,30 @@ class Expr:
 
     def __str__(self) -> str:
         return self._source
+
+    def __bool__(self) -> Never:
+        raise TypeError("a formula has no Python truth value; compose it with &, |, or ~")
+
+    def _operand(self, parent: _Precedence, *, wrap_equal: bool = False) -> str:
+        if self._precedence < parent or (wrap_equal and self._precedence == parent):
+            return f"({self})"
+        return self._source
+
+    def __and__(self, other: ExprLike) -> Expr:
+        return _binary(self, "AND", other)
+
+    def __rand__(self, other: ExprLike) -> Expr:
+        return _binary(other, "AND", self)
+
+    def __or__(self, other: ExprLike) -> Expr:
+        return _binary(self, "OR", other)
+
+    def __ror__(self, other: ExprLike) -> Expr:
+        return _binary(other, "OR", self)
+
+    def __invert__(self) -> Expr:
+        operand = self._operand(_Precedence.NOT)
+        return Expr._from_source(f"NOT {operand}", _Precedence.NOT)
 
     def __add__(self, other: ExprLike) -> Expr:
         return _binary(self, "+", other)
@@ -114,16 +152,10 @@ def parse(source: str) -> Expr:
 
 
 def _binary(left: ExprLike, operator: str, right: ExprLike) -> Expr:
-    precedence = _Precedence.ADDITIVE if operator in ("+", "-") else _Precedence.MULTIPLICATIVE
-    left_expr = lit(left)
-    right_expr = lit(right)
-    left_source = left_expr.as_str()
-    right_source = right_expr.as_str()
-    if left_expr._precedence < precedence:
-        left_source = f"({left_source})"
+    precedence = _BINARY_PRECEDENCE[operator]
+    left_source = lit(left)._operand(precedence)
     # Equal-precedence operators are left-associative.
-    if right_expr._precedence <= precedence:
-        right_source = f"({right_source})"
+    right_source = lit(right)._operand(precedence, wrap_equal=True)
     return Expr._from_source(f"{left_source} {operator} {right_source}", precedence)
 
 

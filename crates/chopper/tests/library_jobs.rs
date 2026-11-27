@@ -61,12 +61,12 @@ fn input_probes_discover_the_dialect_and_columns_without_a_destination() -> anyh
     let mut analyzable = settings.clone();
     analyzable.output = root.path().join("results").to_str().unwrap().into();
     let analyzable = Job::new(analyzable);
-    assert_eq!(analyzable.analyze(None)?.rows(), 9);
+    assert_eq!(analyzable.analyze()?.rows(), 9);
 
     input.push_str("invalid\r\n");
     fs::write(&source, input)?;
     assert_eq!(job.preview()?.preview_rows().len(), 8);
-    assert!(analyzable.analyze(None).is_err());
+    assert!(analyzable.analyze().is_err());
     settings.input_csv.headers = false;
     let headerless = Job::new(settings).inspect()?;
     assert!(headerless.header().is_none());
@@ -145,7 +145,7 @@ fn input_probes_report_only_encoding_errors_in_consumed_records() -> anyhow::Res
     ));
     assert_eq!(job.inspect()?.column_count(), 2);
     assert_eq!(job.preview()?.preview_rows().len(), 8);
-    for error in [job.analyze(None).err(), job.run(None).err()] {
+    for error in [job.analyze().err(), job.run().err()] {
         let error = error.expect("full execution must reject malformed input");
         assert!(error.to_string().contains("invalid byte sequence"));
     }
@@ -177,7 +177,7 @@ fn composed_job_publishes_capped_files_and_replays_from_cli() -> anyhow::Result<
         )
     });
 
-    let report = job.run(None)?;
+    let report = job.run()?;
     assert_eq!(
         (
             report.rows,
@@ -355,7 +355,7 @@ fn loaded_jobs_keep_dialect_calculations_and_limits_with_gzip_and_zip_input() ->
         Job::new(settings).save(&saved)?;
         let loaded = Job::load(saved)?;
         assert_eq!(serde_json::to_value(loaded.settings())?, requested);
-        let report = loaded.run(None)?;
+        let report = loaded.run()?;
         assert_eq!((report.rows, report.groups, report.output_files), (2, 2, 2));
         let mut outputs = Vec::new();
         for line in fs::read_to_string(&report.manifest_path)?.lines().skip(1) {
@@ -414,8 +414,8 @@ fn validation_analysis_and_run_return_structured_outcomes() -> anyhow::Result<()
     assert_eq!(error.code(), "invalid_config");
     assert_eq!(error.path(), Some("/limits/bytes"));
     assert!(!error.to_string().is_empty());
-    assert_eq!(invalid.run(None).unwrap_err().code(), error.code());
-    assert_eq!(invalid.analyze(None).err().unwrap().code(), error.code());
+    assert_eq!(invalid.run().unwrap_err().code(), error.code());
+    assert_eq!(invalid.analyze().err().unwrap().code(), error.code());
     assert_eq!(root.path().read_dir()?.count(), 0);
 
     let error = Job::from_json("{\"resources\": {\"memory_mb\": false}}")
@@ -429,7 +429,7 @@ fn validation_analysis_and_run_return_structured_outcomes() -> anyhow::Result<()
 
     fs::create_dir(&temp)?;
     fs::write(&input, "id,country\n1,CA\n2,US\n")?;
-    let profile = job.analyze(None)?;
+    let profile = job.analyze()?;
     assert_eq!(profile.rows(), 2);
     assert_eq!(profile.columns(), 2);
     assert_eq!(profile.stages()[0].input_distinct_keys, Some(2));
@@ -441,17 +441,17 @@ fn validation_analysis_and_run_return_structured_outcomes() -> anyhow::Result<()
     // replacement input record whose serialized bytes cannot fit the cap.
     fs::create_dir(&output)?;
     fs::write(output.join("sentinel"), "keep")?;
-    let error = job.run(None).unwrap_err();
+    let error = job.run().unwrap_err();
     assert_eq!(error.code(), "destination");
     assert_eq!(fs::read_to_string(output.join("sentinel"))?, "keep");
     fs::remove_file(output.join("sentinel"))?;
     fs::write(&input, "id,country\n1234567890,US\n")?;
-    assert_eq!(job.run(None).unwrap_err().code(), "record_limit");
+    assert_eq!(job.run().unwrap_err().code(), "record_limit");
     assert_eq!(output.read_dir()?.count(), 0);
     assert_eq!(temp.read_dir()?.count(), 0);
 
     fs::write(&input, "id,country\n1,CA\n2,US\n3,CA\n")?;
-    assert_eq!(job.run(None)?.rows, 3);
+    assert_eq!(job.run()?.rows, 3);
     Ok(())
 }
 
@@ -484,7 +484,7 @@ fn controls_cancel_live_jobs_without_affecting_other_executions() -> anyhow::Res
     let analyze = Job::new(settings("analyze"));
     let analyze_control = ExecutionControl::new();
     thread::scope(|scope| {
-        let scanning = scope.spawn(|| analyze.analyze(Some(&analyze_control)));
+        let scanning = scope.spawn(|| analyze.analyze_with_control(&analyze_control));
         wait_for_rows(&analyze_control);
         analyze_control.cancel();
         assert_eq!(scanning.join().unwrap().err().unwrap().code(), "cancelled");
@@ -497,8 +497,8 @@ fn controls_cancel_live_jobs_without_affecting_other_executions() -> anyhow::Res
     let first_control = ExecutionControl::new();
     let second_control = ExecutionControl::new();
     let completed = thread::scope(|scope| -> anyhow::Result<_> {
-        let cancelling = scope.spawn(|| first.run(Some(&first_control)));
-        let completing = scope.spawn(|| second.run(Some(&second_control)));
+        let cancelling = scope.spawn(|| first.run_with_control(&first_control));
+        let completing = scope.spawn(|| second.run_with_control(&second_control));
         wait_for_rows(&first_control);
         wait_for_rows(&second_control);
         first_control.cancel();
@@ -510,7 +510,7 @@ fn controls_cancel_live_jobs_without_affecting_other_executions() -> anyhow::Res
     assert_eq!(second_control.progress().phase.as_str(), "Complete");
     assert_eq!(second_control.progress().rows, 300_000);
     assert_eq!(
-        first.run(Some(&first_control)).unwrap_err().code(),
+        first.run_with_control(&first_control).unwrap_err().code(),
         "control_in_use"
     );
     assert!(!root.path().join("cancelled").exists());
