@@ -11,18 +11,28 @@ from . import functions
 from ._formula import Expr, col, lit, parse
 from ._native import (
     ChopperError,
-    ExecutionControl,
-    ManifestReader,
+    ExecutionControl as _NativeExecutionControl,
     NativeJob as _NativeJob,
     formula_functions,
+)
+from ._reports import (
+    AnalyzeReport,
+    DetectedDialect,
+    InputReport,
+    ManifestHeader,
+    ManifestOutput,
+    ManifestReader,
+    Progress,
+    RunReport,
     open_manifest,
 )
 
 __all__ = [
-    "ChopperError", "ExecutionControl", "Expr", "Job", "ManifestReader", "Pipeline", "analyze",
-    "assign", "assign_probabilistic", "balanced", "col", "detect_dialect", "formula_functions",
-    "functions", "inspect", "interleaved", "iter_columns", "lit", "open_manifest", "parse",
-    "partition", "preview", "run", "shuffle", "validate",
+    "AnalyzeReport", "ChopperError", "DetectedDialect", "ExecutionControl", "Expr", "InputReport",
+    "Job", "ManifestHeader", "ManifestOutput", "ManifestReader", "Pipeline", "Progress", "RunReport",
+    "analyze", "assign", "assign_probabilistic", "balanced", "col", "detect_dialect",
+    "formula_functions", "functions", "inspect", "interleaved", "iter_columns", "lit", "open_manifest",
+    "parse", "partition", "preview", "run", "shuffle", "validate",
 ]
 
 _Column = str | int
@@ -98,6 +108,31 @@ def interleaved(files: int) -> _Operation:
     return _operation("interleaved", files=files)
 
 
+class ExecutionControl:
+    """Cancellation and progress for one Analyze or Run call."""
+
+    __slots__ = ("_inner",)
+
+    def __init__(self) -> None:
+        self._inner = _NativeExecutionControl()
+
+    def cancel(self) -> None:
+        """Request cooperative cancellation."""
+        self._inner.cancel()
+
+    def progress(self) -> Progress:
+        """Return a snapshot of the latest execution progress."""
+        return Progress(self._inner.progress())
+
+
+def _native_control(control: ExecutionControl | None) -> _NativeExecutionControl | None:
+    if control is None:
+        return None
+    if not isinstance(control, ExecutionControl):
+        raise TypeError("control must be an ExecutionControl or None")
+    return control._inner
+
+
 class Job:
     """A reusable Job backed by the same settings and engine as the CLI."""
 
@@ -164,25 +199,25 @@ class Job:
         """Check configuration and raise ChopperError on failure."""
         self._native.validate()
 
-    def inspect(self) -> dict[str, Any]:
+    def inspect(self) -> InputReport:
         """Discover input columns from the first parsed record."""
-        return self._native.inspect()
+        return InputReport(self._native.inspect())
 
-    def preview(self) -> dict[str, Any]:
+    def preview(self) -> InputReport:
         """Discover input columns and sample up to eight data records."""
-        return self._native.preview()
+        return InputReport(self._native.preview())
 
-    def detect_dialect(self) -> dict[str, Any]:
+    def detect_dialect(self) -> DetectedDialect:
         """Suggest CSV settings from a bounded sample of the input."""
-        return self._native.detect_dialect()
+        return DetectedDialect(self._native.detect_dialect())
 
-    def analyze(self, control: ExecutionControl | None = None) -> dict[str, Any]:
+    def analyze(self, control: ExecutionControl | None = None) -> AnalyzeReport:
         """Return bounded statistics and advisory estimates."""
-        return self._native.analyze(control)
+        return AnalyzeReport(self._native.analyze(_native_control(control)))
 
-    def run(self, control: ExecutionControl | None = None) -> dict[str, Any]:
+    def run(self, control: ExecutionControl | None = None) -> RunReport:
         """Run the Job and return aggregate counts and the manifest path."""
-        return self._native.run(control)
+        return RunReport(self._native.run(_native_control(control)))
 
 
 def validate(settings: dict[str, Any]) -> None:
@@ -190,33 +225,33 @@ def validate(settings: dict[str, Any]) -> None:
     Job(settings).validate()
 
 
-def inspect(settings: dict[str, Any]) -> dict[str, Any]:
+def inspect(settings: dict[str, Any]) -> InputReport:
     """Discover input columns for a dictionary Job."""
     return Job(settings).inspect()
 
 
-def preview(settings: dict[str, Any]) -> dict[str, Any]:
+def preview(settings: dict[str, Any]) -> InputReport:
     """Preview the input for a dictionary Job."""
     return Job(settings).preview()
 
 
-def detect_dialect(settings: dict[str, Any]) -> dict[str, Any]:
+def detect_dialect(settings: dict[str, Any]) -> DetectedDialect:
     """Suggest CSV settings for a dictionary Job."""
     return Job(settings).detect_dialect()
 
 
-def iter_columns(report: dict[str, Any]) -> Iterator[tuple[int, str | None]]:
+def iter_columns(report: Mapping[str, Any]) -> Iterator[tuple[int, str | None]]:
     """Yield zero-based column indices and optional names from an input report."""
     header = report.get("header")
     names = header if header is not None else repeat(None, report["columns"])
     return enumerate(names)
 
 
-def analyze(settings: dict[str, Any], control: ExecutionControl | None = None) -> dict[str, Any]:
+def analyze(settings: dict[str, Any], control: ExecutionControl | None = None) -> AnalyzeReport:
     """Analyze a dictionary Job."""
     return Job(settings).analyze(control)
 
 
-def run(settings: dict[str, Any], control: ExecutionControl | None = None) -> dict[str, Any]:
+def run(settings: dict[str, Any], control: ExecutionControl | None = None) -> RunReport:
     """Run a dictionary Job."""
     return Job(settings).run(control)

@@ -89,9 +89,9 @@ async function checkSplitLibraryGuides(browser, origin, base) {
     Python: /pip install chopper-csv/,
   };
   const sections = {
-    'inspect-an-input': { Rust: /\bInputReport\b/, Python: /\biter_columns\b/ },
+    'inspect-an-input': { Rust: /\bcolumn_count\(\)/, Python: /\biter_columns\b/ },
     'add-calculated-columns': { Rust: /\.alias\(/, Python: /\bcalculated_columns\s+mapping\b/ },
-    'stream-published-output-metadata': { Rust: /\breport\.outputs\(/, Python: /\bopen_manifest\b/ },
+    'stream-published-output-metadata': { Rust: /\boutputs\(max_record_bytes\)/, Python: /\bopen_manifest\b/ },
     'observe-and-cancel-a-run': { Rust: /\bcloned control\b/, Python: /\bcontrol object\b/ },
   };
 
@@ -159,7 +159,7 @@ async function checkSplitLibraryGuides(browser, origin, base) {
       }
 
       await page.getByRole('button', { name: 'Search' }).first().click();
-      await page.getByRole('searchbox').fill(language === 'Rust' ? 'InputReport' : 'open_manifest');
+      await page.getByRole('searchbox').fill(language === 'Rust' ? 'column_count' : 'open_manifest');
       const route = new URL(destination).pathname;
       await page.locator(`#localsearch-list a[href^="${route}#"]`).first().click();
       await page.waitForURL(target => target.pathname === route && target.hash.length > 1);
@@ -180,9 +180,15 @@ async function checkSplitLibraryGuides(browser, origin, base) {
     await checkFragment(page, url('Rust') + compose);
     await page.getByRole('button', { name: 'Search' }).first().click();
     const search = page.getByRole('searchbox');
-    await search.fill('InputReport');
+    await search.fill('column_count');
     const result = `${base}libraries-rust${detect}`;
-    await page.locator(`#localsearch-list [aria-selected="true"] a[href="${result}"]`).waitFor();
+    const results = page.locator('#localsearch-list');
+    await results.locator(`a[href="${result}"]`).waitFor();
+    const selected = results.locator(`[aria-selected="true"] a[href="${result}"]`);
+    for (let remaining = await results.locator('a').count(); remaining && !(await selected.isVisible()); remaining--) {
+      await search.press('ArrowDown');
+    }
+    await selected.waitFor();
     await search.press('Enter');
     await checkFragment(page, url('Rust') + detect);
     const pythonGuide = link(page, 'Python');

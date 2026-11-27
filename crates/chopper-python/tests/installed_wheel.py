@@ -5,6 +5,7 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 import csv
 from importlib.metadata import version
+from importlib.resources import files
 import json
 import os
 from pathlib import Path
@@ -97,6 +98,52 @@ class InstalledWheel(unittest.TestCase):
         )
         self.assertEqual(cli.returncode, 0, cli.stderr)
         self.verify_capped_result("replayed/manifest.jsonl", json.loads(cli.stdout), cap)
+
+    def test_typed_report_properties_and_json_snapshots(self):
+        self.assertTrue(files(chopper).joinpath("py.typed").is_file())
+        job = chopper.Job(self.settings)
+        inspection = job.inspect()
+        self.assertEqual(inspection.columns, 4)
+        self.assertEqual(inspection.header, ["id", "country", "segment", "note"])
+        self.assertFalse(inspection.input_is_zip)
+        self.assertEqual(inspection.preview, [])
+        self.assertEqual(inspection.preview_row_numbers, [])
+        self.assertNotIn("preview", inspection.to_dict())
+        preview = job.preview()
+        self.assertEqual(preview.preview_row_numbers, list(range(1, 9)))
+        self.assertEqual(len(preview.preview), 8)
+        detected = job.detect_dialect()
+        self.assertEqual(detected.settings["delimiter"], ",")
+        self.assertGreater(detected.sample_bytes, 0)
+
+        analysis = job.analyze()
+        self.assertEqual((analysis.rows, analysis.columns), (12, 4))
+        with self.assertRaises(AttributeError):
+            analysis.rows = 0
+        snapshot = analysis.to_dict()
+        self.assertEqual(snapshot, dict(analysis))
+        snapshot["header"][0] = "changed"
+        self.assertEqual(analysis.header[0], "id")
+        self.assertEqual(analysis["rows"], analysis.rows)
+
+        control = chopper.ExecutionControl()
+        progress = control.progress()
+        self.assertEqual((progress.rows, progress.temp_bytes), (0, 0))
+        self.assertEqual(progress.phase, progress["phase"])
+        result = job.run(control)
+        self.assertEqual(result.manifest_path, Path("output/manifest.jsonl"))
+        self.assertTrue(result.manifest_path.is_file())
+        self.assertIsInstance(result["manifest_path"], str)
+        self.assertEqual(Path(result["manifest_path"]), result.manifest_path)
+        self.assertEqual(json.loads(json.dumps(result.to_dict())), dict(result))
+        with result.outputs() as manifest:
+            header = manifest.header
+            self.assertEqual(header.output_files, result.output_files)
+            entry, = manifest
+            self.assertEqual(entry.rows, result.rows)
+            self.assertEqual(entry.path, entry["path"])
+            self.assertEqual(header.to_dict(), dict(header))
+            self.assertEqual(entry.to_dict(), dict(entry))
 
     def test_inspect_and_detect_a_source_only_job(self):
         content = "0\tsegment\tsegment\r\n" + "1\tnew\treturning\r\n" * 10

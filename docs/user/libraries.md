@@ -94,14 +94,20 @@ job = Job(
     pipeline=pipeline,
 )
 job.validate()
-print(f"{job.analyze()['rows']} input rows")
-print(job.run()["manifest_path"])
+print(f"{job.analyze().rows} input rows")
+print(job.run().manifest_path)
 job.save("job.json")
 ```
 
 Use `Job(settings)` to construct a Job from a dictionary, or pass a dictionary
 to `validate`, `analyze`, or `run`. Execution releases the GIL, so another
 Python thread can observe or cancel the Job. Engine errors raise `ChopperError`.
+
+`analyze()` returns an `AnalyzeReport`, and `run()` returns a `RunReport`.
+Read their fields as attributes. The Run report's `.manifest_path` is a
+`pathlib.Path`. Use `.to_dict()` for a JSON-ready copy, with the manifest
+path as a string. `InputReport`, `DetectedDialect`, `Progress`,
+`ManifestHeader`, and `ManifestOutput` also provide `.to_dict()`.
 
 ## Inspect an input
 
@@ -142,8 +148,11 @@ Read the recommendation with `DetectedDialect::settings()`. The
 
 <!-- docs:python -->
 
-Read the recommendation from the `settings` key. The `delimiter_status` key
-reports `"detected"`, `"ambiguous"`, or `"not_detected"`.
+`detect_dialect()` returns a `DetectedDialect`. Its `.settings` is a CSV
+settings dictionary you can use as a Job's `input_csv`. The
+`.delimiter_status` is `"detected"`, `"ambiguous"`, or `"not_detected"`.
+Use `.sample_bytes` for the sample size and `.note` for a description of the
+recommendation.
 
 <!-- docs:end -->
 
@@ -185,11 +194,11 @@ from chopper_csv import detect_dialect, inspect, iter_columns
 
 source = {"input": "customers.csv"}
 detected = detect_dialect(source)
-print(f"{detected['delimiter_status']} from {detected['sample_bytes']} bytes")
-print(detected["note"])
+print(f"{detected.delimiter_status} from {detected.sample_bytes} bytes")
+print(detected.note)
 
-report = inspect({**source, "input_csv": detected["settings"]})
-print(f"{report['columns']} columns")
+report = inspect({**source, "input_csv": detected.settings})
+print(f"{report.columns} columns")
 for index, name in iter_columns(report):
     label = "(no header)" if name is None else name
     print(f"{index}: {label}")
@@ -204,9 +213,10 @@ The Rust `InputReport` exposes `column_count()`, `header()`, and
 
 <!-- docs:python -->
 
-Python's report stores the count in `columns`, the list of names or `None`
-in `header`, and the ZIP flag in `input_is_zip`. `iter_columns(report)`
-yields `(index, name)` pairs lazily.
+The `InputReport` exposes the count as `.columns`, the names or `None` as
+`.header`, and the ZIP flag as `.input_is_zip`. `iter_columns(report)`
+yields `(index, name)` pairs lazily. A preview report also has `.preview` with
+sampled rows and `.preview_row_numbers` with their data record numbers.
 
 <!-- docs:end -->
 
@@ -240,7 +250,7 @@ fn main() -> Result<(), Error> {
 from chopper_csv import Job
 
 report = Job({"input": "customers.csv"}).preview()
-for number, row in zip(report["preview_row_numbers"], report["preview"], strict=True):
+for number, row in zip(report.preview_row_numbers, report.preview, strict=True):
     print(f"{number}: {row}")
 ```
 
@@ -287,7 +297,7 @@ job = Job(
     },
 )
 report = job.run()
-print(f"{report['rows']} rows in {report['groups']} groups")
+print(f"{report.rows} rows in {report.groups} groups")
 ```
 
 With the sample input, the Run writes eight rows in two groups. `validate()`
@@ -350,7 +360,7 @@ job = Job(
     },
     calculated_columns={"double_id": f.number(col(0)) * 2},
 )
-print(f"{job.run()['rows']} rows")
+print(f"{job.run().rows} rows")
 ```
 
 `double_id` names the calculation inside the Job so other formulas and pipeline
@@ -544,7 +554,7 @@ variants = (
 for output, pipeline in variants:
     job = Job({"input": "customers.csv", "output": output}, pipeline=pipeline)
     report = job.run()
-    print(f"{output}: {report['output_files']} files")
+    print(f"{output}: {report.output_files} files")
 ```
 
 ### Reload a Job with a new destination
@@ -577,8 +587,8 @@ from chopper_csv import Job, run
 settings = Job.load("job.json").to_dict()
 settings["output"] = "results-replay"
 report = run(settings)
-print(f"{report['output_files']} files from {report['rows']} rows")
-print(f"Read {report['manifest_path']}")
+print(f"{report.output_files} files from {report.rows} rows")
+print(f"Read {report.manifest_path}")
 ```
 
 <!-- docs:rust -->
@@ -661,16 +671,20 @@ from chopper_csv import open_manifest
 with open_manifest(
     "results/manifest.jsonl", max_record_bytes=16 * 1024 * 1024
 ) as manifest:
-    print(f"{manifest.header['output_files']} published CSVs")
+    print(f"{manifest.header.output_files} published CSVs")
     for output in manifest:
-        print(f"{output['path']}: {output['rows']} rows, {output['csv_bytes']} CSV bytes")
+        print(f"{output.path}: {output.rows} rows, {output.csv_bytes} CSV bytes")
 ```
 
 <!-- docs:python -->
 
-`open_manifest` defaults to a 16 MiB limit per record. The reader
-returns dictionaries and raises `ChopperError` for manifest failures. The
-context manager closes the file. You can also call `manifest.close()` directly.
+Use `RunReport.outputs()` to open a Run's manifest directly, or
+`open_manifest(path)` if you have the manifest path. `open_manifest` defaults
+to a 16 MiB limit per record. The reader exposes `.header` as a
+`ManifestHeader` and yields `ManifestOutput` records. Each record's `.path`
+is a string, which can name a member inside `outputs.zip`. Manifest failures
+raise `ChopperError`. The context manager closes the file. You can also call
+`manifest.close()` directly.
 
 <!-- docs:end -->
 
@@ -766,7 +780,7 @@ to the execution. `progress()` returns a `Progress` snapshot.
 <!-- docs:python -->
 
 Share the same control object with the observing thread. `progress()`
-returns a dictionary.
+returns a `Progress` snapshot with `.phase`, `.rows`, and `.temp_bytes`.
 
 <!-- docs:end -->
 
@@ -818,7 +832,7 @@ control = ExecutionControl()
 with ThreadPoolExecutor(max_workers=1) as pool:
     future = pool.submit(job.run, control)
     progress = control.progress()
-    print(f"{progress['phase']}: {progress['rows']} rows")
+    print(f"{progress.phase}: {progress.rows} rows")
     control.cancel()
     try:
         report = future.result()
@@ -827,5 +841,5 @@ with ThreadPoolExecutor(max_workers=1) as pool:
             raise
         print(f"Cancelled: {error}")
     else:
-        print(f"Published {report['manifest_path']}")
+        print(f"Published {report.manifest_path}")
 ```

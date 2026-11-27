@@ -16,8 +16,8 @@ job = Job({
     "limits": {"bytes": 25_000_000},
 }, pipeline=pipeline)
 job.validate()
-print(job.analyze()["rows"])
-print(job.run()["manifest_path"])
+print(job.analyze().rows)
+print(job.run().manifest_path)
 job.save("job.json")
 ```
 
@@ -48,21 +48,28 @@ of a headerless CSV and `col("0")` for the exact header `0`. The
 [calculated column examples](https://github.com/jsmatfess/chopper/blob/main/docs/user/libraries.md#add-calculated-columns)
 show both forms and how to reuse existing formula text with `parse`.
 
-`validate` returns `None` on success. Analyze returns bounded statistics and
-advisory estimates. Run reads the current input and returns `rows`, `columns`,
-`groups`, `output_files`, `output_csv_bytes`, and `manifest_path`. Job and
-execution failures raise `ChopperError` with a stable `code`, a readable message,
-and `path`, `line`, and `column` when available.
+`validate` returns `None` on success. Analyze returns an `AnalyzeReport` with
+bounded statistics and advisory estimates. Run reads the current input and
+returns a `RunReport` with `.rows`, `.columns`, `.groups`, `.output_files`,
+`.output_csv_bytes`, and `.manifest_path`. The manifest path is a
+`pathlib.Path`. Use `.to_dict()` to get a JSON-ready report dictionary with
+the path as a string. Job and execution failures raise `ChopperError` with a
+stable `code`, a readable message, and `path`, `line`, and `column` when
+available.
 
-Use `Job.detect_dialect()`, `Job.inspect()`, and `Job.preview()` to suggest CSV
-settings, read column names, and sample input records. Use
-`open_manifest(report["manifest_path"])` to iterate through published output
-metadata. `formula_functions()` returns the built-in function names and call
-signatures.
+`Job.detect_dialect()` returns a `DetectedDialect` with a CSV settings
+dictionary in `.settings`. `Job.inspect()` and `Job.preview()` return an
+`InputReport` for column names and sampled input records. Use
+`report.outputs()` on a `RunReport` or `open_manifest(path)` to iterate
+through published output metadata. The reader exposes a `ManifestHeader` as
+`.header` and yields `ManifestOutput` records. Each record's `.path` is a
+string, which can name a ZIP member. These reports also provide `.to_dict()`.
+`formula_functions()` returns the built-in function names and call signatures.
 
 Analyze and Run are synchronous. Pass a fresh `ExecutionControl()` to each
-call to let another thread poll `control.progress()` for `phase`, `rows`, and
-`temp_bytes`, or call `control.cancel()`. Progress is the latest engine event.
+call to let another thread poll `control.progress()` for a `Progress` report
+with `.phase`, `.rows`, and `.temp_bytes`, or call `control.cancel()`.
+`Progress.to_dict()` gives the same snapshot as a JSON-ready dictionary.
 A Run cancelled before publication removes its temporary and staging data.
 A cancellation received after publication preserves the successful result.
 
