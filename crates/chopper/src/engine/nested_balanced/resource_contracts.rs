@@ -49,16 +49,17 @@ fn hosted_guard(root: &std::path::Path) -> Result<()> {
         "three steps selected fusion"
     );
     job.operations.pop();
+    let required = 12 * MIB;
+    let held = 32 * MIB - pool.usage().reserved_bytes - required;
     let mut peer = Reservation::for_workspace(Arc::new(Workspace::shared(32 * MIB as usize, pool)));
-    let held = ctx.working_headroom() - 12 * MIB;
     peer.resize(held as usize)?;
     ensure!(
-        hosted_eligible(&job, &ctx, 256 * MIB, 21),
+        ctx.working_headroom() == required && hosted_eligible(&job, &ctx, 256 * MIB, 21),
         "exact headroom declined fusion"
     );
     peer.resize(held as usize + 1)?;
     ensure!(
-        !hosted_eligible(&job, &ctx, 256 * MIB, 21),
+        ctx.working_headroom() == required - 1 && !hosted_eligible(&job, &ctx, 256 * MIB, 21),
         "insufficient headroom selected fusion"
     );
     Ok(())
