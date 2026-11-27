@@ -109,6 +109,10 @@ if other authorized gaps remain. A CI wait is not objective completion.
 
 ## Finish only at an objective boundary
 
+When an authorized investigation includes a performance release, verify the
+changelog and downloadable charts against the [release chart requirements](../../../docs/release-packaging.md#performance-graphs-in-release-notes)
+as part of publication.
+
 End substantive work when one of these is established:
 
 - **Complete:** the requested end outcome is verified and required changes are

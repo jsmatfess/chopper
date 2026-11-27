@@ -199,6 +199,10 @@ Rank verified large-job Run time in absolute seconds, value measured resource
 headroom in close comparisons, and validate any situational selector's cheap
 signals and decline path before promotion.
 
+Before publishing a performance release, follow the [release chart requirements](docs/release-packaging.md#performance-graphs-in-release-notes).
+Verify that the changelog shows baseline and candidate Run times and the
+percentage change for each matched workload.
+
 For repeated experiments, follow the [coded experiment cycle](docs/maintainer/experiment-cycle.md)
 for reasoning routing, declared command pipelines and compact evidence handoffs.
 For an authorized end-to-end unattended investigation, use the repository

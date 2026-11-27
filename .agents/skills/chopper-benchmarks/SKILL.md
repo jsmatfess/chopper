@@ -1,6 +1,6 @@
 ---
 name: chopper-benchmarks
-description: Analyze Chopper benchmark evidence, design or run targeted performance experiments, and record results with provenance and replay constraints. Use for Chopper performance comparisons and benchmark decision tables; not for unrelated benchmarking or general feature development.
+description: Analyze Chopper benchmark evidence, design targeted experiments, and qualify performance release charts. Use for Chopper performance comparisons, benchmark decision tables, and performance release notes.
 ---
 
 # Chopper benchmarks
@@ -50,6 +50,10 @@ Validate conservation, group membership, logical metadata, strict caps and failu
 Compare absolute Run seconds saved on larger jobs through verified publication and cleanup. Measure small-job cost and use the observed spread when comparing close timings or preferring greater resource headroom. For situational gains, declare the signal Auto can obtain cheaply, its incremental cost, the expected winning region and where Auto should decline. Challenge the selector on held-out workloads and check admission while owners actually overlap. Promote after the benefit, eligibility and contracts hold for the intended workload/runtime and the user has authorized delivery.
 
 ## Record the outcome
+
+For performance release notes, apply the [release chart requirements](../../../docs/release-packaging.md#performance-graphs-in-release-notes).
+Check the displayed baseline and candidate times and percentage changes against
+the matched samples before publishing the changelog and downloadable charts.
 
 For requested repository updates, preserve raw artifacts and add new passes without overwriting historical evidence. Put interpretation, controls, exclusions and reproduction details in a new dated investigation under `docs/performance/investigations/`, registered using `docs/performance/README.md`. Preserve migrated prose and stable source hashes; record corrections in a new investigation. Keep future work and acceptance criteria in the owning GitHub issue; do not create a competing checklist. Analysis-only requests do not require rewriting documentation.
 

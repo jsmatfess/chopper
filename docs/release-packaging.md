@@ -213,8 +213,18 @@ Use the immediately prior published release as the baseline and the new
 release artifacts as the comparison. Verify that the comparison uses the
 same asset bytes as the published release. Run matched workloads, verify the
 outputs, and record both artifact identities, runtime, fixtures, resource
-settings, and measurement boundary. Show individual elapsed-time samples and
-medians or ranges. Include relevant controls, regressions, and resource graphs
-for effects such as temporary reads, writes, peak storage, and working
-reservations. Link the underlying observations and provide a text summary
-alongside the graphs.
+settings, and measurement boundary.
+
+For each matched workload, show the baseline and candidate total Run time in
+seconds on the elapsed-time chart, with the individual samples and medians or
+ranges. Show the percentage change within each pair using
+`100 × (candidate time − baseline time) / baseline time`. Label negative values
+as faster and show the paired median or range. If reporting a total across the
+suite, sum the same timed workload set for each release, exclude warmups, and
+compute the percentage from those totals. The changelog's text or table should
+give both elapsed times and the percentage change as well.
+
+Include relevant controls, regressions, and resource graphs for effects such as
+temporary reads, writes, peak storage, and working reservations. Link the
+underlying observations and verify the chart and changelog values against them
+before publishing.
