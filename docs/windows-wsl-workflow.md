@@ -137,6 +137,8 @@ Substitute the actual Windows checkout path. `doctor` reports native tool paths,
 versions, revision, dirty-path count and C++ Build Tools discovery, returning
 nonzero for missing prerequisites. It is a discovery check, not build acceptance;
 compile and run a native executable to verify linker/SDK/application-policy access.
+The MSVC CLI reserves a 4 MiB stack address range for nested CSV parsing and
+publication. Windows commits stack pages as needed.
 The launcher also accepts `python`, `node` and `npm`. All command arguments after
 the tool name are passed to that tool. Use Windows paths or paths relative to the
 Windows checkout in those arguments; `/mnt/c/...` is translated only for
