@@ -13,6 +13,60 @@ const types = {
   '.png': 'image/png',
   '.csv': 'text/csv; charset=utf-8',
 };
+
+async function checkLibraryLanguage(browser, origin, base) {
+  const url = origin + base + 'libraries';
+  const anchor = '#compose-inspect-and-replay';
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  try {
+    const picker = page.getByRole('group', { name: 'Example language' });
+    const radio = language => picker.getByRole('radio', { name: language });
+    const examples = language => page.locator(`[data-library-example="${language}"]`);
+    async function checkLanguage(language, other) {
+      await radio(language).waitFor();
+      assert.ok(await radio(language).isChecked());
+      assert.ok(await examples(language.toLowerCase()).count() > 0);
+      assert.equal(
+        await examples(language.toLowerCase()).filter({ visible: true }).count(),
+        await examples(language.toLowerCase()).count(),
+      );
+      assert.equal(await examples(other.toLowerCase()).filter({ visible: true }).count(), 0);
+    }
+
+    assert.equal((await page.goto(url + '?lang=python' + anchor))?.status(), 200);
+    await checkLanguage('Python', 'Rust');
+    await page.locator(anchor).waitFor();
+    await radio('Python').press('ArrowLeft');
+    await page.waitForURL(url + '?lang=rust' + anchor);
+    await checkLanguage('Rust', 'Python');
+    await page.reload();
+    await checkLanguage('Rust', 'Python');
+    await page.goto(url + '#python');
+    await checkLanguage('Python', 'Rust');
+    await page.goto(url);
+    await checkLanguage('Python', 'Rust');
+
+    await page.getByRole('button', { name: 'Search' }).first().click();
+    await page.getByRole('searchbox').fill('ExecutionControl');
+    await page.locator(`#localsearch-list a[href^="${base}libraries"]`).first().click();
+    await page.waitForURL(target => target.pathname === base + 'libraries' && target.hash.length > 1);
+    await checkLanguage('Python', 'Rust');
+  } finally {
+    await page.close();
+  }
+
+  const fallback = await browser.newPage({ javaScriptEnabled: false });
+  try {
+    await fallback.goto(url);
+    for (const language of ['rust', 'python']) {
+      await fallback.locator(`[data-library-example="${language}"]`).first().waitFor();
+    }
+    assert.equal(await fallback.getByRole('group', { name: 'Example language' }).count(), 0);
+  } finally {
+    await fallback.close();
+  }
+}
+
 let server;
 let browser;
 try {
@@ -128,6 +182,10 @@ try {
       const formulaResult = page.locator(`#localsearch-list a[href^="${base}formula-functions"]`).first();
       await formulaResult.click();
       await page.waitForURL(url => url.pathname === base + 'formula-functions' && url.hash.length > 1);
+    }
+    if (additionalPages.includes('libraries')) {
+      await checkLibraryLanguage(browser, origin, base);
+      console.log(`Verified ${version} library language choice, deep links, keyboard use, and search`);
     }
     console.log(`Verified ${version} landing, version navigation, sidebar anchors, deep link and search at ${origin}`);
   }

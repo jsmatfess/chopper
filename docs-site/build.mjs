@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { build, createMarkdownRenderer, disposeMdItInstance } from 'vitepress';
 import { checkSite } from './check.mjs';
 import { renderCliReference } from './cli-reference.mjs';
+import { renderLibraryGuide } from './library-guide.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const out = fileURLToPath(new URL('./dist', import.meta.url));
@@ -92,22 +93,25 @@ function rewriteLinks(md, tag, releasePages) {
   }
 }
 
-async function buildSidebar(source, documents) {
+async function preparePages(source, documents) {
   const renderer = await createMarkdownRenderer(source, {
     headers: { level: [2, 3] },
     highlight: () => '',
   });
   try {
-    const navigation = documents.map(({ name, text, markdown }) => {
+    const navigation = [];
+    for (const { name, text, markdown } of documents) {
       const link = name === 'index' ? '/' : `/${name}`;
       const env = { path: join(source, `${name}.md`) };
-      renderer.render(markdown, env);
+      const page = name === libraryPage[1] ? renderLibraryGuide(markdown, renderer.parse(markdown, env)) : markdown;
+      await writeFile(env.path, page);
+      renderer.render(page, env);
       const items = env.headers.map(heading => ({
         text: renderer.utils.escapeHtml(heading.title),
         link: link + heading.link,
       }));
-      return { name, text, link, items };
-    });
+      navigation.push({ name, text, link, items });
+    }
     // VitePress selects a sidebar by source path on each route change.
     return Object.fromEntries(navigation.map(current => {
       const items = navigation.map(({ name, text, link, items }) => (
@@ -152,12 +156,12 @@ try {
         ? renderCliReference(read(path).toString(), JSON.parse(read('docs/cli-reference-data.json')), version)
         : content(read(path).toString(), name),
     }));
-    for (const { name, markdown } of documents) {
-      await writeFile(join(source, `${name}.md`), markdown);
+    if (hasLibraries) {
+      await cp(new URL('./LibraryLanguage.vue', import.meta.url), join(source, 'LibraryLanguage.vue'));
     }
     await writeFile(join(source, 'workbench.png'), read(imagePath));
     await writeFile(join(source, 'public/customers.csv'), read(samplePath));
-    const sidebar = await buildSidebar(source, documents);
+    const sidebar = await preparePages(source, documents);
 
     await build(source, {
       onAfterConfigResolve(config) {
