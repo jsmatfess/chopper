@@ -2,7 +2,7 @@
   "schema_version": 1,
   "type": "derived_evidence_view_inventory",
   "scope": "Extraction coverage, not independent samples, passing test totals or comparison eligibility.",
-  "catalog_sha256": "c92654179ad465d06ef8add5171517a14271f84a928ac749d80bfbd9e32f568d",
+  "catalog_sha256": "8f16d51a73f4c4c70c56b94e3e377aab2ef50a85c3690a75ccdd20b9195e4981",
   "config_sha256": "73dcde6af2cd322260de2573074599124ea407374845e7330d74d8cf8697ea13",
   "adapter_sources": [
     {
@@ -5397,6 +5397,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-release-comparison-064-to-065.mjs",
+      "source_sha256": "54e4891fba8f6e36815ca1854a9bc2a40ad6604c39e3de65e2474b44665df60b",
+      "aliases": [
+        "docs/benchmarks/hosted-release-comparison-064-to-065.mjs"
+      ],
+      "format": "mjs",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/current-build-pages-deployment-2026-10-22.json",
       "source_sha256": "554746247a9c6f78a9a76095e31f95c4e67f98f765151e550d2f1bec68adab64",
       "aliases": [
@@ -10623,6 +10636,19 @@
       "coverage": "not-adapted"
     },
     {
+      "source": "docs/benchmarks/hosted-release-comparison-064-to-065.py",
+      "source_sha256": "a57c2ed03534692d3d59bb359b693ca25fdc355a90f38c282c761ee080ffe6b5",
+      "aliases": [
+        "docs/benchmarks/hosted-release-comparison-064-to-065.py"
+      ],
+      "format": "py",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/child-lineage-cross-runtime-validation-2026-10-22.json",
       "source_sha256": "a6341d600372126c1f1685dc87e370176c5228cfe48012c4d3f54728bc0979e8",
       "aliases": [
@@ -12944,6 +12970,19 @@
       "coverage": "adapted"
     },
     {
+      "source": "docs/benchmarks/0.6.5-performance-data.json",
+      "source_sha256": "c9579e4bcd1d5c2ea307874f297b5d649f68e6dad08e40267e16c803e4430bf3",
+      "aliases": [
+        "docs/benchmarks/0.6.5-performance-data.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
       "source": "docs/benchmarks/terminal-direct-matched-pressure-2026-11-21.json",
       "source_sha256": "c96b721fd938a58643b463ee18869108820f7e9f4f12296e1aec636aa84f1e2c",
       "aliases": [
@@ -14174,19 +14213,6 @@
       "coverage": "not-adapted"
     },
     {
-      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "source_sha256": "d9c46423a2b3d560ce2bd1a45a17ccc9cf7e1893899395184f5f7c7789621827",
-      "aliases": [
-        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
-      ],
-      "format": "json",
-      "layouts": [],
-      "observation_records": 0,
-      "validation_records": 0,
-      "classes": {},
-      "coverage": "not-adapted"
-    },
-    {
       "source": "docs/benchmarks/column-deserialize-linux-validation-2026-10-23.json",
       "source_sha256": "da2371bd117b902d1a0b79cd1827cbd2fc5ee862f5b5cc3cf9236ac8e83aa1ae",
       "aliases": [
@@ -14910,6 +14936,19 @@
       "source_sha256": "e3d78504813184da185a39770574bb417e8d817f7b57843e3f2094924e400766",
       "aliases": [
         "docs/benchmarks/job-manifest-validation-2026-10-21.json"
+      ],
+      "format": "json",
+      "layouts": [],
+      "observation_records": 0,
+      "validation_records": 0,
+      "classes": {},
+      "coverage": "not-adapted"
+    },
+    {
+      "source": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
+      "source_sha256": "e3ed411c464795eb68137ed74c9748152a163e51dd215729a975bfafa05d3874",
+      "aliases": [
+        "docs/benchmarks/strategy-corpus-review-2026-10-23.json"
       ],
       "format": "json",
       "layouts": [],

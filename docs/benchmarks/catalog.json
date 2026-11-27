@@ -3,7 +3,7 @@
   "scope": "Inventory and source locations; no inferred eligibility or pooled performance claims.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "82ad5779db4ade75f0a31994496f8841df0723fb32dcc277f4ee60c6d7a380e6"
+    "sha256": "76b1273c92c9f85f06670adac9bcb7734fa36c61664197da988ac9b7b49e8e81"
   },
   "experiments": [
     {
@@ -4854,6 +4854,21 @@
         "sha256": "386c2882fb6c6f61b377ec683f94df6913df4fe5e033edcfb28386544cb65985",
         "topic": "ownership-and-lifecycle"
       }
+    },
+    {
+      "title": "Hosted release comparison 0.6.4 to 0.6.5 (2026-11-26)",
+      "evidence": "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/0.6.5-performance-data.json",
+        "docs/benchmarks/hosted-release-comparison-064-to-065.mjs",
+        "docs/benchmarks/hosted-release-comparison-064-to-065.py"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-release-comparison-064-to-065-2026-11-26.md",
+        "sha256": "ed013902dca85e62f301abeda4fe5d33ea6277a6bfda3985b66de027569633ef",
+        "topic": "profiling"
+      }
     }
   ],
   "artifacts": [
@@ -4884,6 +4899,34 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#hosted-release-comparison-063-to-064-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/0.6.5-performance-data.json",
+      "sha256": "c9579e4bcd1d5c2ea307874f297b5d649f68e6dad08e40267e16c803e4430bf3",
+      "bytes": 177185,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "baseline",
+        "browser",
+        "comparison",
+        "input_hashes",
+        "metric_scopes",
+        "original_capture_sha256",
+        "resources",
+        "runtime",
+        "storage_scope",
+        "timing_scope",
+        "verified_pairs_per_workload",
+        "warmups_excluded_per_arm",
+        "workloads"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
       ]
     },
     {
@@ -20208,6 +20251,30 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#hosted-partition-shuffle-direct-output-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-release-comparison-064-to-065.mjs",
+      "sha256": "54e4891fba8f6e36815ca1854a9bc2a40ad6604c39e3de65e2474b44665df60b",
+      "bytes": 11130,
+      "format": "mjs",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
+      ]
+    },
+    {
+      "path": "docs/benchmarks/hosted-release-comparison-064-to-065.py",
+      "sha256": "a57c2ed03534692d3d59bb359b693ca25fdc355a90f38c282c761ee080ffe6b5",
+      "bytes": 5541,
+      "format": "py",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
       ]
     },
     {
@@ -39319,8 +39386,8 @@
     },
     {
       "path": "docs/benchmarks/strategy-corpus-review-2026-10-23.json",
-      "sha256": "d9c46423a2b3d560ce2bd1a45a17ccc9cf7e1893899395184f5f7c7789621827",
-      "bytes": 1845825,
+      "sha256": "e3ed411c464795eb68137ed74c9748152a163e51dd215729a975bfafa05d3874",
+      "bytes": 1849045,
       "format": "json",
       "record_counts": {
         "derived_strategy_corpus_audit": 1
@@ -43756,7 +43823,7 @@
   ],
   "narrative_manifest": {
     "path": "docs/performance/narratives.v1.json",
-    "sha256": "e24db2bc727be535bc45b4312a95990c43a22f1a208f7c1ff9ddbd1f23ffbd26"
+    "sha256": "961525ea1f4f10fc501e445a24ccd9ab275f8a9db576b56f97a677c0f85f46ef"
   },
   "archive_registry": {
     "path": "docs/evidence-registry.v1.json",

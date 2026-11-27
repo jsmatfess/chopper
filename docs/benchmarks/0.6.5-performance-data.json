@@ -1,0 +1,5893 @@
+{
+  "baseline": {
+    "version": "v0.6.4",
+    "tag_commit": "fc85297a41d24eb558daecf8ead9b40a816328e1",
+    "hosted_zip_sha256": "0266b124b60438f01789928d1efcadf958ff3c547c955b494b36283c2346a543",
+    "assets_sha256": {
+      "_headers": "46b995e0cbdc5627d6fa68f94b293f929b5bd3ce90d58ab8a8837ecc7da679a0",
+      "app.js": "efc5508aa518069d360ae88ea3083d71d1d432d0a50144be34f0b1c345aa2c2a",
+      "engine-worker.js": "59cdd1990b3177aba8f79972158e58c218d2c31ec978f194429287a5daa50770",
+      "engine.wasm": "032968f7d0a9933940dd2e46d9f7a233f95dcdc30320cfc7a6b903a75fdf7c74",
+      "index.html": "afc6bcf3eeabd4af59d26124d7c9d2e33694ed814f79a7038fb69949df1b8d6d",
+      "storage-worker.js": "a357a9e3e8d3ba21c2e9c08f143712f56f1deb5357c1d93454002950c94ab0ac",
+      "style.css": "19458d8d27254da4f192c19b792536d9716ab56d66f994af9a31fe978dd5560b"
+    }
+  },
+  "comparison": {
+    "version": "v0.6.5",
+    "measurement_build_commit": "2ce001a7a766ea5a1ee2f94fb8229cecf16ffc85",
+    "assets_sha256": {
+      "_headers": "46b995e0cbdc5627d6fa68f94b293f929b5bd3ce90d58ab8a8837ecc7da679a0",
+      "app.js": "53133ada264cbe11f056c8c8ccca4db45d258e2784cf32b55d1d7150d9dbf1ef",
+      "engine-worker.js": "641661ee03afed5c58c1c238857cf1a5c8ca84c16d882fe6aff6c23b20bb9977",
+      "engine.wasm": "5d88c59aac265b8675edf3290f3823b0175001c344ead0654ee3c3b55e979b69",
+      "index.html": "bc93c4f7a581bab3da357c22c026dc54f6c327cb2f3cf19a2775866ccafe920a",
+      "storage-worker.js": "a357a9e3e8d3ba21c2e9c08f143712f56f1deb5357c1d93454002950c94ab0ac",
+      "style.css": "19458d8d27254da4f192c19b792536d9716ab56d66f994af9a31fe978dd5560b"
+    }
+  },
+  "timing_scope": "Run request through completion marker and worker retirement, excludes independent export copy/verification",
+  "storage_scope": "persistent disposable bundled Chromium profile per cell; input copied to OPFS outside Run timer; warm uncontrolled WSL2 caches",
+  "browser": {
+    "version": "156.0.8078.4",
+    "sha256": "4fa61f0ba0b4f89b7bec242c32ca16d3bccf69dbfef0651924a9ba8fede5f9d6"
+  },
+  "runtime": {
+    "kernel": "6.18.33.1-microsoft-standard-WSL2",
+    "node": "v22.23.4",
+    "host_logical_cpus": 16,
+    "host_memory_bytes": 67387371520
+  },
+  "warmups_excluded_per_arm": 1,
+  "verified_pairs_per_workload": 3,
+  "resources": {
+    "workers": 1,
+    "compression": "none",
+    "grouping": "auto",
+    "max_record_bytes": 1048576
+  },
+  "metric_scopes": {
+    "temporary_bytes_read": "Chopper-tracked logical temporary bytes read",
+    "temporary_bytes_written": "Chopper-tracked logical temporary bytes written",
+    "peak_temp_bytes": "Peak Chopper-tracked temporary storage bytes",
+    "peak_workspace_reserved_bytes": "Peak tracked engine working-reservation bytes"
+  },
+  "input_hashes": {
+    "compare-hosted.mjs": "54e4891fba8f6e36815ca1854a9bc2a40ad6604c39e3de65e2474b44665df60b",
+    "benchmark-swarm.ts": "b39f008342d474d62211f4d723969eebbe0015f61ff909873d2f8eda25e2735d",
+    "driver.js": "847e5cce31daca16243f466dea3ab8d483c3c2d50a99b959f615b20bc6e28dcb",
+    "verify-hosted-comparison.py": "a57c2ed03534692d3d59bb359b693ca25fdc355a90f38c282c761ee080ffe6b5"
+  },
+  "original_capture_sha256": "aba5dd24fba814adbc7d1cc767463d90607fe062f6117ae8e7a75df3baf70d05",
+  "workloads": {
+    "partition-then-shuffle": {
+      "label": "Partition → Uniform shuffle",
+      "recipe": {
+        "id": "partition-then-shuffle",
+        "operations": [
+          {
+            "type": "partition",
+            "columns": [
+              "key"
+            ]
+          },
+          {
+            "type": "shuffle",
+            "strategy": "uniform"
+          }
+        ],
+        "rows": 627003,
+        "widths": [
+          245,
+          411,
+          700
+        ],
+        "byteCap": 8388608,
+        "memory": 96,
+        "keys": 13,
+        "pairs": 3,
+        "skewEvery": 9,
+        "route": {
+          "baseline": "snapshot",
+          "candidate": "private_terminal"
+        }
+      },
+      "fixture_bytes": 292072303,
+      "fixture_sha256": "01c0fb36caa58baa59184a25dc360f11378a4e6659b86cfc5b5fed12c74bfe68",
+      "samples": {
+        "baseline": [
+          {
+            "source_line": 5,
+            "variant": "baseline",
+            "pair": 0,
+            "seconds": 8.335739999994635,
+            "verification": {
+              "rows": 627003,
+              "groups": 13,
+              "files": 45,
+              "csv_bytes": 292072963,
+              "ordered_csv_sha256": "d99fc902efa8ff03fad2836ad9233777519c6da3a2f955cdc0677d742cfe21f9",
+              "shuffle_descents": 313640,
+              "marker": {
+                "complete": true,
+                "files": 46,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 651765294,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 13,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 651868529,
+            "temporary_bytes_written": 651868529,
+            "peak_workspace_reserved_bytes": 25457247,
+            "sort_runs": 17,
+            "merge_operations": 1,
+            "source_read_calls": 1115,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 8,
+            "variant": "baseline",
+            "pair": 1,
+            "seconds": 8.26017499999702,
+            "verification": {
+              "rows": 627003,
+              "groups": 13,
+              "files": 45,
+              "csv_bytes": 292072963,
+              "ordered_csv_sha256": "c7f7d686203d5c6a7af2e766840a21cc592409d25e81b367110a616934ef43a2",
+              "shuffle_descents": 312766,
+              "marker": {
+                "complete": true,
+                "files": 46,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 651769434,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 13,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 651868529,
+            "temporary_bytes_written": 651868529,
+            "peak_workspace_reserved_bytes": 25457247,
+            "sort_runs": 17,
+            "merge_operations": 1,
+            "source_read_calls": 1115,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 9,
+            "variant": "baseline",
+            "pair": 2,
+            "seconds": 8.203,
+            "verification": {
+              "rows": 627003,
+              "groups": 13,
+              "files": 45,
+              "csv_bytes": 292072963,
+              "ordered_csv_sha256": "d38b6a3b9db3eafd86809444a5982ac58e1750e0f39afbb6023749effc6aad80",
+              "shuffle_descents": 313697,
+              "marker": {
+                "complete": true,
+                "files": 46,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 651769950,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 13,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 651868529,
+            "temporary_bytes_written": 651868529,
+            "peak_workspace_reserved_bytes": 25457247,
+            "sort_runs": 17,
+            "merge_operations": 1,
+            "source_read_calls": 1115,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ],
+        "candidate": [
+          {
+            "source_line": 6,
+            "variant": "candidate",
+            "pair": 0,
+            "seconds": 7.334454999998212,
+            "verification": {
+              "rows": 627003,
+              "groups": 13,
+              "files": 45,
+              "csv_bytes": 292072963,
+              "ordered_csv_sha256": "7f1dda1590031c8e1f9ab6a493c31711c55c439bef642ef4325edc1d7b6a0763",
+              "shuffle_descents": 313627,
+              "marker": {
+                "complete": true,
+                "files": 46,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 359796802,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "private_terminal",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 13,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 359797285,
+            "temporary_bytes_written": 359797285,
+            "peak_workspace_reserved_bytes": 25457247,
+            "sort_runs": 17,
+            "merge_operations": 1,
+            "source_read_calls": 1115,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 7,
+            "variant": "candidate",
+            "pair": 1,
+            "seconds": 7.431620000004768,
+            "verification": {
+              "rows": 627003,
+              "groups": 13,
+              "files": 45,
+              "csv_bytes": 292072963,
+              "ordered_csv_sha256": "013c77201df3c9a32a67be6a281791eb7e5919d49ad81fbf3923347cdb8cb48c",
+              "shuffle_descents": 313430,
+              "marker": {
+                "complete": true,
+                "files": 46,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 359796802,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "private_terminal",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 13,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 359797285,
+            "temporary_bytes_written": 359797285,
+            "peak_workspace_reserved_bytes": 25457247,
+            "sort_runs": 17,
+            "merge_operations": 1,
+            "source_read_calls": 1115,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 10,
+            "variant": "candidate",
+            "pair": 2,
+            "seconds": 7.3745999999940395,
+            "verification": {
+              "rows": 627003,
+              "groups": 13,
+              "files": 45,
+              "csv_bytes": 292072963,
+              "ordered_csv_sha256": "8a74cf7a9118b24b5f571322dd1648793b09950552675ad2397bbd978698e618",
+              "shuffle_descents": 313482,
+              "marker": {
+                "complete": true,
+                "files": 46,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 359796802,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "private_terminal",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 13,
+                "output_groups": 13,
+                "smallest_group": 5805,
+                "largest_group": 557336,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 359797285,
+            "temporary_bytes_written": 359797285,
+            "peak_workspace_reserved_bytes": 25457247,
+            "sort_runs": 17,
+            "merge_operations": 1,
+            "source_read_calls": 1115,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 627003,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ]
+      },
+      "excluded_warmups": [
+        {
+          "source_line": 3,
+          "variant": "candidate",
+          "pair": -1,
+          "seconds": 7.58107500000298,
+          "verification": {
+            "rows": 627003,
+            "groups": 13,
+            "files": 45,
+            "csv_bytes": 292072963,
+            "ordered_csv_sha256": "873dcbc684cf7688c05a59d8cd66f6522f1487afb93cb80dd7de76c01fdacdbb",
+            "shuffle_descents": 313089,
+            "marker": {
+              "complete": true,
+              "files": 46,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 359796802,
+          "effective_memory_bytes": 100663296,
+          "physical_plan": "private_terminal",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 13,
+              "smallest_group": 5805,
+              "largest_group": 557336,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 13,
+              "output_groups": 13,
+              "smallest_group": 5805,
+              "largest_group": 557336,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 359797285,
+          "temporary_bytes_written": 359797285,
+          "peak_workspace_reserved_bytes": 25457247,
+          "sort_runs": 17,
+          "merge_operations": 1,
+          "source_read_calls": 1115,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 627003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "spill",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 627003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "merge_traversal",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 627003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "grouping",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 627003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 627003,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        },
+        {
+          "source_line": 4,
+          "variant": "baseline",
+          "pair": -1,
+          "seconds": 8.222704999998212,
+          "verification": {
+            "rows": 627003,
+            "groups": 13,
+            "files": 45,
+            "csv_bytes": 292072963,
+            "ordered_csv_sha256": "62b2cc67a31360973686437ec72634dee5e7ae47f9a02eb76999871c91a16430",
+            "shuffle_descents": 313510,
+            "marker": {
+              "complete": true,
+              "files": 46,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 651763737,
+          "effective_memory_bytes": 100663296,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 13,
+              "smallest_group": 5805,
+              "largest_group": 557336,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 13,
+              "output_groups": 13,
+              "smallest_group": 5805,
+              "largest_group": 557336,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 651868529,
+          "temporary_bytes_written": 651868529,
+          "peak_workspace_reserved_bytes": 25457247,
+          "sort_runs": 17,
+          "merge_operations": 1,
+          "source_read_calls": 1115,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 627003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "spill",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 627003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "merge_traversal",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 627003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "grouping",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 627003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 627003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        }
+      ],
+      "paired_seconds_saved": [
+        1.0012849999964226,
+        0.8285549999922512,
+        0.8284000000059599
+      ]
+    },
+    "shuffle-then-partition": {
+      "label": "Auto shuffle → Partition",
+      "recipe": {
+        "id": "shuffle-then-partition",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "auto"
+          },
+          {
+            "type": "partition",
+            "columns": [
+              "key"
+            ]
+          }
+        ],
+        "rows": 629003,
+        "widths": [
+          150,
+          413,
+          671
+        ],
+        "byteCap": 8388608,
+        "memory": 96,
+        "keys": 13,
+        "pairs": 3,
+        "skewEvery": 8,
+        "route": {
+          "baseline": "snapshot",
+          "candidate": "private_terminal"
+        }
+      },
+      "fixture_bytes": 267424588,
+      "fixture_sha256": "634172766cfaedab669b682b83eb6e88bd206c2f05864f060e8f88fbeb058f90",
+      "samples": {
+        "baseline": [
+          {
+            "source_line": 14,
+            "variant": "baseline",
+            "pair": 0,
+            "seconds": 7.566555000007153,
+            "verification": {
+              "rows": 629003,
+              "groups": 13,
+              "files": 40,
+              "csv_bytes": 267425173,
+              "ordered_csv_sha256": "dc4e96e4fa3ad0a07def6f6f11ab1936621308adacd21d4b0e0cfd543cb793e0",
+              "shuffle_descents": 314449,
+              "marker": {
+                "complete": true,
+                "files": 41,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 602724457,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 629003,
+                "largest_group": 629003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 6552,
+                "largest_group": 550377,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 603090325,
+            "temporary_bytes_written": 602788239,
+            "peak_workspace_reserved_bytes": 25454369,
+            "sort_runs": 16,
+            "merge_operations": 1,
+            "source_read_calls": 1021,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 17,
+            "variant": "baseline",
+            "pair": 1,
+            "seconds": 7.559544999986887,
+            "verification": {
+              "rows": 629003,
+              "groups": 13,
+              "files": 40,
+              "csv_bytes": 267425173,
+              "ordered_csv_sha256": "18d19a2a9a370b65e942ab4cdcce8a98f183ddf4fdfcb51c871080cc50fb58c9",
+              "shuffle_descents": 314167,
+              "marker": {
+                "complete": true,
+                "files": 41,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 602730419,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 629003,
+                "largest_group": 629003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 6552,
+                "largest_group": 550377,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 603090325,
+            "temporary_bytes_written": 602788239,
+            "peak_workspace_reserved_bytes": 25454369,
+            "sort_runs": 16,
+            "merge_operations": 1,
+            "source_read_calls": 1021,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 18,
+            "variant": "baseline",
+            "pair": 2,
+            "seconds": 7.54357500000298,
+            "verification": {
+              "rows": 629003,
+              "groups": 13,
+              "files": 40,
+              "csv_bytes": 267425173,
+              "ordered_csv_sha256": "8032fc6cbd71f7608cbb08561516fe0b9e537b4ca0018c69bcb37b6bc69773ea",
+              "shuffle_descents": 314226,
+              "marker": {
+                "complete": true,
+                "files": 41,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 602727864,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 629003,
+                "largest_group": 629003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 6552,
+                "largest_group": 550377,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 603090325,
+            "temporary_bytes_written": 602788239,
+            "peak_workspace_reserved_bytes": 25454369,
+            "sort_runs": 16,
+            "merge_operations": 1,
+            "source_read_calls": 1021,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ],
+        "candidate": [
+          {
+            "source_line": 15,
+            "variant": "candidate",
+            "pair": 0,
+            "seconds": 6.8917250000089405,
+            "verification": {
+              "rows": 629003,
+              "groups": 13,
+              "files": 40,
+              "csv_bytes": 267425173,
+              "ordered_csv_sha256": "e75ce7c4f6f3b710107f64ad06b564e106a1ffab05db12081949eeb461890c66",
+              "shuffle_descents": 314269,
+              "marker": {
+                "complete": true,
+                "files": 41,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 335356897,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "private_terminal",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 629003,
+                "largest_group": 629003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 6552,
+                "largest_group": 550377,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 335364605,
+            "temporary_bytes_written": 335364605,
+            "peak_workspace_reserved_bytes": 25454369,
+            "sort_runs": 16,
+            "merge_operations": 1,
+            "source_read_calls": 1021,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 16,
+            "variant": "candidate",
+            "pair": 1,
+            "seconds": 6.81877500000596,
+            "verification": {
+              "rows": 629003,
+              "groups": 13,
+              "files": 40,
+              "csv_bytes": 267425173,
+              "ordered_csv_sha256": "22e7f24c2bcba745dea8df5d5b9a0b257318748890c639e204a93b664c7ac07a",
+              "shuffle_descents": 314274,
+              "marker": {
+                "complete": true,
+                "files": 41,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 335356897,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "private_terminal",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 629003,
+                "largest_group": 629003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 6552,
+                "largest_group": 550377,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 335364605,
+            "temporary_bytes_written": 335364605,
+            "peak_workspace_reserved_bytes": 25454369,
+            "sort_runs": 16,
+            "merge_operations": 1,
+            "source_read_calls": 1021,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 19,
+            "variant": "candidate",
+            "pair": 2,
+            "seconds": 6.786214999988675,
+            "verification": {
+              "rows": 629003,
+              "groups": 13,
+              "files": 40,
+              "csv_bytes": 267425173,
+              "ordered_csv_sha256": "62e3b35682355f91d082586f2cb52b3f2fb81366ad3a59348fc2a57cb1a6190b",
+              "shuffle_descents": 314253,
+              "marker": {
+                "complete": true,
+                "files": 41,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 335356897,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "private_terminal",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 629003,
+                "largest_group": 629003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 6552,
+                "largest_group": 550377,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 335364605,
+            "temporary_bytes_written": 335364605,
+            "peak_workspace_reserved_bytes": 25454369,
+            "sort_runs": 16,
+            "merge_operations": 1,
+            "source_read_calls": 1021,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 629003,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ]
+      },
+      "excluded_warmups": [
+        {
+          "source_line": 12,
+          "variant": "candidate",
+          "pair": -1,
+          "seconds": 6.846415000006557,
+          "verification": {
+            "rows": 629003,
+            "groups": 13,
+            "files": 40,
+            "csv_bytes": 267425173,
+            "ordered_csv_sha256": "ac376c07162b40f2df22dcfbfcc96ae6bdb468c2bf51d5dac7bbe469de232781",
+            "shuffle_descents": 314492,
+            "marker": {
+              "complete": true,
+              "files": 41,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 335356897,
+          "effective_memory_bytes": 100663296,
+          "physical_plan": "private_terminal",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 1,
+              "smallest_group": 629003,
+              "largest_group": 629003,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 1,
+              "output_groups": 13,
+              "smallest_group": 6552,
+              "largest_group": 550377,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 335364605,
+          "temporary_bytes_written": 335364605,
+          "peak_workspace_reserved_bytes": 25454369,
+          "sort_runs": 16,
+          "merge_operations": 1,
+          "source_read_calls": 1021,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 629003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "spill",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 629003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "merge_traversal",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 629003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "grouping",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 629003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 629003,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        },
+        {
+          "source_line": 13,
+          "variant": "baseline",
+          "pair": -1,
+          "seconds": 7.520469999998808,
+          "verification": {
+            "rows": 629003,
+            "groups": 13,
+            "files": 40,
+            "csv_bytes": 267425173,
+            "ordered_csv_sha256": "82c0457a1ba888df64788dfd23dafa149b775b5062e1afedcccccde949d24f9d",
+            "shuffle_descents": 314704,
+            "marker": {
+              "complete": true,
+              "files": 41,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 602732557,
+          "effective_memory_bytes": 100663296,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 1,
+              "smallest_group": 629003,
+              "largest_group": 629003,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 1,
+              "output_groups": 13,
+              "smallest_group": 6552,
+              "largest_group": 550377,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 603090325,
+          "temporary_bytes_written": 602788239,
+          "peak_workspace_reserved_bytes": 25454369,
+          "sort_runs": 16,
+          "merge_operations": 1,
+          "source_read_calls": 1021,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 629003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "spill",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 629003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "merge_traversal",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 629003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "grouping",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 629003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 629003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        }
+      ],
+      "paired_seconds_saved": [
+        0.6748299999982121,
+        0.7407699999809267,
+        0.7573600000143053
+      ]
+    },
+    "shuffle-then-balanced": {
+      "label": "Uniform shuffle → Balanced",
+      "recipe": {
+        "id": "shuffle-then-balanced",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "uniform"
+          },
+          {
+            "type": "balanced",
+            "files": 18
+          }
+        ],
+        "rows": 614003,
+        "widths": [
+          130,
+          365,
+          608
+        ],
+        "byteCap": 16777216,
+        "memory": 96,
+        "keys": 13,
+        "pairs": 3,
+        "route": {
+          "baseline": "snapshot",
+          "candidate": "private_terminal"
+        }
+      },
+      "fixture_bytes": 234233143,
+      "fixture_sha256": "d08895c9f40dd97c574af9155d7e0c72c6013bf33c973d00f25319d315138df6",
+      "samples": {
+        "baseline": [
+          {
+            "source_line": 23,
+            "variant": "baseline",
+            "pair": 0,
+            "seconds": 6.353390000000596,
+            "verification": {
+              "rows": 614003,
+              "groups": 18,
+              "files": 18,
+              "csv_bytes": 234233398,
+              "ordered_csv_sha256": "95951c5dbfe3d16d3accd972470d8a195f1427d7eee8c2af02e696ded4890761",
+              "shuffle_descents": 307101,
+              "marker": {
+                "complete": true,
+                "files": 19,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 510737807,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 614003,
+                "largest_group": 614003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 18,
+                "smallest_group": 34111,
+                "largest_group": 34112,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 510835274,
+            "temporary_bytes_written": 510835274,
+            "peak_workspace_reserved_bytes": 25370121,
+            "sort_runs": 19,
+            "merge_operations": 1,
+            "source_read_calls": 894,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 0,
+                "status": "interrupted"
+              },
+              {
+                "kind": "fused_balanced",
+                "operations": [
+                  2
+                ],
+                "rows": 614003,
+                "groups": 18,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 26,
+            "variant": "baseline",
+            "pair": 1,
+            "seconds": 6.346765000000596,
+            "verification": {
+              "rows": 614003,
+              "groups": 18,
+              "files": 18,
+              "csv_bytes": 234233398,
+              "ordered_csv_sha256": "af67dd977952a7a3ae9e902fbbb5a0ec9c150f2be4c26a8dca7269aa89c71e70",
+              "shuffle_descents": 307037,
+              "marker": {
+                "complete": true,
+                "files": 19,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 510737393,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 614003,
+                "largest_group": 614003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 18,
+                "smallest_group": 34111,
+                "largest_group": 34112,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 510835274,
+            "temporary_bytes_written": 510835274,
+            "peak_workspace_reserved_bytes": 25370121,
+            "sort_runs": 19,
+            "merge_operations": 1,
+            "source_read_calls": 894,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 0,
+                "status": "interrupted"
+              },
+              {
+                "kind": "fused_balanced",
+                "operations": [
+                  2
+                ],
+                "rows": 614003,
+                "groups": 18,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 27,
+            "variant": "baseline",
+            "pair": 2,
+            "seconds": 6.399415000006557,
+            "verification": {
+              "rows": 614003,
+              "groups": 18,
+              "files": 18,
+              "csv_bytes": 234233398,
+              "ordered_csv_sha256": "ddaade4ae10b01e0de7981215215c81f7123bd2197438760562735d4562d0fff",
+              "shuffle_descents": 306670,
+              "marker": {
+                "complete": true,
+                "files": 19,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 510744089,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 614003,
+                "largest_group": 614003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 18,
+                "smallest_group": 34111,
+                "largest_group": 34112,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 510835274,
+            "temporary_bytes_written": 510835274,
+            "peak_workspace_reserved_bytes": 25370121,
+            "sort_runs": 19,
+            "merge_operations": 1,
+            "source_read_calls": 894,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 0,
+                "status": "interrupted"
+              },
+              {
+                "kind": "fused_balanced",
+                "operations": [
+                  2
+                ],
+                "rows": 614003,
+                "groups": 18,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ],
+        "candidate": [
+          {
+            "source_line": 24,
+            "variant": "candidate",
+            "pair": 0,
+            "seconds": 5.751545000001788,
+            "verification": {
+              "rows": 614003,
+              "groups": 18,
+              "files": 18,
+              "csv_bytes": 234233398,
+              "ordered_csv_sha256": "4c634771773a186978bcdb2a414e8ea6b420147b0f1720467658054485d1f25c",
+              "shuffle_descents": 306934,
+              "marker": {
+                "complete": true,
+                "files": 19,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 276599335,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "private_terminal",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 614003,
+                "largest_group": 614003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 18,
+                "smallest_group": 34111,
+                "largest_group": 34112,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 276602647,
+            "temporary_bytes_written": 276602647,
+            "peak_workspace_reserved_bytes": 25370121,
+            "sort_runs": 19,
+            "merge_operations": 1,
+            "source_read_calls": 894,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 0,
+                "status": "interrupted"
+              },
+              {
+                "kind": "fused_balanced",
+                "operations": [
+                  2
+                ],
+                "rows": 614003,
+                "groups": 18,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 25,
+            "variant": "candidate",
+            "pair": 1,
+            "seconds": 5.7030049999952315,
+            "verification": {
+              "rows": 614003,
+              "groups": 18,
+              "files": 18,
+              "csv_bytes": 234233398,
+              "ordered_csv_sha256": "b73cbdf7aa4db7d34978a4a0edbcee368fc3695432cce2ef0c29553e0b23055e",
+              "shuffle_descents": 307271,
+              "marker": {
+                "complete": true,
+                "files": 19,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 276599335,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "private_terminal",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 614003,
+                "largest_group": 614003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 18,
+                "smallest_group": 34111,
+                "largest_group": 34112,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 276602647,
+            "temporary_bytes_written": 276602647,
+            "peak_workspace_reserved_bytes": 25370121,
+            "sort_runs": 19,
+            "merge_operations": 1,
+            "source_read_calls": 894,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 0,
+                "status": "interrupted"
+              },
+              {
+                "kind": "fused_balanced",
+                "operations": [
+                  2
+                ],
+                "rows": 614003,
+                "groups": 18,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 28,
+            "variant": "candidate",
+            "pair": 2,
+            "seconds": 5.768980000004173,
+            "verification": {
+              "rows": 614003,
+              "groups": 18,
+              "files": 18,
+              "csv_bytes": 234233398,
+              "ordered_csv_sha256": "3f426ae83aca99aa6f2e1fd7909282da60de59e740537e7017cb0319e421e78f",
+              "shuffle_descents": 306802,
+              "marker": {
+                "complete": true,
+                "files": 19,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 276599335,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "private_terminal",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 614003,
+                "largest_group": 614003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 18,
+                "smallest_group": 34111,
+                "largest_group": 34112,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 276602647,
+            "temporary_bytes_written": 276602647,
+            "peak_workspace_reserved_bytes": 25370121,
+            "sort_runs": 19,
+            "merge_operations": 1,
+            "source_read_calls": 894,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 0,
+                "status": "interrupted"
+              },
+              {
+                "kind": "fused_balanced",
+                "operations": [
+                  2
+                ],
+                "rows": 614003,
+                "groups": 18,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 614003,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ]
+      },
+      "excluded_warmups": [
+        {
+          "source_line": 21,
+          "variant": "candidate",
+          "pair": -1,
+          "seconds": 5.6877150000035765,
+          "verification": {
+            "rows": 614003,
+            "groups": 18,
+            "files": 18,
+            "csv_bytes": 234233398,
+            "ordered_csv_sha256": "ca3dd4f9477ec7bfab769ad4ffeba07433d235eb4e1942ff7501c522ee7be0d8",
+            "shuffle_descents": 307018,
+            "marker": {
+              "complete": true,
+              "files": 19,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 276599335,
+          "effective_memory_bytes": 100663296,
+          "physical_plan": "private_terminal",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 1,
+              "smallest_group": 614003,
+              "largest_group": 614003,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 1,
+              "output_groups": 18,
+              "smallest_group": 34111,
+              "largest_group": 34112,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 276602647,
+          "temporary_bytes_written": 276602647,
+          "peak_workspace_reserved_bytes": 25370121,
+          "sort_runs": 19,
+          "merge_operations": 1,
+          "source_read_calls": 894,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 614003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "spill",
+              "operations": [
+                1
+              ],
+              "rows": 614003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "merge_traversal",
+              "operations": [
+                1
+              ],
+              "rows": 0,
+              "groups": 0,
+              "status": "interrupted"
+            },
+            {
+              "kind": "fused_balanced",
+              "operations": [
+                2
+              ],
+              "rows": 614003,
+              "groups": 18,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 614003,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        },
+        {
+          "source_line": 22,
+          "variant": "baseline",
+          "pair": -1,
+          "seconds": 6.3281899999976154,
+          "verification": {
+            "rows": 614003,
+            "groups": 18,
+            "files": 18,
+            "csv_bytes": 234233398,
+            "ordered_csv_sha256": "5bd0e6774ab4383f9ab033bef749f4e5a8a37a60c2a96c410a5aafa8be028cf5",
+            "shuffle_descents": 306865,
+            "marker": {
+              "complete": true,
+              "files": 19,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 510737393,
+          "effective_memory_bytes": 100663296,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 1,
+              "smallest_group": 614003,
+              "largest_group": 614003,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 1,
+              "output_groups": 18,
+              "smallest_group": 34111,
+              "largest_group": 34112,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 510835274,
+          "temporary_bytes_written": 510835274,
+          "peak_workspace_reserved_bytes": 25370121,
+          "sort_runs": 19,
+          "merge_operations": 1,
+          "source_read_calls": 894,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 614003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "spill",
+              "operations": [
+                1
+              ],
+              "rows": 614003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "merge_traversal",
+              "operations": [
+                1
+              ],
+              "rows": 0,
+              "groups": 0,
+              "status": "interrupted"
+            },
+            {
+              "kind": "fused_balanced",
+              "operations": [
+                2
+              ],
+              "rows": 614003,
+              "groups": 18,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 614003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        }
+      ],
+      "paired_seconds_saved": [
+        0.601844999998808,
+        0.6437600000053649,
+        0.6304350000023842
+      ]
+    },
+    "uniform-read-ahead": {
+      "label": "Uniform shuffle · read-ahead",
+      "recipe": {
+        "id": "uniform-read-ahead",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "uniform"
+          }
+        ],
+        "rows": 777003,
+        "widths": [
+          140,
+          410,
+          599
+        ],
+        "byteCap": 8388608,
+        "memory": 96,
+        "keys": 13,
+        "pairs": 3,
+        "prefetch": true
+      },
+      "fixture_bytes": 308359096,
+      "fixture_sha256": "ed8f0d8750e99a358d689319f8c00640e396063ad017662270d1aa1e3cc86ca9",
+      "samples": {
+        "baseline": [
+          {
+            "source_line": 32,
+            "variant": "baseline",
+            "pair": 0,
+            "seconds": 8.416015000000597,
+            "verification": {
+              "rows": 777003,
+              "groups": 1,
+              "files": 37,
+              "csv_bytes": 308359636,
+              "ordered_csv_sha256": "ad536ce50ab9d6ae5f7c1b6a57ee9f85e5b95bf91ac1a14bcb55da6459e98ac8",
+              "shuffle_descents": 388335,
+              "marker": {
+                "complete": true,
+                "files": 38,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 670222779,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 777003,
+                "largest_group": 777003,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 670336437,
+            "temporary_bytes_written": 670336437,
+            "peak_workspace_reserved_bytes": 24497438,
+            "sort_runs": 24,
+            "merge_operations": 1,
+            "source_read_calls": 1177,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  2
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 35,
+            "variant": "baseline",
+            "pair": 1,
+            "seconds": 8.417145000010729,
+            "verification": {
+              "rows": 777003,
+              "groups": 1,
+              "files": 37,
+              "csv_bytes": 308359636,
+              "ordered_csv_sha256": "a3ff0a479c17ba1836ad95658d4b10cec0a6efdad73877a20cedf7fc56cf2a06",
+              "shuffle_descents": 388511,
+              "marker": {
+                "complete": true,
+                "files": 38,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 670234405,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 777003,
+                "largest_group": 777003,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 670336437,
+            "temporary_bytes_written": 670336437,
+            "peak_workspace_reserved_bytes": 24497438,
+            "sort_runs": 24,
+            "merge_operations": 1,
+            "source_read_calls": 1177,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  2
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 36,
+            "variant": "baseline",
+            "pair": 2,
+            "seconds": 8.475930000007153,
+            "verification": {
+              "rows": 777003,
+              "groups": 1,
+              "files": 37,
+              "csv_bytes": 308359636,
+              "ordered_csv_sha256": "c6c8e4e54922ae9375b7132c71b31b46ac590888844c935e8098f67d70c302ec",
+              "shuffle_descents": 388449,
+              "marker": {
+                "complete": true,
+                "files": 38,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 670238237,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 777003,
+                "largest_group": 777003,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 670336437,
+            "temporary_bytes_written": 670336437,
+            "peak_workspace_reserved_bytes": 24497438,
+            "sort_runs": 24,
+            "merge_operations": 1,
+            "source_read_calls": 1177,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  2
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ],
+        "candidate": [
+          {
+            "source_line": 33,
+            "variant": "candidate",
+            "pair": 0,
+            "seconds": 7.483255000010133,
+            "verification": {
+              "rows": 777003,
+              "groups": 1,
+              "files": 37,
+              "csv_bytes": 308359636,
+              "ordered_csv_sha256": "b71be4a45bbd28635dc4789e07cb16a811588bf56ccd668eb20259beed1c1ef5",
+              "shuffle_descents": 388786,
+              "marker": {
+                "complete": true,
+                "files": 38,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 670232740,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 777003,
+                "largest_group": 777003,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 670336437,
+            "temporary_bytes_written": 670336437,
+            "peak_workspace_reserved_bytes": 24497438,
+            "sort_runs": 24,
+            "merge_operations": 1,
+            "source_read_calls": 1,
+            "source_prefetch_requests": 1176,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  2
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 34,
+            "variant": "candidate",
+            "pair": 1,
+            "seconds": 7.411854999989271,
+            "verification": {
+              "rows": 777003,
+              "groups": 1,
+              "files": 37,
+              "csv_bytes": 308359636,
+              "ordered_csv_sha256": "bd2e0a802a163e31699927663c3181b68a068223d26ced3c68d5e723af11d6ee",
+              "shuffle_descents": 388447,
+              "marker": {
+                "complete": true,
+                "files": 38,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 670229324,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 777003,
+                "largest_group": 777003,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 670336437,
+            "temporary_bytes_written": 670336437,
+            "peak_workspace_reserved_bytes": 24497438,
+            "sort_runs": 24,
+            "merge_operations": 1,
+            "source_read_calls": 1,
+            "source_prefetch_requests": 1176,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  2
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 37,
+            "variant": "candidate",
+            "pair": 2,
+            "seconds": 7.426775000005961,
+            "verification": {
+              "rows": 777003,
+              "groups": 1,
+              "files": 37,
+              "csv_bytes": 308359636,
+              "ordered_csv_sha256": "1a13ae6354d812230992edc3d891961825e8a7e5e6fc0e29c039301b4c6eb0f7",
+              "shuffle_descents": 388890,
+              "marker": {
+                "complete": true,
+                "files": 38,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 670226016,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 777003,
+                "largest_group": 777003,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 670336437,
+            "temporary_bytes_written": 670336437,
+            "peak_workspace_reserved_bytes": 24497438,
+            "sort_runs": 24,
+            "merge_operations": 1,
+            "source_read_calls": 1,
+            "source_prefetch_requests": 1176,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "spill",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "merge_traversal",
+                "operations": [
+                  1
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  2
+                ],
+                "rows": 777003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ]
+      },
+      "excluded_warmups": [
+        {
+          "source_line": 30,
+          "variant": "candidate",
+          "pair": -1,
+          "seconds": 7.484670000001788,
+          "verification": {
+            "rows": 777003,
+            "groups": 1,
+            "files": 37,
+            "csv_bytes": 308359636,
+            "ordered_csv_sha256": "3e1b4d704cf30d68fad25048e5854b31c032f842fcdf64fa0c6ab610db8aa021",
+            "shuffle_descents": 388252,
+            "marker": {
+              "complete": true,
+              "files": 38,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 670228203,
+          "effective_memory_bytes": 100663296,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 1,
+              "smallest_group": 777003,
+              "largest_group": 777003,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 670336437,
+          "temporary_bytes_written": 670336437,
+          "peak_workspace_reserved_bytes": 24497438,
+          "sort_runs": 24,
+          "merge_operations": 1,
+          "source_read_calls": 1,
+          "source_prefetch_requests": 1176,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 777003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "spill",
+              "operations": [
+                1
+              ],
+              "rows": 777003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "merge_traversal",
+              "operations": [
+                1
+              ],
+              "rows": 777003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                2
+              ],
+              "rows": 777003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        },
+        {
+          "source_line": 31,
+          "variant": "baseline",
+          "pair": -1,
+          "seconds": 8.421259999990463,
+          "verification": {
+            "rows": 777003,
+            "groups": 1,
+            "files": 37,
+            "csv_bytes": 308359636,
+            "ordered_csv_sha256": "61863aa0aa0b149b678a73d3813201418b4579eec1928f718d5aa5281ecca7bf",
+            "shuffle_descents": 388547,
+            "marker": {
+              "complete": true,
+              "files": 38,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 670233621,
+          "effective_memory_bytes": 100663296,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 1,
+              "smallest_group": 777003,
+              "largest_group": 777003,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 670336437,
+          "temporary_bytes_written": 670336437,
+          "peak_workspace_reserved_bytes": 24497438,
+          "sort_runs": 24,
+          "merge_operations": 1,
+          "source_read_calls": 1177,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 777003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "spill",
+              "operations": [
+                1
+              ],
+              "rows": 777003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "merge_traversal",
+              "operations": [
+                1
+              ],
+              "rows": 777003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                2
+              ],
+              "rows": 777003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        }
+      ],
+      "paired_seconds_saved": [
+        0.9327599999904637,
+        1.005290000021458,
+        1.0491550000011927
+      ]
+    },
+    "nested-balanced": {
+      "label": "Balanced → Balanced",
+      "recipe": {
+        "id": "nested-balanced",
+        "operations": [
+          {
+            "type": "balanced",
+            "files": 3
+          },
+          {
+            "type": "balanced",
+            "files": 7
+          }
+        ],
+        "rows": 530003,
+        "widths": [
+          505
+        ],
+        "byteCap": 16777216,
+        "memory": 64,
+        "keys": 13,
+        "pairs": 3,
+        "fused": true
+      },
+      "fixture_bytes": 274960462,
+      "fixture_sha256": "32ad718152a5937f81a713f3754c2a91131863c7e81dc2637fe7096401fc9b2c",
+      "samples": {
+        "baseline": [
+          {
+            "source_line": 41,
+            "variant": "baseline",
+            "pair": 0,
+            "seconds": 7.124215000003576,
+            "verification": {
+              "rows": 530003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 274960762,
+              "ordered_csv_sha256": "ea083c049544afd4fdaf5ee6199d45219ec3fd11c1a56507e9338ceec29b3c33",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 578015098,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 176667,
+                "largest_group": 176668,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 25238,
+                "largest_group": 25239,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 881116411,
+            "temporary_bytes_written": 578015152,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 1049,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 530003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "shared_ranges",
+                "operations": [
+                  1
+                ],
+                "rows": 530003,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  2
+                ],
+                "rows": 530003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 44,
+            "variant": "baseline",
+            "pair": 1,
+            "seconds": 6.984064999997615,
+            "verification": {
+              "rows": 530003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 274960762,
+              "ordered_csv_sha256": "ea083c049544afd4fdaf5ee6199d45219ec3fd11c1a56507e9338ceec29b3c33",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 578015098,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 176667,
+                "largest_group": 176668,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 25238,
+                "largest_group": 25239,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 881116411,
+            "temporary_bytes_written": 578015152,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 1049,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 530003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "shared_ranges",
+                "operations": [
+                  1
+                ],
+                "rows": 530003,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  2
+                ],
+                "rows": 530003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 45,
+            "variant": "baseline",
+            "pair": 2,
+            "seconds": 7.013674999997019,
+            "verification": {
+              "rows": 530003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 274960762,
+              "ordered_csv_sha256": "ea083c049544afd4fdaf5ee6199d45219ec3fd11c1a56507e9338ceec29b3c33",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 578015098,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 176667,
+                "largest_group": 176668,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 25238,
+                "largest_group": 25239,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 881116411,
+            "temporary_bytes_written": 578015152,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 1049,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 530003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "shared_ranges",
+                "operations": [
+                  1
+                ],
+                "rows": 530003,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  2
+                ],
+                "rows": 530003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ],
+        "candidate": [
+          {
+            "source_line": 42,
+            "variant": "candidate",
+            "pair": 0,
+            "seconds": 6.6744249999970195,
+            "verification": {
+              "rows": 530003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 274960762,
+              "ordered_csv_sha256": "ea083c049544afd4fdaf5ee6199d45219ec3fd11c1a56507e9338ceec29b3c33",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 578014905,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 176667,
+                "largest_group": 176668,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 25238,
+                "largest_group": 25239,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 578014905,
+            "temporary_bytes_written": 578014905,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 1049,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 530003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 530003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 43,
+            "variant": "candidate",
+            "pair": 1,
+            "seconds": 6.579384999990463,
+            "verification": {
+              "rows": 530003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 274960762,
+              "ordered_csv_sha256": "ea083c049544afd4fdaf5ee6199d45219ec3fd11c1a56507e9338ceec29b3c33",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 578014905,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 176667,
+                "largest_group": 176668,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 25238,
+                "largest_group": 25239,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 578014905,
+            "temporary_bytes_written": 578014905,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 1049,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 530003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 530003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 46,
+            "variant": "candidate",
+            "pair": 2,
+            "seconds": 6.580135000005364,
+            "verification": {
+              "rows": 530003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 274960762,
+              "ordered_csv_sha256": "ea083c049544afd4fdaf5ee6199d45219ec3fd11c1a56507e9338ceec29b3c33",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 578014905,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 176667,
+                "largest_group": 176668,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 25238,
+                "largest_group": 25239,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 578014905,
+            "temporary_bytes_written": 578014905,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 1049,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 530003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 530003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 530003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ]
+      },
+      "excluded_warmups": [
+        {
+          "source_line": 39,
+          "variant": "candidate",
+          "pair": -1,
+          "seconds": 6.615975000008941,
+          "verification": {
+            "rows": 530003,
+            "groups": 21,
+            "files": 21,
+            "csv_bytes": 274960762,
+            "ordered_csv_sha256": "ea083c049544afd4fdaf5ee6199d45219ec3fd11c1a56507e9338ceec29b3c33",
+            "shuffle_descents": 0,
+            "marker": {
+              "complete": true,
+              "files": 22,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 578014905,
+          "effective_memory_bytes": 67108864,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 3,
+              "smallest_group": 176667,
+              "largest_group": 176668,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 3,
+              "output_groups": 21,
+              "smallest_group": 25238,
+              "largest_group": 25239,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 578014905,
+          "temporary_bytes_written": 578014905,
+          "peak_workspace_reserved_bytes": 520598,
+          "sort_runs": 0,
+          "merge_operations": 0,
+          "source_read_calls": 1049,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 530003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "dataset_materialize",
+              "operations": [],
+              "rows": 530003,
+              "groups": 1,
+              "status": "completed"
+            },
+            {
+              "kind": "balanced_traversal",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 530003,
+              "groups": 21,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 530003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        },
+        {
+          "source_line": 40,
+          "variant": "baseline",
+          "pair": -1,
+          "seconds": 7.015390000000596,
+          "verification": {
+            "rows": 530003,
+            "groups": 21,
+            "files": 21,
+            "csv_bytes": 274960762,
+            "ordered_csv_sha256": "ea083c049544afd4fdaf5ee6199d45219ec3fd11c1a56507e9338ceec29b3c33",
+            "shuffle_descents": 0,
+            "marker": {
+              "complete": true,
+              "files": 22,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 578015098,
+          "effective_memory_bytes": 67108864,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 3,
+              "smallest_group": 176667,
+              "largest_group": 176668,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 3,
+              "output_groups": 21,
+              "smallest_group": 25238,
+              "largest_group": 25239,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 881116411,
+          "temporary_bytes_written": 578015152,
+          "peak_workspace_reserved_bytes": 520598,
+          "sort_runs": 0,
+          "merge_operations": 0,
+          "source_read_calls": 1049,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 530003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "dataset_materialize",
+              "operations": [],
+              "rows": 530003,
+              "groups": 1,
+              "status": "completed"
+            },
+            {
+              "kind": "shared_ranges",
+              "operations": [
+                1
+              ],
+              "rows": 530003,
+              "groups": 3,
+              "status": "completed"
+            },
+            {
+              "kind": "dataset_materialize",
+              "operations": [
+                1
+              ],
+              "rows": 0,
+              "groups": 3,
+              "status": "completed"
+            },
+            {
+              "kind": "balanced_traversal",
+              "operations": [
+                2
+              ],
+              "rows": 530003,
+              "groups": 21,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 530003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        }
+      ],
+      "paired_seconds_saved": [
+        0.44979000000655667,
+        0.40468000000715243,
+        0.4335399999916554
+      ]
+    },
+    "small-shuffle-partition-control": {
+      "label": "Small shuffle → Partition control",
+      "recipe": {
+        "id": "small-shuffle-partition-control",
+        "operations": [
+          {
+            "type": "shuffle",
+            "strategy": "uniform"
+          },
+          {
+            "type": "partition",
+            "columns": [
+              "key"
+            ]
+          }
+        ],
+        "rows": 33003,
+        "widths": [
+          135,
+          245,
+          354
+        ],
+        "byteCap": 8388608,
+        "memory": 96,
+        "keys": 13,
+        "pairs": 3
+      },
+      "fixture_bytes": 8492678,
+      "fixture_sha256": "6ac2a92c457755858dd60c0472644f58cc65d86f2d5dc37ef3d7791f994885e3",
+      "samples": {
+        "baseline": [
+          {
+            "source_line": 50,
+            "variant": "baseline",
+            "pair": 0,
+            "seconds": 0.36177500000596047,
+            "verification": {
+              "rows": 33003,
+              "groups": 13,
+              "files": 13,
+              "csv_bytes": 8492858,
+              "ordered_csv_sha256": "44a0dbc752d296eadca7d19947be9d4220c7d45b10dcdbfe8c7597cc2de7fa54",
+              "shuffle_descents": 16536,
+              "marker": {
+                "complete": true,
+                "files": 14,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 8494766,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 33003,
+                "largest_group": 33003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 2538,
+                "largest_group": 2539,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 8494766,
+            "temporary_bytes_written": 8494766,
+            "peak_workspace_reserved_bytes": 18475614,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 33,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "resident_sort",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 53,
+            "variant": "baseline",
+            "pair": 1,
+            "seconds": 0.36310500000417234,
+            "verification": {
+              "rows": 33003,
+              "groups": 13,
+              "files": 13,
+              "csv_bytes": 8492858,
+              "ordered_csv_sha256": "c3ce6307e290f71b97bbace5cd78aa0ac5f0da11647fef33ab25820964bf68d1",
+              "shuffle_descents": 16470,
+              "marker": {
+                "complete": true,
+                "files": 14,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 8494766,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 33003,
+                "largest_group": 33003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 2538,
+                "largest_group": 2539,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 8494766,
+            "temporary_bytes_written": 8494766,
+            "peak_workspace_reserved_bytes": 18475614,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 33,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "resident_sort",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 54,
+            "variant": "baseline",
+            "pair": 2,
+            "seconds": 0.3600049999952316,
+            "verification": {
+              "rows": 33003,
+              "groups": 13,
+              "files": 13,
+              "csv_bytes": 8492858,
+              "ordered_csv_sha256": "0ce0daab3ca1534ab42120964ffb9283a1d3b3729a5a7ac4942885b837a7d970",
+              "shuffle_descents": 16413,
+              "marker": {
+                "complete": true,
+                "files": 14,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 8494766,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 33003,
+                "largest_group": 33003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 2538,
+                "largest_group": 2539,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 8494766,
+            "temporary_bytes_written": 8494766,
+            "peak_workspace_reserved_bytes": 18475614,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 33,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "resident_sort",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ],
+        "candidate": [
+          {
+            "source_line": 51,
+            "variant": "candidate",
+            "pair": 0,
+            "seconds": 0.3626199999898672,
+            "verification": {
+              "rows": 33003,
+              "groups": 13,
+              "files": 13,
+              "csv_bytes": 8492858,
+              "ordered_csv_sha256": "70ebe7b1ef2be24b3294347e9ee85db826f1d0ec02fbce8f79510969f95da7f4",
+              "shuffle_descents": 16497,
+              "marker": {
+                "complete": true,
+                "files": 14,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 8494766,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 33003,
+                "largest_group": 33003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 2538,
+                "largest_group": 2539,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 8494766,
+            "temporary_bytes_written": 8494766,
+            "peak_workspace_reserved_bytes": 18475614,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 33,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "resident_sort",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 52,
+            "variant": "candidate",
+            "pair": 1,
+            "seconds": 0.3504300000071526,
+            "verification": {
+              "rows": 33003,
+              "groups": 13,
+              "files": 13,
+              "csv_bytes": 8492858,
+              "ordered_csv_sha256": "09a3a0b2d1019f5783d6a37673d1bdf7d3b4122e59b0583997eaa2d810d30e0c",
+              "shuffle_descents": 16557,
+              "marker": {
+                "complete": true,
+                "files": 14,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 8494766,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 33003,
+                "largest_group": 33003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 2538,
+                "largest_group": 2539,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 8494766,
+            "temporary_bytes_written": 8494766,
+            "peak_workspace_reserved_bytes": 18475614,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 33,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "resident_sort",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 55,
+            "variant": "candidate",
+            "pair": 2,
+            "seconds": 0.35875,
+            "verification": {
+              "rows": 33003,
+              "groups": 13,
+              "files": 13,
+              "csv_bytes": 8492858,
+              "ordered_csv_sha256": "b8d9548c999ccd1105524e9df95e469e997000d8422b386d13dbdb34c68b7f88",
+              "shuffle_descents": 16516,
+              "marker": {
+                "complete": true,
+                "files": 14,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 8494766,
+            "effective_memory_bytes": 100663296,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 1,
+                "smallest_group": 33003,
+                "largest_group": 33003,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 1,
+                "output_groups": 13,
+                "smallest_group": 2538,
+                "largest_group": 2539,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 8494766,
+            "temporary_bytes_written": 8494766,
+            "peak_workspace_reserved_bytes": 18475614,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 33,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "resident_sort",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "grouping",
+                "operations": [
+                  1,
+                  2
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 33003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ]
+      },
+      "excluded_warmups": [
+        {
+          "source_line": 48,
+          "variant": "candidate",
+          "pair": -1,
+          "seconds": 0.3826000000089407,
+          "verification": {
+            "rows": 33003,
+            "groups": 13,
+            "files": 13,
+            "csv_bytes": 8492858,
+            "ordered_csv_sha256": "bfff467b6ee0759fcdf4e4328168b087d2a88c18ad8bbfea3313daa220c4fedd",
+            "shuffle_descents": 16475,
+            "marker": {
+              "complete": true,
+              "files": 14,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 8494766,
+          "effective_memory_bytes": 100663296,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 1,
+              "smallest_group": 33003,
+              "largest_group": 33003,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 1,
+              "output_groups": 13,
+              "smallest_group": 2538,
+              "largest_group": 2539,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 8494766,
+          "temporary_bytes_written": 8494766,
+          "peak_workspace_reserved_bytes": 18475614,
+          "sort_runs": 0,
+          "merge_operations": 0,
+          "source_read_calls": 33,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 33003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "resident_sort",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 33003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "grouping",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 33003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 33003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        },
+        {
+          "source_line": 49,
+          "variant": "baseline",
+          "pair": -1,
+          "seconds": 0.36352500000596044,
+          "verification": {
+            "rows": 33003,
+            "groups": 13,
+            "files": 13,
+            "csv_bytes": 8492858,
+            "ordered_csv_sha256": "188624b83df6acee12024eb4fdc8a7aeed82b8b51f7ae435f2b8823375be9bd8",
+            "shuffle_descents": 16501,
+            "marker": {
+              "complete": true,
+              "files": 14,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 8494766,
+          "effective_memory_bytes": 100663296,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 1,
+              "smallest_group": 33003,
+              "largest_group": 33003,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 1,
+              "output_groups": 13,
+              "smallest_group": 2538,
+              "largest_group": 2539,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 8494766,
+          "temporary_bytes_written": 8494766,
+          "peak_workspace_reserved_bytes": 18475614,
+          "sort_runs": 0,
+          "merge_operations": 0,
+          "source_read_calls": 33,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 33003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "resident_sort",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 33003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "grouping",
+              "operations": [
+                1,
+                2
+              ],
+              "rows": 33003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 33003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        }
+      ],
+      "paired_seconds_saved": [
+        -0.0008449999839067468,
+        0.012674999997019765,
+        0.0012549999952315982
+      ]
+    },
+    "nested-balanced-below-floor-control": {
+      "label": "Below-floor Balanced control",
+      "recipe": {
+        "id": "nested-balanced-below-floor-control",
+        "operations": [
+          {
+            "type": "balanced",
+            "files": 3
+          },
+          {
+            "type": "balanced",
+            "files": 7
+          }
+        ],
+        "rows": 465003,
+        "widths": [
+          505
+        ],
+        "byteCap": 16777216,
+        "memory": 64,
+        "keys": 13,
+        "pairs": 3
+      },
+      "fixture_bytes": 241225462,
+      "fixture_sha256": "2692eb473d067b411ce54383d3cdb6fd83f0da645d64ae06e7e05ea2f6f47b10",
+      "samples": {
+        "baseline": [
+          {
+            "source_line": 59,
+            "variant": "baseline",
+            "pair": 0,
+            "seconds": 6.22125,
+            "verification": {
+              "rows": 465003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 241225762,
+              "ordered_csv_sha256": "99fef1f46e67a9e47ac4e10b1ccc5a8b6664d51ce97d483584b8296887588733",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 507100096,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 155001,
+                "largest_group": 155001,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 22143,
+                "largest_group": 22143,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 773035848,
+            "temporary_bytes_written": 507100150,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 921,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 465003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "shared_ranges",
+                "operations": [
+                  1
+                ],
+                "rows": 465003,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  2
+                ],
+                "rows": 465003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 62,
+            "variant": "baseline",
+            "pair": 1,
+            "seconds": 6.2534400000125165,
+            "verification": {
+              "rows": 465003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 241225762,
+              "ordered_csv_sha256": "99fef1f46e67a9e47ac4e10b1ccc5a8b6664d51ce97d483584b8296887588733",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 507100096,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 155001,
+                "largest_group": 155001,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 22143,
+                "largest_group": 22143,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 773035848,
+            "temporary_bytes_written": 507100150,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 921,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 465003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "shared_ranges",
+                "operations": [
+                  1
+                ],
+                "rows": 465003,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  2
+                ],
+                "rows": 465003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 63,
+            "variant": "baseline",
+            "pair": 2,
+            "seconds": 6.159344999998808,
+            "verification": {
+              "rows": 465003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 241225762,
+              "ordered_csv_sha256": "99fef1f46e67a9e47ac4e10b1ccc5a8b6664d51ce97d483584b8296887588733",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 507100096,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 155001,
+                "largest_group": 155001,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 22143,
+                "largest_group": 22143,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 773035848,
+            "temporary_bytes_written": 507100150,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 921,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 465003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "shared_ranges",
+                "operations": [
+                  1
+                ],
+                "rows": 465003,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  2
+                ],
+                "rows": 465003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ],
+        "candidate": [
+          {
+            "source_line": 60,
+            "variant": "candidate",
+            "pair": 0,
+            "seconds": 6.159375,
+            "verification": {
+              "rows": 465003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 241225762,
+              "ordered_csv_sha256": "99fef1f46e67a9e47ac4e10b1ccc5a8b6664d51ce97d483584b8296887588733",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 507100096,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 155001,
+                "largest_group": 155001,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 22143,
+                "largest_group": 22143,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 773035848,
+            "temporary_bytes_written": 507100150,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 921,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 465003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "shared_ranges",
+                "operations": [
+                  1
+                ],
+                "rows": 465003,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  2
+                ],
+                "rows": 465003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 61,
+            "variant": "candidate",
+            "pair": 1,
+            "seconds": 6.1807849999964235,
+            "verification": {
+              "rows": 465003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 241225762,
+              "ordered_csv_sha256": "99fef1f46e67a9e47ac4e10b1ccc5a8b6664d51ce97d483584b8296887588733",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 507100096,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 155001,
+                "largest_group": 155001,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 22143,
+                "largest_group": 22143,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 773035848,
+            "temporary_bytes_written": 507100150,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 921,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 465003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "shared_ranges",
+                "operations": [
+                  1
+                ],
+                "rows": 465003,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  2
+                ],
+                "rows": 465003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          },
+          {
+            "source_line": 64,
+            "variant": "candidate",
+            "pair": 2,
+            "seconds": 6.122689999997616,
+            "verification": {
+              "rows": 465003,
+              "groups": 21,
+              "files": 21,
+              "csv_bytes": 241225762,
+              "ordered_csv_sha256": "99fef1f46e67a9e47ac4e10b1ccc5a8b6664d51ce97d483584b8296887588733",
+              "shuffle_descents": 0,
+              "marker": {
+                "complete": true,
+                "files": 22,
+                "engine": "chopper-browser",
+                "version": 1
+              }
+            },
+            "peak_temp_bytes": 507100096,
+            "effective_memory_bytes": 67108864,
+            "physical_plan": "snapshot",
+            "stages": [
+              {
+                "operation": 1,
+                "input_groups": 1,
+                "output_groups": 3,
+                "smallest_group": 155001,
+                "largest_group": 155001,
+                "empty_groups": 0
+              },
+              {
+                "operation": 2,
+                "input_groups": 3,
+                "output_groups": 21,
+                "smallest_group": 22143,
+                "largest_group": 22143,
+                "empty_groups": 0
+              }
+            ],
+            "temporary_bytes_read": 773035848,
+            "temporary_bytes_written": 507100150,
+            "peak_workspace_reserved_bytes": 520598,
+            "sort_runs": 0,
+            "merge_operations": 0,
+            "source_read_calls": 921,
+            "source_prefetch_requests": 0,
+            "physical_steps": [
+              {
+                "kind": "read",
+                "operations": [],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [],
+                "rows": 465003,
+                "groups": 1,
+                "status": "completed"
+              },
+              {
+                "kind": "shared_ranges",
+                "operations": [
+                  1
+                ],
+                "rows": 465003,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "dataset_materialize",
+                "operations": [
+                  1
+                ],
+                "rows": 0,
+                "groups": 3,
+                "status": "completed"
+              },
+              {
+                "kind": "balanced_traversal",
+                "operations": [
+                  2
+                ],
+                "rows": 465003,
+                "groups": 21,
+                "status": "completed"
+              },
+              {
+                "kind": "serialize",
+                "operations": [
+                  3
+                ],
+                "rows": 465003,
+                "groups": 0,
+                "status": "completed"
+              },
+              {
+                "kind": "materialize",
+                "operations": [],
+                "rows": 0,
+                "groups": 0,
+                "status": "completed"
+              }
+            ],
+            "workspace_bytes_after_cleanup": 0,
+            "destination_checked_and_removed": true
+          }
+        ]
+      },
+      "excluded_warmups": [
+        {
+          "source_line": 57,
+          "variant": "candidate",
+          "pair": -1,
+          "seconds": 6.207105000004172,
+          "verification": {
+            "rows": 465003,
+            "groups": 21,
+            "files": 21,
+            "csv_bytes": 241225762,
+            "ordered_csv_sha256": "99fef1f46e67a9e47ac4e10b1ccc5a8b6664d51ce97d483584b8296887588733",
+            "shuffle_descents": 0,
+            "marker": {
+              "complete": true,
+              "files": 22,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 507100096,
+          "effective_memory_bytes": 67108864,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 3,
+              "smallest_group": 155001,
+              "largest_group": 155001,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 3,
+              "output_groups": 21,
+              "smallest_group": 22143,
+              "largest_group": 22143,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 773035848,
+          "temporary_bytes_written": 507100150,
+          "peak_workspace_reserved_bytes": 520598,
+          "sort_runs": 0,
+          "merge_operations": 0,
+          "source_read_calls": 921,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 465003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "dataset_materialize",
+              "operations": [],
+              "rows": 465003,
+              "groups": 1,
+              "status": "completed"
+            },
+            {
+              "kind": "shared_ranges",
+              "operations": [
+                1
+              ],
+              "rows": 465003,
+              "groups": 3,
+              "status": "completed"
+            },
+            {
+              "kind": "dataset_materialize",
+              "operations": [
+                1
+              ],
+              "rows": 0,
+              "groups": 3,
+              "status": "completed"
+            },
+            {
+              "kind": "balanced_traversal",
+              "operations": [
+                2
+              ],
+              "rows": 465003,
+              "groups": 21,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 465003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        },
+        {
+          "source_line": 58,
+          "variant": "baseline",
+          "pair": -1,
+          "seconds": 6.203040000006556,
+          "verification": {
+            "rows": 465003,
+            "groups": 21,
+            "files": 21,
+            "csv_bytes": 241225762,
+            "ordered_csv_sha256": "99fef1f46e67a9e47ac4e10b1ccc5a8b6664d51ce97d483584b8296887588733",
+            "shuffle_descents": 0,
+            "marker": {
+              "complete": true,
+              "files": 22,
+              "engine": "chopper-browser",
+              "version": 1
+            }
+          },
+          "peak_temp_bytes": 507100096,
+          "effective_memory_bytes": 67108864,
+          "physical_plan": "snapshot",
+          "stages": [
+            {
+              "operation": 1,
+              "input_groups": 1,
+              "output_groups": 3,
+              "smallest_group": 155001,
+              "largest_group": 155001,
+              "empty_groups": 0
+            },
+            {
+              "operation": 2,
+              "input_groups": 3,
+              "output_groups": 21,
+              "smallest_group": 22143,
+              "largest_group": 22143,
+              "empty_groups": 0
+            }
+          ],
+          "temporary_bytes_read": 773035848,
+          "temporary_bytes_written": 507100150,
+          "peak_workspace_reserved_bytes": 520598,
+          "sort_runs": 0,
+          "merge_operations": 0,
+          "source_read_calls": 921,
+          "source_prefetch_requests": 0,
+          "physical_steps": [
+            {
+              "kind": "read",
+              "operations": [],
+              "rows": 465003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "dataset_materialize",
+              "operations": [],
+              "rows": 465003,
+              "groups": 1,
+              "status": "completed"
+            },
+            {
+              "kind": "shared_ranges",
+              "operations": [
+                1
+              ],
+              "rows": 465003,
+              "groups": 3,
+              "status": "completed"
+            },
+            {
+              "kind": "dataset_materialize",
+              "operations": [
+                1
+              ],
+              "rows": 0,
+              "groups": 3,
+              "status": "completed"
+            },
+            {
+              "kind": "balanced_traversal",
+              "operations": [
+                2
+              ],
+              "rows": 465003,
+              "groups": 21,
+              "status": "completed"
+            },
+            {
+              "kind": "serialize",
+              "operations": [
+                3
+              ],
+              "rows": 465003,
+              "groups": 0,
+              "status": "completed"
+            },
+            {
+              "kind": "materialize",
+              "operations": [],
+              "rows": 0,
+              "groups": 0,
+              "status": "completed"
+            }
+          ],
+          "workspace_bytes_after_cleanup": 0,
+          "destination_checked_and_removed": true
+        }
+      ],
+      "paired_seconds_saved": [
+        0.06187500000000057,
+        0.07265500001609304,
+        0.036655000001192484
+      ]
+    }
+  }
+}

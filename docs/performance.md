@@ -295,3 +295,4 @@ Topics reuse the reviewed strategy-family assignments; they do not establish com
 | <a id="hosted-shuffle-then-partition-buffered-output-2026-11-26"></a>[Hosted Shuffle then Partition buffered output (2026-11-26)](performance/investigations/hosted-shuffle-then-partition-buffered-output-2026-11-26.md) | ownership-and-lifecycle |
 | <a id="hosted-opfs-write-size-lookup-2026-11-26"></a>[Hosted OPFS write size lookup (2026-11-26)](performance/investigations/hosted-opfs-write-size-lookup-2026-11-26.md) | ownership-and-lifecycle |
 | <a id="hosted-data-movement-follow-ups-2026-11-26"></a>[Hosted data movement follow-ups (2026-11-26)](performance/investigations/hosted-data-movement-follow-ups-2026-11-26.md) | ownership-and-lifecycle |
+| <a id="hosted-release-comparison-064-to-065-2026-11-26"></a>[Hosted release comparison 0.6.4 to 0.6.5 (2026-11-26)](performance/investigations/hosted-release-comparison-064-to-065-2026-11-26.md) | profiling |

@@ -2,11 +2,11 @@
   "schema_version": 1,
   "type": "derived_strategy_corpus_audit",
   "analysis_script": "scripts/audit-strategy-evidence.py",
-  "analysis_script_sha256": "0d3ef7ba31ba1edb91b5029871c055ab8d295899bd1c827fcc4f291560bf0a3b",
+  "analysis_script_sha256": "97d889fbe80fdc2f69245cb1da0d56097d9fc2ee66c869b0246a5d149cb7adb1",
   "scope": "Exhaustive artifact/schema/family coverage, not exhaustive pairwise contrasts or pooled performance. First/last are physical record bounds, not an eligibility range.",
   "evidence_document": {
     "path": "docs/performance.md",
-    "sha256": "82ad5779db4ade75f0a31994496f8841df0723fb32dcc277f4ee60c6d7a380e6"
+    "sha256": "76b1273c92c9f85f06670adac9bcb7734fa36c61664197da988ac9b7b49e8e81"
   },
   "families": [
     "adaptive-routing",
@@ -5157,6 +5157,22 @@
         "topic": "ownership-and-lifecycle"
       },
       "family": "ownership-and-lifecycle"
+    },
+    {
+      "title": "Hosted release comparison 0.6.4 to 0.6.5 (2026-11-26)",
+      "evidence": "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26",
+      "artifacts": [
+        "docs/benchmarks/0.6.5-performance-data.json",
+        "docs/benchmarks/hosted-release-comparison-064-to-065.mjs",
+        "docs/benchmarks/hosted-release-comparison-064-to-065.py"
+      ],
+      "scripts": [],
+      "narrative": {
+        "path": "docs/performance/investigations/hosted-release-comparison-064-to-065-2026-11-26.md",
+        "sha256": "ed013902dca85e62f301abeda4fe5d33ea6277a6bfda3985b66de027569633ef",
+        "topic": "profiling"
+      },
+      "family": "profiling"
     }
   ],
   "sources": [
@@ -5187,6 +5203,48 @@
       "context_records": [],
       "evidence": [
         "docs/performance.md#hosted-release-comparison-063-to-064-2026-11-26"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {
+        "untyped": {
+          "first": {
+            "pointer": ""
+          },
+          "last": {
+            "pointer": ""
+          }
+        }
+      },
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/0.6.5-performance-data.json",
+      "sha256": "c9579e4bcd1d5c2ea307874f297b5d649f68e6dad08e40267e16c803e4430bf3",
+      "bytes": 177185,
+      "format": "json",
+      "record_counts": {
+        "untyped": 1
+      },
+      "fields": [
+        "baseline",
+        "browser",
+        "comparison",
+        "input_hashes",
+        "metric_scopes",
+        "original_capture_sha256",
+        "resources",
+        "runtime",
+        "storage_scope",
+        "timing_scope",
+        "verified_pairs_per_workload",
+        "warmups_excluded_per_arm",
+        "workloads"
+      ],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
       ],
       "families": [
         "profiling"
@@ -28666,6 +28724,40 @@
       ],
       "families": [
         "ownership-and-lifecycle"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-release-comparison-064-to-065.mjs",
+      "sha256": "54e4891fba8f6e36815ca1854a9bc2a40ad6604c39e3de65e2474b44665df60b",
+      "bytes": 11130,
+      "format": "mjs",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
+      ],
+      "families": [
+        "profiling"
+      ],
+      "record_bounds_by_kind": {},
+      "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
+    },
+    {
+      "path": "docs/benchmarks/hosted-release-comparison-064-to-065.py",
+      "sha256": "a57c2ed03534692d3d59bb359b693ca25fdc355a90f38c282c761ee080ffe6b5",
+      "bytes": 5541,
+      "format": "py",
+      "record_counts": {},
+      "fields": [],
+      "context_records": [],
+      "evidence": [
+        "docs/performance.md#hosted-release-comparison-064-to-065-2026-11-26"
+      ],
+      "families": [
+        "profiling"
       ],
       "record_bounds_by_kind": {},
       "use": "Family coverage and provenance only; timing admission requires the report and explicit matched cell selectors. JSON bounds refer to the whole document, not nested observations."
