@@ -118,6 +118,11 @@ def check_decoder(chopper, validator, work):
         ({"resources": {"memory_mb": 256, "temp_dir": None, "temp_bytes": None}}, True, True, None),
         ({"resources": {"max_files": 2**64 - 1}}, True, True, None),
         ({"input_csv": {"escape": None, "quote": '"'}, "zip_member": None}, True, True, None),
+        ({"input_dialect": {"trim": "both", "comment_prefix": "#", "skip_blank_rows": True}},
+         True, True, None),
+        ({"input_dialect": {"trim": True}}, False, False, None),
+        ({"input_dialect": {"skip_rows": -1}}, False, False, None),
+        ({"input_dialect": {"comment_prefix": ""}}, False, True, "comment prefix must be nonempty"),
         ({"limits": {"rows": None, "bytes": None, "compressed_bytes": None}}, True, True, None),
         ({"full_shuffle_rng": "blake3_counter_v1", "full_shuffle_algorithm": "adaptive_v1"}, True, True, None),
         ({"compression": "gzip"}, True, True, None),
@@ -191,7 +196,7 @@ def check_defaults(chopper, validator, work):
         saved = json.loads(next(manifest))["config"]
     validator.validate(saved)
     properties = validator.schema["properties"]
-    omitted_on_write = {"full_shuffle_rng", "full_shuffle_algorithm", "calculated_columns"}
+    omitted_on_write = {"full_shuffle_rng", "full_shuffle_algorithm", "calculated_columns", "input_dialect"}
     check(set(saved) | omitted_on_write == set(properties),
           "top-level schema fields and the manifest config differ")
     for field, value in saved.items():

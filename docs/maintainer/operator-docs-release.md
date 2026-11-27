@@ -24,7 +24,7 @@ sidebar, CLI cross-link, and function search check for that page.
 npm --prefix docs-site ci
 npm --prefix docs-site exec -- playwright install chromium
 v=$(node -p "require('./ui/package.json').version")
-npm --prefix docs-site run build -- 0.5.0 0.6.0 0.6.1 0.6.2 0.6.3 0.6.4 "${v}=HEAD"
+npm --prefix docs-site run build -- 0.5.0 0.6.0 0.6.1 0.6.2 0.6.3 0.6.4 0.6.5 "${v}=HEAD"
 npm --prefix docs-site run smoke
 ```
 
@@ -71,7 +71,7 @@ candidate. Use the same commands for a retry, with the intended release tag.
 Keep only one local docs deployment in progress at a time.
 
 ```sh
-tag=v0.6.5
+tag=v0.6.6
 git fetch --tags origin &&
 test "$(git rev-parse HEAD)" = "$(git rev-parse "${tag}^{commit}")" &&
 npm --prefix docs-site run build:published -- "$tag" &&

@@ -1,0 +1,407 @@
+[
+  {
+    "name": "rfc-crlf",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "crlf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["01", "a,b"],
+        ["02", "a\r\nb"],
+        ["03", "a \"quote\""],
+        ["04", ""]
+      ]
+    },
+    "input": "id,note\r\n01,\"a,b\"\r\n02,\"a\r\nb\"\r\n03,\"a \"\"quote\"\"\"\r\n04,"
+  },
+  {
+    "name": "rfc-headerless",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": null,
+      "rows": [
+        ["1", "a,b"],
+        ["2", "c"]
+      ]
+    },
+    "input": "1,\"a,b\"\n2,c\n"
+  },
+  {
+    "name": "rfc-space-empty",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["", ""],
+        [" 03 ", "  spare  "]
+      ]
+    },
+    "input": "id,note\r\n,\"\"\r\n 03 ,  spare  \r\n"
+  },
+  {
+    "name": "single-quoted-empty",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["name"],
+      "rows": [
+        [""]
+      ]
+    },
+    "input": "name\n\"\"\n"
+  },
+  {
+    "name": "mixed-endings",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "a"],
+        ["2", "b"],
+        ["3", "c"]
+      ]
+    },
+    "input": "id,note\r\n1,a\n2,b\r\n3,c"
+  },
+  {
+    "name": "empty-file",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": null,
+      "rows": []
+    },
+    "input": ""
+  },
+  {
+    "name": "header-only",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": []
+    },
+    "input": "id,note\r\n"
+  },
+  {
+    "name": "skip-blank",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": true},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", ""],
+        ["", ""]
+      ]
+    },
+    "input": "id,note\r\n\r\n1,\"\"\n,\n\n"
+  },
+  {
+    "name": "custom-quote-escape",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ";", "quote": "'", "escape": "\\", "line_ending": "crlf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "café 'ok' c:\\tmp"]
+      ]
+    },
+    "input": "id;note\r\n1;'café \\'ok\\' c:\\\\tmp'\r\n"
+  },
+  {
+    "name": "custom-quote-escape-preserved",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ";", "quote": "'", "escape": "\\", "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "a;'b"]
+      ]
+    },
+    "input": "id;note\n1;'a;\\'b'\n"
+  },
+  {
+    "name": "sniff-quote-delimiter-collision",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ";", "quote": "|", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "a"],
+        ["2", "b"]
+      ]
+    },
+    "input": "|id|;|note|\n|1|;|a|\n|2|;|b|\n"
+  },
+  {
+    "name": "semicolon",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ";", "quote": "\"", "escape": null, "line_ending": "crlf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "a,b"],
+        ["2", "z"]
+      ]
+    },
+    "input": "id;note\r\n1;\"a,b\"\r\n2;z\r\n"
+  },
+  {
+    "name": "tab",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": "\t", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "a"],
+        ["2", "b"]
+      ]
+    },
+    "input": "id\tnote\n1\ta\n2\tb\n"
+  },
+  {
+    "name": "pipe",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": "|", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "a"],
+        ["2", "b"]
+      ]
+    },
+    "input": "id|note\n1|a\n2|b\n"
+  },
+  {
+    "name": "ambiguous-comma-tie",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ";", "quote": "\"", "escape": null, "line_ending": "crlf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "last,first"],
+      "rows": [
+        ["1", "Doe,Jane"],
+        ["2", "Smith,Sam"]
+      ]
+    },
+    "input": "id;last,first\r\n1;Doe,Jane\r\n2;Smith,Sam\r\n"
+  },
+  {
+    "name": "wrong-comma-more-columns",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": "|", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "last,first,city"],
+      "rows": [
+        ["1", "Doe,Jane,Paris"],
+        ["2", "Smith,Sam,Rome"]
+      ]
+    },
+    "input": "id|last,first,city\n1|Doe,Jane,Paris\n2|Smith,Sam,Rome\n"
+  },
+  {
+    "name": "unlisted-delimiter",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": "^", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "a"],
+        ["2", "b"]
+      ]
+    },
+    "input": "id^note\n1^a\n2^b\n"
+  },
+  {
+    "name": "embedded-crlf-only",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "before\r\nafter"],
+        ["2", "done"]
+      ]
+    },
+    "input": "id,note\n1,\"before\r\nafter\"\n2,done\n"
+  },
+  {
+    "name": "utf8-bom",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ";", "quote": "\"", "escape": null, "line_ending": "lf", "bom": true, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "café 🙂"]
+      ]
+    },
+    "input": "﻿id;note\n1;café 🙂"
+  },
+  {
+    "name": "utf16le-bom",
+    "input_csv": {"encoding": "utf-16le", "headers": true, "delimiter": ";", "quote": "\"", "escape": null, "line_ending": "lf", "bom": true, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "café 🙂"]
+      ]
+    },
+    "input": [255, 254, 105, 0, 100, 0, 59, 0, 110, 0, 111, 0, 116, 0, 101, 0, 10, 0, 49, 0, 59, 0, 99, 0, 97, 0, 102, 0, 233, 0, 32, 0, 61, 216, 66, 222]
+  },
+  {
+    "name": "utf16be-bom",
+    "input_csv": {"encoding": "utf-16be", "headers": true, "delimiter": ";", "quote": "\"", "escape": null, "line_ending": "lf", "bom": true, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "世界 🙂"]
+      ]
+    },
+    "input": [254, 255, 0, 105, 0, 100, 0, 59, 0, 110, 0, 111, 0, 116, 0, 101, 0, 10, 0, 49, 0, 59, 78, 22, 117, 76, 0, 32, 216, 61, 222, 66]
+  },
+  {
+    "name": "utf16le-no-bom",
+    "input_csv": {"encoding": "utf-16le", "headers": true, "delimiter": ";", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "café 🙂"]
+      ]
+    },
+    "input": [105, 0, 100, 0, 59, 0, 110, 0, 111, 0, 116, 0, 101, 0, 10, 0, 49, 0, 59, 0, 99, 0, 97, 0, 102, 0, 233, 0, 32, 0, 61, 216, 66, 222]
+  },
+  {
+    "name": "utf16le-no-bom-ascii",
+    "input_csv": {"encoding": "utf-16le", "headers": true, "delimiter": ";", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "plain"]
+      ]
+    },
+    "input": [105, 0, 100, 0, 59, 0, 110, 0, 111, 0, 116, 0, 101, 0, 10, 0, 49, 0, 59, 0, 112, 0, 108, 0, 97, 0, 105, 0, 110, 0]
+  },
+  {
+    "name": "windows1252",
+    "input_csv": {"encoding": "windows-1252", "headers": true, "delimiter": ";", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "café €"]
+      ]
+    },
+    "input": [105, 100, 59, 110, 111, 116, 101, 10, 49, 59, 99, 97, 102, 233, 32, 128]
+  },
+  {
+    "name": "shift-jis",
+    "input_csv": {"encoding": "shift_jis", "headers": true, "delimiter": ";", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "日本語"]
+      ]
+    },
+    "input": [105, 100, 59, 110, 111, 116, 101, 10, 49, 59, 147, 250, 150, 123, 140, 234]
+  },
+  {
+    "name": "blank-rejected",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "bare blank CSV record"},
+    "input": "id,note\n\n1,x\n"
+  },
+  {
+    "name": "bare-cr-rejected",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "bare CR outside quoted field"},
+    "input": "id,note\r1,x\r"
+  },
+  {
+    "name": "quote-in-unquoted",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "quote inside unquoted field"},
+    "input": "id,note\n1,ab\"cd\n"
+  },
+  {
+    "name": "unclosed-quote",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "unterminated quoted field"},
+    "input": "id,note\n1,\"foo\nbar"
+  },
+  {
+    "name": "text-after-quote",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "unexpected text after closing quote"},
+    "input": "id,note\n1,\"foo\" \n"
+  },
+  {
+    "name": "invalid-utf8",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "invalid byte sequence"},
+    "input": [105, 100, 44, 110, 111, 116, 101, 10, 49, 44, 255, 10]
+  },
+  {
+    "name": "invalid-utf16",
+    "input_csv": {"encoding": "utf-16le", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "invalid byte sequence"},
+    "input": [255, 254, 105, 0, 100, 0, 44, 0, 110, 0, 111, 0, 116, 0, 101, 0, 10, 0, 49, 0, 44, 0, 0]
+  },
+  {
+    "name": "unsupported-utf32",
+    "input_csv": {"encoding": "utf-32le", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "unsupported", "error": "unsupported encoding"},
+    "input": [255, 254, 0, 0, 105, 0, 0, 0, 100, 0, 0, 0, 44, 0, 0, 0, 110, 0, 0, 0, 111, 0, 0, 0, 116, 0, 0, 0, 101, 0, 0, 0, 10, 0, 0, 0, 49, 0, 0, 0, 44, 0, 0, 0, 114, 0, 0, 0, 97, 0, 0, 0, 119, 0, 0, 0, 10, 0, 0, 0]
+  },
+  {
+    "name": "short-row",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "fields, expected 2", "parsed": [["id", "note"], ["1"]]},
+    "input": "id,note\n1\n"
+  },
+  {
+    "name": "long-row",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "fields, expected 2", "parsed": [["id", "note"], ["1", "x", "other"]]},
+    "input": "id,note\n1,x,other\n"
+  },
+  {
+    "name": "record-limit-63",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "max_record_bytes": 64,
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "xxxxxxxxxxxxxxxxxxxxxxxxxxxx"]
+      ]
+    },
+    "input": "id,note\n1,xxxxxxxxxxxxxxxxxxxxxxxxxxxx\n"
+  },
+  {
+    "name": "record-limit-64",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "max_record_bytes": 64,
+    "expected": {
+      "kind": "rows",
+      "header": ["id", "note"],
+      "rows": [
+        ["1", "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"]
+      ]
+    },
+    "input": "id,note\n1,xxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n"
+  },
+  {
+    "name": "record-limit-65",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "max_record_bytes": 64,
+    "expected": {"kind": "rejected", "error": "record exceeds max_record_bytes"},
+    "input": "id,note\n1,xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n"
+  }
+]

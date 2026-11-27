@@ -15,9 +15,11 @@ import type {PublicationReceipt} from './browser/publication';
 
 export {};
 type Csv = { encoding: string; headers: boolean; delimiter: string; quote: string; escape: string | null; line_ending: string; bom: boolean; skip_empty_lines: boolean };
+type DetectedCsv = Pick<Csv,'encoding'|'delimiter'|'line_ending'|'bom'>;
+type InputDialect = {trim: 'none' | 'start' | 'end' | 'both'; comment_prefix: string | null; skip_rows: number; skip_columns: number; skip_blank_rows: boolean};
 type Operation = { type: string; files?: number; columns?: (string | number)[]; groups?: {name: string; percent: string}[]; strata?: (string | number)[]; strategy?: string };
 type CalculatedColumn = {name:string;expression:string};
-export type Job = {version: number; input: string; output: string; zip_member: string | null; input_csv: Csv; output_csv: Csv; compression: string; calculated_columns?: CalculatedColumn[]; operations: Operation[]; limits: {rows: number | null; bytes: number | null; compressed_bytes: number | null}; resources: {grouping?: 'auto' | 'sort'; workers: number; memory_mb: number | 'auto'; max_files: number; max_record_bytes: number; temp_dir: string | null; temp_bytes: number | null}; full_shuffle_rng?: 'blake3_counter_v1'; full_shuffle_algorithm?: 'adaptive_v1'};
+export type Job = {version: number; input: string; output: string; zip_member: string | null; input_csv: Csv; input_dialect?: Partial<InputDialect>; output_csv: Csv; compression: string; calculated_columns?: CalculatedColumn[]; operations: Operation[]; limits: {rows: number | null; bytes: number | null; compressed_bytes: number | null}; resources: {grouping?: 'auto' | 'sort'; workers: number; memory_mb: number | 'auto'; max_files: number; max_record_bytes: number; temp_dir: string | null; temp_bytes: number | null}; full_shuffle_rng?: 'blake3_counter_v1'; full_shuffle_algorithm?: 'adaptive_v1'};
 type AutoFact = {value:number|null;accuracy:'exact'|'estimated'|'unknown'};
 type AutoPlan = {
   physical_plan:string;actual_strategy:string;
@@ -56,8 +58,19 @@ let columnSchema: ColumnSchema | null = null;
 let inputSample: FormulaSample | null = null;
 let columnMessage = 'Choose an input file to load its columns.';
 let columnSource = '', columnRequest = 0;
+let preferredInputCsv: DetectedCsv;
+let csvDetection: 'idle'|'pending'|'queued' = 'idle';
+const processingBusy=()=>['profiling','running'].includes(status);
 const pickerSchema = () => withCalculatedColumns(columnSchema, job.calculated_columns ?? []);
-function sourceKey() { return results.sourceKey({input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input')}); }
+function sourceSettings() {
+  return {input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input'),input_dialect:readInputDialect()};
+}
+function sourceJob(): Job {
+  const current = {...job,...sourceSettings()};
+  if (!current.input_dialect) delete current.input_dialect;
+  return current;
+}
+function sourceKey() { return results.sourceKey(sourceSettings()); }
 function renderPickers() {
   $('operations').querySelectorAll<HTMLElement>('[data-column-field]').forEach(picker=>{
     const step=Number(picker.closest<HTMLElement>('[data-step]')!.dataset.step);
@@ -65,20 +78,44 @@ function renderPickers() {
     picker.innerHTML=new DOMParser().parseFromString(pickerMarkup(field,job.operations[step][field]||[],step,pickerSchema(),columnMessage),'text/html').body.firstElementChild!.innerHTML;
   });
 }
-async function loadColumns() {
+async function loadColumns(detect = false) {
+  if(!detect&&csvDetection!=='idle')return;
+  clearTimeout(columnTimer);
   const request=++columnRequest;
   columnSource=sourceKey();columnSchema=null;inputSample=null;formulaEditor.resetSample();formulaEditor.update();$('preview-card').hidden=true;hostedWorkspace?.preview(null);
   columnMessage=value('input')?'Loading input columns?':'Choose an input file to load its columns.';
   renderPickers();
-  if(!value('input'))return;
+  if(!value('input')){
+    csvDetection='idle';$('sniff-note').textContent='';updateRunControl();
+    return;
+  }
+  const current=()=>request===columnRequest&&columnSource===sourceKey();
+  if(detect){
+    if(processingBusy()||results.commandPending){
+      csvDetection='queued';$('sniff-note').textContent='CSV detection will start when processing finishes.';updateRunControl();
+      return;
+    }
+    csvDetection='pending';$('sniff-note').textContent='Detecting CSV settings…';updateRunControl();
+    try {
+      const result=await api<{settings:Csv;note:string}>('sniff',sourceJob());
+      if(!current())return;
+      csvForm('input',result.settings);$('sniff-note').textContent=result.note;markDirty();
+      columnSource=sourceKey();
+    } catch(e) {
+      if(!current())return;
+      $('sniff-note').textContent=e instanceof Error?e.message:String(e);
+    } finally {
+      if(request===columnRequest){csvDetection='idle';updateRunControl();}
+    }
+  }
   try {
-    const sourceJob={...job,input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input'),
+    const previewJob={...sourceJob(),
       resources:{...job.resources,max_record_bytes:readSizeField('max-record')??job.resources.max_record_bytes}};
-    const schema=await api<FormulaSample>('preview',sourceJob);
-    if(request!==columnRequest||columnSource!==sourceKey())return;
+    const schema=await api<FormulaSample>('preview',previewJob);
+    if(!current())return;
     renderPreview(schema);hostedWorkspace?.preview(schema);inputSample=schema;columnSchema=schema;columnMessage=schema.columns?'':'The input file has no columns.';
-    if(schema.columns)formulaEditor.startScan((batch,error)=>startFormulaScan(sourceJob,batch,error));
-  } catch(e) {if(request!==columnRequest||columnSource!==sourceKey())return;columnMessage=e instanceof Error?e.message:String(e);$('preview').textContent=`Input preview unavailable: ${columnMessage}`;$('preview-card').hidden=false;hostedWorkspace?.preview(null,true);}
+    if(schema.columns)formulaEditor.startScan((batch,error)=>startFormulaScan(previewJob,batch,error));
+  } catch(e) {if(!current())return;columnMessage=e instanceof Error?e.message:String(e);$('preview').textContent=`Input preview unavailable: ${columnMessage}`;$('preview-card').hidden=false;hostedWorkspace?.preview(null,true);}
   renderPickers();updateFields();validation.update();formulaEditor.update();
 }
 function choiceOptions(values: readonly string[], selected = '', labels: Record<string, string> = {}) {
@@ -118,6 +155,18 @@ function readCsv(prefix: string): Csv {
   const record: Record<string, unknown> = {};
   $(prefix+'-csv').querySelectorAll<HTMLInputElement>('[data-csv]').forEach(el=>{record[el.dataset.csv!] = el.type==='checkbox'?el.checked:el.value;});
   record.escape ||= null; return record as unknown as Csv;
+}
+function readInputDialect(): InputDialect | undefined {
+  const dialect: InputDialect = {
+    trim: value('input-trim') as InputDialect['trim'],
+    comment_prefix: value('input-comment-prefix') || null,
+    skip_rows: Number(value('input-skip-rows')),
+    skip_columns: Number(value('input-skip-columns')),
+    skip_blank_rows: $<HTMLInputElement>('input-skip-blank-rows').checked,
+  };
+  if (dialect.trim !== 'none' || dialect.comment_prefix !== null || dialect.skip_rows ||
+      dialect.skip_columns || dialect.skip_blank_rows) return dialect;
+  return undefined;
 }
 const operationIds = new WeakMap<Operation,number>();
 let nextOperationId = 0;
@@ -175,18 +224,28 @@ const readSizeField=(id:string)=>readSize(unitFields.get(id)!);
 const sizeText=(id:string)=>value(id)?`${value(id)} ${unitFields.get(id)!.unit.value}`:'';
 function populate() {
   validation.reset();
+  csvDetection='idle';$('sniff-note').textContent='';
+  const {encoding,delimiter,line_ending,bom}=job.input_csv;
+  preferredInputCsv={encoding,delimiter,line_ending,bom};
   advancedResourceDraft=null;
   setValue('input',job.input);setValue('output',job.output);setValue('zip-member',job.zip_member);setValue('compression',job.compression);
   setValue('max-rows',job.limits.rows);populateSize(unitFields.get('max-bytes')!,job.limits.bytes);populateSize(unitFields.get('compressed-bytes')!,job.limits.compressed_bytes);
   setValue('grouping',job.resources.grouping || 'auto');setValue('workers',job.resources.workers);populateMemory(memoryControls,job.resources.memory_mb);setValue('max-files',job.resources.max_files);populateSize(unitFields.get('max-record')!,job.resources.max_record_bytes);setValue('temp-dir',job.resources.temp_dir);populateSize(unitFields.get('temp-bytes')!,job.resources.temp_bytes);
+  const dialect = job.input_dialect;
+  setValue('input-trim', dialect?.trim ?? 'none');
+  setValue('input-comment-prefix', dialect?.comment_prefix);
+  setValue('input-skip-rows', dialect?.skip_rows ?? 0);
+  setValue('input-skip-columns', dialect?.skip_columns ?? 0);
+  $<HTMLInputElement>('input-skip-blank-rows').checked = dialect?.skip_blank_rows ?? false;
+  $<HTMLDetailsElement>('input-dialect-options').open = readInputDialect() !== undefined;
   csvForm('input',job.input_csv);csvForm('output',job.output_csv);renderCalculations();renderOps();markDirty();void loadColumns();
 }
 const effectiveOperations = () => advancedExecution() ? job.operations :
   job.operations.map(op=>op.type==='shuffle'?{...op,strategy:'auto'}:op);
 function readJob(): Job {
   const advanced = advancedExecution();
-  return {...job,operations:effectiveOperations(),input:value('input'),output:value('output'),zip_member:value('zip-member')||null,compression:value('compression'),
-    input_csv:readCsv('input'),output_csv:readCsv('output'),limits:{rows:value('max-rows')?Number(value('max-rows')):null,bytes:readSizeField('max-bytes'),compressed_bytes:value('compression')==='none'?null:readSizeField('compressed-bytes')},
+  return {...sourceJob(),operations:effectiveOperations(),output:value('output'),compression:value('compression'),
+    output_csv:readCsv('output'),limits:{rows:value('max-rows')?Number(value('max-rows')):null,bytes:readSizeField('max-bytes'),compressed_bytes:value('compression')==='none'?null:readSizeField('compressed-bytes')},
     resources:{...job.resources,grouping:advanced?value('grouping') as 'auto' | 'sort':'auto',workers:advanced?Number(value('workers')):0,memory_mb:advanced?readMemory(memoryControls):'auto',max_files:Number(value('max-files')),max_record_bytes:readSizeField('max-record')!,temp_dir:value('temp-dir')||null,temp_bytes:readSizeField('temp-bytes')}};
 }
 function updateFields() {
@@ -217,7 +276,11 @@ function updateFields() {
   $<HTMLButtonElement>('add-operation').disabled=(job?.operations.length||0)>=64;
 }
 function markDirty() {
-  const source=sourceKey();
+  const settings=sourceSettings();
+  const source=results.sourceKey(settings);
+  const {encoding,delimiter,headers}=settings.input_csv;
+  const delimiterName=delimiter==='\t'?'tab':delimiter===','?'comma':delimiter||'choose a delimiter';
+  $('input-csv-summary').textContent=`${encoding} · ${delimiterName} · ${headers?'header row':'headerless'}`;
   const {profile,profileCurrent}=results.editDraft(source);
   if(!profileCurrent)$('input-profile').hidden=true;
   if(columnSource!==source)hostedWorkspace?.resetColumnExplorer();
@@ -333,7 +396,7 @@ async function poll() {
     if(!accepted)return;
     status=s.status;
     $('connection').hidden=true;
-    const busy = ['profiling','running'].includes(status);
+    const busy = processingBusy();
     $('status').textContent=status.replace('_',' ').toUpperCase();
     const now=performance.now();
     if(busy&&(progressPhase!==s.progress.phase||progressStatus!==status||s.progress.rows<progressRows)){progressPhase=s.progress.phase;progressStarted=now;progressRows=s.progress.rows;progressStopped=null;}
@@ -342,7 +405,8 @@ async function poll() {
     const seconds=((progressStopped??now)-progressStarted)/1000, rate=(s.progress.rows-progressRows)/Math.max(seconds,0.001);
     $('progress').hidden=!busy&&!['failed','cancelled'].includes(status);$('phase').textContent=s.progress.phase;
     $('progress-detail').textContent=`${format(s.progress.rows)} rows · ${size(s.progress.temp_bytes)} temporary · ${Math.floor(seconds)} s in phase${seconds>=1&&rate>0?` · ${format(Math.round(rate))} rows/s`:''}`;
-    updateRunControl();$<HTMLButtonElement>('profile').disabled=busy;
+    updateRunControl();
+    if(!busy&&csvDetection==='queued')void loadColumns(true);
     $('cancel').hidden=!['profiling','running'].includes(status);
     if(accepted.profile)renderProfile(accepted.profile,source);
     else if(s.profile&&status==='profiled'){lastProfile='';$('input-profile').hidden=false;$('input-profile').textContent='Analysis finished for a different input or parsing configuration. Analyze input again for the current source.';}
@@ -377,11 +441,18 @@ $('job-form').addEventListener('input',event=>{
     if(job)planLinks.render(job.operations,{rows:value('max-rows'),bytes:sizeText('max-bytes'),compressed:sizeText('compressed-bytes')},value('compression'));
     updateDraft();validation.update();return;
   }
-  markDirty();
-  if(target.id==='input'||target.id==='zip-member'||target.closest('#input-csv')){
+  const zipMemberChanged=target.id==='zip-member';
+  const sourceChanged=target.id==='input'||zipMemberChanged||target.closest('#input-csv, #input-dialect-options');
+  if(sourceChanged){
+    const field=(target as HTMLInputElement).dataset.csv;
+    if(field==='delimiter'||field==='encoding')preferredInputCsv[field]=(target as HTMLInputElement).value;
+    if(zipMemberChanged)csvForm('input',{...readCsv('input'),...preferredInputCsv});
+    csvDetection=zipMemberChanged?'pending':'idle';
+    $('sniff-note').textContent=zipMemberChanged?'Detecting CSV settings…':'';
     clearTimeout(columnTimer);columnRequest++;columnSchema=null;inputSample=null;formulaEditor.resetSample();formulaEditor.update();columnMessage='Loading input columns?';renderPickers();
-    $('preview-card').hidden=true;validation.update();columnTimer=setTimeout(()=>void loadColumns(),400);
+    $('preview-card').hidden=true;columnTimer=setTimeout(()=>void loadColumns(zipMemberChanged),400);
   }
+  markDirty();
 });
 $('operations').addEventListener('input',e=>{
   const el=e.target as HTMLInputElement;const step=el.closest<HTMLElement>('[data-step]');if(!step)return;
@@ -488,17 +559,10 @@ $('add-calculated-column').onclick=()=>{
   $('calculated-columns-list').querySelector<HTMLElement>(`[data-calculation="${columns.length-1}"] [data-field="name"]`)?.focus();
 };
 $('add-operation').onclick=()=>{const type=value('new-operation');job.operations.push((type==='balanced'||type==='interleaved')?{type,files:2}:type==='partition'?{type,columns:[]}:(type==='assign'||type==='assign_probabilistic')?{type,groups:[{name:'treatment',percent:'80'},{name:'control',percent:'20'}],strata:[]}:{type,strategy:'auto'});renderOps();markDirty();};
-$('sniff-csv').onclick=async()=>{
-  const button=$<HTMLButtonElement>('sniff-csv');button.disabled=true;
-  const source=sourceKey();
-  try{const result=await api<{settings:Csv;note:string}>('sniff',{...job,input:value('input'),zip_member:value('zip-member')||null,input_csv:readCsv('input')});
-    if(source!==sourceKey())return;
-    csvForm('input',result.settings);$('sniff-note').textContent=result.note;markDirty();void loadColumns();
-  }catch(e){error(e);}finally{button.disabled=false;}
-};
+$('sniff-csv').onclick=()=>void loadColumns(true);
 $('copy-csv').onclick=()=>{csvForm('output',readCsv('input'));markDirty();};
 $('profile').onclick=async()=>{
-  if(!validation.check(false))return;
+  if(csvDetection!=='idle'||!validation.check(false))return;
   try{
     const submitted=readJob();clearError();
     await results.analyze(submitted,sourceKey(),()=>api('profile',submitted));
@@ -506,7 +570,7 @@ $('profile').onclick=async()=>{
   }catch(e){error(e);}
 };
 async function startJob(){
-  if(!validation.check())return;
+  if(csvDetection!=='idle'||!validation.check())return;
   try{
     const submitted=readJob();updateDraft();clearError();
     const dispatched=await results.run(submitted,sourceKey(),()=>api<RunAcknowledgement>('run-direct',submitted));
@@ -520,8 +584,11 @@ async function startJob(){
 }
 function updateRunControl() {
   const button=$<HTMLButtonElement>('run-direct');
-  button.disabled=['profiling','running'].includes(status);
-  $<HTMLButtonElement>('try-sample').disabled=button.disabled||!job||!$('try-sample').dataset.csv;
+  const busy=processingBusy();
+  button.disabled=busy||csvDetection!=='idle';
+  $<HTMLButtonElement>('profile').disabled=button.disabled;
+  $<HTMLButtonElement>('sniff-csv').disabled=button.disabled||!value('input');
+  $<HTMLButtonElement>('try-sample').disabled=busy||!job||!$('try-sample').dataset.csv;
   button.textContent='Run →';
 }
 $('job-form').onsubmit=async e=>{
@@ -537,14 +604,18 @@ const manual=typeof config.resources?.memory_mb==='number'||job.resources.worker
   ||job.operations.some(op=>op.type==='shuffle'&&op.strategy&&op.strategy!=='auto');
 $<HTMLInputElement>('execution-mode').checked=manual;populate();}catch(e){error(e);}};
 function updateSelectedPath(mode:string,path:string){
-  if(mode==='input')results.selectInput();
+  if(mode==='input'){
+    results.selectInput();
+    csvForm('input',{...readCsv('input'),...preferredInputCsv});
+    $('sniff-note').textContent='';
+  }
   setValue(mode,path);markDirty();
-  if(mode==='input')void loadColumns();
+  if(mode==='input')void loadColumns(true);
 }
 const sampleButton=$<HTMLButtonElement>('try-sample');
 sampleButton.onclick=async()=>{
   if(sampleButton.disabled||results.commandPending||$<HTMLButtonElement>('browse-input').disabled)return;
-  if((value('input')||value('zip-member')||value('max-rows'))&&!window.confirm('Load the sample CSV and replace the current input and row limit? Your other job settings will stay in place.'))return;
+  if((value('input')||value('zip-member')||value('max-rows'))&&!window.confirm('Load the sample CSV and replace the current input and row limit?'))return;
   try{
     const rows=Number(sampleButton.dataset.rows);
     const bytes=Uint8Array.from(atob(sampleButton.dataset.csv!),char=>char.charCodeAt(0));

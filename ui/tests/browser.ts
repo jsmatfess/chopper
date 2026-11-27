@@ -96,12 +96,32 @@ async function main(){
       }
     }
   });
-  await test('optional CSV sniffing shares the native engine',async()=>{
+  await test('bounded CSV sniffing shares the native engine',async()=>{
     await select(csv('country;value\r\nUS;1\r\nGB;2\r\n'));
     const result=await api<{settings:Job['input_csv']}>('sniff',job());
     assert(result.settings.delimiter===';'&&result.settings.line_ending==='crlf','wrong sniffed dialect');
+    await select(csv('country;value\nUS;"line one\r\nline two"\nGB;2\n'));
+    const multiline=await api<{settings:Job['input_csv']}>('sniff',job());
+    assert(multiline.settings.delimiter===';'&&multiline.settings.line_ending==='lf','quoted text changed the suggested record ending');
+    await select(csv('country;value\nUS;"unterminated'));
+    const weak=await api<{settings:Job['input_csv'];note:string}>('sniff',job());
+    assert(weak.settings.delimiter===','&&weak.note.includes('No delimiter'),'one record changed the suggested delimiter');
     const r=await run(csv('country,value\nUS,1\nGB,2\nUS,3\n'),job({operations:[{type:'partition',columns:['country']}]}));
     assert(JSON.stringify(r.plan.column_values?.[0].values)===JSON.stringify(['GB','US']),'missing unique values');
+  });
+  await test('opt-in input dialect affects preview and published records',async()=>{
+    const input=csv('Report for this week\n# preliminary data\nidx; region ; note \r\n; ;\r\n1;EU;" example\r\n# kept "\r\n# outside\n2;US; done \r\n');
+    const config=job({
+      input_csv:{...defaults.input_csv,delimiter:';'},
+      input_dialect:{trim:'both',comment_prefix:'#',skip_rows:1,skip_columns:1,skip_blank_rows:true},
+    });
+    await select(input);
+    const preview=await api<{header:string[];preview:string[][]}>('preview',config);
+    assert(JSON.stringify(preview.header)===JSON.stringify(['region','note']),'dialect header changed');
+    assert(JSON.stringify(preview.preview)===JSON.stringify([['EU','example\r\n# kept'],['US','done']]),'dialect preview changed');
+    const result=await run(input,config,true);
+    assert(result.plan.rows===2,'dialect count changed');
+    assert((await texts(result.files))[0]==='region,note\nEU,"example\r\n# kept"\nUS,done\n','dialect export changed');
   });
   await test('bounded input samples use the worker without preparing outputs',async()=>{
     await select(csv('id,note\n'+'1,hello\n'.repeat(8)+'"unterminated'));

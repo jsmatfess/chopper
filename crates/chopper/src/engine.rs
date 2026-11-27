@@ -1172,6 +1172,7 @@ fn validate_input_inspection(job: &Job) -> Result<()> {
     Job {
         input: job.input.clone(),
         input_csv: job.input_csv.clone(),
+        input_dialect: job.input_dialect.clone(),
         output_csv: job.input_csv.clone(),
         resources: job.resources.clone(),
         ..Job::default()
@@ -1195,14 +1196,7 @@ fn inspect_input(job: &Job, preview: bool) -> Result<Inspection> {
 }
 /// Suggest a dialect from at most 64 KiB of decompressed input. Header/escape settings remain explicit.
 pub fn sniff_csv(job: &Job) -> Result<Inspection> {
-    Job {
-        input: job.input.clone(),
-        input_csv: job.input_csv.clone(),
-        output_csv: job.input_csv.clone(),
-        resources: job.resources.clone(),
-        ..Job::default()
-    }
-    .validate()?;
+    validate_input_inspection(job)?;
     let inspection = input_inspection_reservation(job)?;
     with_input(job, inspection.sibling(), |source| {
         input_sniff::sniff(source, job, inspection)
@@ -1414,14 +1408,14 @@ fn ingest_options(
         ctx.max_record,
         Reservation::new(ctx),
     )?;
-    ingest_records(
+    records::with_dialect!(input, &job.input_dialect, |input| ingest_records(
         input,
         job,
         ctx,
         _fuse_partitions,
         _fuse_balanced,
         _fuse_streaming,
-    )
+    ))
 }
 fn observe_input_error(
     observation: &mut Option<crate::observation::physical::Span<'_>>,

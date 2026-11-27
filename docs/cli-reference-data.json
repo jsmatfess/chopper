@@ -621,6 +621,54 @@
           "syntax": "--output-skip-empty-lines <output-skip-empty-lines>"
         },
         {
+          "accepted_values": [
+            "none",
+            "start",
+            "end",
+            "both"
+          ],
+          "defaults": [],
+          "description": "Trim whitespace from decoded input fields",
+          "heading": "Flag-built input CSV",
+          "id": "input-trim",
+          "syntax": "--input-trim <input-trim>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Ignore input lines beginning with this text at a record boundary",
+          "heading": "Flag-built input CSV",
+          "id": "input-comment-prefix",
+          "syntax": "--input-comment-prefix <input-comment-prefix>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Ignore this many physical lines before reading the CSV",
+          "heading": "Flag-built input CSV",
+          "id": "input-skip-rows",
+          "syntax": "--input-skip-rows <input-skip-rows>"
+        },
+        {
+          "accepted_values": [],
+          "defaults": [],
+          "description": "Drop this many leading fields from each input record and its header",
+          "heading": "Flag-built input CSV",
+          "id": "input-skip-columns",
+          "syntax": "--input-skip-columns <input-skip-columns>"
+        },
+        {
+          "accepted_values": [
+            "true",
+            "false"
+          ],
+          "defaults": [],
+          "description": "Ignore input data records with only empty fields",
+          "heading": "Flag-built input CSV",
+          "id": "input-skip-blank-rows",
+          "syntax": "--input-skip-blank-rows <input-skip-blank-rows>"
+        },
+        {
           "accepted_values": [],
           "defaults": [],
           "description": "JSON job file; allows --memory-mb, --workers, --analysis, --summary and --yes",
@@ -739,5 +787,5 @@
     ],
     "version": 1
   },
-  "version": "0.6.5"
+  "version": "0.6.6"
 }

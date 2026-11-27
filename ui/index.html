@@ -15,6 +15,7 @@
         <div id="input-picker">
           <label for="input">Input file</label>
           <div class="input-action"><input id="input" required placeholder="Path to a CSV, gzip or ZIP file"><button type="button" id="browse-input" class="secondary" aria-label="Browse for input file">Browse</button></div>
+          <small id="sniff-note" role="status"></small>
         </div>
         <p id="sample-status" class="hint" role="status"></p>
         <div id="output-picker">
@@ -25,7 +26,27 @@
           <small><a data-folder-docs-link href="https://github.com/jsmatfess/chopper/blob/main/docs/browser.md#choosing-an-output-folder" target="_blank" rel="noopener noreferrer">Folder and export help<span class="sr-only"> (opens in a new tab)</span></a></small>
         </div>
         <div class="grid2"><label>Output format<select id="compression"></select></label><label>ZIP input member <span class="optional">optional</span><input id="zip-member" placeholder="e.g. data/customers.csv" aria-describedby="zip-member-help"><small id="zip-member-help">A member is a file inside the input ZIP archive. Leave blank if the archive has one CSV; otherwise enter the exact path of the CSV inside it, such as data/customers.csv. This setting only applies to ZIP input.</small></label></div>
-        <details><summary>CSV dialect & encoding <span>UTF-8 · comma · headers</span></summary><div class="dialects"><div><h3>Input</h3><button type="button" id="sniff-csv" class="text-button">Detect CSV settings</button><small id="sniff-note" role="status"></small><div id="input-csv"></div></div><div><div class="heading-action"><h3>Output</h3><button type="button" id="copy-csv" class="text-button">Copy input settings ↗</button></div><div id="output-csv"></div></div></div></details>
+        <details><summary>CSV dialect & encoding <span id="input-csv-summary"></span></summary><div class="dialects"><div><h3>Input</h3><button type="button" id="sniff-csv" class="text-button">Detect CSV settings</button><div id="input-csv"></div>
+          <details id="input-dialect-options"><summary>Optional input settings</summary>
+            <fieldset><legend>Input records and fields</legend>
+              <label for="input-trim">Trim field whitespace</label>
+              <select id="input-trim" name="input-trim">
+                <option value="none">Keep whitespace</option>
+                <option value="start">Leading</option>
+                <option value="end">Trailing</option>
+                <option value="both">Leading and trailing</option>
+              </select>
+              <label for="input-comment-prefix">Comment prefix</label>
+              <input id="input-comment-prefix" name="input-comment-prefix" type="text" spellcheck="false" aria-describedby="input-comment-help">
+              <small id="input-comment-help">Lines starting with this text between records are skipped.</small>
+              <div class="grid2">
+                <label for="input-skip-rows">Initial lines to skip<input id="input-skip-rows" name="input-skip-rows" type="number" min="0" max="9007199254740991" step="1" value="0"></label>
+                <label for="input-skip-columns">Leading columns to drop<input id="input-skip-columns" name="input-skip-columns" type="number" min="0" max="9007199254740991" step="1" value="0"></label>
+              </div>
+              <label for="input-skip-blank-rows" class="check-label"><input id="input-skip-blank-rows" name="input-skip-blank-rows" type="checkbox">Skip rows with only empty fields</label>
+            </fieldset>
+          </details>
+        </div><div><div class="heading-action"><h3>Output</h3><button type="button" id="copy-csv" class="text-button">Copy input settings ↗</button></div><div id="output-csv"></div></div></div></details>
       </div></section>
       <section id="calculated-columns" class="card" tabindex="-1" aria-labelledby="calculated-columns-heading"><div class="section-title"><h2 id="calculated-columns-heading">Calculated Columns</h2><a class="formula-reference" data-formula-docs-link href="https://github.com/jsmatfess/chopper/blob/main/docs/formula-functions.md" target="_blank" rel="noopener noreferrer">Function reference<span class="sr-only"> (opens in a new tab)</span></a></div><div class="section-body"><p class="formula-example-hint">Type over any preview value to try a different input.</p><div id="calculated-columns-list"></div><button class="secondary" id="add-calculated-column" type="button">＋ Add calculated column</button></div></section>
       <section class="card"><div class="section-title"><span class="number">02</span><h2>Build a pipeline</h2><span class="tag">ORDER MATTERS</span></div><div class="section-body"><p class="hint">Each step works within the groups made by the step before it.</p><div id="operations"></div><div class="add-row"><select id="new-operation" aria-label="Operation to add"></select><button class="secondary" id="add-operation" type="button">＋ Add step</button></div><p id="conflict" class="notice" hidden></p></div></section>

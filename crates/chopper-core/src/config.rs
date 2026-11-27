@@ -65,6 +65,9 @@ pub struct Job {
     pub full_shuffle_algorithm: FullShuffleAlgorithm,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub calculated_columns: Vec<CalculatedColumn>,
+    // Append fields so the decoder's legacy sequence form keeps its order.
+    #[serde(skip_serializing_if = "InputDialect::is_default")]
+    pub input_dialect: InputDialect,
 }
 impl Default for Job {
     fn default() -> Self {
@@ -74,6 +77,7 @@ impl Default for Job {
             output: String::new(),
             zip_member: None,
             input_csv: CsvSettings::default(),
+            input_dialect: InputDialect::default(),
             output_csv: CsvSettings::default(),
             compression: Compression::None,
             calculated_columns: vec![],
@@ -140,6 +144,35 @@ impl Default for CsvSettings {
         }
     }
 }
+
+/// Optional input-only changes to which records and cells enter the pipeline.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct InputDialect {
+    pub trim: CsvTrim,
+    pub comment_prefix: Option<String>,
+    pub skip_rows: u64,
+    pub skip_columns: usize,
+    pub skip_blank_rows: bool,
+}
+
+impl InputDialect {
+    pub fn is_default(&self) -> bool {
+        *self == Self::default()
+    }
+}
+
+wire_choices! {
+    #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+    pub enum CsvTrim {
+        #[default]
+        None => "none",
+        Start => "start",
+        End => "end",
+        Both => "both",
+    }
+}
+
 // Keep the legacy error while defining accepted wire spellings once.
 macro_rules! compression_choices {
     ($($variant:ident => $wire:literal),+ $(,)?) => {

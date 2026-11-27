@@ -94,6 +94,25 @@ const CSV: &[(&str, &str)] = &[
     ("bom", "Set the byte order mark setting; input marks are detected automatically"),
     ("skip-empty-lines", "Skip empty lines during input parsing"),
 ];
+const INPUT_DIALECT: &[(&str, &str)] = &[
+    ("input-trim", "Trim whitespace from decoded input fields"),
+    (
+        "input-comment-prefix",
+        "Ignore input lines beginning with this text at a record boundary",
+    ),
+    (
+        "input-skip-rows",
+        "Ignore this many physical lines before reading the CSV",
+    ),
+    (
+        "input-skip-columns",
+        "Drop this many leading fields from each input record and its header",
+    ),
+    (
+        "input-skip-blank-rows",
+        "Ignore input data records with only empty fields",
+    ),
+];
 
 // Use the actual validator when labels have aliases or retired values with guidance.
 #[derive(Clone)]
@@ -238,6 +257,20 @@ pub fn command() -> Command {
             command = command.arg(argument);
         }
     }
+    for &(id, help) in INPUT_DIALECT {
+        config_conflicts.push(id);
+        let argument = Arg::new(id)
+            .long(id)
+            .help(help)
+            .help_heading("Flag-built input CSV");
+        command = command.arg(match id {
+            "input-trim" => argument.value_parser(choices(CsvTrim::CHOICES)),
+            "input-skip-blank-rows" => {
+                argument.value_parser(BoolValueParser::new().map(|value| value.to_string()))
+            }
+            _ => argument,
+        });
+    }
     command = command.arg(
         Arg::new("config")
             .long("config")
@@ -374,6 +407,19 @@ pub fn parse(matches: &ArgMatches) -> Result<(Job, bool)> {
     }
     csv(matches, "input", &mut job.input_csv)?;
     csv(matches, "output", &mut job.output_csv)?;
+    for &(flag, _) in INPUT_DIALECT {
+        let Some(value) = matches.get_one::<String>(flag) else {
+            continue;
+        };
+        match flag {
+            "input-trim" => job.input_dialect.trim = enumeration(value, flag)?,
+            "input-comment-prefix" => job.input_dialect.comment_prefix = Some(value.clone()),
+            "input-skip-rows" => job.input_dialect.skip_rows = number(value, flag)?,
+            "input-skip-columns" => job.input_dialect.skip_columns = number(value, flag)?,
+            "input-skip-blank-rows" => job.input_dialect.skip_blank_rows = number(value, flag)?,
+            _ => unreachable!(),
+        }
+    }
     let mut ordered = Vec::new();
     for &(flag, _) in LOCAL {
         if let (Some(indices), Some(values)) =

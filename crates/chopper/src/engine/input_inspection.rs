@@ -12,14 +12,26 @@ pub(super) fn columns(
     record: Reservation,
     input_is_zip: bool,
 ) -> Result<Inspection> {
-    let mut owner = Intake::inspection(
+    let owner = Intake::inspection(
         source,
         &job.input_csv,
         job.resources.max_record_bytes,
         record,
     )?;
+    records::with_dialect!(owner, &job.input_dialect, |owner| columns_from(
+        owner,
+        job.input_csv.headers,
+        input_is_zip,
+    ))
+}
+
+fn columns_from(
+    mut owner: Intake<impl records::Records>,
+    headers: bool,
+    input_is_zip: bool,
+) -> Result<Inspection> {
     owner.next_owned(|| Ok(()))?;
-    let (items, text) = if job.input_csv.headers {
+    let (items, text) = if headers {
         let bytes = owner.owned().iter().try_fold(0usize, |total, field| {
             total
                 .checked_add(field.len())
@@ -32,7 +44,7 @@ pub(super) fn columns(
     Inspection::build(owner.reservation(), items, text, || {
         json!({
             "columns": owner.owned().len(),
-            "header": if job.input_csv.headers { Some(owner.owned()) } else { None },
+            "header": if headers { Some(owner.owned()) } else { None },
             "input_is_zip": input_is_zip,
         })
     })
@@ -45,12 +57,22 @@ pub(super) fn preview(
     record: Reservation,
     input_is_zip: bool,
 ) -> Result<Inspection> {
-    let mut owner = Intake::inspection(
+    let owner = Intake::inspection(
         source,
         &job.input_csv,
         job.resources.max_record_bytes,
         record,
     )?;
+    records::with_dialect!(owner, &job.input_dialect, |owner| preview_from(
+        owner,
+        input_is_zip
+    ))
+}
+
+fn preview_from(
+    mut owner: Intake<impl records::Records>,
+    input_is_zip: bool,
+) -> Result<Inspection> {
     let header = owner.header()?;
     let header = header.map(|header| header.into_parts());
     let mut sample = preview::Builder::new(owner.reservation());

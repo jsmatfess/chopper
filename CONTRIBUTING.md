@@ -42,6 +42,11 @@ contracts. Review success and failure branches and current-versus-designed statu
 | Native CLI help or Job recipes | Build with `cargo build --release --locked -p chopper`, then run `python3 scripts/cli-reference.py target/release/chopper --check` and `python3 scripts/test-job-recipes.py target/release/chopper`. Omit `--check` to regenerate the reference. On Windows, use `python` and `target/release/chopper.exe`. |
 | Documentation or CI routing | Review links, actual command options and workflow syntax; execute newly routed checks. Documentation alone does not require a full engine rebuild. |
 
+For focused CSV parser and export checks, run
+`cargo test --locked -p chopper --test csv_compatibility`. The workspace tests
+also run this suite. See the
+[compatibility report](docs/validation.md#csv-compatibility-coverage).
+
 Run the applicable checks above while developing; the [CI policy](docs/ci.md)
 defines local delivery and hosted merge gates. Use `python3 scripts/local-ci.py check`
 to execute the workflow YAML with act, and `python3 scripts/local-ci.py land` for authorized

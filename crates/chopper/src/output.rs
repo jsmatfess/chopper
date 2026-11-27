@@ -394,7 +394,7 @@ impl<'a> PlanWriter<'a> {
             if job.output_csv.headers {
                 if let Some(header) = header {
                     let prefix_capacity = prefix.capacity();
-                    let bytes = serializer.serialize_fields_reserved(
+                    serializer.serialize_fields_reserved(
                         header.iter().map(String::as_str),
                         &mut |bytes| {
                             serialization.resize(
@@ -404,12 +404,26 @@ impl<'a> PlanWriter<'a> {
                             )
                         },
                     )?;
+                    let quoting = prefix
+                        .is_empty()
+                        .then(|| serializer.file_start_quote())
+                        .flatten();
+                    let bytes = serializer.bytes();
                     let needed = prefix
                         .len()
                         .checked_add(bytes.len())
+                        .and_then(|len| {
+                            len.checked_add(quoting.as_ref().map_or(0, |quote| quote.extra_bytes()))
+                        })
                         .context("output prefix overflow")?;
                     serialization.reserve_vec(&mut prefix, needed)?;
-                    prefix.extend_from_slice(bytes);
+                    if let Some(quote) = quoting {
+                        for part in quote.parts(bytes) {
+                            prefix.extend_from_slice(part);
+                        }
+                    } else {
+                        prefix.extend_from_slice(bytes);
+                    }
                 }
             }
             ensure!(
@@ -1744,26 +1758,27 @@ impl PlanWriter<'_> {
             if let Some(span) = &mut self.observation {
                 span.start();
             }
-            let size = self
-                .serializer
+            self.serializer
                 .serialize_fields_reserved(fields, &mut |bytes| {
                     self._serialization.resize(
                         prefix_capacity
                             .checked_add(bytes)
                             .context("output serialization overflow")?,
                     )
-                })?
-                .len() as u64;
-            self.prepare_encoded_row(group, size)?;
-            self.target.write_all(self.serializer.bytes())?;
-            self.finish_encoded_row(group, size)
+                })?;
+            self.write_encoded_row(group, None)
         })();
         if let Err(error) = &result {
             self.observe_error(error);
         }
         result
     }
-    fn prepare_encoded_row(&mut self, group: &Group, size: u64) -> Result<()> {
+    fn write_encoded_row(
+        &mut self,
+        group: &mut Group,
+        external: Option<&csv::Serializer>,
+    ) -> Result<()> {
+        let size = external.unwrap_or(&self.serializer).bytes().len() as u64;
         let hard = self.job.limits.bytes.unwrap_or(u64::MAX);
         ensure!(
             self.prefix.len() as u64 + size <= hard,
@@ -1787,9 +1802,25 @@ impl PlanWriter<'_> {
             }
         }
         if self.chunk.is_none() {
+            if self.prefix.is_empty() {
+                if let Some(quote) = external.unwrap_or(&self.serializer).file_start_quote() {
+                    let size = size + quote.extra_bytes() as u64;
+                    ensure!(
+                        size <= hard,
+                        "one row plus header exceeds output byte limit"
+                    );
+                    self.open(group)?;
+                    for bytes in quote.parts(external.unwrap_or(&self.serializer).bytes()) {
+                        self.target.write_all(bytes)?;
+                    }
+                    return self.finish_encoded_row(group, size);
+                }
+            }
             self.open(group)?;
         }
-        Ok(())
+        self.target
+            .write_all(external.unwrap_or(&self.serializer).bytes())?;
+        self.finish_encoded_row(group, size)
     }
     fn finish_encoded_row(&mut self, group: &mut Group, size: u64) -> Result<()> {
         let chunk = &mut self.chunk.as_mut().unwrap().value;
@@ -1815,11 +1846,7 @@ impl PlanWriter<'_> {
             if let Some(span) = &mut self.observation {
                 span.start();
             }
-            let bytes = serialized.bytes();
-            let size = bytes.len() as u64;
-            self.prepare_encoded_row(group, size)?;
-            self.target.write_all(bytes)?;
-            self.finish_encoded_row(group, size)
+            self.write_encoded_row(group, Some(serialized))
         })();
         if let Err(error) = &result {
             self.observe_error(error);

@@ -8,6 +8,7 @@ fn wire_cases() -> Vec<Vec<u8>> {
     let mut cases = vec![
         br#"{}"#.to_vec(), br#"[]"#.to_vec(),
         br#"{"input_csv":{},"output_csv":{},"resources":{"memory_mb":"auto"}}"#.to_vec(),
+        br#"{"input_dialect":{"trim":"both","comment_prefix":"\u96ea ","skip_blank_rows":true,"skip_columns":1,"skip_rows":2}}"#.to_vec(),
         br#"{"input":"\u00e9\u96ea\ud83e\udd80","operations":[{"type":"shuffle"},{"files":2,"type":"balanced"},{"type":"interleaved","files":2}]}"#.to_vec(),
         br#"{"operations":[{"columns":[0,"0","snow",1],"type":"partition"},{"groups":[{"name":"a","percent":"100"}],"strata":[0],"type":"assign"},{"type":"assign_probabilistic","groups":[["b","100"]]}]}"#.to_vec(),
         br#"{"calculated_columns":[{"name":"value","expression":"SAFE.NUMBER(a)"},{"name":"more","expression":"value + 2"}]}"#.to_vec(),

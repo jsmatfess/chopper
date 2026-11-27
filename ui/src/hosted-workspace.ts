@@ -101,10 +101,11 @@ export function configureHostedWorkspace(formula:FormulaInsertionTarget) {
   const sourceBody = source.querySelector('.section-body')!;
   const sourceSettings = source.querySelector('details')!;
   sourceSettings.id='source-settings';
-  sourceSettings.querySelector('summary')!.textContent = 'Parsing, encoding & ZIP member';
+  const sourceSummary=sourceSettings.querySelector('summary')!;
+  sourceSummary.replaceChildren('Parsing, encoding & ZIP member',get('input-csv-summary'));
   const inputDialect = get('input-csv').parentElement!;
   const outputDialect = get('output-csv').parentElement!;
-  sourceSettings.replaceChildren(sourceSettings.querySelector('summary')!,label('zip-member'),inputDialect);
+  sourceSettings.replaceChildren(sourceSummary,label('zip-member'),inputDialect);
   const output = document.createElement('section'); output.className = 'card';
   output.innerHTML = '<div class="section-title"><span class="number"></span><h2></h2></div><div class="section-body"></div>';
   title(output,'output-settings','02','Output');

@@ -42,7 +42,7 @@ try {
         window.Worker=class extends RealWorker {
           postMessage(message,transfer=[]){super.postMessage(window.observationDisabled&&message.type==='run-direct'?{...message,observationCredit:undefined}:message,transfer);}
         };
-        const input=new File(['id,key\n1,a\n2,b\n'],'fixture.csv');
+        const input=new File(['id;key\n1;a\n2;b\n'],'fixture.csv');
         window.showOpenFilePicker=async()=>[{getFile:async()=>input}];
         window.destinationPickerError='AbortError';
         window.showDirectoryPicker=async({mode})=>{
@@ -69,6 +69,8 @@ try {
       assert.equal(await app.locator('#memory').isDisabled(),true);
       await app.locator('#browse-input').click();
       await app.waitForFunction(()=>document.getElementById('input').value==='fixture.csv');
+      await app.waitForFunction(()=>document.querySelector('#input-csv [data-csv=delimiter]')?.value===';');
+      await app.getByRole('table',{name:'Input preview sample'}).getByRole('columnheader',{name:'key',exact:true}).waitFor();
       const destinationPicker=app.locator('#browse-output'),pickerStatus=app.locator('#output-picker-status');
       await destinationPicker.click();
       await pickerStatus.filter({hasText:'No folder selected'}).waitFor({timeout:3000});

@@ -18,6 +18,11 @@ with file and folder access enabled. Your CSV is processed locally in your
 browser. [Try a sample export](../browser.md#try-a-sample-export) to practice
 with synthetic data and check the results.
 
+Chopper detects CSV settings when you select a file and uses them to load
+the input preview. Review the columns before running. You can edit the
+input settings or repeat detection under **Parsing, encoding & ZIP member**. See
+[supported CSV settings](../job-json.md#csv-settings).
+
 - [Choose an output folder and recover from a blocked selection](../browser.md#choosing-an-output-folder).
 - [Verify an export or recover after an interruption](../browser.md#checking-a-hosted-export-after-interruption).
 
@@ -34,6 +39,7 @@ with synthetic data and check the results.
 
 | I want to… | Guide |
 | --- | --- |
+| Check which CSV encodings and dialect options are supported | [CSV settings](../job-json.md#csv-settings) |
 | Find commands and flags for the installed version | [CLI reference](../cli-reference.md) |
 | Write a saved Job and get editor completions | [Job JSON and schema](../job-json.md) |
 | Write calculated columns and look up a function | [Formula functions](../formula-functions.md) |

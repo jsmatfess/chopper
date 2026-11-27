@@ -3,6 +3,9 @@ use anyhow::{bail, ensure, Context, Result};
 use encoding_rs::{Decoder, DecoderResult, EncoderResult, Encoding, UTF_16BE, UTF_16LE, UTF_8};
 use std::io::{self, BufRead, Read};
 
+mod dialect;
+pub use dialect::DialectParser;
+
 pub const ENCODINGS: &[&str] = &[
     "UTF-8",
     "UTF-16LE",
@@ -62,9 +65,24 @@ impl<R: Read> DecodeReader<R> {
             done: false,
         })
     }
+
+    /// Decode a byte-limited sample without treating an incomplete trailing
+    /// code unit as invalid input. Malformed sequences still fail.
+    pub fn sample(self) -> impl Read {
+        struct Sample<R>(DecodeReader<R>);
+        impl<R: Read> Read for Sample<R> {
+            fn read(&mut self, out: &mut [u8]) -> io::Result<usize> {
+                self.0.read_decoded::<false, false>(out)
+            }
+        }
+        Sample(self)
+    }
 }
 impl<R: Read> DecodeReader<R> {
-    fn read_decoded<const DIRECT: bool>(&mut self, out: &mut [u8]) -> io::Result<usize> {
+    fn read_decoded<const DIRECT: bool, const FINAL: bool>(
+        &mut self,
+        out: &mut [u8],
+    ) -> io::Result<usize> {
         if out.is_empty() {
             return Ok(0);
         }
@@ -84,7 +102,7 @@ impl<R: Read> DecodeReader<R> {
                 } else {
                     &mut self.output
                 },
-                self.eof,
+                FINAL && self.eof,
             );
             self.start += used;
             self.pos = 0;
@@ -118,7 +136,7 @@ impl<R: Read> DecodeReader<R> {
 
 impl<R: Read> Read for DecodeReader<R> {
     fn read(&mut self, out: &mut [u8]) -> io::Result<usize> {
-        self.read_decoded::<{ cfg!(feature = "experimental-direct-decode") }>(out)
+        self.read_decoded::<{ cfg!(feature = "experimental-direct-decode") }, true>(out)
     }
 }
 
@@ -618,6 +636,10 @@ impl<R: BufRead> Parser<R> {
                     if !touched {
                         return Ok(None);
                     }
+                    ensure!(
+                        bytes.saturating_add(count * 32) <= self.maximum,
+                        "record exceeds max_record_bytes working limit"
+                    );
                     finish_field(fields, &mut count, &mut field)?;
                     return Ok(Some(count));
                 };
@@ -968,6 +990,26 @@ pub struct Serializer {
     text: String,
     encoded: Vec<u8>,
 }
+
+/// Encoded quotes for an otherwise unquoted first field at the start of a file.
+pub struct FileStartQuote {
+    end: usize,
+    bytes: [u8; 4],
+    len: usize,
+}
+
+impl FileStartQuote {
+    pub fn extra_bytes(&self) -> usize {
+        self.len * 2
+    }
+
+    pub fn parts<'a>(&'a self, record: &'a [u8]) -> [&'a [u8]; 4] {
+        let (first, rest) = record.split_at(self.end);
+        let quote = &self.bytes[..self.len];
+        [quote, first, quote, rest]
+    }
+}
+
 impl Serializer {
     pub fn bytes(&self) -> &[u8] {
         if self.encoding == UTF_8 {
@@ -988,6 +1030,36 @@ impl Serializer {
             text: String::new(),
             encoded: Vec::new(),
         })
+    }
+
+    /// A literal U+FEFF at byte zero would be consumed as a BOM on read.
+    /// Call this at file start, after serializing a record and before writing it.
+    pub fn file_start_quote(&self) -> Option<FileStartQuote> {
+        if !self.text.starts_with('\u{feff}')
+            || (self.encoding != UTF_8 && self.encoding != UTF_16LE && self.encoding != UTF_16BE)
+        {
+            return None;
+        }
+        let end = self
+            .text
+            .find([self.settings.delimiter, '\r', '\n'])
+            .unwrap_or(self.text.len());
+        let mut bytes = [0; 4];
+        let (end, len) = if self.encoding == UTF_8 {
+            (end, self.settings.quote.encode_utf8(&mut bytes).len())
+        } else {
+            let mut units = [0; 2];
+            let quote = self.settings.quote.encode_utf16(&mut units);
+            for (part, unit) in bytes.as_chunks_mut::<2>().0.iter_mut().zip(quote.iter()) {
+                part.copy_from_slice(&if self.encoding == UTF_16LE {
+                    unit.to_le_bytes()
+                } else {
+                    unit.to_be_bytes()
+                });
+            }
+            (self.text[..end].encode_utf16().count() * 2, quote.len() * 2)
+        };
+        Some(FileStartQuote { end, bytes, len })
     }
     pub fn serialize(&mut self, fields: &[String]) -> Result<&[u8]> {
         self.serialize_fields(fields.iter().map(String::as_str))
@@ -1366,10 +1438,10 @@ mod direct_decoder_contracts {
         for index in 0..bytes.len() * 2 + 100 {
             let size = sizes[index % sizes.len()];
             let actual = direct
-                .read_decoded::<true>(&mut direct_out[..size])
+                .read_decoded::<true, true>(&mut direct_out[..size])
                 .map_err(|error| error.kind());
             let expected = buffered
-                .read_decoded::<false>(&mut buffered_out[..size])
+                .read_decoded::<false, true>(&mut buffered_out[..size])
                 .map_err(|error| error.kind());
             assert_eq!(
                 actual, expected,
@@ -1398,18 +1470,18 @@ mod direct_decoder_contracts {
             let mut out = vec![0; 65536];
             let mut read = || {
                 if direct {
-                    decoder.read_decoded::<true>(&mut out)
+                    decoder.read_decoded::<true, true>(&mut out)
                 } else {
-                    decoder.read_decoded::<false>(&mut out)
+                    decoder.read_decoded::<false, true>(&mut out)
                 }
             };
             assert_eq!(read().unwrap_err().kind(), io::ErrorKind::InvalidData);
             assert_eq!(read().unwrap(), 1);
             assert_eq!(out[0], b'a');
             let n = if direct {
-                decoder.read_decoded::<true>(&mut out)
+                decoder.read_decoded::<true, true>(&mut out)
             } else {
-                decoder.read_decoded::<false>(&mut out)
+                decoder.read_decoded::<false, true>(&mut out)
             }
             .unwrap();
             assert_eq!((n, out[0]), (1, b'b'));

@@ -1,27 +1,21 @@
 //! Ordered CSV records with an optional, bounded native hash workspace.
 use super::*;
-use crate::csv_intake::DecodedInput;
+use crate::csv_intake::{Intake, Records as CsvRecords};
 
-pub(super) struct Records<R> {
+pub(super) struct Records<P> {
     // Slots (and every owned string in them) drop before their aggregate grant
     // in input. The input owner also destroys its parser before that grant.
     #[cfg(all(feature = "experimental-parallel-profile", not(target_os = "wasi")))]
     batch: Option<Batch>,
-    input: DecodedInput<R>,
+    input: Intake<P>,
     pub execution: ProfileExecution,
 }
 pub(super) struct Record<'a> {
     pub fields: &'a [String],
     pub hashes: Option<&'a [blake3::Hash]>,
 }
-impl<R: Read> Records<R> {
-    pub fn new(
-        input: DecodedInput<R>,
-        present: bool,
-        job: &Job,
-        hashes: usize,
-        parallel: bool,
-    ) -> Self {
+impl<P: CsvRecords> Records<P> {
+    pub fn new(input: Intake<P>, present: bool, job: &Job, hashes: usize, parallel: bool) -> Self {
         let mut result = Self {
             input,
             #[cfg(all(feature = "experimental-parallel-profile", not(target_os = "wasi")))]
@@ -147,9 +141,9 @@ mod parallel {
             })
         }
         #[allow(clippy::too_many_arguments)]
-        pub fn next<'a, R: Read>(
+        pub fn next<'a>(
             &'a mut self,
-            input: &mut DecodedInput<R>,
+            input: &mut Intake<impl CsvRecords>,
             combinations: &[(Vec<usize>, Cardinality)],
             cancel: &AtomicBool,
             execution: &mut ProfileExecution,

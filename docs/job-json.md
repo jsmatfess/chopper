@@ -1,17 +1,17 @@
 # Saved Job JSON
 
 A saved Job describes the input, output, ordered operations and limits that
-Chopper should use. These fields describe Chopper **0.6.5**. The release number
+Chopper should use. These fields describe Chopper **0.6.6**. The release number
 selects the editor schema, while the Job's own `version` field selects the
 configuration format, currently `1`.
 
 ## Editor setup
 
-Check the installed version with `chopper --version`. For 0.6.5, use the
-[release-pinned Job schema](https://raw.githubusercontent.com/jsmatfess/chopper/v0.6.5/schemas/0.6.5/job.schema.json).
+Check the installed version with `chopper --version`. For 0.6.6, use the
+[release-pinned Job schema](https://raw.githubusercontent.com/jsmatfess/chopper/v0.6.6/schemas/0.6.6/job.schema.json).
 Both native archives include the same `job.schema.json` at their root.
 For offline use, use the included copy, save the download, or copy it from the
-[matching source checkout](../schemas/0.6.5/job.schema.json).
+[matching source checkout](../schemas/0.6.6/job.schema.json).
 
 To associate the schema in VS Code, open the repository folder and add this
 entry to its `.vscode/settings.json`. Change `fileMatch` for your own Job files.
@@ -24,7 +24,7 @@ If the schema is at the workspace root, set `url` to
   "json.schemas": [
     {
       "fileMatch": ["/examples/job.json"],
-      "url": "https://raw.githubusercontent.com/jsmatfess/chopper/v0.6.5/schemas/0.6.5/job.schema.json"
+      "url": "https://raw.githubusercontent.com/jsmatfess/chopper/v0.6.6/schemas/0.6.6/job.schema.json"
     }
   ]
 }
@@ -60,6 +60,7 @@ Numeric fields use whole-number JSON syntax, such as `256`.
 | `output` | Empty string | New output directory, for example `"chopped-customers"`. |
 | `zip_member` | `null` | Exact member name within a ZIP, or `null` to select the sole member with a case-insensitive `.csv` extension. |
 | `input_csv`, `output_csv` | Each uses the CSV defaults below | Independent CSV settings objects. |
+| `input_dialect` | Each option is disabled | Optional input record and field settings below. |
 | `compression` | `"none"` | `"none"`, `"gzip"` or `"zip"` for output. |
 | `calculated_columns` | `[]` | Up to 64 named row formulas, in output column order. |
 | `operations` | `[]` | List of operation objects in execution order, applied within each current group. |
@@ -73,15 +74,54 @@ Numeric fields use whole-number JSON syntax, such as `256`.
 | Field | Default | Accepted values and meaning |
 | --- | --- | --- |
 | `encoding` | `"utf-8"` | UTF-8, UTF-16LE, UTF-16BE, Windows-1250 through Windows-1258, Shift_JIS, GBK, Big5, EUC-KR and ISO-8859-2. Chopper also accepts recognized labels that resolve to those encodings. |
-| `headers` | `true` | Boolean. Read a header from input or write the input header to output. For headerless files, set both to `false`. |
+| `headers` | `true` | Boolean. Read the first CSV record as the header or write that header to output. For headerless files, set both to `false`. |
 | `delimiter` | `","` | One ASCII character, for example `"\t"` for tab. |
 | `quote` | `"\""` | One ASCII character, distinct from the delimiter. |
 | `escape` | `null` | One ASCII character distinct from the delimiter and quote, or `null` for doubled quotes. |
-| `line_ending` | `"lf"` | `"lf"` or `"crlf"`. Controls serialized output line endings. |
+| `line_ending` | `"lf"` | `"lf"` or `"crlf"`. Controls the separator between output records. |
 | `bom` | `false` | Boolean. Output can emit the encoding's BOM for UTF-8 or UTF-16. Input decoding handles its BOM. |
 | `skip_empty_lines` | `false` | Boolean. Set to `true` to ignore bare blank input records. |
 
-Chopper rejects NUL, CR and LF as delimiter, quote or escape characters.
+Chopper rejects UTF-32 encoding settings, including `utf-32le` and
+`utf-32be`. Delimiters, quotes and escapes must each be a single ASCII
+character other than NUL, CR or LF. Unicode is supported in field text when
+it can be represented in the selected encoding.
+
+Input accepts both LF and CRLF record endings, including a final record
+without a terminator. The parser preserves LF and CRLF inside quoted fields
+as decoded field text. Chopper rejects a lone CR outside quotes, bare quotes
+inside unquoted fields, text after a closing quote, unterminated quotes and
+inconsistent field counts. With the default quoting rules, write
+`"6"" screen"` to store the text `6" screen`. See
+[RFC 4180 quoting rules](https://www.rfc-editor.org/rfc/rfc4180.html#section-2).
+
+Bare blank input lines are rejected by default. A quoted empty field (`""`)
+is a valid field value. Enable `input_csv.skip_empty_lines` to skip bare blank
+lines, including before the header.
+
+### Optional input dialect
+
+These opt-in controls correspond to selected dialect extensions in W3C CSV on
+the Web (CSVW). Set them in `input_dialect`, beside `input_csv`, for plain CSV,
+gzip or ZIP input. They also apply to preview and Analyze. See
+[CSVW dialect descriptions](https://www.w3.org/TR/tabular-metadata/#dialect-descriptions).
+
+| Field | Default | Behavior |
+| --- | --- | --- |
+| `trim` | `"none"` | Use `"start"`, `"end"` or `"both"` to trim Unicode whitespace from field values after CSV parsing, including headers. |
+| `comment_prefix` | `null` | Ignore physical lines starting with this exact, nonempty text at the start of a CSV record. The prefix accepts Unicode text and excludes NUL, CR and LF. A prefix inside a quoted multiline field remains part of the field. |
+| `skip_rows` | `0` | Skip this many physical lines at the beginning of the input, before reading any CSV records. Useful for report preambles. |
+| `skip_columns` | `0` | Drop this many leading fields from the header and each data record. At least one column must remain. Select columns by their names or indices after dropping fields. |
+| `skip_blank_rows` | `false` | Skip bare blank data records and data records whose fields are all empty after trimming, before dropping columns. |
+
+For flag-built Runs, use `--input-trim`, `--input-comment-prefix`,
+`--input-skip-rows`, `--input-skip-columns` and `--input-skip-blank-rows`.
+In the browser, open **Parsing, encoding & ZIP member** and **Optional input settings**.
+
+CSVW metadata discovery and import, validation against CSVW schemas or
+datatypes, and CSVW conversion to JSON or RDF are unsupported. For files
+with a CSVW metadata sidecar, set the matching Chopper options explicitly.
+See [CSV compatibility coverage](validation.md#csv-compatibility-coverage).
 
 ## Operations
 

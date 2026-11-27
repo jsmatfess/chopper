@@ -152,6 +152,7 @@ pub(crate) fn capacity(job: &Job) -> Result<usize> {
         output,
         zip_member,
         input_csv,
+        input_dialect,
         output_csv,
         calculated_columns,
         operations,
@@ -176,6 +177,14 @@ pub(crate) fn capacity(job: &Job) -> Result<usize> {
     optional(&mut bytes, random_seed)?;
     settings(&mut bytes, input_csv)?;
     settings(&mut bytes, output_csv)?;
+    let chopper_core::InputDialect {
+        comment_prefix,
+        trim: _,
+        skip_rows: _,
+        skip_columns: _,
+        skip_blank_rows: _,
+    } = input_dialect;
+    optional(&mut bytes, comment_prefix)?;
     let Resources {
         temp_dir,
         memory_mb: _,

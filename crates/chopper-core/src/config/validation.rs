@@ -93,6 +93,16 @@ impl Job {
             "unsupported configuration version"
         );
         ensure_field!(!self.input.is_empty(), "/input", "input path is required");
+        ensure_field!(
+            self.input_dialect
+                .comment_prefix
+                .as_deref()
+                .is_none_or(|prefix| {
+                    !prefix.is_empty() && !prefix.contains(['\0', '\r', '\n'])
+                }),
+            "/input_dialect/comment_prefix",
+            "comment prefix must be nonempty and cannot contain NUL or a line ending"
+        );
         if let Some(memory_mb) = self.resources.memory_mb.as_mib() {
             self.resources.validate_effective_memory(memory_mb)?;
         } else {

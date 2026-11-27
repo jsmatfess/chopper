@@ -5,6 +5,43 @@ Use the [validation index](validation-index.md) and
 structured checks and individual attempts. This document owns supported claims;
 query metadata and test counts do not extend their recorded coverage.
 
+<a id="csv-compatibility-coverage"></a>
+**CSV compatibility coverage**
+
+The checked-in suite for issue #113 verifies headers, field values, record
+counts and rejections with explicit settings. It exercises owned and compact
+parser records, fragmented reads, native CLI export and publication. See
+[#113](https://github.com/jsmatfess/chopper/issues/113) and the
+[fixture inventory](../crates/chopper/tests/fixtures/csv-compatibility/README.md).
+
+| Fixtures | Exact Chopper output | Expected rejections | Unsupported settings |
+| --- | ---: | ---: | ---: |
+| Local RFC 4180-style, dialect, encoding and record-limit cases | 28 | 10 | 1 |
+| Selected W3C CSVW header and cell-parsing cases | 14 | 0 | 0 |
+| Selected Go standard library cases | 3 | 4 | 1 |
+| **Total** | **45** | **14** | **2** |
+
+Expected rejections cover invalid input and configured record limits.
+Unsupported cases check configuration errors for UTF-32LE encoding and a
+non-ASCII delimiter. Three Go cases check deliberate differences, one in
+each outcome column. Chopper preserves CRLF inside quoted fields, rejects
+a lone CR outside quotes and requires ASCII delimiters.
+
+CSVW fixture results cover headers and decoded string cells. Six fixtures
+exercise explicit opt-in settings. CSVW metadata discovery and import,
+schema and datatype validation, and conversion to JSON or RDF are outside
+Chopper's support. See [optional input dialect](job-json.md#optional-input-dialect).
+
+Run `cargo test --locked -p chopper --test csv_compatibility` to see the
+breakdown by source and any unexpected failures. The local gate's workspace
+test runs the same suite, including a 40,000-row forced spill that checks
+exact row multiplicities, partition membership and chunk manifests.
+See [contributor checks](../CONTRIBUTING.md#choose-the-checks-for-your-change).
+
+Separate tests cover Sniff suggestions and hosted preview and publication
+with optional settings. See [Sniff tests](../crates/chopper/tests/inspection.rs)
+and [hosted browser checks](browser.md#tests).
+
 ## Analyze Run and payload-pass removal (2026-11-18)
 
 The [investigation](performance/investigations/csv-data-movement-and-analyze-run-2026-11-18.md)

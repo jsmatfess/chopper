@@ -597,6 +597,7 @@ fn memory_plan(
             && csv.quote == '"'
             && csv.escape.is_none()
             && !csv.skip_empty_lines
+            && job.input_dialect.is_default()
             && sample.max_record_bytes == job.resources.max_record_bytes
             && sample.rows == 8
             && sample.columns > 0

@@ -168,11 +168,46 @@ during strict decoding before input I/O; never substitute an algorithm.
 
 Input and output CSV settings are separate. A copy-input-settings action copies resolved input settings into output settings; subsequent output overrides remain possible. This copies the dialect/encoding, not original lexical formatting. Imported encoding labels absent from the editor’s preset list remain visible and selected through editing, export and submission. The engine resolves supported aliases and rejects unsupported labels; the editor never substitutes UTF-8 for an unmatched label.
 
-Proposed defaults: UTF-8; header present; comma delimiter; double-quote quoting with doubled-quote escapes; input accepts LF and CRLF record endings; output uses LF and minimal required quoting; no output BOM. Input UTF-8 BOM is recognized as a signature. Quoted multiline fields are supported and preserve field content.
+The defaults are UTF-8, one header record, a comma delimiter and double quotes
+escaped by doubling. Default output uses LF, minimal required quoting and no
+BOM. Input decoding recognizes a BOM for the configured UTF-8 or UTF-16
+encoding. Reject unsupported encoding labels, including UTF-32, invalid input
+byte sequences and output text that the selected encoding cannot represent.
+See [supported encodings and CSV settings](job-json.md#csv-settings).
 
-Expose encoding, header presence, delimiter, quote/escape policy, line ending, and BOM policy. Publish an explicit supported encoding list during implementation; reject unsupported names, invalid byte sequences, and unrepresentable output text rather than silently substituting characters. Include common UTF encodings and legacy Windows encodings in the compatibility evaluation.
+CSV delimiters, quotes and optional escapes must be distinct single ASCII
+characters other than NUL, CR or LF. Accept LF and CRLF record endings and a
+final record without a terminator. Preserve line breaks inside quoted fields
+as decoded field content. The configured output line ending applies between
+records.
 
-Reject malformed quoting, unterminated quoted fields, unexpected text after a closing quote, and inconsistent field counts. Define validation against the selected dialect, not library permissiveness. Proposed blank-line policy: reject bare blank records by default, with an explicit skip-empty-lines setting. Quoted empty fields remain valid.
+Reject a lone CR outside quotes, a quote inside an unquoted field,
+unterminated quoted fields, unexpected text after a closing quote and
+inconsistent field counts. Reject bare blank records by default. The
+`skip_empty_lines` input setting skips bare blank records, and
+`skip_blank_rows` skips empty data records as described in the optional
+dialect. Quoted empty fields are valid.
+
+An [optional input dialect](job-json.md#optional-input-dialect) can skip an
+initial physical-line preamble and comment lines, trim decoded fields, skip
+all-empty data rows, or drop leading columns before the pipeline binds its
+schema. The input owner selects the parser once. Validate CSV syntax and
+enforce the working size limit before dropping columns.
+
+Sniff uses at most 64 KiB of decompressed input and scores up to 50 records
+per delimiter. A suggested delimiter requires at least two complete records
+at the first record's multi-column width, with at least 90% of the parsed
+records matching that width. A syntax error in a scored record disqualifies that
+candidate. A tail clipped by the byte cap can be discarded. A tie or
+insufficient evidence keeps the current delimiter. Derive line endings
+from parsed record boundaries, keeping the current setting for mixed or
+missing endings. Sniff keeps the selected encoding for inputs without a
+BOM. A likely BOM-less UTF-16 file or a signature shared by UTF-32LE and
+UTF-16LE starting with NUL requires an explicit encoding choice.
+
+When writing UTF-8 or UTF-16 without a BOM, quote a leading literal U+FEFF
+field at the start of each file so the reader preserves it as text. These
+quotes count toward the serialized output byte cap.
 
 Duplicate header names are allowed but name selection must reject ambiguity and offer index selection. Headerless files use indices, infer expected width from the first record, and do not synthesize output headers by default. Empty input produces no data chunks unless named allocation groups require empty outputs; balanced splitting fails. Diagnostics include logical record/field and decoded-stream position where available.
 

@@ -4,6 +4,8 @@
 *.cmd text eol=crlf
 # CSV fixture bytes (including line endings) are part of their input contract.
 *.csv -text
+# CSVW fixtures preserve upstream whitespace, including trailing spaces and blank records.
+crates/chopper/tests/fixtures/csv-compatibility/csvw/** -text whitespace=-blank-at-eol,-blank-at-eof
 # The archived v0.4.0 example includes CRLF record endings.
 scripts/fixtures/release-upgrade/v0.4.0/examples/customers.csv whitespace=cr-at-eol
 

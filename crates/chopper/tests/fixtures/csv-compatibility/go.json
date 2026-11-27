@@ -1,0 +1,75 @@
+[
+  {
+    "name": "StartLine1",
+    "input": "a,\"b\nc\"d,e",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "unexpected text after closing quote"}
+  },
+  {
+    "name": "StartLine2",
+    "input": "a,b\n\"d\n\n,e",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "unterminated quoted field"}
+  },
+  {
+    "name": "BadFieldCountMultiple",
+    "input": "a,b,c\nd,e\nf",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "fields, expected 3", "parsed": [["a", "b", "c"], ["d", "e"], ["f"]]}
+  },
+  {
+    "name": "NonASCIICommentConfusion",
+    "input": "λ\nλ\nθ\nλ\n",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": null,
+      "rows": [
+        ["λ"],
+        ["λ"],
+        ["λ"]
+      ]
+    },
+    "input_dialect": {"comment_prefix": "θ"}
+  },
+  {
+    "name": "QuotedFieldMultipleLF",
+    "input": "\"\n\n\n\n\"",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": null,
+      "rows": [
+        ["\n\n\n\n"]
+      ]
+    }
+  },
+  {
+    "name": "CRLFInQuotedField",
+    "input": "A,\"Hello\r\nHi\",B\r\n",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "crlf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": null,
+      "rows": [
+        ["A", "Hello\r\nHi", "B"]
+      ]
+    },
+    "upstream_difference": "Go normalizes CRLF inside quoted cells to LF. Chopper preserves the field text."
+  },
+  {
+    "name": "BareCR",
+    "input": "a,b\rc,d\r\n",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "crlf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "rejected", "error": "bare CR outside quoted field"},
+    "upstream_difference": "Go keeps a lone CR in an unquoted field. Chopper requires quoting CR in field text."
+  },
+  {
+    "name": "NonASCIICommaAndCommentWithQuotes",
+    "input": "a€\"  b,\"€ c\nλ comment\n",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": "€", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {"kind": "unsupported", "error": "must be non-newline ASCII characters"},
+    "input_dialect": {"comment_prefix": "λ"},
+    "upstream_difference": "Go accepts a Unicode delimiter. Chopper requires ASCII structural characters."
+  }
+]

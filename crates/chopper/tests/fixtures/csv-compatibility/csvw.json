@@ -1,0 +1,209 @@
+[
+  {
+    "name": "csvw-001",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["Surname", "FamilyName"],
+      "rows": [
+        ["Homer", "Simpson"],
+        ["Marge", "Simpson"],
+        ["Bart", "Simpson"],
+        ["Lisa", "Simpson"],
+        ["Maggie", "Simpson"],
+        ["Ned", "Flanders"],
+        ["Krusty", "the Clown"],
+        ["Waylon", "Smithers"]
+      ]
+    },
+    "input": {"file": "csvw/test001.csv"}
+  },
+  {
+    "name": "csvw-002",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["Surname", "FamilyName"],
+      "rows": [
+        ["Homer", "Simpson"],
+        ["Marge", "Simpson"],
+        ["Bart", "Simpson"],
+        ["Lisa", "Simpson"],
+        ["Maggie", "Simpson"],
+        ["Ned", "Flanders"],
+        ["Krusty", "the Clown"],
+        ["Waylon", "Smithers"]
+      ]
+    },
+    "input": {"file": "csvw/test002.csv"}
+  },
+  {
+    "name": "csvw-003",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["Surname", "FamilyName"],
+      "rows": [
+        [" Homer ", " Simpson "],
+        [" Marge ", " Simpson "],
+        [" Bart ", " Simpson "],
+        [" Lisa ", " Simpson "],
+        [" Maggie ", " Simpson "],
+        [" Ned ", " Flanders "],
+        [" Krusty ", " the Clown "],
+        [" Waylon ", " Smithers "]
+      ]
+    },
+    "input": {"file": "csvw/test003.csv"}
+  },
+  {
+    "name": "csvw-019",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": null,
+      "rows": [
+        ["1", "ADDISON AV", "Celtis australis", "Large Tree Routine Prune", "10/18/2010"],
+        ["2", "EMERSON ST", "Liquidambar styraciflua", "Large Tree Routine Prune", "6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/test019.csv"}
+  },
+  {
+    "name": "csvw-023",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": null,
+      "rows": [
+        ["GID", "On Street", "Species", "Trim Cycle", "Inventory Date"],
+        ["1", "ADDISON AV", "Celtis australis", "Large Tree Routine Prune", "10/18/2010"],
+        ["2", "EMERSON ST", "Liquidambar styraciflua", "Large Tree Routine Prune", "6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/tree-ops.csv"}
+  },
+  {
+    "name": "csvw-024",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["GID", "On Street", "Species", "Trim Cycle", "Inventory Date"],
+      "rows": [
+        ["1", "ADDISON AV", "Celtis australis", "Large Tree Routine Prune", "10/18/2010"],
+        ["2", "EMERSON ST", "Liquidambar styraciflua", "Large Tree Routine Prune", "6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/tree-ops.csv"}
+  },
+  {
+    "name": "csvw-050",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": "\t", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["GID", "On Street", "Species", "Trim Cycle", "Inventory Date"],
+      "rows": [
+        ["1", "ADDISON AV", "Celtis australis", "Large Tree Routine Prune", "10/18/2010"],
+        ["2", "EMERSON ST", "Liquidambar styraciflua", "Large Tree Routine Prune", "6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/tree-ops.tsv"}
+  },
+  {
+    "name": "csvw-262",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["GID", "On Street", "Species", "Trim Cycle", "Inventory Date"],
+      "rows": [
+        [" 1 ", " ADDISON AV ", " Celtis australis ", " Large Tree Routine Prune ", " 10/18/2010 "],
+        [" 2 ", " EMERSON ST ", " Liquidambar styraciflua ", " Large Tree Routine Prune ", " 6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/test262.csv"}
+  },
+  {
+    "name": "csvw-022",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["GID", "On Street", "Species", "Trim Cycle", "Inventory Date"],
+      "rows": [
+        ["1", "ADDISON AV", "Celtis australis", "Large Tree Routine Prune", "10/18/2010"],
+        ["2", "EMERSON ST", "Liquidambar styraciflua", "Large Tree Routine Prune", "6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/test022.csv"},
+    "input_dialect": {"trim": "both"}
+  },
+  {
+    "name": "csvw-025",
+    "input_csv": {"encoding": "utf-8", "headers": false, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": null,
+      "rows": [
+        ["1", "ADDISON AV", "Celtis australis", "Large Tree Routine Prune", "10/18/2010"],
+        ["2", "EMERSON ST", "Liquidambar styraciflua", "Large Tree Routine Prune", "6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/tree-ops.csv"},
+    "input_dialect": {"skip_rows": 1}
+  },
+  {
+    "name": "csvw-051",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["GID", "On Street", "Species", "Trim Cycle", "Inventory Date"],
+      "rows": [
+        ["1", "ADDISON AV", "Celtis australis", "Large Tree Routine Prune", "10/18/2010"],
+        ["2", "EMERSON ST", "Liquidambar styraciflua", "Large Tree Routine Prune", "6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/test051.csv"},
+    "input_dialect": {"skip_rows": 2, "comment_prefix": "#"}
+  },
+  {
+    "name": "csvw-052",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["GID", "On Street", "Species", "Trim Cycle", "Inventory Date"],
+      "rows": [
+        ["1", "ADDISON AV", "Celtis australis", "Large Tree Routine Prune", "10/18/2010"],
+        ["2", "EMERSON ST", "Liquidambar styraciflua", "Large Tree Routine Prune", "6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/test052.csv"},
+    "input_dialect": {"comment_prefix": "#"}
+  },
+  {
+    "name": "csvw-054",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": false},
+    "expected": {
+      "kind": "rows",
+      "header": ["On Street", "Species", "Trim Cycle", "Inventory Date"],
+      "rows": [
+        ["ADDISON AV", "Celtis australis", "Large Tree Routine Prune", "10/18/2010"],
+        ["EMERSON ST", "Liquidambar styraciflua", "Large Tree Routine Prune", "6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/tree-ops.csv"},
+    "input_dialect": {"skip_columns": 1}
+  },
+  {
+    "name": "csvw-055",
+    "input_csv": {"encoding": "utf-8", "headers": true, "delimiter": ",", "quote": "\"", "escape": null, "line_ending": "lf", "bom": false, "skip_empty_lines": true},
+    "expected": {
+      "kind": "rows",
+      "header": ["GID", "On Street", "Species", "Trim Cycle", "Inventory Date"],
+      "rows": [
+        ["1", "ADDISON AV", "Celtis australis", "Large Tree Routine Prune", "10/18/2010"],
+        ["2", "EMERSON ST", "Liquidambar styraciflua", "Large Tree Routine Prune", "6/2/2010"]
+      ]
+    },
+    "input": {"file": "csvw/test055.csv"},
+    "input_dialect": {"skip_blank_rows": true}
+  }
+]

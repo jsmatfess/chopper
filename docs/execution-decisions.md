@@ -368,7 +368,7 @@ flowchart TD
     Memory -->|Omitted| Observe
     Memory -->|Integer| Numeric[Use explicit numeric budget]
     Memory -->|auto| Observe[Refresh pressure; observe shared admission headroom]
-    Observe --> Target[Hosted Run: eligible shuffle uses file size, matching preview, bounded interior widths or gzip trailer, and matching Analyze]
+    Observe --> Target[Hosted Run: eligible shuffle uses file size, applicable default-dialect preview and bounded raw probes, and matching Analyze]
     Target --> Resolve[Resolve Run target and fallback tier; credit only this same-pool hosted Job for sizing]
     Observe --> LinuxTarget[Linux shuffle: matching Analyze can target 384 MiB to avoid an extra merge]
     LinuxTarget --> Resolve

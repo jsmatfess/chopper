@@ -19,6 +19,7 @@ fn fixture() -> (Job, usize) {
     job.resources.temp_dir = Some(text("temporary", 128, &mut expected));
     job.input_csv.encoding = text("utf-8", 32, &mut expected);
     job.input_csv.line_ending = text("lf", 16, &mut expected);
+    job.input_dialect.comment_prefix = Some(text("# ", 40, &mut expected));
     job.output_csv.encoding = text("utf-8", 48, &mut expected);
     job.output_csv.line_ending = text("crlf", 24, &mut expected);
     let mut partition = Vec::with_capacity(7);

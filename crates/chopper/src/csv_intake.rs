@@ -8,8 +8,8 @@
 use crate::storage::Reservation;
 use anyhow::{ensure, Context, Result};
 use chopper_core::{
-    csv::{CompactRecord, DecodeReader, Parser},
-    CsvSettings,
+    csv::{CompactRecord, DecodeReader, DialectParser, Parser},
+    CsvSettings, InputDialect,
 };
 use std::io::{BufReader, Read};
 mod parser;
@@ -17,6 +17,23 @@ pub(crate) use parser::Records;
 
 pub(crate) const SOURCE_BUFFER: usize = 64 * 1024;
 pub(crate) type DecodedInput<R> = Intake<Parser<BufReader<DecodeReader<R>>>>;
+
+// Dispatch before entering a record loop so the plain parser stays statically
+// dispatched and never tests for dialect extensions while reading rows.
+macro_rules! with_dialect {
+    ($input:expr, $dialect:expr, |$binding:ident| $run:expr) => {{
+        let input = $input;
+        let dialect = $dialect;
+        if dialect.is_default() {
+            let $binding = input;
+            $run
+        } else {
+            let $binding = input.with_dialect(dialect);
+            $run
+        }
+    }};
+}
+pub(crate) use with_dialect;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Representation {
@@ -50,6 +67,36 @@ impl HeaderFields {
 }
 
 impl<R: Read> DecodedInput<R> {
+    pub(crate) fn with_dialect<'a>(
+        self,
+        dialect: &'a InputDialect,
+    ) -> Intake<DialectParser<'a, BufReader<DecodeReader<R>>>> {
+        let Self {
+            parser,
+            owned,
+            compact,
+            width,
+            headers,
+            prefetched,
+            terminal,
+            representation,
+            _source,
+            memory,
+        } = self;
+        Intake {
+            parser: DialectParser::new(parser, dialect),
+            owned,
+            compact,
+            width,
+            headers,
+            prefetched,
+            terminal,
+            representation,
+            _source,
+            memory,
+        }
+    }
+
     pub(crate) fn new(
         source: R,
         settings: &CsvSettings,

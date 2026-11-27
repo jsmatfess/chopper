@@ -17,6 +17,10 @@ export function runArguments(job:Job):string[]{
   const settings=job[`${prefix}_csv`];
   for(const field of Object.keys(csvDefaults) as (keyof typeof csvDefaults)[]){if(settings[field]!==csvDefaults[field])add(`${prefix}-${field.replaceAll('_','-')}`,settings[field]);}
  }
+ for(const [field,defaultValue] of Object.entries({trim:'none',comment_prefix:null,skip_rows:0,skip_columns:0,skip_blank_rows:false})){
+  const value=job.input_dialect?.[field as keyof NonNullable<Job['input_dialect']>];
+  if(value!==defaultValue)add(`input-${field.replaceAll('_','-')}`,value);
+ }
  for(const column of job.calculated_columns??[])add('calculated-column',`${column.name}=${column.expression}`);
  for(const op of job.operations){
   add('step',op.type);

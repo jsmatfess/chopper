@@ -149,12 +149,23 @@ struct Counted {
 }
 
 fn count(source: &mut dyn Read, job: &Job, ctx: &Context, partition: bool) -> Result<Counted> {
-    let mut input = Intake::new(
+    let input = Intake::new(
         source,
         &job.input_csv,
         ctx.max_record,
         Reservation::new(ctx),
     )?;
+    records::with_dialect!(input, &job.input_dialect, |input| count_records(
+        input, job, ctx, partition,
+    ))
+}
+
+fn count_records(
+    mut input: Intake<impl records::Records>,
+    job: &Job,
+    ctx: &Context,
+    partition: bool,
+) -> Result<Counted> {
     let header = header::read(&mut input)?;
     // Singleton Balanced needs only the count. Partition also needs the
     // first-pass digest to verify the rows used to compute per-key quotas.
@@ -336,11 +347,11 @@ fn consume(
     job: &Job,
     ctx: &Context,
     observer: &mut Option<Observer<'_>>,
-    mut counted: Option<&mut Counted>,
+    counted: Option<&mut Counted>,
     fanout_job: bool,
     chain_job: bool,
 ) -> Result<(Analysis, output::DirectPublication)> {
-    let mut input = Intake::new(
+    let input = Intake::new(
         source,
         &job.input_csv,
         ctx.max_record,
@@ -357,6 +368,20 @@ fn consume(
             observe_error(observer, false, 0, error)
         }
     })?;
+    records::with_dialect!(input, &job.input_dialect, |input| consume_records(
+        input, job, ctx, observer, counted, fanout_job, chain_job,
+    ))
+}
+
+fn consume_records(
+    mut input: Intake<impl records::Records>,
+    job: &Job,
+    ctx: &Context,
+    observer: &mut Option<Observer<'_>>,
+    mut counted: Option<&mut Counted>,
+    fanout_job: bool,
+    chain_job: bool,
+) -> Result<(Analysis, output::DirectPublication)> {
     let seed = AnalysisText::copy(job.random_seed.as_deref().unwrap(), Reservation::new(ctx))?;
     let mut stages = Stages::new(job.operations.len(), Reservation::new(ctx))?;
     let header =

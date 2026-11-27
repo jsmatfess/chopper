@@ -98,10 +98,17 @@ fn bom_and_boundary() -> Result<usize> {
 }
 
 fn scoring() -> Result<()> {
-    parity(b"a,b;c\n1,2;3\n", ',', "utf-8", false, false)?;
-    parity(b"a,b,c;d\n1,2,3;4\n", ',', "utf-8", false, false)?;
-    parity(b"a;b\n1;2\n\"unterminated", ';', "utf-8", false, false)?;
     let workspace = Arc::new(Workspace::new(LIMIT));
+    let result = sniff(
+        b"a;b\n1;2\n\"unterminated".as_slice(),
+        &Job::default(),
+        Reservation::for_workspace(workspace.clone()),
+    )?;
+    ensure!(
+        result["note"] == NO_MATCH,
+        "malformed sample changed the delimiter"
+    );
+    drop(result);
     let settings = CsvSettings {
         delimiter: ';',
         ..Default::default()
@@ -110,28 +117,40 @@ fn scoring() -> Result<()> {
     source.push_str("\"unterminated");
     ensure!(
         candidate_score(
-            &source,
+            source.as_bytes(),
+            false,
             settings.clone(),
+            &Default::default(),
             Reservation::for_workspace(workspace.clone())
-        )? == Some((50, 2)),
+        )?
+        .consistent
+            == 50,
         "candidate read past50 rows"
     );
     let nine = format!("{}a;b;c\n", "a;b\n".repeat(9));
     ensure!(
         candidate_score(
-            &nine,
+            nine.as_bytes(),
+            false,
             settings.clone(),
+            &Default::default(),
             Reservation::for_workspace(workspace.clone())
-        )? == Some((9, 2)),
+        )?
+        .consistent
+            == 9,
         "90percent boundary changed"
     );
     let eight = format!("{}a;b;c\na;b;c\n", "a;b\n".repeat(8));
     ensure!(
         candidate_score(
-            &eight,
+            eight.as_bytes(),
+            false,
             settings,
+            &Default::default(),
             Reservation::for_workspace(workspace.clone())
-        )? == Some((0, 2)),
+        )?
+        .consistent
+            == 0,
         "inconsistent candidate accepted"
     );
     ensure!(workspace.used() == 0, "candidate scoring leaked");
@@ -181,8 +200,9 @@ fn phase(index: usize, charge: Reservation) -> Result<()> {
             ..Default::default()
         };
         ensure!(
-            candidate_score(std::str::from_utf8(&decoded.bytes)?, settings, charge)?
-                == Some((3, 2)),
+            candidate_score(&decoded.bytes, false, settings, &Default::default(), charge)?
+                .consistent
+                == 3,
             "candidate score changed"
         );
         ensure!(

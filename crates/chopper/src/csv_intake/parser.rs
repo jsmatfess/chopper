@@ -2,7 +2,7 @@
 //! Readers retain their own I/O grants; this callback charges caller-owned
 //! record/scratch capacity before growth and through consumer handoff.
 use anyhow::Result;
-use chopper_core::csv::{CompactRecord, Parser};
+use chopper_core::csv::{CompactRecord, DialectParser, Parser};
 use std::io::BufRead;
 
 pub(crate) trait Records {
@@ -40,5 +40,28 @@ impl<R: BufRead> Records for Parser<R> {
         reserve: &mut impl FnMut(usize) -> Result<()>,
     ) -> Result<bool> {
         Parser::next_compact_record_into_reserved(self, fields, reserve)
+    }
+}
+
+impl<R: BufRead> Records for DialectParser<'_, R> {
+    fn record_number(&self) -> u64 {
+        self.record_number()
+    }
+    fn scratch_capacity(&self) -> usize {
+        self.scratch_capacity()
+    }
+    fn next_record_into_reserved(
+        &mut self,
+        fields: &mut Vec<String>,
+        reserve: &mut impl FnMut(usize) -> Result<()>,
+    ) -> Result<bool> {
+        self.next_record_into_reserved(fields, reserve)
+    }
+    fn next_compact_record_into_reserved(
+        &mut self,
+        fields: &mut CompactRecord,
+        reserve: &mut impl FnMut(usize) -> Result<()>,
+    ) -> Result<bool> {
+        self.next_compact_record_into_reserved(fields, reserve)
     }
 }

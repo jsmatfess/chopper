@@ -29,8 +29,13 @@ async function bundle(){
         if(path==='defaults')return structuredClone(window.defaults);
         if(path==='state'){const snapshot=structuredClone(window.fixtureState);if(window.deferNextState){window.deferNextState=false;return await new Promise(resolve=>window.releaseState=()=>resolve(snapshot));}return snapshot;}
         if(path==='preview'){if(window.deferPreview)await new Promise(resolve=>window.releasePreview=resolve);const sample=window.previewFixture??{columns:2,header:['country','note'],preview:[[data.input==='old.csv'?'OLD':'US','sample']],input_is_zip:false};return {...sample,preview_row_numbers:sample.preview.map((_,index)=>index+1)};}
-        if(path==='pick-path')return {path:data.mode==='sample'?'customers.csv':data.mode==='input'?'source.csv':'destination'};
-        if(path==='sniff')return {settings:{...data.input_csv,delimiter:';'},note:'Fixture detection; no scan'};
+        if(path==='pick-path')return {path:data.mode==='sample'?'customers.csv':data.mode==='input'?(window.pickedInput??'source.csv'):'destination'};
+        if(path==='sniff'){
+          if(window.sniffWithoutMemberError&&!data.zip_member)throw new Error(window.sniffWithoutMemberError);
+          const settings={...data.input_csv,...window.sniffSettings};
+          if(window.deferSniff){window.deferSniff=false;await new Promise(resolve=>window.releaseSniff=resolve);}
+          return {settings,note:'Fixture detection complete'};
+        }
         if(path==='profile'){if(window.deferAnalysisAck)await new Promise(resolve=>window.releaseAnalysisAck=resolve);const finish=()=>window.fixtureState={...window.fixtureState,status:'profiled',profile:window.profileFixture??{rows:4,columns:2,header:['country','note'],seconds:1,accuracy:'Exact fixture input count',stages:[],column_values:[]}};if(window.deferProfile){window.fixtureState={...window.fixtureState,status:'profiling',profile:null};window.finishProfile=finish;}else finish();return {};}
         if(path==='run-direct'){
           if(window.runError)throw new Error(window.runError);
@@ -71,6 +76,79 @@ async function harness(browser,hosted=true,clock=false,scrollspy=true,transition
   return {page,errors};
 }
 async function choose(page){await page.locator('#browse-input').click();await page.locator('#browse-output').click();}
+
+test('automatic CSV detection follows the latest file and preserves manual edits',async()=>{
+ const browser=await chromium.launch();
+ try{
+  const {page,errors}=await harness(browser);
+  const browse=page.locator('#browse-input');
+  const delimiter=page.locator('#input-csv [data-csv="delimiter"]');
+  const encoding=page.locator('#input-csv [data-csv="encoding"]');
+  await page.evaluate(()=>{window.sniffSettings={delimiter:';',encoding:'utf-16le',bom:true};});
+  await browse.click();
+  await page.waitForFunction(()=>window.calls.some(call=>call.path==='preview'&&call.data.input_csv.encoding==='utf-16le'));
+  assert.equal(await encoding.inputValue(),'utf-16le');
+
+  await page.evaluate(()=>{window.deferSniff=true;window.releaseSniff=null;});
+  await browse.click();
+  await page.waitForFunction(()=>window.releaseSniff);
+  const request=await page.evaluate(()=>window.calls.findLast(call=>call.path==='sniff').data.input_csv);
+  assert.equal(request.encoding,'utf-8');
+  assert.equal(request.delimiter,',');
+  assert.equal(await page.locator('#run-direct').isDisabled(),true);
+  assert.equal(await page.locator('#profile').isDisabled(),true);
+
+  await page.evaluate(()=>{window.sniffSettings={delimiter:'|'};});
+  await browse.click();
+  await page.waitForFunction(()=>window.calls.some(call=>call.path==='preview'&&call.data.input_csv.delimiter==='|'));
+  await page.evaluate(()=>window.releaseSniff());
+  assert.equal(await delimiter.inputValue(),'|');
+  assert.equal(await encoding.inputValue(),'utf-8');
+
+  await page.evaluate(()=>{window.sniffSettings={delimiter:';'};window.deferSniff=true;window.releaseSniff=null;});
+  await browse.click();
+  await page.waitForFunction(()=>window.releaseSniff);
+  await page.locator('#source-settings > summary').click();
+  await delimiter.fill('^');
+  await page.evaluate(()=>window.releaseSniff());
+  await page.waitForFunction(()=>window.calls.some(call=>call.path==='preview'&&call.data.input_csv.delimiter==='^'));
+  assert.equal(await delimiter.inputValue(),'^');
+  assert.equal(await page.locator('#run-direct').isEnabled(),true);
+  assert.deepEqual(errors,[]);
+ }finally{await browser.close();}
+});
+
+test('automatic detection waits for processing and retries when a ZIP member is entered',async()=>{
+ const browser=await chromium.launch();
+ try{
+  const {page,errors}=await harness(browser,true,true);
+  await page.evaluate(()=>{
+    window.pickedInput='source.zip';
+    window.fixtureState.status='profiling';
+    window.sniffWithoutMemberError='ZIP has multiple CSV members; set zip_member';
+    window.previewFixture={columns:2,header:['country','note'],preview:[['US','sample']],input_is_zip:true};
+    window.sniffSettings={delimiter:';'};
+  });
+  await page.clock.runFor(1000);
+  await page.locator('#browse-input').click();
+  const note=page.locator('#sniff-note');
+  await note.filter({hasText:'when processing finishes'}).waitFor();
+  assert.equal(await page.evaluate(()=>window.calls.some(call=>call.path==='sniff')),false);
+
+  await page.evaluate(()=>window.fixtureState.status='idle');
+  await page.clock.runFor(1000);
+  await note.filter({hasText:'ZIP has multiple CSV members'}).waitFor();
+  await page.locator('#source-settings > summary').click();
+  await page.locator('#zip-member').fill('data/chosen.csv');
+  assert.equal(await page.locator('#run-direct').isDisabled(),true);
+  await page.clock.runFor(400);
+  await page.waitForFunction(()=>window.calls.some(call=>call.path==='preview'
+    &&call.data.zip_member==='data/chosen.csv'&&call.data.input_csv.delimiter===';'));
+  assert.equal(await page.locator('#run-direct').isEnabled(),true);
+  assert.deepEqual(errors,[]);
+ }finally{await browser.close();}
+});
+
 test('results describe the published archive and copy its subfolder name',async()=>{
  const browser=await chromium.launch();
  try{
@@ -318,9 +396,14 @@ test('keyboard validation, column picker, seed-free submission and mobile reacha
 test('source detection, independent serialization and operation edits remain reachable',async()=>{
   const browser=await chromium.launch({headless:true});
   try{
-    const {page,errors}=await harness(browser);await choose(page);
+    const {page,errors}=await harness(browser);
+    await page.evaluate(()=>{window.sniffSettings={delimiter:';'};});
+    await choose(page);
+    await page.waitForFunction(()=>window.calls.some(call=>call.path==='preview'&&call.data.input_csv.delimiter===';'));
+    assert.equal(await page.locator('#input-csv [data-csv="delimiter"]').inputValue(),';');
     await page.locator('#source-settings > summary').click();
     await page.locator('#sniff-csv').click();
+    await page.waitForFunction(()=>window.calls.filter(call=>call.path==='sniff').length===2);
     assert.equal(await page.locator('#input-csv [data-csv="delimiter"]').inputValue(),';');
     await page.locator('#output-settings details > summary').click();
     assert.equal(await page.locator('#output-csv [data-csv="delimiter"]').inputValue(),',');
@@ -1168,11 +1251,20 @@ test('CLI handoff exports the current draft and copies a shell-safe command with
   await cli.locator('summary').click();
   await cli.getByRole('radio',{name:'Windows PowerShell'}).check();
   await page.locator('#max-rows').fill('1234');
+  await page.locator('#input-csv').evaluate(element=>element.closest('details').open=true);
+  await page.locator('#input-dialect-options > summary').click();
+  await page.getByLabel('Trim field whitespace').selectOption('both');
+  await page.getByLabel('Comment prefix').fill('# ');
+  await page.getByLabel('Leading columns to drop').fill('1');
+  await page.getByLabel('Skip rows with only empty fields').check();
+  await page.waitForFunction(()=>window.calls.some(call=>call.path==='preview'&&call.data.input_dialect?.skip_columns===1));
   await cli.getByRole('button',{name:'Export job JSON'}).click();
   const job=await page.evaluate(async()=>JSON.parse(await window.exported.text()));
   assert.equal(job.input,'source.csv');assert.equal(job.output,'destination');assert.equal(job.limits.rows,1234);
+  assert.deepEqual(job.input_dialect,{trim:'both',comment_prefix:'# ',skip_rows:0,skip_columns:1,skip_blank_rows:true});
   assert.match(await cli.innerText(),/full local paths/);
   assert.match(await cli.locator('#cli-command').textContent(),/--rows=1234/);
+  assert.match(await cli.locator('#cli-command').textContent(),/--input-trim=both.*--input-comment-prefix=# .*--input-skip-columns=1.*--input-skip-blank-rows=true/);
   for(const type of ['shuffle','partition']){await page.locator('#new-operation').selectOption(type);await page.locator('#add-operation').click();}
   let command=await cli.locator('#cli-command').textContent();assert.ok(command.indexOf('--step=shuffle')<command.indexOf('--step=partition'));
   await page.locator('#operations [data-step="1"] [data-action="up"]').click();

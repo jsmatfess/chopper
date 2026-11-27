@@ -91,11 +91,20 @@ impl Key {
             length: metadata.len(),
             modified: metadata.modified()?,
             created: metadata.created().ok(),
-            input_options: serde_json::to_string(&(
-                &job.input_csv,
-                &job.zip_member,
-                job.resources.max_record_bytes,
-            ))?,
+            input_options: if job.input_dialect.is_default() {
+                serde_json::to_string(&(
+                    &job.input_csv,
+                    &job.zip_member,
+                    job.resources.max_record_bytes,
+                ))?
+            } else {
+                serde_json::to_string(&(
+                    &job.input_csv,
+                    &job.zip_member,
+                    job.resources.max_record_bytes,
+                    &job.input_dialect,
+                ))?
+            },
             memory_mb,
             #[cfg(unix)]
             identity: {
@@ -672,12 +681,25 @@ fn scan_configured(
     workspace: Arc<Workspace>,
     parallel: bool,
 ) -> Result<Observations> {
-    let mut input = Intake::new(
+    let input = Intake::new(
         Cancellable { source, cancel },
         &job.input_csv,
         job.resources.max_record_bytes,
         Reservation::for_workspace(workspace.clone()),
     )?;
+    crate::csv_intake::with_dialect!(input, &job.input_dialect, |input| scan_records(
+        input, job, cancel, notify, workspace, parallel,
+    ))
+}
+
+fn scan_records(
+    mut input: Intake<impl crate::csv_intake::Records>,
+    job: &Job,
+    cancel: &AtomicBool,
+    notify: &Notify,
+    workspace: Arc<Workspace>,
+    parallel: bool,
+) -> Result<Observations> {
     // Declare the retained grant before its payload for early-return cleanup.
     let mut header_buffers = input.reservation();
     let mut preview_buffers = Reservation::for_workspace(workspace.clone());

@@ -1339,7 +1339,22 @@ checks served hashes, input profiling, preparation, capped export and cleanup on
 one small fixture. It does not establish native picker/external-filesystem,
 large-job or other-device acceptance.
 
-CSV settings can now be detected explicitly from a sample of at most 64 KiB of decompressed input. Review the suggestion: BOMs identify UTF-16/UTF-8; otherwise UTF-8 is assumed, and header/quote/escape choices are preserved. The picker includes CSV, TSV, text, and supported compressed extensions, with an all-files option.
+Selecting an input, choosing a ZIP member, or loading the sample starts CSV
+detection and applies the input settings before loading the preview. Use
+**Detect CSV settings** to repeat detection after editing the input settings.
+Review the preview and the detection message near the file picker before
+running. Use **Copy input settings** to apply the detected dialect to output.
+The picker includes CSV, TSV, text and supported compressed extensions.
+
+Detection samples at most 64 KiB of decompressed input. It uses record
+boundaries to suggest line endings and keeps the current choice when those
+endings are mixed. It tries the selected delimiter, comma, tab, semicolon
+and pipe. A suggestion needs at least two consistent complete records.
+When candidates tie or evidence is insufficient, detection keeps the current
+delimiter. A UTF-8 or UTF-16 BOM can identify the encoding.
+For input without a BOM, detection uses the selected encoding. A signature
+shared by UTF-32LE and UTF-16LE starting with NUL prompts for an explicit
+encoding choice. See [supported CSV settings](job-json.md#csv-settings).
 
 Analysis includes expandable distinct-value lists for selected partition/stratification columns. Lists cover the whole validated input but are capped at 64 columns, 100 values per column, and 256 KiB total; incomplete lists are labeled. Progress shows phase-local rows, elapsed time, observed throughput, and temporary usage. No overall percentage is shown because multi-pass work does not provide a reliable completion total.
 
